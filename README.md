@@ -1,4 +1,4 @@
-# 👋 你好，我是王京  ➡️ [个人简历](https://junior6666.github.io/junior6666/)
+# 👋 你好，我是王京  ➡️ [个人简历](https://jingw-ui.github.io/)
 **Algorithm / Software / Testing Engineer**  
 📍 成都｜🏠 重庆
 
