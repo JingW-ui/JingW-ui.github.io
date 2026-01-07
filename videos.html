@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Videos - Project Showcase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            padding: 24px 16px;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .title {
+            text-align: center;
+            color: #222;
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            margin-bottom: 32px;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .video-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .video-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #d0d0d0;
+        }
+
+        .video-header {
+            background: #f5f5f5;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            background: #000;
+            overflow: hidden;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .video-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+            gap: 12px;
+        }
+
+        .control-button {
+            background: white;
+            color: #333;
+            border: 1px solid #d0d0d0;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .control-button:hover {
+            border-color: #999;
+            background: #f9f9f9;
+        }
+
+        .control-button:active {
+            background: #f0f0f0;
+        }
+
+        .video-info {
+            font-size: 12px;
+            color: #999;
+            flex: 1;
+        }
+
+        .duration {
+            font-size: 12px;
+            color: #666;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        .video-meta {
+            padding: 12px 16px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .meta-label {
+            color: #999;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .fullscreen-btn {
+            margin-left: auto;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .title {
+                font-size: 22px;
+                margin-bottom: 24px;
+            }
+
+            .video-card {
+                border-left: none;
+                border-right: none;
+            }
+
+            .videos-grid {
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+
+            .video-controls {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+
+            .control-button {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+
+            .video-info,
+            .duration {
+                font-size: 11px;
+            }
+
+            .video-meta {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .videos-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 1px solid #d0d0d0;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            border-color: #999;
+            background: #f9f9f9;
+        }
+
+        .nav-btn:active {
+            background: #f0f0f0;
+        }
+
+        .nav-btn.primary {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        .nav-btn.primary:hover {
+            background: #555;
+            border-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Video Gallery</h1>
+        
+        <div class="videos-grid" id="videosGrid"></div>
+
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">← Home</a>
+            <a href="carousel.html" class="nav-btn primary">Image Gallery →</a>
+        </div>
+    </div>
+
+    <script>
+        // 视频数据配置
+        const videos = [
+            {
+                id: 'polyp',
+                title: '息肉目标检测平台',
+                type: 'local',
+                filename: 'videos/息肉目标检测平台.mp4',
+                description: 'Advanced polyp detection platform with AI-powered analysis',
+                duration: 'Auto'
+            },
+            {
+                id: 'hippocampus',
+                title: '海马体分割平台',
+                type: 'local',
+                filename: 'videos/海马体分割平台.mp4',
+                description: 'Intelligent hippocampus segmentation and visualization system',
+                duration: 'Auto'
+            },
+            {
+                id: 'bilibili1',
+                title: '自动化办公软件',
+                type: 'bilibili',
+                bvid: 'BV1FzpLzHEWL',
+                description: 'Intelligent office automation solution enabling efficient document processing and workflow management'
+            },
+            {
+                id: 'bilibili2',
+                title: '通用目标检测UI界面',
+                type: 'bilibili',
+                bvid: 'BV1dQedz9EKn',
+                description: 'Versatile object detection interface with intuitive visual design for multi-scenario applications'
+            },
+            {
+                id: 'bilibili3',
+                title: '学科评估数据可视化系统',
+                type: 'bilibili',
+                bvid: 'BV1s24TzEEit',
+                description: 'Comprehensive data visualization platform for disciplinary assessment and performance analytics'
+            }
+        ];
+
+        // 初始化视频网格
+        function init() {
+            const grid = document.getElementById('videosGrid');
+            videos.forEach(video => {
+                const card = createVideoCard(video);
+                grid.appendChild(card);
+            });
+        }
+
+        // 创建视频卡片
+        function createVideoCard(video) {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            
+            const header = document.createElement('div');
+            header.className = 'video-header';
+            header.textContent = video.title;
+            
+            const container = document.createElement('div');
+            container.className = 'video-container';
+            
+            if (video.type === 'local') {
+                createLocalVideoCard(card, container, video, header);
+            } else if (video.type === 'bilibili') {
+                createBilibiliCard(card, container, video, header);
+            }
+            
+            return card;
+        }
+
+        // 创建本地视频卡片
+        function createLocalVideoCard(card, container, video, header) {
+            const videoElem = document.createElement('video');
+            videoElem.id = `video-${video.id}`;
+            videoElem.controls = false;
+            videoElem.preload = 'metadata';
+            videoElem.src = video.filename;
+            container.appendChild(videoElem);
+            
+            const controls = document.createElement('div');
+            controls.className = 'video-controls';
+            
+            const playBtn = document.createElement('button');
+            playBtn.className = 'control-button';
+            playBtn.textContent = '▶ Play';
+            playBtn.onclick = () => togglePlay(videoElem, playBtn);
+            
+            const info = document.createElement('div');
+            info.className = 'video-info';
+            info.textContent = 'Ready';
+            
+            const duration = document.createElement('div');
+            duration.className = 'duration';
+            duration.textContent = 'Loading...';
+            
+            const fullscreenBtn = document.createElement('button');
+            fullscreenBtn.className = 'control-button fullscreen-btn';
+            fullscreenBtn.textContent = '⛶ Full';
+            fullscreenBtn.onclick = () => toggleFullscreen(videoElem);
+            
+            // 监听元数据加载
+            videoElem.addEventListener('loadedmetadata', () => {
+                const minutes = Math.floor(videoElem.duration / 60);
+                const seconds = Math.floor(videoElem.duration % 60);
+                duration.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            });
+            
+            // 监听播放状态
+            videoElem.addEventListener('play', () => {
+                playBtn.textContent = '⏸ Pause';
+                info.textContent = 'Playing...';
+            });
+            
+            videoElem.addEventListener('pause', () => {
+                playBtn.textContent = '▶ Play';
+                info.textContent = 'Paused';
+            });
+            
+            videoElem.addEventListener('ended', () => {
+                playBtn.textContent = '▶ Play';
+                info.textContent = 'Ended';
+            });
+            
+            videoElem.addEventListener('timeupdate', () => {
+                const current = Math.floor(videoElem.currentTime);
+                const minutes = Math.floor(current / 60);
+                const seconds = Math.floor(current % 60);
+                info.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            });
+            
+            // 处理加载错误
+            videoElem.addEventListener('error', () => {
+                info.textContent = 'Failed to load video';
+                playBtn.disabled = true;
+            });
+            
+            controls.appendChild(playBtn);
+            controls.appendChild(info);
+            controls.appendChild(duration);
+            controls.appendChild(fullscreenBtn);
+            
+            const meta = document.createElement('div');
+            meta.className = 'video-meta';
+            const metaLabel = document.createElement('div');
+            metaLabel.className = 'meta-label';
+            metaLabel.textContent = 'Description';
+            const metaText = document.createElement('div');
+            metaText.textContent = video.description;
+            meta.appendChild(metaLabel);
+            meta.appendChild(metaText);
+            
+            card.appendChild(header);
+            card.appendChild(container);
+            card.appendChild(controls);
+            card.appendChild(meta);
+        }
+
+        // 创建 B站视频卡片
+        function createBilibiliCard(card, container, video, header) {
+            const iframe = document.createElement('iframe');
+            iframe.src = `//player.bilibili.com/player.html?bvid=${video.bvid}`;
+            iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+            iframe.allowFullscreen = true;
+            container.appendChild(iframe);
+            
+            const meta = document.createElement('div');
+            meta.className = 'video-meta';
+            const metaLabel = document.createElement('div');
+            metaLabel.className = 'meta-label';
+            metaLabel.textContent = 'Platform';
+            const metaText = document.createElement('div');
+            metaText.textContent = video.description + ' | View on Bilibili →';
+            metaText.style.cursor = 'pointer';
+            metaText.onclick = () => {
+                window.open(`https://www.bilibili.com/video/${video.bvid}`, '_blank');
+            };
+            meta.appendChild(metaLabel);
+            meta.appendChild(metaText);
+            
+            card.appendChild(header);
+            card.appendChild(container);
+            card.appendChild(meta);
+        }
+
+        // 播放/暂停控制
+        function togglePlay(videoElem, btn) {
+            if (videoElem.paused) {
+                videoElem.play().catch(err => {
+                    console.error('Play failed:', err);
+                    alert('Failed to play video. The file may not exist or cannot be accessed.');
+                });
+            } else {
+                videoElem.pause();
+            }
+        }
+
+        // 全屏控制
+        function toggleFullscreen(videoElem) {
+            if (videoElem.requestFullscreen) {
+                videoElem.requestFullscreen();
+            } else if (videoElem.webkitRequestFullscreen) {
+                videoElem.webkitRequestFullscreen();
+            } else if (videoElem.msRequestFullscreen) {
+                videoElem.msRequestFullscreen();
+            }
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

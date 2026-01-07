@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片轮播 - 专利、竞赛、生活及其他</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: #fafafa;
+            min-height: 100vh;
+            padding: 24px 16px;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .title {
+            text-align: center;
+            color: #222;
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            margin-bottom: 24px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: white;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: #999;
+            color: #333;
+        }
+
+        .tab-btn.active {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        .carousel-wrapper {
+            background: white;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .carousel-header {
+            background: #f5f5f5;
+            color: #333;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .carousel-content {
+            position: relative;
+            width: 100%;
+            padding-bottom: 70%;
+            background: #fafafa;
+        }
+
+        .carousel-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            perspective: 1000px;
+        }
+
+        .carousel-item {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: scale(0.95) translateY(10px);
+        }
+
+        .carousel-item.active {
+            opacity: 1;
+            z-index: 10;
+            transform: scale(1) translateY(0);
+        }
+
+        .carousel-item img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
+            transition: filter 0.3s ease;
+        }
+
+        .carousel-item.active img {
+            filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.15)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+        }
+
+        .carousel-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+            gap: 12px;
+        }
+
+        .carousel-button {
+            background: white;
+            color: #333;
+            border: 1px solid #d0d0d0;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .carousel-button:hover {
+            border-color: #999;
+            background: #f9f9f9;
+        }
+
+        .carousel-button:active {
+            background: #f0f0f0;
+        }
+
+        .carousel-info {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            flex: 1;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .dot:hover {
+            background: #bbb;
+        }
+
+        .dot.active {
+            background: #333;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 32px;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 1px solid #d0d0d0;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            border-color: #999;
+            background: #f9f9f9;
+        }
+
+        .nav-btn:active {
+            background: #f0f0f0;
+        }
+
+        .nav-btn.primary {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        .nav-btn.primary:hover {
+            background: #555;
+            border-color: #555;
+        }
+        /* overlay for image enlarge */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.8);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .overlay img {
+            max-width: 94vw;
+            max-height: 92vh;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+
+        /* mobile adjustments: larger carousel area */
+        @media (max-width: 768px) {
+            .carousel-content {
+                padding-bottom: 85%;
+            }
+
+            .carousel-item {
+                width: 92%;
+                height: 92%;
+            }
+        }
+            .title {
+                font-size: 22px;
+                margin-bottom: 16px;
+            }
+
+            .carousel-wrapper {
+                border-left: none;
+                border-right: none;
+            }
+
+            .tab-buttons {
+                gap: 6px;
+                margin-bottom: 16px;
+            }
+
+            .tab-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .carousel-controls {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+
+            .carousel-button {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+
+            .carousel-info {
+                font-size: 11px;
+            }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Image Gallery</h1>
+        
+        <div class="tab-buttons" id="tabButtons"></div>
+        
+        <div class="carousel-wrapper">
+            <div class="carousel-header" id="carouselHeader">Loading...</div>
+            <div class="carousel-content">
+                <div class="carousel-inner" id="carouselInner"></div>
+            </div>
+            <div class="carousel-controls">
+                <button class="carousel-button" id="prevBtn" onclick="previousImage()">Previous</button>
+                <div class="carousel-info">
+                    <div id="imageInfo">Loading...</div>
+                    <div class="carousel-dots" id="dotsContainer"></div>
+                </div>
+                <button class="carousel-button" id="nextBtn" onclick="nextImage()">Next</button>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn">← Home</a>
+            <a href="videos.html" class="nav-btn primary">Video Gallery →</a>
+        </div>
+    </div>
+
+    <script>
+        // 图片数据配置
+        const categories = {
+            'patents_and_software': {
+                name: 'Patents & Software',
+                images: [
+                    'imgs/patents_and_software/1.png',
+                    'imgs/patents_and_software/2.png',
+                    'imgs/patents_and_software/3.png',
+                    'imgs/patents_and_software/4.png',
+                    'imgs/patents_and_software/5.png',
+                    'imgs/patents_and_software/6.png',
+                    'imgs/patents_and_software/7.png',
+                    'imgs/patents_and_software/8.png'
+                ]
+            },
+            'competitions': {
+                name: 'Competitions',
+                images: [
+                    'imgs/competitions/1.jpg',
+                    'imgs/competitions/2.jpg',
+                    'imgs/competitions/3.png',
+                    'imgs/competitions/4.png',
+                    'imgs/competitions/5.jpg',
+                    'imgs/competitions/6.jpg',
+                    'imgs/competitions/7.png',
+                    'imgs/competitions/8.png',
+                    'imgs/competitions/9.png',
+                    'imgs/competitions/10.png',
+                    'imgs/competitions/11.JPG'
+                ]
+            },
+            'life_and_others': {
+                name: 'Life & Others',
+                images: [
+                    'imgs/life_and_others/1.jpg',
+                    'imgs/life_and_others/2.jpg',
+                    'imgs/life_and_others/3.jpg',
+                    'imgs/life_and_others/4.jpg',
+                    'imgs/life_and_others/三好学生.jpg',
+                    'imgs/life_and_others/优秀寝室.jpg',
+                    'imgs/life_and_others/体育优秀奖.jpg',
+                    'imgs/life_and_others/创新奖.jpg',
+                    'imgs/life_and_others/四川省优秀毕业生.jpg',
+                    'imgs/life_and_others/混双乒乓球第二名.jpg',
+                    'imgs/life_and_others/绵阳市三好学生.png',
+                    'imgs/life_and_others/跳大绳第一名.jpg'
+                ]
+            }
+        };
+
+        let currentCategory = 'patents_and_software';
+        let currentIndex = 0;
+        let autoplayTimer = null;
+
+        // 初始化
+        function init() {
+            createTabButtons();
+            loadCategory('patents_and_software');
+            startAutoplay();
+
+            // 添加覆盖层（用于放大图片）
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            overlay.id = 'imageOverlay';
+            overlay.innerHTML = '<img id="overlayImg" src="" alt="enlarged">';
+            overlay.addEventListener('click', closeOverlay);
+            document.body.appendChild(overlay);
+            // 点击图片本身不关闭覆盖层
+            const overlayImgEl = document.getElementById('overlayImg');
+            if (overlayImgEl) overlayImgEl.addEventListener('click', (ev) => ev.stopPropagation());
+
+            // 鼠标滚轮切换 (节流)
+            const wheelHandler = throttle((e) => {
+                if (Math.abs(e.deltaY) < 5) return;
+                if (e.deltaY > 0) {
+                    nextImage();
+                } else {
+                    previousImage();
+                }
+            }, 600);
+            // 使用 passive:false 以便在需要时阻止默认滚动
+            window.addEventListener('wheel', (e) => {
+                // 如果 overlay 打开则不切换
+                if (document.getElementById('imageOverlay').classList.contains('show')) return;
+                wheelHandler(e);
+            }, { passive: true });
+
+            // 点击或触摸放大 - 事件代理到 carouselInner
+            const carouselInner = document.getElementById('carouselInner');
+            carouselInner.addEventListener('click', (e) => {
+                const img = e.target && e.target.tagName === 'IMG' ? e.target : null;
+                if (!img) return;
+                openOverlay(img.src);
+            });
+
+            // 移动端：短触触发放大（避免与滑动冲突）
+            let touchStartPos = null;
+            let touchStartTime = 0;
+            carouselInner.addEventListener('touchstart', (e) => {
+                if (e.touches && e.touches[0]) {
+                    touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    touchStartTime = Date.now();
+                }
+            }, { passive: true });
+            carouselInner.addEventListener('touchend', (e) => {
+                const touch = (e.changedTouches && e.changedTouches[0]) || null;
+                if (!touch || !touchStartPos) return;
+                const dx = Math.abs(touch.clientX - touchStartPos.x);
+                const dy = Math.abs(touch.clientY - touchStartPos.y);
+                const dt = Date.now() - touchStartTime;
+                // 认为是点击的条件：短时间且移动距离小
+                if (dt < 300 && dx < 10 && dy < 10) {
+                    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+                    if (el && el.tagName === 'IMG') openOverlay(el.src);
+                }
+                touchStartPos = null;
+            }, { passive: true });
+        }
+
+        // 创建分类标签按钮
+        function createTabButtons() {
+            const tabContainer = document.getElementById('tabButtons');
+            Object.keys(categories).forEach(key => {
+                const btn = document.createElement('button');
+                btn.className = `tab-btn ${key === 'patents_and_software' ? 'active' : ''}`;
+                btn.textContent = categories[key].name;
+                btn.onclick = () => switchCategory(key, btn);
+                tabContainer.appendChild(btn);
+            });
+        }
+
+        // 切换分类
+        function switchCategory(categoryKey, btnElement) {
+            currentCategory = categoryKey;
+            currentIndex = 0;
+            
+            // 更新按钮状态
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            btnElement.classList.add('active');
+            
+            loadCategory(categoryKey);
+            resetAutoplay();
+        }
+
+        // 加载分类的所有图片
+        function loadCategory(categoryKey) {
+            const category = categories[categoryKey];
+            const carouselInner = document.getElementById('carouselInner');
+            const carouselHeader = document.getElementById('carouselHeader');
+            
+            carouselHeader.textContent = category.name;
+            carouselInner.innerHTML = '';
+            
+            category.images.forEach((image, index) => {
+                const item = document.createElement('div');
+                item.className = 'carousel-item';
+                item.innerHTML = `<img src="${image}" alt="Image ${index + 1}" onerror="handleImageError(this)">`;
+                carouselInner.appendChild(item);
+            });
+            
+            currentIndex = 0;
+            updateCarousel();
+        }
+
+        // 显示下一张
+        function nextImage() {
+            const images = categories[currentCategory].images;
+            currentIndex = (currentIndex + 1) % images.length;
+            updateCarousel();
+            resetAutoplay();
+        }
+
+        // 显示上一张
+        function previousImage() {
+            const images = categories[currentCategory].images;
+            currentIndex = (currentIndex - 1 + images.length) % images.length;
+            updateCarousel();
+            resetAutoplay();
+        }
+
+        // 更新轮播（支持左右、前后项堆叠显示）
+        function updateCarousel() {
+            const items = Array.from(document.querySelectorAll('.carousel-item'));
+            const total = items.length;
+
+            items.forEach((item, idx) => {
+                item.classList.remove('active', 'prev', 'next');
+                item.style.opacity = '';
+                item.style.zIndex = '';
+            });
+
+            if (total === 0) return;
+
+            const active = items[currentIndex];
+            const prevIndex = (currentIndex - 1 + total) % total;
+            const nextIndex = (currentIndex + 1) % total;
+
+            items[prevIndex].classList.add('prev');
+            items[nextIndex].classList.add('next');
+            active.classList.add('active');
+
+            // 确保层级： active > prev/next > others
+            items.forEach((it, i) => {
+                if (i === currentIndex) it.style.zIndex = 10;
+                else if (i === prevIndex || i === nextIndex) it.style.zIndex = 5;
+                else it.style.zIndex = 1;
+            });
+
+            updateDots();
+            updateInfo();
+        }
+
+        // 更新指示点
+        function updateDots() {
+            const images = categories[currentCategory].images;
+            const dotsContainer = document.getElementById('dotsContainer');
+            dotsContainer.innerHTML = '';
+
+            images.forEach((_, index) => {
+                const dot = document.createElement('span');
+                dot.className = `dot ${index === currentIndex ? 'active' : ''}`;
+                dot.onclick = () => {
+                    currentIndex = index;
+                    updateCarousel();
+                    resetAutoplay();
+                };
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        // 更新信息文本
+        function updateInfo() {
+            const images = categories[currentCategory].images;
+            const imageInfo = document.getElementById('imageInfo');
+            imageInfo.textContent = `${currentIndex + 1} / ${images.length}`;
+        }
+
+        // 自动播放
+        function startAutoplay() {
+            autoplayTimer = setInterval(() => {
+                nextImage();
+            }, 5000); // 5秒切换一次
+        }
+
+        // 重置自动播放
+        function resetAutoplay() {
+            clearInterval(autoplayTimer);
+            startAutoplay();
+        }
+
+        // 简单节流器
+        function throttle(fn, wait) {
+            let last = 0;
+            return function(...args) {
+                const now = Date.now();
+                if (now - last >= wait) {
+                    last = now;
+                    fn.apply(this, args);
+                }
+            };
+        }
+
+        // 打开覆盖层放大图片
+        function openOverlay(src) {
+            const overlay = document.getElementById('imageOverlay');
+            if (!overlay) return;
+            const img = document.getElementById('overlayImg');
+            img.src = src;
+            overlay.classList.add('show');
+            // 当覆盖层打开时暂停自动播放
+            clearInterval(autoplayTimer);
+            // 监听键盘 ESC 关闭
+            document.addEventListener('keydown', escCloseHandler);
+        }
+
+        function escCloseHandler(e) {
+            if (e.key === 'Escape') closeOverlay();
+        }
+
+        // 关闭覆盖层
+        function closeOverlay() {
+            const overlay = document.getElementById('imageOverlay');
+            if (!overlay) return;
+            overlay.classList.remove('show');
+            // 恢复自动播放
+            resetAutoplay();
+            document.removeEventListener('keydown', escCloseHandler);
+        }
+
+        // 处理图片加载错误
+        function handleImageError(img) {
+            img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f5f5f5" width="200" height="200"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23ccc" font-size="14"%3EImage Not Found%3C/text%3E%3C/svg%3E';
+        }
+
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', init);
+
+        // 页面卸载时清除定时器
+        window.addEventListener('beforeunload', () => {
+            clearInterval(autoplayTimer);
+        });
+    </script>
+</body>
+</html>
