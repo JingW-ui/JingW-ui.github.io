@@ -237,20 +237,50 @@
             background: #555;
             border-color: #555;
         }
+        /* 左侧极简导航样式 */
+        .layout { display: flex; min-height: 100vh; }
+        .side-nav { width: 220px; padding: 28px 18px; background: #ffffff; border-right: 1px solid #eee; }
+        .nav-inner { display: flex; flex-direction: column; gap: 8px; }
+        .site-title { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 14px; }
+        .nav-link { display: block; padding: 10px 12px; color: #444; text-decoration: none; border-left: 4px solid transparent; font-weight: 500; border-radius: 2px; }
+        .nav-link:hover { background: #f7f7f7; color: #111; }
+        body.page-index .nav-link[href="index.html"], body.page-videos .nav-link[href="videos.html"], body.page-carousel .nav-link[href="carousel.html"] { border-left-color: transparent; }
+        body.page-index .nav-link[href="index.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
+        body.page-videos .nav-link[href="videos.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
+        body.page-carousel .nav-link[href="carousel.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
+        .main-content { flex: 1; padding: 24px; }
+
+        @media (max-width: 760px) {
+            .layout { flex-direction: column; }
+            .side-nav { width: 100%; display: flex; padding: 8px; border-bottom: 1px solid #eee; }
+            .nav-inner { flex-direction: row; gap: 6px; width: 100%; justify-content: space-around; }
+            .main-content { padding: 16px; }
+        }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1 class="title">Video Gallery</h1>
-        
-        <div class="videos-grid" id="videosGrid"></div>
+<body class="page-videos">
+    <div class="layout">
+        <nav class="side-nav" aria-label="主导航">
+            <div class="nav-inner">
+                <div class="site-title">王京 · 简历</div>
+                <a class="nav-link" href="index.html">简历</a>
+                <a class="nav-link" href="carousel.html">图片</a>
+                <a class="nav-link" href="videos.html">视频</a>
+            </div>
+        </nav>
+        <main class="main-content">
+            <div class="container">
+                <h1 class="title">Video Gallery</h1>
+                
+                <div class="videos-grid" id="videosGrid"></div>
 
-        <div class="nav-buttons">
-            <a href="index.html" class="nav-btn">← Home</a>
-            <a href="carousel.html" class="nav-btn primary">Image Gallery →</a>
-        </div>
+                <div class="nav-buttons">
+                    <a href="index.html" class="nav-btn">← Home</a>
+                    <a href="carousel.html" class="nav-btn primary">Image Gallery →</a>
+                </div>
+            </div>
+        </main>
     </div>
-
     <script>
         // 视频数据配置
         const videos = [

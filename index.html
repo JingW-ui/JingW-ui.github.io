@@ -77,6 +77,14 @@
             color: #222;
             margin-bottom: 6px;
         }
+        .subsection-a {
+            font-size: 14px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 6px;
+            text-decoration: none;
+        }
+        .subsection-a:hover { text-decoration: underline !important; color: #2d74bb !important; }
         .date {
             font-size: 11px;
             color: #999;
@@ -129,16 +137,27 @@
         
         .avatar {
             width: 150px;
-            height: 150px;
+            height: 165px;
             border-radius: 0%;
             object-fit: cover;
             border: 1px solid #e0e0e0;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .avatar:hover {
+            transform: scale(1.1);
         }
         
         .profile-info {
             text-align: left;
         }
+        .profile-top { display: flex; align-items: center; gap: 30px; justify-content: center; width: 100%; }
+        /* nav as plain text links (centered) */
+        .header-cta { margin-left: 0; }
+        .nav-cta { display: inline-block; padding: 0; border: none; background: none; color: #4a90e2; text-decoration: none; font-weight: 500; font-size: 12px; margin-left: 12px; }
+        .nav-cta:first-child { margin-left: 0; }
+        .nav-cta:hover { text-decoration: underline; color: #2f78d1; }
         
         .name {
             font-size: 28px;
@@ -202,6 +221,61 @@
             background: #1a1a1a;
             box-shadow: 0 4px 12px rgba(51,51,51,0.2);
         }
+
+        /* Header layout: center avatar+profile block */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            justify-content: center;
+        }
+        .profile-container { display: flex; align-items: center; gap: 24px; justify-content: center; }
+        .header-cta { margin-left: 0; display: flex; align-items: center; gap: 8px; }
+        /* force nav to be plain text (no button) */
+        .nav-cta { background: none !important; border: none !important; padding: 0 !important; box-shadow: none !important; border-radius: 0 !important; color: #86888a !important; text-decoration: none !important; font-weight: 500; font-size: 12px !important; margin-left: 12px; }
+        .nav-cta:first-child { margin-left: 0; }
+        .nav-cta:hover { text-decoration: underline !important; color: #2d74bb !important; }
+
+        /* hide Resume link if present, and add spacing between name and nav */
+        .profile-top .nav-cta[href$="index.html"] { display: none !important; }
+        .profile-top > .name { margin-right: 18px; }
+
+        @media (max-width: 760px) {
+            .header { flex-direction: column; align-items: center; }
+            .profile-container { flex-direction: column; align-items: center; }
+            .profile-top { flex-direction: column; gap: 8px; }
+            .header-cta { width: auto; display: flex; gap: 8px; justify-content: center; }
+        }
+        /* modal image viewer */
+        .img-modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .img-modal-content {
+            max-width: 95%;
+            max-height: 95%;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            border-radius: 4px;
+        }
+        .img-close {
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            line-height: 30px;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -209,7 +283,15 @@
     <div class="profile-container">
         <img src="imgs/life_and_others/myavtar.png" alt="王京的头像" class="avatar">
         <div class="profile-info">
-            <div class="name">王京</div>
+            <div class="profile-top">
+                <div class="name">王京 </div>
+                <div class="header-cta">
+                    <nav aria-label="page navigation">
+                        <a class="nav-cta" href="carousel.html">Images</a>
+                        <a class="nav-cta" href="videos.html">Videos</a>
+                    </nav>
+                </div>
+            </div>
             <div class="contact-info">求职意向： 算法/软件/测试 | 成都 </div>
             <div class="contact-info">年龄： 24岁 | 性别： 男 | 籍贯： 重庆</div>
             <div class="contact-info">联系方式： 17702376984 | 2642144249@qq.com</div>
@@ -217,13 +299,11 @@
     </div>
 </div>
 
-
-
     <div class="section">
         <div class="section-title">教育背景</div>
                 <div class="subsection">
-            <div class="subsection-title">电子科技大学 生物医学工程 硕士</div>
-            <div class="date">2024.09 - 至今</div>
+                    <div class="subsection-title">电子科技大学 生物医学工程 硕士  导师：<a class="subsection-a" href="https://uestc.bohrium.com/scholar/c30h0926/Huafu_Chen" target="_blank" rel="noopener">陈华富</a></div>
+                    <div class="date">2024.09 - 至今</div>
             <ul>
                 <li>专业成绩：GPA 3.83/4（专业前5%）</li>
                 <li>主修课程：生物医学材料前沿进展、矩阵理论、认知神经科学、神经信息学基础、统计推断方法、医学影像学进展、脑机接口技术</li>
@@ -354,6 +434,36 @@
         <a href="carousel.html" class="nav-btn">Image Gallery</a>
         <a href="videos.html" class="nav-btn primary">Video Gallery</a>
     </div>
-</div>
+    </div>
+    <!-- image modal for avatar -->
+    <div id="imgModal" class="img-modal" aria-hidden="true" role="dialog">
+        <span class="img-close" aria-label="关闭">&times;</span>
+        <img class="img-modal-content" id="modalImg" alt="">
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const avatar = document.querySelector('.avatar');
+            const modal = document.getElementById('imgModal');
+            const modalImg = document.getElementById('modalImg');
+            const closeBtn = modal.querySelector('.img-close');
+            if (!avatar) return;
+            avatar.addEventListener('click', function(){
+                modal.style.display = 'flex';
+                modal.setAttribute('aria-hidden', 'false');
+                modalImg.src = this.src;
+                modalImg.alt = this.alt || '';
+                document.body.style.overflow = 'hidden';
+            });
+            function closeModal(){
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                modalImg.src = '';
+            }
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
+        });
+    </script>
 </body>
 </html>

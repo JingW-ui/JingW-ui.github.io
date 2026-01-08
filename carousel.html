@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>图片轮播 - 专利、竞赛、生活及其他</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
@@ -19,295 +15,94 @@
             color: #333;
         }
 
-        .container {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-        }
+        .container { width: 100%; max-width: 900px; margin: 0 auto; }
 
-        .title {
-            text-align: center;
-            color: #222;
-            font-size: 28px;
-            font-weight: 300;
-            letter-spacing: 0.5px;
-            margin-bottom: 24px;
-        }
+        .title { text-align: center; color: #222; font-size: 28px; font-weight: 300; letter-spacing: 0.5px; margin-bottom: 24px; }
 
-        .tab-buttons {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+        .tab-buttons { display: flex; gap: 8px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap; }
+        .tab-btn { background: white; border: 1px solid #d0d0d0; color: #666; padding: 8px 16px; border-radius: 3px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s ease; }
+        .tab-btn:hover { border-color: #999; color: #333; }
+        .tab-btn.active { background: #333; color: white; border-color: #333; }
 
-        .tab-btn {
-            background: white;
-            border: 1px solid #d0d0d0;
-            color: #666;
-            padding: 8px 16px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
+        .carousel-wrapper { background: white; border: 1px solid #e0e0e0; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .carousel-header { background: #f5f5f5; color: #333; padding: 12px 16px; font-size: 14px; font-weight: 500; border-bottom: 1px solid #e0e0e0; }
+        .carousel-content { position: relative; width: 100%; padding-bottom: 60%; background: #fafafa; }
+        .carousel-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: visible; perspective: 1000px; }
+        .carousel-item { position: absolute; width: 100%; height: 100%; opacity: 0; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; display: flex; align-items: center; justify-content: center; transform: scale(0.95) translateY(10px); }
+        .carousel-item.active { opacity: 1; z-index: 10; transform: scale(1) translateY(0); }
+        .carousel-item img { max-width: 90%; max-height: 90%; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.12)) drop-shadow(0 2px 4px rgba(0,0,0,0.08)); transition: filter 0.3s ease; }
+        .carousel-item.active img { filter: drop-shadow(0 12px 24px rgba(0,0,0,0.15)) drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
 
-        .tab-btn:hover {
-            border-color: #999;
-            color: #333;
-        }
+        .carousel-controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fafafa; border-top: 1px solid #e0e0e0; gap: 12px; }
+        .carousel-button { background: white; color: #333; border: 1px solid #d0d0d0; padding: 6px 12px; cursor: pointer; font-size: 12px; transition: all 0.2s ease; flex-shrink: 0; }
+        .carousel-button:hover { border-color: #999; background: #f9f9f9; }
+        .carousel-button:active { background: #f0f0f0; }
 
-        .tab-btn.active {
-            background: #333;
-            color: white;
-            border-color: #333;
-        }
+        .carousel-info { text-align: center; color: #999; font-size: 12px; flex: 1; }
+        .carousel-dots { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: #ddd; cursor: pointer; transition: background 0.2s ease; }
+        .dot:hover { background: #bbb; }
+        .dot.active { background: #333; }
 
-        .carousel-wrapper {
-            background: white;
-            border: 1px solid #e0e0e0;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
+        .nav-buttons { display: flex; justify-content: center; gap: 12px; margin-top: 32px; }
+        .nav-btn { background: white; border: 1px solid #d0d0d0; color: #333; padding: 10px 20px; border-radius: 3px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s ease; text-decoration: none; display: inline-block; }
+        .nav-btn:hover { border-color: #999; background: #f9f9f9; }
+        .nav-btn:active { background: #f0f0f0; }
+        .nav-btn.primary { background: #333; color: white; border-color: #333; }
+        .nav-btn.primary:hover { background: #555; border-color: #555; }
 
-        .carousel-header {
-            background: #f5f5f5;
-            color: #333;
-            padding: 12px 16px;
-            font-size: 14px;
-            font-weight: 500;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .carousel-content {
-            position: relative;
-            width: 100%;
-            padding-bottom: 70%;
-            background: #fafafa;
-        }
-
-        .carousel-inner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: visible;
-            perspective: 1000px;
-        }
-
-        .carousel-item {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transform: scale(0.95) translateY(10px);
-        }
-
-        .carousel-item.active {
-            opacity: 1;
-            z-index: 10;
-            transform: scale(1) translateY(0);
-        }
-
-        .carousel-item img {
-            max-width: 95%;
-            max-height: 95%;
-            object-fit: contain;
-            filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
-            transition: filter 0.3s ease;
-        }
-
-        .carousel-item.active img {
-            filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.15)) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-        }
-
-        .carousel-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background: #fafafa;
-            border-top: 1px solid #e0e0e0;
-            gap: 12px;
-        }
-
-        .carousel-button {
-            background: white;
-            color: #333;
-            border: 1px solid #d0d0d0;
-            padding: 6px 12px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-
-        .carousel-button:hover {
-            border-color: #999;
-            background: #f9f9f9;
-        }
-
-        .carousel-button:active {
-            background: #f0f0f0;
-        }
-
-        .carousel-info {
-            text-align: center;
-            color: #999;
-            font-size: 12px;
-            flex: 1;
-        }
-
-        .carousel-dots {
-            display: flex;
-            justify-content: center;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-
-        .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #ddd;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .dot:hover {
-            background: #bbb;
-        }
-
-        .dot.active {
-            background: #333;
-        }
-
-        .nav-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-top: 32px;
-        }
-
-        .nav-btn {
-            background: white;
-            border: 1px solid #d0d0d0;
-            color: #333;
-            padding: 10px 20px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .nav-btn:hover {
-            border-color: #999;
-            background: #f9f9f9;
-        }
-
-        .nav-btn:active {
-            background: #f0f0f0;
-        }
-
-        .nav-btn.primary {
-            background: #333;
-            color: white;
-            border-color: #333;
-        }
-
-        .nav-btn.primary:hover {
-            background: #555;
-            border-color: #555;
-        }
         /* overlay for image enlarge */
-        .overlay {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0,0,0,0.8);
-            z-index: 9999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-        }
-
-        .overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .overlay img {
-            max-width: 94vw;
-            max-height: 92vh;
-            object-fit: contain;
-            border-radius: 6px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-        }
+        .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.8); z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+        .overlay.show { opacity: 1; pointer-events: auto; }
+        .overlay img { max-width: 90vw; max-height: 88vh; object-fit: contain; border-radius: 6px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
 
         /* mobile adjustments: larger carousel area */
         @media (max-width: 768px) {
-            .carousel-content {
-                padding-bottom: 85%;
-            }
-
-            .carousel-item {
-                width: 92%;
-                height: 92%;
-            }
+            .carousel-content { padding-bottom: 75%; }
+            .carousel-item { width: 92%; height: 92%; }
         }
-            .title {
-                font-size: 22px;
-                margin-bottom: 16px;
-            }
 
-            .carousel-wrapper {
-                border-left: none;
-                border-right: none;
-            }
+        .title { font-size: 22px; margin-bottom: 10px; }
+        .carousel-wrapper { border-left: none; border-right: none; }
+        .tab-buttons { gap: 6px; margin-bottom: 16px; }
+        .tab-btn { padding: 6px 12px; font-size: 12px; }
+        .carousel-controls { padding: 10px 12px; gap: 8px; }
+        .carousel-button { padding: 5px 10px; font-size: 11px; }
+        .carousel-info { font-size: 11px; }
 
-            .tab-buttons {
-                gap: 6px;
-                margin-bottom: 16px;
-            }
+        /* 左侧极简导航样式 */
+        .layout { display: flex; min-height: 100vh; }
+        .side-nav { width: 220px; padding: 28px 18px; background: #ffffff; border-right: 1px solid #eee; }
+        .nav-inner { display: flex; flex-direction: column; gap: 8px; }
+        .site-title { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 14px; }
+        .nav-link { display: block; padding: 10px 12px; color: #444; text-decoration: none; border-left: 4px solid transparent; font-weight: 500; border-radius: 2px; }
+        .nav-link:hover { background: #f7f7f7; color: #111; }
+        body.page-index .nav-link[href="index.html"], body.page-videos .nav-link[href="videos.html"], body.page-carousel .nav-link[href="carousel.html"] { border-left-color: transparent; }
+        body.page-index .nav-link[href="index.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
+        body.page-videos .nav-link[href="videos.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
+        body.page-carousel .nav-link[href="carousel.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
+        .main-content { flex: 1; padding: 12px; }
 
-            .tab-btn {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-
-            .carousel-controls {
-                padding: 10px 12px;
-                gap: 8px;
-            }
-
-            .carousel-button {
-                padding: 5px 10px;
-                font-size: 11px;
-            }
-
-            .carousel-info {
-                font-size: 11px;
-            }
-
-    </style>
+        @media (max-width: 760px) {
+            .layout { flex-direction: column; }
+            .side-nav { width: 100%; display: flex; padding: 8px; border-bottom: 1px solid #eee; }
+            .nav-inner { flex-direction: row; gap: 6px; width: 100%; justify-content: space-around; }
+            .main-content { padding: 16px; }
+        }
+</style>
 </head>
-<body>
-    <div class="container">
+    <body class="page-carousel">
+        <div class="layout">
+            <nav class="side-nav" aria-label="主导航">
+                <div class="nav-inner">
+                    <div class="site-title">王京 · 简历</div>
+                    <a class="nav-link" href="index.html">简历</a>
+                    <a class="nav-link" href="carousel.html">图片</a>
+                    <a class="nav-link" href="videos.html">视频</a>
+                </div>
+            </nav>
+            <main class="main-content">
+                <div class="container">
         <h1 class="title">Image Gallery</h1>
         
         <div class="tab-buttons" id="tabButtons"></div>
@@ -331,6 +126,8 @@
             <a href="index.html" class="nav-btn">← Home</a>
             <a href="videos.html" class="nav-btn primary">Video Gallery →</a>
         </div>
+            </div>
+        </main>
     </div>
 
     <script>
@@ -414,12 +211,17 @@
                     previousImage();
                 }
             }, 600);
-            // 使用 passive:false 以便在需要时阻止默认滚动
-            window.addEventListener('wheel', (e) => {
-                // 如果 overlay 打开则不切换
-                if (document.getElementById('imageOverlay').classList.contains('show')) return;
-                wheelHandler(e);
-            }, { passive: true });
+            // 仅在轮播区域内监听滚轮；区域外保留页面滚动
+            const carouselContentEl = document.querySelector('.carousel-content');
+            if (carouselContentEl) {
+                // 使用 passive:false 以便在轮播区内阻止默认页面滚动并切换图片
+                carouselContentEl.addEventListener('wheel', (e) => {
+                    // 如果 overlay 打开则不切换
+                    if (document.getElementById('imageOverlay').classList.contains('show')) return;
+                    e.preventDefault();
+                    wheelHandler(e);
+                }, { passive: false });
+            }
 
             // 点击或触摸放大 - 事件代理到 carouselInner
             const carouselInner = document.getElementById('carouselInner');
