@@ -241,11 +241,14 @@
         .profile-top > .name { margin-right: 18px; }
 
         @media (max-width: 760px) {
-            .header { flex-direction: column; align-items: center; }
-            .profile-container { flex-direction: row; align-items: center; gap: 15px; }
-            .profile-top { flex-direction: column; gap: 8px; }
-            .header-cta { width: auto; display: flex; gap: 8px; justify-content: center; }
-            .avatar { width: 80px; height: 88px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .profile-container { flex-direction: row !important; align-items: flex-start; gap: 20px; justify-content: flex-start; flex-wrap: nowrap !important; }
+            .profile-top { flex-direction: row !important; align-items: center; gap: 12px; justify-content: space-between; }
+            .header-cta { width: auto; display: flex; gap: 8px; justify-content: center; margin: 0; }
+            .avatar { width: 120px; height: 132px; }
+            .name { font-size: 24px; margin-bottom: 0; margin-right: 10px; }
+            .contact-info { font-size: 12px; margin-bottom: 3px; }
+            .profile-info { flex: 1; min-width: 0; }
         }
         /* modal image viewer */
         .img-modal {
