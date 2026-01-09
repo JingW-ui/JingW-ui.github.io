@@ -221,6 +221,42 @@
             background: #1a1a1a;
             box-shadow: 0 4px 12px rgba(51,51,51,0.2);
         }
+        
+        /* 图片网格布局 */
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .grid-item {
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .grid-item:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .grid-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+        }
+        
+        .grid-item-caption {
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            background-color: white;
+        }
 
         /* Header layout: center avatar+profile block */
         .header {
@@ -293,7 +329,6 @@
                     <nav aria-label="page navigation">
                         <a class="nav-cta" href="carousel.html">Images</a>
                         <a class="nav-cta" href="videos.html">Videos</a>
-                        <a class="nav-cta" href="index_all.html">All</a>
                     </nav>
                 </div>
             </div>
@@ -432,44 +467,63 @@
         <li>佳能男摄，接客超过100+，指导动作，提供情绪价值，专业级修图</li>
     </ul>
 </div>
+ 
+    <!-- 图片资源平铺展示 -->
+    <div class="section">
+        <div class="section-title">图片资源展示</div>
+                <!-- 专利及软件图片 -->
+        <div class="subsection">
+            <div class="subsection-title">专利及软件图片</div>
+            <div class="image-grid">
+                <div class="grid-item"><img src="imgs/patents_and_software/1.png" alt="专利及软件图片1"><div class="grid-item-caption">1.png</div></div>
+                <div class="grid-item"><img src="imgs/patents_and_software/2.png" alt="专利及软件图片2"><div class="grid-item-caption">2.png</div></div>
+                <div class="grid-item"><img src="imgs/patents_and_software/3.png" alt="专利及软件图片3"><div class="grid-item-caption">3.png</div></div>
+                <div class="grid-item"><img src="imgs/patents_and_software/4.png" alt="专利及软件图片4"><div class="grid-item-caption">4.png</div></div>
+                <div class="grid-item"><img src="imgs/patents_and_software/5.png" alt="专利及软件图片5"><div class="grid-item-caption">5.png</div></div>
+                <div class="grid-item"><img src="imgs/patents_and_software/6.png" alt="专利及软件图片6"><div class="grid-item-caption">6.png</div></div>
+                <div class="grid-item"><img src="imgs/patents_and_software/7.png" alt="专利及软件图片7"><div class="grid-item-caption">7.png</div></div>
+                <div class="grid-item"><img src="imgs/patents_and_software/8.png" alt="专利及软件图片8"><div class="grid-item-caption">8.png</div></div>
+            </div>
+        </div>
+        <!-- 竞赛图片 -->
+        <div class="subsection">
+            <div class="subsection-title">竞赛图片</div>
+            <div class="image-grid">
+                <div class="grid-item"><img src="imgs/competitions/1.jpg" alt="竞赛图片1"><div class="grid-item-caption">1.jpg</div></div>
+                <div class="grid-item"><img src="imgs/competitions/10.png" alt="竞赛图片10"><div class="grid-item-caption">10.png</div></div>
+                <div class="grid-item"><img src="imgs/competitions/11.JPG" alt="竞赛图片11"><div class="grid-item-caption">11.JPG</div></div>
 
-<div class="section">
-    <div class="section-title">作品展示</div>
-<div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-    <a href="carousel.html" class="nav-btn">Image Gallery</a>
-    <a href="videos.html" class="nav-btn primary">Video Gallery</a>
-    <a href="resources/王京的个人简历20260109_compressed.pdf" class="nav-btn" download>Download PDF</a>
-</div>
+                <div class="grid-item"><img src="imgs/competitions/3.png" alt="竞赛图片3"><div class="grid-item-caption">3.png</div></div>
+                <div class="grid-item"><img src="imgs/competitions/4.png" alt="竞赛图片4"><div class="grid-item-caption">4.png</div></div>
+                <div class="grid-item"><img src="imgs/competitions/5.jpg" alt="竞赛图片5"><div class="grid-item-caption">5.jpg</div></div>
+
+                <div class="grid-item"><img src="imgs/competitions/7.png" alt="竞赛图片7"><div class="grid-item-caption">7.png</div></div>
+                <div class="grid-item"><img src="imgs/competitions/8.png" alt="竞赛图片8"><div class="grid-item-caption">8.png</div></div>
+                <div class="grid-item"><img src="imgs/competitions/9.png" alt="竞赛图片9"><div class="grid-item-caption">9.png</div></div>
+            </div>
+        </div>
+        
+        <!-- 生活及其他图片 -->
+        <div class="subsection">
+            <div class="subsection-title">生活及其他图片</div>
+            <div class="image-grid">
+
+                <div class="grid-item"><img src="imgs/life_and_others/2.jpg" alt="生活图片2"><div class="grid-item-caption">2.jpg</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/3.jpg" alt="生活图片3"><div class="grid-item-caption">3.jpg</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/4.jpg" alt="生活图片4"><div class="grid-item-caption">4.jpg</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/三好学生.jpg" alt="三好学生"><div class="grid-item-caption">三好学生.jpg</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/优秀寝室.jpg" alt="优秀寝室"><div class="grid-item-caption">优秀寝室.jpg</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/体育优秀奖.jpg" alt="体育优秀奖"><div class="grid-item-caption">体育优秀奖.jpg</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/创新奖.jpg" alt="创新奖"><div class="grid-item-caption">创新奖.jpg</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/四川省优秀毕业生.jpg" alt="四川省优秀毕业生"><div class="grid-item-caption">四川省优秀毕业生.jpg</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/混双乒乓球第二名.jpg" alt="混双乒乓球第二名"><div class="grid-item-caption">混双乒乓球第二名.jpg</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/绵阳市三好学生.png" alt="绵阳市三好学生"><div class="grid-item-caption">绵阳市三好学生.png</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/跳大绳第一名.jpg" alt="跳大绳第一名"><div class="grid-item-caption">跳大绳第一名.jpg</div></div>
+                <div class="grid-item"><img src="imgs/life_and_others/1.jpg" alt="生活图片1"><div class="grid-item-caption">1.jpg</div></div>
+            </div>
+        </div>
+        
+
     </div>
-    <!-- image modal for avatar -->
-    <div id="imgModal" class="img-modal" aria-hidden="true" role="dialog">
-        <span class="img-close" aria-label="关闭">&times;</span>
-        <img class="img-modal-content" id="modalImg" alt="">
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function(){
-            const avatar = document.querySelector('.avatar');
-            const modal = document.getElementById('imgModal');
-            const modalImg = document.getElementById('modalImg');
-            const closeBtn = modal.querySelector('.img-close');
-            if (!avatar) return;
-            avatar.addEventListener('click', function(){
-                modal.style.display = 'flex';
-                modal.setAttribute('aria-hidden', 'false');
-                modalImg.src = this.src;
-                modalImg.alt = this.alt || '';
-                document.body.style.overflow = 'hidden';
-            });
-            function closeModal(){
-                modal.style.display = 'none';
-                modal.setAttribute('aria-hidden', 'true');
-                document.body.style.overflow = '';
-                modalImg.src = '';
-            }
-            closeBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
-            document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
-        });
-    </script>
 </body>
 </html>
