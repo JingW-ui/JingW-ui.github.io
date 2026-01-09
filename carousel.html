@@ -26,11 +26,13 @@
 
         .carousel-wrapper { background: white; border: 1px solid #e0e0e0; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .carousel-header { background: #f5f5f5; color: #333; padding: 12px 16px; font-size: 14px; font-weight: 500; border-bottom: 1px solid #e0e0e0; }
-        .carousel-content { position: relative; width: 100%; padding-bottom: 60%; background: #fafafa; }
+        .carousel-content { position: relative; width: 100%; padding-bottom: 60%; background: #fafafa; cursor: pointer; }
         .carousel-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: visible; perspective: 1000px; }
-        .carousel-item { position: absolute; width: 100%; height: 100%; opacity: 0; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; display: flex; align-items: center; justify-content: center; transform: scale(0.95) translateY(10px); }
-        .carousel-item.active { opacity: 1; z-index: 10; transform: scale(1) translateY(0); }
-        .carousel-item img { max-width: 90%; max-height: 90%; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.12)) drop-shadow(0 2px 4px rgba(0,0,0,0.08)); transition: filter 0.3s ease; }
+        .carousel-item { position: absolute; width: 70%; height: 90%; opacity: 0; transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); display: flex; align-items: center; justify-content: center; transform-origin: center; }
+        .carousel-item.active { opacity: 1; z-index: 10; transform: translateX(0) rotateY(0) scale(1.1); }
+        .carousel-item.prev { opacity: 0.8; z-index: 9; transform: translateX(-30%) rotateY(-15deg) scale(1); }
+        .carousel-item.next { opacity: 0.8; z-index: 8; transform: translateX(30%) rotateY(15deg) scale(1); }
+        .carousel-item img { max-width: 95%; max-height: 95%; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.12)) drop-shadow(0 2px 4px rgba(0,0,0,0.08)); transition: filter 0.3s ease; width: 100%; height: 100%; object-fit: contain; }
         .carousel-item.active img { filter: drop-shadow(0 12px 24px rgba(0,0,0,0.15)) drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
 
         .carousel-controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fafafa; border-top: 1px solid #e0e0e0; gap: 12px; }
@@ -58,8 +60,11 @@
 
         /* mobile adjustments: larger carousel area */
         @media (max-width: 768px) {
-            .carousel-content { padding-bottom: 95%; }
-            .carousel-item { width: 92%; height: 92%; }
+            .carousel-content { padding-bottom: 90%; }
+            .carousel-item { width: 80%; height: 90%; }
+            .carousel-item.active { transform: translateX(0) rotateY(0) scale(1.05); }
+            .carousel-item.prev { transform: translateX(-30%) rotateY(-10deg) scale(1); }
+            .carousel-item.next { transform: translateX(30%) rotateY(10deg) scale(1); }
         }
 
         .title { font-size: 22px; margin-bottom: 10px; }
@@ -96,7 +101,7 @@
             <nav class="side-nav" aria-label="主导航">
                 <div class="nav-inner">
                     <div class="site-title">王京 · 简历</div>
-                    <a class="nav-link" href="index.html">简历</a>
+                    <a class="nav-link" href="https://jingw-ui.github.io/">简历</a>
                     <a class="nav-link" href="carousel.html">图片</a>
                     <a class="nav-link" href="videos.html">视频</a>
                 </div>
@@ -109,7 +114,7 @@
         
         <div class="carousel-wrapper">
             <div class="carousel-header" id="carouselHeader">Loading...</div>
-            <div class="carousel-content">
+            <div class="carousel-content" id="carouselContent">
                 <div class="carousel-inner" id="carouselInner"></div>
             </div>
             <div class="carousel-controls">
@@ -226,33 +231,121 @@
             // 点击或触摸放大 - 事件代理到 carouselInner
             const carouselInner = document.getElementById('carouselInner');
             carouselInner.addEventListener('click', (e) => {
-                const img = e.target && e.target.tagName === 'IMG' ? e.target : null;
-                if (!img) return;
-                openOverlay(img.src);
+                // 如果点击的是图片本身，则放大图片
+                if (e.target.tagName === 'IMG') {
+                    openOverlay(e.target.src);
+                }
             });
 
-            // 移动端：短触触发放大（避免与滑动冲突）
+            // 点击画布区域切换图片
+            const carouselContent = document.getElementById('carouselContent');
+            
+            carouselContent.addEventListener('click', (e) => {
+                // 如果点击的不是图片本身，则执行切换操作
+                if (e.target.tagName !== 'IMG') {
+                    const rect = carouselContent.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const centerX = rect.width / 2;
+                    
+                    if (clickX < centerX) {
+                        // 点击左侧，上一张
+                        previousImage();
+                    } else {
+                        // 点击右侧，下一张
+                        nextImage();
+                    }
+                }
+            });
+
+            // 移动端：滑动和点击处理（避免与滑动切换冲突）
             let touchStartPos = null;
             let touchStartTime = 0;
+            let isSwiping = false;
+            
+            // 记录滑动起始位置的变量
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
             carouselInner.addEventListener('touchstart', (e) => {
                 if (e.touches && e.touches[0]) {
                     touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                    touchStartX = e.touches[0].clientX; // 记录滑动起始位置
                     touchStartTime = Date.now();
+                    isSwiping = false; // 重置滑动状态
                 }
             }, { passive: true });
+            
+            carouselInner.addEventListener('touchmove', (e) => {
+                if (touchStartPos) {
+                    const touch = e.touches[0];
+                    const dx = Math.abs(touch.clientX - touchStartPos.x);
+                    const dy = Math.abs(touch.clientY - touchStartPos.y);
+                    
+                    // 如果水平滑动距离大于垂直滑动距离，标记为滑动
+                    if (dx > dy && dx > 10) {
+                        isSwiping = true;
+                    }
+                }
+            }, { passive: true });
+            
             carouselInner.addEventListener('touchend', (e) => {
                 const touch = (e.changedTouches && e.changedTouches[0]) || null;
                 if (!touch || !touchStartPos) return;
+                
+                touchEndX = touch.clientX; // 记录滑动结束位置
+                
                 const dx = Math.abs(touch.clientX - touchStartPos.x);
                 const dy = Math.abs(touch.clientY - touchStartPos.y);
                 const dt = Date.now() - touchStartTime;
+                
+                // 检查是否为滑动操作
+                const swipeThreshold = 50; // 最小滑动距离阈值
+                const diff = touchStartX - touchEndX;
+                
+                // 如果是明显的滑动动作，执行切换
+                if (Math.abs(diff) > swipeThreshold) {
+                    isSwiping = true;
+                    if (diff > 0) {
+                        // 向左滑动，切换到下一张
+                        nextImage();
+                    } else {
+                        // 向右滑动，切换到上一张
+                        previousImage();
+                    }
+                    touchStartPos = null;
+                    return;
+                }
+                
+                // 如果是滑动动作但未达到阈值，不执行任何操作
+                if (isSwiping) {
+                    touchStartPos = null;
+                    return;
+                }
+                
                 // 认为是点击的条件：短时间且移动距离小
                 if (dt < 300 && dx < 10 && dy < 10) {
                     const el = document.elementFromPoint(touch.clientX, touch.clientY);
-                    if (el && el.tagName === 'IMG') openOverlay(el.src);
+                    if (el && el.tagName === 'IMG') {
+                        // 点击的是图片，执行放大
+                        openOverlay(el.src);
+                    } else {
+                        // 点击的是画布区域，执行切换
+                        const rect = carouselContent.getBoundingClientRect();
+                        const clickX = touch.clientX - rect.left;
+                        const centerX = rect.width / 2;
+                        
+                        if (clickX < centerX) {
+                            // 点击左侧，上一张
+                            previousImage();
+                        } else {
+                            // 点击右侧，下一张
+                            nextImage();
+                        }
+                    }
                 }
                 touchStartPos = null;
             }, { passive: true });
+            
         }
 
         // 创建分类标签按钮
@@ -291,12 +384,17 @@
             carouselHeader.textContent = category.name;
             carouselInner.innerHTML = '';
             
-            category.images.forEach((image, index) => {
+            // 确保至少有3张图片用于显示
+            const images = category.images;
+            if (images.length === 0) return;
+            
+            // 添加三张图片：前一张、当前、后一张
+            for (let i = 0; i < images.length; i++) {
                 const item = document.createElement('div');
                 item.className = 'carousel-item';
-                item.innerHTML = `<img src="${image}" alt="Image ${index + 1}" onerror="handleImageError(this)">`;
+                item.innerHTML = `<img src="${images[i]}" alt="Image ${i + 1}" onerror="handleImageError(this)">`;
                 carouselInner.appendChild(item);
-            });
+            }
             
             currentIndex = 0;
             updateCarousel();
@@ -323,28 +421,48 @@
             const items = Array.from(document.querySelectorAll('.carousel-item'));
             const total = items.length;
 
-            items.forEach((item, idx) => {
-                item.classList.remove('active', 'prev', 'next');
-                item.style.opacity = '';
-                item.style.zIndex = '';
-            });
-
             if (total === 0) return;
 
-            const active = items[currentIndex];
-            const prevIndex = (currentIndex - 1 + total) % total;
-            const nextIndex = (currentIndex + 1) % total;
-
-            items[prevIndex].classList.add('prev');
-            items[nextIndex].classList.add('next');
-            active.classList.add('active');
-
-            // 确保层级： active > prev/next > others
-            items.forEach((it, i) => {
-                if (i === currentIndex) it.style.zIndex = 10;
-                else if (i === prevIndex || i === nextIndex) it.style.zIndex = 5;
-                else it.style.zIndex = 1;
+            // 清除所有类和样式
+            items.forEach(item => {
+                item.classList.remove('active', 'prev', 'next');
+                // 默认隐藏所有图片
+                item.style.zIndex = '1';
+                item.style.opacity = '0';
+                item.style.transform = 'translateX(0) rotateY(0) scale(0.8)';
             });
+
+            // 确保currentIndex在有效范围内
+            if (total > 0) {
+                currentIndex = ((currentIndex % total) + total) % total;
+            }
+
+            // 获取当前、前一个和后一个索引
+            const activeIndex = currentIndex;
+            const prevIndex = total > 1 ? (currentIndex - 1 + total) % total : -1;
+            const nextIndex = total > 1 ? (currentIndex + 1) % total : -1;
+
+            // 设置对应图片的状态和样式
+            if (items[activeIndex] && total > 0) {
+                items[activeIndex].classList.add('active');
+                items[activeIndex].style.zIndex = '10';
+                items[activeIndex].style.opacity = '1';
+                items[activeIndex].style.transform = 'translateX(0) rotateY(0) scale(1.1)';
+            }
+            
+            if (items[prevIndex] && total > 1) {
+                items[prevIndex].classList.add('prev');
+                items[prevIndex].style.zIndex = '9';
+                items[prevIndex].style.opacity = '0.8';
+                items[prevIndex].style.transform = 'translateX(-30%) rotateY(-15deg) scale(1)';
+            }
+            
+            if (items[nextIndex] && total > 1) {
+                items[nextIndex].classList.add('next');
+                items[nextIndex].style.zIndex = '8';
+                items[nextIndex].style.opacity = '0.8';
+                items[nextIndex].style.transform = 'translateX(30%) rotateY(15deg) scale(1)';
+            }
 
             updateDots();
             updateInfo();
