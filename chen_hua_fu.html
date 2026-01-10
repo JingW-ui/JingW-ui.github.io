@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陈华富教授 - 学者风采</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.95em;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .profile-header {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .profile-image {
+            flex: 0 0 200px; /* 固定宽度为200px */
+            text-align: center;
+        }
+
+        .profile-image img {
+            width: 180px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .profile-image img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .personal-links {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .link-button {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #34495e;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+            font-size: 0.8em;
+            transition: background 0.3s ease;
+            text-align: center;
+        }
+
+        .link-button:hover {
+            background: #2c3e50;
+            text-decoration: none;
+        }
+
+        .personal-info {
+            flex: 1;
+            min-width: 250px;
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 4px;
+            border-left: 3px solid #34495e;
+        }
+
+        .personal-info h2 {
+            color: #2c3e50;
+            font-size: 1.2em;
+            font-weight: 400;
+            margin-bottom: 15px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e0e0e0;
+            display: none; /* 隐藏标题，因为这是基本信息 */
+        }
+
+        .info-item {
+            margin-bottom: 8px;
+            padding: 5px 0;
+            border-bottom: 1px dashed #e8e8e8;
+            font-size: 0.9em;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-item strong {
+            color: #555;
+            display: inline-block;
+            width: 100px;
+            font-weight: 400;
+        }
+
+        .research-interests {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 3px solid #9b59b6;
+        }
+
+        .research-interests h2 {
+            color: #2c3e50;
+            font-size: 1.2em;
+            font-weight: 400;
+            margin-bottom: 15px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .interests-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .interest-item {
+            background: white;
+            padding: 12px;
+            border-radius: 3px;
+            border: 1px solid #eee;
+            text-align: center;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+        }
+
+        .interest-item:hover {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: translateY(-1px);
+        }
+
+        .interest-item h3 {
+            color: #34495e;
+            font-size: 1em;
+            margin-bottom: 5px;
+            font-weight: 400;
+        }
+
+        .interest-item p {
+            color: #7f8c8d;
+            font-size: 0.85em;
+        }
+
+        .education {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 3px solid #7f8c8d;
+        }
+
+        .education h2 {
+            color: #2c3e50;
+            font-size: 1.2em;
+            font-weight: 400;
+            margin-bottom: 15px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .degree-item {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 3px;
+            border-left: 3px solid #95a5a6;
+        }
+
+        .degree-item h3 {
+            color: #34495e;
+            margin-bottom: 3px;
+            font-size: 1em;
+            font-weight: 400;
+        }
+
+        .degree-item p {
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .achievements {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .achievement-card {
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 3px solid #3498db;
+            text-align: center;
+        }
+
+        .achievement-card h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+            font-weight: 400;
+        }
+
+        .achievement-card p {
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .profile-image {
+                flex: 0 0 auto;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .achievements {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>陈华富 教授</h1>
+            <p>博士生导师 | 国家杰出青年科学基金获得者</p>
+        </div>
+
+        <div class="content">
+            <div class="profile-header">
+                <div class="profile-image">
+                    <img src="imgs/huafuchen/avtar/avtar.png" alt="陈华富教授照片">
+                    <div class="personal-links">
+                        <a href="https://baike.baidu.com/item/%E9%99%88%E5%8D%8E%E5%AF%8C/22713855" target="_blank" class="link-button">百度百科</a>
+                        <a href="https://uestc.bohrium.com/scholar/c30h0926/Huafu_Chen" target="_blank" class="link-button">波尔学术链接</a>
+                        <a href="https://faculty.uestc.edu.cn/chenhuafu/zh_CN/index.htm" target="_blank" class="link-button">学校主页</a>
+                    </div>
+                </div>
+                
+                <div class="personal-info">
+                    <h2>基本信息</h2>
+                    <div class="info-item">
+                        <strong>姓名:</strong> 陈华富
+                    </div>
+                    <div class="info-item">
+                        <strong>出生年份:</strong> 1967年
+                    </div>
+                    <div class="info-item">
+                        <strong>学历:</strong> 博士
+                    </div>
+                    <div class="info-item">
+                        <strong>职务:</strong> 电子科技大学教授、博士生导师
+                    </div>
+                    <div class="info-item">
+                        <strong>荣誉:</strong> 国家杰出青年科学基金获得者
+                    </div>
+                    <div class="info-item">
+                        <strong>实验室职位:</strong> 神经信息教育部重点实验室副主任
+                    </div>
+                    <div class="info-item">
+                        <strong>实验室职位:</strong> 高场磁共振成像四川省重点实验室副主任
+                    </div>
+                    <div class="info-item">
+                        <strong>现任职务:</strong> 电子科技大学生命科学与技术学院院长（2022年11月起）
+                    </div>
+                </div>
+            </div>
+
+            <div class="research-interests">
+                <h2>研究方向</h2>
+                <div class="interests-grid">
+                    <div class="interest-item">
+                        <h3>磁共振脑影像数据分析</h3>
+                        <p>从事磁共振脑影像数据的先进分析方法研究</p>
+                    </div>
+                    <div class="interest-item">
+                        <h3>神经精神疾病影像机制</h3>
+                        <p>研究神经精神疾病的影像学机制</p>
+                    </div>
+                    <div class="interest-item">
+                        <h3>脑功能网络分析</h3>
+                        <p>探索大脑功能网络的连接模式和特性</p>
+                    </div>
+                    <div class="interest-item">
+                        <h3>多模态脑成像</h3>
+                        <p>结合多种脑成像技术进行综合分析</p>
+                    </div>
+                    <div class="interest-item">
+                        <h3>人工智能方法应用</h3>
+                        <p>将AI技术应用于脑科学研究</p>
+                    </div>
+                    <div class="interest-item">
+                        <h3>神经信息学</h3>
+                        <p>研究神经系统的信息处理机制</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="education">
+                <h2>教育背景</h2>
+                <div class="degree-item">
+                    <h3>1986-1989年</h3>
+                    <p>绵阳师范专科学校 数学专业</p>
+                </div>
+                <div class="degree-item">
+                    <h3>1996年</h3>
+                    <p>四川大学 应用数学硕士</p>
+                </div>
+                <div class="degree-item">
+                    <h3>2004年</h3>
+                    <p>电子科技大学 生物医学工程博士</p>
+                </div>
+
+                <h2 style="margin-top: 20px;">职业经历</h2>
+                <div class="degree-item">
+                    <h3>2005年</h3>
+                    <p>破格晋升教授并任博士生导师</p>
+                </div>
+                <div class="degree-item">
+                    <h3>2009年</h3>
+                    <p>任神经信息教育部重点实验室副主任</p>
+                </div>
+                <div class="degree-item">
+                    <h3>2011年</h3>
+                    <p>获国家杰出青年科学基金</p>
+                </div>
+                <div class="degree-item">
+                    <h3>2017年</h3>
+                    <p>以抑郁症脑机制研究获四川省科技进步奖自然科学类一等奖</p>
+                </div>
+                <div class="degree-item">
+                    <h3>2022年11月</h3>
+                    <p>任电子科技大学生命科学与技术学院院长</p>
+                </div>
+            </div>
+
+            <div class="achievements">
+                <div class="achievement-card">
+                    <h3>科研项目</h3>
+                    <p>主持国家自然科学基金重点项目、科技部863计划等20余项国家级科研项目</p>
+                </div>
+                <div class="achievement-card">
+                    <h3>学术成果</h3>
+                    <p>发表SCI论文300余篇，收录论文442篇</p>
+                </div>
+                <div class="achievement-card">
+                    <h3>学术影响</h3>
+                    <p>在脑影像分析、神经疾病研究等领域具有重要影响力</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
