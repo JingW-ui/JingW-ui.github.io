@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王京的个人简历</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0 20px;
+            border-bottom: 2px solid #333;
+            background: white;
+            margin-left: -20px;
+            margin-right: -20px;
+            margin-top: -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .name {
+            font-size: 36px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+        }
+        .contact-info {
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #666;
+            letter-spacing: 0.5px;
+        }
+        .section {
+            margin-bottom: 24px;
+            background-color: white;
+            padding: 24px;
+            border: 1px solid #e8e8e8;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .section:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-color: #d0d0d0;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 18px;
+            border-left: 4px solid #333;
+            padding-left: 12px;
+        }
+        .subsection {
+            margin-bottom: 18px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 6px;
+        }
+        .subsection-a {
+            font-size: 14px;
+            font-weight: 600;
+            color: #2d74bb;
+            margin-bottom: 6px;
+            text-decoration: none;
+        }
+        .subsection-a:hover { text-decoration: underline !important; color: #2d74bb !important; }
+        .date {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        ul {
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .skill {
+            background: linear-gradient(135deg, #f5f5f5 0%, #f0f0f0 100%);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid #e0e0e0;
+            color: #555;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .skill:hover {
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            color: white;
+            border-color: #333;
+        }
+        .label-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 9px;
+            border: 1px solid #bbdefb;
+            color: #1976d2;
+            text-decoration: none;
+            margin-left: 4px;
+            transition: all 0.2s ease;
+            vertical-align: middle;
+        }
+        .label-link:hover {
+            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
+            color: white;
+            border-color: #0d47a1;
+            transform: translateY(-1px);
+        }
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 30px 0;
+            opacity: 1;
+        }
+        
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .avatar {
+            width: 150px;
+            height: 165px;
+            border-radius: 0%;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .avatar:hover {
+            transform: scale(1.1);
+        }
+        
+        .profile-info {
+            text-align: left;
+        }
+        .profile-top { display: flex; align-items: center; gap: 30px; justify-content: center; width: 100%; }
+        /* nav as plain text links (centered) */
+        .header-cta { margin-left: 0; }
+        .nav-cta { display: inline-block; padding: 0; border: none; background: none; color: #4a90e2; text-decoration: none; font-weight: 500; font-size: 12px; margin-left: 12px; }
+        .nav-cta:first-child { margin-left: 0; }
+        .nav-cta:hover { text-decoration: underline; color: #2f78d1; }
+        
+        .name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #222;
+        }
+        
+        .contact-info {
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: #666;
+            line-height: 1.5;
+        }
+        .image-container {
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            border-radius: 3px;
+            margin-top: 15px;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 2px solid #333;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-btn:hover {
+            background: #f5f5f5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-btn:active {
+            transform: translateY(0);
+        }
+
+        .nav-btn.primary {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        .nav-btn.primary:hover {
+            background: #1a1a1a;
+            box-shadow: 0 4px 12px rgba(51,51,51,0.2);
+        }
+
+        /* Header layout: center avatar+profile block */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            justify-content: center;
+        }
+        .profile-container { display: flex; align-items: center; gap: 24px; justify-content: center; }
+        .header-cta { margin-left: 0; display: flex; align-items: center; gap: 8px; }
+        /* force nav to be plain text (no button) */
+        .nav-cta { background: none !important; border: none !important; padding: 0 !important; box-shadow: none !important; border-radius: 0 !important; color: #86888a !important; text-decoration: none !important; font-weight: 500; font-size: 12px !important; margin-left: 12px; }
+        .nav-cta:first-child { margin-left: 0; }
+        .nav-cta:hover { text-decoration: underline !important; color: #2d74bb !important; }
+
+        /* hide Resume link if present, and add spacing between name and nav */
+        .profile-top .nav-cta[href$="index.html"] { display: none !important; }
+        .profile-top > .name { margin-right: 18px; }
+
+        @media (max-width: 760px) {
+            .header { flex-direction: column; align-items: flex-start; }
+            .profile-container { flex-direction: row !important; align-items: flex-start; gap: 20px; justify-content: flex-start; flex-wrap: nowrap !important; }
+            .profile-top { flex-direction: row !important; align-items: center; gap: 12px; justify-content: space-between; }
+            .header-cta { width: auto; display: flex; gap: 8px; justify-content: center; margin: 0; }
+            .avatar { width: 120px; height: 132px; }
+            .name { font-size: 24px; margin-bottom: 0; margin-right: 10px; }
+            .contact-info { font-size: 12px; margin-bottom: 3px; }
+            .profile-info { flex: 1; min-width: 0; }
+        }
+        /* modal image viewer */
+        .img-modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .img-modal-content {
+            max-width: 95%;
+            max-height: 95%;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            border-radius: 4px;
+        }
+        .img-close {
+            position: absolute;
+            top: 18px;
+            right: 22px;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            line-height: 30px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="profile-container">
+        <img src="imgs/life_and_others/myavtar.png" alt="王京的头像" class="avatar">
+        <div class="profile-info">
+            <div class="profile-top">
+                <div class="name">王京 </div>
+                <div class="header-cta">
+                    <nav aria-label="page navigation">
+                        <a class="nav-cta" href="carousel.html">Images</a>
+                        <a class="nav-cta" href="videos.html">Videos</a>
+                        <a class="nav-cta" href="index_all.html">All</a>
+                    </nav>
+                </div>
+            </div>
+            <div class="contact-info">求职意向： 算法/软件/测试 | 成都 </div>
+            <div class="contact-info">年龄： 24岁 | 性别： 男 | 籍贯： 重庆</div>
+            <div class="contact-info">联系方式： 17702376984 | 2642144249@qq.com</div>
+<div class="contact-info">社交媒体：<a class="nav-cta" href="https://github.com/JingW-ui" target="_blank" rel="noopener">Github</a><a class="nav-cta" href="https://space.bilibili.com/521967044?spm_id_from=333.1007.0.0" target="_blank" rel="noopener">B站</a> | 微信：Barbarianwj </div></div>
+    </div>
+</div>
+
+    <div class="section">
+        <div class="section-title">教育背景</div>
+                <div class="subsection">
+                    <div class="subsection-title">电子科技大学 生物医学工程 硕士  导师：<a class="subsection-a" href="chen_hua_fu.html" target="_blank" rel="noopener">陈华富</a></div>
+                    <div class="date">2024.09 - 至今</div>
+            <ul>
+                <li>专业成绩：GPA 3.83/4（专业前5%）</li>
+                <li>主修课程：生物医学材料前沿进展、矩阵理论、认知神经科学、神经信息学基础、统计推断方法、医学影像学进展、脑机接口技术</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 生物医学工程 本科</div>
+            <div class="date">2020.09 - 2024.06</div>
+            <ul>
+                <li>专业成绩：GPA 4.15/5（专业前2%）</li>
+                <li>主修课程：计算机编程、信号与系统、计算机原理及应用、医学影像处理技术、医学传感器、医学图像处理、医学机器学习、高等数学A、程序设计基础（C语言）电路分析基础A、模拟电子技术、数字电子技术等</li>
+                <li>荣誉：24届四川省优秀毕业生、综合素质A级证书、获得推免资格</li>
+            </ul>
+        </div>
+        
+
+    </div>
+<div class="section">
+        <div class="section-title">实习经历</div>
+        
+        <div class="subsection">
+            <div class="subsection-title">实习单位：国网宁夏电力有限公司</div>
+            <div class="date">2023.10.10~2023.12.10</div>
+            <div>技术栈： 无人机、斗臂车、YOLO、OpenPose、Python</div>
+            <ul>
+                <li>实习内容：学习配电网不停电作业流程：了解操作规范和安全要点；机器视觉与人工智能应用：掌握其在作业行为管控中的技术原理；数据收集与分析：协助采集和处理图像、视频数据，为算法开发提供支持；操作斗臂车与无人机：完成模拟作业，采集作业数据
+                    算法调研与实现：调研并实现头盔检测、人体姿势估计等算法；危险姿势分析：开发算法识别作业中的危险姿势，提供安全预警。
+                </li>
+                <li>项目职责：采集数据、模拟作业、调研算法并实现；</li>
+            </ul>
+        </div>
+</div>
+    <div class="section">
+        <div class="section-title">项目经验</div>
+        
+        <div class="subsection">
+            <div class="subsection-title">基于人体骨架检测的摔倒行为智能识别</div>
+            <div class="date">2025.04 - 2025.07</div>
+            <div>技术栈： YoloPose、OpenPose、BlazePose、PySide6、机器学习、深度学习、Transformer</div>
+            <ul>
+                <li>第十届全国大学生生物医学工程自选项目，获四川省一等奖：提出了一种基于人体骨架检测的智能识别系统。该系统首先采用 YoloPose、OpenPose 和 BlazePose 等技术估计人体姿态并提取骨骼点，随后基于这些骨骼点，设计并对比了阈值法、机器学习法、深度学习法和新颖的 Transformer 方法进行特征提取以实现跌倒检测。此外，系统基于 PySide6 设计了图形化界面，集成所提方法，供用户根据需求进行选择（默认采用阈值法），能够对实时摄像头输入进行较高帧率的跌倒检测并提供短信预警功能。</li>
+                <li>项目职责：主要负责人，自建数据集采集，预处理，环境配置，各类模型设计和训练及测试，阈值法，Qt页面设计开发及测试；</li>
+            </ul>
+        </div>
+        
+        <div class="subsection">
+            <div class="subsection-title">C语言能力考试系统：设计和开发人员</div>
+            <div class="date">2022.06 - 2022.11</div>
+            <div>技术栈： Spring Boot、MySQL、Java</div>
+            <ul>
+                <li>实验室项目，基于 Spring Boot 和 Vue 的网站开发，主要功能包括教师发布考试题目、设置考试时间、编辑学生成绩、系统自动根据教师的设定分配考试题目、学生可预约考试、教师可查看学生考试情况、教师还可设置模拟考试，目前已投入学校使用。</li>
+                <li>项目职责: mysql数据库设计，后端接口开发及测试；</li>
+            </ul>
+        </div>
+        
+        <div class="subsection">
+            <div class="subsection-title">结直肠癌智能检测与诊断系统：设计和开发人员</div>
+            <div class="date">2023.04 - 2023.07</div>
+            <div>技术栈： YOLOv8、Django、HTML、CSS、MySQL、Python</div>
+            <ul>
+                <li>第八届全国大学生生物医学工程创新设计竞赛，获全国二等奖，四川省一等奖。基于 YOLOv8 网络设计并训练出一种用于结直肠癌图像检测和诊断的模型，并结合 Django 框架、HTML、CSS 语言和 MySQL 数据库开发出一款结直肠癌智能检测和诊断系统，以帮助医生进行结直肠癌的早期筛查和诊断。</li>
+                <li>项目职责: 主要负责人，独立完成项目，针对指定数据集的目标检测模型的训练及测试，数据预处理，数据增强，页面设计及美化，mysql数据库设计，接口开发及测试；</li>
+            </ul>
+        </div>
+        
+        <div class="subsection">
+            <div class="subsection-title">基于深度学习的脑部MRI图像马区自动分割系统：设计和开发人员</div>
+            <div class="date">2024.04 - 2024.07</div>
+            <div>技术栈： nnU-Net、Python、3D Slicer</div>
+            <ul>
+                <li>第九届全国大学生生物医学工程创新设计竞赛，获全国一等奖。基于深度学习的 nnU-Net 3D 分割模型，完成开发出一款基于 MRI 格式脑部 MRI 图像的自动分割系统，分割精度：Dice系数：0.9554；HD95：1.0mm；；支持 3D 和 2D 分割结果的可视化及历史记录查询，为医生提供了一个便捷的在线诊断工具。</li>
+                <li>项目职责: 主要负责人，独立完成项目，针对指定数据集的分割模型的训练及测试，数据预处理，数据增强，页面设计及美化，数据库设计，接口开发及测试；</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">获奖经历</div>
+        <ul>
+            <li>2021年数学建模亚太地区三等奖（1/3）</li>
+            <li>2021年企业竞赛模拟一等奖（中国管理现代化研究会）（2/3）</li>
+            <li>2022年第二届四川省生物医学工程创新设计大赛二等奖（1/3）</li>
+            <li>2022年第七届全国大学生生物医学工程创新设计竞赛三等奖（1/3）</li>
+            <li>2023年第三届四川省生物医学工程创新设计大赛一等奖（1/3）</li>
+            <li>2023年第八届全国大学生生物医学工程创新设计竞赛二等奖（1/3）</li>
+            <li>2024年第四届四川省生物医学工程创新设计大赛一等奖（1/3）</li>
+            <li>2024年第九届全国大学生生物医学工程创新设计竞赛一等奖（1/2）<a class="label-link" href="https://www.toutiao.com/article/7395799470740390434/" target="_blank" rel="noopener">6911</a></li>
+            <li>2025年第五届四川省生物医学工程创新设计大赛一等奖（1/5）</li>
+            <li>2025年第五届四川省生物医学工程创新设计大赛一等奖（2/5）</li>
+            <li>2025年电子科技大学研究生数学建模校竞赛三等奖（1/1）</li>
+            <li>2025年第十届BOE全球创新挑战赛二等奖（2/3）</li>
+            <li>2025年电子科技大学研究生数学建模校竞赛三等奖（1/1）</li>
+            <li>2025年湖北工业大学“华为云杯”昇腾云血液图像处理大赛二等奖（1/2）<a class="label-link" href="https://developer.huaweicloud.com/competition/information/1300000220/html1" target="_blank" rel="noopener">[链接]</a></li>
+            <li>2025年第六届CSIG图像图形技术挑战赛：2025“Camera学术之星” 影像算法技术竞赛第八名（1/3）<a class="label-link" href="https://developer.huaweicloud.com/competition/information/1300000173/html2" target="_blank" rel="noopener">[链接]</a></li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <div class="section-title">语言技能</div>
+        <div class="skills">
+            <span class="skill">英语6级</span>
+            <span class="skill">Python</span>
+            <span class="skill">Java</span>
+            <span class="skill">Mysql</span>
+            <span class="skill">C/C++</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">科研成果</div>
+        <ul>
+            <li>专利已受权一项</li>
+            <li>软著五项</li>
+        </ul>
+    </div>
+
+<div class="section">
+    <div class="section-title">娱乐生活</div>
+    <ul>
+        <li>健身vlog博主，抖音粉丝5000+，获赞10w+(抖音名：京|自律版)</li>
+        <li>佳能男摄，接客超过100+，指导动作，提供情绪价值，专业级修图</li>
+    </ul>
+</div>
+
+<div class="section">
+    <div class="section-title">作品展示</div>
+<div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+    <a href="carousel.html" class="nav-btn">Image Gallery</a>
+    <a href="videos.html" class="nav-btn primary">Video Gallery</a>
+    <a href="resources/王京的个人简历20260109_compressed.pdf" class="nav-btn" download>Download PDF</a>
+</div>
+    </div>
+    <!-- image modal for avatar -->
+    <div id="imgModal" class="img-modal" aria-hidden="true" role="dialog">
+        <span class="img-close" aria-label="关闭">&times;</span>
+        <img class="img-modal-content" id="modalImg" alt="">
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const avatar = document.querySelector('.avatar');
+            const modal = document.getElementById('imgModal');
+            const modalImg = document.getElementById('modalImg');
+            const closeBtn = modal.querySelector('.img-close');
+            if (!avatar) return;
+            avatar.addEventListener('click', function(){
+                modal.style.display = 'flex';
+                modal.setAttribute('aria-hidden', 'false');
+                modalImg.src = this.src;
+                modalImg.alt = this.alt || '';
+                document.body.style.overflow = 'hidden';
+            });
+            function closeModal(){
+                modal.style.display = 'none';
+                modal.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                modalImg.src = '';
+            }
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
+        });
+    </script>
+</body>
+</html>
