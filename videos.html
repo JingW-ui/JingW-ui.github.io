@@ -1,10 +1,118 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en" class=" js ">
 <head>
-    <meta charset="UTF-8">
+    <style type="text/css">
+        .anticon {
+          display: inline-block;
+          color: inherit;
+          font-style: normal;
+          line-height: 0;
+          text-align: center;
+          text-transform: none;
+          vertical-align: -0.125em;
+          text-rendering: optimizeLegibility;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        .anticon > * {
+          line-height: 1;
+        }
+
+        .anticon svg {
+          display: inline-block;
+        }
+
+        .anticon::before {
+          display: none;
+        }
+
+        .anticon .anticon-icon {
+          display: block;
+        }
+
+        .anticon[tabindex] {
+          cursor: pointer;
+        }
+
+        .anticon-spin::before,
+        .anticon-spin {
+          display: inline-block;
+          -webkit-animation: loadingCircle 1s infinite linear;
+          animation: loadingCircle 1s infinite linear;
+        }
+
+        @-webkit-keyframes loadingCircle {
+          100% {
+            -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes loadingCircle {
+          100% {
+            -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+          }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="utf-8"> <!-- begin SEO --><title>About me - 王京</title>
+    <meta property="og:locale" content="zh-CN">
+    <meta property="og:site_name" content="WangJing">
+    <meta property="og:title" content="About me - WangJing">
+    <link rel="canonical" href="https://JingW-ui.github.io/">
+    <meta property="og:url" content="https://JingW-ui.github.io/">
+    <meta property="og:description" content="王京的个人简介">
+    <script async="" src="//www.google-analytics.com/analytics.js"></script>
+    <script type="application/ld+json"> {
+        "@context": "http://schema.org",
+        "@type": "Person",
+        "name": "WangJing",
+        "url": "https://JingW-ui.github.io",
+        "sameAs": null
+    } </script> <!-- end SEO -->
+    <link href="https://JingW-ui.github.io/feed.xml" type="application/atom+xml" rel="alternate" title="王京 Feed">
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Videos - Project Showcase</title>
-    <style>
+    <script>
+        document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+    </script> <!-- For all browsers -->
+    <link rel="stylesheet" href="https://caumente.github.io/assets/css/main.css">
+    <meta http-equiv="cleartype" content="on"> <!-- start custom head snippets -->
+    <link rel="apple-touch-icon" sizes="57x57" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="144x144"
+          href="https://caumente.github.io/images/apple-touch-icon-144x144.png?v=M44lzPylqQ">
+    <link rel="apple-touch-icon" sizes="152x152"
+          href="https://caumente.github.io/images/apple-touch-icon-152x152.png?v=M44lzPylqQ">
+    <link rel="apple-touch-icon" sizes="180x180"
+          href="https://caumente.github.io/images/apple-touch-icon-180x180.png?v=M44lzPylqQ">
+    <link rel="icon" type="image/png" href="https://caumente.github.io/images/favicon-32x32.png?v=M44lzPylqQ"
+          sizes="32x32">
+    <link rel="icon" type="image/png" href="https://caumente.github.io/images/android-chrome-192x192.png?v=M44lzPylqQ"
+          sizes="192x192">
+    <link rel="icon" type="image/png" href="https://caumente.github.io/images/favicon-96x96.png?v=M44lzPylqQ"
+          sizes="96x96">
+    <link rel="icon" type="image/png" href="https://caumente.github.io/images/favicon-16x16.png?v=M44lzPylqQ"
+          sizes="16x16">
+    <link rel="manifest" href="https://caumente.github.io/images/manifest.json?v=M44lzPylqQ">
+    <link rel="mask-icon" href="https://caumente.github.io/images/safari-pinned-tab.svg?v=M44lzPylqQ" color="#000000">
+    <link rel="shortcut icon" href="/images/favicon.ico?v=M44lzPylqQ">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="msapplication-TileImage" content="https://caumente.github.io/images/mstile-144x144.png?v=M44lzPylqQ">
+    <meta name="msapplication-config" content="https://caumente.github.io/images/browserconfig.xml?v=M44lzPylqQ">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="https://caumente.github.io/assets/css/academicons.css">
+    <style id="fit-vids-style">
+        .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
+    </style>
+        <style>
         * {
             margin: 0;
             padding: 0;
@@ -13,7 +121,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-            background: #fafafa;
+            background: #ffffff;
             min-height: 100vh;
             padding: 24px 16px;
             color: #333;
@@ -43,8 +151,7 @@
 
         .video-card {
             background: white;
-            border: 1px solid #e0e0e0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 8px 8px rgba(0, 0, 0, 0.06);
             overflow: hidden;
             transition: all 0.3s ease;
         }
@@ -55,12 +162,14 @@
         }
 
         .video-header {
-            background: #f5f5f5;
             padding: 12px 16px;
             border-bottom: 1px solid #e0e0e0;
             font-size: 14px;
             font-weight: 500;
             color: #333;
+            text-align: center;
+
+
         }
 
         .video-container {
@@ -69,6 +178,7 @@
             padding-bottom: 56.25%;
             background: #000;
             overflow: hidden;
+
         }
 
         .video-container video {
@@ -220,7 +330,7 @@
 
         .nav-btn:hover {
             border-color: #999;
-            background: #f9f9f9;
+            background: #ffffff;
         }
 
         .nav-btn:active {
@@ -237,18 +347,6 @@
             background: #555;
             border-color: #555;
         }
-        /* 左侧极简导航样式 */
-        .layout { display: flex; min-height: 100vh; }
-        .side-nav { width: 220px; padding: 28px 18px; background: #ffffff; border-right: 1px solid #eee; }
-        .nav-inner { display: flex; flex-direction: column; gap: 8px; }
-        .site-title { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 14px; }
-        .nav-link { display: block; padding: 10px 12px; color: #444; text-decoration: none; border-left: 4px solid transparent; font-weight: 500; border-radius: 2px; }
-        .nav-link:hover { background: #f7f7f7; color: #111; }
-        body.page-index .nav-link[href="index.html"], body.page-videos .nav-link[href="videos.html"], body.page-carousel .nav-link[href="carousel.html"] { border-left-color: transparent; }
-        body.page-index .nav-link[href="index.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
-        body.page-videos .nav-link[href="videos.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
-        body.page-carousel .nav-link[href="carousel.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
-        .main-content { flex: 1; padding: 24px; }
 
         @media (max-width: 760px) {
             .layout { flex-direction: column; }
@@ -258,20 +356,72 @@
         }
     </style>
 </head>
-<body class="page-videos">
-    <div class="layout">
-        <nav class="side-nav" aria-label="主导航">
-            <div class="nav-inner">
-                <div class="site-title"> </div>
-                <a class="nav-link" href="https://jingw-ui.github.io/">首页</a>
-                <a class="nav-link" href="carousel.html">图片</a>
-                <a class="nav-link" href="videos.html">视频</a>
+<body>
+<div id="MathJax_Message" style="display: none;"></div>
+<!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please
+    <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
+</div><![endif]-->
+<div class="masthead">
+    <div class="masthead__inner-wrap">
+        <div class="masthead__menu">
+            <nav id="site-nav" class="greedy-nav">
+                <button class="hidden" count="0">
+                    <div class="navicon"></div>
+                </button>
+                <ul class="visible-links">
+                    <li class="masthead__menu-item masthead__menu-item--lg"><a href="https://JingW-ui.github.io/">WangJing</a>
+                    </li>
+                    <li class="masthead__menu-item"><a href="resume.html">Resume</a></li>
+                    <li class="masthead__menu-item"><a href="carousel.html">Online Images</a></li>
+                    <li class="masthead__menu-item"><a href="https://JingW-ui.github.io/">Research
+                        Interests</a></li>
+                    <li class="masthead__menu-item"><a href="videos.html">Projects</a></li>
+                    <!--                    <li class="masthead__menu-item"><a href="https://JingW-ui.github.io/AUDIT/">AUDIT library</a></li>-->
+                </ul>
+                <ul class="hidden-links hidden"></ul>
+            </nav>
+        </div>
+    </div>
+</div>
+<div id="main" role="main">
+    <div class="sidebar sticky">
+        <div itemscope="" itemtype="http://schema.org/Person">
+            <div class="author__avatar"><img src="imgs/life_and_others/myavtar.png" class="author__avatar" alt="王京">
             </div>
-        </nav>
-        <main class="main-content">
+            <div class="author__content"><h3 class="author__name">Wang Jing</h3>
+                <p class="author__bio">Master's student in Biomedical Engineering at the UESTC, research interests: Brain-Computer Interface Technology
+                    Technology, Medical Image Processing, and Machine Learning.</p></div>
+            <div class="author__urls-wrapper">
+                <button class="btn btn--inverse">Follow</button>
+                <ul class="author__urls social-icons">
+                    <li style="color: #DB4437;"><a href="mailto:2642144249@qq.com"><i class="fas fa-fw fa-envelope"
+                                                                                      aria-hidden="true"></i> <span
+                            style="color: #494e52;">Email</span></a></li>
+                    <li>
+                        <a href="https://www.douyin.com/user/MS4wLjABAAAAgTtnMEWyl9SeEZpMYAJgzY1zEu7sZ5Z2AkwLiN8tags?from_tab_name=main">
+                            <i class="fab fa-fw fa-tiktok icon-item"></i>
+                            douyin</a></li>
+                    <li><a href="https://github.com/JingW-ui"><i class="fab fa-fw fa-github" aria-hidden="true"></i>
+                        Github</a></li>
+<!--                    <li style="color: #4285F4;"><a-->
+<!--                            href="https://scholar.google.es/citations?user=pGHSxGMAAAAJ&amp;hl=en"><i-->
+<!--                            class="ai ai-google-scholar-square ai-fw"></i> <span-->
+<!--                            style="color: #494e52;">Google Scholar</span></a></li>-->
+                    <li><a href="https://space.bilibili.com/521967044?spm_id_from=333.1007.0.0"> <i
+                            class="fab fa-fw fa-bilibili icon-item"></i> Bilibili</a></li>
+                                        <li><a href="#" class="label-link" onclick="showWeChatQRCode(); return false;"> <i class="fab fa-fw fa-weixin"></i> WeiChat</a></li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <article class="page" itemscope="" itemtype="http://schema.org/CreativeWork">
+        <meta itemprop="headline" content="About me">
+        <meta itemprop="description" content="About me">
+        <div class="page__inner-wrap">
+<main class="main-content">
             <div class="container">
-                <h1 class="title">Video Gallery</h1>
-                
                 <div class="videos-grid" id="videosGrid"></div>
 
                 <div class="nav-buttons">
@@ -280,7 +430,58 @@
                 </div>
             </div>
         </main>
+        </div>
+    </article>
+</div>
+<div class="page__footer">
+    <footer> <!-- start custom footer snippets --> <!--<a href="/sitemap/">Sitemap</a>-->
+        <!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+            <ul class="social-icons">
+                <li><strong>Follow:</strong></li>
+                <li><a href="https://jingw-ui.github.io/"><i class="fab fa-github" aria-hidden="true"></i> GitHub</a>
+                </li>
+                <li><a href="https://jingw-ui.github.io/"><i class="fa fa-fw fa-rss-square"
+                                                             aria-hidden="true"></i> Feed</a></li>
+            </ul>
+        </div>
+        <div class="page__footer-copyright">© 2025 Carlos Aumente Maestro. Powered by <a href="http://jekyllrb.com"
+                                                                                         rel="nofollow">Jekyll</a> &amp;
+            <a href="https://github.com/academicpages/academicpages.github.io">AcademicPages</a>, a fork of <a
+                    href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal
+                Mistakes</a>.
+        </div>
+    </footer>
+</div>
+<script src="https://caumente.github.io/assets/js/main.min.js"></script>
+<script>
+    function showWeChatQRCode() {
+        var qrCodeContainer = document.getElementById('wechat-qrcode-container');
+        if (qrCodeContainer) {
+            qrCodeContainer.style.display = 'block';
+            // 添加关闭功能
+            qrCodeContainer.onclick = function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            };
+        }
+    }
+
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) })(window,document,'script','//www.google-analytics.com/analytics.js','ga'); ga('create', '', 'auto'); ga('send', 'pageview');
+</script>
+<div id="aiknowledge_pdf_auto_upload"
+     style="position: fixed; top: 8px; right: 8px; z-index: 9999; background-color: white;"></div>
+<!-- 微信二维码容器 -->
+<div id="wechat-qrcode-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+        <img src="imgs/life_and_others/weichat.png" alt="微信二维码" style="max-width: 50%; max-height: 80vh;">
+        <p style="margin-top: 10px; color: #666;"></p>
+        <button onclick="document.getElementById('wechat-qrcode-container').style.display='none';" style="margin-top: 10px; padding: 5px 10px; border: none; background: #4285F4; color: white; border-radius: 5px; cursor: pointer;">关闭</button>
     </div>
+</div>
+</body>
+<div id="immersive-translate-popup" style="all: initial"></div>
     <script>
         // 视频数据配置
         const videos = [
@@ -351,20 +552,20 @@
         function createVideoCard(video) {
             const card = document.createElement('div');
             card.className = 'video-card';
-            
+
             const header = document.createElement('div');
             header.className = 'video-header';
             header.textContent = video.title;
-            
+
             const container = document.createElement('div');
             container.className = 'video-container';
-            
+
             if (video.type === 'local') {
                 createLocalVideoCard(card, container, video, header);
             } else if (video.type === 'bilibili') {
                 createBilibiliCard(card, container, video, header);
             }
-            
+
             return card;
         }
 
@@ -376,69 +577,69 @@
             videoElem.preload = 'metadata';
             videoElem.src = video.filename;
             container.appendChild(videoElem);
-            
+
             const controls = document.createElement('div');
             controls.className = 'video-controls';
-            
+
             const playBtn = document.createElement('button');
             playBtn.className = 'control-button';
             playBtn.textContent = '▶ Play';
             playBtn.onclick = () => togglePlay(videoElem, playBtn);
-            
+
             const info = document.createElement('div');
             info.className = 'video-info';
             info.textContent = 'Ready';
-            
+
             const duration = document.createElement('div');
             duration.className = 'duration';
             duration.textContent = 'Loading...';
-            
+
             const fullscreenBtn = document.createElement('button');
             fullscreenBtn.className = 'control-button fullscreen-btn';
             fullscreenBtn.textContent = '⛶ Full';
             fullscreenBtn.onclick = () => toggleFullscreen(videoElem);
-            
+
             // 监听元数据加载
             videoElem.addEventListener('loadedmetadata', () => {
                 const minutes = Math.floor(videoElem.duration / 60);
                 const seconds = Math.floor(videoElem.duration % 60);
                 duration.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
             });
-            
+
             // 监听播放状态
             videoElem.addEventListener('play', () => {
                 playBtn.textContent = '⏸ Pause';
                 info.textContent = 'Playing...';
             });
-            
+
             videoElem.addEventListener('pause', () => {
                 playBtn.textContent = '▶ Play';
                 info.textContent = 'Paused';
             });
-            
+
             videoElem.addEventListener('ended', () => {
                 playBtn.textContent = '▶ Play';
                 info.textContent = 'Ended';
             });
-            
+
             videoElem.addEventListener('timeupdate', () => {
                 const current = Math.floor(videoElem.currentTime);
                 const minutes = Math.floor(current / 60);
                 const seconds = Math.floor(current % 60);
                 info.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
             });
-            
+
             // 处理加载错误
             videoElem.addEventListener('error', () => {
                 info.textContent = 'Failed to load video';
                 playBtn.disabled = true;
             });
-            
+
             controls.appendChild(playBtn);
             controls.appendChild(info);
             controls.appendChild(duration);
             controls.appendChild(fullscreenBtn);
-            
+
             const meta = document.createElement('div');
             meta.className = 'video-meta';
             const metaLabel = document.createElement('div');
@@ -448,7 +649,7 @@
             metaText.textContent = video.description;
             meta.appendChild(metaLabel);
             meta.appendChild(metaText);
-            
+
             card.appendChild(header);
             card.appendChild(container);
             card.appendChild(controls);
@@ -462,7 +663,7 @@
             iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
             iframe.allowFullscreen = true;
             container.appendChild(iframe);
-            
+
             const meta = document.createElement('div');
             meta.className = 'video-meta';
             const metaLabel = document.createElement('div');
@@ -476,7 +677,7 @@
             };
             meta.appendChild(metaLabel);
             meta.appendChild(metaText);
-            
+
             card.appendChild(header);
             card.appendChild(container);
             card.appendChild(meta);
@@ -508,5 +709,4 @@
         // 页面加载完成后初始化
         window.addEventListener('DOMContentLoaded', init);
     </script>
-</body>
 </html>

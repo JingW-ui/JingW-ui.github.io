@@ -1,17 +1,125 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en" class=" js ">
 <head>
-    <meta charset="UTF-8">
+    <style type="text/css">
+        .anticon {
+          display: inline-block;
+          color: inherit;
+          font-style: normal;
+          line-height: 0;
+          text-align: center;
+          text-transform: none;
+          vertical-align: -0.125em;
+          text-rendering: optimizeLegibility;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+        }
+
+        .anticon > * {
+          line-height: 1;
+        }
+
+        .anticon svg {
+          display: inline-block;
+        }
+
+        .anticon::before {
+          display: none;
+        }
+
+        .anticon .anticon-icon {
+          display: block;
+        }
+
+        .anticon[tabindex] {
+          cursor: pointer;
+        }
+
+        .anticon-spin::before,
+        .anticon-spin {
+          display: inline-block;
+          -webkit-animation: loadingCircle 1s infinite linear;
+          animation: loadingCircle 1s infinite linear;
+        }
+
+        @-webkit-keyframes loadingCircle {
+          100% {
+            -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes loadingCircle {
+          100% {
+            -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+          }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="utf-8"> <!-- begin SEO --><title>About me - 王京</title>
+    <meta property="og:locale" content="zh-CN">
+    <meta property="og:site_name" content="WangJing">
+    <meta property="og:title" content="About me - WangJing">
+    <link rel="canonical" href="https://JingW-ui.github.io/">
+    <meta property="og:url" content="https://JingW-ui.github.io/">
+    <meta property="og:description" content="王京的个人简介">
+    <script async="" src="//www.google-analytics.com/analytics.js"></script>
+    <script type="application/ld+json"> {
+        "@context": "http://schema.org",
+        "@type": "Person",
+        "name": "WangJing",
+        "url": "https://JingW-ui.github.io",
+        "sameAs": null
+    } </script> <!-- end SEO -->
+    <link href="https://JingW-ui.github.io/feed.xml" type="application/atom+xml" rel="alternate" title="王京 Feed">
+    <!-- http://t.co/dKP3o1e -->
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图片轮播 - 专利、竞赛、生活及其他</title>
-    <style>
+    <script>
+        document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
+    </script> <!-- For all browsers -->
+    <link rel="stylesheet" href="https://caumente.github.io/assets/css/main.css">
+    <meta http-equiv="cleartype" content="on"> <!-- start custom head snippets -->
+    <link rel="apple-touch-icon" sizes="57x57" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="imgs/life_and_others/myavtar.png">
+    <link rel="apple-touch-icon" sizes="144x144"
+          href="https://caumente.github.io/images/apple-touch-icon-144x144.png?v=M44lzPylqQ">
+    <link rel="apple-touch-icon" sizes="152x152"
+          href="https://caumente.github.io/images/apple-touch-icon-152x152.png?v=M44lzPylqQ">
+    <link rel="apple-touch-icon" sizes="180x180"
+          href="https://caumente.github.io/images/apple-touch-icon-180x180.png?v=M44lzPylqQ">
+    <link rel="icon" type="image/png" href="https://caumente.github.io/images/favicon-32x32.png?v=M44lzPylqQ"
+          sizes="32x32">
+    <link rel="icon" type="image/png" href="https://caumente.github.io/images/android-chrome-192x192.png?v=M44lzPylqQ"
+          sizes="192x192">
+    <link rel="icon" type="image/png" href="https://caumente.github.io/images/favicon-96x96.png?v=M44lzPylqQ"
+          sizes="96x96">
+    <link rel="icon" type="image/png" href="https://caumente.github.io/images/favicon-16x16.png?v=M44lzPylqQ"
+          sizes="16x16">
+    <link rel="manifest" href="https://caumente.github.io/images/manifest.json?v=M44lzPylqQ">
+    <link rel="mask-icon" href="https://caumente.github.io/images/safari-pinned-tab.svg?v=M44lzPylqQ" color="#000000">
+    <link rel="shortcut icon" href="/images/favicon.ico?v=M44lzPylqQ">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="msapplication-TileImage" content="https://caumente.github.io/images/mstile-144x144.png?v=M44lzPylqQ">
+    <meta name="msapplication-config" content="https://caumente.github.io/images/browserconfig.xml?v=M44lzPylqQ">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="https://caumente.github.io/assets/css/academicons.css">
+    <style id="fit-vids-style">
+        .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
+    </style>
+        <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-            background: #fafafa;
+
             min-height: 100vh;
-            padding: 24px 16px;
+            padding: 0px 0px;
             color: #333;
         }
 
@@ -25,7 +133,6 @@
         .tab-btn.active { background: #333; color: white; border-color: #333; }
 
         .carousel-wrapper { background: white; border: 1px solid #e0e0e0; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .carousel-header { background: #f5f5f5; color: #333; padding: 12px 16px; font-size: 14px; font-weight: 500; border-bottom: 1px solid #e0e0e0; }
         .carousel-content { position: relative; width: 100%; padding-bottom: 60%; background: #fafafa; cursor: pointer; }
         .carousel-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: visible; perspective: 1000px; }
         .carousel-item { position: absolute; width: 70%; height: 90%; opacity: 0; transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); display: flex; align-items: center; justify-content: center; transform-origin: center; }
@@ -67,53 +174,211 @@
             .carousel-item.next { transform: translateX(30%) rotateY(10deg) scale(1); }
         }
 
-        .title { font-size: 22px; margin-bottom: 10px; }
-        .carousel-wrapper { border-left: none; border-right: none; }
-        .tab-buttons { gap: 6px; margin-bottom: 16px; }
-        .tab-btn { padding: 6px 12px; font-size: 12px; }
-        .carousel-controls { padding: 10px 12px; gap: 8px; }
-        .carousel-button { padding: 5px 10px; font-size: 11px; }
-        .carousel-info { font-size: 11px; }
-
-        /* 左侧极简导航样式 */
-        .layout { display: flex; min-height: 100vh; }
-        .side-nav { width: 220px; padding: 28px 18px; background: #ffffff; border-right: 1px solid #eee; }
-        .nav-inner { display: flex; flex-direction: column; gap: 8px; }
-        .site-title { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 14px; }
-        .nav-link { display: block; padding: 10px 12px; color: #444; text-decoration: none; border-left: 4px solid transparent; font-weight: 500; border-radius: 2px; }
-        .nav-link:hover { background: #f7f7f7; color: #111; }
-        body.page-index .nav-link[href="index.html"], body.page-videos .nav-link[href="videos.html"], body.page-carousel .nav-link[href="carousel.html"] { border-left-color: transparent; }
-        body.page-index .nav-link[href="index.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
-        body.page-videos .nav-link[href="videos.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
-        body.page-carousel .nav-link[href="carousel.html"] { background:#f0f0f0; border-left-color:#333; color:#111; }
-        .main-content { flex: 1; padding: 12px; }
-
-        @media (max-width: 760px) {
-            .layout { flex-direction: column; }
-            .side-nav { width: 100%; display: flex; padding: 8px; border-bottom: 1px solid #eee; }
-            .nav-inner { flex-direction: row; gap: 6px; width: 100%; justify-content: space-around; }
-            .main-content { padding: 16px; }
+        /* 针对更小屏幕的优化 */
+        @media (max-width: 480px) {
+            .carousel-content { padding-bottom: 100%; }
+            .carousel-item { width: 85%; height: 90%; }
+            .carousel-item.active { transform: translateX(0) rotateY(0) scale(1.05); }
+            .carousel-item.prev { transform: translateX(-25%) rotateY(-10deg) scale(0.95); }
+            .carousel-item.next { transform: translateX(25%) rotateY(10deg) scale(0.95); }
         }
-</style>
+
+        /* 优化页脚样式，使其在初始状态下隐藏 */
+        .page__footer {
+            position: fixed;
+            bottom: -100px; /* 初始位置在页面下方，不可见 */
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+            transition: bottom 0.3s ease;
+            z-index: 999;
+        }
+
+        .page__footer.show {
+            bottom: 0;
+        }
+
+        /* 主要内容区域样式调整 */
+        #main {
+            margin-left: 240px; /* 为侧边栏留出空间 */
+            padding-bottom: 100px; /* 为固定页脚留出空间 */
+        }
+
+        .page__inner-wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0px;
+        }
+
+        .carousel-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* 优化轮播图容器以适应侧边栏布局 */
+        .carousel-wrapper {
+            margin: 0 auto;
+            max-width: 800px;
+        }
+
+        /* 针对不同屏幕尺寸的优化 */
+        @media (max-width: 1024px) {
+            #main {
+                margin-left: 0;
+                padding: 0 10px 100px 10px; /* 为固定页脚留出空间 */
+            }
+
+            .carousel-wrapper {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page__inner-wrap {
+                padding: 5px;
+            }
+
+            .carousel-container {
+                padding: 15px;
+            }
+
+            .carousel-content {
+                padding-bottom: 70%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .carousel-content {
+                padding-bottom: 85%;
+            }
+
+            .carousel-item { width: 85%; height: 90%; }
+            .carousel-item.active { transform: translateX(0) rotateY(0) scale(1.05); }
+            .carousel-item.prev { transform: translateX(-25%) rotateY(-10deg) scale(0.95); }
+            .carousel-item.next { transform: translateX(25%) rotateY(10deg) scale(0.95); }
+        }
+
+        /* 悬停切换功能样式 */
+        .carousel-content {
+            position: relative;
+            width: 100%;
+            padding-bottom: 60%;
+            background: #fafafa;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        /* 左右悬停区域指示器（可选显示） */
+        .carousel-content::before,
+        .carousel-content::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 30%;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .carousel-content::before {
+            left: 0;
+            /* 可选：添加微妙的半透明覆盖层显示切换区域 */
+        }
+
+        .carousel-content::after {
+            right: 0;
+            /* 可选：添加微妙的半透明覆盖层显示切换区域 */
+        }
+
+        /* 页脚样式 - 初始隐藏，滚动后显示 */
+        .page__footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .page__footer.show {
+            transform: translateY(0);
+        }
+    </style>
 </head>
-    <body class="page-carousel">
-        <div class="layout">
-            <nav class="side-nav" aria-label="主导航">
-                <div class="nav-inner">
-                    <div class="site-title"> </div>
-                    <a class="nav-link" href="https://jingw-ui.github.io/">首页</a>
-                    <a class="nav-link" href="carousel.html">图片</a>
-                    <a class="nav-link" href="videos.html">视频</a>
-                </div>
+<body>
+<div id="MathJax_Message" style="display: none;"></div>
+<!--[if lt IE 9]>
+<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please
+    <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
+</div><![endif]-->
+<div class="masthead">
+    <div class="masthead__inner-wrap">
+        <div class="masthead__menu">
+            <nav id="site-nav" class="greedy-nav">
+                <button class="hidden" count="0">
+                    <div class="navicon"></div>
+                </button>
+                <ul class="visible-links">
+                    <li class="masthead__menu-item masthead__menu-item--lg"><a href="https://JingW-ui.github.io/">WangJing</a>
+                    </li>
+                    <li class="masthead__menu-item"><a href="resume.html">Resume</a></li>
+                    <li class="masthead__menu-item"><a href="carousel.html">Online Images</a></li>
+                    <li class="masthead__menu-item"><a href="https://JingW-ui.github.io/">Research
+                        Interests</a></li>
+                    <li class="masthead__menu-item"><a href="videos.html">Projects</a></li>
+                    <!--                    <li class="masthead__menu-item"><a href="https://JingW-ui.github.io/AUDIT/">AUDIT library</a></li>-->
+                </ul>
+                <ul class="hidden-links hidden"></ul>
             </nav>
-            <main class="main-content">
-                <div class="container">
-        <h1 class="title">Image Gallery</h1>
-        
+        </div>
+    </div>
+</div>
+<div id="main" role="main">
+    <div class="sidebar sticky">
+        <div itemscope="" itemtype="http://schema.org/Person">
+            <div class="author__avatar"><img src="imgs/life_and_others/myavtar.png" class="author__avatar" alt="王京">
+            </div>
+            <div class="author__content"><h3 class="author__name">Wang Jing</h3>
+                <p class="author__bio">Master's student in Biomedical Engineering at the UESTC, research interests: Brain-Computer Interface Technology
+                    Technology, Medical Image Processing, and Machine Learning.</p></div>
+            <div class="author__urls-wrapper">
+                <button class="btn btn--inverse">Follow</button>
+                <ul class="author__urls social-icons">
+                    <li style="color: #DB4437;"><a href="mailto:2642144249@qq.com"><i class="fas fa-fw fa-envelope"
+                                                                                      aria-hidden="true"></i> <span
+                            style="color: #494e52;">Email</span></a></li>
+                    <li>
+                        <a href="https://www.douyin.com/user/MS4wLjABAAAAgTtnMEWyl9SeEZpMYAJgzY1zEu7sZ5Z2AkwLiN8tags?from_tab_name=main">
+                            <i class="fab fa-fw fa-tiktok icon-item"></i>
+                            douyin</a></li>
+                    <li><a href="https://github.com/JingW-ui"><i class="fab fa-fw fa-github" aria-hidden="true"></i>
+                        Github</a></li>
+<!--                    <li style="color: #4285F4;"><a-->
+<!--                            href="https://scholar.google.es/citations?user=pGHSxGMAAAAJ&amp;hl=en"><i-->
+<!--                            class="ai ai-google-scholar-square ai-fw"></i> <span-->
+<!--                            style="color: #494e52;">Google Scholar</span></a></li>-->
+                    <li><a href="https://space.bilibili.com/521967044?spm_id_from=333.1007.0.0"> <i
+                            class="fab fa-fw fa-bilibili icon-item"></i> Bilibili</a></li>
+                                        <li><a href="#" class="label-link" onclick="showWeChatQRCode(); return false;"> <i class="fab fa-fw fa-weixin"></i> WeiChat</a></li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <article class="page" itemscope="" itemtype="http://schema.org/CreativeWork">
+        <meta itemprop="headline" content="About me">
+        <meta itemprop="description" content="About me">
+        <div class="page__inner-wrap">
         <div class="tab-buttons" id="tabButtons"></div>
-        
+
         <div class="carousel-wrapper">
-            <div class="carousel-header" id="carouselHeader">Loading...</div>
+            <div class="carousel-header" id="carouselHeader"></div>
             <div class="carousel-content" id="carouselContent">
                 <div class="carousel-inner" id="carouselInner"></div>
             </div>
@@ -126,439 +391,495 @@
                 <button class="carousel-button" id="nextBtn" onclick="nextImage()">Next</button>
             </div>
         </div>
-
-        <div class="nav-buttons">
-            <a href="index.html" class="nav-btn">← Home</a>
-            <a href="videos.html" class="nav-btn primary">Video Gallery →</a>
         </div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        // 图片数据配置
-        const categories = {
-            'patents_and_software': {
-                name: 'Patents & Software',
-                images: [
-                    'imgs/patents_and_software/1.png',
-                    'imgs/patents_and_software/2.png',
-                    'imgs/patents_and_software/3.png',
-                    'imgs/patents_and_software/4.png',
-                    'imgs/patents_and_software/5.png',
-                    'imgs/patents_and_software/6.png',
-                    'imgs/patents_and_software/7.png',
-                    'imgs/patents_and_software/8.png',
-                    'imgs/patents_and_software/9.png'
-                ]
-            },
-            'competitions': {
-                name: 'Competitions',
-                images: [
-                    'imgs/competitions/1.jpg',
-                    'imgs/competitions/2.jpg',
-                    'imgs/competitions/3.png',
-                    'imgs/competitions/4.png',
-                    'imgs/competitions/5.jpg',
-                    'imgs/competitions/6.jpg',
-                    'imgs/competitions/7.png',
-                    'imgs/competitions/8.png',
-                    'imgs/competitions/9.png',
-                    'imgs/competitions/10.png',
-                    'imgs/competitions/11.JPG',
-                    'imgs/competitions/12.JPG'
-                ]
-            },
-            'life_and_others': {
-                name: 'Life & Others',
-                images: [
-                    'imgs/life_and_others/1.jpg',
-                    'imgs/life_and_others/2.jpg',
-                    'imgs/life_and_others/3.jpg',
-                    'imgs/life_and_others/4.jpg',
-                    'imgs/life_and_others/三好学生.jpg',
-                    'imgs/life_and_others/优秀寝室.jpg',
-                    'imgs/life_and_others/体育优秀奖.jpg',
-                    'imgs/life_and_others/创新奖.jpg',
-                    'imgs/life_and_others/四川省优秀毕业生.jpg',
-                    'imgs/life_and_others/混双乒乓球第二名.jpg',
-                    'imgs/life_and_others/绵阳市三好学生.png',
-                    'imgs/life_and_others/跳大绳第一名.jpg'
-                ]
-            }
-        };
-
-        let currentCategory = 'patents_and_software';
-        let currentIndex = 0;
-        let autoplayTimer = null;
-
-        // 初始化
-        function init() {
-            createTabButtons();
-            loadCategory('patents_and_software');
-            startAutoplay();
-
-            // 添加覆盖层（用于放大图片）
-            const overlay = document.createElement('div');
-            overlay.className = 'overlay';
-            overlay.id = 'imageOverlay';
-            overlay.innerHTML = '<img id="overlayImg" src="" alt="enlarged">';
-            overlay.addEventListener('click', closeOverlay);
-            document.body.appendChild(overlay);
-            // 点击图片本身不关闭覆盖层
-            const overlayImgEl = document.getElementById('overlayImg');
-            if (overlayImgEl) overlayImgEl.addEventListener('click', (ev) => ev.stopPropagation());
-
-            // 鼠标滚轮切换 (节流)
-            const wheelHandler = throttle((e) => {
-                if (Math.abs(e.deltaY) < 5) return;
-                if (e.deltaY > 0) {
-                    nextImage();
-                } else {
-                    previousImage();
-                }
-            }, 600);
-            // 仅在轮播区域内监听滚轮；区域外保留页面滚动
-            const carouselContentEl = document.querySelector('.carousel-content');
-            if (carouselContentEl) {
-                // 使用 passive:false 以便在轮播区内阻止默认页面滚动并切换图片
-                carouselContentEl.addEventListener('wheel', (e) => {
-                    // 如果 overlay 打开则不切换
-                    if (document.getElementById('imageOverlay').classList.contains('show')) return;
-                    e.preventDefault();
-                    wheelHandler(e);
-                }, { passive: false });
-            }
-
-            // 点击或触摸放大 - 事件代理到 carouselInner
-            const carouselInner = document.getElementById('carouselInner');
-            carouselInner.addEventListener('click', (e) => {
-                // 如果点击的是图片本身，则放大图片
-                if (e.target.tagName === 'IMG') {
-                    openOverlay(e.target.src);
-                }
-            });
-
-            // 点击画布区域切换图片
-            const carouselContent = document.getElementById('carouselContent');
-            
-            carouselContent.addEventListener('click', (e) => {
-                // 如果点击的不是图片本身，则执行切换操作
-                if (e.target.tagName !== 'IMG') {
-                    const rect = carouselContent.getBoundingClientRect();
-                    const clickX = e.clientX - rect.left;
-                    const centerX = rect.width / 2;
-                    
-                    if (clickX < centerX) {
-                        // 点击左侧，上一张
-                        previousImage();
-                    } else {
-                        // 点击右侧，下一张
-                        nextImage();
-                    }
-                }
-            });
-
-            // 移动端：滑动和点击处理（避免与滑动切换冲突）
-            let touchStartPos = null;
-            let touchStartTime = 0;
-            let isSwiping = false;
-            
-            // 记录滑动起始位置的变量
-            let touchStartX = 0;
-            let touchEndX = 0;
-            
-            carouselInner.addEventListener('touchstart', (e) => {
-                if (e.touches && e.touches[0]) {
-                    touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                    touchStartX = e.touches[0].clientX; // 记录滑动起始位置
-                    touchStartTime = Date.now();
-                    isSwiping = false; // 重置滑动状态
-                }
-            }, { passive: true });
-            
-            carouselInner.addEventListener('touchmove', (e) => {
-                if (touchStartPos) {
-                    const touch = e.touches[0];
-                    const dx = Math.abs(touch.clientX - touchStartPos.x);
-                    const dy = Math.abs(touch.clientY - touchStartPos.y);
-                    
-                    // 如果水平滑动距离大于垂直滑动距离，标记为滑动
-                    if (dx > dy && dx > 10) {
-                        isSwiping = true;
-                    }
-                }
-            }, { passive: true });
-            
-            carouselInner.addEventListener('touchend', (e) => {
-                const touch = (e.changedTouches && e.changedTouches[0]) || null;
-                if (!touch || !touchStartPos) return;
-                
-                touchEndX = touch.clientX; // 记录滑动结束位置
-                
-                const dx = Math.abs(touch.clientX - touchStartPos.x);
-                const dy = Math.abs(touch.clientY - touchStartPos.y);
-                const dt = Date.now() - touchStartTime;
-                
-                // 检查是否为滑动操作
-                const swipeThreshold = 50; // 最小滑动距离阈值
-                const diff = touchStartX - touchEndX;
-                
-                // 如果是明显的滑动动作，执行切换
-                if (Math.abs(diff) > swipeThreshold) {
-                    isSwiping = true;
-                    if (diff > 0) {
-                        // 向左滑动，切换到下一张
-                        nextImage();
-                    } else {
-                        // 向右滑动，切换到上一张
-                        previousImage();
-                    }
-                    touchStartPos = null;
-                    return;
-                }
-                
-                // 如果是滑动动作但未达到阈值，不执行任何操作
-                if (isSwiping) {
-                    touchStartPos = null;
-                    return;
-                }
-                
-                // 认为是点击的条件：短时间且移动距离小
-                if (dt < 300 && dx < 10 && dy < 10) {
-                    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-                    if (el && el.tagName === 'IMG') {
-                        // 点击的是图片，执行放大
-                        openOverlay(el.src);
-                    } else {
-                        // 点击的是画布区域，执行切换
-                        const rect = carouselContent.getBoundingClientRect();
-                        const clickX = touch.clientX - rect.left;
-                        const centerX = rect.width / 2;
-                        
-                        if (clickX < centerX) {
-                            // 点击左侧，上一张
-                            previousImage();
-                        } else {
-                            // 点击右侧，下一张
-                            nextImage();
-                        }
-                    }
-                }
-                touchStartPos = null;
-            }, { passive: true });
-            
-        }
-
-        // 创建分类标签按钮
-        function createTabButtons() {
-            const tabContainer = document.getElementById('tabButtons');
-            Object.keys(categories).forEach(key => {
-                const btn = document.createElement('button');
-                btn.className = `tab-btn ${key === 'patents_and_software' ? 'active' : ''}`;
-                btn.textContent = categories[key].name;
-                btn.onclick = () => switchCategory(key, btn);
-                tabContainer.appendChild(btn);
-            });
-        }
-
-        // 切换分类
-        function switchCategory(categoryKey, btnElement) {
-            currentCategory = categoryKey;
-            currentIndex = 0;
-            
-            // 更新按钮状态
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            btnElement.classList.add('active');
-            
-            loadCategory(categoryKey);
-            resetAutoplay();
-        }
-
-        // 加载分类的所有图片
-        function loadCategory(categoryKey) {
-            const category = categories[categoryKey];
-            const carouselInner = document.getElementById('carouselInner');
-            const carouselHeader = document.getElementById('carouselHeader');
-            
-            carouselHeader.textContent = category.name;
-            carouselInner.innerHTML = '';
-            
-            // 确保至少有3张图片用于显示
-            const images = category.images;
-            if (images.length === 0) return;
-            
-            // 添加三张图片：前一张、当前、后一张
-            for (let i = 0; i < images.length; i++) {
-                const item = document.createElement('div');
-                item.className = 'carousel-item';
-                item.innerHTML = `<img src="${images[i]}" alt="Image ${i + 1}" onerror="handleImageError(this)">`;
-                carouselInner.appendChild(item);
-            }
-            
-            currentIndex = 0;
-            updateCarousel();
-        }
-
-        // 显示下一张
-        function nextImage() {
-            const images = categories[currentCategory].images;
-            currentIndex = (currentIndex + 1) % images.length;
-            updateCarousel();
-            resetAutoplay();
-        }
-
-        // 显示上一张
-        function previousImage() {
-            const images = categories[currentCategory].images;
-            currentIndex = (currentIndex - 1 + images.length) % images.length;
-            updateCarousel();
-            resetAutoplay();
-        }
-
-        // 更新轮播（支持左右、前后项堆叠显示）
-        function updateCarousel() {
-            const items = Array.from(document.querySelectorAll('.carousel-item'));
-            const total = items.length;
-
-            if (total === 0) return;
-
-            // 清除所有类和样式
-            items.forEach(item => {
-                item.classList.remove('active', 'prev', 'next');
-                // 默认隐藏所有图片
-                item.style.zIndex = '1';
-                item.style.opacity = '0';
-                item.style.transform = 'translateX(0) rotateY(0) scale(0.8)';
-            });
-
-            // 确保currentIndex在有效范围内
-            if (total > 0) {
-                currentIndex = ((currentIndex % total) + total) % total;
-            }
-
-            // 获取当前、前一个和后一个索引
-            const activeIndex = currentIndex;
-            const prevIndex = total > 1 ? (currentIndex - 1 + total) % total : -1;
-            const nextIndex = total > 1 ? (currentIndex + 1) % total : -1;
-
-            // 设置对应图片的状态和样式
-            if (items[activeIndex] && total > 0) {
-                items[activeIndex].classList.add('active');
-                items[activeIndex].style.zIndex = '10';
-                items[activeIndex].style.opacity = '1';
-                items[activeIndex].style.transform = 'translateX(0) rotateY(0) scale(1.1)';
-            }
-            
-            if (items[prevIndex] && total > 1) {
-                items[prevIndex].classList.add('prev');
-                items[prevIndex].style.zIndex = '9';
-                items[prevIndex].style.opacity = '0.8';
-                items[prevIndex].style.transform = 'translateX(-30%) rotateY(-15deg) scale(1)';
-            }
-            
-            if (items[nextIndex] && total > 1) {
-                items[nextIndex].classList.add('next');
-                items[nextIndex].style.zIndex = '8';
-                items[nextIndex].style.opacity = '0.8';
-                items[nextIndex].style.transform = 'translateX(30%) rotateY(15deg) scale(1)';
-            }
-
-            updateDots();
-            updateInfo();
-        }
-
-        // 更新指示点
-        function updateDots() {
-            const images = categories[currentCategory].images;
-            const dotsContainer = document.getElementById('dotsContainer');
-            dotsContainer.innerHTML = '';
-
-            images.forEach((_, index) => {
-                const dot = document.createElement('span');
-                dot.className = `dot ${index === currentIndex ? 'active' : ''}`;
-                dot.onclick = () => {
-                    currentIndex = index;
-                    updateCarousel();
-                    resetAutoplay();
-                };
-                dotsContainer.appendChild(dot);
-            });
-        }
-
-        // 更新信息文本
-        function updateInfo() {
-            const images = categories[currentCategory].images;
-            const imageInfo = document.getElementById('imageInfo');
-            imageInfo.textContent = `${currentIndex + 1} / ${images.length}`;
-        }
-
-        // 自动播放
-        function startAutoplay() {
-            autoplayTimer = setInterval(() => {
-                nextImage();
-            }, 5000); // 5秒切换一次
-        }
-
-        // 重置自动播放
-        function resetAutoplay() {
-            clearInterval(autoplayTimer);
-            startAutoplay();
-        }
-
-        // 简单节流器
-        function throttle(fn, wait) {
-            let last = 0;
-            return function(...args) {
-                const now = Date.now();
-                if (now - last >= wait) {
-                    last = now;
-                    fn.apply(this, args);
+    </article>
+</div>
+<div class="page__footer">
+    <footer> <!-- start custom footer snippets --> <!--<a href="/sitemap/">Sitemap</a>-->
+        <!-- end custom footer snippets -->
+        <div class="page__footer-follow">
+            <ul class="social-icons">
+                <li><strong>Follow:</strong></li>
+                <li><a href="https://jingw-ui.github.io/"><i class="fab fa-github" aria-hidden="true"></i> GitHub</a>
+                </li>
+                <li><a href="https://jingw-ui.github.io/"><i class="fa fa-fw fa-rss-square"
+                                                             aria-hidden="true"></i> Feed</a></li>
+            </ul>
+        </div>
+        <div class="page__footer-copyright">© 2025 Carlos Aumente Maestro. Powered by <a href="http://jekyllrb.com"
+                                                                                         rel="nofollow">Jekyll</a> &amp;
+            <a href="https://github.com/academicpages/academicpages.github.io">AcademicPages</a>, a fork of <a
+                    href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal
+                Mistakes</a>.
+        </div>
+    </footer>
+</div>
+<script src="https://caumente.github.io/assets/js/main.min.js"></script>
+<script>
+    function showWeChatQRCode() {
+        var qrCodeContainer = document.getElementById('wechat-qrcode-container');
+        if (qrCodeContainer) {
+            qrCodeContainer.style.display = 'block';
+            // 添加关闭功能
+            qrCodeContainer.onclick = function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
                 }
             };
         }
+    }
 
-        // 打开覆盖层放大图片
-        function openOverlay(src) {
-            const overlay = document.getElementById('imageOverlay');
-            if (!overlay) return;
-            const img = document.getElementById('overlayImg');
-            img.src = src;
-            overlay.classList.add('show');
-            // 当覆盖层打开时暂停自动播放
-            clearInterval(autoplayTimer);
-            // 监听键盘 ESC 关闭
-            document.addEventListener('keydown', escCloseHandler);
-        }
-
-        function escCloseHandler(e) {
-            if (e.key === 'Escape') closeOverlay();
-        }
-
-        // 关闭覆盖层
-        function closeOverlay() {
-            const overlay = document.getElementById('imageOverlay');
-            if (!overlay) return;
-            overlay.classList.remove('show');
-            // 恢复自动播放
-            resetAutoplay();
-            document.removeEventListener('keydown', escCloseHandler);
-        }
-
-        // 处理图片加载错误
-        function handleImageError(img) {
-            img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f5f5f5" width="200" height="200"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23ccc" font-size="14"%3EImage Not Found%3C/text%3E%3C/svg%3E';
-        }
-
-        // 页面加载完成后初始化
-        window.addEventListener('DOMContentLoaded', init);
-
-        // 页面卸载时清除定时器
-        window.addEventListener('beforeunload', () => {
-            clearInterval(autoplayTimer);
-        });
-    </script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) })(window,document,'script','//www.google-analytics.com/analytics.js','ga'); ga('create', '', 'auto'); ga('send', 'pageview');
+</script>
+<div id="aiknowledge_pdf_auto_upload"
+     style="position: fixed; top: 8px; right: 8px; z-index: 9999; background-color: white;"></div>
+<!-- 微信二维码容器 -->
+<div id="wechat-qrcode-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+        <img src="imgs/life_and_others/weichat.png" alt="微信二维码" style="max-width: 50%; max-height: 80vh;">
+        <p style="margin-top: 10px; color: #666;"></p>
+        <button onclick="document.getElementById('wechat-qrcode-container').style.display='none';" style="margin-top: 10px; padding: 5px 10px; border: none; background: #4285F4; color: white; border-radius: 5px; cursor: pointer;">关闭</button>
+    </div>
+</div>
 </body>
+<div id="immersive-translate-popup" style="all: initial"></div>
+<script>
+    // 图片数据配置
+    const categories = {
+        'patents_and_software': {
+            name: 'Patents & Software',
+            images: [
+                'imgs/patents_and_software/1.png',
+                'imgs/patents_and_software/2.png',
+                'imgs/patents_and_software/3.png',
+                'imgs/patents_and_software/4.png',
+                'imgs/patents_and_software/5.png',
+                'imgs/patents_and_software/6.png',
+                'imgs/patents_and_software/7.png',
+                'imgs/patents_and_software/8.png',
+                'imgs/patents_and_software/9.png'
+            ]
+        },
+        'competitions': {
+            name: 'Competitions',
+            images: [
+                'imgs/competitions/1.jpg',
+                'imgs/competitions/2.jpg',
+                'imgs/competitions/3.png',
+                'imgs/competitions/4.png',
+                'imgs/competitions/5.jpg',
+                'imgs/competitions/6.jpg',
+                'imgs/competitions/7.png',
+                'imgs/competitions/8.png',
+                'imgs/competitions/9.png',
+                'imgs/competitions/10.png',
+                'imgs/competitions/11.JPG',
+                'imgs/competitions/12.JPG'
+            ]
+        },
+        'life_and_others': {
+            name: 'Life & Others',
+            images: [
+                'imgs/life_and_others/1.jpg',
+                'imgs/life_and_others/2.jpg',
+                'imgs/life_and_others/3.jpg',
+                'imgs/life_and_others/4.jpg',
+                'imgs/life_and_others/三好学生.jpg',
+                'imgs/life_and_others/优秀寝室.jpg',
+                'imgs/life_and_others/体育优秀奖.jpg',
+                'imgs/life_and_others/创新奖.jpg',
+                'imgs/life_and_others/四川省优秀毕业生.jpg',
+                'imgs/life_and_others/混双乒乓球第二名.jpg',
+                'imgs/life_and_others/绵阳市三好学生.png',
+                'imgs/life_and_others/跳大绳第一名.jpg'
+            ]
+        }
+    };
+
+    let currentCategory = 'patents_and_software';
+    let currentIndex = 0;
+    let autoplayTimer = null;
+
+    // 初始化
+    function init() {
+        createTabButtons();
+        loadCategory('patents_and_software');
+        startAutoplay();
+
+        // 添加覆盖层（用于放大图片）
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay';
+        overlay.id = 'imageOverlay';
+        overlay.innerHTML = '<img id="overlayImg" src="" alt="enlarged">';
+        overlay.addEventListener('click', closeOverlay);
+        document.body.appendChild(overlay);
+        // 点击图片本身不关闭覆盖层
+        const overlayImgEl = document.getElementById('overlayImg');
+        if (overlayImgEl) overlayImgEl.addEventListener('click', (ev) => ev.stopPropagation());
+
+        // 鼠标滚轮切换 (节流)
+        const wheelHandler = throttle((e) => {
+            if (Math.abs(e.deltaY) < 5) return;
+            if (e.deltaY > 0) {
+                nextImage();
+            } else {
+                previousImage();
+            }
+        }, 600);
+        // 仅在轮播区域内监听滚轮；区域外保留页面滚动
+        const carouselContentEl = document.querySelector('.carousel-content');
+        if (carouselContentEl) {
+            // 使用 passive:false 以便在轮播区内阻止默认页面滚动并切换图片
+            carouselContentEl.addEventListener('wheel', (e) => {
+                // 如果 overlay 打开则不切换
+                if (document.getElementById('imageOverlay').classList.contains('show')) return;
+                e.preventDefault();
+                wheelHandler(e);
+            }, { passive: false });
+        }
+
+        // 点击或触摸放大 - 事件代理到 carouselInner
+        const carouselInner = document.getElementById('carouselInner');
+        carouselInner.addEventListener('click', (e) => {
+            // 如果点击的是图片本身，则放大图片
+            if (e.target.tagName === 'IMG') {
+                openOverlay(e.target.src);
+            }
+        });
+
+        // 悬停切换功能 - 根据项目规范实现即时悬停切换
+        carouselContentEl.addEventListener('mousemove', (e) => {
+            const rect = carouselContentEl.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const threshold = rect.width * 0.3; // 30% 阈值
+
+            if (mouseX < threshold) {
+                // 鼠标在左侧30%区域，准备切换到上一张
+                document.body.style.cursor = 'w-resize';
+            } else if (mouseX > rect.width - threshold) {
+                // 鼠标在右侧30%区域，准备切换到下一张
+                document.body.style.cursor = 'e-resize';
+            } else {
+                // 鼠标在中间40%区域，不触发切换
+                document.body.style.cursor = 'default';
+            }
+        });
+
+        // 点击切换图片（根据悬停位置）
+        carouselContentEl.addEventListener('click', (e) => {
+            const rect = carouselContentEl.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const threshold = rect.width * 0.3; // 30% 阈值
+
+            if (clickX < threshold) {
+                // 点击左侧30%区域，切换到上一张
+                previousImage();
+            } else if (clickX > rect.width - threshold) {
+                // 点击右侧30%区域，切换到下一张
+                nextImage();
+            }
+            // 中间40%区域不执行切换操作，允许用户与控制元素交互
+        });
+
+        // 移动端：滑动和点击处理（避免与滑动切换冲突）
+        let touchStartPos = null;
+        let touchStartTime = 0;
+        let isSwiping = false;
+
+        // 记录滑动起始位置的变量
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        carouselInner.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches[0]) {
+                touchStartPos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                touchStartX = e.touches[0].clientX; // 记录滑动起始位置
+                touchStartTime = Date.now();
+                isSwiping = false; // 重置滑动状态
+            }
+        }, { passive: true });
+
+        carouselInner.addEventListener('touchmove', (e) => {
+            if (touchStartPos) {
+                const touch = e.touches[0];
+                const dx = Math.abs(touch.clientX - touchStartPos.x);
+                const dy = Math.abs(touch.clientY - touchStartPos.y);
+
+                // 如果水平滑动距离大于垂直滑动距离，标记为滑动
+                if (dx > dy && dx > 10) {
+                    isSwiping = true;
+                }
+            }
+        }, { passive: true });
+
+        carouselInner.addEventListener('touchend', (e) => {
+            const touch = (e.changedTouches && e.changedTouches[0]) || null;
+            if (!touch || !touchStartPos) return;
+
+            touchEndX = touch.clientX; // 记录滑动结束位置
+
+            const dx = Math.abs(touch.clientX - touchStartPos.x);
+            const dy = Math.abs(touch.clientY - touchStartPos.y);
+            const dt = Date.now() - touchStartTime;
+
+            // 检查是否为滑动操作
+            const swipeThreshold = 50; // 最小滑动距离阈值
+            const diff = touchStartX - touchEndX;
+
+            // 如果是明显的滑动动作，执行切换
+            if (Math.abs(diff) > swipeThreshold) {
+                isSwiping = true;
+                if (diff > 0) {
+                    // 向左滑动，切换到下一张
+                    nextImage();
+                } else {
+                    // 向右滑动，切换到上一张
+                    previousImage();
+                }
+                touchStartPos = null;
+                return;
+            }
+
+            // 如果是滑动动作但未达到阈值，不执行任何操作
+            if (isSwiping) {
+                touchStartPos = null;
+                return;
+            }
+
+            // 认为是点击的条件：短时间且移动距离小
+            if (dt < 300 && dx < 10 && dy < 10) {
+                const el = document.elementFromPoint(touch.clientX, touch.clientY);
+                if (el && el.tagName === 'IMG') {
+                    // 点击的是图片，执行放大
+                    openOverlay(el.src);
+                } else {
+                    // 根据点击位置决定是否切换图片
+                    const rect = carouselContentEl.getBoundingClientRect();
+                    const clickX = touch.clientX - rect.left;
+                    const threshold = rect.width * 0.3; // 30% 阈值
+
+                    if (clickX < threshold) {
+                        // 点击左侧30%区域，切换到上一张
+                        previousImage();
+                    } else if (clickX > rect.width - threshold) {
+                        // 点击右侧30%区域，切换到下一张
+                        nextImage();
+                    }
+                    // 中间40%区域不执行切换操作
+                }
+            }
+            touchStartPos = null;
+        }, { passive: true });
+
+    }
+
+    // 创建分类标签按钮
+    function createTabButtons() {
+        const tabContainer = document.getElementById('tabButtons');
+        Object.keys(categories).forEach(key => {
+            const btn = document.createElement('button');
+            btn.className = `tab-btn ${key === 'patents_and_software' ? 'active' : ''}`;
+            btn.textContent = categories[key].name;
+            btn.onclick = () => switchCategory(key, btn);
+            tabContainer.appendChild(btn);
+        });
+    }
+
+    // 切换分类
+    function switchCategory(categoryKey, btnElement) {
+        currentCategory = categoryKey;
+        currentIndex = 0;
+
+        // 更新按钮状态
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        btnElement.classList.add('active');
+
+        loadCategory(categoryKey);
+        resetAutoplay();
+    }
+
+    // 加载分类的所有图片
+    function loadCategory(categoryKey) {
+        const category = categories[categoryKey];
+        const carouselInner = document.getElementById('carouselInner');
+
+        // 不再更新已删除的carouselHeader
+        carouselInner.innerHTML = '';
+
+        // 确保至少有3张图片用于显示
+        const images = category.images;
+        if (images.length === 0) return;
+
+        // 添加三张图片：前一张、当前、后一张
+        for (let i = 0; i < images.length; i++) {
+            const item = document.createElement('div');
+            item.className = 'carousel-item';
+            item.innerHTML = `<img src="${images[i]}" alt="Image ${i + 1}" onerror="handleImageError(this)">`;
+            carouselInner.appendChild(item);
+        }
+
+        currentIndex = 0;
+        updateCarousel();
+    }
+
+    // 显示下一张
+    function nextImage() {
+        const images = categories[currentCategory].images;
+        currentIndex = (currentIndex + 1) % images.length;
+        updateCarousel();
+        resetAutoplay();
+    }
+
+    // 显示上一张
+    function previousImage() {
+        const images = categories[currentCategory].images;
+        currentIndex = (currentIndex - 1 + images.length) % images.length;
+        updateCarousel();
+        resetAutoplay();
+    }
+
+    // 更新轮播（支持左右、前后项堆叠显示）
+    function updateCarousel() {
+        const items = Array.from(document.querySelectorAll('.carousel-item'));
+        const total = items.length;
+
+        if (total === 0) return;
+
+        // 清除所有类和样式
+        items.forEach(item => {
+            item.classList.remove('active', 'prev', 'next');
+            // 默认隐藏所有图片
+            item.style.zIndex = '1';
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(0) rotateY(0) scale(0.8)';
+        });
+
+        // 确保currentIndex在有效范围内
+        if (total > 0) {
+            currentIndex = ((currentIndex % total) + total) % total;
+        }
+
+        // 获取当前、前一个和后一个索引
+        const activeIndex = currentIndex;
+        const prevIndex = total > 1 ? (currentIndex - 1 + total) % total : -1;
+        const nextIndex = total > 1 ? (currentIndex + 1) % total : -1;
+
+        // 设置对应图片的状态和样式
+        if (items[activeIndex] && total > 0) {
+            items[activeIndex].classList.add('active');
+            items[activeIndex].style.zIndex = '10';
+            items[activeIndex].style.opacity = '1';
+            items[activeIndex].style.transform = 'translateX(0) rotateY(0) scale(1.1)';
+        }
+
+        if (items[prevIndex] && total > 1) {
+            items[prevIndex].classList.add('prev');
+            items[prevIndex].style.zIndex = '9';
+            items[prevIndex].style.opacity = '0.8';
+            items[prevIndex].style.transform = 'translateX(-30%) rotateY(-15deg) scale(1)';
+        }
+
+        if (items[nextIndex] && total > 1) {
+            items[nextIndex].classList.add('next');
+            items[nextIndex].style.zIndex = '8';
+            items[nextIndex].style.opacity = '0.8';
+            items[nextIndex].style.transform = 'translateX(30%) rotateY(15deg) scale(1)';
+        }
+
+        updateDots();
+        updateInfo();
+    }
+
+    // 更新指示点
+    function updateDots() {
+        const images = categories[currentCategory].images;
+        const dotsContainer = document.getElementById('dotsContainer');
+        dotsContainer.innerHTML = '';
+
+        images.forEach((_, index) => {
+            const dot = document.createElement('span');
+            dot.className = `dot ${index === currentIndex ? 'active' : ''}`;
+            dot.onclick = () => {
+                currentIndex = index;
+                updateCarousel();
+                resetAutoplay();
+            };
+            dotsContainer.appendChild(dot);
+        });
+    }
+
+    // 更新信息文本
+    function updateInfo() {
+        const images = categories[currentCategory].images;
+        const imageInfo = document.getElementById('imageInfo');
+        imageInfo.textContent = `${currentIndex + 1} / ${images.length}`;
+    }
+
+    // 自动播放
+    function startAutoplay() {
+        autoplayTimer = setInterval(() => {
+            nextImage();
+        }, 5000); // 5秒切换一次
+    }
+
+    // 重置自动播放
+    function resetAutoplay() {
+        clearInterval(autoplayTimer);
+        startAutoplay();
+    }
+
+    // 简单节流器
+    function throttle(fn, wait) {
+        let last = 0;
+        return function(...args) {
+            const now = Date.now();
+            if (now - last >= wait) {
+                last = now;
+                fn.apply(this, args);
+            }
+        };
+    }
+
+    // 打开覆盖层放大图片
+    function openOverlay(src) {
+        const overlay = document.getElementById('imageOverlay');
+        if (!overlay) return;
+        const img = document.getElementById('overlayImg');
+        img.src = src;
+        overlay.classList.add('show');
+        // 当覆盖层打开时暂停自动播放
+        clearInterval(autoplayTimer);
+        // 监听键盘 ESC 关闭
+        document.addEventListener('keydown', escCloseHandler);
+    }
+
+    function escCloseHandler(e) {
+        if (e.key === 'Escape') closeOverlay();
+    }
+
+    // 关闭覆盖层
+    function closeOverlay() {
+        const overlay = document.getElementById('imageOverlay');
+        if (!overlay) return;
+        overlay.classList.remove('show');
+        // 恢复自动播放
+        resetAutoplay();
+        document.removeEventListener('keydown', escCloseHandler);
+    }
+
+    // 处理图片加载错误
+    function handleImageError(img) {
+        img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23f5f5f5" width="200" height="200"/%3E%3Ctext x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23ccc" font-size="14"%3EImage Not Found%3C/text%3E%3C/svg%3E';
+    }
+
+    // 页面加载完成后初始化
+    window.addEventListener('DOMContentLoaded', init);
+
+    // 页面卸载时清除定时器
+    window.addEventListener('beforeunload', () => {
+        clearInterval(autoplayTimer);
+    });
+</script>
 </html>
