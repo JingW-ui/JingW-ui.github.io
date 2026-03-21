@@ -80,11 +80,14 @@
         .subsection-a {
             font-size: 14px;
             font-weight: 600;
-            color: #2d74bb;
+            color: #222;
             margin-bottom: 6px;
             text-decoration: none;
         }
-        .subsection-a:hover { text-decoration: underline !important; color: #2d74bb !important; }
+        .subsection-a:hover {
+            text-decoration: underline !important;
+            color: #2d74bb !important;
+        }
         .date {
             font-size: 11px;
             color: #999;
@@ -122,22 +125,23 @@
         }
         .label-link {
             display: inline-block;
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            background-color: #f5f5f5;
             padding: 2px 6px;
-            border-radius: 10px;
+            border-radius: 4px;
             font-size: 9px;
-            border: 1px solid #bbdefb;
-            color: #1976d2;
+            border: 1px solid #d0d0d0;
+            color: #666;
             text-decoration: none;
             margin-left: 4px;
             transition: all 0.2s ease;
             vertical-align: middle;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
         .label-link:hover {
-            background: linear-gradient(135deg, #1976d2 0%, #0d47a1 100%);
-            color: white;
-            border-color: #0d47a1;
-            transform: translateY(-1px);
+            background-color: #e0e0e0;
+            color: #333;
+            border-color: #b0b0b0;
         }
         .divider {
             height: 1px;
@@ -324,17 +328,17 @@
 </div>
 
     <div class="section">
-        <div class="section-title">教育背景</div>
-                <div class="subsection">
-                    <div class="subsection-title">电子科技大学 生物医学工程 硕士  导师：<a class="subsection-a" href="chen_hua_fu.html" target="_blank" rel="noopener">陈华富</a></div>
-                    <div class="date">2024.09 - 至今</div>
+
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学　生物医学工程　硕士　导师：<a class="subsection-a" href="chen_hua_fu.html" target="_blank" rel="noopener">陈华富</a>　　实验室：<a class="subsection-a" href="https://www.neuro.uestc.edu.cn/" target="_blank" rel="noopener">神经信息教育部重点实验室</a></div>
+            <div class="date">2024.09 - 至今</div>
             <ul>
                 <li>专业成绩：GPA 3.83/4（专业前5%）</li>
                 <li>主修课程：生物医学材料前沿进展、矩阵理论、认知神经科学、神经信息学基础、统计推断方法、医学影像学进展、脑机接口技术</li>
             </ul>
         </div>
         <div class="subsection">
-            <div class="subsection-title">西南科技大学 生物医学工程 本科</div>
+            <div class="subsection-title">西南科技大学　生物医学工程　本科　导师：<a class="subsection-a" href="https://baike.baidu.com/item/%E5%91%A8%E9%A2%96%E7%8E%A5/53042183" target="_blank" rel="noopener">周颖玥</a>　　实验室：ACM项目组&&BMELab</div>
             <div class="date">2020.09 - 2024.06</div>
             <ul>
                 <li>专业成绩：GPA 4.15/5（专业前2%）</li>
@@ -403,7 +407,17 @@
             </ul>
         </div>
     </div>
-
+    <div class="section">
+        <div class="section-title">科研成果</div>
+        <ul>
+            <li>专利：基于深度学习的MRI海马体3D智能分析诊断平台<a class="label-link" href="imgs/patents_and_software/1.png" target="_blank" rel="noopener">查看证书</a><a class="label-link" href="https://jingw-ui.github.io/videos.html" target="_blank" rel="noopener">视频</a></li></li>
+            <li>软著：结直肠息肉智能检测系统<a class="label-link" href="imgs/patents_and_software/8.png" target="_blank" rel="noopener">查看证书</a></li>
+            <li>软著：基于人体骨架检测的摔倒行为智能识别平台<a class="label-link" href="imgs/patents_and_software/5.png" target="_blank" rel="noopener">查看证书</a></li>
+            <li>软著：基于Real-ESRgan的批量图像处理工具平台 <a class="label-link" href="imgs/patents_and_software/7.png" target="_blank" rel="noopener">查看证书</a><a class="label-link" href="https://github.com/JingW-ui/PI-MAPP/tree/main/project/huaweiyun_Camera/ui" target="_blank" rel="noopener">Github</a></li>
+            <li>软著：基于深度学习的MRI海马体3D智能分析诊断平台<a class="label-link" href="imgs/patents_and_software/6.png" target="_blank" rel="noopener">查看证书</a><a class="label-link" href="https://jingw-ui.github.io/videos.html" target="_blank" rel="noopener">视频</a></li>
+            <li>软著：基于YOLO的脑部肿瘤检测系统平台<a class="label-link" href="imgs/patents_and_software/9.png" target="_blank" rel="noopener">查看证书</a><a class="label-link" href="https://github.com/JingW-ui/PI-MAPP/tree/main/project/Brain_Tumor_dection_ui" target="_blank" rel="noopener">Github</a><a class="label-link" href="https://jingw-ui.github.io/videos.html" target="_blank" rel="noopener">视频</a></li></li>
+        </ul>
+    </div>
     <div class="section">
         <div class="section-title">获奖经历</div>
         <ul>
@@ -421,10 +435,29 @@
             <li>2025年第十届BOE全球创新挑战赛二等奖（2/3）<a class="label-link" href="https://campus.boe.com/global_challenger" target="_blank" rel="noopener">链接</a></li>
             <li>2025年湖北工业大学“华为云杯”昇腾云血液图像处理大赛二等奖（1/2）<a class="label-link" href="https://developer.huaweicloud.com/competition/information/1300000220/html1" target="_blank" rel="noopener">链接</a></li>
             <li>2025年第六届CSIG图像图形技术挑战赛：2025“Camera学术之星” 影像算法技术竞赛第八名（1/3）<a class="label-link" href="https://developer.huaweicloud.com/competition/information/1300000173/html2" target="_blank" rel="noopener">链接</a></li>
-            <li>2026年电子科技大学研究生"学术青苗"奖<a class="label-link" href="https://www.life.uestc.edu.cn/info/1200/7135.htm" target="_blank" rel="noopener">链接</a></li>
         </ul>
     </div>
+    <div class="section">
+        <div class="section-title">证书</div>
+        <ul>
+            <li>国家级：国家励志奖学金荣誉证书（2次）<a class="label-link" href="imgs/life_and_others/2020-2021年度国家励志奖学金.png" target="_blank" rel="noopener">查看证书</a></li>
+            <li>省级：2024届四川省优秀大学毕业生<a class="label-link" href="imgs/life_and_others/四川省优秀毕业生.jpg" target="_blank" rel="noopener">查看证书</a></li>
+            <li>市级：四川省绵阳市三好学生<a class="label-link" href="imgs/life_and_others/绵阳市三好学生.png" target="_blank" rel="noopener">查看证书</a></li>
+            <li>校级：西南科技大学三好学生<a class="label-link" href="imgs/life_and_others/三好学生.jpg" target="_blank" rel="noopener">查看证书</a></li>
+            <li>校级：西南科技大学体育优秀奖<a class="label-link" href="imgs/life_and_others/体育优秀奖.jpg" target="_blank" rel="noopener">查看证书</a></li>
+            <li>校级：西南科技大学科技创新奖<a class="label-link" href="imgs/life_and_others/创新奖.jpg" target="_blank" rel="noopener">查看证书</a></li>
+            <li>校级：西南科技大学第十二届运动会跳大绳比赛第一名<a class="label-link" href="imgs/life_and_others/跳大绳第一名.jpg" target="_blank" rel="noopener">查看证书</a></li>
+            <li>校级：电子科技大学‘优秀研究生’<a class="label-link" href="imgs/life_and_others/3.jpg" target="_blank" rel="noopener">查看证书</a></li>
+            <li>校级：电子科技大学学业奖学金一等奖<a class="label-link" href="imgs/life_and_others/4.jpg" target="_blank" rel="noopener">查看证书</a></li>
+            <li>校级：比亚迪杯电子科技大学第五十八届田径运动会4*100米赛跑第二名（男女混合学生乙组）<a class="label-link" href="imgs/life_and_others/1.jpg" target="_blank" rel="noopener">查看证书</a></li>
+            <li>校级：电子科技大学硕博师生乒乓球第四名（混双学生组）<a class="label-link" href="imgs/life_and_others/2.jpg" target="_blank" rel="noopener">查看证书</a></li>
+            <li>校级：电子科技大学研究生"学术青苗"奖<a class="label-link" href="https://www.life.uestc.edu.cn/info/1200/7135.htm" target="_blank" rel="noopener">链接</a></li>
+            <li>院级：西南科技大学信息工程学院学风优良寝室<a class="label-link" href="imgs/life_and_others/优秀寝室.jpg" target="_blank" rel="noopener">查看证书</a></li>
+            <li>院级：西南科技大学信息工程学院乒乓球混双第二名<a class="label-link" href="imgs/life_and_others/混双乒乓球第二名.jpg" target="_blank" rel="noopener">查看证书</a></li>
 
+
+        </ul>
+    </div>
     <div class="section">
         <div class="section-title">语言技能</div>
         <div class="skills">
@@ -436,13 +469,7 @@
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-title">科研成果</div>
-        <ul>
-            <li>专利已授权一项</li>
-            <li>软著五项</li>
-        </ul>
-    </div>
+
 
 <div class="section">
     <div class="section-title">娱乐生活</div>
