@@ -556,6 +556,8 @@
     let currentMessage = '';  // 当前显示的消息
     let isFromWebSocket = false;  // 标记消息是否来自WebSocket
     let workflowStartTime = null;  // 工作流开始时间
+    let statusTimerInterval = null;  // 状态计时器ID
+    let currentStatusStartTime = null;  // 当前状态开始时间
 
     // 页面加载时自动读配置和加载历史记录
     window.onload = function () {
@@ -732,16 +734,64 @@
 
         const config = statusConfig[status] || statusConfig['待命'];
 
-        // 构建显示文本
-        let displayText = `${config.icon} ${status}`;
-        if (elapsed !== null && elapsed > 0) {
-            displayText += ` (${elapsed.toFixed(2)}s)`;
+        // 如果需要计时的状态，启动计时器
+        if (status === 'OCR分析中' || status === 'LLM分析中') {
+            // 如果计时器未运行或状态改变，重新启动计时器
+            if (!statusTimerInterval || currentStatusStartTime === null) {
+                currentStatusStartTime = Date.now();
+                startStatusTimer(status, config.icon);
+            }
+        } else {
+            // 其他状态，停止计时器
+            stopStatusTimer();
+            currentStatusStartTime = null;
+
+            // 构建显示文本（使用传入的elapsed或无耗时）
+            let displayText = `${config.icon} ${status}`;
+            if (elapsed !== null && elapsed > 0) {
+                displayText += ` (${elapsed.toFixed(2)}s)`;
+            }
+            pcStatusEl.textContent = displayText;
         }
 
         // 更新样式
-        pcStatusEl.textContent = displayText;
         pcStatusEl.style.background = config.bg;
         pcStatusEl.style.color = config.color;
+    }
+
+    // 启动状态计时器
+    function startStatusTimer(status, icon) {
+        const pcStatusEl = document.getElementById('pc-status');
+
+        // 清除之前的计时器
+        if (statusTimerInterval) {
+            clearInterval(statusTimerInterval);
+        }
+
+        // 立即更新一次
+        updateTimerDisplay(status, icon);
+
+        // 每秒更新一次
+        statusTimerInterval = setInterval(() => {
+            updateTimerDisplay(status, icon);
+        }, 1000);
+    }
+
+    // 更新计时器显示
+    function updateTimerDisplay(status, icon) {
+        const pcStatusEl = document.getElementById('pc-status');
+        if (currentStatusStartTime) {
+            const elapsed = (Date.now() - currentStatusStartTime) / 1000;
+            pcStatusEl.textContent = `${icon} ${status} (${elapsed.toFixed(0)}s)`;
+        }
+    }
+
+    // 停止状态计时器
+    function stopStatusTimer() {
+        if (statusTimerInterval) {
+            clearInterval(statusTimerInterval);
+            statusTimerInterval = null;
+        }
     }
 
     // 解析工作流消息，提取状态和内容
