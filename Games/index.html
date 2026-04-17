@@ -2,11 +2,20 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>Three.js 无限轨道弹跳球</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0a0a1a; overflow: hidden; }
+    body { 
+      background: #0a0a1a; 
+      overflow: hidden;
+      touch-action: none; /* 禁用默认触摸行为 */
+      -webkit-touch-callout: none; /* 禁用iOS长按菜单 */
+      -webkit-user-select: none; /* 禁用文本选择 */
+      user-select: none;
+    }
     canvas { display: block; }
 
     /* GameOver 弹窗 */
@@ -600,6 +609,242 @@
       40%  { transform: scale(1.2); }
       100% { transform: scale(1); }
     }
+
+    /* ===== 移动端响应式优化 ===== */
+    @media (max-width: 768px) {
+      /* 通用按钮触摸优化 - 增大点击区域 */
+      button {
+        -webkit-tap-highlight-color: rgba(100, 180, 255, 0.3); /* 触摸高亮 */
+        touch-action: manipulation; /* 优化触摸响应 */
+        min-height: 44px; /* iOS推荐最小点击区域 */
+        min-width: 44px;
+      }
+
+      /* 关卡卡片触摸优化 */
+      .level-card {
+        -webkit-tap-highlight-color: rgba(100, 180, 255, 0.2);
+        touch-action: manipulation;
+        transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, border-color 0.15s ease-out;
+      }
+      .level-card:active {
+        transform: translateY(-2px) scale(0.96);
+        box-shadow: 0 4px 16px rgba(100, 180, 255, 0.15);
+      }
+
+      /* 距离显示 - 缩小字体 */
+      #distanceUI {
+        top: 20px;
+        right: 20px;
+      }
+      #distCurrent {
+        font-size: 36px;
+      }
+      #distCurrent .unit {
+        font-size: 18px;
+      }
+      #distTarget {
+        font-size: 14px;
+      }
+      #levelName {
+        font-size: 16px;
+      }
+
+      /* 游戏内菜单按钮 - 优化触摸 */
+      #inGameMenuBtn {
+        top: 20px;
+        left: 20px;
+        font-size: 12px;
+        padding: 10px 20px; /* 增大padding提高可点击性 */
+        min-height: 44px;
+        -webkit-tap-highlight-color: rgba(100, 180, 255, 0.3);
+        touch-action: manipulation;
+      }
+      #inGameMenuBtn:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+
+      /* 连击 UI - 缩小 */
+      #comboWord {
+        font-size: 32px;
+      }
+      #comboCount {
+        font-size: 22px;
+      }
+
+      /* GameOver 弹窗 - 调整大小 */
+      #gameOverBox {
+        padding: 35px 40px;
+        margin: 0 20px;
+      }
+      #gameOverBox h1 {
+        font-size: 36px;
+      }
+      #gameOverBox p {
+        font-size: 14px;
+      }
+      #continueBtn {
+        font-size: 16px;
+        padding: 14px 36px; /* 增大padding提高可点击性 */
+        min-height: 48px;
+        -webkit-tap-highlight-color: rgba(255, 104, 253, 0.3);
+        touch-action: manipulation;
+      }
+      #continueBtn:active {
+        transform: scale(0.95);
+        opacity: 0.85;
+      }
+      #backBtn {
+        font-size: 13px;
+        padding: 14px 24px; /* 增大padding提高可点击性 */
+        min-height: 48px;
+        -webkit-tap-highlight-color: rgba(100, 180, 255, 0.2);
+        touch-action: manipulation;
+      }
+      #backBtn:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+
+      /* 胜利弹窗 - 调整 */
+      #victoryBox {
+        padding: 30px 40px 28px;
+        margin: 0 20px;
+        min-width: auto;
+      }
+      #victoryStars .star {
+        font-size: 32px;
+      }
+      #victoryBox h1 {
+        font-size: 36px;
+      }
+      #victoryBox p {
+        font-size: 16px;
+      }
+      #victoryStats {
+        font-size: 13px;
+      }
+      #victoryNextBtn {
+        font-size: 16px;
+        padding: 14px 36px; /* 增大padding提高可点击性 */
+        min-height: 48px;
+        -webkit-tap-highlight-color: rgba(100, 181, 246, 0.3);
+        touch-action: manipulation;
+      }
+      #victoryNextBtn:active {
+        transform: scale(0.95);
+        opacity: 0.85;
+      }
+      #victoryBackBtn {
+        font-size: 13px;
+        padding: 12px 24px; /* 增大padding提高可点击性 */
+        min-height: 48px;
+        -webkit-tap-highlight-color: rgba(100, 180, 255, 0.2);
+        touch-action: manipulation;
+      }
+      #victoryBackBtn:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+
+      /* 校徽弹窗 - 调整 */
+      #uestcBox {
+        padding: 35px 45px;
+        margin: 0 20px;
+      }
+      #uestcLogo {
+        width: 200px;
+      }
+      #uestcText {
+        font-size: 24px;
+      }
+      #uestcSubtext {
+        font-size: 14px;
+      }
+
+      /* 关卡选择界面 - 调整 */
+      #levelSelectTitle {
+        font-size: 32px;
+      }
+      #levelSelectSub {
+        font-size: 12px;
+      }
+      #levelCards {
+        gap: 15px;
+      }
+      .level-card {
+        width: 100px;
+        padding: 18px 10px 16px;
+        min-height: 44px; /* 确保最小点击区域 */
+      }
+      .level-card .card-num {
+        font-size: 11px;
+      }
+      .level-card .card-name {
+        font-size: 16px;
+      }
+      .level-card .card-name-en {
+        font-size: 9px;
+      }
+      #backToMenuBtn {
+        font-size: 13px;
+        padding: 12px 24px; /* 增大padding提高可点击性 */
+        min-height: 48px;
+        -webkit-tap-highlight-color: rgba(100, 180, 255, 0.2);
+        touch-action: manipulation;
+      }
+      #backToMenuBtn:active {
+        transform: scale(0.95);
+        opacity: 0.8;
+      }
+
+      /* 关卡名称闪现 - 调整 */
+      #levelAnnounce .level-num {
+        font-size: 18px;
+      }
+      #levelAnnounce .level-title {
+        font-size: 40px;
+      }
+      #levelAnnounce .level-sub {
+        font-size: 14px;
+      }
+    }
+
+    /* 超小屏幕进一步优化 */
+    @media (max-width: 480px) {
+      #distCurrent {
+        font-size: 28px;
+      }
+      #gameOverBox h1 {
+        font-size: 28px;
+      }
+      #victoryBox h1 {
+        font-size: 28px;
+      }
+      #levelSelectTitle {
+        font-size: 26px;
+      }
+      .level-card {
+        width: 90px;
+        padding: 14px 8px 12px;
+      }
+      .level-card .card-name {
+        font-size: 14px;
+      }
+      
+      /* 按钮进一步增大点击区域 */
+      button {
+        min-height: 48px; /* 更大的点击区域 */
+      }
+      #continueBtn,
+      #backBtn,
+      #victoryNextBtn,
+      #victoryBackBtn,
+      #backToMenuBtn {
+        padding-top: 14px;
+        padding-bottom: 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1094,11 +1339,27 @@
         <div class="card-name">${lv.name}</div>
         <div class="card-name-en">${lv.nameEn}</div>
       `;
-      card.addEventListener('click', () => {
+      
+      // 点击事件（同时支持鼠标和触摸）
+      const handleCardClick = () => {
         if (i + 1 > getMaxUnlocked()) return;
         currentLevel = i;
         startGame();
-      });
+      };
+      
+      card.addEventListener('click', handleCardClick);
+      
+      // 为移动端添加触摸反馈
+      card.addEventListener('touchstart', () => {
+        if (i + 1 <= getMaxUnlocked()) {
+          card.style.transform = 'translateY(-2px) scale(0.96)';
+        }
+      }, { passive: true });
+      
+      card.addEventListener('touchend', () => {
+        card.style.transform = '';
+      }, { passive: true });
+      
       levelCardsContainer.appendChild(card);
     });
 
@@ -1147,6 +1408,16 @@
     inGameMenuBtn.addEventListener('click', () => {
       showLevelSelect();
     });
+    
+    // 移动端触摸反馈
+    inGameMenuBtn.addEventListener('touchstart', () => {
+      inGameMenuBtn.style.transform = 'scale(0.95)';
+      inGameMenuBtn.style.opacity = '0.8';
+    }, { passive: true });
+    inGameMenuBtn.addEventListener('touchend', () => {
+      inGameMenuBtn.style.transform = '';
+      inGameMenuBtn.style.opacity = '';
+    }, { passive: true });
 
     // 空格键触发菜单/继续游戏
     document.addEventListener('keydown', (e) => {
@@ -1188,6 +1459,16 @@
       }
       // 如果是初始状态（没有游戏数据），不做任何操作，保持在菜单
     });
+    
+    // 移动端触摸反馈
+    backToMenuBtn.addEventListener('touchstart', () => {
+      backToMenuBtn.style.transform = 'scale(0.95)';
+      backToMenuBtn.style.opacity = '0.8';
+    }, { passive: true });
+    backToMenuBtn.addEventListener('touchend', () => {
+      backToMenuBtn.style.transform = '';
+      backToMenuBtn.style.opacity = '';
+    }, { passive: true });
 
     // 初始显示关卡选择界面
     showLevelSelect();
@@ -1422,6 +1703,55 @@
       if (e.movementX !== undefined) {
         mouseDeltaX += e.movementX;
       }
+    });
+
+    // ===== 移动端触摸控制 =====
+    let touchStartX = null;
+    let lastTouchX = null;
+    const TOUCH_SENSITIVITY = 0.025;      // 触摸灵敏度（比鼠标稍高）
+
+    document.addEventListener('touchstart', (e) => {
+      // 如果触摸的是按钮或其他UI元素，不处理（让click事件正常工作）
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button') || 
+          e.target.closest('.level-card') || e.target.closest('#gameOverOverlay') ||
+          e.target.closest('#victoryOverlay') || e.target.closest('#uestcOverlay') ||
+          e.target.closest('#levelSelectOverlay')) {
+        return; // 不阻止，让按钮正常响应
+      }
+      
+      if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        lastTouchX = e.touches[0].clientX;
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchmove', (e) => {
+      // 如果正在与UI交互，不处理
+      if (e.target.tagName === 'BUTTON' || e.target.closest('button') || 
+          e.target.closest('.level-card') || e.target.closest('#gameOverOverlay') ||
+          e.target.closest('#victoryOverlay') || e.target.closest('#uestcOverlay') ||
+          e.target.closest('#levelSelectOverlay')) {
+        return;
+      }
+      
+      if (e.touches.length === 1 && lastTouchX !== null) {
+        const currentX = e.touches[0].clientX;
+        const deltaX = currentX - lastTouchX;
+        mouseDeltaX += deltaX * TOUCH_SENSITIVITY / MOUSE_SENSITIVITY;
+        lastTouchX = currentX;
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    document.addEventListener('touchend', (e) => {
+      touchStartX = null;
+      lastTouchX = null;
+    });
+
+    document.addEventListener('touchcancel', (e) => {
+      touchStartX = null;
+      lastTouchX = null;
     });
 
     // 球（圆）与方块（AABB）的碰撞检测
@@ -1901,6 +2231,16 @@
         recalcVelZ();
       });
     });
+    
+    // 移动端触摸反馈
+    continueBtn.addEventListener('touchstart', () => {
+      continueBtn.style.transform = 'scale(0.95)';
+      continueBtn.style.opacity = '0.85';
+    }, { passive: true });
+    continueBtn.addEventListener('touchend', () => {
+      continueBtn.style.transform = '';
+      continueBtn.style.opacity = '';
+    }, { passive: true });
 
     // ===== 校徽展示系统 =====
     const uestcOverlay = document.getElementById('uestcOverlay');
@@ -1939,6 +2279,16 @@
       hideGameOver();
       showLevelSelect();
     });
+    
+    // 移动端触摸反馈
+    backBtn.addEventListener('touchstart', () => {
+      backBtn.style.transform = 'scale(0.95)';
+      backBtn.style.opacity = '0.8';
+    }, { passive: true });
+    backBtn.addEventListener('touchend', () => {
+      backBtn.style.transform = '';
+      backBtn.style.opacity = '';
+    }, { passive: true });
 
     // 坠落后超过一定距离，重置游戏
     const FALL_RESET_Y = -30;
@@ -2219,11 +2569,32 @@
         startGame();
       }
     });
+    
+    // 移动端触摸反馈
+    victoryNextBtn.addEventListener('touchstart', () => {
+      victoryNextBtn.style.transform = 'scale(0.95)';
+      victoryNextBtn.style.opacity = '0.85';
+    }, { passive: true });
+    victoryNextBtn.addEventListener('touchend', () => {
+      victoryNextBtn.style.transform = '';
+      victoryNextBtn.style.opacity = '';
+    }, { passive: true });
+    
     // 返回选关
     victoryBackBtn.addEventListener('click', () => {
       hideVictory();
       showLevelSelect();
     });
+    
+    // 移动端触摸反馈
+    victoryBackBtn.addEventListener('touchstart', () => {
+      victoryBackBtn.style.transform = 'scale(0.95)';
+      victoryBackBtn.style.opacity = '0.8';
+    }, { passive: true });
+    victoryBackBtn.addEventListener('touchend', () => {
+      victoryBackBtn.style.transform = '';
+      victoryBackBtn.style.opacity = '';
+    }, { passive: true });
 
     // ===== 关卡名称闪现 =====
     const levelAnnounce = document.getElementById('levelAnnounce');
