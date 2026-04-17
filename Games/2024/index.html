@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>像素物语：4048小町</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'ZCOOL KuaiLe', cursive, sans-serif;
+            background: linear-gradient(135deg, #FFE5E5 0%, #E5F0FF 50%, #FFF5E5 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 动态背景 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 100px;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 100px;
+        }
+
+        .cloud:nth-child(1) {
+            width: 100px;
+            height: 40px;
+            top: 20%;
+            left: -100px;
+            animation-duration: 25s;
+        }
+
+        .cloud:nth-child(2) {
+            width: 80px;
+            height: 35px;
+            top: 40%;
+            left: -80px;
+            animation-duration: 30s;
+            animation-delay: 5s;
+        }
+
+        .cloud:nth-child(3) {
+            width: 120px;
+            height: 45px;
+            top: 60%;
+            left: -120px;
+            animation-duration: 35s;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        /* 主容器 */
+        .game-container {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 标题 */
+        .game-title {
+            text-align: center;
+            color: #FF6B9D;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0px rgba(255, 182, 193, 0.5);
+            animation: title-bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes title-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* 信息面板 */
+        .info-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .score-box, .level-box {
+            background: white;
+            border-radius: 20px;
+            padding: 15px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            text-align: center;
+        }
+
+        .score-label, .level-label {
+            font-size: 0.9em;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .score-value, .level-value {
+            font-size: 1.8em;
+            color: #FF6B9D;
+            font-weight: bold;
+        }
+
+        /* 游戏棋盘 */
+        .game-board {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            position: relative;
+            touch-action: none;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            aspect-ratio: 1;
+        }
+
+        .grid-cell {
+            background: rgba(240, 240, 240, 0.5);
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .tile {
+            position: absolute;
+            width: calc(25% - 7.5px);
+            height: calc(25% - 7.5px);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            animation: tile-pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes tile-pop {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .tile.merged {
+            animation: tile-merge 0.4s ease-out;
+        }
+
+        @keyframes tile-merge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .tile-icon {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        .tile-name {
+            font-size: 0.7em;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            padding: 0 5px;
+        }
+
+        /* 不同等级的方块颜色 */
+        .tile-2 { background: linear-gradient(135deg, #FFB6C1, #FFC0CB); }
+        .tile-4 { background: linear-gradient(135deg, #87CEEB, #ADD8E6); }
+        .tile-8 { background: linear-gradient(135deg, #98FB98, #90EE90); }
+        .tile-16 { background: linear-gradient(135deg, #DDA0DD, #DA70D6); }
+        .tile-32 { background: linear-gradient(135deg, #F0E68C, #FFD700); }
+        .tile-64 { background: linear-gradient(135deg, #FFA07A, #FF7F50); }
+        .tile-128 { background: linear-gradient(135deg, #FF69B4, #FF1493); box-shadow: 0 0 20px rgba(255, 105, 180, 0.6); }
+        .tile-256 { background: linear-gradient(135deg, #00CED1, #00BFFF); box-shadow: 0 0 25px rgba(0, 206, 209, 0.6); }
+        .tile-512 { background: linear-gradient(135deg, #FF4500, #FF6347); box-shadow: 0 0 30px rgba(255, 69, 0, 0.6); }
+        .tile-1024 { background: linear-gradient(135deg, #9370DB, #8A2BE2); box-shadow: 0 0 35px rgba(147, 112, 219, 0.7); }
+        .tile-2048 { background: linear-gradient(135deg, #FFD700, #FFA500); box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
+        .tile-4096 { background: linear-gradient(135deg, #FF1493, #C71585); box-shadow: 0 0 50px rgba(255, 20, 147, 0.9); }
+
+        /* 控制按钮 */
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: white;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 25px;
+            font-size: 1em;
+            font-family: inherit;
+            color: #FF6B9D;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* 弹窗 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 40px;
+            max-width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: modal-pop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes modal-pop {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-title {
+            font-size: 2em;
+            color: #FF6B9D;
+            margin-bottom: 20px;
+        }
+
+        .modal-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        /* 关卡选择 */
+        .level-select {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #FFE5E5 0%, #E5F0FF 100%);
+            z-index: 999;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .level-select.active {
+            display: block;
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .level-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .level-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .level-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .level-number {
+            font-size: 2em;
+            color: #FF6B9D;
+            margin-bottom: 10px;
+        }
+
+        .level-name {
+            font-size: 1em;
+            color: #666;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .game-title {
+                font-size: 1.5em;
+            }
+
+            .score-value, .level-value {
+                font-size: 1.3em;
+            }
+
+            .score-label, .level-label {
+                font-size: 0.8em;
+            }
+
+            .score-box, .level-box {
+                padding: 10px 15px;
+            }
+
+            .tile-icon {
+                font-size: 1.3em;
+            }
+
+            .tile-name {
+                font-size: 0.55em;
+            }
+
+            .btn {
+                padding: 10px 18px;
+                font-size: 0.9em;
+            }
+
+            .controls {
+                gap: 10px;
+            }
+
+            .boss-name {
+                font-size: 1em;
+            }
+
+            .modal-title {
+                font-size: 1.6em;
+            }
+
+            .modal-text {
+                font-size: 1em;
+            }
+
+            .modal-content {
+                padding: 30px 25px;
+            }
+
+            .skill-indicator {
+                width: 60px;
+                height: 60px;
+                bottom: 15px;
+                right: 15px;
+            }
+
+            .skill-icon {
+                font-size: 2em;
+            }
+        }
+
+        /* Boss血条 */
+        .boss-hp-bar {
+            display: none;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .boss-hp-bar.active {
+            display: block;
+        }
+
+        .boss-name {
+            font-size: 1.2em;
+            color: #FF6B9D;
+            margin-bottom: 10px;
+        }
+
+        .hp-bar-container {
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 30px;
+            overflow: hidden;
+        }
+
+        .hp-bar-fill {
+            background: linear-gradient(90deg, #FF6B9D, #FF1493);
+            height: 100%;
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        /* 技能指示器 */
+        .skill-indicator {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+            animation: pulse 2s infinite;
+        }
+
+        .skill-indicator.active {
+            display: flex;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .skill-icon {
+            font-size: 2.5em;
+        }
+
+        /* 角色图鉴教程 */
+        .tutorial-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .tutorial-overlay.active {
+            display: flex;
+        }
+
+        .tutorial-content {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            animation: modal-pop 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .tutorial-title {
+            text-align: center;
+            font-size: 1.8em;
+            color: #FF6B9D;
+            margin-bottom: 20px;
+        }
+
+        .tutorial-subtitle {
+            text-align: center;
+            font-size: 1em;
+            color: #999;
+            margin-bottom: 25px;
+        }
+
+        .character-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .character-card {
+            background: linear-gradient(135deg, #f5f5f5, #ffffff);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .character-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .character-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #FF6B9D;
+            margin-bottom: 8px;
+        }
+
+        .character-icon {
+            font-size: 3em;
+            margin: 10px 0;
+            display: block;
+        }
+
+        .character-name {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .tutorial-tip {
+            background: linear-gradient(135deg, #FFE5E5, #E5F0FF);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .tutorial-tip strong {
+            color: #FF6B9D;
+        }
+
+        .tutorial-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        @media (max-width: 600px) {
+            .tutorial-content {
+                padding: 20px;
+            }
+
+            .tutorial-title {
+                font-size: 1.4em;
+            }
+
+            .character-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .character-icon {
+                font-size: 2.5em;
+            }
+
+            .character-number {
+                font-size: 1.2em;
+            }
+
+            .character-name {
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 动态背景 -->
+    <div class="bg-animation">
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+    </div>
+
+    <!-- 关卡选择界面 -->
+    <div class="level-select" id="levelSelect">
+        <h1 class="game-title">选择关卡</h1>
+        <div class="level-grid" id="levelGrid"></div>
+    </div>
+
+    <!-- 角色图鉴教程 -->
+    <div class="tutorial-overlay" id="tutorialOverlay">
+        <div class="tutorial-content">
+            <h2 class="tutorial-title">📖 角色进化图鉴</h2>
+            <p class="tutorial-subtitle">滑动合并相同角色，不断进化！</p>
+            
+            <div class="character-grid" id="characterGrid"></div>
+            
+            <div class="tutorial-tip">
+                <strong>💡 游戏玩法：</strong><br>
+                • 向上下左右滑动，让相同数字的角色移动并合并<br>
+                • 两个 2 合并成 4，两个 4 合并成 8，以此类推<br>
+                • 每次合并都会获得分数，目标是合成更高等级的角色！<br>
+                • 合成 256 级以上可解锁强力技能哦~
+            </div>
+            
+            <div class="tutorial-buttons">
+                <button class="btn" onclick="game.startGame()">🎮 开始游戏</button>
+                <button class="btn" onclick="game.closeTutorial()">✖ 关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏主界面 -->
+    <div class="game-container" id="gameContainer">
+        <h1 class="game-title">✨ 像素物语：4048小町 ✨</h1>
+        
+        <!-- Boss血条 -->
+        <div class="boss-hp-bar" id="bossHpBar">
+            <div class="boss-name" id="bossName">暴走的打印机</div>
+            <div class="hp-bar-container">
+                <div class="hp-bar-fill" id="hpBarFill" style="width: 100%"></div>
+            </div>
+        </div>
+
+        <!-- 信息面板 -->
+        <div class="info-panel">
+            <div class="score-box">
+                <div class="score-label">得分</div>
+                <div class="score-value" id="scoreValue">0</div>
+            </div>
+            <div class="level-box">
+                <div class="level-label">关卡</div>
+                <div class="level-value" id="levelValue">1</div>
+            </div>
+        </div>
+
+        <!-- 游戏棋盘 -->
+        <div class="game-board" id="gameBoard">
+            <div class="grid-container" id="gridContainer"></div>
+        </div>
+
+        <!-- 控制按钮 -->
+        <div class="controls">
+            <button class="btn" onclick="game.restart()">🔄 重新开始</button>
+            <button class="btn" onclick="game.showLevelSelect()">📋 选择关卡</button>
+            <button class="btn" onclick="game.showTutorial()">📖 角色图鉴</button>
+            <button class="btn" onclick="game.toggleSound()">🔊 音效</button>
+        </div>
+    </div>
+
+    <!-- 技能指示器 -->
+    <div class="skill-indicator" id="skillIndicator" onclick="game.useSkill()">
+        <div class="skill-icon" id="skillIcon">⚡</div>
+    </div>
+
+    <!-- 胜利弹窗 -->
+    <div class="modal" id="winModal">
+        <div class="modal-content">
+            <div class="modal-title">🎉 恭喜通关！</div>
+            <div class="modal-text" id="winText">你成功完成了关卡！</div>
+            <button class="btn" onclick="game.nextLevel()">下一关</button>
+            <button class="btn" onclick="game.closeModal('winModal')">继续游戏</button>
+        </div>
+    </div>
+
+    <!-- 失败弹窗 -->
+    <div class="modal" id="loseModal">
+        <div class="modal-content">
+            <div class="modal-title">😢 游戏结束</div>
+            <div class="modal-text">棋盘已满，无法继续移动！</div>
+            <button class="btn" onclick="game.restart()">重新开始</button>
+            <button class="btn" onclick="game.closeModal('loseModal')">返回菜单</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 角色系统 ====================
+        const TILE_CHARACTERS = {
+            2: { icon: '🥚', name: '迷糊蛋' },
+            4: { icon: '🐱', name: '好奇喵' },
+            8: { icon: '🐶', name: '汪星人' },
+            16: { icon: '🐰', name: '软萌兔' },
+            32: { icon: '🐻', name: '熊本熊' },
+            64: { icon: '🦊', name: '狐耳娘' },
+            128: { icon: '👧', name: '猫耳女仆' },
+            256: { icon: '👦', name: '狗头执事' },
+            512: { icon: '🦄', name: '独角兽' },
+            1024: { icon: '🐉', name: '小龙女' },
+            2048: { icon: '👑', name: '公主殿下' },
+            4096: { icon: '⭐', name: '神兽·管理员酱' }
+        };
+
+        // ==================== 关卡配置 ====================
+        const LEVELS = [
+            {
+                id: 1,
+                name: '初遇迷糊蛋',
+                gridSize: 4,
+                targetScore: 100,
+                targetTile: 4,
+                bossHP: 0,
+                description: '合成一只 [好奇喵] (4)'
+            },
+            {
+                id: 2,
+                name: '崩坏的数据海',
+                gridSize: 4,
+                targetScore: 10000,
+                targetTile: 128,
+                bossHP: 0,
+                specialRule: 'collapse',
+                description: '达到 10,000 分'
+            },
+            {
+                id: 3,
+                name: '暴走的打印机',
+                gridSize: 4,
+                targetScore: 5000,
+                targetTile: 256,
+                bossHP: 1000,
+                specialRule: 'waste',
+                description: '击败 Boss (血量1000)'
+            },
+            {
+                id: 4,
+                name: '锁住的保险箱',
+                gridSize: 4,
+                targetScore: 15000,
+                targetTile: 512,
+                bossHP: 0,
+                specialRule: 'locked',
+                description: '合成 [独角兽] (512)'
+            },
+            {
+                id: 5,
+                name: '终极挑战',
+                gridSize: 4,
+                targetScore: 50000,
+                targetTile: 2048,
+                bossHP: 0,
+                specialRule: 'reverse',
+                description: '合成 [公主殿下] (2048)'
+            }
+        ];
+
+        // ==================== 游戏核心逻辑 ====================
+        class Game {
+            constructor() {
+                this.grid = [];
+                this.score = 0;
+                this.currentLevel = 1;
+                this.gridSize = 4;
+                this.bossHP = 0;
+                this.maxBossHP = 0;
+                this.soundEnabled = true;
+                this.skillReady = false;
+                this.skillType = null;
+                this.isProcessing = false;
+                
+                this.init();
+            }
+
+            init() {
+                this.loadProgress();
+                this.renderLevelSelect();
+                this.renderCharacterGuide(); // 渲染角色图鉴
+                this.setupInputHandlers();
+                
+                // 首次访问显示教程
+                const hasSeenTutorial = localStorage.getItem('pixelTale_tutorial_seen');
+                if (!hasSeenTutorial) {
+                    setTimeout(() => {
+                        this.showTutorial();
+                        localStorage.setItem('pixelTale_tutorial_seen', 'true');
+                    }, 500);
+                } else {
+                    // 如果已经看过教程，直接启动游戏
+                    this.startLevel(this.currentLevel);
+                }
+            }
+
+            // 开始关卡
+            startLevel(levelId) {
+                const level = LEVELS.find(l => l.id === levelId);
+                if (!level) return;
+
+                this.currentLevel = levelId;
+                this.gridSize = level.gridSize;
+                this.score = 0;
+                this.bossHP = level.bossHP || 0;
+                this.maxBossHP = level.bossHP || 0;
+                this.skillReady = false;
+                
+                this.initializeGrid();
+                this.updateUI();
+                this.hideLevelSelect();
+                
+                // 显示Boss血条
+                const bossHpBar = document.getElementById('bossHpBar');
+                if (this.bossHP > 0) {
+                    bossHpBar.classList.add('active');
+                    document.getElementById('bossName').textContent = level.name;
+                } else {
+                    bossHpBar.classList.remove('active');
+                }
+
+                // 添加初始方块
+                this.addRandomTile();
+                this.addRandomTile();
+            }
+
+            // 初始化棋盘
+            initializeGrid() {
+                this.grid = Array(this.gridSize).fill(null).map(() => Array(this.gridSize).fill(0));
+                this.renderGrid();
+            }
+
+            // 渲染棋盘
+            renderGrid() {
+                const container = document.getElementById('gridContainer');
+                container.innerHTML = '';
+                container.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
+
+                for (let i = 0; i < this.gridSize * this.gridSize; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    container.appendChild(cell);
+                }
+
+                this.renderTiles();
+            }
+
+            // 渲染方块
+            renderTiles() {
+                const container = document.getElementById('gridContainer');
+                // 清除旧方块
+                const oldTiles = container.querySelectorAll('.tile');
+                oldTiles.forEach(tile => tile.remove());
+
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        const value = this.grid[row][col];
+                        if (value !== 0) {
+                            this.createTileElement(row, col, value);
+                        }
+                    }
+                }
+            }
+
+            // 创建方块元素
+            createTileElement(row, col, value, isNew = false, isMerged = false) {
+                const container = document.getElementById('gridContainer');
+                const tile = document.createElement('div');
+                const character = TILE_CHARACTERS[value] || { icon: '❓', name: `Lv${value}` };
+                
+                tile.className = `tile tile-${value}${isMerged ? ' merged' : ''}`;
+                tile.style.left = `${col * 25}%`;
+                tile.style.top = `${row * 25}%`;
+                
+                tile.innerHTML = `
+                    <div class="tile-icon">${character.icon}</div>
+                    <div class="tile-name">${character.name}</div>
+                `;
+
+                container.appendChild(tile);
+            }
+
+            // 添加随机方块
+            addRandomTile() {
+                const emptyCells = [];
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        if (this.grid[row][col] === 0) {
+                            emptyCells.push({ row, col });
+                        }
+                    }
+                }
+
+                if (emptyCells.length > 0) {
+                    const { row, col } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                    this.grid[row][col] = Math.random() < 0.9 ? 2 : 4;
+                    this.createTileElement(row, col, this.grid[row][col], true);
+                }
+            }
+
+            // 移动处理
+            move(direction) {
+                if (this.isProcessing) return;
+                this.isProcessing = true;
+
+                let moved = false;
+                const newGrid = this.grid.map(row => [...row]);
+
+                if (direction === 'left' || direction === 'right') {
+                    for (let row = 0; row < this.gridSize; row++) {
+                        const result = this.processLine(newGrid[row], direction === 'left');
+                        newGrid[row] = result.line;
+                        if (result.moved) moved = true;
+                    }
+                } else {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        const line = [];
+                        for (let row = 0; row < this.gridSize; row++) {
+                            line.push(newGrid[row][col]);
+                        }
+                        
+                        const result = this.processLine(line, direction === 'up');
+                        
+                        for (let row = 0; row < this.gridSize; row++) {
+                            newGrid[row][col] = result.line[row];
+                        }
+                        
+                        if (result.moved) moved = true;
+                    }
+                }
+
+                if (moved) {
+                    this.grid = newGrid;
+                    this.renderTiles();
+                    
+                    setTimeout(() => {
+                        this.addRandomTile();
+                        this.updateUI(); // 更新UI显示分数
+                        this.checkWinCondition();
+                        this.checkLoseCondition();
+                        this.saveProgress();
+                        this.isProcessing = false;
+                    }, 150);
+                } else {
+                    this.isProcessing = false;
+                }
+            }
+
+            // 处理一行/列
+            processLine(line, forward) {
+                if (!forward) line.reverse();
+                
+                // 移除零
+                let filtered = line.filter(val => val !== 0);
+                let moved = filtered.length !== line.length;
+                
+                // 合并
+                for (let i = 0; i < filtered.length - 1; i++) {
+                    if (filtered[i] === filtered[i + 1]) {
+                        const mergeValue = filtered[i]; // 合并前的值
+                        filtered[i] *= 2; // 合并后的值
+                        
+                        // 正确的得分计算：加上合并后方块的值（标准2048规则）
+                        this.score += filtered[i];
+                        
+                        filtered[i + 1] = 0;
+                        moved = true;
+                        
+                        // Boss关卡造成伤害：伤害值为合并后方块的值
+                        if (this.bossHP > 0) {
+                            this.damageBoss(filtered[i]);
+                        }
+                        
+                        // 检查是否生成技能（合并后达到256或更高）
+                        if (filtered[i] >= 256 && !this.skillReady) {
+                            this.generateSkill(filtered[i]);
+                        }
+                    }
+                }
+                
+                // 再次移除零
+                filtered = filtered.filter(val => val !== 0);
+                
+                // 补零
+                while (filtered.length < line.length) {
+                    filtered.push(0);
+                }
+                
+                if (!forward) filtered.reverse();
+                
+                return { line: filtered, moved };
+            }
+
+            // 生成技能
+            generateSkill(value) {
+                this.skillReady = true;
+                this.skillType = value >= 1024 ? 'rainbow' : 'timefreeze';
+                
+                const skillIndicator = document.getElementById('skillIndicator');
+                const skillIcon = document.getElementById('skillIcon');
+                
+                skillIndicator.classList.add('active');
+                skillIcon.textContent = this.skillType === 'rainbow' ? '🌈' : '⏸️';
+            }
+
+            // 使用技能
+            useSkill() {
+                if (!this.skillReady) return;
+                
+                if (this.skillType === 'rainbow') {
+                    // 彩虹冲击波：清除所有相同值的方块
+                    const mostCommon = this.getMostCommonValue();
+                    let clearedCount = 0;
+                    if (mostCommon > 0) {
+                        for (let row = 0; row < this.gridSize; row++) {
+                            for (let col = 0; col < this.gridSize; col++) {
+                                if (this.grid[row][col] === mostCommon) {
+                                    this.grid[row][col] = 0;
+                                    clearedCount++;
+                                }
+                            }
+                        }
+                        // 根据清除的方块数量和等级计算得分
+                        this.score += clearedCount * mostCommon * 2;
+                    }
+                } else if (this.skillType === 'timefreeze') {
+                    // 时间暂停：允许重新滑动（这里简化为额外一次移动机会）
+                    this.isProcessing = false;
+                }
+                
+                this.skillReady = false;
+                document.getElementById('skillIndicator').classList.remove('active');
+                this.renderTiles();
+                this.updateUI();
+            }
+
+            // 获取最常见的值
+            getMostCommonValue() {
+                const count = {};
+                let maxCount = 0;
+                let maxValue = 0;
+                
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        const val = this.grid[row][col];
+                        if (val > 0) {
+                            count[val] = (count[val] || 0) + 1;
+                            if (count[val] > maxCount) {
+                                maxCount = count[val];
+                                maxValue = val;
+                            }
+                        }
+                    }
+                }
+                
+                return maxValue;
+            }
+
+            // Boss受到伤害
+            damageBoss(damage) {
+                if (this.bossHP > 0) {
+                    this.bossHP -= damage;
+                    if (this.bossHP <= 0) {
+                        this.bossHP = 0;
+                        // Boss击败奖励：根据关卡ID计算
+                        const bossBonus = this.currentLevel * 2000;
+                        this.score += bossBonus;
+                        setTimeout(() => this.showWinModal(), 500);
+                    }
+                    this.updateBossHP();
+                }
+            }
+
+            // 更新Boss血条
+            updateBossHP() {
+                const hpPercent = (this.bossHP / this.maxBossHP) * 100;
+                document.getElementById('hpBarFill').style.width = `${hpPercent}%`;
+            }
+
+            // 检查胜利条件
+            checkWinCondition() {
+                const level = LEVELS.find(l => l.id === this.currentLevel);
+                if (!level) return;
+
+                let won = false;
+                let winReason = '';
+
+                // Boss已被击败（优先检查）
+                if (level.bossHP && this.bossHP <= 0) {
+                    won = true;
+                    winReason = `🎯 成功击败了 ${level.name}！`;
+                }
+                // 检查目标方块
+                else if (level.targetTile) {
+                    for (let row = 0; row < this.gridSize; row++) {
+                        for (let col = 0; col < this.gridSize; col++) {
+                            if (this.grid[row][col] >= level.targetTile) {
+                                won = true;
+                                const character = TILE_CHARACTERS[level.targetTile];
+                                winReason = `✨ 成功合成了 [${character.name}]！`;
+                                break;
+                            }
+                        }
+                        if (won) break;
+                    }
+                }
+                // 检查目标分数
+                else if (level.targetScore && this.score >= level.targetScore) {
+                    won = true;
+                    winReason = `💯 达到了目标分数 ${level.targetScore}！`;
+                }
+
+                if (won) {
+                    document.getElementById('winText').textContent = winReason;
+                    this.showWinModal();
+                }
+            }
+
+            // 检查失败条件
+            checkLoseCondition() {
+                // 检查是否还有空格
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        if (this.grid[row][col] === 0) return;
+                    }
+                }
+
+                // 检查是否还能合并
+                for (let row = 0; row < this.gridSize; row++) {
+                    for (let col = 0; col < this.gridSize; col++) {
+                        const current = this.grid[row][col];
+                        if (
+                            (row < this.gridSize - 1 && this.grid[row + 1][col] === current) ||
+                            (col < this.gridSize - 1 && this.grid[row][col + 1] === current)
+                        ) {
+                            return;
+                        }
+                    }
+                }
+
+                // 游戏失败
+                this.showLoseModal();
+            }
+
+            // 显示胜利弹窗
+            showWinModal() {
+                document.getElementById('winModal').classList.add('active');
+            }
+
+            // 显示失败弹窗
+            showLoseModal() {
+                document.getElementById('loseModal').classList.add('active');
+            }
+
+            // 关闭弹窗
+            closeModal(modalId) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+
+            // 下一关
+            nextLevel() {
+                this.closeModal('winModal');
+                if (this.currentLevel < LEVELS.length) {
+                    this.startLevel(this.currentLevel + 1);
+                } else {
+                    alert('🎊 恭喜你通关了所有关卡！');
+                    this.startLevel(1);
+                }
+            }
+
+            // 重新开始
+            restart() {
+                this.startLevel(this.currentLevel);
+            }
+
+            // 显示关卡选择
+            showLevelSelect() {
+                document.getElementById('levelSelect').classList.add('active');
+            }
+
+            // 隐藏关卡选择
+            hideLevelSelect() {
+                document.getElementById('levelSelect').classList.remove('active');
+            }
+
+            // 显示教程
+            showTutorial() {
+                document.getElementById('tutorialOverlay').classList.add('active');
+            }
+
+            // 关闭教程
+            closeTutorial() {
+                document.getElementById('tutorialOverlay').classList.remove('active');
+            }
+
+            // 开始游戏（从教程界面）
+            startGame() {
+                this.closeTutorial();
+                // 延迟一下再启动，让关闭动画完成
+                setTimeout(() => {
+                    this.startLevel(this.currentLevel);
+                }, 300);
+            }
+
+            // 渲染关卡选择界面
+            renderLevelSelect() {
+                const grid = document.getElementById('levelGrid');
+                grid.innerHTML = '';
+
+                LEVELS.forEach(level => {
+                    const card = document.createElement('div');
+                    card.className = 'level-card';
+                    card.onclick = () => this.startLevel(level.id);
+                    
+                    card.innerHTML = `
+                        <div class="level-number">Level ${level.id}</div>
+                        <div class="level-name">${level.name}</div>
+                        <div style="margin-top: 10px; font-size: 0.8em; color: #999;">
+                            ${level.description}
+                        </div>
+                    `;
+                    
+                    grid.appendChild(card);
+                });
+            }
+
+            // 渲染角色图鉴
+            renderCharacterGuide() {
+                const grid = document.getElementById('characterGrid');
+                if (!grid) return;
+                
+                grid.innerHTML = '';
+                
+                // 按照数字顺序排列角色
+                const sortedValues = Object.keys(TILE_CHARACTERS).map(Number).sort((a, b) => a - b);
+                
+                sortedValues.forEach(value => {
+                    const character = TILE_CHARACTERS[value];
+                    const card = document.createElement('div');
+                    card.className = 'character-card';
+                    
+                    // 根据数值设置背景色
+                    const tileClass = `tile-${value}`;
+                    card.style.background = this.getTileGradient(value);
+                    
+                    card.innerHTML = `
+                        <div class="character-number">${value}</div>
+                        <span class="character-icon">${character.icon}</span>
+                        <div class="character-name">${character.name}</div>
+                    `;
+                    
+                    grid.appendChild(card);
+                });
+            }
+
+            // 获取方块渐变色
+            getTileGradient(value) {
+                const gradients = {
+                    2: 'linear-gradient(135deg, #FFB6C1, #FFC0CB)',
+                    4: 'linear-gradient(135deg, #87CEEB, #ADD8E6)',
+                    8: 'linear-gradient(135deg, #98FB98, #90EE90)',
+                    16: 'linear-gradient(135deg, #DDA0DD, #DA70D6)',
+                    32: 'linear-gradient(135deg, #F0E68C, #FFD700)',
+                    64: 'linear-gradient(135deg, #FFA07A, #FF7F50)',
+                    128: 'linear-gradient(135deg, #FF69B4, #FF1493)',
+                    256: 'linear-gradient(135deg, #00CED1, #00BFFF)',
+                    512: 'linear-gradient(135deg, #FF4500, #FF6347)',
+                    1024: 'linear-gradient(135deg, #9370DB, #8A2BE2)',
+                    2048: 'linear-gradient(135deg, #FFD700, #FFA500)',
+                    4096: 'linear-gradient(135deg, #FF1493, #C71585)'
+                };
+                return gradients[value] || 'linear-gradient(135deg, #f5f5f5, #ffffff)';
+            }
+
+            // 更新UI
+            updateUI() {
+                document.getElementById('scoreValue').textContent = this.score;
+                document.getElementById('levelValue').textContent = this.currentLevel;
+            }
+
+            // 切换音效
+            toggleSound() {
+                this.soundEnabled = !this.soundEnabled;
+                alert(`音效已${this.soundEnabled ? '开启' : '关闭'}`);
+            }
+
+            // 设置输入处理
+            setupInputHandlers() {
+                let startX, startY, endX, endY;
+                const gameBoard = document.getElementById('gameBoard');
+
+                // 触摸事件
+                gameBoard.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                    e.preventDefault();
+                }, { passive: false });
+
+                gameBoard.addEventListener('touchend', (e) => {
+                    if (!startX || !startY) return;
+                    
+                    endX = e.changedTouches[0].clientX;
+                    endY = e.changedTouches[0].clientY;
+                    
+                    this.handleSwipe(startX, startY, endX, endY);
+                    
+                    startX = startY = endX = endY = null;
+                    e.preventDefault();
+                }, { passive: false });
+
+                // 键盘事件
+                document.addEventListener('keydown', (e) => {
+                    switch(e.key) {
+                        case 'ArrowUp':
+                            this.move('up');
+                            break;
+                        case 'ArrowDown':
+                            this.move('down');
+                            break;
+                        case 'ArrowLeft':
+                            this.move('left');
+                            break;
+                        case 'ArrowRight':
+                            this.move('right');
+                            break;
+                        case ' ':
+                            e.preventDefault();
+                            if (this.skillReady) {
+                                this.useSkill();
+                            }
+                            break;
+                    }
+                });
+
+                // 鼠标事件（用于桌面测试）
+                gameBoard.addEventListener('mousedown', (e) => {
+                    startX = e.clientX;
+                    startY = e.clientY;
+                });
+
+                gameBoard.addEventListener('mouseup', (e) => {
+                    if (!startX || !startY) return;
+                    
+                    endX = e.clientX;
+                    endY = e.clientY;
+                    
+                    this.handleSwipe(startX, startY, endX, endY);
+                    
+                    startX = startY = endX = endY = null;
+                });
+            }
+
+            // 处理滑动
+            handleSwipe(startX, startY, endX, endY) {
+                const deltaX = endX - startX;
+                const deltaY = endY - startY;
+                const minSwipeDistance = 30;
+
+                if (Math.abs(deltaX) < minSwipeDistance && Math.abs(deltaY) < minSwipeDistance) {
+                    return;
+                }
+
+                if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                    // 水平滑动
+                    if (deltaX > 0) {
+                        this.move('right');
+                    } else {
+                        this.move('left');
+                    }
+                } else {
+                    // 垂直滑动
+                    if (deltaY > 0) {
+                        this.move('down');
+                    } else {
+                        this.move('up');
+                    }
+                }
+            }
+
+            // 保存进度
+            saveProgress() {
+                const state = {
+                    currentLevel: this.currentLevel,
+                    score: this.score,
+                    grid: this.grid,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('pixelTale_save', JSON.stringify(state));
+            }
+
+            // 加载进度
+            loadProgress() {
+                const saved = localStorage.getItem('pixelTale_save');
+                if (saved) {
+                    try {
+                        const state = JSON.parse(saved);
+                        // 检查是否是同一天的存档
+                        const savedDate = new Date(state.timestamp);
+                        const now = new Date();
+                        if (savedDate.toDateString() === now.toDateString()) {
+                            this.currentLevel = state.currentLevel || 1;
+                            this.score = state.score || 0;
+                            this.grid = state.grid || [];
+                        }
+                    } catch (e) {
+                        console.error('加载存档失败:', e);
+                    }
+                }
+            }
+        }
+
+        // 启动游戏
+        const game = new Game();
+
+        // 页面关闭前保存
+        window.addEventListener('beforeunload', () => {
+            game.saveProgress();
+        });
+    </script>
+</body>
+</html>
