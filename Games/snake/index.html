@@ -1260,6 +1260,8 @@
         const FOOD_SPAWN_INTERVAL = 1500; // 食物生成间隔（毫秒）
         const POISON_FOOD_LIFETIME = 8000; // 有毒食物存活时间（8秒）
         const MAX_SNAKE_LENGTH = 2000; // 蛇身最大长度限制，避免性能问题
+        let actualSnakeLength = 3; // 蛇的实际长度（用于通关判断）
+        let displaySnakeLength = 3; // 蛇的显示长度（控制在地图格数的0.3倍）
         let lastFoodSpawnTime = 0; // 上次生成食物的时间
         let mapScaleLevel = 0; // 地图缩放级别，0=原始，1=2倍，2=4倍...
         
@@ -1407,6 +1409,8 @@
             snakeHistory = []; // 重置历史记录
             mapScaleLevel = 0; // 重置地图缩放级别
             MAX_FOOD_COUNT = 100; // 重置食物最大数量
+            actualSnakeLength = 3; // 重置实际长度
+            displaySnakeLength = 3; // 重置显示长度
             
             // 随机选择蛇头emoji（如果未手动设置）
             const headSelect = document.getElementById('snakeHeadSelect');
@@ -1685,13 +1689,25 @@
 
             // 蛇身增长（根据食物类型）- 优化：限制最大长度
             const growthAmount = foodType.growth - 1; // 基础增长1已经通过不pop实现
-            if (snake.length < MAX_SNAKE_LENGTH) {
-                for (let i = 0; i < growthAmount; i++) {
-                    if (snake.length >= MAX_SNAKE_LENGTH) break;
+            
+            // 更新实际长度（用于通关判断）
+            actualSnakeLength += foodType.growth;
+            
+            // 计算显示长度（控制在地图格数的0.3倍）
+            const currentGridCount = (CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE) * (CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE);
+            const maxDisplayLength = Math.floor(currentGridCount * 0.3);
+            
+            if (displaySnakeLength < maxDisplayLength) {
+                // 显示长度还未达到上限，正常增长
+                const displayGrowth = Math.min(growthAmount, maxDisplayLength - displaySnakeLength);
+                displaySnakeLength += displayGrowth;
+                
+                for (let i = 0; i < displayGrowth; i++) {
                     const tail = snake[snake.length - 1];
                     snake.push({ ...tail });
                 }
             }
+            // 如果显示长度已达上限，不再增加视觉长度，但实际长度继续累加
 
             // 显示食物提示
             if (foodType.growth > 1) {
@@ -2108,8 +2124,8 @@
             const currentGridCount = (CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE) * (CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE);
             const threshold = currentGridCount * 0.8;
             
-            // 当蛇身长度第一次超过地图格数的0.8倍时，直接通关
-            if (snake.length >= threshold && mapScaleLevel === 0) {
+            // 当蛇身实际长度第一次超过地图格数的0.8倍时，直接通关
+            if (actualSnakeLength >= threshold && mapScaleLevel === 0) {
                 showVictoryAnimation();
             }
         }
@@ -2265,13 +2281,25 @@
                         
                         // 蛇身增长 - 优化：限制最大长度
                         const growthAmount = foodType.growth - 1;
-                        if (snake.length < MAX_SNAKE_LENGTH) {
-                            for (let j = 0; j < growthAmount; j++) {
-                                if (snake.length >= MAX_SNAKE_LENGTH) break;
+                        
+                        // 更新实际长度（用于通关判断）
+                        actualSnakeLength += foodType.growth;
+                        
+                        // 计算显示长度（控制在地图格数的0.3倍）
+                        const currentGridCount = (CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE) * (CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE);
+                        const maxDisplayLength = Math.floor(currentGridCount * 0.3);
+                        
+                        if (displaySnakeLength < maxDisplayLength) {
+                            // 显示长度还未达到上限，正常增长
+                            const displayGrowth = Math.min(growthAmount, maxDisplayLength - displaySnakeLength);
+                            displaySnakeLength += displayGrowth;
+                            
+                            for (let j = 0; j < displayGrowth; j++) {
                                 const tail = snake[snake.length - 1];
                                 snake.push({ ...tail });
                             }
                         }
+                        // 如果显示长度已达上限，不再增加视觉长度，但实际长度继续累加
                         
                         // 显示食物提示
                         if (foodType.growth > 1) {
@@ -2826,6 +2854,12 @@
                 saveHighScore();
             }
             document.getElementById('highScore').textContent = highScore;
+            
+            // 更新长度显示（显示实际长度）
+            const lengthDisplay = document.getElementById('lengthDisplay');
+            if (lengthDisplay) {
+                lengthDisplay.textContent = `长度: ${actualSnakeLength}`;
+            }
         }
 
         function updateEnergyBar() {
