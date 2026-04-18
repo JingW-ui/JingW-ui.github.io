@@ -221,6 +221,8 @@
             font-weight: 600;
             opacity: 0;
             transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 50;
         }
 
         .ghost-indicator.active {
@@ -308,6 +310,124 @@
             background: rgba(255, 182, 185, 0.1);
             border-color: #FFB6B9;
             color: #FFB6B9;
+        }
+
+        /* 设置面板 */
+        .settings-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .settings-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-label {
+            font-size: 11px;
+            color: #666;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .settings-select {
+            padding: 5px 10px;
+            border: 1.5px solid #E0E6ED;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            background: white;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+            min-width: 80px;
+        }
+
+        .settings-select:focus {
+            border-color: #9CAF88;
+            box-shadow: 0 0 0 3px rgba(156, 175, 136, 0.1);
+        }
+
+        .settings-input {
+            padding: 5px 10px;
+            border: 1.5px solid #E0E6ED;
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+            background: white;
+            outline: none;
+            transition: all 0.2s ease;
+            width: 100px;
+        }
+
+        .settings-input:focus {
+            border-color: #9CAF88;
+            box-shadow: 0 0 0 3px rgba(156, 175, 136, 0.1);
+        }
+
+        .pause-settings-btn {
+            padding: 6px 10px;
+            background: linear-gradient(135deg, #9CAF88, #A8D8EA);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(156, 175, 136, 0.3);
+            min-width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pause-settings-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(156, 175, 136, 0.4);
+        }
+
+        .pause-settings-btn:active {
+            transform: scale(0.95);
+        }
+
+        .restart-settings-btn {
+            padding: 6px 10px;
+            background: linear-gradient(135deg, #9CAF88, #A8D8EA);
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(156, 175, 136, 0.3);
+            min-width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .restart-settings-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 182, 185, 0.4);
+        }
+
+        .restart-settings-btn:active {
+            transform: scale(0.95);
         }
 
         /* 模态框 */
@@ -538,13 +658,10 @@
             color: #999;
         }
 
-        /* 暂停按钮 */
+        /* 暂停按钮 - 移动端放在排行榜面板内 */
         .pause-btn {
             display: none;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 50;
+            position: static;
             width: 44px;
             height: 44px;
             background: rgba(255, 255, 255, 0.8);
@@ -557,6 +674,7 @@
             justify-content: center;
             align-items: center;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
         }
 
         .pause-btn.show {
@@ -624,37 +742,137 @@
 
         /* 移动端响应式优化 */
         @media (max-width: 768px) {
+            body {
+                align-items: flex-start;
+                padding-top: env(safe-area-inset-top, 0);
+            }
+
             .game-container {
-                padding: 15px;
-                gap: 15px;
+                padding: 8px;
+                gap: 10px;
                 flex-direction: column;
                 max-width: 100%;
+                margin-top: 0;
             }
             
             .game-main {
                 width: 100%;
             }
 
+            /* 顶部信息面板移动端优化 - 保持横向布局，压缩组件 */
             .info-panel {
-                padding: 12px 20px;
+                padding: 10px 12px;
+                flex-direction: row;
+                gap: 8px;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: nowrap;
+            }
+
+            /* 设置面板移动端优化 */
+            .settings-panel {
+                padding: 8px 12px;
+                gap: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .settings-group {
+                gap: 5px;
+            }
+
+            .settings-label {
+                font-size: 10px;
+            }
+
+            .settings-select,
+            .settings-input {
+                padding: 4px 8px;
+                font-size: 12px;
+                min-width: 60px;
+            }
+
+            .settings-input {
+                width: 70px;
+            }
+
+            .pause-settings-btn,
+            .restart-settings-btn {
+                padding: 5px 8px;
+                font-size: 14px;
+                min-width: 32px;
+            }
+
+            /* 分数区域 - 压缩宽度 */
+            .score-display,
+            .high-score-display {
+                min-width: 60px;
+                flex-shrink: 0;
+            }
+
+            .score-label {
+                font-size: 9px;
+                letter-spacing: 0.3px;
             }
 
             .score-value {
-                font-size: 28px;
+                font-size: 22px;
+                line-height: 1.1;
+            }
+
+            /* 生命值显示 - 压缩 */
+            .lives-display {
+                min-width: 55px;
+                flex-shrink: 0;
+                text-align: center;
+            }
+
+            .lives-label {
+                font-size: 9px;
+                margin-bottom: 1px;
+            }
+
+            .lives-icons {
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+
+            /* 气血值条 - 自适应剩余空间 */
+            .energy-bar-wrapper {
+                flex: 1;
+                max-width: none;
+                margin: 0 3px;
+                padding: 0;
+                min-width: 80px;
+            }
+
+            .energy-bar-container {
+                width: 100%;
+                height: 20px;
+            }
+
+            .energy-bar-text {
+                font-size: 9px;
+            }
+
+            .energy-hint {
+                font-size: 8px;
+                margin-bottom: 3px;
             }
 
             .combo-display {
-                font-size: 36px;
+                font-size: 32px;
             }
 
             .leaderboard-panel {
                 width: 100%;
-                max-width: 600px;
-                padding: 15px;
+                max-width: 100%;
+                padding: 12px;
             }
 
             .modal-content {
-                padding: 30px;
+                padding: 25px 20px;
+                width: 90%;
             }
 
             .modal-title {
@@ -671,57 +889,108 @@
                 bottom: 15px;
             }
 
-            /* 显示暂停按钮 */
-            .pause-btn {
-                display: flex;
+            /* 幽灵模式指示器移动端优化 */
+            .ghost-indicator {
+                top: 10px;
+                right: 10px;
+                padding: 6px 12px;
+                font-size: 11px;
+                border-radius: 15px;
+                border-width: 1.5px;
             }
 
             /* 模式选择卡片调整 */
             .mode-selection {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 10px;
+                gap: 8px;
+                margin: 15px 0;
             }
 
             .mode-card {
-                padding: 15px;
+                padding: 12px 8px;
             }
 
             .mode-icon {
-                font-size: 28px;
+                font-size: 24px;
+                margin-bottom: 5px;
             }
 
             .mode-name {
-                font-size: 14px;
+                font-size: 13px;
             }
 
             .mode-desc {
-                font-size: 11px;
-            }
-
-            /* 气血值条移动端适配 */
-            .energy-bar-container {
-                width: 250px;
-                height: 26px;
-            }
-
-            .energy-bar-text {
-                font-size: 11px;
-            }
-
-            .energy-hint {
                 font-size: 10px;
-                top: 50px;
             }
         }
 
         @media (max-width: 480px) {
+            .game-container {
+                padding: 8px;
+                gap: 10px;
+            }
+
+            /* 超小屏幕进一步压缩 */
+            .info-panel {
+                padding: 8px 10px;
+                gap: 6px;
+            }
+
+            .score-display,
+            .high-score-display {
+                min-width: 50px;
+            }
+
+            .score-label {
+                font-size: 8px;
+            }
+
             .score-value {
-                font-size: 24px;
+                font-size: 20px;
+            }
+
+            .lives-display {
+                min-width: 48px;
+            }
+
+            .lives-label {
+                font-size: 8px;
+            }
+
+            .lives-icons {
+                font-size: 12px;
+                letter-spacing: 0.5px;
+            }
+
+            .energy-bar-wrapper {
+                min-width: 60px;
+                margin: 0 2px;
+            }
+
+            .energy-bar-container {
+                height: 18px;
+            }
+
+            .energy-bar-text {
+                font-size: 8px;
+            }
+
+            .energy-hint {
+                font-size: 7px;
             }
 
             .modal-btn {
-                padding: 10px 20px;
-                font-size: 14px;
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+
+            .controls-hint {
+                font-size: 10px;
+                padding: 6px 12px;
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                transform: none;
             }
         }
     </style>
@@ -738,6 +1007,44 @@
     <div class="game-container">
         <!-- 游戏主区域 -->
         <div class="game-main">
+            <!-- 设置面板 -->
+            <div class="settings-panel" id="settingsPanel">
+                <div class="settings-group">
+                    <label class="settings-label">蛇头:</label>
+                    <select class="settings-select" id="snakeHeadSelect" onchange="changeSnakeHead()">
+                        <option value="🐲">🐲 龙</option>
+                        <option value="🐉">🐉 神龙</option>
+                        <option value="🦎">🦎 蜥蜴</option>
+                        <option value="🐛">🐛 毛毛虫</option>
+                        <option value="🐌">🐌 蜗牛</option>
+                        <option value="🐸">🐸 青蛙</option>
+                        <option value="🦕">🦕 恐龙</option>
+                        <option value="🦖">🦖 霸王龙</option>
+                        <option value="🐊">🐊 鳄鱼</option>
+                        <option value="🐢">🐢 乌龟</option>
+                    </select>
+                </div>
+                
+                <div class="settings-group">
+                    <label class="settings-label">昵称:</label>
+                    <input type="text" class="settings-input" id="playerNickname" placeholder="输入昵称" maxlength="8">
+                </div>
+                
+                <div class="settings-group">
+                    <label class="settings-label">生命:</label>
+                    <select class="settings-select" id="livesSelect" onchange="changeLives()">
+                        <option value="1">1条</option>
+                        <option value="2">2条</option>
+                        <option value="3" selected>3条</option>
+                        <option value="5">5条</option>
+                        <option value="999">无限</option>
+                    </select>
+                </div>
+                
+                <button class="pause-settings-btn" id="pauseSettingsBtn" onclick="togglePause()" title="暂停">⏸</button>
+                <button class="restart-settings-btn" id="restartSettingsBtn" onclick="quickRestart()" title="重新开始">🔄</button>
+            </div>
+
             <!-- 顶部信息面板 -->
             <div class="info-panel">
                 <div class="score-display">
@@ -779,16 +1086,13 @@
                     <div class="pause-hint">按空格键或点击继续</div>
                 </div>
             </div>
-            
-            <!-- 暂停按钮（移动端） -->
-            <button class="pause-btn" id="pauseBtn" onclick="togglePause()">⏸</button>
 
             <!-- 连击显示 -->
             <div class="combo-display" id="comboDisplay"></div>
 
             <!-- 幽灵模式指示器 -->
             <div class="ghost-indicator" id="ghostIndicator">
-                幽灵模式可用 [空格]
+                👻 技能就绪
             </div>
         </div>
         
@@ -879,7 +1183,7 @@
                 SNAKE_HEAD: '#9CAF88',
                 SNAKE_BODY_START: '#9CAF88',
                 SNAKE_BODY_END: '#A8D8EA',
-                OBSTACLE: 'rgba(100, 100, 100, 0.3)',
+                OBSTACLE: 'rgba(255, 107, 107, 0.6)', // 醒目的红色半透明
                 GRID: 'rgba(0, 0, 0, 0.03)',
                 ENERGY_BAR_BG: 'rgba(0, 0, 0, 0.1)',
                 ENERGY_BAR_FILL: '#9CAF88',
@@ -905,7 +1209,12 @@
                 // 有毒食物
                 { emoji: '☠️', name: '毒蘑菇', growth: 0, score: -5, color: '#8B0000', isPoison: true },
                 { emoji: '🦠', name: '病毒', growth: 0, score: -5, color: '#6B4423', isPoison: true }
-            ]
+            ],
+            POWERUPS: [
+                { emoji: '🔴', name: '大吸铁石', type: 'magnet_large', duration: 10000, range: 3, color: '#FF6B6B' },
+                { emoji: '🟠', name: '小吸铁石', type: 'magnet_small', duration: 10000, range: 1, color: '#FFA502' },
+                { emoji: '⚡', name: '闪电加速', type: 'speed_boost', duration: 10000, speedMultiplier: 0.5, color: '#FFD700' }
+            ],
         };
 
         // ==================== 游戏状态 ====================
@@ -913,10 +1222,7 @@
         let snake = [];
         let direction = { x: 1, y: 0 };
         let nextDirection = { x: 1, y: 0 };
-        let food = null;
-        let currentFoodType = null;
-        let bonusFood = null; // 额外的高价值食物（与有毒食物同时出现）
-        let bonusFoodType = null;
+        let foods = []; // 多个食物数组，每个元素包含 {x, y, type}
         let obstacles = [];
         let score = 0;
         let highScore = 0;
@@ -948,6 +1254,19 @@
         let snakeHistory = []; // 蛇的历史位置记录，用于复活
         let snakeHeadEmoji = '🐲'; // 当前蛇头emoji，游戏开始时随机选择
         const SNAKE_HEAD_EMOJIS = ['🐲', '🐉', '🦎', '🐛', '🐌', '🐸', '🦕', '🦖', '🐊', '🐢']; // 可选的可爱动物头像
+        let MAX_FOOD_COUNT = 600; // 地图上最大食物数量（动态变化）
+        const FOOD_SPAWN_BATCH_MIN = 8; // 每批最少生成食物数
+        const FOOD_SPAWN_BATCH_MAX = 12; // 每批最多生成食物数
+        const FOOD_SPAWN_INTERVAL = 1500; // 食物生成间隔（毫秒）
+        const POISON_FOOD_LIFETIME = 8000; // 有毒食物存活时间（8秒）
+        const MAX_SNAKE_LENGTH = 2000; // 蛇身最大长度限制，避免性能问题
+        let lastFoodSpawnTime = 0; // 上次生成食物的时间
+        let mapScaleLevel = 0; // 地图缩放级别，0=原始，1=2倍，2=4倍...
+        
+        // 道具系统
+        let activePowerups = []; // 当前激活的道具列表 [{type, endTime, config}]
+        let powerupItems = []; // 地图上的道具物品 [{x, y, type, config}]
+        let attractingFoods = []; // 正在被吸附的食物 [{food, startX, startY, progress}] 
 
         // ==================== 初始化 ====================
         function init() {
@@ -992,6 +1311,60 @@
             startGame();
         }
 
+        // ==================== 设置面板功能 ====================
+        function changeSnakeHead() {
+            const select = document.getElementById('snakeHeadSelect');
+            snakeHeadEmoji = select.value;
+            
+            // 如果游戏正在进行，立即更新显示
+            if (isGameStarted && !isGameOver) {
+                render();
+            }
+        }
+
+        function changeLives() {
+            const select = document.getElementById('livesSelect');
+            const newLives = parseInt(select.value);
+            
+            // 如果是无限生命，设置为999
+            if (newLives === 999) {
+                lives = 999;
+            } else {
+                lives = newLives;
+            }
+            
+            // 更新显示
+            updateLivesDisplay();
+        }
+
+        function getPlayerNickname() {
+            const input = document.getElementById('playerNickname');
+            return input.value.trim() || '匿名玩家';
+        }
+
+        // 快速重新开始（回到模式选择）
+        function quickRestart() {
+            // 如果游戏正在进行，先停止当前游戏
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            // 清除暂停状态
+            isPaused = false;
+            pauseStartTime = 0;
+            hidePauseOverlay();
+            
+            // 隐藏游戏结束模态框
+            hideModal();
+            
+            // 重置游戏状态标志
+            isGameStarted = false;
+            isGameOver = false;
+            
+            // 显示模式选择界面
+            showModeSelectModal();
+        }
+
         function resizeCanvas() {
             const maxWidth = Math.min(window.innerWidth - 40, 600);
             const scale = maxWidth / CONFIG.CANVAS_WIDTH;
@@ -1021,23 +1394,47 @@
             isGameStarted = true;
             particles = [];
             obstacles = [];
+            foods = []; // 重置食物数组
+            powerupItems = []; // 重置道具
+            activePowerups = []; // 重置激活的道具
+            attractingFoods = []; // 重置吸附中的食物
             ghostModeAvailable = false;
             ghostModeUsed = false;
             comboCount = 0;
             lastEatTime = 0;
             energyValue = 0; // 重置气血值
-            bonusFood = null; // 重置奖励食物
-            bonusFoodType = null;
             lives = MAX_LIVES; // 重置生命值
             snakeHistory = []; // 重置历史记录
+            mapScaleLevel = 0; // 重置地图缩放级别
+            MAX_FOOD_COUNT = 100; // 重置食物最大数量
             
-            // 随机选择蛇头emoji
-            snakeHeadEmoji = SNAKE_HEAD_EMOJIS[Math.floor(Math.random() * SNAKE_HEAD_EMOJIS.length)];
+            // 随机选择蛇头emoji（如果未手动设置）
+            const headSelect = document.getElementById('snakeHeadSelect');
+            if (headSelect && headSelect.value) {
+                snakeHeadEmoji = headSelect.value;
+            } else {
+                snakeHeadEmoji = SNAKE_HEAD_EMOJIS[Math.floor(Math.random() * SNAKE_HEAD_EMOJIS.length)];
+            }
+            
+            // 从设置面板获取生命值
+            const livesSelect = document.getElementById('livesSelect');
+            if (livesSelect) {
+                const selectedLives = parseInt(livesSelect.value);
+                lives = selectedLives === 999 ? 999 : selectedLives;
+            } else {
+                lives = MAX_LIVES;
+            }
             
             // 重置时间记录
             gameStartTime = Date.now();
             totalPlayTime = 0;
             pauseStartTime = 0;
+            
+            // 重置画布大小为初始值
+            CONFIG.CANVAS_WIDTH = 600;
+            CONFIG.CANVAS_HEIGHT = 600;
+            canvas.width = 600;
+            canvas.height = 600;
 
             // 根据模式调整初始速度
             switch(selectedMode) {
@@ -1055,13 +1452,16 @@
                     break;
             }
 
-            spawnFood();
+            // 初始批量生成食物（20-30个）
+            const initialFoodCount = Math.floor(Math.random() * 11) + 20;
+            spawnFood(initialFoodCount);
+            lastFoodSpawnTime = performance.now();
+            
             updateUI();
             updateEnergyBar();
             hideModal();
 
-            // 显示暂停按钮、气血值条和生命值
-            document.getElementById('pauseBtn').classList.add('show');
+            // 显示气血值条和生命值
             document.getElementById('energyBarWrapper').style.display = 'flex';
             document.getElementById('livesDisplay').style.display = 'block';
             updateLivesDisplay();
@@ -1087,9 +1487,66 @@
                 return;
             }
 
+            // 定时批量生成食物（每2秒检查一次）
+            if (currentTime - lastFoodSpawnTime >= FOOD_SPAWN_INTERVAL) {
+                // 如果食物数量较少，批量生成
+                if (foods.length < MAX_FOOD_COUNT - 2) {
+                    const batchCount = Math.floor(Math.random() * (FOOD_SPAWN_BATCH_MAX - FOOD_SPAWN_BATCH_MIN + 1)) + FOOD_SPAWN_BATCH_MIN;
+                    spawnFood(batchCount);
+                }
+                lastFoodSpawnTime = currentTime;
+            }
+
+            // 检查有毒食物是否超时（8秒后自动消失）
+            const now = Date.now();
+            for (let i = foods.length - 1; i >= 0; i--) {
+                if (foods[i].isPoison && (now - foods[i].createTime) >= POISON_FOOD_LIFETIME) {
+                    // 有毒食物超时，显示特效和提示
+                    createExplosion(foods[i].x, foods[i].y, '#4CAF50', 10);
+                    showPraiseHint('👍 机智！没有上当');
+                    
+                    // 移除有毒食物
+                    foods.splice(i, 1);
+                    
+                    // 补充新食物
+                    spawnFood(1);
+                }
+            }
+            
+            // 检查障碍物是否超时（10-20秒后自动消失）
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                if ((now - obstacles[i].createTime) >= obstacles[i].lifetime) {
+                    // 障碍物超时，显示特效
+                    createExplosion(obstacles[i].x, obstacles[i].y, '#FF6B6B', 15);
+                    
+                    // 移除障碍物
+                    obstacles.splice(i, 1);
+                }
+            }
+            
+            // 定时生成道具（简单模式不生成）
+            if (selectedMode !== 'easy') {
+                if (Math.random() < 0.006) { // 约每5秒30%概率
+                    spawnPowerup();
+                }
+            }
+
             // 控制移动速度
             if (currentTime - lastMoveTime >= gameSpeed) {
                 moveSnake();
+                
+                // 检查是否需要扩大地图
+                checkAndExpandMap();
+                
+                // 吸附食物（如果有吸铁石）
+                attractFoods();
+                
+                // 更新吸附动画
+                updateAttractingAnimation();
+                
+                // 更新道具状态
+                updatePowerups();
+                
                 lastMoveTime = currentTime;
             }
 
@@ -1099,85 +1556,106 @@
         }
 
         function moveSnake() {
-            // 更新方向
-            direction = { ...nextDirection };
+            // 更新方向 - 优化：直接赋值而非展开运算符
+            direction.x = nextDirection.x;
+            direction.y = nextDirection.y;
 
-            // 计算新头部位置
-            const head = { ...snake[0] };
-            head.x += direction.x;
-            head.y += direction.y;
+            // 计算新头部位置 - 优化：直接创建对象
+            const headX = snake[0].x + direction.x;
+            const headY = snake[0].y + direction.y;
+            const newHead = { x: headX, y: headY };
 
-            // 检查碰撞
-            if (checkCollision(head)) {
-                // 尝试使用生命值复活
-                if (tryReviveWithLife()) {
-                    return; // 复活成功，不结束游戏
-                }
-                // 尝试自动保命复活（气血值满时）
-                if (autoRevive()) {
-                    return; // 复活成功，不结束游戏
-                }
-                gameOver();
+            // 检查碰撞（墙和障碍物）- 优化：提前检测，避免不必要的操作
+            if (headX < 0 || headX >= CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE ||
+                headY < 0 || headY >= CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE) {
+                handleCollision();
                 return;
             }
-
-            // 保存当前状态到历史记录（保留最近3步）
-            snakeHistory.push({
-                snake: JSON.parse(JSON.stringify(snake)),
-                direction: { ...direction }
-            });
-            if (snakeHistory.length > 3) {
-                snakeHistory.shift(); // 只保留最近3步
+            
+            // 检查障碍物碰撞
+            for (let i = 0, len = obstacles.length; i < len; i++) {
+                if (headX === obstacles[i].x && headY === obstacles[i].y) {
+                    handleCollision();
+                    return;
+                }
             }
 
-            // 添加新头部
-            snake.unshift(head);
+            // 保存当前状态到历史记录（保留最近3步）- 优化：延迟拷贝，只在需要时
+            // （移到后面，只有确认不死亡才保存）
 
-            // 检查是否吃到食物
-            if (head.x === food.x && head.y === food.y) {
-                eatFood();
-            } else if (bonusFood && head.x === bonusFood.x && head.y === bonusFood.y) {
-                eatBonusFood();
-            } else {
-                // 移除尾部
+            // 添加新头部 - 优化：unshift已经在最前面添加
+            snake.unshift(newHead);
+
+            // 检查是否吃到食物 - 优化：减少循环次数
+            let ateFood = false;
+            const foodsLen = foods.length;
+            for (let i = foodsLen - 1; i >= 0; i--) {
+                if (headX === foods[i].x && headY === foods[i].y) {
+                    eatFood(foods[i], i);
+                    ateFood = true;
+                    break;
+                }
+            }
+            
+            // 检查是否吃到道具 - 优化：减少循环次数
+            if (!ateFood) {
+                const powerupLen = powerupItems.length;
+                for (let i = powerupLen - 1; i >= 0; i--) {
+                    if (headX === powerupItems[i].x && headY === powerupItems[i].y) {
+                        activatePowerup(powerupItems[i].type);
+                        powerupItems.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+
+            // 如果没吃到食物，移除尾部 - 优化：直接pop
+            if (!ateFood) {
                 snake.pop();
+                
+                // 只有在没有吃食物时才保存历史记录（减少拷贝开销）
+                saveSnakeHistory();
             }
 
             // 更新幽灵模式状态
             updateGhostMode();
         }
-
-        function checkCollision(head) {
-            // 撞墙检测
-            if (head.x < 0 || head.x >= CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE ||
-                head.y < 0 || head.y >= CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE) {
-                return true;
+        
+        // 处理碰撞逻辑
+        function handleCollision() {
+            // 如果是无限生命，直接触发死亡动画
+            if (lives === 999) {
+                gameOver();
+                return;
             }
-
-            // 撞自己检测
-            for (let i = 0; i < snake.length; i++) {
-                if (head.x === snake[i].x && head.y === snake[i].y) {
-                    return true;
-                }
+            
+            // 尝试使用生命值复活
+            if (tryReviveWithLife()) {
+                return;
             }
-
-            // 撞障碍物检测
-            for (let obs of obstacles) {
-                if (head.x === obs.x && head.y === obs.y) {
-                    return true;
-                }
+            
+            // 尝试自动保命复活（气血值满时）
+            if (autoRevive()) {
+                return;
             }
-
-            return false;
+            
+            gameOver();
+        }
+        
+        // 保存蛇身历史记录 - 优化：提取为独立函数
+        function saveSnakeHistory() {
+            snakeHistory.push({
+                snake: snake.map(segment => ({x: segment.x, y: segment.y})),
+                direction: { x: direction.x, y: direction.y }
+            });
+            if (snakeHistory.length > 3) {
+                snakeHistory.shift();
+            }
         }
 
-        function eatFood() {
-            // 清除有毒食物定时器
-            if (poisonFoodTimer) {
-                clearTimeout(poisonFoodTimer);
-                poisonFoodTimer = null;
-            }
-
+        function eatFood(foodItem, foodIndex) {
+            const foodType = foodItem.type;
+            
             // 计算连击
             const now = Date.now();
             if (now - lastEatTime < CONFIG.COMBO_TIME_WINDOW) {
@@ -1188,68 +1666,69 @@
             lastEatTime = now;
 
             // 检查是否为有毒食物
-            if (currentFoodType.isPoison) {
-                handlePoisonFood();
+            if (foodType.isPoison) {
+                handlePoisonFood(foodItem, foodIndex);
                 return;
             }
 
             // 计算得分（连击加成）
-            const points = currentFoodType.score * comboCount;
+            const points = foodType.score * comboCount;
             score += points;
 
             // 生成粒子特效
-            createExplosion(food.x, food.y, currentFoodType.color);
+            createExplosion(foodItem.x, foodItem.y, foodType.color);
 
             // 显示连击
             if (comboCount > 1) {
                 showCombo(comboCount);
             }
 
-            // 蛇身增长（根据食物类型）
-            const growthAmount = currentFoodType.growth - 1; // 基础增长1已经通过不pop实现
-            for (let i = 0; i < growthAmount; i++) {
-                const tail = snake[snake.length - 1];
-                snake.push({ ...tail });
+            // 蛇身增长（根据食物类型）- 优化：限制最大长度
+            const growthAmount = foodType.growth - 1; // 基础增长1已经通过不pop实现
+            if (snake.length < MAX_SNAKE_LENGTH) {
+                for (let i = 0; i < growthAmount; i++) {
+                    if (snake.length >= MAX_SNAKE_LENGTH) break;
+                    const tail = snake[snake.length - 1];
+                    snake.push({ ...tail });
+                }
             }
 
             // 显示食物提示
-            if (currentFoodType.growth > 1) {
-                showFoodHint(currentFoodType);
+            if (foodType.growth > 1) {
+                showFoodHint(foodType);
             }
 
             // 增加气血值（每个食物增加 0.05-0.1）
             addEnergy(0.05 + Math.random() * 0.05);
 
-            // 生成新食物
-            spawnFood();
+            // 移除被吃的食物
+            foods.splice(foodIndex, 1);
+            
+            // 批量补充新食物（有概率一次生成多个）
+            const shouldSpawnBatch = Math.random() < 0.3; // 30%概率批量生成
+            if (shouldSpawnBatch) {
+                const batchCount = Math.floor(Math.random() * 3) + 2; // 2-4个
+                spawnFood(batchCount);
+            } else {
+                spawnFood(1); // 正常补充1个
+            }
 
             // 增加游戏速度
             gameSpeed = Math.max(CONFIG.MIN_SPEED, gameSpeed - CONFIG.SPEED_INCREMENT);
 
-            // 生成障碍物
-            if (score % CONFIG.OBSTACLE_SPAWN_SCORE === 0 && score > 0) {
-                spawnObstacle();
+            // 生成障碍物（仅噩梦模式）
+            if (selectedMode === 'nightmare') {
+                if (score % CONFIG.OBSTACLE_SPAWN_SCORE === 0 && score > 0) {
+                    spawnObstacle();
+                }
             }
 
             updateUI();
         }
 
-        function handlePoisonFood() {
-            // 清除定时器
-            if (poisonFoodTimer) {
-                clearTimeout(poisonFoodTimer);
-                poisonFoodTimer = null;
-            }
-
+        function handlePoisonFood(foodItem, foodIndex) {
             // 有毒食物特效
-            createExplosion(food.x, food.y, CONFIG.COLORS.POISON_FOOD, 15);
-            
-            // 清除奖励食物
-            if (bonusFood && bonusFoodType) {
-                createExplosion(bonusFood.x, bonusFood.y, bonusFoodType.color, 10);
-                bonusFood = null;
-                bonusFoodType = null;
-            }
+            createExplosion(foodItem.x, foodItem.y, CONFIG.COLORS.POISON_FOOD, 15);
 
             // 如果气血值为零时吃到毒物，身体长度减一
             if (energyValue <= 0) {
@@ -1268,11 +1747,14 @@
             }
 
             // 扣分
-            score = Math.max(0, score + currentFoodType.score);
+            score = Math.max(0, score + foodItem.type.score);
             updateUI();
 
-            // 生成新食物
-            spawnFood();
+            // 移除有毒食物
+            foods.splice(foodIndex, 1);
+            
+            // 补充新食物（毒物被吃后也正常补充）
+            spawnFood(1);
         }
         
         // 吃到高价值奖励食物
@@ -1329,9 +1811,11 @@
             // 增加游戏速度
             gameSpeed = Math.max(CONFIG.MIN_SPEED, gameSpeed - CONFIG.SPEED_INCREMENT);
             
-            // 生成障碍物
-            if (score % CONFIG.OBSTACLE_SPAWN_SCORE === 0 && score > 0) {
-                spawnObstacle();
+            // 生成障碍物（仅噩梦模式）
+            if (selectedMode === 'nightmare') {
+                if (score % CONFIG.OBSTACLE_SPAWN_SCORE === 0 && score > 0) {
+                    spawnObstacle();
+                }
             }
             
             updateUI();
@@ -1354,78 +1838,85 @@
             updateEnergyBar();
         }
 
-        function spawnFood() {
+        function spawnFood(batchCount = null) {
             const cols = CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE;
             const rows = CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE;
 
-            // 随机选择食物类型（有毒食物概率较低）
-            const random = Math.random();
-            if (random < 0.15) { // 15%概率生成有毒食物
-                currentFoodType = CONFIG.FOOD_TYPES.find(f => f.isPoison);
-                
-                // 生成有毒食物位置
-                do {
-                    food = {
-                        x: Math.floor(Math.random() * cols),
-                        y: Math.floor(Math.random() * rows)
-                    };
-                } while (isPositionOccupied(food));
-                
-                // 同时生成一个高价值的无毒奖励食物
-                const highValueFoods = CONFIG.FOOD_TYPES.filter(f => !f.isPoison && f.score >= 20);
-                bonusFoodType = highValueFoods[Math.floor(Math.random() * highValueFoods.length)];
-                
-                do {
-                    bonusFood = {
-                        x: Math.floor(Math.random() * cols),
-                        y: Math.floor(Math.random() * rows)
-                    };
-                } while (isPositionOccupied(bonusFood) || (bonusFood.x === food.x && bonusFood.y === food.y));
-                
-                // 设置自动消失定时器
-                setupPoisonFoodTimer();
-            } else {
-                // 普通食物
-                currentFoodType = CONFIG.FOOD_TYPES.filter(f => !f.isPoison)[Math.floor(Math.random() * CONFIG.FOOD_TYPES.filter(f => !f.isPoison).length)];
-                bonusFood = null;
-                bonusFoodType = null;
-                
-                do {
-                    food = {
-                        x: Math.floor(Math.random() * cols),
-                        y: Math.floor(Math.random() * rows)
-                    };
-                } while (isPositionOccupied(food));
+            // 如果没有指定批次数量，随机决定
+            if (batchCount === null) {
+                batchCount = Math.floor(Math.random() * (FOOD_SPAWN_BATCH_MAX - FOOD_SPAWN_BATCH_MIN + 1)) + FOOD_SPAWN_BATCH_MIN;
             }
+
+            // 批量生成食物
+            let spawnedCount = 0;
+            for (let i = 0; i < batchCount && foods.length < MAX_FOOD_COUNT; i++) {
+                // 随机选择食物类型（有毒食物概率较低）
+                const random = Math.random();
+                let foodType;
+                
+                // 根据模式决定是否生成有毒食物
+                let poisonChance = 0;
+                if (selectedMode === 'hard' || selectedMode === 'nightmare') {
+                    poisonChance = 0.08; // 困难和噩梦模式8%概率
+                }
+                
+                if (random < poisonChance) {
+                    foodType = CONFIG.FOOD_TYPES.find(f => f.isPoison);
+                } else {
+                    // 普通食物
+                    const normalFoods = CONFIG.FOOD_TYPES.filter(f => !f.isPoison);
+                    foodType = normalFoods[Math.floor(Math.random() * normalFoods.length)];
+                }
+                
+                // 生成食物位置
+                let newFood;
+                let attempts = 0;
+                do {
+                    newFood = {
+                        x: Math.floor(Math.random() * cols),
+                        y: Math.floor(Math.random() * rows),
+                        type: foodType,
+                        createTime: Date.now(),
+                        isPoison: foodType.isPoison || false // 标记是否为有毒食物
+                    };
+                    attempts++;
+                } while (isPositionOccupied(newFood) && attempts < 50);
+                
+                // 如果找到合适位置，添加食物
+                if (attempts < 50) {
+                    foods.push(newFood);
+                    spawnedCount++;
+                } else {
+                    break; // 无法找到合适位置，退出
+                }
+            }
+            
+            return spawnedCount;
         }
 
-        function setupPoisonFoodTimer() {
-            // 清除之前的定时器
-            if (poisonFoodTimer) {
-                clearTimeout(poisonFoodTimer);
+        // 检查位置是否被占用（蛇身、障碍物、其他食物、道具）- 优化：使用Set加速
+        function isPositionOccupied(pos) {
+            // 检查蛇身 - 优化：直接遍历比较
+            for (let i = 0, len = snake.length; i < len; i++) {
+                if (pos.x === snake[i].x && pos.y === snake[i].y) return true;
             }
 
-            // 8秒后有毒食物和奖励食物自动消失
-            poisonFoodTimer = setTimeout(() => {
-                if (currentFoodType && currentFoodType.isPoison) {
-                    // 有毒食物消失，夸奖玩家
-                    createExplosion(food.x, food.y, '#4CAF50', 10);
-                    
-                    // 如果奖励食物还在，也一起消失
-                    if (bonusFood && bonusFoodType) {
-                        createExplosion(bonusFood.x, bonusFood.y, bonusFoodType.color, 10);
-                    }
-                    
-                    showPraiseHint('👍 机智！没有上当');
-                    
-                    // 清除奖励食物
-                    bonusFood = null;
-                    bonusFoodType = null;
-                    
-                    // 生成新食物
-                    spawnFood();
-                }
-            }, 8000);
+            // 检查障碍物 - 优化：缓存长度
+            for (let i = 0, len = obstacles.length; i < len; i++) {
+                if (pos.x === obstacles[i].x && pos.y === obstacles[i].y) return true;
+            }
+            
+            // 检查其他食物 - 优化：缓存长度
+            for (let i = 0, len = foods.length; i < len; i++) {
+                if (pos.x === foods[i].x && pos.y === foods[i].y) return true;
+            }
+            
+            // 检查道具 - 优化：缓存长度
+            for (let i = 0, len = powerupItems.length; i < len; i++) {
+                if (pos.x === powerupItems[i].x && pos.y === powerupItems[i].y) return true;
+            }
+
+            return false;
         }
 
         function spawnObstacle() {
@@ -1436,25 +1927,13 @@
             do {
                 obstacle = {
                     x: Math.floor(Math.random() * cols),
-                    y: Math.floor(Math.random() * rows)
+                    y: Math.floor(Math.random() * rows),
+                    createTime: Date.now(), // 记录创建时间
+                    lifetime: 10000 + Math.random() * 10000 // 10-20秒随机存活时间
                 };
             } while (isPositionOccupied(obstacle) || isNearSnake(obstacle));
 
             obstacles.push(obstacle);
-        }
-
-        function isPositionOccupied(pos) {
-            // 检查蛇身
-            for (let segment of snake) {
-                if (pos.x === segment.x && pos.y === segment.y) return true;
-            }
-
-            // 检查障碍物
-            for (let obs of obstacles) {
-                if (pos.x === obs.x && pos.y === obs.y) return true;
-            }
-
-            return false;
         }
 
         function isNearSnake(pos) {
@@ -1585,6 +2064,354 @@
             document.getElementById('livesIcons').textContent = hearts;
         }
 
+        // 无限生命自动复活
+        function autoReviveInfinite() {
+            // 保存死亡前的长度
+            const deathLength = snake.length;
+            
+            // 重置蛇的位置到地图中央
+            const centerX = Math.floor(CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE / 2);
+            const centerY = Math.floor(CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE / 2);
+            
+            // 创建新蛇，保持死亡前的长度
+            snake = [];
+            for (let i = 0; i < deathLength; i++) {
+                snake.push({
+                    x: centerX - i,
+                    y: centerY
+                });
+            }
+            
+            direction = { x: 1, y: 0 };
+            nextDirection = { x: 1, y: 0 };
+            
+            // 清空历史记录
+            snakeHistory = [];
+            
+            // 清除障碍物（可选，让游戏继续）
+            obstacles = [];
+            
+            // 重置速度
+            gameSpeed = CONFIG.INITIAL_SPEED;
+            
+            // 特效
+            createExplosion(centerX, centerY, '#FFD700', 30);
+            showSkillHint('✨ 无限生命复活！');
+            
+            // 继续游戏
+            isGameOver = false;
+            lastMoveTime = performance.now();
+        }
+
+        // 检查并扩大地图
+        function checkAndExpandMap() {
+            const currentGridCount = (CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE) * (CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE);
+            const threshold = currentGridCount * 0.8;
+            
+            // 当蛇身长度第一次超过地图格数的0.8倍时，直接通关
+            if (snake.length >= threshold && mapScaleLevel === 0) {
+                showVictoryAnimation();
+            }
+        }
+
+        // 生成道具
+        function spawnPowerup() {
+            const cols = CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE;
+            const rows = CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE;
+            
+            // 随机选择一个道具类型
+            const powerupConfig = CONFIG.POWERUPS[Math.floor(Math.random() * CONFIG.POWERUPS.length)];
+            
+            let attempts = 0;
+            let newPowerup;
+            do {
+                newPowerup = {
+                    x: Math.floor(Math.random() * cols),
+                    y: Math.floor(Math.random() * rows),
+                    type: powerupConfig.type,
+                    config: powerupConfig,
+                    createTime: Date.now()
+                };
+                attempts++;
+            } while (isPositionOccupied(newPowerup) && attempts < 50);
+            
+            if (attempts < 50) {
+                powerupItems.push(newPowerup);
+            }
+        }
+
+        // 激活道具
+        function activatePowerup(powerupType) {
+            const config = CONFIG.POWERUPS.find(p => p.type === powerupType);
+            if (!config) return;
+            
+            const now = Date.now();
+            activePowerups.push({
+                type: powerupType,
+                endTime: now + config.duration,
+                config: config
+            });
+            
+            // 显示提示
+            showSkillHint(`${config.emoji} ${config.name}！${config.duration/1000}秒`);
+            
+            // 如果是加速道具，立即应用
+            if (powerupType === 'speed_boost') {
+                gameSpeed = gameSpeed * config.speedMultiplier;
+            }
+        }
+
+        // 更新道具状态
+        function updatePowerups() {
+            const now = Date.now();
+            
+            // 移除过期的道具
+            for (let i = activePowerups.length - 1; i >= 0; i--) {
+                if (now >= activePowerups[i].endTime) {
+                    const expired = activePowerups[i];
+                    
+                    // 如果是加速道具，恢复速度
+                    if (expired.type === 'speed_boost') {
+                        gameSpeed = gameSpeed / expired.config.speedMultiplier;
+                    }
+                    
+                    activePowerups.splice(i, 1);
+                    showSkillHint(`${expired.config.emoji} ${expired.config.name} 结束`);
+                }
+            }
+        }
+
+        // 检查是否有吸铁石效果
+        function hasMagnetEffect() {
+            const magnetLarge = activePowerups.find(p => p.type === 'magnet_large');
+            const magnetSmall = activePowerups.find(p => p.type === 'magnet_small');
+            
+            if (magnetLarge) return { active: true, range: magnetLarge.config.range };
+            if (magnetSmall) return { active: true, range: magnetSmall.config.range };
+            
+            return { active: false, range: 0 };
+        }
+
+        // 吸附食物 - 优化：减少重复计算
+        function attractFoods() {
+            const magnet = hasMagnetEffect();
+            if (!magnet.active) return;
+            
+            const head = snake[0];
+            const range = magnet.range;
+            
+            // 检查范围内的食物，添加到吸附列表
+            for (let i = foods.length - 1; i >= 0; i--) {
+                const food = foods[i];
+                const distance = Math.abs(food.x - head.x) + Math.abs(food.y - head.y);
+                
+                if (distance <= range && distance > 0) {
+                    // 检查是否已经在吸附列表中
+                    const alreadyAttracting = attractingFoods.find(af => af.food === food);
+                    if (!alreadyAttracting) {
+                        // 添加到吸附列表
+                        attractingFoods.push({
+                            food: food,
+                            foodIndex: i,
+                            startX: food.x,
+                            startY: food.y,
+                            progress: 0
+                        });
+                        
+                        // 立即从foods数组中移除（原地消失）
+                        foods.splice(i, 1);
+                    }
+                }
+            }
+        }
+
+        // 更新吸附动画
+        function updateAttractingAnimation() {
+            const head = snake[0];
+            
+            for (let i = attractingFoods.length - 1; i >= 0; i--) {
+                const attr = attractingFoods[i];
+                
+                // 增加进度（速度）
+                attr.progress += 0.08;
+                
+                // 如果动画完成
+                if (attr.progress >= 1) {
+                    // 直接处理吃食物的逻辑（不再从foods数组查找）
+                    const foodType = attr.food.type;
+                    
+                    // 计算连击
+                    const now = Date.now();
+                    if (now - lastEatTime < CONFIG.COMBO_TIME_WINDOW) {
+                        comboCount++;
+                    } else {
+                        comboCount = 1;
+                    }
+                    lastEatTime = now;
+                    
+                    // 检查是否为有毒食物
+                    if (!foodType.isPoison) {
+                        // 计算得分
+                        const points = foodType.score * comboCount;
+                        score += points;
+                        
+                        // 生成粒子特效
+                        createExplosion(head.x, head.y, foodType.color);
+                        
+                        // 显示连击
+                        if (comboCount > 1) {
+                            showCombo(comboCount);
+                        }
+                        
+                        // 蛇身增长 - 优化：限制最大长度
+                        const growthAmount = foodType.growth - 1;
+                        if (snake.length < MAX_SNAKE_LENGTH) {
+                            for (let j = 0; j < growthAmount; j++) {
+                                if (snake.length >= MAX_SNAKE_LENGTH) break;
+                                const tail = snake[snake.length - 1];
+                                snake.push({ ...tail });
+                            }
+                        }
+                        
+                        // 显示食物提示
+                        if (foodType.growth > 1) {
+                            showFoodHint(foodType);
+                        }
+                        
+                        // 增加气血值
+                        addEnergy(0.05 + Math.random() * 0.05);
+                        
+                        // 增加游戏速度
+                        gameSpeed = Math.max(CONFIG.MIN_SPEED, gameSpeed - CONFIG.SPEED_INCREMENT);
+                        
+                        // 生成障碍物（仅噩梦模式）
+                        if (selectedMode === 'nightmare') {
+                            if (score % CONFIG.OBSTACLE_SPAWN_SCORE === 0 && score > 0) {
+                                spawnObstacle();
+                            }
+                        }
+                        
+                        updateUI();
+                    }
+                    
+                    // 从列表中移除
+                    attractingFoods.splice(i, 1);
+                }
+            }
+        }
+
+        // 扩大地图
+        function expandMap() {
+            mapScaleLevel++;
+            
+            // 扩大画布尺寸为原来的2倍
+            const newWidth = CONFIG.CANVAS_WIDTH * 2;
+            const newHeight = CONFIG.CANVAS_HEIGHT * 2;
+            
+            // 更新canvas元素大小
+            canvas.width = newWidth;
+            canvas.height = newHeight;
+            
+            // 更新配置
+            CONFIG.CANVAS_WIDTH = newWidth;
+            CONFIG.CANVAS_HEIGHT = newHeight;
+            
+            // 调整食物最大数量
+            if (mapScaleLevel === 1) {
+                // 第一次扩大：食物数量翻倍
+                MAX_FOOD_COUNT = 200;
+                showSkillHint('🗺️ 地图扩大2倍！食物上限200');
+            } else {
+                // 第二次及以后：食物数量固定为10
+                MAX_FOOD_COUNT = 10;
+                showSkillHint(`🗺️ 地图扩大${Math.pow(2, mapScaleLevel)}倍！食物上限10`);
+            }
+            
+            // 重新调整画布显示大小
+            resizeCanvas();
+            
+            // 特效
+            createExplosion(
+                Math.floor(CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE / 2),
+                Math.floor(CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE / 2),
+                '#9CAF88',
+                50
+            );
+        }
+
+        // 播放通关动画
+        function showVictoryAnimation() {
+            isGameOver = true;
+            
+            // 停止游戏循环
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            
+            // 创建华丽的通关特效
+            const centerX = Math.floor(CONFIG.CANVAS_WIDTH / CONFIG.GRID_SIZE / 2);
+            const centerY = Math.floor(CONFIG.CANVAS_HEIGHT / CONFIG.GRID_SIZE / 2);
+            
+            // 多次爆炸特效
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createExplosion(
+                        centerX + (Math.random() - 0.5) * 20,
+                        centerY + (Math.random() - 0.5) * 20,
+                        ['#FFD700', '#FF6B6B', '#9CAF88', '#A8D8EA', '#FFA502'][i],
+                        40
+                    );
+                }, i * 200);
+            }
+            
+            // 显示通关提示
+            showVictoryHint();
+            
+            // 屏幕震动
+            canvas.style.animation = 'shake 1s ease';
+            setTimeout(() => {
+                canvas.style.animation = '';
+            }, 1000);
+            
+            // 3秒后显示结算界面
+            setTimeout(() => {
+                showGameOverModal();
+            }, 3000);
+        }
+
+        // 显示通关提示
+        function showVictoryHint() {
+            const hint = document.createElement('div');
+            hint.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 48px;
+                font-weight: 900;
+                color: #FFD700;
+                opacity: 0;
+                pointer-events: none;
+                z-index: 1000;
+                text-shadow: 0 0 30px rgba(255, 215, 0, 0.8), 0 0 60px rgba(255, 215, 0, 0.4);
+                text-align: center;
+            `;
+            hint.innerHTML = '🎉 通关！ 🎉<br><span style="font-size: 24px;">太厉害了！</span>';
+            document.body.appendChild(hint);
+
+            requestAnimationFrame(() => {
+                hint.style.transition = 'all 1.5s ease-out';
+                hint.style.opacity = '1';
+                hint.style.transform = 'translate(-50%, -50%) scale(1.2)';
+                
+                setTimeout(() => {
+                    hint.style.opacity = '0';
+                    hint.style.transform = 'translate(-50%, -50%) scale(1.5)';
+                    setTimeout(() => hint.remove(), 500);
+                }, 2500);
+            });
+        }
+
         // ==================== 渲染系统 ====================
         function render() {
             // 清空画布
@@ -1597,13 +2424,11 @@
             // 绘制障碍物
             drawObstacles();
 
-            // 绘制食物
+            // 绘制食物（多个）
             drawFood();
             
-            // 绘制奖励食物
-            if (bonusFood && bonusFoodType) {
-                drawBonusFood();
-            }
+            // 绘制道具
+            drawPowerups();
 
             // 绘制蛇
             drawSnake();
@@ -1635,152 +2460,298 @@
         }
 
         function drawSnake() {
-            snake.forEach((segment, index) => {
+            const snakeLength = snake.length;
+            
+            // 预计算颜色缓存（每10节蛇身计算一次颜色）
+            const colorCache = [];
+            const cacheStep = 10;
+            for (let i = 0; i < snakeLength; i += cacheStep) {
+                const ratio = i / snakeLength;
+                colorCache[i] = interpolateColor(
+                    CONFIG.COLORS.SNAKE_BODY_START,
+                    CONFIG.COLORS.SNAKE_BODY_END,
+                    ratio
+                );
+            }
+            
+            // 第一步：先绘制蛇身（从尾部到头部前一个）
+            for (let index = snakeLength - 1; index >= 1; index--) {
+                const segment = snake[index];
                 const x = segment.x * CONFIG.GRID_SIZE;
                 const y = segment.y * CONFIG.GRID_SIZE;
                 const size = CONFIG.GRID_SIZE - 2;
-
-                // 蛇头绘制 emoji 图标
-                if (index === 0) {
-                    const centerX = x + CONFIG.GRID_SIZE / 2;
-                    const centerY = y + CONFIG.GRID_SIZE / 2;
-                    
-                    // 根据方向旋转蛇头
-                    ctx.save();
-                    ctx.translate(centerX, centerY);
-                    
-                    let rotation = 0;
-                    if (direction.x === 1) rotation = 0;           // → 向右（默认）
-                    else if (direction.x === -1) rotation = Math.PI;   // ← 向左（180度）
-                    else if (direction.y === -1) rotation = Math.PI / 2;   // ↑ 向上（90度）
-                    else if (direction.y === 1) rotation = -Math.PI / 2;   // ↓ 向下（-90度）
-                    
-                    ctx.rotate(rotation);
-                    
-                    // 绘制可爱的蛇头 emoji（随机选择）
-                    ctx.font = `${CONFIG.GRID_SIZE}px Arial`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(snakeHeadEmoji, 0, 0);
-                    
-                    ctx.restore();
-                    
-                    // 蛇头光效
-                    ctx.shadowColor = CONFIG.COLORS.SNAKE_HEAD;
-                    ctx.shadowBlur = 15;
-                    ctx.beginPath();
-                    ctx.arc(centerX, centerY, size / 2, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.shadowBlur = 0;
+                
+                // 蛇身绘制圆角矩形 - 优化：使用缓存的颜色
+                let color;
+                if (index % cacheStep === 0) {
+                    color = colorCache[index];
                 } else {
-                    // 蛇身绘制圆角矩形
-                    const ratio = index / snake.length;
-                    const color = interpolateColor(
-                        CONFIG.COLORS.SNAKE_BODY_START,
-                        CONFIG.COLORS.SNAKE_BODY_END,
-                        ratio
-                    );
-
-                    ctx.fillStyle = color;
-                    roundRect(ctx, x + 1, y + 1, size, size, 5);
-                    ctx.fill();
-
-                    // 幽灵模式拖尾效果
-                    if (ghostModeAvailable && index < 5) {
-                        ctx.globalAlpha = 0.3 - (index * 0.05);
-                        ctx.fill();
-                        ctx.globalAlpha = 1;
-                    }
+                    // 对于非缓存点，使用最近的缓存颜色
+                    const cacheIndex = Math.floor(index / cacheStep) * cacheStep;
+                    color = colorCache[cacheIndex];
                 }
-            });
+
+                ctx.fillStyle = color;
+                roundRect(ctx, x + 1, y + 1, size, size, 5);
+                ctx.fill();
+
+                // 幽灵模式拖尾效果
+                if (ghostModeAvailable && index < 5) {
+                    ctx.globalAlpha = 0.3 - (index * 0.05);
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+            }
+            
+            // 第二步：最后绘制蛇头（确保蛇头在最上层）
+            if (snakeLength > 0) {
+                const head = snake[0];
+                const x = head.x * CONFIG.GRID_SIZE;
+                const y = head.y * CONFIG.GRID_SIZE;
+                const size = CONFIG.GRID_SIZE - 2;
+                const centerX = x + CONFIG.GRID_SIZE / 2;
+                const centerY = y + CONFIG.GRID_SIZE / 2;
+                
+                // 先绘制蛇头光效（在背景层）
+                ctx.shadowColor = CONFIG.COLORS.SNAKE_HEAD;
+                ctx.shadowBlur = 15;
+                ctx.fillStyle = CONFIG.COLORS.SNAKE_HEAD;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, size / 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                
+                // 根据方向旋转蛇头
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                
+                let rotation = 0;
+                if (direction.x === 1) rotation = 0;           // → 向右（默认）
+                else if (direction.x === -1) rotation = Math.PI;   // ← 向左（180度）
+                else if (direction.y === -1) rotation = Math.PI / 2;   // ↑ 向上（90度）
+                else if (direction.y === 1) rotation = -Math.PI / 2;   // ↓ 向下（-90度）
+                
+                ctx.rotate(rotation);
+                
+                // 绘制可爱的蛇头 emoji（随机选择）
+                ctx.font = `${CONFIG.GRID_SIZE}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(snakeHeadEmoji, 0, 0);
+                
+                ctx.restore();
+            }
         }
 
         function drawFood() {
-            if (!food || !currentFoodType) return;
+            // 遍历所有食物并绘制
+            foods.forEach(foodItem => {
+                const foodType = foodItem.type;
+                const x = foodItem.x * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
+                const y = foodItem.y * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
 
-            const x = food.x * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
-            const y = food.y * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
+                // 呼吸灯效果
+                const pulse = Math.sin(Date.now() / 300) * 2;
 
-            // 呼吸灯效果
-            const pulse = Math.sin(Date.now() / 300) * 2;
+                // 外发光（柔和的渐变光晕）
+                const glowRadius = CONFIG.GRID_SIZE / 2 + 8 + pulse;
+                const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
+                gradient.addColorStop(0, foodType.color + '40'); // 25% 透明度
+                gradient.addColorStop(0.5, foodType.color + '20'); // 12.5% 透明度
+                gradient.addColorStop(1, 'transparent');
 
-            // 外发光（柔和的渐变光晕）
-            const glowRadius = CONFIG.GRID_SIZE / 2 + 8 + pulse;
-            const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
-            gradient.addColorStop(0, currentFoodType.color + '40'); // 25% 透明度
-            gradient.addColorStop(0.5, currentFoodType.color + '20'); // 12.5% 透明度
-            gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
+                ctx.fill();
 
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
-            ctx.fill();
-
-            // 绘制 emoji 图标
-            ctx.font = `${CONFIG.GRID_SIZE - 4}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
+                // 绘制 emoji 图标
+                ctx.font = `${CONFIG.GRID_SIZE - 4}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // 添加轻微的跳动动画
+                const bounce = Math.sin(Date.now() / 200) * 2;
+                ctx.fillText(foodType.emoji, x, y + bounce);
+            });
             
-            // 添加轻微的跳动动画
-            const bounce = Math.sin(Date.now() / 200) * 2;
-            ctx.fillText(currentFoodType.emoji, x, y + bounce);
+            // 绘制正在被吸附的食物
+            drawAttractingFoods();
         }
         
-        // 绘制高价值奖励食物
-        function drawBonusFood() {
-            if (!bonusFood || !bonusFoodType) return;
-
-            const x = bonusFood.x * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
-            const y = bonusFood.y * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
-
-            // 更强的呼吸灯效果
-            const pulse = Math.sin(Date.now() / 200) * 3;
-
-            // 更炫的外发光效果（金色光晕）
-            const glowRadius = CONFIG.GRID_SIZE / 2 + 12 + pulse;
-            const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
-            gradient.addColorStop(0, '#FFD700' + '60'); // 37.5% 透明度
-            gradient.addColorStop(0.5, bonusFoodType.color + '40'); // 25% 透明度
-            gradient.addColorStop(1, 'transparent');
-
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
-            ctx.fill();
+        // 绘制道具
+        function drawPowerups() {
+            powerupItems.forEach(powerup => {
+                const x = powerup.x * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
+                const y = powerup.y * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
+                
+                // 更强的呼吸灯效果
+                const pulse = Math.sin(Date.now() / 150) * 3;
+                
+                // 炫彩光晕
+                const glowRadius = CONFIG.GRID_SIZE / 2 + 10 + pulse;
+                const gradient = ctx.createRadialGradient(x, y, 0, x, y, glowRadius);
+                gradient.addColorStop(0, powerup.config.color + '60');
+                gradient.addColorStop(0.5, powerup.config.color + '30');
+                gradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(x, y, glowRadius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 旋转光环
+                const time = Date.now() / 1000;
+                ctx.strokeStyle = powerup.config.color + '80';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(x, y, glowRadius - 3, time, time + Math.PI);
+                ctx.stroke();
+                
+                // 绘制 emoji
+                ctx.font = `${CONFIG.GRID_SIZE}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                const bounce = Math.sin(Date.now() / 150) * 3;
+                ctx.fillText(powerup.config.emoji, x, y + bounce);
+            });
+        }
+        
+        // 绘制正在被吸附的食物
+        function drawAttractingFoods() {
+            const head = snake[0];
+            const headX = head.x * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
+            const headY = head.y * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
             
-            // 添加旋转光环
-            const time = Date.now() / 1000;
-            ctx.strokeStyle = '#FFD700' + '80';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(x, y, glowRadius - 5, time, time + Math.PI);
-            ctx.stroke();
-
-            // 绘制 emoji 图标（更大）
-            ctx.font = `${CONFIG.GRID_SIZE}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            
-            // 更明显的跳动动画
-            const bounce = Math.sin(Date.now() / 150) * 3;
-            ctx.fillText(bonusFoodType.emoji, x, y + bounce);
-            
-            // 添加"高分"标签
-            ctx.font = 'bold 10px Arial';
-            ctx.fillStyle = '#FFD700';
-            ctx.fillText('★', x, y - CONFIG.GRID_SIZE / 2 - 5);
+            attractingFoods.forEach(attr => {
+                const food = attr.food;
+                const foodType = food.type;
+                
+                // 计算当前位置（从起始位置向蛇头移动）
+                const startX = attr.startX * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
+                const startY = attr.startY * CONFIG.GRID_SIZE + CONFIG.GRID_SIZE / 2;
+                
+                // 使用缓动函数让移动更自然
+                const easeProgress = easeOutCubic(attr.progress);
+                
+                const currentX = startX + (headX - startX) * easeProgress;
+                const currentY = startY + (headY - startY) * easeProgress;
+                
+                // 计算当前大小（慢慢变小）
+                const scale = 1 - attr.progress * 0.7; // 最小缩放到30%
+                const currentSize = (CONFIG.GRID_SIZE - 4) * scale;
+                
+                // 绘制光晕（逐渐变弱）
+                const glowAlpha = Math.max(0, 0.4 - attr.progress * 0.3);
+                const glowRadius = (CONFIG.GRID_SIZE / 2 + 8) * scale;
+                const gradient = ctx.createRadialGradient(currentX, currentY, 0, currentX, currentY, glowRadius);
+                gradient.addColorStop(0, foodType.color + hexAlpha(glowAlpha));
+                gradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(currentX, currentY, glowRadius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // 绘制食物emoji（逐渐变小）
+                ctx.font = `${currentSize}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // 透明度逐渐降低
+                ctx.globalAlpha = 1 - attr.progress * 0.5;
+                ctx.fillText(foodType.emoji, currentX, currentY);
+                ctx.globalAlpha = 1;
+                
+                // 绘制吸引轨迹线
+                if (attr.progress < 0.8) {
+                    ctx.strokeStyle = foodType.color + '40';
+                    ctx.lineWidth = 2 * (1 - attr.progress);
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(currentX, currentY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            });
+        }
+        
+        // 缓动函数 - 三次方缓出
+        function easeOutCubic(t) {
+            return 1 - Math.pow(1 - t, 3);
+        }
+        
+        // 将透明度转换为十六进制
+        function hexAlpha(alpha) {
+            const hex = Math.round(alpha * 255).toString(16);
+            return hex.length === 1 ? '0' + hex : hex;
         }
 
         function drawObstacles() {
-            ctx.fillStyle = CONFIG.COLORS.OBSTACLE;
+            const now = Date.now();
             
             obstacles.forEach(obs => {
                 const x = obs.x * CONFIG.GRID_SIZE;
                 const y = obs.y * CONFIG.GRID_SIZE;
                 const size = CONFIG.GRID_SIZE - 2;
+                const centerX = x + CONFIG.GRID_SIZE / 2;
+                const centerY = y + CONFIG.GRID_SIZE / 2;
+                
+                // 计算剩余时间
+                const remainingTime = obs.lifetime - (now - obs.createTime);
+                const isExpiring = remainingTime <= 3000; // 最后3秒
+                
+                // 如果即将消失，添加闪烁效果
+                let opacity = 0.85;
+                if (isExpiring) {
+                    // 闪烁：每200ms切换透明度
+                    const blink = Math.floor(now / 200) % 2;
+                    opacity = blink ? 0.85 : 0.3;
+                }
 
-                roundRect(ctx, x + 1, y + 1, size, size, 3);
+                // 强烈的外发光效果（脉冲动画）
+                const pulse = Math.sin(Date.now() / 200) * 3;
+                const glowRadius = CONFIG.GRID_SIZE / 2 + 8 + pulse;
+                
+                const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, glowRadius);
+                gradient.addColorStop(0, `rgba(255, 0, 0, ${opacity * 0.7})`);
+                gradient.addColorStop(0.5, `rgba(255, 50, 50, ${opacity * 0.35})`);
+                gradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, glowRadius, 0, Math.PI * 2);
                 ctx.fill();
+
+                // 障碍物主体（高不透明度红色）
+                ctx.fillStyle = `rgba(255, 60, 60, ${opacity})`;
+                roundRect(ctx, x + 1, y + 1, size, size, 4);
+                ctx.fill();
+                
+                // 粗边框（非常醒目）
+                ctx.strokeStyle = `rgba(255, 0, 0, ${opacity + 0.15})`;
+                ctx.lineWidth = 3;
+                roundRect(ctx, x + 1, y + 1, size, size, 4);
+                ctx.stroke();
+                
+                // 内部高光
+                ctx.fillStyle = `rgba(255, 150, 150, ${opacity * 0.35})`;
+                roundRect(ctx, x + 3, y + 3, size - 4, size/2 - 2, 2);
+                ctx.fill();
+                
+                // 大号警告图标
+                ctx.font = `bold ${CONFIG.GRID_SIZE - 4}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                
+                // 图标阴影
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 4;
+                ctx.fillStyle = `rgba(255, 255, 255, ${opacity + 0.15})`;
+                ctx.fillText('✖', centerX, centerY);
+                ctx.shadowBlur = 0;
             });
         }
 
@@ -2051,6 +3022,21 @@
 
         // ==================== 游戏结束 ====================
         function gameOver() {
+            // 如果是无限生命，播放死亡动画后自动复活
+            if (lives === 999) {
+                // 播放死亡特效
+                createDeathEffect();
+                
+                // 显示死亡提示
+                showDamageHint('💀 死亡！立即复活...');
+                
+                // 延迟后自动复活
+                setTimeout(() => {
+                    autoReviveInfinite();
+                }, 800);
+                return;
+            }
+            
             isGameOver = true;
             
             // 计算最终游玩时间（排除暂停时间）
@@ -2064,15 +3050,8 @@
                 totalPlayTime = actualPlayTime;
             }
             
-            // 隐藏暂停按钮和气血值条
-            document.getElementById('pauseBtn').classList.remove('show');
+            // 隐藏气血值条
             document.getElementById('energyBarWrapper').style.display = 'none';
-            
-            // 清除有毒食物定时器
-            if (poisonFoodTimer) {
-                clearTimeout(poisonFoodTimer);
-                poisonFoodTimer = null;
-            }
             
             // 死亡特效
             createDeathEffect();
@@ -2128,7 +3107,9 @@
         }
 
         function submitScore() {
-            const nickname = document.getElementById('nicknameInput').value.trim() || '匿名玩家';
+            // 优先使用设置面板中的昵称，其次使用输入框
+            const nicknameInput = document.getElementById('nicknameInput');
+            const nickname = nicknameInput.value.trim() || getPlayerNickname();
             saveToLeaderboard(nickname, score);
             updateLeaderboard();
             hideModal();
@@ -2282,7 +3263,20 @@
                 } else {
                     hideModal();
                 }
-                startGame();
+                // 停止当前游戏
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+                
+                // 重置游戏状态
+                isGameStarted = false;
+                isGameOver = false;
+                isPaused = false;
+                pauseStartTime = 0;
+                hidePauseOverlay();
+                
+                // 显示模式选择界面
+                showModeSelectModal();
             });
 
             document.getElementById('backBtn').addEventListener('click', () => {
@@ -2300,7 +3294,21 @@
             document.getElementById('nicknameInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     submitScore();
-                    startGame();
+                    
+                    // 停止当前游戏
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                    }
+                    
+                    // 重置游戏状态
+                    isGameStarted = false;
+                    isGameOver = false;
+                    isPaused = false;
+                    pauseStartTime = 0;
+                    hidePauseOverlay();
+                    
+                    // 显示模式选择界面
+                    showModeSelectModal();
                 }
             });
 
