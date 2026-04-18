@@ -126,6 +126,7 @@
       border-radius: 24px;
       box-shadow: 0 0 80px rgba(0, 100, 200, 0.2), 0 0 120px rgba(0, 80, 160, 0.1);
       animation: boxIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
     }
     #uestcLogo {
       width: 280px;
@@ -149,16 +150,47 @@
       color: rgba(0, 80, 160, 0.6);
       letter-spacing: 3px;
     }
-    #uestcCountdown {
+    /* 广告右上角控制区（倒计时 + 关闭按钮） */
+    #uestcControls {
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    #uestcCountdown {
       font-family: 'Segoe UI', Arial, sans-serif;
       font-size: 16px;
       font-weight: 700;
-      color: rgba(0, 80, 160, 0.5);
+      color: rgba(0, 80, 160, 0.6);
       letter-spacing: 1px;
       pointer-events: none;
+    }
+    #uestcCloseBtn {
+      width: 32px;
+      height: 32px;
+      border: 2px solid rgba(0, 80, 160, 0.3);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      font-size: 18px;
+      color: rgba(0, 80, 160, 0.6);
+      line-height: 1;
+      padding: 0;
+    }
+    #uestcCloseBtn:hover {
+      background: rgba(255, 255, 255, 1);
+      border-color: rgba(0, 80, 160, 0.6);
+      color: rgba(0, 80, 160, 0.9);
+      transform: scale(1.1);
+    }
+    #uestcCloseBtn:active {
+      transform: scale(0.95);
     }
 
 
@@ -761,6 +793,19 @@
       #uestcSubtext {
         font-size: 14px;
       }
+      #uestcControls {
+        top: 12px;
+        right: 12px;
+        gap: 10px;
+      }
+      #uestcCountdown {
+        font-size: 14px;
+      }
+      #uestcCloseBtn {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+      }
 
       /* 关卡选择界面 - 调整 */
       #levelSelectTitle {
@@ -903,11 +948,14 @@
   <!-- 校徽展示弹窗 -->
   <div id="uestcOverlay">
     <div id="uestcBox">
+      <div id="uestcControls">
+        <div id="uestcCountdown">3</div>
+        <button id="uestcCloseBtn" title="关闭广告">×</button>
+      </div>
       <img id="uestcLogo" src="img/UESTC_ico.png" alt="电子科技大学校徽">
       <div id="uestcText">欢迎报考电子科技大学</div>
       <div id="uestcSubtext">UESTC</div>
     </div>
-    <div id="uestcCountdown">3</div>
   </div>
 
   <!-- GameOver 弹窗 -->
@@ -2245,10 +2293,13 @@
     // ===== 校徽展示系统 =====
     const uestcOverlay = document.getElementById('uestcOverlay');
     const uestcCountdown = document.getElementById('uestcCountdown');
+    const uestcCloseBtn = document.getElementById('uestcCloseBtn');
     let uestcCountdownTimer = null;
+    let uestcOnComplete = null; // 保存完成回调
     const UESTC_DURATION = 5; // 校徽展示时长（秒）
 
     function showUestcLogo(onComplete) {
+      uestcOnComplete = onComplete; // 保存回调
       uestcOverlay.style.display = 'flex';
       let remaining = UESTC_DURATION;
       uestcCountdown.textContent = remaining;
@@ -2260,7 +2311,10 @@
           clearInterval(uestcCountdownTimer);
           uestcCountdownTimer = null;
           uestcOverlay.style.display = 'none';
-          if (onComplete) onComplete();
+          if (uestcOnComplete) {
+            uestcOnComplete();
+            uestcOnComplete = null;
+          }
         }
         uestcCountdown.textContent = remaining;
       }, 1000);
@@ -2272,7 +2326,25 @@
         uestcCountdownTimer = null;
       }
       uestcOverlay.style.display = 'none';
+      // 关闭时也执行回调，让游戏继续
+      if (uestcOnComplete) {
+        uestcOnComplete();
+        uestcOnComplete = null;
+      }
     }
+
+    // 【关闭广告】按钮：立即关闭广告弹窗并继续游戏
+    uestcCloseBtn.addEventListener('click', () => {
+      hideUestcLogo();
+    });
+    
+    // 移动端触摸反馈
+    uestcCloseBtn.addEventListener('touchstart', () => {
+      uestcCloseBtn.style.transform = 'scale(0.9)';
+    }, { passive: true });
+    uestcCloseBtn.addEventListener('touchend', () => {
+      uestcCloseBtn.style.transform = '';
+    }, { passive: true });
 
     // 【返回】按钮：回到选关界面
     backBtn.addEventListener('click', () => {
@@ -2810,7 +2882,7 @@
       }
     }
 
-      if (!falling && !dying) {
+      if (!falling && !dying && !winning) {
         // 正常弹跳模式
         if (ballY <= floorContact && velY < 0) {
           // 碰到地面：检测是否和轨道碰撞
