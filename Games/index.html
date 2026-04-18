@@ -282,6 +282,255 @@
             overflow: hidden;
         }
 
+        .card-header.snake-theme {
+            background: linear-gradient(135deg, #F5F5F0 0%, #E8F0E8 50%, #D8E8D8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header.dice-theme {
+            background: linear-gradient(135deg, #1a0a2e 0%, #2d1b69 50%, #4a2c8a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 贪吃蛇游戏场景 */
+        .game-scene-snake {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            z-index: 2;
+        }
+
+        .snake-body {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 3px;
+            animation: snake-move 3s ease-in-out infinite;
+        }
+
+        .snake-segment {
+            width: 25px;
+            height: 25px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .snake-segment:nth-child(1) {
+            background: linear-gradient(135deg, #9CAF88, #8BAF78);
+            animation: segment-pulse 1.5s ease-in-out infinite;
+        }
+
+        .snake-segment:nth-child(2) {
+            background: linear-gradient(135deg, #A8C8A0, #98B890);
+            animation: segment-pulse 1.5s ease-in-out infinite 0.1s;
+        }
+
+        .snake-segment:nth-child(3) {
+            background: linear-gradient(135deg, #B4D4B0, #A4C4A0);
+            animation: segment-pulse 1.5s ease-in-out infinite 0.2s;
+        }
+
+        .snake-segment:nth-child(4) {
+            background: linear-gradient(135deg, #C0E0C0, #B0D0B0);
+            animation: segment-pulse 1.5s ease-in-out infinite 0.3s;
+        }
+
+        .snake-segment:nth-child(5) {
+            background: linear-gradient(135deg, #A8D8EA, #98C8DA);
+            animation: segment-pulse 1.5s ease-in-out infinite 0.4s;
+        }
+
+        @keyframes snake-move {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-45%, -55%) rotate(-5deg); }
+            50% { transform: translate(-50%, -50%) rotate(0deg); }
+            75% { transform: translate(-55%, -45%) rotate(5deg); }
+        }
+
+        @keyframes segment-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* 食物光球 */
+        .snake-food {
+            position: absolute;
+            font-size: 28px;
+            animation: food-float 2s ease-in-out infinite;
+            filter: drop-shadow(0 4px 12px rgba(255, 182, 185, 0.4));
+        }
+
+        .snake-food:nth-of-type(1) {
+            top: 15%;
+            right: 20%;
+            content: '🍎';
+        }
+
+        .snake-food:nth-of-type(1)::before {
+            content: '🍎';
+        }
+
+        .snake-food:nth-of-type(2) {
+            bottom: 20%;
+            left: 15%;
+            animation-delay: 0.5s;
+        }
+
+        .snake-food:nth-of-type(2)::before {
+            content: '🍓';
+        }
+
+        @keyframes food-float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-8px) rotate(5deg);
+            }
+        }
+
+        /* 3D骰子游戏场景 */
+        .game-scene-dice {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dice-cube {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: dice-spin 4s ease-in-out infinite;
+        }
+
+        .dice-face {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #ffffff, #f0f0f0);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            box-shadow: 
+                inset 0 0 20px rgba(255, 255, 255, 0.5),
+                0 0 15px rgba(100, 200, 255, 0.3);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            padding: 10px;
+        }
+
+        .dice-face:nth-child(1) { transform: translateZ(40px); }
+        .dice-face:nth-child(2) { transform: rotateY(180deg) translateZ(40px); }
+        .dice-face:nth-child(3) { transform: rotateY(90deg) translateZ(40px); }
+        .dice-face:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); }
+        .dice-face:nth-child(5) { transform: rotateX(90deg) translateZ(40px); }
+        .dice-face:nth-child(6) { transform: rotateX(-90deg) translateZ(40px); }
+
+        .dot {
+            width: 14px;
+            height: 14px;
+            background: radial-gradient(circle at 30% 30%, #2a2a2a, #000);
+            border-radius: 50%;
+            align-self: center;
+            justify-self: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes dice-spin {
+            0%, 100% {
+                transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+            }
+            25% {
+                transform: rotateX(90deg) rotateY(180deg) rotateZ(45deg);
+            }
+            50% {
+                transform: rotateX(180deg) rotateY(360deg) rotateZ(90deg);
+            }
+            75% {
+                transform: rotateX(270deg) rotateY(540deg) rotateZ(135deg);
+            }
+        }
+
+        /* 骰子发光效果 */
+        .dice-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(100, 200, 255, 0.3), transparent);
+            border-radius: 50%;
+            animation: glow-pulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* 霓虹光点装饰 */
+        .neon-dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            animation: neon-blink 2s ease-in-out infinite;
+        }
+
+        .neon-dot:nth-child(1) {
+            top: 20%;
+            left: 15%;
+            background: #ff0055;
+            box-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055;
+            animation-delay: 0s;
+        }
+
+        .neon-dot:nth-child(2) {
+            top: 30%;
+            right: 20%;
+            background: #00aaff;
+            box-shadow: 0 0 10px #00aaff, 0 0 20px #00aaff;
+            animation-delay: 0.5s;
+        }
+
+        .neon-dot:nth-child(3) {
+            bottom: 25%;
+            left: 25%;
+            background: #aa00ff;
+            box-shadow: 0 0 10px #aa00ff, 0 0 20px #aa00ff;
+            animation-delay: 1s;
+        }
+
+        .neon-dot:nth-child(4) {
+            bottom: 20%;
+            right: 15%;
+            background: #ff0055;
+            box-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes neon-blink {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.3); }
+        }
+
         /* 发光粒子效果 */
         .particle-container {
             position: absolute;
@@ -720,6 +969,109 @@
                     <span class="feature-tag">🌌 3D画面</span>
                     <span class="feature-tag">🏆 关卡解锁</span>
                     <span class="feature-tag">⚡ 连击系统</span>
+                </div>
+                <button class="play-button">
+                    <span class="play-icon">▶️</span>
+                    <span>立即游玩</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 霓虹贪吃蛇 -->
+        <div class="game-card" onclick="window.location.href='/Games/snake'">
+            <div class="card-header snake-theme">
+                <div class="game-scene-snake">
+                    <div class="snake-body">
+                        <div class="snake-segment"></div>
+                        <div class="snake-segment"></div>
+                        <div class="snake-segment"></div>
+                        <div class="snake-segment"></div>
+                        <div class="snake-segment"></div>
+                    </div>
+                    <div class="snake-food"></div>
+                    <div class="snake-food"></div>
+                </div>
+                <div class="card-badge">休闲益智</div>
+            </div>
+            <div class="card-body">
+                <h2 class="game-title">霓虹贪吃蛇</h2>
+                <p class="game-description">
+                    极简美学的现代贪吃蛇！柔和莫兰迪配色，流畅的滑行动画，创新的幽灵模式和连击系统。支持全球排行榜，挑战你的反应极限！
+                </p>
+                <div class="game-features">
+                    <span class="feature-tag">🐍 经典玩法</span>
+                    <span class="feature-tag">✨ 粒子特效</span>
+                    <span class="feature-tag">👻 幽灵模式</span>
+                    <span class="feature-tag">🏅 全球排行</span>
+                </div>
+                <button class="play-button">
+                    <span class="play-icon">▶️</span>
+                    <span>立即游玩</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3D炫光骰子 -->
+        <div class="game-card" onclick="window.location.href='/Games/dice_3D/'">
+            <div class="card-header dice-theme">
+                <div class="neon-dot"></div>
+                <div class="neon-dot"></div>
+                <div class="neon-dot"></div>
+                <div class="neon-dot"></div>
+                <div class="game-scene-dice">
+                    <div class="dice-glow"></div>
+                    <div class="dice-cube">
+                        <div class="dice-face">
+                            <div style="grid-area: 2 / 2;"></div>
+                        </div>
+                        <div class="dice-face">
+                            <div style="grid-area: 1 / 1;"></div>
+                            <div style="grid-area: 1 / 3;"></div>
+                            <div style="grid-area: 3 / 1;"></div>
+                            <div style="grid-area: 3 / 3;"></div>
+                        </div>
+                        <div class="dice-face">
+                            <div style="grid-area: 1 / 1;"></div>
+                            <div style="grid-area: 2 / 2;"></div>
+                            <div style="grid-area: 3 / 3;"></div>
+                        </div>
+                        <div class="dice-face">
+                            <div style="grid-area: 1 / 1;"></div>
+                            <div style="grid-area: 1 / 3;"></div>
+                            <div style="grid-area: 2 / 1;"></div>
+                            <div style="grid-area: 2 / 3;"></div>
+                            <div style="grid-area: 3 / 1;"></div>
+                            <div style="grid-area: 3 / 3;"></div>
+                        </div>
+                        <div class="dice-face">
+                            <div style="grid-area: 1 / 1;"></div>
+                            <div style="grid-area: 1 / 3;"></div>
+                            <div style="grid-area: 2 / 2;"></div>
+                            <div style="grid-area: 3 / 1;"></div>
+                            <div style="grid-area: 3 / 3;"></div>
+                        </div>
+                        <div class="dice-face">
+                            <div style="grid-area: 1 / 1;"></div>
+                            <div style="grid-area: 1 / 3;"></div>
+                            <div style="grid-area: 2 / 1;"></div>
+                            <div style="grid-area: 2 / 3;"></div>
+                            <div style="grid-area: 3 / 1;"></div>
+                            <div style="grid-area: 3 / 3;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-badge">街机动作</div>
+            </div>
+            <div class="card-body">
+                <h2 class="game-title">3D炫光骰子</h2>
+                <p class="game-description">
+                    炫酷的3D骰子模拟器！精美的圆角骰子模型，真实的物理抛掷动画，赛博朋克风格的霓虹灯光效。点击或按空格键摇动骰子，体验沉浸式3D视觉盛宴！
+                </p>
+                <div class="game-features">
+                    <span class="feature-tag">🎲 3D渲染</span>
+                    <span class="feature-tag">💫 物理动画</span>
+                    <span class="feature-tag">🌈 霓虹光效</span>
+                    <span class="feature-tag">🎮 交互体验</span>
                 </div>
                 <button class="play-button">
                     <span class="play-icon">▶️</span>
