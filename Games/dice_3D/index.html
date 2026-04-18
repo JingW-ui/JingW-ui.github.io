@@ -215,8 +215,12 @@
         // ==================== 骰子纹理生成 ====================
         function createDiceMaterials() {
             const materials = [];
-            // 面顺序: +x(3), -x(4), +y(2), -y(5), +z(1), -z(6)
-            const faceNumbers = [3, 4, 2, 5, 1, 6];
+            // Three.js BoxGeometry 面顺序: 0:+x(右), 1:-x(左), 2:+y(上), 3:-y(下), 4:+z(前), 5:-z(后)
+            // 标准骰子对面之和为7: 1对6, 2对5, 3对4
+            // 设定: +z=1(前), -z=6(后), +y=2(上), -y=5(下), +x=3(右), -x=4(左)
+            const faceNumbers = [3, 4, 2, 5, 1, 6];  // 对应索引 0,1,2,3,4,5
+            
+            console.log('面材质映射:', faceNumbers.map((num, idx) => `索引${idx}=${num}`).join(', '));
             const dotMap = {
                 1: [[128, 128]],
                 2: [[64, 64], [192, 192]],
@@ -302,6 +306,17 @@
         dice.receiveShadow = true;
         dice.position.y = 0;
         scene.add(dice);
+        
+        // 调试：打印几何体信息
+        console.log('几何体面数:', diceGeo.groups.length);
+        console.log('材质数量:', diceMats.length);
+        
+        // 测试：初始状态下各个面的朝向
+        console.log('\n=== 初始状态分析 ===');
+        console.log('当前rotation:', dice.rotation);
+        console.log('+z方向(相机方向)的面应该是索引4，对应数字:', [3, 4, 2, 5, 1, 6][4]);
+        console.log('+y方向(上方)的面应该是索引2，对应数字:', [3, 4, 2, 5, 1, 6][2]);
+        console.log('+x方向(右方)的面应该是索引0，对应数字:', [3, 4, 2, 5, 1, 6][0]);
 
         // 骰子外轮廓发光（稍大一点的透明立方体）
         const glowGeo = new RoundedBoxGeometry(2.25, 2.25, 2.25, 8, 0.25);
@@ -355,15 +370,27 @@
         const rollBtn = document.getElementById('rollBtn');
         const uiLayer = document.getElementById('ui-layer');
 
-        // 各数字朝上的目标旋转（基于初始面映射）
-        // 面顺序: +x(3右), -x(4左), +y(2顶), -y(5底), +z(1正), -z(6背)
+        // 各数字朝上（+y方向）的目标旋转
+        // 初始状态: +z面(数字1)朝向相机，+y面(数字2)朝上
+        // 要让某个面朝上（+y方向），需要将该面旋转到+y方向
         const faceRotations = {
-            1: { x: 0, y: 0, z: 0 },              // 正面(z+)已朝前
-            2: { x: Math.PI/2, y: 0, z: 0 },       // 顶面(y+)转向前
-            3: { x: 0, y: -Math.PI/2, z: 0 },      // 右面(x+)转向前
-            4: { x: 0, y: Math.PI/2, z: 0 },       // 左面(x-)转向前
-            5: { x: -Math.PI/2, y: 0, z: 0 },      // 底面(y-)转向前
-            6: { x: 0, y: Math.PI, z: 0 }          // 背面(z-)转向前
+            // 数字2在+y面(索引2)，已在上方，无需旋转
+            2: { x: 0, y: 0, z: 0 },
+            
+            // 数字5在-y面(索引3)，需要绕X轴转180度让-y转到+y
+            5: { x: Math.PI, y: 0, z: 0 },
+            
+            // 数字1在+z面(索引4)，需要绕X轴转-90度让+z转到+y
+            1: { x: -Math.PI / 2, y: 0, z: 0 },
+            
+            // 数字6在-z面(索引5)，需要绕X轴转+90度让-z转到+y
+            6: { x: Math.PI / 2, y: 0, z: 0 },
+            
+            // 数字3在+x面(索引0)，需要绕Z轴转-90度让+x转到+y
+            3: { x: 0, y: 0, z: -Math.PI / 2 },
+            
+            // 数字4在-x面(索引1)，需要绕Z轴转+90度让-x转到+y
+            4: { x: 0, y: 0, z: Math.PI / 2 }
         };
 
         // 音效合成（落地声）
@@ -391,12 +418,18 @@
 
             const result = Math.floor(Math.random() * 6) + 1;
             const base = faceRotations[result];
+            
+            console.log('\n=== 摇骰子调试信息 ===');
+            console.log('目标数字:', result, '(将出现在顶部)');
+            console.log('目标旋转:', base);
 
             // 归一化当前旋转，避免数值无限累积
             const curX = dice.rotation.x % (Math.PI * 2);
             const curY = dice.rotation.y % (Math.PI * 2);
             const curZ = dice.rotation.z % (Math.PI * 2);
             dice.rotation.set(curX, curY, curZ);
+            
+            console.log('当前旋转:', { x: curX, y: curY, z: curZ });
 
             // 随机多圈翻滚（3~6圈）
             const addX = (3 + Math.floor(Math.random() * 4)) * Math.PI * 2;
@@ -406,11 +439,20 @@
             const targetX = base.x + addX;
             const targetY = base.y + addY;
             const targetZ = base.z + addZ;
+            
+            console.log('最终目标旋转:', { x: targetX, y: targetY, z: targetZ });
 
             const tl = gsap.timeline({
                 onComplete: () => {
                     isRolling = false;
                     rollBtn.disabled = false;
+                    
+                    // 验证最终旋转
+                    const finalX = dice.rotation.x % (Math.PI * 2);
+                    const finalY = dice.rotation.y % (Math.PI * 2);
+                    const finalZ = dice.rotation.z % (Math.PI * 2);
+                    console.log('最终实际旋转:', { x: finalX, y: finalY, z: finalZ });
+                    console.log('期望数字:', result);
 
                     // 落地效果
                     playBounceSound();
