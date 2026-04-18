@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 炫光骰子</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            user-select: none;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        /* UI 层 */
+        #ui-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5vh 20px;
+            z-index: 10;
+        }
+        .title {
+            color: rgba(255,255,255,0.9);
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 900;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(100,200,255,0.5), 0 0 40px rgba(100,200,255,0.2);
+            animation: pulse 3s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 1; text-shadow: 0 0 30px rgba(100,200,255,0.8), 0 0 60px rgba(100,200,255,0.4); }
+        }
+        .controls {
+            pointer-events: auto;
+            text-align: center;
+        }
+        .roll-btn {
+            background: rgba(255,255,255,0.03);
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 18px 60px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 0.4em;
+            cursor: pointer;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .roll-btn:hover:not(:disabled) {
+            border-color: #fff;
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 40px rgba(100,200,255,0.3), inset 0 0 20px rgba(100,200,255,0.05);
+            transform: translateY(-2px);
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
+        }
+        .roll-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        .roll-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-color: rgba(255,255,255,0.1);
+        }
+        .roll-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.6s;
+        }
+        .roll-btn:hover:not(:disabled)::before {
+            left: 100%;
+        }
+        .hint {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.85rem;
+            margin-top: 12px;
+            letter-spacing: 0.1em;
+        }
+        /* 屏幕震动效果 */
+        .shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+    <!-- 引入 GSAP 动画库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div id="ui-layer">
+        <div class="title">3D DICE</div>
+        <div class="controls">
+            <button class="roll-btn" id="rollBtn">ROLL</button>
+            <div class="hint">点击按钮或按空格键摇骰子</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+        const gsap = window.gsap;
+
+        // ==================== 场景初始化 ====================
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x030303);
+        scene.fog = new THREE.FogExp2(0x030303, 0.03);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 3.5, 7);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.0;
+        container.appendChild(renderer.domElement);
+
+        // 环境贴图（让金属/玻璃质感更真实）
+        const pmremGenerator = new THREE.PMREMGenerator(renderer);
+        scene.environment = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+
+        // 控制器
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.minDistance = 4;
+        controls.maxDistance = 15;
+        controls.maxPolarAngle = Math.PI / 2 - 0.05;
+
+        // ==================== 灯光系统（降低光照强度） ====================
+        const ambientLight = new THREE.AmbientLight(0x222222, 0.3);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        mainLight.position.set(5, 10, 5);
+        mainLight.castShadow = true;
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        mainLight.shadow.camera.near = 0.1;
+        mainLight.shadow.camera.far = 50;
+        mainLight.shadow.bias = -0.0005;
+        mainLight.shadow.radius = 4;
+        scene.add(mainLight);
+
+        // 赛博朋克风格彩色点光源（降低强度）
+        const colors = [0xff0055, 0x00aaff, 0xaa00ff];
+        const lightPositions = [[4, 3, 4], [-4, 2, -4], [0, 4, -3]];
+        const pointLights = [];
+        lightPositions.forEach((pos, i) => {
+            const pl = new THREE.PointLight(colors[i], 1.5, 20);
+            pl.position.set(...pos);
+            scene.add(pl);
+            pointLights.push(pl);
+        });
+
+        // ==================== 地面 ====================
+        const planeGeo = new THREE.PlaneGeometry(100, 100);
+        const planeMat = new THREE.MeshStandardMaterial({
+            color: 0x080808,
+            roughness: 0.15,
+            metalness: 0.6
+        });
+        const plane = new THREE.Mesh(planeGeo, planeMat);
+        plane.rotation.x = -Math.PI / 2;
+        plane.position.y = -1.2;
+        plane.receiveShadow = true;
+        scene.add(plane);
+
+        const grid = new THREE.GridHelper(100, 100, 0x333333, 0x111111);
+        grid.position.y = -1.19;
+        scene.add(grid);
+
+        // ==================== 骰子纹理生成 ====================
+        function createDiceMaterials() {
+            const materials = [];
+            // 面顺序: +x(3), -x(4), +y(2), -y(5), +z(1), -z(6)
+            const faceNumbers = [3, 4, 2, 5, 1, 6];
+            const dotMap = {
+                1: [[128, 128]],
+                2: [[64, 64], [192, 192]],
+                3: [[64, 64], [128, 128], [192, 192]],
+                4: [[64, 64], [192, 64], [64, 192], [192, 192]],
+                5: [[64, 64], [192, 64], [128, 128], [64, 192], [192, 192]],
+                6: [[64, 64], [192, 64], [64, 128], [192, 128], [64, 192], [192, 192]]
+            };
+
+            faceNumbers.forEach(num => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+
+                // 底色 - 珍珠白渐变
+                const grad = ctx.createRadialGradient(256, 256, 20, 256, 256, 350);
+                grad.addColorStop(0, '#ffffff');
+                grad.addColorStop(0.7, '#f0f0ea');
+                grad.addColorStop(1, '#d8d8d0');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, 512, 512);
+
+                // 边框
+                ctx.strokeStyle = 'rgba(180,180,170,0.5)';
+                ctx.lineWidth = 16;
+                ctx.strokeRect(8, 8, 496, 496);
+
+                // 点数阴影
+                ctx.shadowColor = 'rgba(0,0,0,0.4)';
+                ctx.shadowBlur = 12;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+                ctx.fillStyle = '#151515';
+
+                const dots = dotMap[num];
+                dots.forEach(([x, y]) => {
+                    const cx = x * 2;
+                    const cy = y * 2;
+                    const r = 34;
+
+                    // 主圆
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 内部高光（让点数有凹陷感）
+                    ctx.shadowColor = 'transparent';
+                    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                    ctx.beginPath();
+                    ctx.arc(cx - 10, cy - 10, 12, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 恢复下一点的样式
+                    ctx.shadowColor = 'rgba(0,0,0,0.4)';
+                    ctx.fillStyle = '#151515';
+                });
+
+                const tex = new THREE.CanvasTexture(canvas);
+                tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+                materials.push(new THREE.MeshPhysicalMaterial({
+                    map: tex,
+                    color: 0xffffff,
+                    metalness: 0.05,
+                    roughness: 0.25,
+                    clearcoat: 1.0,
+                    clearcoatRoughness: 0.1,
+                    envMapIntensity: 1.2,
+                    ior: 1.45
+                }));
+            });
+
+            return materials;
+        }
+
+        // ==================== 创建圆角骰子 ====================
+        // 使用 RoundedBoxGeometry: width, height, depth, segments, radius
+        const diceGeo = new RoundedBoxGeometry(2.2, 2.2, 2.2, 8, 0.25);
+        const diceMats = createDiceMaterials();
+        const dice = new THREE.Mesh(diceGeo, diceMats);
+        dice.castShadow = true;
+        dice.receiveShadow = true;
+        dice.position.y = 0;
+        scene.add(dice);
+
+        // 骰子外轮廓发光（稍大一点的透明立方体）
+        const glowGeo = new RoundedBoxGeometry(2.25, 2.25, 2.25, 8, 0.25);
+        const glowMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.03,
+            side: THREE.BackSide
+        });
+        const glowMesh = new THREE.Mesh(glowGeo, glowMat);
+        dice.add(glowMesh);
+
+        // ==================== 粒子系统 ====================
+        const particleCount = 800;
+        const pGeo = new THREE.BufferGeometry();
+        const pPos = new Float32Array(particleCount * 3);
+        const pSpeed = [];
+        for (let i = 0; i < particleCount; i++) {
+            pPos[i*3] = (Math.random() - 0.5) * 40;
+            pPos[i*3+1] = (Math.random() - 0.5) * 30 + 5;
+            pPos[i*3+2] = (Math.random() - 0.5) * 40;
+            pSpeed.push((Math.random() * 0.01) + 0.002);
+        }
+        pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+        const pMat = new THREE.PointsMaterial({
+            size: 0.08,
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.5,
+            blending: THREE.AdditiveBlending,
+            sizeAttenuation: true
+        });
+        const particles = new THREE.Points(pGeo, pMat);
+        scene.add(particles);
+
+        // ==================== 后期处理 Bloom（降低强度） ====================
+        const composer = new EffectComposer(renderer);
+        composer.addPass(new RenderPass(scene, camera));
+
+        const bloomPass = new UnrealBloomPass(
+            new THREE.Vector2(window.innerWidth, window.innerHeight),
+            0.15,   // strength (降低)
+            0.5,    // radius
+            0.9     // threshold (提高，减少泛光)
+        );
+        composer.addPass(bloomPass);
+
+        // ==================== 摇骰子逻辑 ====================
+        let isRolling = false;
+        let hasRolled = false; // 标记是否已经摇过一次
+        const rollBtn = document.getElementById('rollBtn');
+        const uiLayer = document.getElementById('ui-layer');
+
+        // 各数字朝上的目标旋转（基于初始面映射）
+        // 面顺序: +x(3右), -x(4左), +y(2顶), -y(5底), +z(1正), -z(6背)
+        const faceRotations = {
+            1: { x: 0, y: 0, z: 0 },              // 正面(z+)已朝前
+            2: { x: Math.PI/2, y: 0, z: 0 },       // 顶面(y+)转向前
+            3: { x: 0, y: -Math.PI/2, z: 0 },      // 右面(x+)转向前
+            4: { x: 0, y: Math.PI/2, z: 0 },       // 左面(x-)转向前
+            5: { x: -Math.PI/2, y: 0, z: 0 },      // 底面(y-)转向前
+            6: { x: 0, y: Math.PI, z: 0 }          // 背面(z-)转向前
+        };
+
+        // 音效合成（落地声）
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playBounceSound() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.25);
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function rollDice() {
+            if (isRolling) return;
+            isRolling = true;
+            hasRolled = true; // 标记已摇动
+            rollBtn.disabled = true;
+
+            const result = Math.floor(Math.random() * 6) + 1;
+            const base = faceRotations[result];
+
+            // 归一化当前旋转，避免数值无限累积
+            const curX = dice.rotation.x % (Math.PI * 2);
+            const curY = dice.rotation.y % (Math.PI * 2);
+            const curZ = dice.rotation.z % (Math.PI * 2);
+            dice.rotation.set(curX, curY, curZ);
+
+            // 随机多圈翻滚（3~6圈）
+            const addX = (3 + Math.floor(Math.random() * 4)) * Math.PI * 2;
+            const addY = (3 + Math.floor(Math.random() * 4)) * Math.PI * 2;
+            const addZ = (1 + Math.floor(Math.random() * 2)) * Math.PI * 2;
+
+            const targetX = base.x + addX;
+            const targetY = base.y + addY;
+            const targetZ = base.z + addZ;
+
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    isRolling = false;
+                    rollBtn.disabled = false;
+
+                    // 落地效果
+                    playBounceSound();
+                    uiLayer.classList.add('shake');
+                    setTimeout(() => uiLayer.classList.remove('shake'), 400);
+
+                    // 灯光闪烁
+                    pointLights.forEach((pl, i) => {
+                        gsap.fromTo(pl, { intensity: 3 }, { intensity: 1.5, duration: 0.5, delay: i * 0.1 });
+                    });
+                }
+            });
+
+            // 抛起
+            tl.to(dice.position, {
+                y: 3.5,
+                duration: 0.5,
+                ease: "power2.out"
+            }, 0);
+
+            // 落下
+            tl.to(dice.position, {
+                y: 0,
+                duration: 0.6,
+                ease: "bounce.out"
+            }, 0.5);
+
+            // 旋转（带轻微随机扰动，更自然）
+            tl.to(dice.rotation, {
+                x: targetX + (Math.random() - 0.5) * 0.05,
+                y: targetY + (Math.random() - 0.5) * 0.05,
+                z: targetZ + (Math.random() - 0.5) * 0.05,
+                duration: 1.8,
+                ease: "power4.out"
+            }, 0);
+
+            // 骰子抛起时光源跟随变亮
+            tl.to(pointLights[0], { intensity: 2.5, duration: 0.3 }, 0);
+            tl.to(pointLights[1], { intensity: 2.5, duration: 0.3 }, 0.1);
+        }
+
+        rollBtn.addEventListener('click', rollDice);
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') rollDice();
+        });
+
+        // ==================== 窗口自适应 ====================
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ==================== 渲染循环 ====================
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const t = clock.getElapsedTime();
+
+            // 粒子缓慢漂移
+            const positions = particles.geometry.attributes.position.array;
+            for (let i = 0; i < particleCount; i++) {
+                positions[i*3+1] += Math.sin(t * 0.5 + i) * 0.005;
+                if (positions[i*3+1] > 20) positions[i*3+1] = -10;
+            }
+            particles.geometry.attributes.position.needsUpdate = true;
+            particles.rotation.y = t * 0.02;
+
+            // 闲置时骰子轻微悬浮呼吸（仅在未摇过或摇动中时）
+            if (!hasRolled && !isRolling) {
+                dice.position.y = Math.sin(t * 1.5) * 0.08;
+                dice.rotation.y += 0.003;
+            } else if (isRolling) {
+                // 摇动中保持呼吸效果
+                dice.position.y = Math.sin(t * 1.5) * 0.08;
+            }
+            // 摇完后（!isRolling && hasRolled）骰子完全静止
+
+            // 彩色光源环绕运动
+            pointLights[0].position.x = Math.sin(t * 0.7) * 5;
+            pointLights[0].position.z = Math.cos(t * 0.7) * 5;
+            pointLights[1].position.x = Math.sin(t * 0.5 + 2) * 5;
+            pointLights[1].position.z = Math.cos(t * 0.5 + 2) * 5;
+
+            controls.update();
+            composer.render();
+        }
+        animate();
+    </script>
+</body>
+</html>
