@@ -6,7 +6,7 @@
     <title>像素物语：4048小町</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
-        
+
         * {
             margin: 0;
             padding: 0;
@@ -149,6 +149,7 @@
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             aspect-ratio: 1;
+            position: relative;
         }
 
         .grid-cell {
@@ -166,10 +167,15 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: all 0.15s ease-in-out;
+            transition: left 0.15s ease-in-out, top 0.15s ease-in-out;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             cursor: pointer;
+            z-index: 10;
+        }
+
+        .tile.new-tile {
             animation: tile-pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            animation-fill-mode: forwards;
         }
 
         @keyframes tile-pop {
@@ -178,13 +184,137 @@
         }
 
         .tile.merged {
-            animation: tile-merge 0.4s ease-out;
+            animation: tile-merge 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 10;
         }
 
         @keyframes tile-merge {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0% {
+                transform: scale(0.8);
+                filter: brightness(2) saturate(1.5);
+                box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+            }
+            30% {
+                transform: scale(1.35);
+                filter: brightness(1.8) saturate(1.3);
+                box-shadow: 0 0 40px rgba(255, 255, 255, 0.9), 0 0 60px currentColor;
+            }
+            50% {
+                transform: scale(0.95);
+                filter: brightness(1.3);
+            }
+            70% {
+                transform: scale(1.05);
+                filter: brightness(1.1);
+            }
+            100% {
+                transform: scale(1);
+                filter: brightness(1) saturate(1);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* 合并粒子效果 */
+        .merge-particle {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            animation: particle-explode 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            box-shadow: 0 0 6px currentColor;
+            left: 0;
+            top: 0;
+        }
+
+        @keyframes particle-explode {
+            0% {
+                transform: translate(var(--start-x, 0), var(--start-y, 0)) scale(1);
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(calc(var(--start-x, 0) + var(--tx)), calc(var(--start-y, 0) + var(--ty))) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* 合并光晕效果 */
+        .merge-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.4) 40%, transparent 70%);
+            pointer-events: none;
+            animation: glow-expand 0.6s ease-out forwards;
+            z-index: 50;
+        }
+
+        @keyframes glow-expand {
+            0% {
+                transform: scale(0.3);
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        /* 合并震动效果 */
+        .game-board.shake {
+            animation: board-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+        }
+
+        @keyframes board-shake {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            10% { transform: translateX(-4px) translateY(-2px) rotate(-1deg); }
+            20% { transform: translateX(4px) translateY(2px) rotate(1deg); }
+            30% { transform: translateX(-3px) translateY(-1px) rotate(-0.5deg); }
+            40% { transform: translateX(3px) translateY(1px) rotate(0.5deg); }
+            50% { transform: translateX(-2px) translateY(-1px); }
+            60% { transform: translateX(2px) translateY(1px); }
+            70% { transform: translateX(-1px); }
+            80% { transform: translateX(1px); }
+        }
+
+        /* 分数飘字效果 */
+        .score-popup {
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            z-index: 2000;
+            animation: score-float 1s ease-out forwards;
+            transform: translate(var(--start-x, 0), var(--start-y, 0));
+        }
+
+        @keyframes score-float {
+            0% {
+                transform: translate(var(--start-x, 0), var(--start-y, 0)) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                transform: translate(var(--start-x, 0), calc(var(--start-y, 0) - 20px)) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--start-x, 0), calc(var(--start-y, 0) - 80px)) scale(1);
+                opacity: 0;
+            }
         }
 
         .tile-icon {
@@ -625,9 +755,9 @@
         <div class="tutorial-content">
             <h2 class="tutorial-title">📖 角色进化图鉴</h2>
             <p class="tutorial-subtitle">滑动合并相同角色，不断进化！</p>
-            
+
             <div class="character-grid" id="characterGrid"></div>
-            
+
             <div class="tutorial-tip">
                 <strong>💡 游戏玩法：</strong><br>
                 • 向上下左右滑动，让相同数字的角色移动并合并<br>
@@ -635,7 +765,7 @@
                 • 每次合并都会获得分数，目标是合成更高等级的角色！<br>
                 • 合成 256 级以上可解锁强力技能哦~
             </div>
-            
+
             <div class="tutorial-buttons">
                 <button class="btn" onclick="game.startGame()">🎮 开始游戏</button>
                 <button class="btn" onclick="game.closeTutorial()">✖ 关闭</button>
@@ -646,7 +776,7 @@
     <!-- 游戏主界面 -->
     <div class="game-container" id="gameContainer">
         <h1 class="game-title">✨ 像素物语：4048小町 ✨</h1>
-        
+
         <!-- Boss血条 -->
         <div class="boss-hp-bar" id="bossHpBar">
             <div class="boss-name" id="bossName">暴走的打印机</div>
@@ -789,45 +919,75 @@
                 this.skillReady = false;
                 this.skillType = null;
                 this.isProcessing = false;
-                
+                this.tiles = new Map(); // 追踪所有方块对象 {id: {element, row, col, value}}
+                this.tileIdCounter = 0; // 方块ID计数器
+                this.mergedPositions = []; // 记录合并位置
+                this.pendingMerges = []; // 待处理的合并
+
                 this.init();
             }
 
             init() {
-                this.loadProgress();
+                const hasSavedGame = this.loadProgress();
                 this.renderLevelSelect();
-                this.renderCharacterGuide(); // 渲染角色图鉴
+                this.renderCharacterGuide();
                 this.setupInputHandlers();
-                
-                // 首次访问显示教程
-                const hasSeenTutorial = localStorage.getItem('pixelTale_tutorial_seen');
-                if (!hasSeenTutorial) {
-                    setTimeout(() => {
+
+                // 延迟启动确保 DOM 完全加载
+                setTimeout(() => {
+                    // 首次访问显示教程
+                    const hasSeenTutorial = localStorage.getItem('pixelTale_tutorial_seen');
+                    if (!hasSeenTutorial) {
                         this.showTutorial();
                         localStorage.setItem('pixelTale_tutorial_seen', 'true');
-                    }, 500);
-                } else {
-                    // 如果已经看过教程，直接启动游戏
-                    this.startLevel(this.currentLevel);
-                }
+                    } else {
+                        // 如果已经看过教程，直接启动游戏（恢复存档或新游戏）
+                        this.startLevel(this.currentLevel, hasSavedGame);
+                    }
+                }, 150);
             }
 
             // 开始关卡
-            startLevel(levelId) {
+            startLevel(levelId, loadSaved = false) {
                 const level = LEVELS.find(l => l.id === levelId);
-                if (!level) return;
+                if (!level) {
+                    console.error('Invalid level ID:', levelId);
+                    return;
+                }
+
 
                 this.currentLevel = levelId;
                 this.gridSize = level.gridSize;
-                this.score = 0;
+                this.score = loadSaved ? this.score : 0;
                 this.bossHP = level.bossHP || 0;
                 this.maxBossHP = level.bossHP || 0;
                 this.skillReady = false;
-                
-                this.initializeGrid();
+                this.mergedPositions = [];
+                this.pendingMerges = [];
+
+                // 清空所有方块
+                for (const [id, data] of this.tiles) {
+                    if (data.element && data.element.parentNode) {
+                        data.element.remove();
+                    }
+                }
+                this.tiles.clear();
+                this.tileIdCounter = 0;
+
+                if (loadSaved && this.grid && this.grid.length > 0) {
+                    // 从存档恢复 - 使用已有的 grid 数据
+                    this.gridSize = this.grid.length;
+                } else {
+                    // 初始化新 grid 数据
+                    this.grid = Array(this.gridSize).fill(null).map(() => Array(this.gridSize).fill(0));
+                }
+
+                // 渲染棋盘格子
+                this.renderGrid();
+
                 this.updateUI();
                 this.hideLevelSelect();
-                
+
                 // 显示Boss血条
                 const bossHpBar = document.getElementById('bossHpBar');
                 if (this.bossHP > 0) {
@@ -837,9 +997,24 @@
                     bossHpBar.classList.remove('active');
                 }
 
-                // 添加初始方块
-                this.addRandomTile();
-                this.addRandomTile();
+                // 延迟后添加/恢复方块，确保 DOM 已渲染
+                setTimeout(() => {
+                    if (loadSaved && this.grid && this.grid.length > 0) {
+                        // 从存档恢复所有方块
+                        for (let row = 0; row < this.gridSize; row++) {
+                            for (let col = 0; col < this.gridSize; col++) {
+                                if (this.grid[row][col] !== 0) {
+                                    const tileId = ++this.tileIdCounter;
+                                    this.createOrUpdateTile(tileId, row, col, this.grid[row][col], false);
+                                }
+                            }
+                        }
+                    } else {
+                        // 新游戏 - 添加初始方块
+                        this.addRandomTile();
+                        this.addRandomTile();
+                    }
+                }, 150);
             }
 
             // 初始化棋盘
@@ -851,6 +1026,10 @@
             // 渲染棋盘
             renderGrid() {
                 const container = document.getElementById('gridContainer');
+                if (!container) {
+                    console.error('gridContainer not found!');
+                    return;
+                }
                 container.innerHTML = '';
                 container.style.gridTemplateColumns = `repeat(${this.gridSize}, 1fr)`;
 
@@ -859,47 +1038,73 @@
                     cell.className = 'grid-cell';
                     container.appendChild(cell);
                 }
-
-                this.renderTiles();
             }
 
-            // 渲染方块
-            renderTiles() {
+            // 创建或更新方块（支持动画）
+            createOrUpdateTile(id, row, col, value, isNew = false) {
                 const container = document.getElementById('gridContainer');
-                // 清除旧方块
-                const oldTiles = container.querySelectorAll('.tile');
-                oldTiles.forEach(tile => tile.remove());
+                let tileData = this.tiles.get(id);
 
-                for (let row = 0; row < this.gridSize; row++) {
-                    for (let col = 0; col < this.gridSize; col++) {
-                        const value = this.grid[row][col];
-                        if (value !== 0) {
-                            this.createTileElement(row, col, value);
-                        }
+                if (!tileData) {
+                    // 创建新方块
+                    const tile = document.createElement('div');
+                    const character = TILE_CHARACTERS[value] || { icon: '❓', name: `Lv${value}` };
+
+                    tile.className = `tile tile-${value}${isNew ? ' new-tile' : ''}`;
+                    tile.style.left = `${col * 25}%`;
+                    tile.style.top = `${row * 25}%`;
+
+                    tile.innerHTML = `
+                        <div class="tile-icon">${character.icon}</div>
+                        <div class="tile-name">${character.name}</div>
+                    `;
+
+                    container.appendChild(tile);
+
+                    tileData = { id, element: tile, row, col, value, lastValue: value };
+                    this.tiles.set(id, tileData);
+                } else {
+                    // 更新现有方块位置和值
+                    const character = TILE_CHARACTERS[value] || { icon: '❓', name: `Lv${value}` };
+                    const oldValue = tileData.value;
+                    tileData.row = row;
+                    tileData.col = col;
+                    tileData.value = value;
+                    tileData.lastValue = value;
+
+                    // 更新位置（触发 CSS transition）
+                    tileData.element.style.left = `${col * 25}%`;
+                    tileData.element.style.top = `${row * 25}%`;
+
+                    // 如果值改变了，更新内容和样式
+                    if (oldValue !== value) {
+                        tileData.element.className = `tile tile-${value}`;
+                        tileData.element.innerHTML = `
+                            <div class="tile-icon">${character.icon}</div>
+                            <div class="tile-name">${character.name}</div>
+                        `;
                     }
                 }
+
+                return tileData;
             }
 
-            // 创建方块元素
-            createTileElement(row, col, value, isNew = false, isMerged = false) {
-                const container = document.getElementById('gridContainer');
-                const tile = document.createElement('div');
-                const character = TILE_CHARACTERS[value] || { icon: '❓', name: `Lv${value}` };
-                
-                tile.className = `tile tile-${value}${isMerged ? ' merged' : ''}`;
-                tile.style.left = `${col * 25}%`;
-                tile.style.top = `${row * 25}%`;
-                
-                tile.innerHTML = `
-                    <div class="tile-icon">${character.icon}</div>
-                    <div class="tile-name">${character.name}</div>
-                `;
-
-                container.appendChild(tile);
+            // 移除方块
+            removeTile(id) {
+                const tileData = this.tiles.get(id);
+                if (tileData && tileData.element.parentNode) {
+                    tileData.element.remove();
+                }
+                this.tiles.delete(id);
             }
 
             // 添加随机方块
             addRandomTile() {
+                if (!this.grid || this.grid.length === 0) {
+                    console.error('Grid not initialized!');
+                    return;
+                }
+
                 const emptyCells = [];
                 for (let row = 0; row < this.gridSize; row++) {
                     for (let col = 0; col < this.gridSize; col++) {
@@ -909,11 +1114,133 @@
                     }
                 }
 
+
                 if (emptyCells.length > 0) {
                     const { row, col } = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-                    this.grid[row][col] = Math.random() < 0.9 ? 2 : 4;
-                    this.createTileElement(row, col, this.grid[row][col], true);
+                    const value = Math.random() < 0.9 ? 2 : 4;
+                    this.grid[row][col] = value;
+
+
+                    const tileId = ++this.tileIdCounter;
+                    this.createOrUpdateTile(tileId, row, col, value, true);
+                } else {
+                    console.warn('No empty cells available!');
                 }
+            }
+
+            // 创建合并特效
+            createMergeEffects(tile, row, col, value) {
+                const container = document.getElementById('gridContainer');
+                const cellWidth = container.offsetWidth / this.gridSize;
+                const cellHeight = container.offsetHeight / this.gridSize;
+                const centerX = col * cellWidth + cellWidth / 2;
+                const centerY = row * cellHeight + cellHeight / 2;
+
+                // 1. 创建粒子爆炸效果
+                this.createParticles(centerX, centerY, value);
+
+                // 2. 创建光晕效果
+                const glow = document.createElement('div');
+                glow.className = 'merge-glow';
+                tile.appendChild(glow);
+
+                // 3. 棋盘震动效果
+                const gameBoard = document.getElementById('gameBoard');
+                gameBoard.classList.add('shake');
+                setTimeout(() => {
+                    gameBoard.classList.remove('shake');
+                }, 400);
+
+                // 4. 显示分数飘字
+                this.showScorePopup(centerX, centerY, value);
+
+                // 5. 清理光晕元素
+                setTimeout(() => {
+                    if (glow.parentNode) {
+                        glow.remove();
+                    }
+                }, 600);
+            }
+
+            // 显示分数飘字
+            showScorePopup(x, y, value) {
+                const container = document.getElementById('gridContainer');
+                const popup = document.createElement('div');
+                popup.className = 'score-popup';
+                popup.textContent = `+${value}`;
+                popup.style.setProperty('--start-x', `${x}px`);
+                popup.style.setProperty('--start-y', `${y}px`);
+
+                container.appendChild(popup);
+
+                setTimeout(() => {
+                    if (popup.parentNode) {
+                        popup.remove();
+                    }
+                }, 1000);
+            }
+
+            // 创建粒子效果
+            createParticles(x, y, value) {
+                const container = document.getElementById('gridContainer');
+                const colors = this.getParticleColors(value);
+                const particleCount = 16; // 增加粒子数量
+
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'merge-particle';
+
+                    // 随机颜色
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.background = color;
+                    particle.style.color = color; // 用于box-shadow
+
+                    // 设置初始位置
+                    particle.style.setProperty('--start-x', `${x}px`);
+                    particle.style.setProperty('--start-y', `${y}px`);
+
+                    // 计算爆炸方向（圆形分布）
+                    const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.3;
+                    const distance = 60 + Math.random() * 80; // 增加爆炸距离
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+
+                    particle.style.setProperty('--tx', `${tx}px`);
+                    particle.style.setProperty('--ty', `${ty}px`);
+
+                    // 随机大小
+                    const size = 8 + Math.random() * 6;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+
+                    container.appendChild(particle);
+
+                    // 动画结束后移除粒子
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.remove();
+                        }
+                    }, 800);
+                }
+            }
+
+            // 获取粒子颜色（根据方块等级）
+            getParticleColors(value) {
+                const colorSets = {
+                    2: ['#FFB6C1', '#FFC0CB', '#FF69B4'],
+                    4: ['#87CEEB', '#ADD8E6', '#00BFFF'],
+                    8: ['#98FB98', '#90EE90', '#32CD32'],
+                    16: ['#DDA0DD', '#DA70D6', '#BA55D3'],
+                    32: ['#F0E68C', '#FFD700', '#FFA500'],
+                    64: ['#FFA07A', '#FF7F50', '#FF6347'],
+                    128: ['#FF69B4', '#FF1493', '#FF0066'],
+                    256: ['#00CED1', '#00BFFF', '#00FFFF'],
+                    512: ['#FF4500', '#FF6347', '#FF8C00'],
+                    1024: ['#9370DB', '#8A2BE2', '#9400D3'],
+                    2048: ['#FFD700', '#FFA500', '#FFCC00'],
+                    4096: ['#FF1493', '#C71585', '#FF00FF']
+                };
+                return colorSets[value] || ['#FFFFFF', '#FFD700', '#FF69B4'];
             }
 
             // 移动处理
@@ -921,12 +1248,22 @@
                 if (this.isProcessing) return;
                 this.isProcessing = true;
 
+
                 let moved = false;
                 const newGrid = this.grid.map(row => [...row]);
+                this.pendingMerges = []; // 重置待处理的合并记录
+                const moves = []; // 记录所有移动 {fromRow, fromCol, toRow, toCol, value, tileId}
+
+                // 构建当前方块的映射（位置 -> tileId）
+                const positionToTileId = new Map();
+                for (const [id, data] of this.tiles) {
+                    const key = `${data.row},${data.col}`;
+                    positionToTileId.set(key, id);
+                }
 
                 if (direction === 'left' || direction === 'right') {
                     for (let row = 0; row < this.gridSize; row++) {
-                        const result = this.processLine(newGrid[row], direction === 'left');
+                        const result = this.processLine(newGrid[row], direction === 'left', row, moves, positionToTileId);
                         newGrid[row] = result.line;
                         if (result.moved) moved = true;
                     }
@@ -936,87 +1273,267 @@
                         for (let row = 0; row < this.gridSize; row++) {
                             line.push(newGrid[row][col]);
                         }
-                        
-                        const result = this.processLine(line, direction === 'up');
-                        
+
+                        const result = this.processLine(line, direction === 'up', col, moves, positionToTileId, true);
+
                         for (let row = 0; row < this.gridSize; row++) {
                             newGrid[row][col] = result.line[row];
                         }
-                        
+
                         if (result.moved) moved = true;
                     }
                 }
 
+
                 if (moved) {
-                    this.grid = newGrid;
-                    this.renderTiles();
-                    
+                    // 将 pendingMerges 转移到 mergedPositions
+                    this.mergedPositions = [...this.pendingMerges];
+                    this.pendingMerges = [];
+
+
+                    // 执行所有移动动画
+                    this.executeMoves(moves, newGrid);
+
                     setTimeout(() => {
                         this.addRandomTile();
-                        this.updateUI(); // 更新UI显示分数
+                        this.updateUI();
                         this.checkWinCondition();
                         this.checkLoseCondition();
                         this.saveProgress();
                         this.isProcessing = false;
-                    }, 150);
+                    }, 200);
                 } else {
                     this.isProcessing = false;
                 }
             }
 
-            // 处理一行/列
-            processLine(line, forward) {
-                if (!forward) line.reverse();
-                
-                // 移除零
-                let filtered = line.filter(val => val !== 0);
-                let moved = filtered.length !== line.length;
-                
-                // 合并
-                for (let i = 0; i < filtered.length - 1; i++) {
-                    if (filtered[i] === filtered[i + 1]) {
-                        const mergeValue = filtered[i]; // 合并前的值
-                        filtered[i] *= 2; // 合并后的值
-                        
-                        // 正确的得分计算：加上合并后方块的值（标准2048规则）
-                        this.score += filtered[i];
-                        
-                        filtered[i + 1] = 0;
-                        moved = true;
-                        
-                        // Boss关卡造成伤害：伤害值为合并后方块的值
-                        if (this.bossHP > 0) {
-                            this.damageBoss(filtered[i]);
+            // 执行移动动画
+            executeMoves(moves, newGrid) {
+                const tilesToRemove = new Set();
+                const mergedTiles = []; // 记录需要显示特效的合并方块
+
+                // 处理所有移动
+                moves.forEach(move => {
+                    const { fromRow, fromCol, toRow, toCol, tileId, willMerge } = move;
+
+                    if (willMerge) {
+                        // 这个方块将要被合并（消失）
+                        tilesToRemove.add(tileId);
+                    } else {
+                        // 移动方块到新位置
+                        const tileData = this.tiles.get(tileId);
+                        if (tileData) {
+                            tileData.row = toRow;
+                            tileData.col = toCol;
+                            tileData.element.style.left = `${toCol * 25}%`;
+                            tileData.element.style.top = `${toRow * 25}%`;
                         }
-                        
-                        // 检查是否生成技能（合并后达到256或更高）
-                        if (filtered[i] >= 256 && !this.skillReady) {
-                            this.generateSkill(filtered[i]);
+                    }
+                });
+
+                // 更新 grid 数据
+                this.grid = newGrid;
+
+                // 延迟后移除被合并的方块并创建新方块
+                setTimeout(() => {
+                    // 移除被合并的方块
+                    tilesToRemove.forEach(id => {
+                        this.removeTile(id);
+                    });
+
+                    // 为合并位置创建新方块并显示特效
+                    this.mergedPositions.forEach(merge => {
+                        const { row, col, value } = merge;
+                        const tileId = ++this.tileIdCounter;
+                        const tileData = this.createOrUpdateTile(tileId, row, col, value, false);
+
+                        // 立即添加合并特效
+                        setTimeout(() => {
+                            tileData.element.classList.add('merged');
+                            this.createMergeEffects(tileData.element, row, col, value);
+                        }, 50);
+                    });
+
+                    // 清空合并位置记录
+                    this.mergedPositions = [];
+                }, 150);
+            }
+
+            // 处理一行/列 - 最终修复版本
+            processLine(line, forward, index, moves, positionToTileId, isVertical = false) {
+                const n = line.length;
+
+                // 1. 收集非零项及其原始索引（按原始顺序）
+                let items = [];
+                for (let i = 0; i < n; i++) {
+                    if (line[i] !== 0) {
+                        items.push({ value: line[i], origIdx: i });
+                    }
+                }
+
+                // 2. 执行合并（始终从左到右处理）
+                let merged = new Array(items.length).fill(false); // 标记哪些位置已被合并
+                let newTiles = [];
+
+                for (let i = 0; i < items.length; i++) {
+                    if (merged[i]) continue; // 已合并的跳过
+
+                    // 检查是否可以与下一个合并
+                    if (i + 1 < items.length && !merged[i + 1] && items[i].value === items[i + 1].value) {
+                        // 合并 items[i] 和 items[i+1]
+                        const newVal = items[i].value * 2;
+                        newTiles.push({
+                            value: newVal,
+                            keptOrigIdx: items[i].origIdx,
+                            removedOrigIdx: items[i + 1].origIdx,
+                            merged: true
+                        });
+                        merged[i] = true;
+                        merged[i + 1] = true;
+                    } else {
+                        // 不合并，保持原样
+                        newTiles.push({
+                            value: items[i].value,
+                            origIdx: items[i].origIdx,
+                            merged: false
+                        });
+                    }
+                }
+
+                // 3. 构建结果数组
+                const result = new Array(n).fill(0);
+
+                if (forward) {
+                    // 向左/上：从位置 0 开始放置
+                    for (let i = 0; i < newTiles.length; i++) {
+                        result[i] = newTiles[i].value;
+                    }
+                } else {
+                    // 向右/下：从末尾开始放置，但保持 newTiles 的顺序
+                    // newTiles[0] 应该放在最右边（索引最大）
+                    const startIdx = n - newTiles.length;
+                    for (let i = 0; i < newTiles.length; i++) {
+                        result[startIdx + i] = newTiles[i].value;
+                    }
+                }
+
+                // 4. 判断是否有变化
+                let moved = false;
+                for (let i = 0; i < n; i++) {
+                    if (line[i] !== result[i]) {
+                        moved = true;
+                        break;
+                    }
+                }
+
+                // Debug logging
+                if (moved) {
+                    console.log(`ProcessLine [${isVertical ? 'V' : 'H'}:${index}] ${forward ? '←↑' : '→↓'}`,
+                                'Input:', line, 'Output:', result, 'Merges:', newTiles.filter(t => t.merged).length);
+                }
+
+                // 5. 记录移动和合并
+                for (let i = 0; i < newTiles.length; i++) {
+                    const tile = newTiles[i];
+
+                    // 计算目标位置
+                    let targetPos;
+                    if (forward) {
+                        targetPos = i;
+                    } else {
+                        targetPos = (n - newTiles.length) + i;
+                    }
+
+                    if (tile.merged) {
+                        // 合并情况：两个方块都要移动到目标位置，然后都消失
+                        const { keptOrigIdx, removedOrigIdx, value } = tile;
+
+                        // 5a. 记录被移除方块的移动（滑向目标然后消失）
+                        let fromRow, fromCol, toRow, toCol;
+                        if (isVertical) {
+                            fromRow = removedOrigIdx;
+                            fromCol = index;
+                            toRow = targetPos;
+                            toCol = index;
+                        } else {
+                            fromRow = index;
+                            fromCol = removedOrigIdx;
+                            toRow = index;
+                            toCol = targetPos;
+                        }
+
+                        const fromKey1 = `${fromRow},${fromCol}`;
+                        const tileId1 = positionToTileId.get(fromKey1);
+                        if (tileId1 !== undefined) {
+                            moves.push({ fromRow, fromCol, toRow, toCol, tileId: tileId1, willMerge: true });
+                        }
+
+                        // 5b. 记录保留方块的移动（也滑向目标然后消失）
+                        if (isVertical) {
+                            fromRow = keptOrigIdx;
+                            fromCol = index;
+                            toRow = targetPos;
+                            toCol = index;
+                        } else {
+                            fromRow = index;
+                            fromCol = keptOrigIdx;
+                            toRow = index;
+                            toCol = targetPos;
+                        }
+
+                        const fromKey2 = `${fromRow},${fromCol}`;
+                        const tileId2 = positionToTileId.get(fromKey2);
+                        if (tileId2 !== undefined) {
+                            moves.push({ fromRow, fromCol, toRow, toCol, tileId: tileId2, willMerge: true });
+                        }
+
+                        // 记录合并位置（用于创建新方块）
+                        this.pendingMerges.push({ row: toRow, col: toCol, value });
+
+                        // 得分
+                        this.score += value;
+
+                        // Boss 伤害
+                        if (this.bossHP > 0) this.damageBoss(value);
+
+                        // 技能
+                        if (value >= 256 && !this.skillReady) this.generateSkill(value);
+                    } else {
+                        // 普通移动：从 origIdx 移动到 targetPos
+                        if (tile.origIdx !== targetPos) {
+                            let fromRow, fromCol, toRow, toCol;
+                            if (isVertical) {
+                                fromRow = tile.origIdx;
+                                fromCol = index;
+                                toRow = targetPos;
+                                toCol = index;
+                            } else {
+                                fromRow = index;
+                                fromCol = tile.origIdx;
+                                toRow = index;
+                                toCol = targetPos;
+                            }
+
+                            const fromKey = `${fromRow},${fromCol}`;
+                            const tileId = positionToTileId.get(fromKey);
+                            if (tileId !== undefined) {
+                                moves.push({ fromRow, fromCol, toRow, toCol, tileId, willMerge: false });
+                            }
                         }
                     }
                 }
-                
-                // 再次移除零
-                filtered = filtered.filter(val => val !== 0);
-                
-                // 补零
-                while (filtered.length < line.length) {
-                    filtered.push(0);
-                }
-                
-                if (!forward) filtered.reverse();
-                
-                return { line: filtered, moved };
+
+                return { line: result, moved };
             }
 
             // 生成技能
             generateSkill(value) {
                 this.skillReady = true;
                 this.skillType = value >= 1024 ? 'rainbow' : 'timefreeze';
-                
+
                 const skillIndicator = document.getElementById('skillIndicator');
                 const skillIcon = document.getElementById('skillIcon');
-                
+
                 skillIndicator.classList.add('active');
                 skillIcon.textContent = this.skillType === 'rainbow' ? '🌈' : '⏸️';
             }
@@ -1024,7 +1541,7 @@
             // 使用技能
             useSkill() {
                 if (!this.skillReady) return;
-                
+
                 if (this.skillType === 'rainbow') {
                     // 彩虹冲击波：清除所有相同值的方块
                     const mostCommon = this.getMostCommonValue();
@@ -1045,7 +1562,7 @@
                     // 时间暂停：允许重新滑动（这里简化为额外一次移动机会）
                     this.isProcessing = false;
                 }
-                
+
                 this.skillReady = false;
                 document.getElementById('skillIndicator').classList.remove('active');
                 this.renderTiles();
@@ -1057,7 +1574,7 @@
                 const count = {};
                 let maxCount = 0;
                 let maxValue = 0;
-                
+
                 for (let row = 0; row < this.gridSize; row++) {
                     for (let col = 0; col < this.gridSize; col++) {
                         const val = this.grid[row][col];
@@ -1070,7 +1587,7 @@
                         }
                     }
                 }
-                
+
                 return maxValue;
             }
 
@@ -1188,6 +1705,15 @@
 
             // 重新开始
             restart() {
+                // 清除所有现有方块
+                for (const [id, data] of this.tiles) {
+                    if (data.element.parentNode) {
+                        data.element.remove();
+                    }
+                }
+                this.tiles.clear();
+                this.tileIdCounter = 0;
+
                 this.startLevel(this.currentLevel);
             }
 
@@ -1229,7 +1755,7 @@
                     const card = document.createElement('div');
                     card.className = 'level-card';
                     card.onclick = () => this.startLevel(level.id);
-                    
+
                     card.innerHTML = `
                         <div class="level-number">Level ${level.id}</div>
                         <div class="level-name">${level.name}</div>
@@ -1237,7 +1763,7 @@
                             ${level.description}
                         </div>
                     `;
-                    
+
                     grid.appendChild(card);
                 });
             }
@@ -1246,27 +1772,27 @@
             renderCharacterGuide() {
                 const grid = document.getElementById('characterGrid');
                 if (!grid) return;
-                
+
                 grid.innerHTML = '';
-                
+
                 // 按照数字顺序排列角色
                 const sortedValues = Object.keys(TILE_CHARACTERS).map(Number).sort((a, b) => a - b);
-                
+
                 sortedValues.forEach(value => {
                     const character = TILE_CHARACTERS[value];
                     const card = document.createElement('div');
                     card.className = 'character-card';
-                    
+
                     // 根据数值设置背景色
                     const tileClass = `tile-${value}`;
                     card.style.background = this.getTileGradient(value);
-                    
+
                     card.innerHTML = `
                         <div class="character-number">${value}</div>
                         <span class="character-icon">${character.icon}</span>
                         <div class="character-name">${character.name}</div>
                     `;
-                    
+
                     grid.appendChild(card);
                 });
             }
@@ -1316,12 +1842,12 @@
 
                 gameBoard.addEventListener('touchend', (e) => {
                     if (!startX || !startY) return;
-                    
+
                     endX = e.changedTouches[0].clientX;
                     endY = e.changedTouches[0].clientY;
-                    
+
                     this.handleSwipe(startX, startY, endX, endY);
-                    
+
                     startX = startY = endX = endY = null;
                     e.preventDefault();
                 }, { passive: false });
@@ -1358,12 +1884,12 @@
 
                 gameBoard.addEventListener('mouseup', (e) => {
                     if (!startX || !startY) return;
-                    
+
                     endX = e.clientX;
                     endY = e.clientY;
-                    
+
                     this.handleSwipe(startX, startY, endX, endY);
-                    
+
                     startX = startY = endX = endY = null;
                 });
             }
@@ -1415,15 +1941,31 @@
                         // 检查是否是同一天的存档
                         const savedDate = new Date(state.timestamp);
                         const now = new Date();
-                        if (savedDate.toDateString() === now.toDateString()) {
-                            this.currentLevel = state.currentLevel || 1;
-                            this.score = state.score || 0;
-                            this.grid = state.grid || [];
+                        if (savedDate.toDateString() === now.toDateString() && state.grid && state.grid.length > 0) {
+                            // 检查 grid 是否真的有任何非零值
+                            let hasTiles = false;
+                            for (let row = 0; row < state.grid.length && !hasTiles; row++) {
+                                for (let col = 0; col < state.grid[row].length; col++) {
+                                    if (state.grid[row][col] !== 0) {
+                                        hasTiles = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (hasTiles) {
+                                this.currentLevel = state.currentLevel || 1;
+                                this.score = state.score || 0;
+                                this.grid = state.grid;
+                                this.gridSize = this.grid.length;
+                                return true; // 返回 true 表示有存档
+                            }
                         }
                     } catch (e) {
                         console.error('加载存档失败:', e);
                     }
                 }
+                return false; // 没有有效存档
             }
         }
 

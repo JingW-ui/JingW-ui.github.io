@@ -47,6 +47,44 @@
             pointer-events: auto;
             text-align: center;
         }
+        #settings-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.22);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            padding: 10px 14px;
+            border-radius: 999px;
+            color: rgba(255,255,255,0.75);
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+        }
+        #settings-panel label {
+            user-select: none;
+        }
+        #diceCountInput {
+            appearance: none;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            padding: 9px 12px;
+            width: 60px;
+            border-radius: 999px;
+            text-align: center;
+            font-size: 0.95rem;
+            transition: border-color 0.3s, background 0.3s;
+        }
+        #diceCountInput:hover,
+        #diceCountInput:focus {
+            border-color: rgba(255,255,255,0.55);
+            background: rgba(255,255,255,0.12);
+            outline: none;
+        }
         .roll-btn {
             background: rgba(255,255,255,0.03);
             color: #fff;
@@ -122,9 +160,13 @@
     <div id="canvas-container"></div>
     <div id="ui-layer">
         <div class="title">3D DICE</div>
+        <div id="settings-panel">
+            <label for="diceCountInput">骰子数量</label>
+            <input id="diceCountInput" type="number" min="1" max="20" value="1" step="1" />
+        </div>
         <div class="controls">
             <button class="roll-btn" id="rollBtn">ROLL</button>
-            <div class="hint">点击按钮或按空格键摇骰子</div>
+            <div class="hint">选择骰子数量后点击按钮、按空格或摇动手机摇骰子</div>
         </div>
     </div>
 
@@ -146,7 +188,7 @@
         scene.fog = new THREE.FogExp2(0x030303, 0.03);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.set(0, 3.5, 7);
+        camera.position.set(0, 5.5, 13.5);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -166,14 +208,14 @@
         controls.enableDamping = true;
         controls.dampingFactor = 0.05;
         controls.minDistance = 4;
-        controls.maxDistance = 15;
+        controls.maxDistance = 30;
         controls.maxPolarAngle = Math.PI / 2 - 0.05;
 
         // ==================== 灯光系统（降低光照强度） ====================
-        const ambientLight = new THREE.AmbientLight(0x222222, 0.3);
+        const ambientLight = new THREE.AmbientLight(0x222222, 0.18);
         scene.add(ambientLight);
 
-        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 0.85);
         mainLight.position.set(5, 10, 5);
         mainLight.castShadow = true;
         mainLight.shadow.mapSize.width = 2048;
@@ -184,12 +226,12 @@
         mainLight.shadow.radius = 4;
         scene.add(mainLight);
 
-        // 赛博朋克风格彩色点光源（降低强度）
-        const colors = [0xff0055, 0x00aaff, 0xaa00ff];
+        // 赛博朋克风格彩色点光源（降低强度，避免高光过曝）
+        const colors = [0xff6f9b, 0x6fdcff, 0xb56dff];
         const lightPositions = [[4, 3, 4], [-4, 2, -4], [0, 4, -3]];
         const pointLights = [];
         lightPositions.forEach((pos, i) => {
-            const pl = new THREE.PointLight(colors[i], 1.5, 20);
+            const pl = new THREE.PointLight(colors[i], 0.7, 18);
             pl.position.set(...pos);
             scene.add(pl);
             pointLights.push(pl);
@@ -301,22 +343,9 @@
         // 使用 RoundedBoxGeometry: width, height, depth, segments, radius
         const diceGeo = new RoundedBoxGeometry(2.2, 2.2, 2.2, 8, 0.25);
         const diceMats = createDiceMaterials();
-        const dice = new THREE.Mesh(diceGeo, diceMats);
-        dice.castShadow = true;
-        dice.receiveShadow = true;
-        dice.position.y = 0;
-        scene.add(dice);
-        
-        // 调试：打印几何体信息
-        console.log('几何体面数:', diceGeo.groups.length);
-        console.log('材质数量:', diceMats.length);
-        
-        // 测试：初始状态下各个面的朝向
-        console.log('\n=== 初始状态分析 ===');
-        console.log('当前rotation:', dice.rotation);
-        console.log('+z方向(相机方向)的面应该是索引4，对应数字:', [3, 4, 2, 5, 1, 6][4]);
-        console.log('+y方向(上方)的面应该是索引2，对应数字:', [3, 4, 2, 5, 1, 6][2]);
-        console.log('+x方向(右方)的面应该是索引0，对应数字:', [3, 4, 2, 5, 1, 6][0]);
+        const diceGroup = new THREE.Group();
+        scene.add(diceGroup);
+        let diceList = [];
 
         // 骰子外轮廓发光（稍大一点的透明立方体）
         const glowGeo = new RoundedBoxGeometry(2.25, 2.25, 2.25, 8, 0.25);
@@ -326,8 +355,131 @@
             opacity: 0.03,
             side: THREE.BackSide
         });
-        const glowMesh = new THREE.Mesh(glowGeo, glowMat);
-        dice.add(glowMesh);
+
+        function createSingleDice() {
+            const dice = new THREE.Mesh(diceGeo, diceMats);
+            dice.castShadow = true;
+            dice.receiveShadow = true;
+            dice.position.y = 0;
+            const glowMesh = new THREE.Mesh(glowGeo, glowMat);
+            dice.add(glowMesh);
+            return dice;
+        }
+
+        function createDiceSet(count) {
+            while (diceGroup.children.length) {
+                diceGroup.remove(diceGroup.children[0]);
+            }
+            diceList = [];
+
+            if (count === 1) {
+                const dice = createSingleDice();
+                dice.position.set(0, 0, 0);
+                dice.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+                diceGroup.add(dice);
+                diceList.push(dice);
+                return;
+            }
+
+            const ringConfigs = [];
+            let remaining = count;
+            let ringIndex = 0;
+            while (remaining > 0) {
+                const maxInRing = 6 + ringIndex * 6;
+                const ringCount = Math.min(remaining, maxInRing);
+                const radius = 2.8 + ringIndex * 3.0;
+                ringConfigs.push({ count: ringCount, radius, startAngle: Math.random() * Math.PI * 2 });
+                remaining -= ringCount;
+                ringIndex += 1;
+            }
+
+            ringConfigs.forEach(({ count: ringCount, radius, startAngle }, ringIndex) => {
+                const ringNoise = (Math.random() - 0.5) * 0.8;
+                const angleGap = Math.PI * 2 / ringCount;
+                for (let j = 0; j < ringCount; j++) {
+                    const dice = createSingleDice();
+                    const baseAngle = startAngle + j * angleGap;
+                    const angle = baseAngle + (Math.random() - 0.5) * 0.3;
+                    const ringRadius = radius + ringNoise + (Math.random() - 0.5) * 0.6;
+                    const x = Math.cos(angle) * ringRadius + (Math.random() - 0.5) * 0.4;
+                    const z = Math.sin(angle) * ringRadius + (Math.random() - 0.5) * 0.4;
+                    const y = Math.random() * 0.7;
+                    dice.position.set(x, y, z);
+                    dice.rotation.set(
+                        Math.random() * Math.PI,
+                        Math.random() * Math.PI,
+                        Math.random() * Math.PI
+                    );
+
+                    const spiralOffset = ringIndex * 0.3;
+                    if (ringIndex > 0) {
+                        const spiralAngle = baseAngle + Math.PI / 8;
+                        dice.position.x += Math.cos(spiralAngle) * spiralOffset;
+                        dice.position.z += Math.sin(spiralAngle) * spiralOffset;
+                    }
+
+                    diceGroup.add(dice);
+                    diceList.push(dice);
+                }
+            });
+        }
+
+        createDiceSet(1);
+
+        function computeLandingPositions(count) {
+            const positions = [];
+            const ringConfigs = [];
+            let remaining = count;
+            let ringIndex = 0;
+
+            while (remaining > 0) {
+                const maxInRing = 6 + ringIndex * 6;
+                const ringCount = Math.min(remaining, maxInRing);
+                const radius = 2.8 + ringIndex * 3.2;
+                ringConfigs.push({ count: ringCount, radius, startAngle: Math.random() * Math.PI * 2 });
+                remaining -= ringCount;
+                ringIndex += 1;
+            }
+
+            ringConfigs.forEach(({ count: ringCount, radius, startAngle }, ringIndex) => {
+                const angleGap = Math.PI * 2 / ringCount;
+                const ringNoise = (Math.random() - 0.5) * 0.6;
+                for (let j = 0; j < ringCount; j++) {
+                    const baseAngle = startAngle + j * angleGap;
+                    const angle = baseAngle + (Math.random() - 0.5) * 0.25;
+                    const spread = radius + ringNoise + (Math.random() - 0.5) * 0.4;
+                    const x = Math.cos(angle) * spread + (Math.random() - 0.5) * 0.25;
+                    const z = Math.sin(angle) * spread + (Math.random() - 0.5) * 0.25;
+                    const y = 0;
+                    positions.push(new THREE.Vector3(x, y, z));
+                }
+            });
+
+            const minDist = 2.6;
+            for (let iter = 0; iter < 16; iter++) {
+                let moved = false;
+                for (let i = 0; i < positions.length; i++) {
+                    for (let j = i + 1; j < positions.length; j++) {
+                        const a = positions[i];
+                        const b = positions[j];
+                        const diff = new THREE.Vector3().subVectors(b, a);
+                        const dist = diff.length();
+                        if (dist < minDist && dist > 0.001) {
+                            const overlap = (minDist - dist) * 0.52;
+                            diff.normalize();
+                            a.addScaledVector(diff, -overlap);
+                            b.addScaledVector(diff, overlap);
+                            a.y = 0;
+                            b.y = 0;
+                            moved = true;
+                        }
+                    }
+                }
+                if (!moved) break;
+            }
+
+            return positions;
+        }
 
         // ==================== 粒子系统 ====================
         const particleCount = 800;
@@ -368,6 +520,7 @@
         let isRolling = false;
         let hasRolled = false; // 标记是否已经摇过一次
         const rollBtn = document.getElementById('rollBtn');
+        const diceCountInput = document.getElementById('diceCountInput');
         const uiLayer = document.getElementById('ui-layer');
 
         // 各数字朝上（+y方向）的目标旋转
@@ -416,43 +569,21 @@
             hasRolled = true; // 标记已摇动
             rollBtn.disabled = true;
 
-            const result = Math.floor(Math.random() * 6) + 1;
-            const base = faceRotations[result];
-            
-            console.log('\n=== 摇骰子调试信息 ===');
-            console.log('目标数字:', result, '(将出现在顶部)');
-            console.log('目标旋转:', base);
-
-            // 归一化当前旋转，避免数值无限累积
-            const curX = dice.rotation.x % (Math.PI * 2);
-            const curY = dice.rotation.y % (Math.PI * 2);
-            const curZ = dice.rotation.z % (Math.PI * 2);
-            dice.rotation.set(curX, curY, curZ);
-            
-            console.log('当前旋转:', { x: curX, y: curY, z: curZ });
-
-            // 随机多圈翻滚（3~6圈）
-            const addX = (3 + Math.floor(Math.random() * 4)) * Math.PI * 2;
-            const addY = (3 + Math.floor(Math.random() * 4)) * Math.PI * 2;
-            const addZ = (1 + Math.floor(Math.random() * 2)) * Math.PI * 2;
-
-            const targetX = base.x + addX;
-            const targetY = base.y + addY;
-            const targetZ = base.z + addZ;
-            
-            console.log('最终目标旋转:', { x: targetX, y: targetY, z: targetZ });
-
+            const count = Math.min(20, Math.max(1, Number(diceCountInput.value) || 1));
+            diceCountInput.value = count;
+            if (diceList.length !== count) {
+                createDiceSet(count);
+            }
+            const results = Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1);
+            const targets = computeLandingPositions(count);
             const tl = gsap.timeline({
                 onComplete: () => {
                     isRolling = false;
                     rollBtn.disabled = false;
-                    
-                    // 验证最终旋转
-                    const finalX = dice.rotation.x % (Math.PI * 2);
-                    const finalY = dice.rotation.y % (Math.PI * 2);
-                    const finalZ = dice.rotation.z % (Math.PI * 2);
-                    console.log('最终实际旋转:', { x: finalX, y: finalY, z: finalZ });
-                    console.log('期望数字:', result);
+
+                    console.log('\n=== 摇骰子调试信息 ===');
+                    console.log('结果数组:', results);
+                    console.log('落点位置:', targets);
 
                     // 落地效果
                     playBounceSound();
@@ -466,38 +597,121 @@
                 }
             });
 
-            // 抛起
-            tl.to(dice.position, {
-                y: 3.5,
-                duration: 0.5,
-                ease: "power2.out"
-            }, 0);
+            results.forEach((result, index) => {
+                const dice = diceList[index];
+                const base = faceRotations[result];
+                const target = targets[index];
 
-            // 落下
-            tl.to(dice.position, {
-                y: 0,
-                duration: 0.6,
-                ease: "bounce.out"
-            }, 0.5);
+                const curX = dice.rotation.x % (Math.PI * 2);
+                const curY = dice.rotation.y % (Math.PI * 2);
+                const curZ = dice.rotation.z % (Math.PI * 2);
+                dice.rotation.set(curX, curY, curZ);
 
-            // 旋转（带轻微随机扰动，更自然）
-            tl.to(dice.rotation, {
-                x: targetX + (Math.random() - 0.5) * 0.05,
-                y: targetY + (Math.random() - 0.5) * 0.05,
-                z: targetZ + (Math.random() - 0.5) * 0.05,
-                duration: 1.8,
-                ease: "power4.out"
-            }, 0);
+                const finalRotX = base.x + Math.PI * 2 * Math.floor(Math.random() * 2);
+                const finalRotY = Math.PI / 2 * Math.floor(Math.random() * 4);
+                const finalRotZ = base.z + Math.PI * 2 * Math.floor(Math.random() * 2);
+                const delay = index * 0.05;
+                const apex = 4.6 + Math.random() * 0.5;
+                const driftX = target.x + (Math.random() - 0.5) * 0.8;
+                const driftZ = target.z + (Math.random() - 0.5) * 0.8;
+                const spinX = Math.PI * 2 * (3 + Math.random() * 2);
+                const spinY = Math.PI * 2 * (3 + Math.random() * 2);
+                const spinZ = Math.PI * 2 * (2 + Math.random() * 2);
 
-            // 骰子抛起时光源跟随变亮
+                tl.to(dice.position, {
+                    x: driftX,
+                    z: driftZ,
+                    y: apex,
+                    duration: 0.35,
+                    ease: 'power2.out'
+                }, delay);
+
+                tl.to(dice.position, {
+                    x: target.x,
+                    z: target.z,
+                    y: 1.2,
+                    duration: 0.45,
+                    ease: 'power1.inOut'
+                }, delay + 0.35);
+
+                tl.to(dice.position, {
+                    y: 0,
+                    duration: 0.55,
+                    ease: 'bounce.out'
+                }, delay + 0.75);
+
+                tl.to(dice.rotation, {
+                    x: dice.rotation.x + spinX,
+                    y: dice.rotation.y + spinY,
+                    z: dice.rotation.z + spinZ,
+                    duration: 0.8,
+                    ease: 'linear'
+                }, delay);
+
+                tl.to(dice.rotation, {
+                    x: finalRotX,
+                    y: finalRotY,
+                    z: finalRotZ,
+                    duration: 0.55,
+                    ease: 'power2.out'
+                }, delay + 0.7);
+            });
+
             tl.to(pointLights[0], { intensity: 2.5, duration: 0.3 }, 0);
             tl.to(pointLights[1], { intensity: 2.5, duration: 0.3 }, 0.1);
         }
 
         rollBtn.addEventListener('click', rollDice);
+        diceCountInput.addEventListener('change', () => {
+            const count = Math.min(20, Math.max(1, Number(diceCountInput.value) || 1));
+            diceCountInput.value = count;
+            createDiceSet(count);
+            hasRolled = false;
+        });
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space') rollDice();
         });
+
+        let lastShakeTime = 0;
+        let lastMotionMagnitude = 0;
+        const SHAKE_THRESHOLD = 16;
+
+        function handleDeviceMotion(event) {
+            const acc = event.accelerationIncludingGravity || event.acceleration;
+            if (!acc) return;
+
+            const x = acc.x || 0;
+            const y = acc.y || 0;
+            const z = acc.z || 0;
+            const magnitude = Math.sqrt(x * x + y * y + z * z);
+            const delta = Math.abs(magnitude - lastMotionMagnitude);
+            lastMotionMagnitude = magnitude;
+
+            const now = Date.now();
+            if (delta > SHAKE_THRESHOLD && now - lastShakeTime > 800) {
+                lastShakeTime = now;
+                rollDice();
+            }
+        }
+
+        function initShakeDetection() {
+            if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission().then(response => {
+                    if (response === 'granted') {
+                        window.addEventListener('devicemotion', handleDeviceMotion);
+                    }
+                }).catch(() => {
+                    window.addEventListener('devicemotion', handleDeviceMotion);
+                });
+            } else {
+                window.addEventListener('devicemotion', handleDeviceMotion);
+            }
+        }
+
+        document.addEventListener('touchstart', function initShake() {
+            initShakeDetection();
+            document.removeEventListener('touchstart', initShake);
+        }, { passive: true });
 
         // ==================== 窗口自适应 ====================
         window.addEventListener('resize', () => {
@@ -522,13 +736,12 @@
             particles.geometry.attributes.position.needsUpdate = true;
             particles.rotation.y = t * 0.02;
 
-            // 闲置时骰子轻微悬浮呼吸（仅在未摇过或摇动中时）
+            // 闲置时骰子轻微悬浮呼吸（仅在未摇过时）
             if (!hasRolled && !isRolling) {
-                dice.position.y = Math.sin(t * 1.5) * 0.08;
-                dice.rotation.y += 0.003;
-            } else if (isRolling) {
-                // 摇动中保持呼吸效果
-                dice.position.y = Math.sin(t * 1.5) * 0.08;
+                diceList.forEach(d => {
+                    d.position.y = Math.sin(t * 1.5) * 0.08;
+                    d.rotation.y += 0.003;
+                });
             }
             // 摇完后（!isRolling && hasRolled）骰子完全静止
 
