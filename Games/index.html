@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>游戏中心 - Games Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet"></noscript>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
         
         * {
             margin: 0;
@@ -24,6 +27,10 @@
             padding: 40px 20px;
             position: relative;
             overflow-x: hidden;
+            /* 性能优化 */
+            will-change: auto;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         /* 可爱背景装饰 */
@@ -36,13 +43,22 @@
             pointer-events: none;
             z-index: 0;
             overflow: hidden;
+            /* 性能优化：使用 transform 而不是 opacity 动画 */
+            contain: strict;
         }
 
         .floating-item {
             position: absolute;
             font-size: 2em;
-            opacity: 0.3;
+            opacity: 0; /* 初始隐藏，JS 加载后显示 */
             animation: float-around 15s infinite ease-in-out;
+            /* 性能优化：使用 GPU 加速 */
+            will-change: transform;
+            transform: translateZ(0);
+        }
+        
+        .floating-item.loaded {
+            opacity: 0.3;
         }
 
         .floating-item:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
@@ -68,6 +84,8 @@
             animation: title-bounce 2s ease-in-out infinite;
             position: relative;
             z-index: 1;
+            /* 性能优化 */
+            will-change: transform;
         }
 
         @keyframes title-bounce {
@@ -104,6 +122,16 @@
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             cursor: pointer;
             position: relative;
+            /* 性能优化 */
+            will-change: transform;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            /* 初始不启动复杂动画 */
+            animation-play-state: paused;
+        }
+        
+        .game-card.animations-enabled {
+            animation-play-state: running;
         }
 
         .game-card::before {
@@ -145,6 +173,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            /* 性能优化 */
+            contain: layout style paint;
         }
 
         .card-header.puzzle-theme {
@@ -181,6 +211,9 @@
                 inset 0 0 15px rgba(255, 255, 255, 0.3);
             animation: center-pulse 2s ease-in-out infinite;
             z-index: 10;
+            /* 性能优化 */
+            will-change: transform, box-shadow;
+            transform: translateZ(0);
         }
 
         @keyframes center-pulse {
@@ -214,6 +247,9 @@
                 0 4px 10px rgba(0, 0, 0, 0.15),
                 inset 0 0 10px rgba(255, 255, 255, 0.3);
             animation: orbit-rotate 6s linear infinite;
+            /* 性能优化 */
+            will-change: transform, opacity;
+            transform: translateZ(0);
         }
 
         .orbit-tile:nth-child(2) {
@@ -283,6 +319,8 @@
             background: radial-gradient(circle, rgba(111, 143, 111, 0.28), transparent);
             animation: merge-expand 2s ease-out infinite;
             pointer-events: none;
+            /* 性能优化 */
+            will-change: width, height, opacity;
         }
 
         @keyframes merge-expand {
@@ -316,6 +354,12 @@
             overflow: hidden;
         }
 
+        .card-header.racing-theme {
+            background: linear-gradient(135deg, #e8f0e8 0%, #d4e4d4 50%, #ecf5ec 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
         /* 贪吃蛇游戏场景 */
         .game-scene-snake {
             position: relative;
@@ -332,6 +376,8 @@
             display: flex;
             gap: 3px;
             animation: snake-move 3s ease-in-out infinite;
+            /* 性能优化 */
+            will-change: transform;
         }
 
         .snake-segment {
@@ -339,6 +385,9 @@
             height: 25px;
             border-radius: 6px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            /* 性能优化 */
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         .snake-segment:nth-child(1) {
@@ -384,6 +433,8 @@
             font-size: 28px;
             animation: food-float 2s ease-in-out infinite;
             filter: drop-shadow(0 4px 12px rgba(255, 182, 185, 0.4));
+            /* 性能优化 */
+            will-change: transform;
         }
 
         .snake-food:nth-of-type(1) {
@@ -432,6 +483,8 @@
             position: relative;
             transform-style: preserve-3d;
             animation: dice-spin 4s ease-in-out infinite;
+            /* 性能优化 */
+            will-change: transform;
         }
 
         .dice-face {
@@ -448,6 +501,8 @@
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
             padding: 10px;
+            /* 性能优化 */
+            backface-visibility: hidden;
         }
 
         .dice-face:nth-child(1) { transform: translateZ(40px); }
@@ -494,6 +549,8 @@
             border-radius: 50%;
             animation: glow-pulse 2s ease-in-out infinite;
             pointer-events: none;
+            /* 性能优化 */
+            will-change: transform, opacity;
         }
 
         @keyframes glow-pulse {
@@ -503,6 +560,212 @@
             }
             50% {
                 transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* 3D赛车游戏场景 */
+        .game-scene-racing {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .racing-car {
+            position: relative;
+            width: 100px;
+            height: 60px;
+            animation: car-drive 3s ease-in-out infinite;
+            /* 性能优化 */
+            will-change: transform;
+        }
+
+        .car-body {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 35px;
+            background: linear-gradient(135deg, #7fa87f, #6a946a);
+            border-radius: 15px 15px 8px 8px;
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.2),
+                inset 0 2px 8px rgba(255, 255, 255, 0.3);
+        }
+
+        .car-body::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 20px;
+            background: linear-gradient(135deg, #8fb88f, #7aa47a);
+            border-radius: 10px 10px 0 0;
+            box-shadow: inset 0 2px 6px rgba(255, 255, 255, 0.3);
+        }
+
+        .car-wheel {
+            position: absolute;
+            bottom: 0;
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle at 30% 30%, #4a4a4a, #2a2a2a);
+            border-radius: 50%;
+            border: 2px solid #3a3a3a;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            animation: wheel-spin 0.5s linear infinite;
+            /* 性能优化 */
+            will-change: transform;
+        }
+
+        .car-wheel:nth-child(2) { left: 8px; }
+        .car-wheel:nth-child(3) { right: 8px; }
+
+        @keyframes car-drive {
+            0%, 100% {
+                transform: translateX(0) translateY(0) rotate(0deg);
+            }
+            25% {
+                transform: translateX(-15px) translateY(-3px) rotate(-2deg);
+            }
+            50% {
+                transform: translateX(0) translateY(-5px) rotate(0deg);
+            }
+            75% {
+                transform: translateX(15px) translateY(-3px) rotate(2deg);
+            }
+        }
+
+        @keyframes wheel-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* 赛道效果 */
+        .racing-track {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 8px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(127, 168, 127, 0.4) 20%, 
+                rgba(127, 168, 127, 0.6) 50%, 
+                rgba(127, 168, 127, 0.4) 80%, 
+                transparent 100%);
+            border-radius: 4px;
+            animation: track-move 1.5s linear infinite;
+            /* 性能优化 */
+            will-change: opacity;
+        }
+
+        .racing-track::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 100%;
+            height: 2px;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0.6) 0px,
+                rgba(255, 255, 255, 0.6) 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            animation: dash-move 0.8s linear infinite;
+        }
+
+        @keyframes track-move {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        @keyframes dash-move {
+            from { background-position: 0 0; }
+            to { background-position: 20px 0; }
+        }
+
+        /* 速度线效果 */
+        .speed-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(127, 168, 127, 0.6), transparent);
+            border-radius: 2px;
+            animation: speed-zoom 1s linear infinite;
+            /* 性能优化 */
+            will-change: transform, opacity;
+        }
+
+        .speed-line:nth-child(1) {
+            width: 40px;
+            top: 30%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .speed-line:nth-child(2) {
+            width: 35px;
+            top: 45%;
+            left: 5%;
+            animation-delay: 0.3s;
+        }
+
+        .speed-line:nth-child(3) {
+            width: 45px;
+            top: 60%;
+            left: 8%;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes speed-zoom {
+            0% {
+                transform: translateX(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-60px);
+                opacity: 0;
+            }
+        }
+
+        /* 赛车光效 */
+        .racing-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 100px;
+            background: radial-gradient(ellipse, rgba(127, 168, 127, 0.25), transparent);
+            border-radius: 50%;
+            animation: racing-pulse 2s ease-in-out infinite;
+            pointer-events: none;
+            /* 性能优化 */
+            will-change: transform, opacity;
+        }
+
+        @keyframes racing-pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.15);
                 opacity: 0.8;
             }
         }
@@ -650,6 +913,8 @@
                 inset 0 0 20px rgba(255, 255, 255, 0.3);
             animation: ball-glow 2s ease-in-out infinite;
             position: relative;
+            /* 性能优化 */
+            will-change: box-shadow;
         }
 
         .ball-core::before {
@@ -674,6 +939,8 @@
             border: 2px solid rgba(126, 166, 126, 0.4);
             border-radius: 50%;
             animation: ring-rotate 4s linear infinite;
+            /* 性能优化 */
+            will-change: transform;
         }
 
         .ball-ring::before,
@@ -727,6 +994,8 @@
             font-size: 6em;
             animation: icon-wiggle 2s ease-in-out infinite;
             filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+            /* 性能优化 */
+            will-change: transform;
         }
 
         @keyframes icon-wiggle {
@@ -1098,20 +1367,155 @@
                 </button>
             </div>
         </div>
+
+        <!-- 3D极速赛车 -->
+        <div class="game-card" onclick="window.location.href='racing/'">
+            <div class="card-header racing-theme">
+                <div class="game-scene-racing">
+                    <div class="racing-glow"></div>
+                    <div class="speed-line"></div>
+                    <div class="speed-line"></div>
+                    <div class="speed-line"></div>
+                    <div class="racing-car">
+                        <div class="car-body">
+                        </div>
+                    </div>
+                    <div class="racing-track"></div>
+                </div>
+                <div class="card-badge">竞速驾驶</div>
+            </div>
+            <div class="card-body">
+                <h2 class="game-title">3D极速赛车</h2>
+                <p class="game-description">
+                    刺激的3D赛车竞速游戏！基于Three.js打造，支持多辆赛车选择，真实的物理引擎模拟。在无限延伸的赛道上漂移、加速，挑战最快圈速记录！
+                </p>
+                <div class="game-features">
+                    <span class="feature-tag">🏎️ 3D赛车</span>
+                    <span class="feature-tag">🎮 真实物理</span>
+                    <span class="feature-tag">🏆 车辆解锁</span>
+                </div>
+                <button class="play-button">
+                    <span class="play-icon">▶️</span>
+                    <span>立即游玩</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // 添加卡片进入动画
+        // 性能优化：使用 requestAnimationFrame 和 IntersectionObserver
         document.addEventListener('DOMContentLoaded', () => {
             const cards = document.querySelectorAll('.game-card');
+            const floatingItems = document.querySelectorAll('.floating-item');
+            
+            // 0. 立即显示背景装饰（不等待动画）
+            setTimeout(() => {
+                floatingItems.forEach(item => item.classList.add('loaded'));
+            }, 100);
+            
+            // 1. 卡片进入动画 - 使用 RAF 优化，减少延迟
             cards.forEach((card, index) => {
                 card.style.opacity = '0';
                 card.style.transform = 'translateY(30px)';
+                
+                // 错开动画时间，进一步减少延迟
                 setTimeout(() => {
-                    card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 150);
+                    requestAnimationFrame(() => {
+                        card.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    });
+                }, index * 80); // 从 100ms 减少到 80ms
+            });
+            
+            // 2. 懒加载动画 - 只在可见时启动复杂动画
+            if ('IntersectionObserver' in window) {
+                const animationObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            // 元素进入视口，启动动画
+                            entry.target.classList.add('animations-enabled');
+                            animationObserver.unobserve(entry.target);
+                        }
+                    });
+                }, {
+                    threshold: 0.05, // 降低阈值，更快触发
+                    rootMargin: '100px' // 扩大观察范围
+                });
+                
+                cards.forEach(card => {
+                    animationObserver.observe(card);
+                });
+            }
+            
+            // 3. 智能预加载 - 只预加载前两个游戏
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                    // 只预加载最可能点击的前两个游戏
+                    const priorityLinks = [
+                        '/Games/racing/',  // 新游戏优先
+                        '/Games/snake'
+                    ];
+                    
+                    priorityLinks.forEach(link => {
+                        const prefetchLink = document.createElement('link');
+                        prefetchLink.rel = 'prefetch';
+                        prefetchLink.href = link;
+                        prefetchLink.as = 'document';
+                        document.head.appendChild(prefetchLink);
+                    });
+                }, { timeout: 1000 }); // 减少超时时间
+            }
+            
+            // 4. 减少移动设备上的动画复杂度
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+                document.body.classList.add('mobile-device');
+                // 移动端禁用部分复杂动画
+                document.documentElement.style.setProperty('--animation-speed', '0.5');
+            }
+            
+            // 5. 检测用户偏好：减少动画
+            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+            if (prefersReducedMotion.matches) {
+                document.body.classList.add('reduced-motion');
+            }
+            
+            // 6. 页面完全加载后执行次要任务
+            window.addEventListener('load', () => {
+                // 预加载剩余游戏
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(() => {
+                        const remainingLinks = [
+                            '/Games/2024/',
+                            '/Games/ball',
+                            '/Games/dice_3D/'
+                        ];
+                        
+                        remainingLinks.forEach(link => {
+                            const prefetchLink = document.createElement('link');
+                            prefetchLink.rel = 'prefetch';
+                            prefetchLink.href = link;
+                            document.head.appendChild(prefetchLink);
+                        });
+                    });
+                }
+            });
+        });
+        
+        // 7. 优化点击响应 - 立即跳转，不等待动画
+        document.querySelectorAll('.game-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                // 防止重复点击
+                if (card.dataset.loading) return;
+                card.dataset.loading = 'true';
+                
+                // 添加点击反馈
+                card.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    const href = card.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    window.location.href = href;
+                }, 50);
             });
         });
     </script>
