@@ -63,21 +63,29 @@
             font-size: 0.9rem;
             letter-spacing: 0.08em;
             box-shadow: 0 10px 35px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
         }
         #settings-panel label {
             user-select: none;
+            white-space: nowrap;
         }
         #diceCountInput {
             appearance: none;
+            -moz-appearance: textfield;
             background: rgba(255,255,255,0.08);
             color: #fff;
             border: 1px solid rgba(255,255,255,0.25);
-            padding: 9px 12px;
-            width: 60px;
+            padding: 8px 10px;
+            width: 55px;
             border-radius: 999px;
             text-align: center;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             transition: border-color 0.3s, background 0.3s;
+        }
+        #diceCountInput::-webkit-outer-spin-button,
+        #diceCountInput::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
         #diceCountInput:hover,
         #diceCountInput:focus {
@@ -143,6 +151,61 @@
             20%, 80% { transform: translate3d(2px, 0, 0); }
             30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
             40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            #settings-panel {
+                top: 12px;
+                right: 12px;
+                padding: 6px 10px;
+                gap: 6px;
+                font-size: 0.75rem;
+            }
+            #settings-panel label {
+                font-size: 0.75rem;
+            }
+            #diceCountInput {
+                width: 45px;
+                padding: 6px 8px;
+                font-size: 0.8rem;
+            }
+            .roll-btn {
+                padding: 16px 48px;
+                font-size: 1.1rem;
+                letter-spacing: 0.3em;
+            }
+            .hint {
+                font-size: 0.75rem;
+                margin-top: 8px;
+            }
+            .title {
+                font-size: clamp(1.5rem, 6vw, 2.5rem);
+            }
+        }
+
+        @media (max-width: 480px) {
+            #settings-panel {
+                top: 10px;
+                right: 10px;
+                padding: 5px 8px;
+                gap: 5px;
+            }
+            #settings-panel label {
+                font-size: 0.7rem;
+            }
+            #diceCountInput {
+                width: 40px;
+                padding: 5px 6px;
+                font-size: 0.75rem;
+            }
+            .roll-btn {
+                padding: 15px 42px;
+                font-size: 1rem;
+            }
+            .hint {
+                font-size: 0.7rem;
+            }
         }
     </style>
     <!-- 引入 GSAP 动画库 -->
@@ -360,7 +423,7 @@
             const dice = new THREE.Mesh(diceGeo, diceMats);
             dice.castShadow = true;
             dice.receiveShadow = true;
-            dice.position.y = 0;
+            dice.position.y = 1.1; // 骰子边长2.2的一半，确保底部刚好接触地面
             const glowMesh = new THREE.Mesh(glowGeo, glowMat);
             dice.add(glowMesh);
             return dice;
@@ -374,7 +437,7 @@
 
             if (count === 1) {
                 const dice = createSingleDice();
-                dice.position.set(0, 0, 0);
+                dice.position.set(0, 1.1, 0); // 提高到地面上方
                 dice.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
                 diceGroup.add(dice);
                 diceList.push(dice);
@@ -403,7 +466,7 @@
                     const ringRadius = radius + ringNoise + (Math.random() - 0.5) * 0.6;
                     const x = Math.cos(angle) * ringRadius + (Math.random() - 0.5) * 0.4;
                     const z = Math.sin(angle) * ringRadius + (Math.random() - 0.5) * 0.4;
-                    const y = Math.random() * 0.7;
+                    const y = 1.1 + Math.random() * 0.7; // 基础高度1.1 + 随机偏移
                     dice.position.set(x, y, z);
                     dice.rotation.set(
                         Math.random() * Math.PI,
@@ -563,11 +626,24 @@
             osc.stop(audioCtx.currentTime + 0.3);
         }
 
+        // 加载ROLL按钮音效
+        const rollSound = new Audio('audio/push-switcher.mp3');
+        rollSound.preload = 'auto';
+        rollSound.volume = 0.6;
+
+        function playRollSound() {
+            rollSound.currentTime = 0;
+            rollSound.play().catch(e => console.log('音频播放失败:', e));
+        }
+
         function rollDice() {
             if (isRolling) return;
             isRolling = true;
             hasRolled = true; // 标记已摇动
             rollBtn.disabled = true;
+
+            // 播放ROLL按钮音效
+            playRollSound();
 
             const count = Math.min(20, Math.max(1, Number(diceCountInput.value) || 1));
             diceCountInput.value = count;
@@ -739,7 +815,7 @@
             // 闲置时骰子轻微悬浮呼吸（仅在未摇过时）
             if (!hasRolled && !isRolling) {
                 diceList.forEach(d => {
-                    d.position.y = Math.sin(t * 1.5) * 0.08;
+                    d.position.y = 1.1 + Math.sin(t * 1.5) * 0.08; // 基础高度1.1 + 悬浮动画
                     d.rotation.y += 0.003;
                 });
             }
