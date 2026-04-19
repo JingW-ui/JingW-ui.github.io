@@ -9,7 +9,7 @@ export class SmokeTrails {
 
 		this.particles = [];
 
-		const map = new THREE.TextureLoader().load( 'sprites/smoke.png' );
+		const map = new THREE.TextureLoader().load( './sprites/smoke.png' );
 		this.material = new THREE.SpriteMaterial( {
 			map,
 			transparent: true,

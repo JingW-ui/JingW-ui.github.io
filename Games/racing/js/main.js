@@ -118,7 +118,7 @@ async function loadModels() {
 	const promises = modelNames.map( ( name ) =>
 		new Promise( ( resolve, reject ) => {
 
-			loader.load( `models/${ name }.glb`, ( gltf ) => {
+			loader.load( `./models/${ name }.glb`, ( gltf ) => {
 
 				gltf.scene.traverse( ( child ) => {
 

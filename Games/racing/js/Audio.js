@@ -58,7 +58,7 @@ export class GameAudio {
 
 		this.skidSound = new THREE.Audio( this.listener );
 
-		loader.load( 'audio/engine.ogg', ( buffer ) => {
+		loader.load( './audio/engine.ogg', ( buffer ) => {
 
 			this.engineSound.setBuffer( buffer );
 			this.engineSound.setLoop( true );
@@ -72,7 +72,7 @@ export class GameAudio {
 
 		} );
 
-		loader.load( 'audio/skid.ogg', ( buffer ) => {
+		loader.load( './audio/skid.ogg', ( buffer ) => {
 
 			this.skidSound.setBuffer( buffer );
 			this.skidSound.setLoop( true );
@@ -81,7 +81,7 @@ export class GameAudio {
 
 		} );
 
-		loader.load( 'audio/impact.ogg', ( buffer ) => {
+		loader.load( './audio/impact.ogg', ( buffer ) => {
 
 			this.impactBuffer = buffer;
 
