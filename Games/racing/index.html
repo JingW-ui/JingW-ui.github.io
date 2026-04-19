@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>Racing</title>
+	<style>
+		body { margin: 0; overflow: hidden; background: #000; }
+		canvas { display: block; touch-action: none; }
+		#editor-link {
+			position: absolute;
+			bottom: 12px;
+			right: 16px;
+			color: #fff;
+			font: 14px sans-serif;
+			text-decoration: none;
+			background: rgba(0,0,0,0.5);
+			padding: 8px 14px;
+			border-radius: 6px;
+			z-index: 10;
+		}
+		#editor-link:hover { background: rgba(0,0,0,0.7); }
+		@media (pointer: coarse) {
+			#editor-link { bottom: auto; top: 12px; right: 12px; }
+		}
+		
+		/* Pause Button */
+		#pause-btn {
+			position: absolute;
+			top: 20px;
+			left: 20px;
+			width: 50px;
+			height: 50px;
+			background: rgba(30, 30, 30, 0.9);
+			border: 2px solid #606060;
+			border-radius: 50%;
+			color: #d0d0d0;
+			font-size: 24px;
+			cursor: pointer;
+			z-index: 50;
+			transition: all 0.3s;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+		}
+		#pause-btn:hover {
+			background: rgba(50, 50, 50, 0.95);
+			color: #ffffff;
+			transform: scale(1.1);
+			border-color: #808080;
+		}
+		#pause-btn.paused {
+			background: rgba(60, 60, 60, 0.95);
+			border-color: #909090;
+			color: white;
+		}
+		
+		/* Pause Overlay */
+		#pause-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(44, 62, 80, 0.85);
+			display: none;
+			justify-content: center;
+			align-items: center;
+			flex-direction: column;
+			z-index: 40;
+			backdrop-filter: blur(5px);
+		}
+		#pause-overlay.active {
+			display: flex;
+		}
+		.pause-title {
+			color: #d4af37;
+			font-size: 48px;
+			font-weight: bold;
+			margin-bottom: 20px;
+			text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+			letter-spacing: 3px;
+		}
+		.pause-hint {
+			color: rgba(189, 195, 199, 0.9);
+			font-size: 18px;
+			margin-bottom: 30px;
+		}
+		.resume-btn {
+			padding: 15px 50px;
+			font-size: 20px;
+			font-weight: bold;
+			background: linear-gradient(135deg, #7fb069 0%, #6a9e56 100%);
+			color: white;
+			border: none;
+			border-radius: 30px;
+			cursor: pointer;
+			transition: all 0.3s;
+			box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+			text-transform: uppercase;
+			letter-spacing: 2px;
+		}
+		.resume-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 25px rgba(127, 176, 105, 0.4);
+			background: linear-gradient(135deg, #8bc273 0%, #7fb069 100%);
+		}
+		
+		/* Vehicle Selection Screen */
+		#vehicle-select {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: radial-gradient(ellipse at center, #2a2a2a 0%, #1a1a1a 50%, #0d0d0d 100%);
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: center;
+			z-index: 100;
+			transition: opacity 0.5s, background 0.6s ease;
+			overflow: hidden;
+		}
+		#vehicle-select.hidden {
+			opacity: 0;
+			pointer-events: none;
+		}
+		#preview-canvas {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 0;
+			pointer-events: auto;
+			cursor: grab;
+		}
+		#preview-canvas:active {
+			cursor: grabbing;
+		}
+		.select-header {
+			position: relative;
+			z-index: 10;
+			text-align: center;
+			padding-top: 40px;
+			padding-bottom: 15px; /* Add space below header */
+		}
+		.select-header h1 {
+			color: #e0e0e0; /* Light gray */
+			font-size: 48px;
+			margin: 0 0 10px 0;
+			text-shadow: 0 0 20px rgba(255,255,255,0.3), 2px 2px 8px rgba(0,0,0,0.8);
+			letter-spacing: 3px;
+			transition: color 0.4s ease;
+			font-weight: 300;
+		}
+		.select-header p {
+			color: rgba(180, 180, 180, 0.8); /* Medium gray */
+			font-size: 14px;
+			margin: 0;
+			letter-spacing: 1px;
+			text-transform: uppercase;
+		}
+		.vehicle-indicator {
+			position: absolute;
+			top: 130px; /* Position right below the header */
+			left: 50%;
+			transform: translateX(-50%);
+			z-index: 10;
+			display: flex;
+			gap: 12px;
+			margin: 30px;
+		}
+		.indicator-dot {
+			width: 10px;
+			height: 10px;
+			border-radius: 50%;
+			background: rgba(100, 100, 100, 0.4); /* Dark gray */
+			transition: all 0.4s ease;
+			cursor: pointer;
+			border: 2px solid rgba(150, 150, 150, 0.3);
+		}
+		.indicator-dot.active {
+			background: #ffffff; /* White for active */
+			transform: scale(1.5);
+			box-shadow: 0 0 15px rgba(255,255,255,0.8), 0 0 30px rgba(255,255,255,0.4);
+			border-color: #ffffff;
+		}
+		.indicator-dot:hover {
+			background: rgba(200, 200, 200, 0.6);
+			border-color: rgba(220, 220, 220, 0.5);
+		}
+		.select-footer {
+			position: relative;
+			z-index: 10;
+			width: 100%;
+			max-width: 600px;
+			padding: 30px 20px;
+			background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
+		}
+		.vehicle-info {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+		.vehicle-name {
+			color: #f0f0f0; /* Very light gray */
+			font-size: 32px;
+			font-weight: bold;
+			margin-bottom: 8px;
+			text-shadow: 0 0 15px rgba(255,255,255,0.2), 1px 1px 4px rgba(0,0,0,0.8);
+			letter-spacing: 2px;
+			transition: color 0.4s ease;
+		}
+		.vehicle-desc {
+			color: rgba(170, 170, 170, 0.9); /* Medium-light gray */
+			font-size: 14px;
+			margin-bottom: 15px;
+			letter-spacing: 0.5px;
+		}
+		.vehicle-stats-simple {
+			display: flex;
+			justify-content: center;
+			gap: 20px;
+			flex-wrap: wrap;
+		}
+		.stat-item {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			min-width: 60px;
+		}
+		.stat-value {
+			color: #ffffff; /* White */
+			font-size: 22px;
+			font-weight: bold;
+			transition: color 0.4s ease;
+			text-shadow: 0 0 10px rgba(255,255,255,0.3);
+		}
+		.stat-name {
+			color: rgba(150, 150, 150, 0.9); /* Medium gray */
+			font-size: 10px;
+			margin-top: 4px;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+		}
+		.start-btn {
+			width: 100%;
+			padding: 18px 40px;
+			font-size: 18px;
+			font-weight: 600;
+			background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%); /* Dark gray gradient */
+			color: #e0e0e0;
+			border: 2px solid #505050;
+			border-radius: 30px;
+			cursor: pointer;
+			transition: all 0.4s ease;
+			box-shadow: 0 5px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+			text-transform: uppercase;
+			letter-spacing: 3px;
+		}
+		.start-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 30px rgba(255,255,255,0.15), 0 5px 20px rgba(0,0,0,0.6);
+			background: linear-gradient(135deg, #4a4a4a 0%, #3a3a3a 100%);
+			border-color: #707070;
+			color: #ffffff;
+		}
+		.start-btn:active {
+			transform: translateY(0);
+		}
+		.scroll-hint {
+			position: absolute;
+			top: 50%;
+			transform: translateY(-50%);
+			color: rgba(255, 255, 255, 0.15); /* Very subtle white */
+			font-size: 48px;
+			z-index: 5;
+			pointer-events: none;
+			animation: pulse 2s infinite;
+			transition: color 0.4s ease;
+		}
+		.scroll-hint.left {
+			left: 20px;
+		}
+		.scroll-hint.right {
+			right: 20px;
+		}
+		@keyframes pulse {
+			0%, 100% { opacity: 0.3; }
+			50% { opacity: 0.7; }
+		}
+		@media (max-width: 768px) {
+			.select-header h1 {
+				font-size: 32px;
+			}
+			.vehicle-name {
+				font-size: 24px;
+			}
+			.vehicle-stats-simple {
+				gap: 12px;
+			}
+			.stat-item {
+				min-width: 50px;
+			}
+			.stat-value {
+				font-size: 16px;
+			}
+			.start-btn {
+				font-size: 18px;
+				padding: 15px 30px;
+			}
+			.scroll-hint {
+				font-size: 36px;
+			}
+		}
+	</style>
+	<script type="importmap">
+	{
+		"imports": {
+			"three": "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js",
+			"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.184.0/examples/jsm/",
+			"crashcat": "https://esm.sh/crashcat@0.0.3"
+		}
+	}
+	</script>
+</head>
+<body>
+	<button id="pause-btn" style="display: none;">⏸</button>
+	<div id="pause-overlay">
+		<div class="pause-title">PAUSED</div>
+		<div class="pause-hint">Press SPACE or click to resume</div>
+		<button class="resume-btn" id="resume-btn">Resume</button>
+	</div>
+	
+	<div id="vehicle-select">
+		<canvas id="preview-canvas"></canvas>
+		
+		<div class="select-header">
+			<h1>🏎️ Racing Game</h1>
+			<p>Scroll or swipe to choose your vehicle</p>
+		</div>
+		
+		<div class="scroll-hint left">‹</div>
+		<div class="scroll-hint right">›</div>
+		
+		<div class="vehicle-indicator" id="vehicle-indicator"></div>
+		
+		<div class="select-footer">
+			<div class="vehicle-info">
+				<div class="vehicle-name" id="vehicle-name">Yellow Speedster</div>
+				<div class="vehicle-desc" id="vehicle-desc">Balanced performance</div>
+				<div class="vehicle-stats-simple" id="vehicle-stats"></div>
+			</div>
+			<button class="start-btn" id="start-btn">Start Race</button>
+		</div>
+	</div>
+	<a id="editor-link" href="editor.html">Create your own track</a>
+	<script>
+		const map = new URLSearchParams( location.search ).get( 'map' );
+		if ( map ) {
+			const link = document.getElementById( 'editor-link' );
+			link.href = 'editor.html?map=' + map;
+			link.textContent = 'Edit this track';
+		}
+	</script>
+	<script type="module" src="js/main.js"></script>
+</body>
+</html>
