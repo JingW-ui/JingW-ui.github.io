@@ -1336,33 +1336,156 @@
       {
         name: '永恒号', nameEn: 'Endurance',
         maxType: 1, winHits: 1,
-        desc: '跳 1 次，进入黑洞'
+        desc: '跳 1 次，进入黑洞',
+        music: 'audio/1.mp3',
+        bpm: 120,
+        duration: 60 // 秒
       },
       {
         name: '水星', nameEn: 'Miller',
         maxType: 2, winHits: 10,
-        desc: '跳 10 次，进入黑洞'
+        desc: '跳 10 次，进入黑洞',
+        music: 'audio/2.mp3',
+        bpm: 140,
+        duration: 90
       },
       {
         name: '曼恩星球', nameEn: 'Mann',
         maxType: 3, winHits: 20,
-        desc: '跳 20 次，进入黑洞'
+        desc: '跳 20 次，进入黑洞',
+        music: 'audio/3.mp3',
+        bpm: 160,
+        duration: 120
       },
       {
         name: '土星', nameEn: 'Saturn',
         maxType: 3, winHits: 200,
-        desc: '跳 200 次，进入黑洞'
+        desc: '跳 200 次，进入黑洞',
+        music: 'audio/4.mp3',
+        bpm: 180,
+        duration: 180
       },
       {
         name: '卡冈图雅', nameEn: 'Gargantua',
         maxType: 3, winHits: 2000,
-        desc: '跳 2000 次，进入黑洞'
+        desc: '跳 2000 次，进入黑洞',
+        music: 'audio/5.mp3',
+        bpm: 200,
+        duration: 240
       }
     ];
+    let currentAudio = null;
+    let rhythmInterval = null;
+    let audioContext = null;
+    let analyser = null;
+    let dataArray = null;
+    let source = null;
+
+    function playMusic(level) {
+      if (currentAudio) {
+        currentAudio.pause();
+      }
+      currentAudio = new Audio(LEVELS[level].music);
+      currentAudio.loop = false;
+      currentAudio.volume = 0.5;
+      currentAudio.crossOrigin = 'anonymous'; // 允许跨域音频
+
+      // 初始化Web Audio API
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        const bufferLength = analyser.frequencyBinCount;
+        dataArray = new Uint8Array(bufferLength);
+        analyser.connect(audioContext.destination);
+      }
+
+      currentAudio.addEventListener('canplay', () => {
+        if (!source) {
+          source = audioContext.createMediaElementSource(currentAudio);
+          source.connect(analyser);
+        }
+        if (audioContext.state === 'suspended') {
+          audioContext.resume();
+        }
+        currentAudio.play().catch(e => console.log('Audio play failed:', e));
+      });
+
+      currentAudio.onended = () => {
+        showVictory();
+      };
+    }
+
+    function stopMusic() {
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+      }
+      if (source) {
+        source.disconnect();
+        source = null;
+      }
+      if (audioContext && audioContext.state !== 'closed') {
+        audioContext.close();
+        audioContext = null;
+        analyser = null;
+        dataArray = null;
+      }
+    }
+
+    function startRhythm(level) {
+      // 现在使用实时分析，不需要定时器
+    }
+
+    function stopRhythm() {
+      // 清理在stopMusic中
+    }
+
+    let lastBeatTime = 0;
+    const beatThreshold = 0.5; // 节拍检测阈值
+    let lastEnergy = 0;
+    let nextGapModifier = 1.0; // 轨道间距修饰符，节拍时变小
+
+    function analyzeRhythm(dt) {
+      if (!analyser || !dataArray) return;
+
+      analyser.getByteFrequencyData(dataArray);
+
+      // 计算低频能量（贝斯/鼓点）
+      let energy = 0;
+      const lowFreqBins = 32; // 前32个频段（低频）
+      for (let i = 0; i < lowFreqBins; i++) {
+        energy += dataArray[i];
+      }
+      energy /= lowFreqBins;
+
+      // 检测节拍：能量突然增加
+      const energyDiff = energy - lastEnergy;
+      if (energyDiff > beatThreshold && performance.now() - lastBeatTime > 200) { // 防止过于频繁
+        triggerRhythmEvent();
+        nextGapModifier = 0.5; // 节拍时轨道间距减半，更容易卡点
+        lastBeatTime = performance.now();
+      }
+
+      lastEnergy = energy;
+    }
+
+    function triggerRhythmEvent() {
+      // 节奏事件：轨道间距已通过nextGapModifier调整，这里可以添加其他效果，如粒子或音效
+      // 暂时不改变球颜色，专注于轨道节奏
+    }
+
+    function updateBallColor() {
+      if (ballColorKey) {
+        const rgb = COLORS[ballColorKey].rgb;
+        sphereMat.color.set(COLORS[ballColorKey].hex);
+        sphereMat.emissive.set(new THREE.Color(rgb[0]*0.3/255, rgb[1]*0.3/255, rgb[2]*0.3/255));
+        setBoostParticleColor(ballColorKey);
+      }
+    }
+
     let currentLevel = 0;
     function getLevel() { return LEVELS[currentLevel]; }
-
-    // ===== 关卡解锁系统 =====
     const UNLOCK_KEY = 'bounceGame_maxUnlocked';
     function getMaxUnlocked() {
       return parseInt(localStorage.getItem(UNLOCK_KEY) || '1', 10);
@@ -1451,6 +1574,8 @@
       hideLevelSelect();
       inGameMenuBtn.style.display = 'block';
       resetGame();
+      playMusic(currentLevel);
+      startRhythm(currentLevel);
     }
 
     inGameMenuBtn.addEventListener('click', () => {
@@ -1630,7 +1755,10 @@
     }
 
     function randGap() {
-      return GAP_MIN + Math.random() * (GAP_MAX - GAP_MIN);
+      const gap = GAP_MIN + Math.random() * (GAP_MAX - GAP_MIN);
+      const modifiedGap = gap * nextGapModifier;
+      nextGapModifier = 1.0; // 重置修饰符
+      return modifiedGap;
     }
 
     // 追踪最近的长直轨道颜色，用于保证路径连通
@@ -2750,6 +2878,9 @@
     }
 
     function resetGame() {
+      // 停止音乐和节奏
+      stopMusic();
+      stopRhythm();
       // 隐藏连击
       hideCombo();
       // 隐藏胜利
@@ -3042,6 +3173,7 @@
       updateLandEffects(dt);
       updateBoostParticles(dt);
       updateDistanceUI();
+      analyzeRhythm(dt);
       renderer.render(scene, camera);
     }
     animate();
