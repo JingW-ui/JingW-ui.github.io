@@ -906,6 +906,611 @@
             }
         ];
 
+        // ==================== 音效系统 ====================
+        class SoundManager {
+            constructor() {
+                this.audioContext = null;
+                this.enabled = true;
+                this.masterVolume = 0.5;
+                this.initAudioContext();
+            }
+
+            initAudioContext() {
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.warn('Web Audio API not supported');
+                    this.enabled = false;
+                }
+            }
+
+            // 确保AudioContext已恢复（浏览器自动播放策略）
+            ensureContext() {
+                if (this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+            }
+
+            // 播放移动音效（短促的滑动声）
+            playMove() {
+                if (!this.enabled || !this.audioContext) return;
+                this.ensureContext();
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(300, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(200, this.audioContext.currentTime + 0.05);
+
+                gainNode.gain.setValueAtTime(this.masterVolume * 0.15, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.05);
+
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.05);
+            }
+
+            // 播放合并音效（清脆的合成声）- 增强版
+            playMerge(value) {
+                if (!this.enabled || !this.audioContext) return;
+                this.ensureContext();
+
+                const now = this.audioContext.currentTime;
+                
+                // 根据数值范围选择不同的音效方案
+                if (value <= 8) {
+                    // 低等级：轻快的双音调
+                    this._playLowTierMerge(value, now);
+                } else if (value <= 64) {
+                    // 中等级：丰富的和弦效果
+                    this._playMidTierMerge(value, now);
+                } else if (value <= 512) {
+                    // 高等级：华丽的多层音效
+                    this._playHighTierMerge(value, now);
+                } else {
+                    // 顶级：史诗级的复合音效
+                    this._playUltraTierMerge(value, now);
+                }
+            }
+
+            // 低等级合并音效 (2-8) - 优化版：更通透持久
+            _playLowTierMerge(value, now) {
+                const baseFreq = 500 + Math.log2(value) * 100;
+                
+                // 主音 - 正弦波，更长持续时间
+                const osc1 = this.audioContext.createOscillator();
+                const gain1 = this.audioContext.createGain();
+                const filter1 = this.audioContext.createBiquadFilter();
+                
+                osc1.connect(filter1);
+                filter1.connect(gain1);
+                gain1.connect(this.audioContext.destination);
+
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(baseFreq, now);
+                osc1.frequency.exponentialRampToValueAtTime(baseFreq * 1.4, now + 0.1);
+
+                // 高通滤波器让声音更通透
+                filter1.type = 'highpass';
+                filter1.frequency.value = 200;
+                filter1.Q.value = 1;
+
+                gain1.gain.setValueAtTime(0, now);
+                gain1.gain.linearRampToValueAtTime(this.masterVolume * 0.3, now + 0.01);
+                gain1.gain.setTargetAtTime(0, now + 0.15, 0.08); // 使用setTargetAtTime实现更自然的衰减
+
+                osc1.start(now);
+                osc1.stop(now + 0.35);
+
+                // 泛音 - 三角波，增加亮度
+                const osc2 = this.audioContext.createOscillator();
+                const gain2 = this.audioContext.createGain();
+                osc2.connect(gain2);
+                gain2.connect(this.audioContext.destination);
+
+                osc2.type = 'triangle';
+                osc2.frequency.setValueAtTime(baseFreq * 2, now);
+                osc2.frequency.exponentialRampToValueAtTime(baseFreq * 2.5, now + 0.08);
+
+                gain2.gain.setValueAtTime(0, now);
+                gain2.gain.linearRampToValueAtTime(this.masterVolume * 0.15, now + 0.01);
+                gain2.gain.setTargetAtTime(0, now + 0.12, 0.06);
+
+                osc2.start(now);
+                osc2.stop(now + 0.25);
+
+                // 添加轻微的回声
+                setTimeout(() => {
+                    const echo = this.audioContext.createOscillator();
+                    const echoGain = this.audioContext.createGain();
+                    echo.connect(echoGain);
+                    echoGain.connect(this.audioContext.destination);
+
+                    echo.type = 'sine';
+                    echo.frequency.value = baseFreq * 1.5;
+                    
+                    echoGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+                    echoGain.gain.linearRampToValueAtTime(this.masterVolume * 0.08, this.audioContext.currentTime + 0.01);
+                    echoGain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.15);
+
+                    echo.start(this.audioContext.currentTime);
+                    echo.stop(this.audioContext.currentTime + 0.15);
+                }, 100);
+            }
+
+            // 中等级合并音效 (16-64) - 优化版：更通透持久
+            _playMidTierMerge(value, now) {
+                const baseFreq = 600 + Math.log2(value) * 80;
+                
+                // 主音 - 方波带来更明亮的音色，通过滤波器柔化
+                const osc1 = this.audioContext.createOscillator();
+                const gain1 = this.audioContext.createGain();
+                const filter1 = this.audioContext.createBiquadFilter();
+                
+                osc1.connect(filter1);
+                filter1.connect(gain1);
+                gain1.connect(this.audioContext.destination);
+
+                osc1.type = 'square';
+                osc1.frequency.setValueAtTime(baseFreq, now);
+                osc1.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, now + 0.12);
+
+                // 带通滤波器让声音更集中通透
+                filter1.type = 'bandpass';
+                filter1.frequency.setValueAtTime(2500, now);
+                filter1.frequency.exponentialRampToValueAtTime(3500, now + 0.06);
+                filter1.Q.value = 3;
+
+                gain1.gain.setValueAtTime(0, now);
+                gain1.gain.linearRampToValueAtTime(this.masterVolume * 0.22, now + 0.01);
+                gain1.gain.setTargetAtTime(0, now + 0.18, 0.1); // 更长的衰减时间
+
+                osc1.start(now);
+                osc1.stop(now + 0.4);
+
+                // 三度音程 - 增加和谐感
+                const osc2 = this.audioContext.createOscillator();
+                const gain2 = this.audioContext.createGain();
+                const filter2 = this.audioContext.createBiquadFilter();
+                
+                osc2.connect(filter2);
+                filter2.connect(gain2);
+                gain2.connect(this.audioContext.destination);
+
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(baseFreq * 1.25, now); // 大三度
+                osc2.frequency.exponentialRampToValueAtTime(baseFreq * 1.25 * 1.4, now + 0.1);
+
+                filter2.type = 'highpass';
+                filter2.frequency.value = 300;
+
+                gain2.gain.setValueAtTime(0, now);
+                gain2.gain.linearRampToValueAtTime(this.masterVolume * 0.18, now + 0.01);
+                gain2.gain.setTargetAtTime(0, now + 0.15, 0.08);
+
+                osc2.start(now);
+                osc2.stop(now + 0.35);
+
+                // 五度音程 - 增强力量感
+                const osc3 = this.audioContext.createOscillator();
+                const gain3 = this.audioContext.createGain();
+                osc3.connect(gain3);
+                gain3.connect(this.audioContext.destination);
+
+                osc3.type = 'triangle';
+                osc3.frequency.setValueAtTime(baseFreq * 1.5, now); // 纯五度
+                osc3.frequency.exponentialRampToValueAtTime(baseFreq * 1.5 * 1.3, now + 0.08);
+
+                gain3.gain.setValueAtTime(0, now);
+                gain3.gain.linearRampToValueAtTime(this.masterVolume * 0.12, now + 0.01);
+                gain3.gain.setTargetAtTime(0, now + 0.12, 0.06);
+
+                osc3.start(now);
+                osc3.stop(now + 0.3);
+
+                // 双重回声效果
+                [120, 200].forEach((delay, idx) => {
+                    setTimeout(() => {
+                        const echo = this.audioContext.createOscillator();
+                        const echoGain = this.audioContext.createGain();
+                        echo.connect(echoGain);
+                        echoGain.connect(this.audioContext.destination);
+
+                        echo.type = 'sine';
+                        echo.frequency.value = baseFreq * (1.5 + idx * 0.2);
+                        
+                        const echoVol = this.masterVolume * (0.1 - idx * 0.02);
+                        echoGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+                        echoGain.gain.linearRampToValueAtTime(echoVol, this.audioContext.currentTime + 0.01);
+                        echoGain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.18);
+
+                        echo.start(this.audioContext.currentTime);
+                        echo.stop(this.audioContext.currentTime + 0.18);
+                    }, delay);
+                });
+            }
+
+            // 高等级合并音效 (128-512) - 优化版：更通透持久
+            _playHighTierMerge(value, now) {
+                const baseFreq = 700 + Math.log2(value) * 70;
+                
+                // 主音 - 锯齿波带来强烈的存在感，通过滤波器优化
+                const osc1 = this.audioContext.createOscillator();
+                const gain1 = this.audioContext.createGain();
+                const filter1 = this.audioContext.createBiquadFilter();
+                
+                osc1.connect(filter1);
+                filter1.connect(gain1);
+                gain1.connect(this.audioContext.destination);
+
+                osc1.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(baseFreq, now);
+                osc1.frequency.exponentialRampToValueAtTime(baseFreq * 1.6, now + 0.15);
+
+                // 带通滤波器让声音更集中且通透
+                filter1.type = 'bandpass';
+                filter1.frequency.setValueAtTime(3000, now);
+                filter1.frequency.exponentialRampToValueAtTime(4500, now + 0.08);
+                filter1.Q.value = 5;
+
+                gain1.gain.setValueAtTime(0, now);
+                gain1.gain.linearRampToValueAtTime(this.masterVolume * 0.24, now + 0.01);
+                gain1.gain.setTargetAtTime(0, now + 0.2, 0.12); // 更长的衰减
+
+                osc1.start(now);
+                osc1.stop(now + 0.5);
+
+                // 八度音 - 增强震撼感
+                const osc2 = this.audioContext.createOscillator();
+                const gain2 = this.audioContext.createGain();
+                const filter2 = this.audioContext.createBiquadFilter();
+                
+                osc2.connect(filter2);
+                filter2.connect(gain2);
+                gain2.connect(this.audioContext.destination);
+
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(baseFreq * 2, now);
+                osc2.frequency.exponentialRampToValueAtTime(baseFreq * 2 * 1.5, now + 0.12);
+
+                filter2.type = 'highpass';
+                filter2.frequency.value = 400;
+
+                gain2.gain.setValueAtTime(0, now);
+                gain2.gain.linearRampToValueAtTime(this.masterVolume * 0.2, now + 0.01);
+                gain2.gain.setTargetAtTime(0, now + 0.18, 0.1);
+
+                osc2.start(now);
+                osc2.stop(now + 0.45);
+
+                // 高次泛音 - 增加闪耀感
+                const osc3 = this.audioContext.createOscillator();
+                const gain3 = this.audioContext.createGain();
+                osc3.connect(gain3);
+                gain3.connect(this.audioContext.destination);
+
+                osc3.type = 'triangle';
+                osc3.frequency.setValueAtTime(baseFreq * 3, now);
+                osc3.frequency.exponentialRampToValueAtTime(baseFreq * 3 * 1.4, now + 0.1);
+
+                gain3.gain.setValueAtTime(0, now);
+                gain3.gain.linearRampToValueAtTime(this.masterVolume * 0.12, now + 0.01);
+                gain3.gain.setTargetAtTime(0, now + 0.15, 0.08);
+
+                osc3.start(now);
+                osc3.stop(now + 0.4);
+
+                // 多层回声效果，营造空间感
+                [100, 180, 260, 340].forEach((delay, idx) => {
+                    setTimeout(() => {
+                        const echo = this.audioContext.createOscillator();
+                        const echoGain = this.audioContext.createGain();
+                        echo.connect(echoGain);
+                        echoGain.connect(this.audioContext.destination);
+
+                        echo.type = 'sine';
+                        echo.frequency.value = baseFreq * (1.5 + idx * 0.25);
+                        
+                        const echoVol = this.masterVolume * (0.12 - idx * 0.02);
+                        echoGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+                        echoGain.gain.linearRampToValueAtTime(echoVol, this.audioContext.currentTime + 0.01);
+                        echoGain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+
+                        echo.start(this.audioContext.currentTime);
+                        echo.stop(this.audioContext.currentTime + 0.2);
+                    }, delay);
+                });
+            }
+
+            // 顶级合并音效 (1024-4096) - 优化版：史诗级通透持久
+            _playUltraTierMerge(value, now) {
+                const baseFreq = 800 + Math.log2(value) * 60;
+                
+                // 第一层：低频冲击波
+                const osc1 = this.audioContext.createOscillator();
+                const gain1 = this.audioContext.createGain();
+                const filter1 = this.audioContext.createBiquadFilter();
+                
+                osc1.connect(filter1);
+                filter1.connect(gain1);
+                gain1.connect(this.audioContext.destination);
+
+                osc1.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(baseFreq * 0.5, now);
+                osc1.frequency.exponentialRampToValueAtTime(baseFreq * 2, now + 0.18);
+
+                filter1.type = 'bandpass';
+                filter1.frequency.setValueAtTime(3500, now);
+                filter1.frequency.exponentialRampToValueAtTime(5500, now + 0.1);
+                filter1.Q.value = 8;
+
+                gain1.gain.setValueAtTime(0, now);
+                gain1.gain.linearRampToValueAtTime(this.masterVolume * 0.28, now + 0.01);
+                gain1.gain.setTargetAtTime(0, now + 0.25, 0.15); // 非常长的衰减
+
+                osc1.start(now);
+                osc1.stop(now + 0.7);
+
+                // 第二层：主旋律
+                const osc2 = this.audioContext.createOscillator();
+                const gain2 = this.audioContext.createGain();
+                const filter2 = this.audioContext.createBiquadFilter();
+                
+                osc2.connect(filter2);
+                filter2.connect(gain2);
+                gain2.connect(this.audioContext.destination);
+
+                osc2.type = 'square';
+                osc2.frequency.setValueAtTime(baseFreq, now);
+                osc2.frequency.exponentialRampToValueAtTime(baseFreq * 2.2, now + 0.15);
+
+                filter2.type = 'highpass';
+                filter2.frequency.value = 500;
+
+                gain2.gain.setValueAtTime(0, now);
+                gain2.gain.linearRampToValueAtTime(this.masterVolume * 0.22, now + 0.01);
+                gain2.gain.setTargetAtTime(0, now + 0.22, 0.12);
+
+                osc2.start(now);
+                osc2.stop(now + 0.6);
+
+                // 第三层：高八度
+                const osc3 = this.audioContext.createOscillator();
+                const gain3 = this.audioContext.createGain();
+                osc3.connect(gain3);
+                gain3.connect(this.audioContext.destination);
+
+                osc3.type = 'sine';
+                osc3.frequency.setValueAtTime(baseFreq * 2, now);
+                osc3.frequency.exponentialRampToValueAtTime(baseFreq * 3.5, now + 0.12);
+
+                gain3.gain.setValueAtTime(0, now);
+                gain3.gain.linearRampToValueAtTime(this.masterVolume * 0.2, now + 0.01);
+                gain3.gain.setTargetAtTime(0, now + 0.2, 0.1);
+
+                osc3.start(now);
+                osc3.stop(now + 0.55);
+
+                // 第四层：超高泛音（闪耀效果）
+                const osc4 = this.audioContext.createOscillator();
+                const gain4 = this.audioContext.createGain();
+                osc4.connect(gain4);
+                gain4.connect(this.audioContext.destination);
+
+                osc4.type = 'triangle';
+                osc4.frequency.setValueAtTime(baseFreq * 4, now);
+                osc4.frequency.exponentialRampToValueAtTime(baseFreq * 6, now + 0.1);
+
+                gain4.gain.setValueAtTime(0, now);
+                gain4.gain.linearRampToValueAtTime(this.masterVolume * 0.15, now + 0.01);
+                gain4.gain.setTargetAtTime(0, now + 0.18, 0.09);
+
+                osc4.start(now);
+                osc4.stop(now + 0.5);
+
+                // 第五层：极高频空气感
+                const osc5 = this.audioContext.createOscillator();
+                const gain5 = this.audioContext.createGain();
+                osc5.connect(gain5);
+                gain5.connect(this.audioContext.destination);
+
+                osc5.type = 'sine';
+                osc5.frequency.setValueAtTime(baseFreq * 6, now);
+                osc5.frequency.exponentialRampToValueAtTime(baseFreq * 8, now + 0.08);
+
+                gain5.gain.setValueAtTime(0, now);
+                gain5.gain.linearRampToValueAtTime(this.masterVolume * 0.1, now + 0.01);
+                gain5.gain.setTargetAtTime(0, now + 0.15, 0.07);
+
+                osc5.start(now);
+                osc5.stop(now + 0.45);
+
+                // 多重延迟回声，营造宏大空间感
+                [120, 200, 280, 360, 440, 520].forEach((delay, idx) => {
+                    setTimeout(() => {
+                        const echo = this.audioContext.createOscillator();
+                        const echoGain = this.audioContext.createGain();
+                        echo.connect(echoGain);
+                        echoGain.connect(this.audioContext.destination);
+
+                        echo.type = 'sine';
+                        echo.frequency.value = baseFreq * (1.5 + idx * 0.3);
+                        
+                        const echoVol = this.masterVolume * (0.15 - idx * 0.018);
+                        echoGain.gain.setValueAtTime(0, this.audioContext.currentTime);
+                        echoGain.gain.linearRampToValueAtTime(echoVol, this.audioContext.currentTime + 0.01);
+                        echoGain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.25);
+
+                        echo.start(this.audioContext.currentTime);
+                        echo.stop(this.audioContext.currentTime + 0.25);
+                    }, delay);
+                });
+            }
+
+            // 播放新方块出现音效
+            playNewTile(value) {
+                if (!this.enabled || !this.audioContext) return;
+                this.ensureContext();
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.type = 'sine';
+                const freq = value === 2 ? 600 : 800;
+                oscillator.frequency.setValueAtTime(freq, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(freq * 0.7, this.audioContext.currentTime + 0.1);
+
+                gainNode.gain.setValueAtTime(this.masterVolume * 0.2, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.1);
+
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.1);
+            }
+
+            // 播放Boss受伤音效
+            playBossDamage() {
+                if (!this.enabled || !this.audioContext) return;
+                this.ensureContext();
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(150, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(80, this.audioContext.currentTime + 0.2);
+
+                gainNode.gain.setValueAtTime(this.masterVolume * 0.25, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
+
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.2);
+            }
+
+            // 播放技能使用音效
+            playSkill() {
+                if (!this.enabled || !this.audioContext) return;
+                this.ensureContext();
+
+                // 多音调效果
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                    const osc = this.audioContext.createOscillator();
+                    const gain = this.audioContext.createGain();
+                    osc.connect(gain);
+                    gain.connect(this.audioContext.destination);
+
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    
+                    const startTime = this.audioContext.currentTime + i * 0.05;
+                    gain.gain.setValueAtTime(0, startTime);
+                    gain.gain.linearRampToValueAtTime(this.masterVolume * 0.2, startTime + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.3);
+
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.3);
+                });
+            }
+
+            // 播放通关音效（欢快的旋律）
+            playWin() {
+                if (!this.enabled || !this.audioContext) return;
+                this.ensureContext();
+
+                const melody = [
+                    { freq: 523.25, time: 0 },      // C5
+                    { freq: 659.25, time: 0.15 },   // E5
+                    { freq: 783.99, time: 0.3 },    // G5
+                    { freq: 1046.50, time: 0.45 },  // C6
+                    { freq: 1318.51, time: 0.6 },   // E6
+                ];
+
+                melody.forEach(note => {
+                    const osc = this.audioContext.createOscillator();
+                    const gain = this.audioContext.createGain();
+                    osc.connect(gain);
+                    gain.connect(this.audioContext.destination);
+
+                    osc.type = 'sine';
+                    osc.frequency.value = note.freq;
+                    
+                    const startTime = this.audioContext.currentTime + note.time;
+                    gain.gain.setValueAtTime(0, startTime);
+                    gain.gain.linearRampToValueAtTime(this.masterVolume * 0.3, startTime + 0.05);
+                    gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.4);
+
+                    osc.start(startTime);
+                    osc.stop(startTime + 0.4);
+                });
+            }
+
+            // 播放失败音效（低沉的声音）
+            playLose() {
+                if (!this.enabled || !this.audioContext) return;
+                this.ensureContext();
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(80, this.audioContext.currentTime + 0.5);
+
+                gainNode.gain.setValueAtTime(this.masterVolume * 0.3, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.5);
+
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.5);
+            }
+
+            // 播放点击音效
+            playClick() {
+                if (!this.enabled || !this.audioContext) return;
+                this.ensureContext();
+
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(800, this.audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(600, this.audioContext.currentTime + 0.05);
+
+                gainNode.gain.setValueAtTime(this.masterVolume * 0.15, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.05);
+
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + 0.05);
+            }
+
+            // 切换音效开关
+            toggle() {
+                this.enabled = !this.enabled;
+                if (this.enabled && this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume();
+                }
+                return this.enabled;
+            }
+
+            // 设置音量
+            setVolume(volume) {
+                this.masterVolume = Math.max(0, Math.min(1, volume));
+            }
+        }
+
         // ==================== 游戏核心逻辑 ====================
         class Game {
             constructor() {
@@ -923,6 +1528,7 @@
                 this.tileIdCounter = 0; // 方块ID计数器
                 this.mergedPositions = []; // 记录合并位置
                 this.pendingMerges = []; // 待处理的合并
+                this.soundManager = new SoundManager(); // 音效管理器
 
                 this.init();
             }
@@ -1063,6 +1669,11 @@
 
                     tileData = { id, element: tile, row, col, value, lastValue: value };
                     this.tiles.set(id, tileData);
+
+                    // 播放新方块音效
+                    if (isNew) {
+                        setTimeout(() => this.soundManager.playNewTile(value), 50);
+                    }
                 } else {
                     // 更新现有方块位置和值
                     const character = TILE_CHARACTERS[value] || { icon: '❓', name: `Lv${value}` };
@@ -1286,6 +1897,9 @@
 
 
                 if (moved) {
+                    // 播放移动音效
+                    this.soundManager.playMove();
+
                     // 将 pendingMerges 转移到 mergedPositions
                     this.mergedPositions = [...this.pendingMerges];
                     this.pendingMerges = [];
@@ -1351,6 +1965,8 @@
                         setTimeout(() => {
                             tileData.element.classList.add('merged');
                             this.createMergeEffects(tileData.element, row, col, value);
+                            // 播放合并音效
+                            this.soundManager.playMerge(value);
                         }, 50);
                     });
 
@@ -1542,6 +2158,9 @@
             useSkill() {
                 if (!this.skillReady) return;
 
+                // 播放技能音效
+                this.soundManager.playSkill();
+
                 if (this.skillType === 'rainbow') {
                     // 彩虹冲击波：清除所有相同值的方块
                     const mostCommon = this.getMostCommonValue();
@@ -1679,11 +2298,15 @@
 
             // 显示胜利弹窗
             showWinModal() {
+                // 播放通关音效
+                this.soundManager.playWin();
                 document.getElementById('winModal').classList.add('active');
             }
 
             // 显示失败弹窗
             showLoseModal() {
+                // 播放失败音效
+                this.soundManager.playLose();
                 document.getElementById('loseModal').classList.add('active');
             }
 
@@ -1754,7 +2377,10 @@
                 LEVELS.forEach(level => {
                     const card = document.createElement('div');
                     card.className = 'level-card';
-                    card.onclick = () => this.startLevel(level.id);
+                    card.onclick = () => {
+                        this.soundManager.playClick();
+                        this.startLevel(level.id);
+                    };
 
                     card.innerHTML = `
                         <div class="level-number">Level ${level.id}</div>
@@ -1824,8 +2450,11 @@
 
             // 切换音效
             toggleSound() {
-                this.soundEnabled = !this.soundEnabled;
-                alert(`音效已${this.soundEnabled ? '开启' : '关闭'}`);
+                this.soundEnabled = this.soundManager.toggle();
+                // 播放反馈音效
+                if (this.soundEnabled) {
+                    setTimeout(() => this.soundManager.playClick(), 50);
+                }
             }
 
             // 设置输入处理
@@ -1837,6 +2466,8 @@
                 gameBoard.addEventListener('touchstart', (e) => {
                     startX = e.touches[0].clientX;
                     startY = e.touches[0].clientY;
+                    // 初始化音频上下文（用户交互触发）
+                    this.soundManager.ensureContext();
                     e.preventDefault();
                 }, { passive: false });
 
@@ -1880,6 +2511,8 @@
                 gameBoard.addEventListener('mousedown', (e) => {
                     startX = e.clientX;
                     startY = e.clientY;
+                    // 初始化音频上下文（用户交互触发）
+                    this.soundManager.ensureContext();
                 });
 
                 gameBoard.addEventListener('mouseup', (e) => {
