@@ -360,6 +360,68 @@ for ( let i = 0; i < TYPE_NAMES.length; i ++ ) TYPE_INDEX[ TYPE_NAMES[ i ] ] = i
 const ORIENT_TO_GODOT = [ 0, 16, 10, 22 ];
 const GODOT_TO_ORIENT = { 0: 0, 16: 1, 10: 2, 22: 3 };
 
+// Map configurations
+export const MAP_CONFIGS = {
+	default: {
+		name: '经典赛道',
+		description: '平衡的弯道与直道设计',
+		cells: TRACK_CELLS,
+		theme: {
+			primary: '#d4af37',
+			secondary: '#c9b037',
+			accent: '#7fb069',
+			bgStart: '#2c3e50',
+			bgEnd: '#34495e'
+		}
+	},
+	plains: {
+		name: '笔直平原',
+		description: '长直道高速驰骋',
+		cells: [
+			// Main straight line
+			[ 0, 0, 'track-finish', 0 ],
+			[ 0, -1, 'track-straight', 0 ],
+			[ 0, -2, 'track-straight', 0 ],
+			[ 0, -3, 'track-straight', 0 ],
+			[ 0, -4, 'track-straight', 0 ],
+			[ 0, -5, 'track-straight', 0 ],
+			[ 0, -6, 'track-straight', 0 ],
+			[ 0, -7, 'track-straight', 0 ],
+			// U-turn at the end
+			[ 0, -8, 'track-corner', 0 ],
+			[ -1, -8, 'track-straight', 22 ],
+			[ -2, -8, 'track-corner', 16 ],
+			// Return path
+			[ -2, -7, 'track-straight', 10 ],
+			[ -2, -6, 'track-straight', 10 ],
+			[ -2, -5, 'track-straight', 10 ],
+			[ -2, -4, 'track-straight', 10 ],
+			[ -2, -3, 'track-straight', 10 ],
+			[ -2, -2, 'track-straight', 10 ],
+			[ -2, -1, 'track-straight', 10 ],
+			[ -2, 0, 'track-straight', 10 ],
+			// Final corner back to start
+			[ -2, 1, 'track-corner', 10 ],
+			[ -1, 1, 'track-straight', 16 ],
+			[ 0, 1, 'track-corner', 22 ],
+		],
+		theme: {
+			primary: '#87CEEB',
+			secondary: '#4682B4',
+			accent: '#FFD700',
+			bgStart: '#1C2833',
+			bgEnd: '#2E4053'
+		}
+	}
+
+};
+
+export function getMapConfig( mapKey ) {
+
+	return MAP_CONFIGS[ mapKey ] || MAP_CONFIGS.default;
+
+}
+
 export { TYPE_NAMES };
 
 export function encodeCells( cells ) {

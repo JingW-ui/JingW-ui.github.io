@@ -127,6 +127,30 @@
 			opacity: 0;
 			pointer-events: none;
 		}
+		
+		/* Map Selection Screen */
+		#map-select {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: radial-gradient(ellipse at center, #2a2a2a 0%, #1a1a1a 50%, #0d0d0d 100%);
+			display: none;
+			flex-direction: column;
+			justify-content: space-between;
+			align-items: center;
+			z-index: 99;
+			transition: opacity 0.5s, background 0.6s ease;
+			overflow: hidden;
+		}
+		#map-select.active {
+			display: flex;
+		}
+		#map-select.hidden {
+			opacity: 0;
+			pointer-events: none;
+		}
 		#preview-canvas {
 			position: absolute;
 			top: 0;
@@ -139,6 +163,16 @@
 		}
 		#preview-canvas:active {
 			cursor: grabbing;
+		}
+		#map-preview-canvas {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 0;
+			pointer-events: auto;
+			cursor: grab;
 		}
 		.select-header {
 			position: relative;
@@ -162,10 +196,21 @@
 			margin: 0;
 			letter-spacing: 1px;
 			text-transform: uppercase;
+			line-height: 1.6;
 		}
 		.vehicle-indicator {
 			position: absolute;
 			top: 130px; /* Position right below the header */
+			left: 50%;
+			transform: translateX(-50%);
+			z-index: 10;
+			display: flex;
+			gap: 12px;
+			margin: 30px;
+		}
+		.map-indicator {
+			position: absolute;
+			bottom: 280px; /* Position above the footer info */
 			left: 50%;
 			transform: translateX(-50%);
 			z-index: 10;
@@ -200,6 +245,27 @@
 			padding: 30px 20px;
 			background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);
 		}
+		.map-info {
+			text-align: center;
+			margin-bottom: 15px;
+			padding: 12px;
+			background: rgba(0, 0, 0, 0.4);
+			border-radius: 8px;
+			border: 1px solid rgba(255, 255, 255, 0.1);
+		}
+		.map-step-label {
+			color: rgba(200, 200, 200, 0.7);
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			margin-bottom: 8px;
+		}
+		.map-indicator {
+			display: flex;
+			justify-content: center;
+			gap: 12px;
+			margin: 15px 0;
+		}
 		.vehicle-info {
 			text-align: center;
 			margin-bottom: 20px;
@@ -213,11 +279,27 @@
 			letter-spacing: 2px;
 			transition: color 0.4s ease;
 		}
+		.map-name {
+			color: #e8e8e8;
+			font-size: 24px;
+			font-weight: bold;
+			margin-bottom: 5px;
+			text-shadow: 0 0 10px rgba(255,255,255,0.15), 1px 1px 3px rgba(0,0,0,0.8);
+			letter-spacing: 1.5px;
+			transition: color 0.4s ease;
+		}
 		.vehicle-desc {
 			color: rgba(170, 170, 170, 0.9); /* Medium-light gray */
 			font-size: 14px;
 			margin-bottom: 15px;
 			letter-spacing: 0.5px;
+		}
+		.map-desc {
+			color: rgba(160, 160, 160, 0.85);
+			font-size: 12px;
+			margin-bottom: 0;
+			letter-spacing: 0.5px;
+			font-style: italic;
 		}
 		.vehicle-stats-simple {
 			display: flex;
@@ -298,6 +380,9 @@
 			.vehicle-name {
 				font-size: 24px;
 			}
+			.map-name {
+				font-size: 20px;
+			}
 			.vehicle-stats-simple {
 				gap: 12px;
 			}
@@ -332,6 +417,7 @@
 		<div class="pause-title">PAUSED</div>
 		<div class="pause-hint">Press SPACE or click to resume</div>
 		<button class="resume-btn" id="resume-btn">Resume</button>
+		<button class="resume-btn" id="menu-btn" style="margin-top: 15px; background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);">Main Menu</button>
 	</div>
 	
 	<div id="vehicle-select">
@@ -339,7 +425,7 @@
 		
 		<div class="select-header">
 			<h1>🏎️ Racing Game</h1>
-			<p>Scroll or swipe to choose your vehicle</p>
+			<p>Step 1: Choose Your Vehicle<br><small style="opacity: 0.7; font-size: 12px;">Use ← → or A/D keys, or scroll/swipe</small></p>
 		</div>
 		
 		<div class="scroll-hint left">‹</div>
@@ -353,7 +439,32 @@
 				<div class="vehicle-desc" id="vehicle-desc">Balanced performance</div>
 				<div class="vehicle-stats-simple" id="vehicle-stats"></div>
 			</div>
-			<button class="start-btn" id="start-btn">Start Race</button>
+			<button class="start-btn" id="next-to-map-btn">Next: Choose Track →</button>
+		</div>
+	</div>
+	
+	<div id="map-select">
+		<canvas id="map-preview-canvas"></canvas>
+		
+		<div class="select-header">
+			<h1>🗺️ Select Track</h1>
+			<p>Step 2: Choose Your Track<br><small style="opacity: 0.7; font-size: 12px;">Use ↑ ↓ or W/S keys to switch</small></p>
+		</div>
+		
+		<div class="scroll-hint left">‹</div>
+		<div class="scroll-hint right">›</div>
+		
+		<div class="map-indicator" id="map-indicator"></div>
+		
+		<div class="select-footer">
+			<div class="map-info">
+				<div class="map-name" id="map-name">经典赛道</div>
+				<div class="map-desc" id="map-desc">平衡的弯道与直道设计</div>
+			</div>
+			<div style="display: flex; gap: 15px; margin-top: 20px;">
+				<button class="start-btn" id="back-to-vehicle-btn" style="flex: 1; background: linear-gradient(135deg, #505050 0%, #404040 100%); border-color: #606060;">← Back</button>
+				<button class="start-btn" id="start-race-btn" style="flex: 2;">Start Race 🏁</button>
+			</div>
 		</div>
 	</div>
 	<a id="editor-link" href="editor.html">Create your own track</a>
