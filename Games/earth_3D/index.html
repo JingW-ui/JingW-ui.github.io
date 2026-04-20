@@ -1,0 +1,182 @@
+<html lang="zh"><head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+      <style>
+        body {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        * {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        *::-webkit-scrollbar {
+          display: none;
+        }
+      </style>
+  </head>
+  <body>
+      <script nonce="">
+        window.onerror = function(e) {
+          window.parent.postMessage({
+            type: 'error',
+            error: e
+          }, '*')
+        }
+        window.alert = (s) => console.log(s);
+        window.confirm = (s) => console.log(s);
+      </script>
+
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D地球模型</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+        }
+        canvas {
+            display: block;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            pointer-events: none; /* 防止信息面板阻挡鼠标事件 */
+        }
+    </style>
+
+
+    <div id="info">拖动地球旋转 | Drag to rotate the Earth</div>
+    <div id="container"><canvas width="1198" height="661" style="display: block; width: 799px; height: 441px;"></canvas></div>
+
+    <script nonce="" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script nonce="">
+        // 创建场景
+        const scene = new THREE.Scene();
+
+        // 创建相机
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 2;
+
+        // 创建渲染器
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('container').appendChild(renderer.domElement);
+
+        // 创建地球几何体
+        const geometry = new THREE.SphereGeometry(1, 64, 64);
+
+        // 加载地球纹理
+        const textureLoader = new THREE.TextureLoader();
+        const earthTexture = textureLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg');
+        const earthBumpMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_normal_2048.jpg');
+        const earthSpecularMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_specular_2048.jpg');
+
+        // 创建地球材质
+        const material = new THREE.MeshPhongMaterial({
+            map: earthTexture,
+            bumpMap: earthBumpMap,
+            bumpScale: 0.05,
+            specularMap: earthSpecularMap,
+            specular: new THREE.Color('grey'),
+            shininess: 5
+        });
+
+        // 创建地球网格
+        const earth = new THREE.Mesh(geometry, material);
+        scene.add(earth);
+
+        // 添加环境光
+        const ambientLight = new THREE.AmbientLight(0x404040, 1);
+        scene.add(ambientLight);
+
+        // 添加方向光
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(2, 1, 3).normalize();
+        scene.add(directionalLight);
+
+        // 添加窗口大小调整支持
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 鼠标拖动控制变量
+        let isDragging = false;
+        let previousMousePosition = {
+            x: 0,
+            y: 0
+        };
+
+        // 鼠标按下事件
+        renderer.domElement.addEventListener('mousedown', (event) => {
+            isDragging = true;
+            previousMousePosition = {
+                x: event.clientX,
+                y: event.clientY
+            };
+        });
+
+        // 鼠标移动事件
+        renderer.domElement.addEventListener('mousemove', (event) => {
+            if (isDragging) {
+                const deltaX = event.clientX - previousMousePosition.x;
+                const deltaY = event.clientY - previousMousePosition.y;
+
+                earth.rotation.y += deltaX * 0.01;
+                earth.rotation.x += deltaY * 0.01;
+
+                previousMousePosition = {
+                    x: event.clientX,
+                    y: event.clientY
+                };
+            }
+        });
+
+        // 鼠标释放事件
+        renderer.domElement.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // 鼠标离开画布事件
+        renderer.domElement.addEventListener('mouseleave', () => {
+            isDragging = false;
+        });
+
+        // 禁用默认的右键菜单
+        renderer.domElement.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+        });
+
+        // 渲染循环
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // 如果没有拖动，则缓慢旋转地球
+            if (!isDragging) {
+                earth.rotation.y += 0.001;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // 启动渲染循环
+        animate();
+    </script>
+
+
+
+  </body></html>
