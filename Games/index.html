@@ -360,6 +360,18 @@
             overflow: hidden;
         }
 
+        .card-header.muyu-theme {
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 50%, #3a3a3a 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header.earth-theme {
+            background: linear-gradient(135deg, #0a1628 0%, #1a2d4a 50%, #0d1f3c 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
         /* 贪吃蛇游戏场景 */
         .game-scene-snake {
             position: relative;
@@ -767,6 +779,312 @@
             50% {
                 transform: translate(-50%, -50%) scale(1.15);
                 opacity: 0.8;
+            }
+        }
+
+        /* 赛博木鱼游戏场景 */
+        .game-scene-muyu {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .muyu-icon {
+            font-size: 100px;
+            animation: muyu-tap 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(255, 176, 103, 0.6));
+            /* 性能优化 */
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        @keyframes muyu-tap {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+            }
+            10% {
+                transform: scale(1.15) rotate(-5deg);
+            }
+            20% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        /* 功德文字效果 */
+        .merit-text {
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #ffb067;
+            font-size: 1.2em;
+            font-weight: 900;
+            text-shadow: 0 0 10px rgba(255, 176, 103, 0.8);
+            animation: merit-float 2s ease-in-out infinite;
+            /* 性能优化 */
+            will-change: transform, opacity;
+        }
+
+        @keyframes merit-float {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translateX(-50%) translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        /* 赛博光效 */
+        .cyber-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(255, 176, 103, 0.3), transparent);
+            border-radius: 50%;
+            animation: cyber-pulse 2s ease-in-out infinite;
+            pointer-events: none;
+            /* 性能优化 */
+            will-change: transform, opacity;
+        }
+
+        @keyframes cyber-pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.4;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.7;
+            }
+        }
+
+        /* 禅意粒子 */
+        .zen-particle {
+            position: absolute;
+            color: #ffb067;
+            font-size: 1.5em;
+            animation: zen-float 3s ease-in-out infinite;
+            opacity: 0.6;
+            /* 性能优化 */
+            will-change: transform, opacity;
+        }
+
+        .zen-particle:nth-child(1) {
+            top: 15%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+
+        .zen-particle:nth-child(2) {
+            top: 25%;
+            right: 15%;
+            animation-delay: 0.7s;
+        }
+
+        .zen-particle:nth-child(3) {
+            bottom: 20%;
+            left: 25%;
+            animation-delay: 1.4s;
+        }
+
+        .zen-particle:nth-child(4) {
+            bottom: 15%;
+            right: 20%;
+            animation-delay: 2.1s;
+        }
+
+        @keyframes zen-float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0.4;
+            }
+            50% {
+                transform: translateY(-15px) rotate(180deg);
+                opacity: 0.8;
+            }
+        }
+
+        /* 3D地球游戏场景 */
+        .game-scene-earth {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            z-index: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .earth-sphere {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                #4a90e2 0%, 
+                #2d6cb5 20%, 
+                #1a5490 40%, 
+                #0d3a6b 60%, 
+                #062040 100%);
+            box-shadow: 
+                0 0 40px rgba(74, 144, 226, 0.6),
+                0 0 80px rgba(74, 144, 226, 0.4),
+                0 0 120px rgba(74, 144, 226, 0.2),
+                inset -15px -15px 30px rgba(0, 0, 0, 0.5),
+                inset 5px 5px 15px rgba(255, 255, 255, 0.2);
+            animation: earth-rotate 8s linear infinite;
+            position: relative;
+            overflow: hidden;
+            /* 性能优化 */
+            will-change: transform, box-shadow;
+            transform: translateZ(0);
+        }
+
+        /* 大陆轮廓模拟 */
+        .earth-sphere::before {
+            content: '';
+            position: absolute;
+            top: 20%;
+            left: 15%;
+            width: 40%;
+            height: 35%;
+            background: radial-gradient(ellipse at center, 
+                rgba(76, 175, 80, 0.6) 0%, 
+                rgba(56, 142, 60, 0.4) 50%, 
+                transparent 70%);
+            border-radius: 50%;
+            filter: blur(3px);
+            animation: continent-drift 12s ease-in-out infinite;
+        }
+
+        .earth-sphere::after {
+            content: '';
+            position: absolute;
+            bottom: 25%;
+            right: 20%;
+            width: 35%;
+            height: 30%;
+            background: radial-gradient(ellipse at center, 
+                rgba(76, 175, 80, 0.5) 0%, 
+                rgba(56, 142, 60, 0.3) 50%, 
+                transparent 70%);
+            border-radius: 50%;
+            filter: blur(3px);
+            animation: continent-drift 12s ease-in-out infinite reverse;
+        }
+
+        @keyframes earth-rotate {
+            from {
+                transform: rotateY(0deg);
+            }
+            to {
+                transform: rotateY(360deg);
+            }
+        }
+
+        @keyframes continent-drift {
+            0%, 100% {
+                transform: translateX(0) scale(1);
+            }
+            50% {
+                transform: translateX(10px) scale(1.05);
+            }
+        }
+
+        /* 大气层光晕 */
+        .earth-atmosphere {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, 
+                rgba(100, 181, 246, 0.3) 0%, 
+                rgba(74, 144, 226, 0.15) 40%, 
+                transparent 70%);
+            animation: atmosphere-glow 3s ease-in-out infinite;
+            pointer-events: none;
+            /* 性能优化 */
+            will-change: transform, opacity;
+        }
+
+        @keyframes atmosphere-glow {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.9;
+            }
+        }
+
+        /* 星空背景粒子 */
+        .star-particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: star-twinkle 2s ease-in-out infinite;
+            /* 性能优化 */
+            will-change: opacity;
+        }
+
+        .star-particle:nth-child(1) {
+            top: 10%;
+            left: 15%;
+            animation-delay: 0s;
+        }
+
+        .star-particle:nth-child(2) {
+            top: 20%;
+            right: 10%;
+            animation-delay: 0.4s;
+        }
+
+        .star-particle:nth-child(3) {
+            top: 50%;
+            left: 5%;
+            animation-delay: 0.8s;
+        }
+
+        .star-particle:nth-child(4) {
+            bottom: 20%;
+            right: 15%;
+            animation-delay: 1.2s;
+        }
+
+        .star-particle:nth-child(5) {
+            bottom: 10%;
+            left: 25%;
+            animation-delay: 1.6s;
+        }
+
+        .star-particle:nth-child(6) {
+            top: 30%;
+            right: 25%;
+            animation-delay: 0.6s;
+        }
+
+        @keyframes star-twinkle {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
             }
         }
 
@@ -1400,6 +1718,69 @@
                 </button>
             </div>
         </div>
+
+        <!-- 赛博木鱼 -->
+        <div class="game-card" onclick="window.location.href='/Games/muyu/'">
+            <div class="card-header muyu-theme">
+                <div class="cyber-glow"></div>
+                <div class="zen-particle">✨</div>
+                <div class="zen-particle">🙏</div>
+                <div class="zen-particle">☸️</div>
+                <div class="zen-particle">🕉️</div>
+                <div class="game-scene-muyu">
+                    <div class="merit-text">功德+1</div>
+                    <div class="muyu-icon">🐟</div>
+                </div>
+                <div class="card-badge">休闲益智</div>
+            </div>
+            <div class="card-body">
+                <h2 class="game-title">赛博木鱼</h2>
+                <p class="game-description">
+                    轻敲木鱼，细悟赛博真经！点击屏幕敲击木鱼积累功德，配有真实音效和流畅动画。简约禅意设计，让你在数字世界中寻找内心的宁静与平和。
+                </p>
+                <div class="game-features">
+                    <span class="feature-tag">🔔 禅意体验</span>
+                    <span class="feature-tag">🎵 真实音效</span>
+                    <span class="feature-tag">🧘 心灵放松</span>
+                </div>
+                <button class="play-button">
+                    <span class="play-icon">▶️</span>
+                    <span>立即游玩</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3D地球模型 -->
+        <div class="game-card" onclick="window.location.href='/Games/earth_3D/'">
+            <div class="card-header earth-theme">
+                <div class="star-particle"></div>
+                <div class="star-particle"></div>
+                <div class="star-particle"></div>
+                <div class="star-particle"></div>
+                <div class="star-particle"></div>
+                <div class="star-particle"></div>
+                <div class="game-scene-earth">
+                    <div class="earth-atmosphere"></div>
+                    <div class="earth-sphere"></div>
+                </div>
+                <div class="card-badge">教育探索</div>
+            </div>
+            <div class="card-body">
+                <h2 class="game-title">3D地球模型</h2>
+                <p class="game-description">
+                    逼真的3D地球可视化体验！基于Three.js打造，支持鼠标拖拽旋转查看地球全貌。配备高清纹理、凹凸贴图和高光效果，感受真实的地球光影变化。
+                </p>
+                <div class="game-features">
+                    <span class="feature-tag">🌍 3D渲染</span>
+                    <span class="feature-tag">🖱️ 交互控制</span>
+                    <span class="feature-tag">✨ 真实光影</span>
+                </div>
+                <button class="play-button">
+                    <span class="play-icon">▶️</span>
+                    <span>立即游玩</span>
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1454,7 +1835,9 @@
                     // 只预加载最可能点击的前两个游戏
                     const priorityLinks = [
                         '/Games/racing/',  // 新游戏优先
-                        '/Games/snake'
+                        '/Games/snake',
+                        '/Games/muyu/',
+                        '/Games/earth_3D/'
                     ];
                     
                     priorityLinks.forEach(link => {

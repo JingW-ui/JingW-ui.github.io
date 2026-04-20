@@ -1,44 +1,25 @@
-<html lang="zh"><head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Document</title>
-      <style>
-        body {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        * {
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        *::-webkit-scrollbar {
-          display: none;
-        }
-      </style>
-  </head>
-  <body>
-      <script nonce="">
-        window.onerror = function(e) {
-          window.parent.postMessage({
-            type: 'error',
-            error: e
-          }, '*')
-        }
-        window.alert = (s) => console.log(s);
-        window.confirm = (s) => console.log(s);
-      </script>
-
-
-
+<!DOCTYPE html>
+<html lang="zh">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D地球模型</title>
+    <title>3D地球模型 - 增强版</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        *::-webkit-scrollbar {
+            display: none;
+        }
         body {
             margin: 0;
             overflow: hidden;
             background-color: #000;
+            font-family: Arial, sans-serif;
         }
         canvas {
             display: block;
@@ -49,134 +30,303 @@
             width: 100%;
             text-align: center;
             color: white;
-            font-family: Arial, sans-serif;
             font-size: 14px;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
-            pointer-events: none; /* 防止信息面板阻挡鼠标事件 */
+            text-shadow: 0 0 5px rgba(0,0,0,0.8), 0 0 10px rgba(0,0,0,0.5);
+            pointer-events: none;
+            z-index: 100;
+            line-height: 1.6;
+        }
+        #controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+            pointer-events: none;
+            z-index: 100;
         }
     </style>
+</head>
+<body>
+    <script>
+        window.onerror = function(e) {
+            window.parent.postMessage({
+                type: 'error',
+                error: e
+            }, '*')
+        }
+        window.alert = (s) => console.log(s);
+        window.confirm = (s) => console.log(s);
+    </script>
 
+    <div id="container"></div>
 
-    <div id="info">拖动地球旋转 | Drag to rotate the Earth</div>
-    <div id="container"><canvas width="1198" height="661" style="display: block; width: 799px; height: 441px;"></canvas></div>
-
-    <script nonce="" src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script nonce="">
-        // 创建场景
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ==================== 场景初始化 ====================
         const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x000000, 0.02);
 
         // 创建相机
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 2;
+        const camera = new THREE.PerspectiveCamera(
+            60,
+            window.innerWidth / window.innerHeight,
+            0.1,
+            2000
+        );
+        camera.position.set(0, 0, 3);
 
         // 创建渲染器
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            alpha: true 
+        });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.getElementById('container').appendChild(renderer.domElement);
 
-        // 创建地球几何体
-        const geometry = new THREE.SphereGeometry(1, 64, 64);
+        // ==================== 创建星空背景 ====================
+        function createStarField() {
+            const starsGeometry = new THREE.BufferGeometry();
+            const starsCount = 3000;
+            const posArray = new Float32Array(starsCount * 3);
+            const sizeArray = new Float32Array(starsCount);
+
+            for(let i = 0; i < starsCount * 3; i += 3) {
+                // 在球面上随机分布星星
+                const radius = 100 + Math.random() * 400;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                
+                posArray[i] = radius * Math.sin(phi) * Math.cos(theta);
+                posArray[i+1] = radius * Math.sin(phi) * Math.sin(theta);
+                posArray[i+2] = radius * Math.cos(phi);
+                
+                sizeArray[i/3] = Math.random() * 2;
+            }
+
+            starsGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            starsGeometry.setAttribute('size', new THREE.BufferAttribute(sizeArray, 1));
+
+            const starsMaterial = new THREE.PointsMaterial({
+                size: 0.5,
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.8,
+                sizeAttenuation: true
+            });
+
+            const starField = new THREE.Points(starsGeometry, starsMaterial);
+            scene.add(starField);
+            return starField;
+        }
+
+        const starField = createStarField();
+
+        // ==================== 创建太阳（光源） ====================
+        const sunLight = new THREE.DirectionalLight(0xffffff, 1.5);
+        sunLight.position.set(50, 30, 50);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.camera.near = 0.5;
+        sunLight.shadow.camera.far = 500;
+        scene.add(sunLight);
+
+        // 添加环境光（模拟太空微弱光线）
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+        scene.add(ambientLight);
+
+        // 添加半球光（更自然的光照）
+        const hemisphereLight = new THREE.HemisphereLight(0xffffbb, 0x080820, 0.5);
+        scene.add(hemisphereLight);
+
+        // ==================== 创建地球 ====================
+        const earthGroup = new THREE.Group();
+        scene.add(earthGroup);
+
+        // 地球几何体
+        const earthGeometry = new THREE.SphereGeometry(1, 128, 128);
 
         // 加载地球纹理
         const textureLoader = new THREE.TextureLoader();
-        const earthTexture = textureLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg');
-        const earthBumpMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_normal_2048.jpg');
-        const earthSpecularMap = textureLoader.load('https://threejs.org/examples/textures/planets/earth_specular_2048.jpg');
+        const earthTexture = textureLoader.load(
+            'https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg'
+        );
+        const earthBumpMap = textureLoader.load(
+            'https://threejs.org/examples/textures/planets/earth_normal_2048.jpg'
+        );
+        const earthSpecularMap = textureLoader.load(
+            'https://threejs.org/examples/textures/planets/earth_specular_2048.jpg'
+        );
 
-        // 创建地球材质
-        const material = new THREE.MeshPhongMaterial({
+        // 地球材质
+        const earthMaterial = new THREE.MeshPhongMaterial({
             map: earthTexture,
             bumpMap: earthBumpMap,
             bumpScale: 0.05,
             specularMap: earthSpecularMap,
-            specular: new THREE.Color('grey'),
-            shininess: 5
+            specular: new THREE.Color(0x333333),
+            shininess: 15
         });
 
-        // 创建地球网格
-        const earth = new THREE.Mesh(geometry, material);
-        scene.add(earth);
+        const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+        earth.castShadow = true;
+        earth.receiveShadow = true;
+        earthGroup.add(earth);
 
-        // 添加环境光
-        const ambientLight = new THREE.AmbientLight(0x404040, 1);
-        scene.add(ambientLight);
+        // ==================== 创建大气层光晕 ====================
+        const atmosphereGeometry = new THREE.SphereGeometry(1.05, 64, 64);
+        const atmosphereMaterial = new THREE.MeshPhongMaterial({
+            color: 0x4444ff,
+            transparent: true,
+            opacity: 0.15,
+            side: THREE.BackSide,
+            blending: THREE.AdditiveBlending
+        });
+        const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
+        earthGroup.add(atmosphere);
 
-        // 添加方向光
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(2, 1, 3).normalize();
-        scene.add(directionalLight);
+        // ==================== 创建月球 ====================
+        const moonOrbitRadius = 3.5;
+        const moonGroup = new THREE.Group();
+        scene.add(moonGroup);
 
-        // 添加窗口大小调整支持
+        // 月球几何体
+        const moonGeometry = new THREE.SphereGeometry(0.27, 64, 64);
+        const moonTexture = textureLoader.load(
+            'https://threejs.org/examples/textures/planets/moon_1024.jpg'
+        );
+        const moonMaterial = new THREE.MeshPhongMaterial({
+            map: moonTexture,
+            bumpMap: moonTexture,
+            bumpScale: 0.02,
+            shininess: 0
+        });
+
+        const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+        moon.position.x = moonOrbitRadius;
+        moon.castShadow = true;
+        moon.receiveShadow = true;
+        moonGroup.add(moon);
+
+        // 月球轨道线
+        const orbitCurve = new THREE.EllipseCurve(
+            0, 0,
+            moonOrbitRadius, moonOrbitRadius,
+            0, 2 * Math.PI,
+            false,
+            0
+        );
+        const orbitPoints = orbitCurve.getPoints(100);
+        const orbitGeometry = new THREE.BufferGeometry().setFromPoints(
+            orbitPoints.map(p => new THREE.Vector3(p.x, 0, p.y))
+        );
+        const orbitMaterial = new THREE.LineBasicMaterial({
+            color: 0x444444,
+            transparent: true,
+            opacity: 0.3
+        });
+        const orbitLine = new THREE.LineLoop(orbitGeometry, orbitMaterial);
+        orbitLine.rotation.x = Math.PI / 2;
+        scene.add(orbitLine);
+
+        // ==================== 交互控制 ====================
+        let cameraDistance = 3;
+        const minDistance = 1.5;
+        const maxDistance = 10;
+
+        // 鼠标滚轮缩放
+        renderer.domElement.addEventListener('wheel', (event) => {
+            event.preventDefault();
+            
+            const zoomSpeed = 0.002;
+            cameraDistance += event.deltaY * zoomSpeed;
+            cameraDistance = Math.max(minDistance, Math.min(maxDistance, cameraDistance));
+            
+            // 直接更新相机位置
+            camera.position.z = cameraDistance;
+        }, { passive: false });
+
+        // 触摸支持（移动端）- 仅保留双指缩放
+        let touchStartDistance = 0;
+        
+        renderer.domElement.addEventListener('touchstart', (event) => {
+            if (event.touches.length === 2) {
+                touchStartDistance = Math.hypot(
+                    event.touches[0].clientX - event.touches[1].clientX,
+                    event.touches[0].clientY - event.touches[1].clientY
+                );
+            }
+        });
+
+        renderer.domElement.addEventListener('touchmove', (event) => {
+            event.preventDefault();
+            
+            if (event.touches.length === 2) {
+                const currentDistance = Math.hypot(
+                    event.touches[0].clientX - event.touches[1].clientX,
+                    event.touches[0].clientY - event.touches[1].clientY
+                );
+                
+                const delta = touchStartDistance - currentDistance;
+                cameraDistance += delta * 0.01;
+                cameraDistance = Math.max(minDistance, Math.min(maxDistance, cameraDistance));
+                
+                camera.position.z = cameraDistance;
+                touchStartDistance = currentDistance;
+            }
+        });
+
+        // 禁用右键菜单
+        renderer.domElement.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+        });
+
+        // ==================== 窗口大小调整 ====================
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // 鼠标拖动控制变量
-        let isDragging = false;
-        let previousMousePosition = {
-            x: 0,
-            y: 0
-        };
+        // ==================== 动画循环 ====================
+        let moonAngle = 0;
+        const moonSpeed = 0.005;
 
-        // 鼠标按下事件
-        renderer.domElement.addEventListener('mousedown', (event) => {
-            isDragging = true;
-            previousMousePosition = {
-                x: event.clientX,
-                y: event.clientY
-            };
-        });
-
-        // 鼠标移动事件
-        renderer.domElement.addEventListener('mousemove', (event) => {
-            if (isDragging) {
-                const deltaX = event.clientX - previousMousePosition.x;
-                const deltaY = event.clientY - previousMousePosition.y;
-
-                earth.rotation.y += deltaX * 0.01;
-                earth.rotation.x += deltaY * 0.01;
-
-                previousMousePosition = {
-                    x: event.clientX,
-                    y: event.clientY
-                };
-            }
-        });
-
-        // 鼠标释放事件
-        renderer.domElement.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        // 鼠标离开画布事件
-        renderer.domElement.addEventListener('mouseleave', () => {
-            isDragging = false;
-        });
-
-        // 禁用默认的右键菜单
-        renderer.domElement.addEventListener('contextmenu', (event) => {
-            event.preventDefault();
-        });
-
-        // 渲染循环
         function animate() {
             requestAnimationFrame(animate);
 
-            // 如果没有拖动，则缓慢旋转地球
-            if (!isDragging) {
-                earth.rotation.y += 0.001;
-            }
+            // 地球持续自转
+            earth.rotation.y += 0.001;
+
+            // 月球公转
+            moonAngle += moonSpeed;
+            moonGroup.rotation.y = moonAngle;
+            
+            // 月球自转（潮汐锁定）
+            moon.rotation.y += 0.001;
+
+            // 星空缓慢旋转
+            starField.rotation.y += 0.0001;
+
+            // 大气层轻微脉动
+            const time = Date.now() * 0.001;
+            atmosphere.scale.setScalar(1 + Math.sin(time) * 0.01);
 
             renderer.render(scene, camera);
         }
 
-        // 启动渲染循环
+        // 启动动画
         animate();
+
+        console.log('🌍 3D地球模型已加载完成');
+        console.log('✨ 特性：地球自转、月球公转、星空背景、滚轮缩放');
     </script>
-
-
-
-  </body></html>
+</body>
+</html>
