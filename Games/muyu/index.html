@@ -1,0 +1,190 @@
+<html lang="zh"><head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+      <style>
+        body {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        * {
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+        }
+        *::-webkit-scrollbar {
+          display: none;
+        }
+      </style>
+  </head>
+  <body>
+      <script nonce="">
+        window.onerror = function(e) {
+          window.parent.postMessage({
+            type: 'error',
+            error: e
+          }, '*')
+        }
+        window.alert = (s) => console.log(s);
+        window.confirm = (s) => console.log(s);
+      </script>
+
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>赛博木鱼点击器</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: 'Kaiti SC', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow-x: hidden; /* 防止水平滚动 */
+        }
+        .header {
+            position: relative;
+            text-align: center;
+            margin-top: -55vh;
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        .cyber-muyu {
+           position:relative;
+            background: linear-gradient(180deg, rgba(255, 176, 103, 0.05) 41%, rgba(115, 55, 0, 0.02) 84%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            font-size: 20vw;
+            margin-bottom: -10vw;
+        }
+
+        .score {
+          font-size: 10vh;
+          font-family: PingFang SC;
+          font-weight: 900;
+        }
+        .description {
+            font-size: 5vh;
+        }
+        .muyu-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            width: 284px;
+            height: 236px;
+            margin-top: 10vh;
+        }
+        .muyu {
+            position: absolute;
+            width: 36vh;
+            height: 30vh;
+            transition: transform 0.1s ease-in-out;
+            cursor: pointer;
+        }
+        .hammer {
+            position: absolute;
+            width: 15vh;
+            margin-left: 30vh;
+            margin-bottom: 15vh;
+            transform: translateX(-50%) rotate(0deg);
+            transition: transform 0.1s ease-in-out;
+        }
+        .subtitle {
+            position: absolute;
+            margin-top: -20vh;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 1;
+            transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+            z-index: 99;
+            font-size: 2vh;
+        }
+        .subtitle.hide {
+            opacity: 0;
+            transform: translate(-50%, calc(-50% - 30px));
+        }
+    </style>
+
+
+    <div class="header">
+        <h1 class="cyber-muyu">赛博木鱼</h1>
+        <div class="score" id="score">2</div>
+        <div class="description">功德</div>
+    </div>
+    <div class="muyu-container" onclick="hitMuyu()">
+        <img src="https://img.alicdn.com/imgextra/i1/O1CN01tKb5Et1aSjWRjCHK3_!!6000000003329-2-tps-119-69.png" alt="木锤" class="hammer" id="hammer" style="transform: translateX(-50%) rotate(0deg);">
+        <img src="https://img.alicdn.com/imgextra/i3/O1CN012CO0YU1VSfNs506ZS_!!6000000002652-2-tps-284-236.png" alt="木鱼" class="muyu" id="muyu" style="transform: scale(1);">
+    <div class="subtitle hide">功德+1</div><div class="subtitle hide">功德+1</div></div>
+    <div style="position: absolute; margin-top: 80vh; font-size: 1.2em;">轻敲木鱼，细悟赛博真经。</div>
+
+    <!-- 添加音效 -->
+    <audio id="clickSound" src="https://qianwen.alicdn.com/resource/qiaomuyu.mp3" preload="auto"></audio>
+
+    <script nonce="">
+        let score = 0;
+
+        function hitMuyu() {
+            const hammer = document.getElementById('hammer');
+            const scoreElement = document.getElementById('score');
+            const clickSound = document.getElementById('clickSound');
+            const muyuContainer = document.querySelector('.muyu-container');
+
+            // Play the sound effect
+            clickSound.currentTime = 0; // Rewind to the start before playing
+            clickSound.play();
+
+            // Rotate the hammer counterclockwise by 10 degrees
+            hammer.style.transform = `translateX(-50%) rotate(-25deg)`;
+
+            // Reset the rotation after a short delay
+            setTimeout(() => {
+                hammer.style.transform = `translateX(-50%) rotate(0deg)`;
+            }, 100);
+
+            // Enlarge the gong slightly and then reset it
+            muyu.style.transform = 'scale(1.1)';
+            setTimeout(() => {
+                muyu.style.transform = 'scale(1)';
+            }, 100);
+
+            // Create a new subtitle element
+            const subtitle = document.createElement('div');
+            subtitle.className = 'subtitle';
+            subtitle.textContent = '功德+1';
+            muyuContainer.appendChild(subtitle);
+
+            // Apply hide class to trigger animation
+            requestAnimationFrame(() => {
+                subtitle.classList.add('hide');
+            });
+
+            // Remove the subtitle when the animation ends
+            subtitle.addEventListener('transitionend', () => {
+                if (subtitle.style.opacity === '0') {
+                    muyuContainer.removeChild(subtitle);
+                }
+            });
+
+            // Update score
+            score++;
+            scoreElement.textContent = score;
+        }
+    </script>
+
+
+
+
+
+
+
+
+
+  </body></html>
