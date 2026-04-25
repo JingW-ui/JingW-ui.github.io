@@ -151,6 +151,29 @@
             border-color: #93b593;
         }
 
+        /* 地球主题卡片悬停特效 */
+        .game-card:hover .card-header.earth-theme {
+            background: linear-gradient(135deg, #0d1a30 0%, #1f3658 30%, #122648 60%, #0a1828 100%);
+        }
+
+        .game-card:hover .earth-sphere {
+            box-shadow: 
+                0 0 60px rgba(74, 144, 226, 0.8),
+                0 0 120px rgba(74, 144, 226, 0.6),
+                0 0 180px rgba(74, 144, 226, 0.4),
+                inset -20px -20px 40px rgba(0, 0, 0, 0.6),
+                inset 8px 8px 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .game-card:hover .earth-atmosphere {
+            animation-duration: 2.5s;
+        }
+
+        .game-card:hover .earth-orbit {
+            animation-duration: 12s;
+            border-color: rgba(100, 181, 246, 0.4);
+        }
+
         .game-card:hover::before {
             background: rgba(167, 216, 167, 0.18);
         }
@@ -367,9 +390,24 @@
         }
 
         .card-header.earth-theme {
-            background: linear-gradient(135deg, #0a1628 0%, #1a2d4a 50%, #0d1f3c 100%);
+            background: linear-gradient(135deg, #0a1628 0%, #1a2d4a 30%, #0f1f3c 60%, #061220 100%);
             position: relative;
             overflow: hidden;
+        }
+
+        /* 深空背景渐变 */
+        .card-header.earth-theme::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(74, 144, 226, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(100, 181, 246, 0.08) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 80%, rgba(45, 108, 181, 0.06) 0%, transparent 45%);
+            pointer-events: none;
         }
 
         /* 贪吃蛇游戏场景 */
@@ -916,8 +954,8 @@
         /* 3D地球游戏场景 */
         .game-scene-earth {
             position: relative;
-            width: 180px;
-            height: 180px;
+            width: 200px;
+            height: 200px;
             z-index: 2;
             display: flex;
             justify-content: center;
@@ -925,22 +963,24 @@
         }
 
         .earth-sphere {
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, 
-                #4a90e2 0%, 
-                #2d6cb5 20%, 
-                #1a5490 40%, 
-                #0d3a6b 60%, 
-                #062040 100%);
+            background: 
+                radial-gradient(circle at 35% 35%, 
+                    #6bb5ff 0%, 
+                    #4a90e2 15%, 
+                    #2d6cb5 30%, 
+                    #1a5490 50%, 
+                    #0d3a6b 70%, 
+                    #062040 100%);
             box-shadow: 
-                0 0 40px rgba(74, 144, 226, 0.6),
-                0 0 80px rgba(74, 144, 226, 0.4),
-                0 0 120px rgba(74, 144, 226, 0.2),
-                inset -15px -15px 30px rgba(0, 0, 0, 0.5),
-                inset 5px 5px 15px rgba(255, 255, 255, 0.2);
-            animation: earth-rotate 8s linear infinite;
+                0 0 50px rgba(74, 144, 226, 0.7),
+                0 0 100px rgba(74, 144, 226, 0.5),
+                0 0 150px rgba(74, 144, 226, 0.3),
+                inset -20px -20px 40px rgba(0, 0, 0, 0.6),
+                inset 8px 8px 20px rgba(255, 255, 255, 0.25);
+            animation: earth-rotate 10s linear infinite;
             position: relative;
             overflow: hidden;
             /* 性能优化 */
@@ -948,71 +988,87 @@
             transform: translateZ(0);
         }
 
-        /* 大陆轮廓模拟 */
+        /* 大陆轮廓模拟 - 优化版 */
         .earth-sphere::before {
             content: '';
             position: absolute;
-            top: 20%;
-            left: 15%;
-            width: 40%;
-            height: 35%;
-            background: radial-gradient(ellipse at center, 
-                rgba(76, 175, 80, 0.6) 0%, 
-                rgba(56, 142, 60, 0.4) 50%, 
-                transparent 70%);
-            border-radius: 50%;
-            filter: blur(3px);
-            animation: continent-drift 12s ease-in-out infinite;
+            top: 15%;
+            left: 10%;
+            width: 50%;
+            height: 40%;
+            background: 
+                radial-gradient(ellipse at 30% 40%, 
+                    rgba(76, 175, 80, 0.7) 0%, 
+                    rgba(56, 142, 60, 0.5) 40%, 
+                    transparent 70%),
+                radial-gradient(ellipse at 70% 60%, 
+                    rgba(139, 195, 74, 0.5) 0%, 
+                    rgba(104, 159, 56, 0.3) 50%, 
+                    transparent 65%);
+            border-radius: 45% 55% 50% 50% / 50% 45% 55% 50%;
+            filter: blur(2px);
+            animation: continent-drift 15s ease-in-out infinite;
         }
 
         .earth-sphere::after {
             content: '';
             position: absolute;
-            bottom: 25%;
-            right: 20%;
-            width: 35%;
-            height: 30%;
-            background: radial-gradient(ellipse at center, 
-                rgba(76, 175, 80, 0.5) 0%, 
-                rgba(56, 142, 60, 0.3) 50%, 
-                transparent 70%);
-            border-radius: 50%;
-            filter: blur(3px);
-            animation: continent-drift 12s ease-in-out infinite reverse;
+            bottom: 20%;
+            right: 15%;
+            width: 45%;
+            height: 35%;
+            background: 
+                radial-gradient(ellipse at 50% 50%, 
+                    rgba(76, 175, 80, 0.6) 0%, 
+                    rgba(56, 142, 60, 0.4) 45%, 
+                    transparent 65%),
+                radial-gradient(ellipse at 30% 70%, 
+                    rgba(129, 199, 132, 0.4) 0%, 
+                    transparent 60%);
+            border-radius: 50% 45% 55% 50% / 45% 55% 45% 55%;
+            filter: blur(2px);
+            animation: continent-drift 15s ease-in-out infinite reverse;
         }
 
         @keyframes earth-rotate {
             from {
-                transform: rotateY(0deg);
+                transform: rotateY(0deg) rotateX(5deg);
             }
             to {
-                transform: rotateY(360deg);
+                transform: rotateY(360deg) rotateX(5deg);
             }
         }
 
         @keyframes continent-drift {
             0%, 100% {
-                transform: translateX(0) scale(1);
+                transform: translateX(0) translateY(0) scale(1);
+                opacity: 0.8;
             }
             50% {
-                transform: translateX(10px) scale(1.05);
+                transform: translateX(12px) translateY(-3px) scale(1.08);
+                opacity: 1;
             }
         }
 
-        /* 大气层光晕 */
+        /* 大气层光晕 - 增强版 */
         .earth-atmosphere {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 160px;
-            height: 160px;
+            width: 175px;
+            height: 175px;
             border-radius: 50%;
-            background: radial-gradient(circle, 
-                rgba(100, 181, 246, 0.3) 0%, 
-                rgba(74, 144, 226, 0.15) 40%, 
-                transparent 70%);
-            animation: atmosphere-glow 3s ease-in-out infinite;
+            background: 
+                radial-gradient(circle, 
+                    rgba(100, 181, 246, 0.35) 0%, 
+                    rgba(74, 144, 226, 0.2) 35%, 
+                    rgba(45, 108, 181, 0.1) 55%, 
+                    transparent 70%);
+            box-shadow: 
+                0 0 60px rgba(100, 181, 246, 0.4),
+                inset 0 0 40px rgba(100, 181, 246, 0.15);
+            animation: atmosphere-glow 4s ease-in-out infinite;
             pointer-events: none;
             /* 性能优化 */
             will-change: transform, opacity;
@@ -1021,70 +1077,161 @@
         @keyframes atmosphere-glow {
             0%, 100% {
                 transform: translate(-50%, -50%) scale(1);
-                opacity: 0.6;
+                opacity: 0.7;
+                box-shadow: 
+                    0 0 60px rgba(100, 181, 246, 0.4),
+                    inset 0 0 40px rgba(100, 181, 246, 0.15);
             }
             50% {
-                transform: translate(-50%, -50%) scale(1.1);
-                opacity: 0.9;
+                transform: translate(-50%, -50%) scale(1.12);
+                opacity: 1;
+                box-shadow: 
+                    0 0 80px rgba(100, 181, 246, 0.6),
+                    inset 0 0 50px rgba(100, 181, 246, 0.25);
             }
         }
 
-        /* 星空背景粒子 */
+        /* 卫星轨道环 */
+        .earth-orbit {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 195px;
+            height: 195px;
+            border-radius: 50%;
+            border: 2px solid rgba(100, 181, 246, 0.25);
+            animation: orbit-rotate 20s linear infinite;
+            pointer-events: none;
+            /* 性能优化 */
+            will-change: transform;
+        }
+
+        .earth-orbit::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #64b5f6, #4a90e2);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 10px rgba(100, 181, 246, 0.8),
+                0 0 20px rgba(100, 181, 246, 0.5);
+        }
+
+        .earth-orbit::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            right: 30%;
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, #81c784, #4caf50);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 8px rgba(129, 199, 132, 0.8),
+                0 0 16px rgba(129, 199, 132, 0.5);
+        }
+
+        @keyframes orbit-rotate {
+            from {
+                transform: translate(-50%, -50%) rotate(0deg);
+            }
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        /* 星空背景粒子 - 增强版 */
         .star-particle {
             position: absolute;
-            width: 2px;
-            height: 2px;
+            width: 3px;
+            height: 3px;
             background: white;
             border-radius: 50%;
-            animation: star-twinkle 2s ease-in-out infinite;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+            animation: star-twinkle 2.5s ease-in-out infinite;
             /* 性能优化 */
-            will-change: opacity;
+            will-change: opacity, transform;
         }
 
         .star-particle:nth-child(1) {
-            top: 10%;
-            left: 15%;
+            top: 8%;
+            left: 12%;
             animation-delay: 0s;
+            width: 2px;
+            height: 2px;
         }
 
         .star-particle:nth-child(2) {
-            top: 20%;
-            right: 10%;
-            animation-delay: 0.4s;
+            top: 15%;
+            right: 8%;
+            animation-delay: 0.5s;
+            width: 3px;
+            height: 3px;
         }
 
         .star-particle:nth-child(3) {
-            top: 50%;
+            top: 45%;
             left: 5%;
-            animation-delay: 0.8s;
+            animation-delay: 1s;
+            width: 2px;
+            height: 2px;
         }
 
         .star-particle:nth-child(4) {
-            bottom: 20%;
-            right: 15%;
-            animation-delay: 1.2s;
+            bottom: 18%;
+            right: 10%;
+            animation-delay: 1.5s;
+            width: 4px;
+            height: 4px;
         }
 
         .star-particle:nth-child(5) {
-            bottom: 10%;
-            left: 25%;
-            animation-delay: 1.6s;
+            bottom: 8%;
+            left: 20%;
+            animation-delay: 2s;
+            width: 2px;
+            height: 2px;
         }
 
         .star-particle:nth-child(6) {
-            top: 30%;
-            right: 25%;
-            animation-delay: 0.6s;
+            top: 25%;
+            right: 20%;
+            animation-delay: 0.8s;
+            width: 3px;
+            height: 3px;
+        }
+
+        .star-particle:nth-child(7) {
+            top: 60%;
+            right: 5%;
+            animation-delay: 1.2s;
+            width: 2px;
+            height: 2px;
+        }
+
+        .star-particle:nth-child(8) {
+            bottom: 35%;
+            left: 8%;
+            animation-delay: 1.8s;
+            width: 3px;
+            height: 3px;
         }
 
         @keyframes star-twinkle {
             0%, 100% {
-                opacity: 0.3;
-                transform: scale(1);
+                opacity: 0.2;
+                transform: scale(0.8);
+                box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
             }
             50% {
                 opacity: 1;
-                transform: scale(1.5);
+                transform: scale(1.3);
+                box-shadow: 0 0 8px rgba(255, 255, 255, 1), 0 0 12px rgba(255, 255, 255, 0.6);
             }
         }
 
@@ -1337,6 +1484,16 @@
             border: 2px solid #d6ecd6;
         }
 
+        /* 地球主题徽章 */
+        .card-header.earth-theme .card-badge {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.95), rgba(45, 108, 181, 0.95));
+            color: white;
+            border: 2px solid rgba(100, 181, 246, 0.5);
+            box-shadow: 
+                0 3px 12px rgba(74, 144, 226, 0.4),
+                0 0 20px rgba(100, 181, 246, 0.2);
+        }
+
         .card-body {
             padding: 25px;
         }
@@ -1375,6 +1532,15 @@
             border: 1px solid rgba(255, 255, 255, 0.6);
         }
 
+        /* 地球主题特征标签 */
+        .card-header.earth-theme + .card-body .game-features .feature-tag {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.9), rgba(45, 108, 181, 0.85));
+            border-color: rgba(100, 181, 246, 0.5);
+            box-shadow: 
+                0 2px 8px rgba(74, 144, 226, 0.3),
+                0 0 12px rgba(100, 181, 246, 0.15);
+        }
+
         .play-button {
             width: 100%;
             padding: 15px;
@@ -1398,6 +1564,22 @@
             background: linear-gradient(135deg, #a5c4a5, #8ba98b);
             box-shadow: 0 8px 25px rgba(103, 138, 103, 0.45);
             transform: translateY(-3px);
+        }
+
+        /* 地球主题按钮 */
+        .card-header.earth-theme + .card-body .play-button {
+            background: linear-gradient(135deg, #4a90e2, #2d6cb5);
+            border-color: rgba(100, 181, 246, 0.3);
+            box-shadow: 
+                0 5px 18px rgba(74, 144, 226, 0.4),
+                0 0 25px rgba(100, 181, 246, 0.2);
+        }
+
+        .card-header.earth-theme + .card-body .play-button:hover {
+            background: linear-gradient(135deg, #5aa0f2, #3d7cc5);
+            box-shadow: 
+                0 8px 28px rgba(74, 144, 226, 0.6),
+                0 0 35px rgba(100, 181, 246, 0.35);
         }
 
         .play-button:active {
@@ -1473,6 +1655,27 @@
                 border-width: 2px;
             }
 
+            /* 地球主题移动端优化 */
+            .game-scene-earth {
+                width: 160px;
+                height: 160px;
+            }
+
+            .earth-sphere {
+                width: 100px;
+                height: 100px;
+            }
+
+            .earth-atmosphere {
+                width: 140px;
+                height: 140px;
+            }
+
+            .earth-orbit {
+                width: 165px;
+                height: 165px;
+            }
+
             .floating-item {
                 font-size: 1.5em;
             }
@@ -1502,6 +1705,27 @@
 
             .game-description {
                 font-size: 0.8em;
+            }
+
+            /* 地球主题超小屏优化 */
+            .game-scene-earth {
+                width: 140px;
+                height: 140px;
+            }
+
+            .earth-sphere {
+                width: 90px;
+                height: 90px;
+            }
+
+            .earth-atmosphere {
+                width: 125px;
+                height: 125px;
+            }
+
+            .earth-orbit {
+                width: 145px;
+                height: 145px;
             }
         }
     </style>
@@ -1759,9 +1983,11 @@
                 <div class="star-particle"></div>
                 <div class="star-particle"></div>
                 <div class="star-particle"></div>
+                <div class="star-particle"></div>
+                <div class="star-particle"></div>
                 <div class="game-scene-earth">
                     <div class="earth-atmosphere"></div>
-                    <div class="earth-sphere"></div>
+                    <div class="earth-orbit"></div>
                 </div>
                 <div class="card-badge">教育探索</div>
             </div>
