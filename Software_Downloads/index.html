@@ -5,26 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>软件下载中心</title>
     <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a25;
+            --bg-hover: #222230;
+            --accent-primary: #00d4aa;
+            --accent-secondary: #00f5c4;
+            --accent-glow: rgba(0, 212, 170, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6b6b7b;
+            --gradient-1: linear-gradient(135deg, #00d4aa 0%, #00a8e8 100%);
+            --shadow-glow: 0 0 40px rgba(0, 212, 170, 0.15);
+            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
         }
 
         body {
-            font-family: "Comic Sans MS", "Chalkboard SE", "STKaiti", cursive, sans-serif;
-            background: linear-gradient(135deg, #faf3e0 0%, #f5e6d3 25%, #f0e6ef 50%, #e8eaf6 75%, #e3f2fd 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
             min-height: 100vh;
-            padding: 40px 20px;
-            color: #2d3436;
-        }
-
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            padding: 120px 20px 80px;
         }
 
         .container {
@@ -32,28 +42,204 @@
             margin: 0 auto;
         }
 
-        h1 {
+        /* 标题区域 */
+        .title-section {
             text-align: center;
-            color: #fff;
-            font-size: 2.2rem;
-            margin-bottom: 40px;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            color: #ffffff;
+        }
+
+        .highlight {
+            color: var(--accent-primary);
+            display: block;
+            font-size: 3.5rem;
+            text-shadow: 0 0 10px var(--accent-glow);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px var(--accent-glow); }
+            to { text-shadow: 0 0 20px rgba(0, 212, 170, 0.6), 0 0 30px rgba(0, 212, 170, 0.4); }
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-banner {
+            background-color: rgba(0, 212, 170, 0.05);
+            color: var(--accent-primary);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid rgba(0, 212, 170, 0.2);
+            margin-top: 1rem;
+        }
+
+        .stats-banner::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-primary);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 软件网格 */
+        .software-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 15px 0;
+        }
+
+        .software-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(0, 212, 170, 0.1);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .software-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .software-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 212, 170, 0.3);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .software-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .software-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(0, 212, 170, 0.2), rgba(0, 168, 232, 0.2));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+            font-size: 30px;
+            border: 1px solid rgba(0, 212, 170, 0.3);
+            transition: var(--transition);
+        }
+
+        .software-card:hover .software-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 20px var(--accent-glow);
+            border-color: rgba(0, 212, 170, 0.5);
+        }
+
+        .software-name {
+            font-size: 1.3rem;
             font-weight: bold;
-            text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1),
-                         6px 6px 0px rgba(255, 118, 117, 0.3);
-            animation: bounceIn 1s ease-out, float 3s ease-in-out infinite;
-            letter-spacing: 2px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            line-height: 1.4;
+            transition: var(--transition);
         }
 
-        @keyframes bounceIn {
-            0% { transform: scale(0.3); opacity: 0; }
-            50% { transform: scale(1.05); }
-            70% { transform: scale(0.9); }
-            100% { transform: scale(1); opacity: 1; }
+        .software-card:hover .software-name {
+            color: var(--accent-primary);
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+        .software-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            min-height: 50px;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 18px 48px;
+            background: var(--gradient-1);
+            color: var(--bg-primary);
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: var(--transition);
+            box-shadow: 0 8px 30px rgba(0, 212, 170, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 212, 170, 0.6);
+        }
+
+        .download-btn:hover::before {
+            left: 100%;
+        }
+
+        .download-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .download-icon {
+            font-size: 1.3rem;
+        }
+
+        /* QQ链接特殊样式 */
+        .qq-link {
+            font-size: 36px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            animation: qqBounce 2s ease-in-out infinite;
         }
 
         @keyframes qqBounce {
@@ -63,196 +249,93 @@
             75% { transform: translateY(-4px) rotate(5deg); }
         }
 
-        .software-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 25px;
-            padding: 15px 0;
-            max-width: 1200px;
-            margin: 0 auto;
+        .qq-link:hover {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 10px var(--accent-glow));
         }
 
-        .software-card {
-            background: #ffffff;
-            border-radius: 20px;
-            padding: 25px;
-            border: 3px solid transparent;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            animation: popIn 0.6s ease-out backwards;
-            position: relative;
-            overflow: hidden;
+        /* 特性列表 */
+        .features-list {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0 3rem;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .software-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            pointer-events: none;
-        }
-
-        .software-card:hover {
-            transform: translateY(-10px) rotate(2deg) scale(1.02);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-        }
-
-        .software-card:hover::before {
-            opacity: 1;
-        }
-
-        .software-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
-            border-radius: 16px;
+        .feature-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            font-size: 28px;
-            box-shadow: 0 4px 12px rgba(253, 203, 110, 0.4);
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            animation: wiggle 2s ease-in-out infinite;
-        }
-
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-5deg); }
-            75% { transform: rotate(5deg); }
-        }
-
-        .software-card:hover .software-icon {
-            transform: scale(1.15) rotate(360deg);
-            box-shadow: 0 6px 18px rgba(253, 203, 110, 0.6);
-        }
-
-        .software-name {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: #2d3436;
-            margin-bottom: 10px;
-            line-height: 1.4;
-            transition: color 0.3s ease;
-        }
-
-        .software-card:hover .software-name {
-            color: #fd79a8;
-        }
-
-        .software-description {
-            color: #636e72;
+            gap: 0.5rem;
+            color: var(--text-secondary);
             font-size: 0.9rem;
-            line-height: 1.6;
-            margin-bottom: 18px;
-            min-height: 45px;
         }
 
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 12px 20px;
-            background: #ffffff;
-            color: #a8b5c9;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1rem;
-            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            border: 2px solid #d0d8e8;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            position: relative;
-            overflow: hidden;
+        .feature-icon {
+            color: var(--accent-primary);
+            font-size: 1.1rem;
         }
 
-        .download-btn::after {
-            content: '✨';
-            position: absolute;
-            right: -30px;
-            transition: right 0.4s ease;
-        }
-
-        .download-btn:hover {
-            background: #f0e6ef;
-            color: #8b9ab8;
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-            border-color: #c5ced8;
-        }
-
-        .download-btn:hover::after {
-            right: 15px;
-        }
-
-        .download-btn:active {
-            transform: translateY(0) scale(1);
-        }
-
-        .download-icon {
-            margin-right: 8px;
-            font-size: 1.2rem;
-            transition: transform 0.3s ease;
-        }
-
-        .download-btn:hover .download-icon {
-            transform: bounce 0.5s ease;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        @keyframes popIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.5) rotate(-10deg);
-            }
-            70% {
-                transform: scale(1.05) rotate(2deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotate(0deg);
-            }
-        }
-
-        /* 为每个卡片设置不同的动画延迟 */
-        .software-card:nth-child(1) { animation-delay: 0.1s; }
-        .software-card:nth-child(2) { animation-delay: 0.15s; }
-        .software-card:nth-child(3) { animation-delay: 0.2s; }
-        .software-card:nth-child(4) { animation-delay: 0.25s; }
-        .software-card:nth-child(5) { animation-delay: 0.3s; }
-        .software-card:nth-child(6) { animation-delay: 0.35s; }
-
+        /* 响应式设计 */
         @media (max-width: 768px) {
+            body {
+                padding: 100px 15px 60px;
+            }
+
             h1 {
-                font-size: 1.8rem;
-                margin-bottom: 30px;
+                font-size: 2rem;
+            }
+
+            .highlight {
+                font-size: 2.5rem;
             }
 
             .software-grid {
-                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                grid-template-columns: 1fr;
                 gap: 20px;
             }
 
             .software-card {
                 padding: 20px;
             }
+
+            .features-list {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📦 软件下载中心</h1>
+        <div class="title-section">
+            <h1>📦 软件下载中心<span class="highlight">Software Hub</span></h1>
+            <p class="subtitle">精选实用工具，提升工作效率</p>
+            <div class="stats-banner">持续更新中 · 永久免费</div>
+        </div>
+
+        <div class="features-list">
+            <div class="feature-item">
+                <span class="feature-icon">✓</span>
+                <span>安全可靠</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">✓</span>
+                <span>永久免费</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">✓</span>
+                <span>定期更新</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">✓</span>
+                <span>技术支持</span>
+            </div>
+        </div>
 
         <div class="software-grid">
             <!-- subject_ranking -->
@@ -266,7 +349,7 @@
                    class="download-btn"
                    download>
                     <span class="download-icon">⬇️</span>
-                    立即下载
+                    立即下载 v1.0.0
                 </a>
             </div>
 
@@ -281,7 +364,7 @@
                    class="download-btn"
                    download>
                     <span class="download-icon">⬇️</span>
-                    立即下载
+                    立即下载 v1.1.4
                 </a>
             </div>
 
@@ -296,7 +379,7 @@
                    class="download-btn"
                    download>
                     <span class="download-icon">⬇️</span>
-                    立即下载
+                    立即下载 v1.0.0
                 </a>
             </div>
 
@@ -336,7 +419,7 @@
                     <div class="software-icon" style="margin-bottom: 0;">🎯</div>
                     <a href="https://qm.qq.com/q/aTPre4jHqw"
                        target="_blank"
-                       style="font-size: 36px; text-decoration: none; transition: transform 0.3s ease; display: inline-block; animation: qqBounce 2s ease-in-out infinite;"
+                       class="qq-link"
                        title="加入QQ交流群">
                         🐧
                     </a>
@@ -379,7 +462,7 @@
                    class="download-btn"
                    download>
                     <span class="download-icon">⬇️</span>
-                    立即下载
+                    立即下载 v2.1
                 </a>
             </div>
 
@@ -389,7 +472,7 @@
                     <div class="software-icon" style="margin-bottom: 0;">⚙️</div>
                     <a href="https://qm.qq.com/q/J38INOhJyk"
                        target="_blank"
-                       style="font-size: 24px; text-decoration: none; transition: transform 0.3s ease; display: inline-block;"
+                       class="qq-link"
                        title="加入QQ交流群">
                         🐧
                     </a>
@@ -402,7 +485,7 @@
                    class="download-btn"
                    download>
                     <span class="download-icon">⬇️</span>
-                    立即下载
+                    立即下载 v2.0.8
                 </a>
             </div>
         </div>
