@@ -71,6 +71,18 @@
             margin-bottom: 0;
             padding-bottom: 0;
         }
+        .subsection-title-school {
+            font-size: 14px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            flex-wrap: wrap;
+            position: relative;
+        }
         .subsection-title {
             font-size: 14px;
             font-weight: 600;
@@ -93,6 +105,18 @@
             background-color: #1F884F;
             color: #ffffff;
             border-color: #1F884F;
+        }
+        
+        /* 学校Logo样式 - 右上角放大显示 */
+        .school-logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 12px;
+            padding-right: 120px;
+            flex-shrink: 0;
         }
         .subsection-a {
             font-size: 14px;
@@ -404,7 +428,6 @@
                     </nav>
                 </div>
             </div>
-            <div class="contact-info">求职意向： 算法/软件/开发 | 北上广深</div>
             <div class="contact-info">年龄： 24岁 | 性别： 男 | 籍贯： 重庆</div>
             <div class="contact-info">联系方式： 17702376984 | 2642144249@qq.com</div>
             <div class="contact-info">社交媒体：<a class="nav-cta" href="https://github.com/JingW-ui" target="_blank"
@@ -418,34 +441,37 @@
 </div>
 
 <div class="section">
+    <div class="section-title">教育背景</div>
 
     <div class="subsection">
-        <div class="subsection-title"><a class="school-label-link"
-                                                                  href="https://www.uestc.edu.cn"
-                                                                  target="_blank" rel="noopener">电子科技大学 985</a> 生物医学工程 硕士 导师：<a class="subsection-a"
-                                                                             href="/chen_hua_fu/" target="_blank"
-                                                                             rel="noopener">陈华富</a>  实验室：<a
-                class="subsection-a" href="https://www.neuro.uestc.edu.cn/" target="_blank"
-                rel="noopener">神经信息教育部重点实验室</a></div>
+        <div class="subsection-title-school">
+            <span><a class="school-label-link" href="https://www.uestc.edu.cn" target="_blank" rel="noopener">电子科技大学(985)</a>  电子信息大类-生物医学工程 硕士  导师：<a
+                    class="subsection-a" href="/chen_hua_fu/" target="_blank" rel="noopener">陈华富</a>  实验室：<a
+                    class="subsection-a" href="https://www.neuro.uestc.edu.cn/" target="_blank" rel="noopener">神经信息教育部重点实验室</a></span>
+            <!--            <img src="img/logo.png" alt="电子科技大学校徽" class="school-logo">-->
+        </div>
         <div class="date">2024.09 - 至今</div>
         <ul>
             <li>专业成绩：GPA 3.83/4（专业前5%）</li>
-            <li>
-                主修课程：生物医学材料前沿进展、矩阵理论、认知神经科学、神经信息学基础、统计推断方法、医学影像学进展、脑机接口技术
-            </li>
+            <!--            <li>-->
+            <!--                主修课程：生物医学材料前沿进展、矩阵理论、认知神经科学、神经信息学基础、统计推断方法、医学影像学进展、脑机接口技术-->
+            <!--            </li>-->
         </ul>
     </div>
+
     <div class="subsection">
-        <div class="subsection-title">西南科技大学　　　　生物医学工程　本科　导师：<a class="subsection-a"
-                                                                             href="https://baike.baidu.com/item/%E5%91%A8%E9%A2%96%E7%8E%A5/53042183"
-                                                                             target="_blank" rel="noopener">周颖玥</a>　　实验室：ACM项目组&&BMELab
+        <div class="subsection-title-school">
+            <span>西南科技大学   电子信息大类-生物医学工程 本科  导师：<a class="subsection-a"
+                                                                        href="https://baike.baidu.com/item/%E5%91%A8%E9%A2%96%E7%8E%A5/53042183"
+                                                                        target="_blank" rel="noopener">周颖玥</a>  实验室：ACM项目组 && BMELab</span>
+            <!--            <img src="img/logo2.png" alt="西南科技大学校徽" class="school-logo">-->
         </div>
         <div class="date">2020.09 - 2024.06</div>
         <ul>
             <li>专业成绩：GPA 4.15/5（专业前2%）</li>
-            <li>
-                主修课程：计算机编程、信号与系统、计算机原理及应用、医学影像处理技术、医学传感器、医学图像处理、医学机器学习、高等数学A、程序设计基础（C语言）电路分析基础A、模拟电子技术、数字电子技术等
-            </li>
+            <!--            <li>-->
+            <!--                主修课程：计算机编程、信号与系统、计算机原理及应用、医学影像处理技术、医学传感器、医学图像处理、医学机器学习、高等数学A、程序设计基础（C语言）电路分析基础A、模拟电子技术、数字电子技术等-->
+            <!--            </li>-->
             <li>荣誉：24届四川省优秀毕业生、综合素质A级证书、获得推免资格</li>
         </ul>
     </div>
@@ -454,33 +480,59 @@
 <div class="section">
     <div class="section-title">科研成果</div>
     <ul>
-        <li>专利：基于深度学习的 MRI 海马体 3D 智能分析诊断平台<a class="label-link" href="/imgs/patents_and_software/1.png"
-                                                             target="_blank" rel="noopener">查看证书</a><a
+        <li>SCI论文：MediScreen-Brain: A Portable, YOLO-powered GUI for Multi-Modal Brain Tumor Detection and 3D
+            Localization<a class="label-link"
+                           href="https://www.sciencedirect.com/journal/medical-image-analysis"
+                           target="_blank" rel="noopener">在投</a><a
+                    class="label-link" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank"
+                    rel="noopener">代码</a>
+        </li>
+        <li>SCI论文：NEURA: An agentic system for autonomous neuroimaging workflows<a class="label-link"
+                                                                                     href=""
+                                                                                     target="_blank"
+                                                                                     rel="noopener">在投</a>
+        </li>
+        <li>SCI论文：Spatiotemporal patterns of brainstem tract atrophy predict disease progression in spinocerebellar
+            ataxia type 3<a class="label-link"
+                            href=""
+                            target="_blank" rel="noopener">在投</a>
+        </li>
+        <li>专利：基于深度学习的 MRI 海马体 3D 智能分析诊断平台<a class="label-link"
+                                                                 href="/imgs/patents_and_software/1.png"
+                                                                 target="_blank" rel="noopener">查看证书</a><a
                 class="label-link" href="/videos/" target="_blank" rel="noopener">视频</a>
         </li>
         </li>
         <li>软著：结直肠息肉智能检测系统<a class="label-link" href="/imgs/patents_and_software/8.png" target="_blank"
-                                          rel="noopener">查看证书</a><a class="label-link" href="/carousel/" target="_blank"
-                                          rel="noopener">排序证明</a></li>
+                                          rel="noopener">查看证书</a><a class="label-link" href="/carousel/"
+                                                                        target="_blank"
+                                                                        rel="noopener">排序证明</a></li>
         <li>软著：基于人体骨架检测的摔倒行为智能识别平台<a class="label-link" href="/imgs/patents_and_software/5.png"
-                                                          target="_blank" rel="noopener">查看证书</a><a class="label-link" href="/carousel/" target="_blank"
-                                          rel="noopener">排序证明</a></li>
+                                                          target="_blank" rel="noopener">查看证书</a><a
+                class="label-link" href="/carousel/" target="_blank"
+                rel="noopener">排序证明</a></li>
         <li>软著：基于 Real-ESRgan 的批量图像处理工具平台 <a class="label-link" href="/imgs/patents_and_software/7.png"
-                                                          target="_blank" rel="noopener">查看证书</a><a class="label-link" href="/carousel/" target="_blank"
-                                          rel="noopener">排序证明</a><a
+                                                            target="_blank" rel="noopener">查看证书</a><a
+                class="label-link" href="/carousel/" target="_blank"
+                rel="noopener">排序证明</a><a
                 class="label-link" href="https://github.com/JingW-ui/PI-MAPP/tree/main/project/huaweiyun_Camera/ui"
                 target="_blank" rel="noopener">Github</a></li>
-        <li>软著：基于深度学习的 MRI 海马体 3D 智能分析诊断平台<a class="label-link" href="/imgs/patents_and_software/6.png"
-                                                             target="_blank" rel="noopener">查看证书</a><a class="label-link" href="/carousel/" target="_blank"
-                                          rel="noopener">排序证明</a><a
+        <li>软著：基于深度学习的 MRI 海马体 3D 智能分析诊断平台<a class="label-link"
+                                                                 href="/imgs/patents_and_software/6.png"
+                                                                 target="_blank" rel="noopener">查看证书</a><a
+                class="label-link" href="/carousel/" target="_blank"
+                rel="noopener">排序证明</a><a
                 class="label-link" href="/videos/" target="_blank" rel="noopener">视频</a>
         </li>
         <li>软著：基于 YOLO 的脑部肿瘤检测系统平台<a class="label-link" href="/imgs/patents_and_software/9.png"
-                                                  target="_blank" rel="noopener">查看证书</a><a class="label-link" href="/carousel/" target="_blank"
-                                          rel="noopener">排序证明</a><a class="label-link"
-                                                                                                href="https://github.com/JingW-ui/PI-MAPP/tree/main/project/Brain_Tumor_dection_ui"
-                                                                                                target="_blank"
-                                                                                                rel="noopener">Github</a><a
+                                                    target="_blank" rel="noopener">查看证书</a><a class="label-link"
+                                                                                                  href="/carousel/"
+                                                                                                  target="_blank"
+                                                                                                  rel="noopener">排序证明</a><a
+                class="label-link"
+                href="https://github.com/JingW-ui/PI-MAPP/tree/main/project/Brain_Tumor_dection_ui"
+                target="_blank"
+                rel="noopener">Github</a><a
                 class="label-link" href="/videos/" target="_blank" rel="noopener">视频</a>
         </li>
         </li>
@@ -504,13 +556,28 @@
 </div>
 <div class="section">
     <div class="section-title">项目经验</div>
+        <div class="subsection">
+        <div class="subsection-title">Agent应用开发：神经影像分析智能体 <a class="github-label-link"
+                                                                  href=""
+                                                                  target="_blank" rel="noopener"><i
+                class="" aria-hidden="true"></i> 闭源 </a>
+        </div>
+        <div class="date">2025.7 - 2026.2</div>
+        <div class="subsection-b">技术栈：Agent,Python,LLM,Chain-of-Thought,Toolset,RAG </div>
+        <ul>
+            <li>系统功能：NEURA 是一个受认知科学启发、由大语言模型驱动的自主智能体系统，专为神经影像分析打造。它通过独特的双知识图谱架构（DiseaseKG 与 ToolKG）动态桥接医学知识与异构软件工具，能够自主理解科研需求、编排并执行复杂的端到端多模态分析工作流，显著降低神经影像处理的技术门槛并解决可复现性难题！
+            </li>
+            <li>项目职责: 负责基于大语言模型的智能体（Agent）系统设计与开发，主导核心认知架构与双知识图谱（DiseaseKG/ToolKG）构建，通过整合异构工具链（如SPM、FreeSurfer等）实现复杂工作流的自主编排与端到端自动化；</li>
+        </ul>
+    </div>
     <div class="subsection">
         <div class="subsection-title">AI应用开发：自动化办公软件<a class="github-label-link"
                                                                   href="https://github.com/JingW-ui/AutoTask-UI-"
                                                                   target="_blank" rel="noopener"><i
                 class="fab fa-fw fa-github" aria-hidden="true"></i> Github 70star+</a><a class="label-link"
                                                                                          href="https://qm.qq.com/q/8Bm7ntOXte"
-                                                                                         target="_blank" rel="noopener">用户群 100人+</a><a
+                                                                                         target="_blank" rel="noopener">用户群
+            100人+</a><a
                 class="label-link"
                 href="https://www.bilibili.com/video/BV1FzpLzHEWL?spm_id_from=333.788.videopod.sections&bvid=BV1FzpLzHEWL&vd_source=ea444bcb59e16e58cfdca990f3514384"
                 target="_blank" rel="noopener"><i
@@ -535,12 +602,12 @@
                                                                                           href="https://qm.qq.com/q/wZRWYGb78I"
                                                                                           target="_blank"
                                                                                           rel="noopener">
-                用户群 20人+</a>
-        <a class="label-link"
-                                                                                          href="https://www.bilibili.com/video/BV1dQedz9EKn?spm_id_from=333.788.videopod.sections&bvid=BV1dQedz9EKn&vd_source=ea444bcb59e16e58cfdca990f3514384"
-                                                                                          target="_blank"
-                                                                                          rel="noopener"><i
-                class="fab fa-fw fa-bilibili icon-item"></i>视频 1W+</a></div>
+            用户群 40人+</a>
+            <a class="label-link"
+               href="https://www.bilibili.com/video/BV1dQedz9EKn?spm_id_from=333.788.videopod.sections&bvid=BV1dQedz9EKn&vd_source=ea444bcb59e16e58cfdca990f3514384"
+               target="_blank"
+               rel="noopener"><i
+                    class="fab fa-fw fa-bilibili icon-item"></i>视频 1W+</a></div>
         <div class="date">2025.08 - 2025.10</div>
         <div class="subsection-b">技术栈：Vibe Coding、YOLOv8~YOLO26、Pytorch、Pyside6</div>
         <ul>
@@ -556,7 +623,14 @@
                 href="https://www.bilibili.com/video/BV1Sd4y1J7k5/?spm_id_from=333.1387.collection.video_card.click&vd_source=ea444bcb59e16e58cfdca990f3514384"
                 target="_blank" rel="noopener"><i
                 class="fab fa-fw fa-bilibili icon-item"></i> 视频播放量 20w+</a><a class="label-link"
-        href="https://www.bilibili.com/video/BV1Sd4y1J7k5/?spm_id_from=333.1387.collection.video_card.click&vd_source=ea444bcb59e16e58cfdca990f3514384">收藏<svg width="10" height="10" viewBox="0 0 28 22" xmlns="http://www.w3.org/2000/svg" class="video-fav-icon video-toolbar-item-icon" data-v-9e4050e4=""><path fill-rule="evenodd" clip-rule="evenodd" d="M19.8071 9.26152C18.7438 9.09915 17.7624 8.36846 17.3534 7.39421L15.4723 3.4972C14.8998 2.1982 13.1004 2.1982 12.4461 3.4972L10.6468 7.39421C10.1561 8.36846 9.25639 9.09915 8.19315 9.26152L3.94016 9.91102C2.63155 10.0734 2.05904 11.6972 3.04049 12.6714L6.23023 15.9189C6.96632 16.6496 7.29348 17.705 7.1299 18.7605L6.39381 23.307C6.14844 24.6872 7.62063 25.6614 8.84745 25.0119L12.4461 23.0634C13.4276 22.4951 14.6544 22.4951 15.6359 23.0634L19.2345 25.0119C20.4614 25.6614 21.8518 24.6872 21.6882 23.307L20.8703 18.7605C20.7051 17.705 21.0339 16.6496 21.77 15.9189L24.9597 12.6714C25.9412 11.6972 25.3687 10.0734 24.06 9.91102L19.8071 9.26152Z" fill="currentColor"></path></svg> 4000+</a></div>
+                                                                                   href="https://www.bilibili.com/video/BV1Sd4y1J7k5/?spm_id_from=333.1387.collection.video_card.click&vd_source=ea444bcb59e16e58cfdca990f3514384">收藏
+            <svg width="10" height="10" viewBox="0 0 28 22" xmlns="http://www.w3.org/2000/svg"
+                 class="video-fav-icon video-toolbar-item-icon" data-v-9e4050e4="">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M19.8071 9.26152C18.7438 9.09915 17.7624 8.36846 17.3534 7.39421L15.4723 3.4972C14.8998 2.1982 13.1004 2.1982 12.4461 3.4972L10.6468 7.39421C10.1561 8.36846 9.25639 9.09915 8.19315 9.26152L3.94016 9.91102C2.63155 10.0734 2.05904 11.6972 3.04049 12.6714L6.23023 15.9189C6.96632 16.6496 7.29348 17.705 7.1299 18.7605L6.39381 23.307C6.14844 24.6872 7.62063 25.6614 8.84745 25.0119L12.4461 23.0634C13.4276 22.4951 14.6544 22.4951 15.6359 23.0634L19.2345 25.0119C20.4614 25.6614 21.8518 24.6872 21.6882 23.307L20.8703 18.7605C20.7051 17.705 21.0339 16.6496 21.77 15.9189L24.9597 12.6714C25.9412 11.6972 25.3687 10.0734 24.06 9.91102L19.8071 9.26152Z"
+                      fill="currentColor"></path>
+            </svg>
+            4000+</a></div>
         <div class="date">2025.08 - 2025.10</div>
         <div class="subsection-b">技术栈：DOSBox​、8255、8253、定时/计数器、汇编语言、指令系统与寻址方式</div>
         <ul>
@@ -571,7 +645,8 @@
     </div>
 
     <div class="subsection">
-        <div class="subsection-title">深度学习项目：基于人体骨架检测的摔倒行为智能识别<a class="awards-label-link">省一等奖</a><a
+        <div class="subsection-title">深度学习项目：基于人体骨架检测的摔倒行为智能识别<a class="awards-label-link"> 🏆
+            省一等奖</a><a
                 class="label-link" href="/imgs/competitions/3.png"
                 target="_blank" rel="noopener">查看证书</a></div>
         <div class="date">2025.04 - 2025.07</div>
@@ -588,7 +663,8 @@
         </ul>
     </div>
     <div class="subsection">
-        <div class="subsection-title">深度学习项目：基于深度学习的脑部MRI图像马区自动分割系统<a class="awards-label-link">国一等奖</a><a
+        <div class="subsection-title">深度学习项目：基于深度学习的脑部MRI图像马区自动分割系统<a
+                class="awards-label-link"> 🏆 国一等奖</a><a
                 class="label-link" href="/imgs/competitions/9.png"
                 target="_blank" rel="noopener">查看证书</a></div>
         <div class="date">2024.04 - 2024.07</div>
@@ -606,10 +682,11 @@
 
 
     <div class="subsection">
-        <div class="subsection-title">深度学习项目：结直肠癌智能检测与诊断系统<a class="awards-label-link">省一等奖</a><a class="label-link"
-                                                                                                     href="/imgs/competitions/8.png"
-                                                                                                     target="_blank"
-                                                                                                     rel="noopener">查看证书</a>
+        <div class="subsection-title">深度学习项目：结直肠癌智能检测与诊断系统<a class="awards-label-link"> 🏆
+            省一等奖</a><a class="label-link"
+                           href="/imgs/competitions/8.png"
+                           target="_blank"
+                           rel="noopener">查看证书</a>
         </div>
         <div class="date">2023.04 - 2023.07</div>
         <div class="subsection-b">技术栈：YOLOv8、Django、HTML、CSS、MySQL、Python</div>
@@ -727,13 +804,17 @@
     </ul>
 </div>
 <div class="section">
-    <div class="section-title">语言技能</div>
+    <div class="section-title">技能</div>
     <div class="skills">
-        <span class="skill">英语6级</span>
+        <span class="skill">AI coding</span>
+        <span class="skill">Ultralytics</span>
         <span class="skill">Python</span>
+        <span class="skill">QT</span>
+        <span class="skill">全栈开发</span>
         <span class="skill">Java</span>
         <span class="skill">Mysql</span>
         <span class="skill">C/C++</span>
+        <span class="skill">英语6级</span>
     </div>
 </div>
 
@@ -759,30 +840,6 @@
     <span class="img-close" aria-label="关闭">&times;</span>
     <img class="img-modal-content" id="modalImg" alt="">
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function(){
-        const avatar = document.querySelector('.avatar');
-        const modal = document.getElementById('imgModal');
-        const modalImg = document.getElementById('modalImg');
-        const closeBtn = modal.querySelector('.img-close');
-        if (!avatar) return;
-        avatar.addEventListener('click', function(){
-            modal.style.display = 'flex';
-            modal.setAttribute('aria-hidden', 'false');
-            modalImg.src = this.src;
-            modalImg.alt = this.alt || '';
-            document.body.style.overflow = 'hidden';
-        });
-        function closeModal(){
-            modal.style.display = 'none';
-            modal.setAttribute('aria-hidden', 'true');
-            document.body.style.overflow = '';
-            modalImg.src = '';
-        }
-        closeBtn.addEventListener('click', closeModal);
-        modal.addEventListener('click', function(e){ if (e.target === modal) closeModal(); });
-        document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
-    });
-</script>
+
 </body>
 </html>
