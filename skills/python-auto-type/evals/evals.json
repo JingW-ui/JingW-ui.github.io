@@ -1,0 +1,23 @@
+{
+  "skill_name": "python-auto-type",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a simple Python script that demonstrates the auto-type functionality and save it as test_script.py, then use the python-auto-type skill to automatically input this code",
+      "expected_output": "A test Python script should be created and the auto-type skill should simulate typing it with realistic delays and error corrections",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Use the python-auto-type skill to input a Python script that contains Markdown code blocks (with ```python markers) to verify that the skill properly filters out the markdown markers",
+      "expected_output": "The auto-type skill should skip the ```python and ``` markers and only type the actual Python code",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Test the python-auto-type skill with custom parameters: use a faster delay (0.02s), lower error rate (0.02), and shorter thinking time (0.3-0.8s) for a quick typing demonstration",
+      "expected_output": "The skill should use the custom parameters for faster, more accurate typing simulation",
+      "files": []
+    }
+  ]
+}

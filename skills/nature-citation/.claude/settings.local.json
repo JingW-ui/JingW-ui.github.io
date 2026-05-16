@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(ls -la *.enw *.html *.tsv)",
+      "Bash(ls -la *.enw)",
+      "Bash(ls -la *.html *.tsv *.json)"
+    ]
+  }
+}
