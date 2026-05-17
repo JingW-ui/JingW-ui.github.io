@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王京 - 个人简历</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 40px;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            padding-bottom: 25px;
+            border-bottom: 3px solid #2c3e50;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .school-logo {
+            position: absolute;
+            top: -20px;
+            right: 0;
+            width: 150px;
+            height: 60px;
+            object-fit: contain;
+        }
+        
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .header-info {
+            flex: 1;
+        }
+        
+        .name {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        .contact {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+        }
+        
+        .contact span {
+            margin-right: 20px;
+        }
+        
+        .contact-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .contact-links a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 13px;
+            padding: 3px 8px;
+            background: #ebf5fb;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+        
+        .contact-links a:hover {
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .contact-links span {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* Section */
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #282b2b;
+            border-left: 4px solid #000000;
+            padding-left: 12px;
+            margin-bottom: 15px;
+        }
+        
+        /* Education */
+        .edu-item {
+            margin-bottom: 15px;
+        }
+        
+        .edu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 5px;
+        }
+        
+        .school {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .date {
+            font-size: 13px;
+            color: #999;
+        }
+        
+        .edu-detail {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        
+        .highlight {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        /* Experience & Projects */
+        .item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+        
+        .item-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .tech-stack {
+            font-size: 12px;
+            color: #3498db;
+            background: #ebf5fb;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        
+        .item-desc {
+            font-size: 14px;
+            color: #555;
+            margin-top: 8px;
+        }
+        
+        .item-desc ul {
+            padding-left: 20px;
+        }
+        
+        .item-desc li {
+            margin-bottom: 5px;
+            line-height: 1.6;
+        }
+        
+        .links {
+            margin-top: 8px;
+        }
+        
+        .links a {
+            color: #3498db;
+            text-decoration: none;
+            font-size: 13px;
+            margin-right: 15px;
+        }
+        
+        .links a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Skills */
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .skill-tag {
+            background: #ecf0f1;
+            color: #2c3e50;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        /* Awards */
+        .awards-list {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .awards-list li {
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        
+        .award-level {
+            color: #e74c3c;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .edu-header,
+            .item-header {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .contact span {
+                display: block;
+                margin: 3px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <img src="/Games/ball/img/UESTC_ico.png" alt="电子科技大学" class="school-logo">
+            <div class="header-info">
+                <div class="name">王京</div>
+                <div class="contact-links">
+                    <span>17702376984</span>
+                    <span>2642144249@qq.com</span>
+                    <span>Weichat：Barbarianwj</span>
+                    <a href="https://github.com/JingW-ui" target="_blank">GitHub</a>
+                    <a href="https://space.bilibili.com/521967044" target="_blank">B站</a><a href="https://jingw-ui.github.io/">Home</a>
+                    <a href="/carousel/">Rewards</a>
+                    <a href="/Software_Downloads/">Downloads</a>
+                    <a href="/phone/">Receiver</a>
+                    <a href="/videos/">Projects</a>
+                    <a href="/Games/">Games</a>
+                    <a href="/skills/">Skills</a>
+                    <a href="/resume/">Details</a>
+                    <a href="https://jingw-ui.github.io/MediScreen-Brain/">MediScreen-Brain</a>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Education -->
+        <div class="section">
+            <div class="section-title">教育背景</div>
+            <div class="edu-item">
+                <div class="edu-header">
+                    <span class="school">电子科技大学（985）</span>
+                    <span class="date">2024.09 - 至今</span>
+                </div>
+                <div class="edu-detail">生物医学工程 · 硕士 | GPA: 3.83/4（前5%）| 导师：陈华富教授</div>
+            </div>
+            <div class="edu-item">
+                <div class="edu-header">
+                    <span class="school">西南科技大学</span>
+                    <span class="date">2020.09 - 2024.06</span>
+                </div>
+                <div class="edu-detail">生物医学工程 · 本科 | GPA: 4.15/5（前2%）| <span class="highlight">四川省优秀毕业生</span></div>
+            </div>
+        </div>
+
+        <!-- Internship -->
+        <div class="section">
+            <div class="section-title">实习经历</div>
+            <div class="item">
+                <div class="item-header">
+                    <span class="item-title">国网宁夏电力有限公司 - AI算法实习生</span>
+                    <span class="date">2023.10 - 2023.12</span>
+                </div>
+                <div class="tech-stack">YOLO · OpenPose · Python · 无人机</div>
+                <div class="item-desc">
+                    <ul>
+                        <li>实现头盔检测、人体姿态估计算法，用于配电网不停电作业安全管控</li>
+                        <li>开发危险姿势识别算法，提供实时安全预警功能</li>
+                        <li>采集和处理图像视频数据，完成无人机模拟作业数据采集</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Projects -->
+        <div class="section">
+            <div class="section-title">项目经历</div>
+            
+            <div class="item">
+                <div class="item-header">
+                    <span class="item-title">NEURA - 神经影像分析智能体系统</span>
+                    <span class="date">2025.07 - 2026.02</span>
+                </div>
+                <div class="tech-stack">LLM Agent · Python · RAG · Chain-of-Thought</div>
+                <div class="links">
+                    <a href="https://github.com/NeuroScienceLab/NEURA" target="_blank">GitHub</a>
+                    <a href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank">论文</a>
+                </div>
+                <div class="item-desc">
+                    <ul>
+                        <li>设计基于大语言模型的自主智能体系统，通过双知识图谱（DiseaseKG & ToolKG）动态桥接医学知识与异构工具链</li>
+                        <li>实现复杂神经影像工作流的自主编排与端到端自动化执行，整合SPM、FreeSurfer等专业工具</li>
+                        <li>显著降低神经影像处理技术门槛，解决科研可复现性难题</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="item-header">
+                    <span class="item-title">AutoTask-UI - 桌面自动化办公工具</span>
+                    <span class="date">2025.10 - 2026.01</span>
+                </div>
+                <div class="tech-stack">PySide6 · PyAutoGUI · Python </div>
+                <div class="links">
+                    <a href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank">GitHub (70+ Stars)</a>
+                    <a href="https://www.bilibili.com/video/BV1FzpLzHEWL" target="_blank">演示视频 (10K+播放)</a>
+                </div>
+                <div class="item-desc">
+                    <ul>
+                        <li>开发零代码桌面自动化工具，实现可视化任务编排、键鼠模拟及微信自动化能力</li>
+                        <li>集成定时调度与批量任务管理功能，解决办公重复流程自动化痛点</li>
+                        <li>开源项目获70+ Stars，建立150+用户社群，下载107MB</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skills -->
+        <div class="section">
+            <div class="section-title">技能专长</div>
+            <div class="skills-grid">
+                <span class="skill-tag">Python</span>
+                <span class="skill-tag">深度学习</span>
+                <span class="skill-tag">YOLO系列</span>
+                <span class="skill-tag">PyTorch</span>
+                <span class="skill-tag">PySide6/Qt</span>
+                <span class="skill-tag">LLM Agent开发</span>
+                <span class="skill-tag">全栈开发</span>
+                <span class="skill-tag">Java/Spring Boot</span>
+                <span class="skill-tag">MySQL</span>
+                <span class="skill-tag">C/C++</span>
+                <span class="skill-tag">英语六级</span>
+            </div>
+        </div>
+
+        <!-- Awards -->
+        <div class="section">
+            <div class="section-title">获奖荣誉</div>
+            <ul class="awards-list">
+                <li><span class="award-level">国家级</span>第九届全国大学生生物医学工程创新设计竞赛一等奖（2024）</li>
+                <li><span class="award-level">国家级</span>第八届全国大学生生物医学工程创新设计竞赛二等奖（2023）</li>
+                <li><span class="award-level">省级</span>第五/四/三届四川省生物医学工程创新设计大赛一等奖 ×4（2023-2025）</li>
+                <li><span class="award-level">省级</span>湖北省"华为云杯"昇腾云血液图像处理大赛二等奖（2025）</li>
+                <li><span class="award-level">校级</span>国家励志奖学金 ×2、电子科技大学优秀研究生、学业奖学金一等奖</li>
+                <li><span class="award-level">其他</span>四川省优秀毕业生、绵阳市三好学生、软件著作权 ×5、专利 ×1</li>
+            </ul>
+        </div>
+
+        <!-- Publications -->
+        <div class="section">
+            <div class="section-title">科研成果</div>
+            <ul class="awards-list">
+                <li>SCI论文：MediScreen-Brain: A Portable, YOLO-powered GUI for Multi-Modal Brain Tumor Detection</li>
+                <li>SCI论文：NEURA: An agentic system for autonomous neuroimaging workflows (bioRxiv)</li>
+                <li>专利：基于深度学习的MRI海马体3D智能分析诊断平台</li>
+                <li>软著：结直肠息肉智能检测系统、脑部肿瘤检测系统、批量图像处理工具等 ×5</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
