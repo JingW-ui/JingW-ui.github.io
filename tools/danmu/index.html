@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>手持弹幕</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: #000000;
+            color: #ffffff;
+            text-align: center;
+            padding: 25px 20px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .header p {
+            font-size: 14px;
+            color: #cccccc;
+        }
+
+        .control-panel {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus {
+            outline: none;
+            border-color: #000000;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .form-group input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .form-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #000000;
+            cursor: pointer;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 15px;
+        }
+
+        .color-group {
+            flex: 1;
+        }
+
+        .color-group input[type="color"] {
+            width: 100%;
+            height: 50px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 14px;
+            background: #000000;
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .play-btn:hover {
+            background: #333333;
+        }
+
+        .hint {
+            text-align: center;
+            margin-top: 15px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .info-section {
+            background: #f5f5f5;
+            padding: 20px 25px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .info-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .info-section p {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        /* 弹幕全屏样式 */
+        .danmu-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 9999;
+            background: #000;
+            display: none;
+        }
+
+        .danmu-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* 横屏提示 */
+        .rotate-hint {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000;
+            color: #ffffff;
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) and (orientation: portrait) {
+            .rotate-hint {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+            }
+            
+            .container {
+                max-width: 100%;
+                border-radius: 0;
+            }
+            
+            .control-panel {
+                padding: 20px;
+            }
+            
+            .color-picker {
+                flex-direction: column;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 横屏提示 -->
+    <div class="rotate-hint" id="rotateHint">
+        <div>
+            <p style="font-size: 48px; margin-bottom: 20px;">📱</p>
+            <p>请将手机横屏使用<br>以获得最佳体验</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>手持弹幕</h1>
+            <p>自定义滚动弹幕工具</p>
+        </div>
+
+        <div class="control-panel">
+            <div class="form-group">
+                <label for="content">弹幕内容：</label>
+                <input type="text" id="content" placeholder="请输入要显示的弹幕文字..." value="我爱你中国！">
+            </div>
+
+            <div class="form-group">
+                <label for="speed">播放速度（秒）：</label>
+                <input type="number" id="speed" value="8" min="1" max="30" step="0.5">
+            </div>
+
+            <div class="form-group">
+                <label for="fontSize">文字大小：</label>
+                <div class="slider-container">
+                    <input type="range" id="fontSize" min="20" max="120" value="60">
+                    <span id="fontSizeValue">60px</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>颜色设置：</label>
+                <div class="color-picker">
+                    <div class="color-group">
+                        <label for="textColor">文字颜色：</label>
+                        <input type="color" id="textColor" value="#ffffff">
+                    </div>
+                    <div class="color-group">
+                        <label for="bgColor">背景颜色：</label>
+                        <input type="color" id="bgColor" value="#000000">
+                    </div>
+                </div>
+            </div>
+
+            <button class="play-btn" onclick="startDanmu()">开始播放</button>
+            <p class="hint">双击屏幕退出弹幕模式</p>
+        </div>
+
+        <div class="info-section">
+            <h3>使用说明</h3>
+            <p>• 输入要显示的弹幕文字内容</p>
+            <p>• 调整播放速度控制文字滚动快慢</p>
+            <p>• 自定义文字大小和颜色效果</p>
+            <p>• 点击"开始播放"进入全屏模式</p>
+            <p>• 双击屏幕或按ESC键退出</p>
+            <p>• 手机端请横屏使用以获得最佳体验</p>
+        </div>
+    </div>
+
+    <!-- 弹幕全屏容器 -->
+    <div class="danmu-fullscreen" id="danmuFullscreen">
+        <canvas class="danmu-canvas" id="danmuCanvas"></canvas>
+    </div>
+
+    <script>
+        // 全局变量
+        let animationId = null;
+        let canvas = null;
+        let ctx = null;
+        let danmuText = '';
+        let scrollSpeed = 8;
+        let fontSize = 60;
+        let textColor = '#ffffff';
+        let bgColor = '#000000';
+        let textX = 0;
+        let textY = 0;
+        let lastTime = 0;
+
+        // 更新字体大小显示
+        document.getElementById('fontSize').addEventListener('input', function() {
+            document.getElementById('fontSizeValue').textContent = this.value + 'px';
+        });
+
+        // 开始弹幕
+        function startDanmu() {
+            // 获取用户配置
+            danmuText = document.getElementById('content').value.trim();
+            if (!danmuText) {
+                alert('请输入弹幕内容！');
+                return;
+            }
+
+            scrollSpeed = parseFloat(document.getElementById('speed').value) || 8;
+            fontSize = parseInt(document.getElementById('fontSize').value) || 60;
+            textColor = document.getElementById('textColor').value;
+            bgColor = document.getElementById('bgColor').value;
+
+            // 检查是否为手机端竖屏
+            const isMobilePortrait = window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
+            if (isMobilePortrait) {
+                alert('请将手机横屏使用以获得最佳体验！');
+                return;
+            }
+
+            // 显示全屏容器
+            const fullscreen = document.getElementById('danmuFullscreen');
+            fullscreen.style.display = 'block';
+
+            // 初始化Canvas
+            canvas = document.getElementById('danmuCanvas');
+            ctx = canvas.getContext('2d');
+            
+            resizeCanvas();
+            
+            // 计算初始位置 - 从右侧开始
+            textX = canvas.width + 100;
+            textY = canvas.height / 2;
+
+            // 请求全屏
+            requestFullscreen(fullscreen);
+
+            // 开始动画
+            lastTime = performance.now();
+            animate();
+
+            // 添加双击退出事件
+            fullscreen.addEventListener('dblclick', exitDanmu);
+            
+            // 添加ESC键退出
+            document.addEventListener('keydown', handleKeyPress);
+        }
+
+        // 调整Canvas大小
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // 请求全屏
+        function requestFullscreen(element) {
+            if (element.requestFullscreen) {
+                element.requestFullscreen();
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            }
+        }
+
+        // 退出全屏
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
+
+        // 动画函数
+        function animate(currentTime) {
+            if (!currentTime) currentTime = performance.now();
+            
+            const deltaTime = (currentTime - lastTime) / 1000; // 转换为秒
+            lastTime = currentTime;
+
+            // 清空画布
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 设置文字样式
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.fillStyle = textColor;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+
+            // 绘制文字
+            ctx.fillText(danmuText, textX, textY);
+
+            // 更新位置（根据速度和时间差计算）
+            const pixelsPerSecond = (canvas.width + ctx.measureText(danmuText).width + 200) / scrollSpeed;
+            textX -= pixelsPerSecond * deltaTime;
+
+            // 如果文字完全移出屏幕左侧，重新开始
+            if (textX < -ctx.measureText(danmuText).width - 100) {
+                textX = canvas.width + 100;
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // 退出弹幕
+        function exitDanmu() {
+            // 停止动画
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+
+            // 隐藏全屏容器
+            const fullscreen = document.getElementById('danmuFullscreen');
+            fullscreen.style.display = 'none';
+
+            // 退出全屏
+            exitFullscreen();
+
+            // 移除事件监听
+            fullscreen.removeEventListener('dblclick', exitDanmu);
+            document.removeEventListener('keydown', handleKeyPress);
+        }
+
+        // 处理键盘事件
+        function handleKeyPress(event) {
+            if (event.key === 'Escape') {
+                exitDanmu();
+            }
+        }
+
+        // 窗口大小改变时重新调整Canvas
+        window.addEventListener('resize', function() {
+            if (canvas && document.getElementById('danmuFullscreen').style.display === 'block') {
+                resizeCanvas();
+                textY = canvas.height / 2;
+            }
+        });
+    </script>
+</body>
+</html>
