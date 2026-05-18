@@ -247,24 +247,156 @@
         
         /* Responsive */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                background: #fff;
+            }
+            
             .container {
-                padding: 20px;
+                padding: 15px;
+                box-shadow: none;
             }
             
+            /* Header - 左右紧凑布局 */
             .header {
-                flex-direction: column;
-                text-align: center;
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+                padding-bottom: 10px;
+                margin-bottom: 12px;
+                text-align: left;
             }
             
-            .edu-header,
-            .item-header {
-                flex-direction: column;
-                gap: 5px;
+            .avatar {
+                width: 55px;
+                height: 55px;
+                flex-shrink: 0;
+                margin-top: 0;
             }
             
-            .contact span {
-                display: block;
-                margin: 3px 0;
+            .school-logo {
+                width: 75px;
+                height: 30px;
+                top: -8px;
+            }
+            
+            .header-info {
+                flex: 1;
+                min-width: 0;
+                padding-top: 0;
+            }
+            
+            .name {
+                font-size: 19px;
+                margin-bottom: 3px;
+                line-height: 1.2;
+            }
+            
+            .contact-links {
+                gap: 4px;
+                flex-wrap: wrap;
+                line-height: 1.3;
+            }
+            
+            .contact-links span,
+            .contact-links a {
+                font-size: 10px;
+                padding: 2px 5px;
+                white-space: nowrap;
+            }
+            
+            /* Section titles */
+            .section-title {
+                font-size: 15px;
+                padding-left: 8px;
+                margin-bottom: 10px;
+            }
+            
+            /* Education */
+            .edu-item {
+                margin-bottom: 10px;
+            }
+            
+            .edu-header {
+                flex-direction: row;
+                justify-content: space-between;
+                gap: 8px;
+                margin-bottom: 3px;
+            }
+            
+            .school {
+                font-size: 13px;
+            }
+            
+            .date {
+                font-size: 11px;
+                white-space: nowrap;
+            }
+            
+            .edu-detail {
+                font-size: 12px;
+                line-height: 1.4;
+            }
+            
+            /* Projects */
+            .project-category {
+                font-size: 14px;
+                margin: 15px 0 8px 0;
+            }
+            
+            .project-table {
+                font-size: 11px;
+            }
+            
+            .project-table th {
+                padding: 6px 5px;
+                font-size: 11px;
+            }
+            
+            .project-table td {
+                padding: 6px 5px;
+            }
+            
+            .project-tech,
+            .project-result {
+                font-size: 10px;
+            }
+            
+            .project-links a {
+                font-size: 10px;
+                margin-right: 4px;
+            }
+            
+            /* Skills */
+            .skills-grid {
+                gap: 4px;
+            }
+            
+            .skill-tag {
+                padding: 3px 6px;
+                font-size: 10px;
+            }
+            
+            /* Awards */
+            .awards-list {
+                font-size: 12px;
+            }
+            
+            .awards-list li {
+                margin-bottom: 4px;
+                line-height: 1.4;
+            }
+            
+            .award-level {
+                font-size: 11px;
+            }
+            
+            .item {
+                margin-bottom: 8px;
+            }
+            
+            .item-title {
+                font-size: 13px;
             }
         }
     </style>
