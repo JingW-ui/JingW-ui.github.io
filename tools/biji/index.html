@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>迷你记事本 · LLM学习笔记</title>
+  <style>
+    :root {
+      --bg-base: #fafaf9;
+      --bg-surface: #ffffff;
+      --bg-sidebar: #ffffff;
+      --bg-hover: #f5f4f2;
+      --bg-input: #f7f6f3;
+      --bg-code: #fafaf7;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f9f9f6;
+      --bg-tooltip: #1c1c1a;
+      --text-primary: #1a1a17;
+      --text-secondary: #5c5b55;
+      --text-muted: #9a9992;
+      --text-inverse: #ffffff;
+      --border: #e8e6df;
+      --border-light: #f0efe9;
+      --border-focus: #d4d2c8;
+      --accent: #e67e3a;
+      --accent-soft: rgba(230, 126, 58, 0.08);
+      --accent-hover: #cf6f30;
+      --accent-light: #fdf0e8;
+      --accent-text: #b85d1f;
+      --green: #4a9c5d;
+      --green-soft: rgba(74, 156, 93, 0.08);
+      --red: #c44e4e;
+      --red-soft: rgba(196, 78, 78, 0.06);
+      --blue: #4a7eb5;
+      --blue-soft: rgba(74, 126, 181, 0.06);
+      --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+      --radius-xs: 4px;
+      --radius-sm: 6px;
+      --radius: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+      --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --font-sans: 'Inter', 'SF Pro Text', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', 'Consolas', monospace;
+      --sidebar-width: 300px;
+      --toolbar-height: 44px;
+    }
+
+    .dark {
+      --bg-base: #1b1b18;
+      --bg-surface: #22221e;
+      --bg-sidebar: #1e1e1b;
+      --bg-hover: #2a2a24;
+      --bg-input: #282822;
+      --bg-code: #252520;
+      --bg-card: #262620;
+      --bg-card-hover: #2c2c26;
+      --bg-tooltip: #fafaf8;
+      --text-primary: #e8e7e0;
+      --text-secondary: #b0afa6;
+      --text-muted: #737268;
+      --text-inverse: #1a1a17;
+      --border: #3a3a32;
+      --border-light: #2e2e28;
+      --border-focus: #55554a;
+      --accent: #f09050;
+      --accent-soft: rgba(240, 144, 80, 0.1);
+      --accent-hover: #f5a870;
+      --accent-light: #2a2218;
+      --accent-text: #f0b080;
+      --green: #5cb86e;
+      --green-soft: rgba(92, 184, 110, 0.08);
+      --red: #d46666;
+      --red-soft: rgba(212, 102, 102, 0.06);
+      --blue: #5c90c0;
+      --blue-soft: rgba(92, 144, 192, 0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { height: 100%; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      -webkit-font-smoothing: antialiased;
+      transition: background 0.4s ease;
+    }
+    .app {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      max-width: 1400px;
+      background: var(--bg-surface);
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      transition: background 0.4s ease;
+    }
+    @media (min-width: 900px) { .app { border-radius: 16px; height: 94vh; margin: 0 12px; } }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100%;
+      background: var(--bg-sidebar);
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid var(--border);
+      flex-shrink: 0;
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 20;
+    }
+    @media (max-width: 768px) {
+      .sidebar { position: absolute; left: 0; top: 0; bottom: 0; width: 280px; transform: translateX(-100%); box-shadow: var(--shadow-lg); }
+      .sidebar.open { transform: translateX(0); }
+    }
+
+    .sidebar-header { padding: 16px 18px 8px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .sidebar-header .logo { display: flex; align-items: center; gap: 9px; font-weight: 700; font-size: 16px; }
+    .logo .icon { width: 32px; height: 32px; border-radius: 8px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 16px; color: #fff; box-shadow: 0 2px 8px rgba(230,126,58,0.3); }
+    .header-btns { display: flex; gap: 4px; }
+    .icon-btn { width: 32px; height: 32px; border-radius: 7px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+    .icon-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .primary-action { background: var(--accent); color: #fff; width: 34px; height: 34px; border-radius: 9px; font-size: 18px; font-weight: 600; box-shadow: 0 2px 8px rgba(230,126,58,0.25); }
+    .primary-action:hover { background: var(--accent-hover); }
+
+    .search-wrap { padding: 6px 14px 8px; }
+    .search-inner { display: flex; align-items: center; background: var(--bg-input); border-radius: 20px; padding: 8px 14px; gap: 8px; border: 1.5px solid transparent; transition: var(--transition); }
+    .search-inner:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); background: var(--bg-surface); }
+    .search-wrap input { flex: 1; border: none; background: transparent; font-size: 13px; outline: none; }
+
+    .tags-row { padding: 4px 14px 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag-chip { padding: 5px 12px; border-radius: 14px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid transparent; background: var(--bg-hover); color: var(--text-secondary); transition: var(--transition); }
+    .tag-chip.active { background: var(--accent-soft); color: var(--accent-text); border-color: var(--accent); }
+
+    .notes-list { flex: 1; overflow-y: auto; padding: 4px 10px 16px; display: flex; flex-direction: column; gap: 3px; }
+    .note-item { padding: 11px 14px; border-radius: var(--radius); cursor: pointer; border: 1px solid transparent; transition: var(--transition); }
+    .note-item:hover { background: var(--bg-card-hover); border-color: var(--border-light); }
+    .note-item.active { background: var(--accent-soft); border-color: var(--accent); }
+
+    .main-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-surface); }
+
+    .toolbar { display: flex; align-items: center; gap: 4px; padding: 6px 12px; border-bottom: 1px solid var(--border-light); flex-shrink: 0; flex-wrap: wrap; min-height: var(--toolbar-height); }
+    .tb-btn { height: 30px; padding: 0 9px; border-radius: 6px; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; font-size: 12px; font-weight: 500; transition: var(--transition); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+    .tb-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+    .tb-divider { width: 1px; height: 22px; background: var(--border-light); margin: 0 6px; }
+    .tb-btn.accent { color: var(--accent); font-weight: 600; }
+    .tb-btn.active { background: var(--accent-soft); color: var(--accent-text); }
+    .tb-spacer { flex: 1; }
+
+    .title-input-wrap { padding: 6px 20px 2px; }
+    .title-input { width: 100%; border: none; background: transparent; font-size: 20px; font-weight: 700; outline: none; padding: 6px 0; border-bottom: 2px solid transparent; transition: var(--transition); }
+    .title-input:focus { border-bottom-color: var(--accent); }
+
+    .editor-area { flex: 1; display: flex; overflow: hidden; }
+    .edit-pane, .preview-pane { flex: 1; overflow-y: auto; padding: 16px 20px 40px; font-size: 14px; line-height: 1.75; }
+    .edit-pane { border: none; background: var(--bg-surface); font-family: var(--font-mono); font-size: 13.5px; resize: none; outline: none; }
+    .preview-pane { background: var(--bg-surface); word-break: break-word; }
+    .split-view .edit-pane { border-right: 1px solid var(--border-light); }
+    .hidden { display: none !important; }
+
+    /* toast */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--bg-tooltip); color: var(--text-inverse); padding: 10px 20px; border-radius: 20px; font-size: 12px; font-weight: 500; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+<div class="app" id="app">
+  <!-- 移动端遮罩层（点击可关闭侧边栏） -->
+  <div class="overlay" id="overlay" style="display:none; position:fixed; inset:0; z-index:15; background:rgba(0,0,0,0.2);"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo"><div class="icon">📝</div><span>LLM笔记</span></div>
+      <div class="header-btns">
+        <button class="icon-btn" id="importBtn" title="导入 .md 文件">📥</button>
+        <button class="icon-btn" id="exportBtn" title="导出当前笔记为 .md">📤</button>
+        <button class="icon-btn" id="themeToggle" title="深色模式">🌓</button>
+        <button class="icon-btn primary-action" id="newNoteSidebar">＋</button>
+      </div>
+    </div>
+    <div class="search-wrap"><div class="search-inner"><span>🔍</span><input id="searchInput" placeholder="搜索笔记..."></div></div>
+    <div class="tags-row" id="tagsRow"></div>
+    <div class="notes-list" id="notesList"></div>
+  </aside>
+
+  <main class="main-panel" id="mainPanel">
+    <div class="toolbar">
+      <button class="tb-btn" id="menuBtn">☰ 列表</button>
+      <span class="tb-divider"></span>
+      <button class="tb-btn" id="boldBtn"><b>B</b></button>
+      <button class="tb-btn" id="italicBtn"><i>I</i></button>
+      <button class="tb-btn" id="headingBtn">H</button>
+      <button class="tb-btn" id="codeBtn">&lt;/&gt;</button>
+      <button class="tb-btn" id="listBtn">≡</button>
+      <button class="tb-btn" id="quoteBtn">❝</button>
+      <button class="tb-btn" id="tableBtn">⊞</button>
+      <button class="tb-btn" id="linkBtn">🔗</button>
+      <span class="tb-divider"></span>
+      <button class="tb-btn" id="saveBtn">💾 保存</button>
+      <span class="tb-spacer"></span>
+      <button class="tb-btn" id="togglePreviewBtn">预览</button>
+      <button class="tb-btn" id="toggleSplitBtn">分屏</button>
+      <button class="tb-btn accent" id="deleteNoteBtn" style="margin-left:4px;">🗑️</button>
+    </div>
+    <div class="title-input-wrap"><input class="title-input" id="titleInput" placeholder="请输入标题..."></div>
+    <div class="editor-area" id="editorArea">
+      <textarea class="edit-pane" id="editPane" placeholder="开始写作..."></textarea>
+      <div class="preview-pane hidden" id="previewPane"></div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<input type="file" id="importFileInput" accept=".md,.txt" style="display:none;">
+
+<script>
+  (function() {
+    const STORAGE_KEY = 'mininote_notes_v3';
+    const SETTINGS_KEY = 'mininote_settings_v3';
+    let notes = [];
+    let currentNoteId = null;
+    let activeTag = 'all';
+    let searchQuery = '';
+    let isDark = false;
+    let isPreview = false;
+    let isSplit = false;
+    let autoSaveTimer = null;
+
+    const defaultNotes = [
+      { id:1, title:'大语言模型概述', date:'2026-05-08', tags:['LLM基础'], content:`## 大语言模型概述\n\n大语言模型（LLM）是基于深度学习构建的，专门用于理解和生成自然语言。\n\n### 核心特征\n- **参数量大**：数十亿到数万亿参数\n- **涌现能力**：规模达到阈值后突然获得新能力\n- **上下文学习**：通过提示词即可完成新任务\n\n| 时间 | 里程碑 |\n|------|--------|\n| 2017 | Transformer架构提出 |\n| 2018 | GPT-1、BERT发布 |\n| 2020 | GPT-3发布 |\n| 2022 | ChatGPT发布 |` },
+      { id:2, title:'Transformer架构', date:'2026-05-07', tags:['架构'], content:`## Transformer架构\n\n2017年Google提出，完全基于注意力机制。\n\n- **自注意力**：捕捉序列内部关系\n- **多头注意力**：并行多个注意力头\n- **位置编码**：提供位置信息\n\n> 并行计算能力强，训练效率高。` },
+      { id:3, title:'注意力机制', date:'2026-05-06', tags:['架构'], content:`## 注意力机制\n\n核心公式：\`Attention(Q,K,V) = softmax(QK^T/√d_k) × V\`\n\n- Q：查询向量\n- K：键向量\n- V：值向量` },
+      { id:4, title:'预训练与微调', date:'2026-05-05', tags:['技术'], content:`## 预训练与微调\n\n- **预训练**：海量无标注数据自监督学习\n- **微调**：特定任务标注数据继续训练\n- **LoRA**：参数高效微调` },
+      { id:5, title:'提示工程', date:'2026-05-04', tags:['应用'], content:`## 提示工程\n\n设计有效提示词引导LLM生成高质量输出。\n\n1. 角色设定\n2. Few-shot 示例\n3. 思维链（CoT）` },
+      { id:6, title:'RAG', date:'2026-05-03', tags:['应用'], content:`## RAG\n\n检索增强生成，结合外部知识库。\n\n- 减少幻觉\n- 知识可更新\n- 可溯源` },
+      { id:7, title:'模型评估', date:'2026-05-02', tags:['技术'], content:`## 模型评估\n\n- MMLU：多任务语言理解\n- HumanEval：代码生成\n- GSM8K：数学推理` },
+      { id:8, title:'深度学习基础', date:'2026-05-01', tags:['基础'], content:`## 深度学习基础\n\n- 反向传播\n- 优化器：Adam\n- 正则化：Dropout` }
+    ];
+
+    const $ = id => document.getElementById(id);
+    const sidebar = $('sidebar'), overlay = $('overlay'), notesList = $('notesList'), tagsRow = $('tagsRow');
+    const searchInput = $('searchInput'), titleInput = $('titleInput'), editPane = $('editPane');
+    const previewPane = $('previewPane'), editorArea = $('editorArea');
+    const togglePreviewBtn = $('togglePreviewBtn'), toggleSplitBtn = $('toggleSplitBtn');
+    const toast = $('toast'), importFileInput = $('importFileInput'), mainPanel = $('mainPanel');
+    const menuBtn = $('menuBtn');
+
+    function loadNotes() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      notes = raw ? JSON.parse(raw) : defaultNotes.map(n => ({...n}));
+      saveNotes();
+    }
+    function saveNotes() { localStorage.setItem(STORAGE_KEY, JSON.stringify(notes)); }
+    function loadSettings() {
+      const s = localStorage.getItem(SETTINGS_KEY);
+      if(s) try { const o = JSON.parse(s); isDark = o.isDark || false; isPreview = o.isPreview || false; isSplit = o.isSplit || false; } catch(e){}
+    }
+    function saveSettings() { localStorage.setItem(SETTINGS_KEY, JSON.stringify({isDark, isPreview, isSplit})); }
+
+    function showToast(msg) {
+      clearTimeout(window._toastTimer);
+      toast.textContent = msg; toast.classList.add('show');
+      window._toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+    function applyTheme() { document.documentElement.classList.toggle('dark', isDark); }
+    function toggleTheme() { isDark = !isDark; applyTheme(); saveSettings(); showToast(isDark ? '已切换深色模式' : '已切换浅色模式'); }
+
+    // ========== Markdown 解析（增强表格） ==========
+    function parseMarkdown(md) {
+      if (!md) return '';
+      const lines = md.split('\n');
+      let html = '';
+      let inTable = false, tableRows = [];
+      function flushTable() {
+        if (tableRows.length < 2) return;
+        let t = '<table>';
+        const header = tableRows[0];
+        t += '<thead><tr>' + header.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
+        for (let i = 2; i < tableRows.length; i++) {
+          const row = tableRows[i];
+          if (row.every(c => /^[-:]+$/.test(c))) continue; // 跳过分隔行
+          t += '<tr>' + row.map(c => `<td>${c}</td>`).join('') + '</tr>';
+        }
+        t += '</tbody></table>';
+        html += t;
+        tableRows = [];
+      }
+      function processInline(text) {
+        return text
+          .replace(/`([^`]+)`/g, '<code>$1</code>')
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+          .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+      }
+      for (let line of lines) {
+        if (/^\|.+\|$/.test(line.trim())) {
+          if (!inTable) inTable = true;
+          const cells = line.split('|').slice(1, -1).map(c => processInline(c.trim()));
+          tableRows.push(cells);
+          continue;
+        } else {
+          if (inTable) { flushTable(); inTable = false; }
+        }
+        if (/^#{1,6}\s/.test(line)) {
+          const level = line.match(/^(#{1,6})/)[1].length;
+          html += `<h${level}>${processInline(line.replace(/^#{1,6}\s+/, ''))}</h${level}>`;
+        } else if (/^> (.+)/.test(line)) {
+          html += `<blockquote>${processInline(line.slice(2))}</blockquote>`;
+        } else if (/^[\-\*]\s/.test(line)) {
+          html += `<ul><li>${processInline(line.replace(/^[\-\*]\s+/, ''))}</li></ul>`;
+        } else if (/^\d+\.\s/.test(line)) {
+          html += `<ol><li>${processInline(line.replace(/^\d+\.\s+/, ''))}</li></ol>`;
+        } else if (line.trim() === '') {
+          html += '<br>';
+        } else {
+          html += `<p>${processInline(line)}</p>`;
+        }
+      }
+      if (inTable) flushTable();
+      return html;
+    }
+
+    function updatePreview() {
+      if (!currentNoteId) return;
+      const note = notes.find(n => n.id === currentNoteId);
+      if (note) previewPane.innerHTML = parseMarkdown(note.content);
+    }
+
+    function applyViewMode() {
+      editorArea.classList.toggle('split-view', isSplit);
+      editPane.classList.toggle('hidden', !isSplit && isPreview);
+      previewPane.classList.toggle('hidden', !isSplit && !isPreview);
+      if (isSplit) {
+        editPane.classList.remove('hidden');
+        previewPane.classList.remove('hidden');
+      }
+      togglePreviewBtn.textContent = isPreview ? '编辑' : '预览';
+      toggleSplitBtn.classList.toggle('active', isSplit);
+      if (isSplit) togglePreviewBtn.classList.add('hidden');
+      else togglePreviewBtn.classList.remove('hidden');
+    }
+
+    function autoSave() {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => {
+        if (!currentNoteId) return;
+        const note = notes.find(n => n.id === currentNoteId);
+        if (note) {
+          const newContent = editPane.value;
+          if (note.content !== newContent) {
+            note.content = newContent;
+            note.title = titleInput.value || (newContent.match(/^#\s+(.+)/m)?.[1] || '未命名笔记');
+            note.date = new Date().toISOString().slice(0,10);
+            saveNotes();
+            renderNotesList();
+            renderTags();
+            if (isSplit || isPreview) updatePreview();
+          }
+        }
+      }, 800);
+    }
+
+    function getAllTags() { const s = new Set(); notes.forEach(n => n.tags.forEach(t => s.add(t))); return [...s].sort(); }
+    function renderTags() {
+      let html = `<span class="tag-chip${activeTag==='all'?' active':''}" data-tag="all">全部</span>`;
+      getAllTags().forEach(t => html += `<span class="tag-chip${activeTag===t?' active':''}" data-tag="${t}">${t}</span>`);
+      tagsRow.innerHTML = html;
+      tagsRow.querySelectorAll('.tag-chip').forEach(c => c.onclick = () => {
+        activeTag = c.dataset.tag;
+        renderTags();
+        renderNotesList();
+      });
+    }
+    function filterNotes() {
+      let res = notes;
+      if (activeTag !== 'all') res = res.filter(n => n.tags.includes(activeTag));
+      if (searchQuery.trim()) {
+        const q = searchQuery.trim().toLowerCase();
+        res = res.filter(n => n.title.toLowerCase().includes(q) || n.tags.some(t => t.toLowerCase().includes(q)) || n.content.toLowerCase().includes(q));
+      }
+      return res;
+    }
+    function renderNotesList() {
+      const list = filterNotes();
+      notesList.innerHTML = list.length ? list.map(n => `<div class="note-item${currentNoteId===n.id?' active':''}" data-id="${n.id}"><div class="item-title">${n.title}</div><div class="item-meta">${n.date} · ${n.tags.slice(0,2).join(' ')}</div></div>`).join('') : '<div class="empty-list">📭 无笔记</div>';
+      notesList.querySelectorAll('.note-item').forEach(el => el.onclick = () => {
+        openNote(parseInt(el.dataset.id));
+        closeSidebar(); // 点击笔记后关闭侧边栏
+      });
+    }
+
+    // ========== 侧边栏控制 ==========
+    function openSidebar() {
+      if (window.innerWidth < 768) {
+        sidebar.classList.add('open');
+        overlay.style.display = 'block';
+      }
+    }
+    function closeSidebar() {
+      if (window.innerWidth < 768) {
+        sidebar.classList.remove('open');
+        overlay.style.display = 'none';
+      }
+    }
+    function toggleSidebar() {
+      if (window.innerWidth < 768) {
+        if (sidebar.classList.contains('open')) closeSidebar();
+        else openSidebar();
+      }
+    }
+
+    function openNote(id) {
+      const note = notes.find(n => n.id === id);
+      if (!note) return;
+      currentNoteId = id;
+      titleInput.value = note.title;
+      editPane.value = note.content;
+      if (isSplit || isPreview) updatePreview();
+      renderNotesList();
+      if (window.innerWidth < 768) mainPanel.style.transform = 'translateX(0)';
+    }
+    function createNewNote() {
+      const nn = { id: Date.now(), title:'新笔记', date: new Date().toISOString().slice(0,10), tags:[], content:'## 新笔记\n\n开始写作...' };
+      notes.unshift(nn); saveNotes();
+      openNote(nn.id);
+      renderNotesList(); renderTags();
+      showToast('✅ 新笔记已创建');
+      closeSidebar();
+    }
+    function deleteCurrentNote() {
+      if (!currentNoteId) return;
+      if (confirm('删除当前笔记？')) {
+        notes = notes.filter(n => n.id !== currentNoteId);
+        saveNotes();
+        currentNoteId = null; titleInput.value=''; editPane.value=''; previewPane.innerHTML='';
+        renderNotesList(); renderTags();
+      }
+    }
+    function exportCurrentNote() {
+      if (!currentNoteId) return showToast('请先选中笔记');
+      const note = notes.find(n => n.id === currentNoteId);
+      const blob = new Blob([note.content], {type:'text/markdown'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = (note.title||'笔记').replace(/[\/:*?"<>|]/g,'') + '.md';
+      a.click();
+      showToast('📤 已导出');
+    }
+    function importMarkdownFile() { importFileInput.click(); }
+
+    function insertMD(prefix, suffix='') {
+      const ta = editPane, start = ta.selectionStart, end = ta.selectionEnd;
+      const sel = ta.value.substring(start, end);
+      ta.value = ta.value.substring(0,start) + prefix + sel + suffix + ta.value.substring(end);
+      ta.focus(); ta.setSelectionRange(start+prefix.length, start+prefix.length+sel.length);
+      autoSave();
+    }
+
+    // 事件绑定
+    menuBtn.onclick = toggleSidebar;
+    overlay.onclick = closeSidebar; // 点击遮罩关闭
+
+    searchInput.oninput = () => { searchQuery = searchInput.value; renderNotesList(); };
+    titleInput.oninput = () => {
+      if(currentNoteId){ const n=notes.find(x=>x.id===currentNoteId); if(n){ n.title=titleInput.value; saveNotes(); renderNotesList(); } }
+    };
+    editPane.oninput = () => { autoSave(); if(isSplit) updatePreview(); };
+    editPane.onkeydown = e => {
+      if(e.key==='Escape'){
+        e.preventDefault();
+        isPreview = true; isSplit = false;
+        applyViewMode(); updatePreview(); saveSettings();
+      }
+    };
+
+    togglePreviewBtn.onclick = () => {
+      if (isSplit) { isSplit = false; isPreview = false; }
+      else { isPreview = !isPreview; }
+      applyViewMode();
+      if (isPreview || isSplit) updatePreview();
+      saveSettings();
+    };
+    toggleSplitBtn.onclick = () => {
+      isSplit = !isSplit;
+      if (isSplit) isPreview = false;
+      applyViewMode();
+      updatePreview();
+      saveSettings();
+    };
+
+    $('themeToggle').onclick = toggleTheme;
+    $('newNoteSidebar').onclick = createNewNote;
+    $('importBtn').onclick = importMarkdownFile;
+    $('exportBtn').onclick = exportCurrentNote;
+    $('saveBtn').onclick = () => {
+      if(currentNoteId){
+        const n = notes.find(x=>x.id===currentNoteId);
+        if(n){
+          n.content = editPane.value;
+          n.title = titleInput.value || '未命名';
+          n.date = new Date().toISOString().slice(0,10);
+          saveNotes(); renderNotesList(); renderTags();
+          showToast('💾 已保存');
+        }
+      }
+    };
+    $('deleteNoteBtn').onclick = deleteCurrentNote;
+
+    ['boldBtn','italicBtn','headingBtn','codeBtn','listBtn','quoteBtn','tableBtn','linkBtn'].forEach(id => {
+      $(id).onclick = () => {
+        const map = {
+          bold: ['**','**'], italic: ['*','*'], heading: ['### '], code: ['`','`'],
+          list: ['- '], quote: ['> '], table: ['\n| 列1 | 列2 |\n|------|------|\n| 内容 | 内容 |\n'], link: ['[','](url)']
+        };
+        const [pre, suf] = map[id.replace('Btn','')] || ['',''];
+        insertMD(pre, suf||'');
+      };
+    });
+
+    importFileInput.onchange = () => {
+      const file = importFileInput.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const content = reader.result;
+        const title = file.name.replace(/\.md$|\.txt$/i,'');
+        const nn = { id: Date.now(), title, date: new Date().toISOString().slice(0,10), tags:[], content };
+        notes.unshift(nn); saveNotes();
+        renderNotesList(); renderTags();
+        openNote(nn.id);
+        showToast('📥 已导入');
+        closeSidebar();
+      };
+      reader.readAsText(file);
+      importFileInput.value = '';
+    };
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 768) {
+        sidebar.classList.remove('open');
+        overlay.style.display = 'none';
+        mainPanel.style.transform = '';
+      }
+    });
+
+    // 初始化
+    loadSettings(); applyTheme();
+    loadNotes(); renderTags(); renderNotesList();
+    if (notes.length && !currentNoteId) openNote(notes[0].id);
+    else if (!notes.length) editPane.value = '# 欢迎！\n开始你的第一条笔记吧。';
+    applyViewMode();
+    if (isSplit || isPreview) updatePreview();
+  })();
+</script>
+</body>
+</html>

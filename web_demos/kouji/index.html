@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>口技十景 - 戴敦邦国画风互动体验</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-brown: #8B4510;
+            --secondary-brown: #A0522D;
+            --accent-brown: #CD853F;
+            --bg-beige: #F5E6D3;
+            --light-beige: #F7F3E9;
+            --accent-red: #8B0000;
+            --text-dark: #2C1810;
+            --text-light: #5D4037;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, var(--bg-beige) 0%, var(--light-beige) 100%);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-beige);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease-out;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loading-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 3rem;
+            color: var(--primary-brown);
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 0.5s forwards;
+        }
+
+        .loading-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 3rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 1s forwards;
+        }
+
+        .progress-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(139, 69, 16, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out 1.5s forwards;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-brown);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .main-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .scene {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .scene-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .scene-bg.loaded {
+            opacity: 1;
+        }
+
+        .scene-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            max-width: 800px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease-out;
+        }
+
+        .scene-content.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scene-title {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .original-text {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.4rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+            color: #FFF8DC;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .modern-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #F0E68C;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 15px 30px;
+            border-radius: 50px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .controls.visible {
+            opacity: 1;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .volume-slider {
+            width: 100px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .scene-nav {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .scene-nav.visible {
+            opacity: 1;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-dot.active {
+            background: var(--accent-red);
+            transform: scale(1.3);
+        }
+
+        .nav-dot:hover {
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(1.2);
+        }
+
+        .nav-tooltip {
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-dot:hover .nav-tooltip {
+            opacity: 1;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes inkSpread {
+            0% {
+                mask-size: 0% 0%;
+            }
+            100% {
+                mask-size: 200% 200%;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .loading-title {
+                font-size: 2rem;
+            }
+            
+            .scene-title {
+                font-size: 2rem;
+            }
+            
+            .original-text {
+                font-size: 1.2rem;
+            }
+            
+            .modern-text {
+                font-size: 1rem;
+            }
+            
+            .controls {
+                bottom: 20px;
+                padding: 12px 20px;
+                gap: 15px;
+            }
+            
+            .control-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .scene-nav {
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 加载画面 -->
+    <div class="loading-screen" id="loadingScreen">
+        <h1 class="loading-title">口技十景</h1>
+        <p class="loading-subtitle">戴敦邦国画风互动体验</p>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 场景1 -->
+        <div class="scene" data-scene="1">
+            <img class="scene-bg" data-src="scene-01.png" alt="场景1">
+            <div class="scene-content">
+                <h2 class="scene-title">京中有善口技者</h2>
+                <p class="original-text">京中有善口技者，会宾客大宴，于厅事之东北角，施八尺屏障，口技人坐屏障中，一桌、一椅、一扇、一抚尺而已。</p>
+                <p class="modern-text">京城有位擅长口技的人，在宴会上表演，只准备了屏风、桌子、椅子、扇子和醒木。</p>
+            </div>
+        </div>
+
+        <!-- 场景2 -->
+        <div class="scene" data-scene="2">
+            <img class="scene-bg" data-src="scene-02.png" alt="场景2">
+            <div class="scene-content">
+                <h2 class="scene-title">满坐寂然</h2>
+                <p class="original-text">但闻屏障中抚尺一下，满坐寂然，无敢哗者。</p>
+                <p class="modern-text">只听屏风内醒木一拍，全场安静，没有人敢喧哗。</p>
+            </div>
+        </div>
+
+        <!-- 场景3 -->
+        <div class="scene" data-scene="3">
+            <img class="scene-bg" data-src="scene-03.png" alt="场景3">
+            <div class="scene-content">
+                <h2 class="scene-title">妇抚儿乳</h2>
+                <p class="original-text">妇抚儿乳，儿含乳啼，妇拍而呜之。</p>
+                <p class="modern-text">妇人喂奶，婴儿边吮边哭，妇人轻拍安抚。</p>
+            </div>
+        </div>
+
+        <!-- 场景4 -->
+        <div class="scene" data-scene="4">
+            <img class="scene-bg" data-src="scene-04.png" alt="场景4">
+            <div class="scene-content">
+                <h2 class="scene-title">夫叱大儿</h2>
+                <p class="original-text">夫叱大儿，大儿初醒，夫呓语。</p>
+                <p class="modern-text">丈夫呵斥大儿子，大儿子刚醒，说梦话。</p>
+            </div>
+        </div>
+
+        <!-- 场景5 -->
+        <div class="scene" data-scene="5">
+            <img class="scene-bg" data-src="scene-05.png" alt="场景5">
+            <div class="scene-content">
+                <h2 class="scene-title">夫起溺</h2>
+                <p class="original-text">夫起溺，妇拍儿，渐拍渐止。</p>
+                <p class="modern-text">丈夫起夜小解，妇人轻拍孩儿，哭声渐止。</p>
+            </div>
+        </div>
+
+        <!-- 场景6 -->
+        <div class="scene" data-scene="6">
+            <img class="scene-bg" data-src="scene-06.png" alt="场景6">
+            <div class="scene-content">
+                <h2 class="scene-title">鼠作作索索</h2>
+                <p class="original-text">微闻有鼠作作索索，盆器倾侧。</p>
+                <p class="modern-text">隐隐听见老鼠悉索，器皿微倾。</p>
+            </div>
+        </div>
+
+        <!-- 场景7 -->
+        <div class="scene" data-scene="7">
+            <img class="scene-bg" data-src="scene-07.png" alt="场景7">
+            <div class="scene-content">
+                <h2 class="scene-title">妇梦中咳嗽</h2>
+                <p class="original-text">妇梦中咳嗽。</p>
+                <p class="modern-text">妇人梦中轻咳。</p>
+            </div>
+        </div>
+
+        <!-- 场景8 -->
+        <div class="scene" data-scene="8">
+            <img class="scene-bg" data-src="scene-08.png" alt="场景8">
+            <div class="scene-content">
+                <h2 class="scene-title">火起</h2>
+                <p class="original-text">忽一人大呼"火起！"</p>
+                <p class="modern-text">忽然有人大喊"着火啦！"</p>
+            </div>
+        </div>
+
+        <!-- 场景9 -->
+        <div class="scene" data-scene="9">
+            <img class="scene-bg" data-src="scene-09.png" alt="场景9">
+            <div class="scene-content">
+                <h2 class="scene-title">群声鼎沸</h2>
+                <p class="original-text">夫起大呼，妇亦起大呼，两儿齐哭。</p>
+                <p class="modern-text">丈夫、妇人都起身大喊，两孩齐哭。</p>
+            </div>
+        </div>
+
+        <!-- 场景10 -->
+        <div class="scene" data-scene="10">
+            <img class="scene-bg" data-src="scene-10.png" alt="场景10">
+            <div class="scene-content">
+                <h2 class="scene-title">群响毕绝</h2>
+                <p class="original-text">宾客无不变色离席，奋袖出臂，两股战战，几欲先走。忽然抚尺一下，群响毕绝。</p>
+                <p class="modern-text">宾客全惊退，所有声音戛然而止。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 控制面板 -->
+    <div class="controls" id="controls">
+        <button class="control-btn" id="playPauseBtn">▶ 自动播放</button>
+        <button class="control-btn" id="muteBtn">🔊 音量</button>
+        <div class="volume-control">
+            <span>音量</span>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="70">
+        </div>
+    </div>
+
+    <!-- 场景导航 -->
+    <div class="scene-nav" id="sceneNav">
+        <div class="nav-dot active" data-scene="1">
+            <span class="nav-tooltip">京中有善口技者</span>
+        </div>
+        <div class="nav-dot" data-scene="2">
+            <span class="nav-tooltip">满坐寂然</span>
+        </div>
+        <div class="nav-dot" data-scene="3">
+            <span class="nav-tooltip">妇抚儿乳</span>
+        </div>
+        <div class="nav-dot" data-scene="4">
+            <span class="nav-tooltip">夫叱大儿</span>
+        </div>
+        <div class="nav-dot" data-scene="5">
+            <span class="nav-tooltip">夫起溺</span>
+        </div>
+        <div class="nav-dot" data-scene="6">
+            <span class="nav-tooltip">鼠作作索索</span>
+        </div>
+        <div class="nav-dot" data-scene="7">
+            <span class="nav-tooltip">妇梦中咳嗽</span>
+        </div>
+        <div class="nav-dot" data-scene="8">
+            <span class="nav-tooltip">火起</span>
+        </div>
+        <div class="nav-dot" data-scene="9">
+            <span class="nav-tooltip">群声鼎沸</span>
+        </div>
+        <div class="nav-dot" data-scene="10">
+            <span class="nav-tooltip">群响毕绝</span>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentScene = 1;
+        let isPlaying = false;
+        let isMuted = false;
+        let autoPlayInterval = null;
+        let audioElements = {};
+        let loadedImages = 0;
+        let totalImages = 10;
+
+        // 场景数据
+        const sceneData = {
+            1: { audio: '01.mp3', title: '京中有善口技者' },
+            2: { audio: '02.mp3', title: '满坐寂然' },
+            3: { audio: '03.mp3', title: '妇抚儿乳' },
+            4: { audio: '04.mp3', title: '夫叱大儿' },
+            5: { audio: '05.mp3', title: '夫起溺' },
+            6: { audio: '06.mp3', title: '鼠作作索索' },
+            7: { audio: '07.mp3', title: '妇梦中咳嗽' },
+            8: { audio: '08.mp3', title: '火起' },
+            9: { audio: '09.mp3', title: '群声鼎沸' },
+            10: { audio: '10.mp3', title: '群响毕绝' }
+        };
+
+        // DOM元素
+        const loadingScreen = document.getElementById('loadingScreen');
+        const progressFill = document.getElementById('progressFill');
+        const controls = document.getElementById('controls');
+        const sceneNav = document.getElementById('sceneNav');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const muteBtn = document.getElementById('muteBtn');
+        const volumeSlider = document.getElementById('volumeSlider');
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            try {
+                // 预加载图片
+                await preloadImages();
+                
+                // 初始化音频
+                initializeAudio();
+                
+                // 绑定事件
+                bindEvents();
+                
+                // 显示界面
+                showInterface();
+                
+            } catch (error) {
+                console.error('初始化失败:', error);
+            }
+        }
+
+        function preloadImages() {
+            return new Promise((resolve) => {
+                const images = document.querySelectorAll('.scene-bg[data-src]');
+                
+                images.forEach(img => {
+                    const image = new Image();
+                    image.onload = () => {
+                        img.src = img.dataset.src;
+                        img.classList.add('loaded');
+                        loadedImages++;
+                        updateProgress();
+                    };
+                    image.src = img.dataset.src;
+                });
+
+                const checkAllLoaded = () => {
+                    if (loadedImages >= totalImages) {
+                        resolve();
+                    } else {
+                        setTimeout(checkAllLoaded, 100);
+                    }
+                };
+                checkAllLoaded();
+            });
+        }
+
+        function updateProgress() {
+            const progress = (loadedImages / totalImages) * 100;
+            progressFill.style.width = progress + '%';
+        }
+
+        function initializeAudio() {
+            // 创建音频元素
+            for (let i = 1; i <= 10; i++) {
+                const audio = new Audio();
+                audio.src = sceneData[i].audio;
+                audio.loop = true;
+                audio.volume = 0.7;
+                audio.preload = 'metadata';
+                audioElements[i] = audio;
+            }
+        }
+
+        function bindEvents() {
+            // 滚动事件
+            window.addEventListener('scroll', handleScroll);
+            
+            // 控制按钮事件
+            playPauseBtn.addEventListener('click', toggleAutoPlay);
+            muteBtn.addEventListener('click', toggleMute);
+            volumeSlider.addEventListener('input', handleVolumeChange);
+            
+            // 导航点击事件
+            document.querySelectorAll('.nav-dot').forEach(dot => {
+                dot.addEventListener('click', (e) => {
+                    const scene = parseInt(e.target.dataset.scene);
+                    scrollToScene(scene);
+                });
+            });
+
+            // 键盘事件
+            document.addEventListener('keydown', handleKeyPress);
+        }
+
+        function showInterface() {
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+                controls.classList.add('visible');
+                sceneNav.classList.add('visible');
+                
+                // 显示第一个场景
+                updateSceneVisibility();
+            }, 1000);
+        }
+
+        function handleScroll() {
+            const scrollPosition = window.scrollY;
+            const windowHeight = window.innerHeight;
+            const newScene = Math.round(scrollPosition / windowHeight) + 1;
+            
+            if (newScene !== currentScene && newScene >= 1 && newScene <= 10) {
+                currentScene = newScene;
+                updateSceneVisibility();
+                updateNavigation();
+            }
+        }
+
+        function updateSceneVisibility() {
+            const scenes = document.querySelectorAll('.scene');
+            scenes.forEach((scene, index) => {
+                const sceneNumber = index + 1;
+                const sceneContent = scene.querySelector('.scene-content');
+                
+                if (sceneNumber === currentScene) {
+                    sceneContent.classList.add('visible');
+                    playSceneAudio(currentScene);
+                } else {
+                    sceneContent.classList.remove('visible');
+                    pauseSceneAudio(sceneNumber);
+                }
+            });
+        }
+
+        function playSceneAudio(sceneNumber) {
+            // 暂停其他音频
+            Object.keys(audioElements).forEach(key => {
+                if (parseInt(key) !== sceneNumber) {
+                    audioElements[key].pause();
+                }
+            });
+            
+            // 播放当前场景音频
+            const audio = audioElements[sceneNumber];
+            if (audio && !isMuted) {
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log('音频播放失败:', e));
+            }
+        }
+
+        function pauseSceneAudio(sceneNumber) {
+            const audio = audioElements[sceneNumber];
+            if (audio) {
+                audio.pause();
+            }
+        }
+
+        function updateNavigation() {
+            document.querySelectorAll('.nav-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index + 1 === currentScene);
+            });
+        }
+
+        function scrollToScene(sceneNumber) {
+            const targetScene = document.querySelector(`[data-scene="${sceneNumber}"]`);
+            if (targetScene) {
+                targetScene.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function toggleAutoPlay() {
+            isPlaying = !isPlaying;
+            
+            if (isPlaying) {
+                playPauseBtn.textContent = '⏸ 暂停';
+                startAutoPlay();
+            } else {
+                playPauseBtn.textContent = '▶ 自动播放';
+                stopAutoPlay();
+            }
+        }
+
+        function startAutoPlay() {
+            autoPlayInterval = setInterval(() => {
+                if (currentScene < 10) {
+                    scrollToScene(currentScene + 1);
+                } else {
+                    // 重新开始
+                    setTimeout(() => {
+                        scrollToScene(1);
+                    }, 3000);
+                }
+            }, 8000); // 每个场景停留8秒
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+            }
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            
+            Object.values(audioElements).forEach(audio => {
+                audio.muted = isMuted;
+            });
+            
+            muteBtn.textContent = isMuted ? '🔇 静音' : '🔊 音量';
+        }
+
+        function handleVolumeChange(e) {
+            const volume = e.target.value / 100;
+            Object.values(audioElements).forEach(audio => {
+                audio.volume = volume;
+            });
+        }
+
+        function handleKeyPress(e) {
+            switch(e.key) {
+                case ' ':
+                case 'Enter':
+                    e.preventDefault();
+                    toggleAutoPlay();
+                    break;
+                case 'ArrowUp':
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    if (currentScene > 1) {
+                        scrollToScene(currentScene - 1);
+                    }
+                    break;
+                case 'ArrowDown':
+                case 'ArrowRight':
+                    e.preventDefault();
+                    if (currentScene < 10) {
+                        scrollToScene(currentScene + 1);
+                    }
+                    break;
+                case 'm':
+                case 'M':
+                    toggleMute();
+                    break;
+            }
+        }
+
+        // 页面卸载时清理音频
+        window.addEventListener('beforeunload', () => {
+            Object.values(audioElements).forEach(audio => {
+                audio.pause();
+                audio.src = '';
+            });
+        });
+    </script>
+</body>
+</html>

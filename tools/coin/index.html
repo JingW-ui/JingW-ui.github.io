@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 抛硬币 - 黑色典藏版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0a0a0f;
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            overflow: hidden;
+            color: #e0e0e0;
+        }
+
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #canvas-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 硬币样式选择器 */
+        .coin-selector {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .coin-btn {
+            background: rgba(30, 30, 40, 0.9);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #c0c0c0;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .coin-btn:hover {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: rgba(255, 215, 0, 0.6);
+            color: #FFD700;
+        }
+
+        .coin-btn.active {
+            background: rgba(255, 215, 0, 0.25);
+            border-color: #FFD700;
+            color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
+        }
+
+        /* 抛硬币按钮 */
+        .controls {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+        }
+
+        .flip-btn {
+            background: linear-gradient(135deg, #2a2a3a 0%, #1a1a2e 100%);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            padding: 16px 50px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFD700;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.1);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        .flip-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.6), 0 0 40px rgba(255, 215, 0, 0.2);
+            border-color: rgba(255, 215, 0, 0.8);
+        }
+
+        .flip-btn:active {
+            transform: translateY(0);
+        }
+
+        .flip-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* 判断面板 */
+        .judgment-panel {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(15, 15, 25, 0.95);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 30px 40px;
+            text-align: center;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.1);
+        }
+
+        .judgment-panel.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .judgment-panel h3 {
+            color: #FFD700;
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: 400;
+            letter-spacing: 2px;
+        }
+
+        .judgment-btns {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .judgment-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #e0e0e0;
+            padding: 12px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .judgment-btn:hover {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: #FFD700;
+            color: #FFD700;
+        }
+
+        .judgment-btn.front {
+            border-color: rgba(100, 200, 100, 0.4);
+        }
+
+        .judgment-btn.front:hover {
+            background: rgba(100, 200, 100, 0.15);
+            border-color: #64c864;
+            color: #64c864;
+        }
+
+        .judgment-btn.back {
+            border-color: rgba(200, 100, 100, 0.4);
+        }
+
+        .judgment-btn.back:hover {
+            background: rgba(200, 100, 100, 0.15);
+            border-color: #c86464;
+            color: #c86464;
+        }
+
+        /* 统计信息 - 已隐藏 */
+        .stats {
+            display: none;
+        }
+
+        /* 结果提示 - 已隐藏 */
+        .result-toast {
+            display: none;
+        }
+
+        /* 音效开关 */
+        .sound-toggle {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(30, 30, 40, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #666;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            z-index: 100;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .sound-toggle:hover {
+            color: #FFD700;
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
+        .sound-toggle.on {
+            color: #FFD700;
+            border-color: rgba(255, 215, 0, 0.4);
+        }
+
+        /* 加载提示 */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #FFD700;
+            font-size: 16px;
+            z-index: 1000;
+            letter-spacing: 3px;
+        }
+
+        .loading::after {
+            content: '';
+            animation: loadingDots 1.5s infinite;
+        }
+
+        @keyframes loadingDots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* 当前硬币名称 */
+        .coin-name {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 215, 0, 0.4);
+            font-size: 14px;
+            letter-spacing: 4px;
+            z-index: 100;
+        }
+
+        /* 相机控制提示 */
+        .camera-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(10, 10, 15, 0.7);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: #555;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            transition: all 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .camera-hint:hover {
+            background: rgba(20, 20, 30, 0.9);
+            border-color: rgba(255, 215, 0, 0.2);
+            color: #888;
+        }
+
+        .camera-hint .key {
+            color: #FFD700;
+            font-weight: bold;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div id="container">
+        <div id="canvas-container"></div>
+
+        <div class="loading" id="loading">加载中</div>
+
+        <!-- 硬币样式选择 -->
+        <div class="coin-selector">
+            <button class="coin-btn active" data-coin="gold">金币</button>
+            <button class="coin-btn" data-coin="yuan">袁大头</button>
+            <button class="coin-btn" data-coin="qianlong">乾隆通宝</button>
+            <button class="coin-btn" data-coin="eagle">鹰洋金币</button>
+        </div>
+
+
+
+        <!-- 判断面板 -->
+        <div class="judgment-panel" id="judgmentPanel">
+            <h3>请判断正反面</h3>
+            <div class="judgment-btns">
+                <button class="judgment-btn front" data-judgment="heads">正面</button>
+                <button class="judgment-btn back" data-judgment="tails">反面</button>
+            </div>
+        </div>
+
+
+
+        <!-- 当前硬币名称 -->
+        <div class="coin-name" id="coinName">金币</div>
+
+        <!-- 控制按钮 -->
+        <div class="controls">
+            <button class="flip-btn" id="flipBtn">抛硬币</button>
+        </div>
+
+        <!-- 音效开关 -->
+        <button class="sound-toggle on" id="soundToggle">🔊 音效开启</button>
+
+        <!-- 相机控制提示 -->
+        <div class="camera-hint">
+            <div><span class="key">左键拖拽</span> 旋转视角</div>
+            <div><span class="key">滚轮</span> 缩放远近</div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ==================== 全局变量 ====================
+        let scene, camera, renderer, coinMesh, coinGroup;
+        let isFlipping = false;
+        let isWaitingJudgment = false;
+        let flipAnimation = null;
+        let currentResult = null; // 0=正面, 1=反面（动画结束后根据最终角度确定）
+        let currentCoinType = 'gold';
+        let soundEnabled = true;
+        let isBouncing = false; // 弹跳状态标记
+
+        // 相机控制相关
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let cameraAngle = { theta: 0, phi: Math.PI / 3 }; // 球坐标角度
+        let cameraDistance = 8;
+        const minDistance = 4;
+        const maxDistance = 15;
+        const cameraTarget = new THREE.Vector3(0, 1, 0);
+
+        let headsCount = 0;
+        let tailsCount = 0;
+        let totalCount = 0;
+        let correctCount = 0;
+
+        // ==================== 硬币贴图配置 ====================
+        const coinConfigs = {
+            gold: {
+                name: '金币',
+                color: 0xFFD700,
+                metalness: 0.95,
+                roughness: 0.08,
+                frontText: '正面',
+                backText: '反面',
+                frontColor: '#2a2a3e',
+                backColor: '#2a2a3e',
+                frontBorder: '#FFD700',
+                backBorder: '#FFD700',
+                rimColor: '#FFD700'
+            },
+            yuan: {
+                name: '袁大头',
+                color: 0xD0D0D0,
+                metalness: 0.9,
+                roughness: 0.15,
+                frontText: '壹圓',
+                backText: '袁像',
+                frontColor: '#3a3a4a',
+                backColor: '#3a3a4a',
+                frontBorder: '#D0D0D0',
+                backBorder: '#D0D0D0',
+                rimColor: '#D0D0D0'
+            },
+            qianlong: {
+                name: '乾隆通宝',
+                color: 0x8B7355,
+                metalness: 0.7,
+                roughness: 0.4,
+                frontText: '乾隆通宝',
+                backText: '宝泉',
+                frontColor: '#3a2a1a',
+                backColor: '#3a2a1a',
+                frontBorder: '#8B7355',
+                backBorder: '#8B7355',
+                rimColor: '#8B7355'
+            },
+            eagle: {
+                name: '鹰洋金币',
+                color: 0xE5C050,
+                metalness: 0.92,
+                roughness: 0.1,
+                frontText: 'EAGLE',
+                backText: 'GOLD',
+                frontColor: '#2a2a3e',
+                backColor: '#2a2a3e',
+                frontBorder: '#E5C050',
+                backBorder: '#E5C050',
+                rimColor: '#E5C050'
+            }
+        };
+
+        // ==================== Canvas 生成贴图 ====================
+        function createCoinTexture(config, isFront) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d');
+            const w = 1024, h = 1024;
+            const cx = w / 2, cy = h / 2;
+            const radius = 480;
+
+            // 背景
+            ctx.fillStyle = config.frontColor;
+            ctx.fillRect(0, 0, w, h);
+
+            // 外圈
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.fillStyle = config.color === 0x8B7355 ? '#6b5a45' : (config.color === 0xC0C0C0 ? '#a0a0a0' : '#b8860b');
+            ctx.fill();
+
+            // 内圈
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius - 20, 0, Math.PI * 2);
+            ctx.fillStyle = config.frontColor;
+            ctx.fill();
+
+            // 装饰环
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius - 10, 0, Math.PI * 2);
+            ctx.strokeStyle = config.frontBorder;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius - 30, 0, Math.PI * 2);
+            ctx.strokeStyle = config.frontBorder;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 添加噪点纹理
+            for (let i = 0; i < 5000; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const r = Math.random() * (radius - 40);
+                const x = cx + Math.cos(angle) * r;
+                const y = cy + Math.sin(angle) * r;
+                ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.05})`;
+                ctx.fillRect(x, y, 2, 2);
+            }
+
+            // 文字
+            const text = isFront ? config.frontText : config.backText;
+            ctx.fillStyle = config.frontBorder;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            if (config.name === '乾隆通宝') {
+                // 乾隆通宝四字布局
+                ctx.font = 'bold 120px "SimSun", "Songti SC", serif';
+                if (isFront) {
+                    ctx.fillText('乾', cx, cy - 180);
+                    ctx.fillText('隆', cx + 180, cy);
+                    ctx.fillText('通', cx, cy + 180);
+                    ctx.fillText('宝', cx - 180, cy);
+                } else {
+                    ctx.fillText('宝', cx, cy - 180);
+                    ctx.fillText('泉', cx + 180, cy);
+                    ctx.fillText('满', cx, cy + 180);
+                    ctx.fillText('文', cx - 180, cy);
+                }
+                // 中心方孔
+                ctx.fillStyle = '#1a1a2e';
+                ctx.fillRect(cx - 60, cy - 60, 120, 120);
+                ctx.strokeStyle = config.frontBorder;
+                ctx.lineWidth = 4;
+                ctx.strokeRect(cx - 60, cy - 60, 120, 120);
+            } else if (config.name === '袁大头') {
+                ctx.font = 'bold 140px "SimSun", serif';
+                if (isFront) {
+                    ctx.fillText('壹', cx, cy - 80);
+                    ctx.fillText('圓', cx, cy + 80);
+                    // 麦穗装饰
+                    ctx.font = '40px serif';
+                    ctx.fillText('中华民国三年', cx, cy - 250);
+                } else {
+                    ctx.font = 'bold 100px serif';
+                    ctx.fillText('袁世凯像', cx, cy);
+                    ctx.font = '40px serif';
+                    ctx.fillText('ONE DOLLAR', cx, cy + 200);
+                }
+            } else if (config.name === '鹰洋金币') {
+                ctx.font = 'bold 100px "Times New Roman", serif';
+                if (isFront) {
+                    ctx.fillText('UNITED STATES', cx, cy - 200);
+                    ctx.fillText('OF AMERICA', cx, cy - 120);
+                    ctx.font = 'bold 160px serif';
+                    ctx.fillText('$50', cx, cy + 40);
+                    ctx.font = '50px serif';
+                    ctx.fillText('1 OZ. FINE GOLD', cx, cy + 180);
+                } else {
+                    ctx.font = 'bold 80px serif';
+                    ctx.fillText('LIBERTY', cx, cy - 200);
+                    ctx.fillText('IN GOD WE TRUST', cx, cy + 200);
+                    // 鹰图案简化
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 150, 0, Math.PI * 2);
+                    ctx.strokeStyle = config.frontBorder;
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+            } else {
+                // 默认金币
+                ctx.font = 'bold 160px "Arial", sans-serif';
+                ctx.fillText(text, cx, cy);
+                ctx.font = '50px serif';
+                ctx.fillStyle = config.frontBorder;
+                ctx.globalAlpha = 0.6;
+                ctx.fillText(isFront ? 'HEADS' : 'TAILS', cx, cy + 180);
+                ctx.globalAlpha = 1;
+            }
+
+            // 边缘齿纹
+            const teeth = 120;
+            for (let i = 0; i < teeth; i++) {
+                const angle = (i / teeth) * Math.PI * 2;
+                const r1 = radius - 5;
+                const r2 = radius + 5;
+                ctx.beginPath();
+                ctx.moveTo(cx + Math.cos(angle) * r1, cy + Math.sin(angle) * r1);
+                ctx.lineTo(cx + Math.cos(angle) * r2, cy + Math.sin(angle) * r2);
+                ctx.strokeStyle = config.frontBorder;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.anisotropy = 16;
+            return texture;
+        }
+
+        // ==================== 音效系统 ====================
+        const AudioSys = {
+            ctx: null,
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+
+            playFlip() {
+                if (!soundEnabled) return;
+                this.init();
+                const ctx = this.ctx;
+                const now = ctx.currentTime;
+
+                // 上升音
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.3);
+
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+                osc.start(now);
+                osc.stop(now + 0.3);
+
+                // 风声
+                const noise = ctx.createOscillator();
+                const noiseGain = ctx.createGain();
+                noise.connect(noiseGain);
+                noiseGain.connect(ctx.destination);
+                noise.type = 'sawtooth';
+                noise.frequency.setValueAtTime(200, now);
+                noise.frequency.linearRampToValueAtTime(100, now + 1);
+                noiseGain.gain.setValueAtTime(0.02, now);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 1);
+                noise.start(now);
+                noise.stop(now + 1);
+            },
+
+            playLand() {
+                if (!soundEnabled) return;
+                this.init();
+                const ctx = this.ctx;
+                const now = ctx.currentTime;
+
+                // 落地声 - 金属撞击
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.exponentialRampToValueAtTime(50, now + 0.15);
+
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+                osc.start(now);
+                osc.stop(now + 0.15);
+
+                // 高频叮声
+                const bell = ctx.createOscillator();
+                const bellGain = ctx.createGain();
+                bell.connect(bellGain);
+                bellGain.connect(ctx.destination);
+                bell.type = 'sine';
+                bell.frequency.setValueAtTime(1200, now);
+                bell.frequency.exponentialRampToValueAtTime(600, now + 0.5);
+                bellGain.gain.setValueAtTime(0.08, now);
+                bellGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                bell.start(now);
+                bell.stop(now + 0.5);
+            },
+
+            playCorrect() {
+                if (!soundEnabled) return;
+                this.init();
+                const ctx = this.ctx;
+                const now = ctx.currentTime;
+
+                [523, 659, 784].forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.1, now + i * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.3);
+                    osc.start(now + i * 0.1);
+                    osc.stop(now + i * 0.1 + 0.3);
+                });
+            },
+
+            playWrong() {
+                if (!soundEnabled) return;
+                this.init();
+                const ctx = this.ctx;
+                const now = ctx.currentTime;
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.linearRampToValueAtTime(150, now + 0.4);
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            }
+        };
+
+        // ==================== 初始化场景 ====================
+        function init() {
+            const container = document.getElementById('canvas-container');
+
+            // 场景
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0f);
+            scene.fog = new THREE.Fog(0x0a0a0f, 10, 30);
+
+            // 相机
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 3, 8);
+            camera.lookAt(0, 0, 0);
+
+            // 渲染器
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.0;
+            container.appendChild(renderer.domElement);
+
+            // 光照
+            setupLighting();
+
+            // 创建硬币
+            createCoin('gold');
+
+            // 创建地面
+            createGround();
+
+            // 隐藏加载
+            document.getElementById('loading').style.display = 'none';
+
+            // 事件监听
+            setupEventListeners();
+            setupCameraControls();
+
+            // 动画循环
+            animate();
+        }
+
+        // ==================== 光照系统 ====================
+        function setupLighting() {
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            // 主光源 - 暖金色（斜向照射）
+            const mainLight = new THREE.DirectionalLight(0xffd700, 2.5);
+            mainLight.position.set(8, 12, 6);
+            mainLight.castShadow = true;
+            mainLight.shadow.mapSize.width = 2048;
+            mainLight.shadow.mapSize.height = 2048;
+            mainLight.shadow.camera.near = 0.5;
+            mainLight.shadow.camera.far = 50;
+            mainLight.shadow.bias = -0.001;
+            scene.add(mainLight);
+
+            // 补光 - 冷色
+            const fillLight = new THREE.DirectionalLight(0x8888ff, 0.7);
+            fillLight.position.set(-6, 6, -6);
+            scene.add(fillLight);
+
+            // 顶部聚光
+            const spotLight = new THREE.SpotLight(0xffd700, 1.5, 30, Math.PI / 6, 0.5, 1);
+            spotLight.position.set(2, 15, 2);
+            spotLight.target.position.set(0, 0, 0);
+            spotLight.castShadow = true;
+            scene.add(spotLight);
+            scene.add(spotLight.target);
+
+            // 边缘光
+            const rimLight = new THREE.PointLight(0xffaa00, 1.0, 20);
+            rimLight.position.set(0, 2, -5);
+            scene.add(rimLight);
+        }
+
+        // ==================== 创建硬币 ====================
+        function createCoin(type) {
+            if (coinGroup) {
+                scene.remove(coinGroup);
+            }
+
+            currentCoinType = type;
+            const config = coinConfigs[type];
+
+            coinGroup = new THREE.Group();
+
+            // 硬币主体
+            const geometry = new THREE.CylinderGeometry(1.2, 1.2, 0.12, 128);
+
+            // 生成贴图
+            const frontTexture = createCoinTexture(config, true);
+            const backTexture = createCoinTexture(config, false);
+
+            // 侧面材质
+            const sideMaterial = new THREE.MeshStandardMaterial({
+                color: config.color,
+                metalness: config.metalness,
+                roughness: config.roughness,
+            });
+
+            // 正面材质
+            const frontMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                metalness: config.metalness,
+                roughness: config.roughness,
+                map: frontTexture,
+                bumpMap: frontTexture,
+                bumpScale: 0.02
+            });
+
+            // 背面材质
+            const backMaterial = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                metalness: config.metalness,
+                roughness: config.roughness,
+                map: backTexture,
+                bumpMap: backTexture,
+                bumpScale: 0.02
+            });
+
+            // 应用材质 (Cylinder: side, top, bottom)
+            coinMesh = new THREE.Mesh(geometry, [sideMaterial, frontMaterial, backMaterial]);
+            coinMesh.castShadow = true;
+            coinMesh.receiveShadow = true;
+
+            // 旋转使正面朝上（平放）
+            coinMesh.rotation.x = Math.PI;
+
+            coinGroup.add(coinMesh);
+
+            // 边缘高光环
+            const edgeGeo = new THREE.TorusGeometry(1.2, 0.03, 16, 128);
+            const edgeMat = new THREE.MeshStandardMaterial({
+                color: config.rimColor,
+                metalness: 1.0,
+                roughness: 0.0,
+                emissive: config.rimColor,
+                emissiveIntensity: 0.1
+            });
+            const edge = new THREE.Mesh(edgeGeo, edgeMat);
+            edge.rotation.x = Math.PI/2 ;
+            coinGroup.add(edge);
+
+            // 边缘齿纹
+            const teethCount = 150;
+            for (let i = 0; i < teethCount; i++) {
+                const angle = (i / teethCount) * Math.PI * 2;
+                const toothGeo = new THREE.BoxGeometry(0.04, 0.14, 0.02);
+                const tooth = new THREE.Mesh(toothGeo, sideMaterial);
+                tooth.position.x = Math.cos(angle) * 1.22;
+                tooth.position.z = Math.sin(angle) * 1.22;
+                tooth.rotation.y = -angle;
+                tooth.rotation.x = Math.PI ;
+                coinGroup.add(tooth);
+            }
+
+            coinGroup.position.y = 2;
+            scene.add(coinGroup);
+
+            // 更新名称显示
+            document.getElementById('coinName').textContent = config.name;
+        }
+
+        // ==================== 创建地面 ====================
+        function createGround() {
+            const groundGeometry = new THREE.PlaneGeometry(50, 50);
+            const groundMaterial = new THREE.MeshStandardMaterial({
+                color: 0x111118,
+                metalness: 0.3,
+                roughness: 0.7,
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -1; // 地面在 y = -1
+            ground.receiveShadow = true;
+            scene.add(ground);
+            
+            console.log('🌍 地面位置 y =', ground.position.y);
+
+            // 网格辅助
+            const gridHelper = new THREE.GridHelper(50, 50, 0x222233, 0x151520);
+            gridHelper.position.y = -0.99;
+            scene.add(gridHelper);
+        }
+
+        // ==================== 相机控制 ====================
+        function setupCameraControls() {
+            const canvas = renderer.domElement;
+
+            // 鼠标按下
+            canvas.addEventListener('mousedown', (e) => {
+                if (e.button === 0) { // 左键
+                    isDragging = true;
+                    previousMousePosition = { x: e.clientX, y: e.clientY };
+                }
+            });
+
+            // 鼠标移动
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+
+                // 更新相机角度
+                cameraAngle.theta -= deltaX * 0.01;
+                cameraAngle.phi -= deltaY * 0.01;
+
+                // 限制垂直角度
+                cameraAngle.phi = Math.max(0.1, Math.min(Math.PI - 0.1, cameraAngle.phi));
+
+                updateCameraPosition();
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            // 鼠标释放
+            canvas.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            canvas.addEventListener('mouseleave', () => {
+                isDragging = false;
+            });
+
+            // 滚轮缩放
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                
+                cameraDistance += e.deltaY * 0.01;
+                cameraDistance = Math.max(minDistance, Math.min(maxDistance, cameraDistance));
+                
+                updateCameraPosition();
+            }, { passive: false });
+
+            // 触摸支持（移动端）
+            let touchStartDistance = 0;
+            let touchStartZoom = 0;
+
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isDragging = true;
+                    previousMousePosition = { 
+                        x: e.touches[0].clientX, 
+                        y: e.touches[0].clientY 
+                    };
+                } else if (e.touches.length === 2) {
+                    // 双指捏合缩放
+                    touchStartDistance = getTouchDistance(e.touches);
+                    touchStartZoom = cameraDistance;
+                }
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+
+                if (e.touches.length === 1 && isDragging) {
+                    const deltaX = e.touches[0].clientX - previousMousePosition.x;
+                    const deltaY = e.touches[0].clientY - previousMousePosition.y;
+
+                    cameraAngle.theta -= deltaX * 0.01;
+                    cameraAngle.phi -= deltaY * 0.01;
+                    cameraAngle.phi = Math.max(0.1, Math.min(Math.PI - 0.1, cameraAngle.phi));
+
+                    updateCameraPosition();
+
+                    previousMousePosition = { 
+                        x: e.touches[0].clientX, 
+                        y: e.touches[0].clientY 
+                    };
+                } else if (e.touches.length === 2) {
+                    const currentDistance = getTouchDistance(e.touches);
+                    const scale = touchStartDistance / currentDistance;
+                    cameraDistance = touchStartZoom * scale;
+                    cameraDistance = Math.max(minDistance, Math.min(maxDistance, cameraDistance));
+                    updateCameraPosition();
+                }
+            });
+
+            canvas.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        }
+
+        // 计算两指距离
+        function getTouchDistance(touches) {
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        // 更新相机位置
+        function updateCameraPosition() {
+            const x = cameraDistance * Math.sin(cameraAngle.phi) * Math.cos(cameraAngle.theta);
+            const y = cameraDistance * Math.cos(cameraAngle.phi);
+            const z = cameraDistance * Math.sin(cameraAngle.phi) * Math.sin(cameraAngle.theta);
+
+            camera.position.set(x, y + cameraTarget.y, z);
+            camera.lookAt(cameraTarget);
+        }
+
+        // ==================== 事件监听 ====================
+        function setupEventListeners() {
+            // 抛硬币按钮
+            document.getElementById('flipBtn').addEventListener('click', flipCoin);
+
+            // 硬币选择
+            document.querySelectorAll('.coin-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (isFlipping) return;
+                    document.querySelectorAll('.coin-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    createCoin(e.target.dataset.coin);
+                });
+            });
+
+            // 音效开关
+            document.getElementById('soundToggle').addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                const btn = document.getElementById('soundToggle');
+                btn.textContent = soundEnabled ? '🔊 音效开启' : '🔇 音效关闭';
+                btn.classList.toggle('on', soundEnabled);
+            });
+
+            // 窗口调整
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // ==================== 抛硬币逻辑 ====================
+        function flipCoin() {
+            if (isFlipping || isWaitingJudgment) return;
+
+            // 初始化音频
+            AudioSys.init();
+
+            isFlipping = true;
+            document.getElementById('flipBtn').disabled = true;
+
+            // 播放抛掷音效
+            AudioSys.playFlip();
+
+            // 重置硬币状态（平放，正面朝上）
+            coinGroup.position.y = 2;
+            coinGroup.rotation.set(Math.PI / 2, 0, 0);
+
+            // 物理参数 - 随机初始速度和旋转
+            const flipHeight = 3 + Math.random() * 2; // 抛掷高度 3-5
+            const initialRotSpeed = 20 + Math.random() * 15; // 增加初始旋转速度 (20-35 rad/s)
+            const zRotSpeed = (Math.random() - 0.5) * 6; // 增加Z轴旋转
+            
+            // 根据物理公式计算持续时间：t = sqrt(2h/g) * 2（上升+下降）
+            // g = 9.8 m/s²，这里我们使用合适的缩放因子
+            const gravity = 9.8;
+            const timeToPeak = Math.sqrt(2 * flipHeight / gravity);
+            const totalTime = timeToPeak * 2; // 总时间包括上升和下降
+            const duration = totalTime * 1000; // 转换为毫秒
+
+            flipAnimation = {
+                startTime: Date.now(),
+                duration: duration,
+                flipHeight: flipHeight,
+                initialRotSpeed: initialRotSpeed,
+                zRotSpeed: zRotSpeed,
+                currentRotSpeed: initialRotSpeed, // 当前旋转速度（会衰减）
+                wobble: Math.random() * 0.5
+            };
+        }
+
+        // ==================== 更新动画 ====================
+        function updateFlipAnimation() {
+            if (!flipAnimation || !isFlipping) return;
+
+            const elapsed = Date.now() - flipAnimation.startTime;
+            const progress = Math.min(elapsed / flipAnimation.duration, 1);
+
+            if (progress < 1) {
+                // 抛物线运动 - 使用真实物理公式
+                const t = progress;
+                
+                // 根据物理公式计算位置：y = y0 + v0*t - 0.5*g*t^2
+                // 在最高点时速度为0，所以上升时间 t_up = v0/g，下降时间相同
+                // 总时间 T = 2*v0/g，因此 v0 = g*T/2
+                const gravity = 9.8;
+                const totalTime = flipAnimation.duration / 1000; // 转换为秒
+                const initialVelocity = gravity * totalTime / 2;
+                
+                // 当前时间（秒）
+                const currentTime = t * totalTime;
+                
+                // 物理公式：y = y0 + v0*t - 0.5*g*t^2
+                const startY = 2; // 起始高度
+                const y = startY + initialVelocity * currentTime - 0.5 * gravity * Math.pow(currentTime, 2);
+                
+                coinGroup.position.y = Math.max(y, 0.06);
+
+                // 旋转速度逐渐衰减（模拟空气阻力）- 减慢衰减速度
+                const speedDecay = Math.pow(0.995, elapsed / 16); // 每帧衰减0.5%
+                flipAnimation.currentRotSpeed = flipAnimation.initialRotSpeed * speedDecay;
+                
+                // 应用旋转
+                coinGroup.rotation.x += flipAnimation.currentRotSpeed * 0.016;
+                coinGroup.rotation.z += flipAnimation.zRotSpeed * 0.016 * speedDecay;
+                coinGroup.rotation.y = Math.sin(progress * Math.PI * 4) * flipAnimation.wobble * (1 - progress);
+
+            } else {
+                // 动画结束，根据最终角度确定结果
+                finishFlip();
+            }
+        }
+
+        // ==================== 完成抛掷 ====================
+        function finishFlip() {
+            console.log('=== finishFlip 开始 ===');
+            
+            isFlipping = false;
+            flipAnimation = null;
+            isBouncing = true; // 开始弹跳
+
+            AudioSys.playLand();
+
+            // 根据最终旋转角度确定正反面
+            // 将角度规范化到 0-2π 范围
+            let normalizedRotation = coinGroup.rotation.x % (Math.PI * 2);
+            if (normalizedRotation < 0) normalizedRotation += Math.PI * 2;
+            
+            // 判断是正面还是反面
+            // 正面：角度接近 0 或 2π
+            // 反面：角度接近 π
+            const distanceToHeads = Math.min(normalizedRotation, Math.PI * 2 - normalizedRotation);
+            const distanceToTails = Math.abs(normalizedRotation - Math.PI);
+            
+            currentResult = distanceToHeads < distanceToTails ? 0 : 1;
+            
+            console.log('最终旋转角度:', coinGroup.rotation.x);
+            console.log('规范化角度:', normalizedRotation.toFixed(3));
+            console.log('距离正面:', distanceToHeads.toFixed(3));
+            console.log('距离反面:', distanceToTails.toFixed(3));
+            console.log('判定结果:', currentResult === 0 ? '正面' : '反面');
+
+            // 平滑过渡到最终角度（正面=0, 反面=π）
+            const targetRotation = currentResult === 0 ? 0 : Math.PI;
+            
+            // 找到最近的等效角度
+            const currentX = coinGroup.rotation.x;
+            const rounds = Math.round(currentX / (Math.PI * 2));
+            const finalX = rounds * Math.PI * 2 + targetRotation;
+            
+            coinGroup.rotation.x = finalX;
+            coinGroup.rotation.z = 0;
+            coinGroup.rotation.y = 0;
+            
+            console.log('设置目标旋转:', targetRotation);
+            console.log('设置后旋转 x:', coinGroup.rotation.x);
+
+            // 弹跳参数
+            const groundY = 0.06; // 地面高度（硬币中心）
+            console.log('⚠️ 注意：地面实际在 y=-1，硬币厚度0.12，所以硬币中心应该在 y=-1+0.06=-0.94');
+            console.log('❌ 当前设置的 groundY:', groundY, '这会让硬币悬浮在空中！');
+            
+            // 修正：地面在 y=-1，硬币半径1.2，厚度0.12
+            // 硬币平放时，底部接触地面，中心应该在 y = -1 + 0.06 = -0.94
+            const actualGroundY = -1 + 0.06;
+            console.log('✅ 修正后的地面高度 actualGroundY:', actualGroundY);
+            let bounceCount = 0;
+            const maxBounces = 3;
+            let bounceStartTime = Date.now();
+            
+            console.log('开始弹跳动画');
+            
+            // 弹跳动画函数
+            const performBounce = () => {
+                console.log(`弹跳检查 - isBouncing: ${isBouncing}, bounceCount: ${bounceCount}, maxBounces: ${maxBounces}`);
+                
+                if (!isBouncing || bounceCount >= maxBounces) {
+                    // 弹跳结束，固定在地面
+                    coinGroup.position.y = actualGroundY;
+                    isBouncing = false;
+                    console.log('✅ 弹跳结束！最终位置 y:', coinGroup.position.y);
+                    console.log('最终旋转 x:', coinGroup.rotation.x);
+                    console.log('📍 相机目标位置:', cameraTarget);
+                    return;
+                }
+                
+                const now = Date.now();
+                const elapsed = now - bounceStartTime;
+                const bounceDuration = 150; // 每次弹跳150ms
+                
+                if (elapsed < bounceDuration) {
+                    // 弹跳进行中
+                    const progress = elapsed / bounceDuration;
+                    const bounceHeight = 0.12 * Math.pow(0.5, bounceCount);
+                    
+                    // 使用正弦波实现平滑的上升和下降
+                    coinGroup.position.y = actualGroundY + bounceHeight * Math.sin(progress * Math.PI);
+                    
+                    if (bounceCount === 0 && progress < 0.1) {
+                        console.log(`第${bounceCount + 1}次弹跳 - progress: ${progress.toFixed(2)}, y: ${coinGroup.position.y.toFixed(3)}`);
+                    }
+                    
+                    // 继续下一帧
+                    requestAnimationFrame(performBounce);
+                } else {
+                    // 本次弹跳结束
+                    console.log(`第${bounceCount + 1}次弹跳完成，位置 y:`, coinGroup.position.y.toFixed(3));
+                    coinGroup.position.y = actualGroundY;
+                    bounceCount++;
+                    
+                    if (bounceCount < maxBounces) {
+                        // 短暂停顿后开始下一次弹跳
+                        console.log(`准备第${bounceCount + 1}次弹跳...`);
+                        bounceStartTime = Date.now();
+                        setTimeout(() => {
+                            if (isBouncing) {
+                                requestAnimationFrame(performBounce);
+                            }
+                        }, 50);
+                    } else {
+                        // 所有弹跳结束
+                        console.log('🎯 所有弹跳完成！');
+                        coinGroup.position.y = actualGroundY;
+                        isBouncing = false;
+                        console.log('✅ 最终位置 y:', coinGroup.position.y);
+                    }
+                }
+            };
+            
+            // 开始弹跳
+            coinGroup.position.y = actualGroundY;
+            console.log('初始弹跳位置设置为:', actualGroundY);
+            setTimeout(() => {
+                console.log('50ms后启动弹跳动画');
+                if (isBouncing) {
+                    requestAnimationFrame(performBounce);
+                }
+            }, 50);
+
+            // 启用按钮
+            setTimeout(() => {
+                document.getElementById('flipBtn').disabled = false;
+            }, 800);
+        }
+
+
+        // ==================== 动画循环 ====================
+        function animate() {
+            requestAnimationFrame(animate);
+
+            updateFlipAnimation();
+
+            // 空闲状态处理
+            if (!isFlipping && !isBouncing && coinGroup) {
+                // 只有当硬币不在弹跳且不在翻转时，才执行空闲动画
+                if (coinGroup.position.y > 0.5) {
+                    // 初始悬浮状态（还未抛过）
+                    const time = Date.now() * 0.001;
+                    coinGroup.position.y = 2 + Math.sin(time * 0.8) * 0.08;
+                    coinGroup.rotation.y += 0.003;
+                } else {
+                    // 在地面附近，保持静止
+                    // console.log('硬币在地面静止, y:', coinGroup.position.y.toFixed(3));
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // ==================== 启动 ====================
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

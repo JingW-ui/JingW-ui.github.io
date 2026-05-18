@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>three.js – webgl_loader_collada</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+	<style>
+		html, body { margin: 0; height: 100%; overflow: hidden; background: #111; }
+		canvas { display: block; }
+	</style>
+</head>
+<body>
+
+<script type="importmap">
+{
+	"imports": {
+		"three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+		"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+	}
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import Stats from 'three/addons/libs/stats.module.js';
+import { ColladaLoader } from 'three/addons/loaders/ColladaLoader.js';
+
+let camera, scene, renderer, elf, stats, clock;
+
+init();
+animate();
+
+function init() {
+
+	camera = new THREE.PerspectiveCamera(
+		45,
+		window.innerWidth / window.innerHeight,
+		0.1,
+		2000
+	);
+	camera.position.set( 8, 10, 8 );
+	camera.lookAt( 0, 3, 0 );
+
+	scene = new THREE.Scene();
+	scene.background = new THREE.Color( 0x222222 );
+
+	clock = new THREE.Clock();
+
+	const loader = new ColladaLoader();
+loader.load(
+	'https://threejs.org/examples/models/collada/elf/elf.dae',
+	(collada) => {
+
+		elf = collada.scene;
+
+
+
+		// ✅ 关键：放大模型（你之前是缩小）
+		elf.scale.set( 1, 1, 1 );
+
+		// ✅ 手动放到地面
+		elf.position.y = 0;
+
+		scene.add( elf );
+	}
+);
+
+	scene.add( new THREE.AmbientLight( 0xffffff, 0.8 ) );
+
+	const dir = new THREE.DirectionalLight( 0xffffff, 3 );
+	dir.position.set( 5, 10, 7 );
+	scene.add( dir );
+
+	renderer = new THREE.WebGLRenderer({ antialias: true });
+	renderer.setSize( window.innerWidth, window.innerHeight );
+	document.body.appendChild( renderer.domElement );
+
+
+	window.addEventListener( 'resize', onResize );
+}
+
+function onResize() {
+	camera.aspect = window.innerWidth / window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize( window.innerWidth, window.innerHeight );
+}
+
+function animate() {
+	requestAnimationFrame( animate );
+
+	const delta = clock.getDelta();
+
+	if ( elf ) {
+		elf.rotation.z += delta * 0.5;
+	}
+
+	renderer.render( scene, camera );
+	stats.update();
+}
+</script>
+
+</body>
+</html>

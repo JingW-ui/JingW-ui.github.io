@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Characters - The Godfather Trilogy</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@300;400;600&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sepia-brown': '#3C2415',
+                        'warm-amber': '#D4A574',
+                        'vintage-gold': '#B8860B',
+                        'rich-burgundy': '#722F37',
+                        'cream-white': '#F5F5DC',
+                        'charcoal-gray': '#36454F',
+                        'muted-olive': '#6B8E23',
+                        'aged-brass': '#CD7F32'
+                    },
+                    fontFamily: {
+                        'display': ['Playfair Display', 'serif'],
+                        'body': ['Source Sans Pro', 'sans-serif'],
+                        'accent': ['Crimson Text', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --sepia-brown: #3C2415;
+            --warm-amber: #D4A574;
+            --vintage-gold: #B8860B;
+            --rich-burgundy: #722F37;
+            --cream-white: #F5F5DC;
+            --charcoal-gray: #36454F;
+            --muted-olive: #6B8E23;
+            --aged-brass: #CD7F32;
+        }
+        
+        body {
+            background-color: var(--sepia-brown);
+            color: var(--cream-white);
+            font-family: 'Source Sans Pro', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Film Grain Effect */
+        .film-grain::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, transparent 20%, rgba(139, 69, 19, 0.3) 21%, rgba(139, 69, 19, 0.3) 34%, transparent 35%, transparent),
+                linear-gradient(0deg, rgba(255, 255, 255, 0.1) 50%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Vintage Paper Texture */
+        .vintage-paper {
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        
+        /* Film Strip Navigation */
+        .film-strip {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--aged-brass) 5%, 
+                var(--aged-brass) 95%, 
+                transparent 100%);
+            position: relative;
+        }
+        
+        .film-strip::before,
+        .film-strip::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                var(--sepia-brown),
+                var(--sepia-brown) 10px,
+                var(--aged-brass) 10px,
+                var(--aged-brass) 15px
+            );
+        }
+        
+        .film-strip::before { left: 0; }
+        .film-strip::after { right: 0; }
+        
+        /* Character Cards */
+        .character-card {
+            background: linear-gradient(145deg, rgba(60, 36, 21, 0.9), rgba(54, 69, 79, 0.8));
+            border: 2px solid var(--aged-brass);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .character-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border-color: var(--vintage-gold);
+        }
+        
+        /* Timeline Styling */
+        .timeline-container {
+            position: relative;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--aged-brass), var(--vintage-gold));
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-bottom: 4rem;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: 55%;
+            text-align: right;
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 55%;
+            text-align: left;
+        }
+        
+        .timeline-marker {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: var(--vintage-gold);
+            border: 4px solid var(--sepia-brown);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        
+        /* Family Tree */
+        .family-tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3rem;
+        }
+        
+        .family-generation {
+            display: flex;
+            justify-content: center;
+            gap: 4rem;
+            flex-wrap: wrap;
+        }
+        
+        .family-member {
+            position: relative;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .family-member:hover {
+            transform: scale(1.1);
+        }
+        
+        .family-member-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, var(--aged-brass), var(--vintage-gold));
+            border: 3px solid var(--warm-amber);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            font-size: 2rem;
+            color: var(--sepia-brown);
+            font-weight: bold;
+        }
+        
+        /* Vintage Button */
+        .vintage-btn {
+            background: linear-gradient(145deg, var(--aged-brass), var(--vintage-gold));
+            border: 2px solid var(--vintage-gold);
+            color: var(--sepia-brown);
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .vintage-btn:hover {
+            background: linear-gradient(145deg, var(--vintage-gold), var(--aged-brass));
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 6px 8px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* Navigation */
+        .nav-link {
+            color: var(--cream-white);
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--warm-amber);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                margin: 0 0 0 2rem;
+                text-align: left;
+            }
+            
+            .timeline-line {
+                left: 1rem;
+            }
+            
+            .timeline-marker {
+                left: 1rem;
+            }
+            
+            .family-generation {
+                gap: 2rem;
+            }
+            
+            .family-member-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+        
+        /* Content Sections */
+        .content-section {
+            position: relative;
+            padding: 4rem 0;
+        }
+        
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(60, 36, 21, 0.8);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 film-strip py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="font-display text-2xl font-bold text-warm-amber">
+                <a href="index.html">The Godfather Trilogy</a>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="characters.html" class="nav-link text-warm-amber">Characters</a>
+                <a href="scenes.html" class="nav-link">Scenes</a>
+                <a href="quiz.html" class="nav-link">Quiz</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobileMenuBtn" class="text-cream-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="fixed top-0 left-0 w-full h-full bg-sepia-brown z-40 transform -translate-x-full transition-transform duration-300">
+        <div class="flex flex-col items-center justify-center h-full space-y-8">
+            <a href="index.html" class="nav-link text-2xl">Home</a>
+            <a href="characters.html" class="nav-link text-2xl text-warm-amber">Characters</a>
+            <a href="scenes.html" class="nav-link text-2xl">Scenes</a>
+            <a href="quiz.html" class="nav-link text-2xl">Quiz</a>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <section class="relative min-h-screen flex items-center justify-center film-grain" style="padding-top: 100px;">
+        <div class="absolute inset-0 z-0">
+            <img src="character-gallery.png" alt="Character Gallery" class="w-full h-full object-cover opacity-30">
+            <div class="absolute inset-0 bg-gradient-to-r from-sepia-brown via-transparent to-sepia-brown opacity-80"></div>
+        </div>
+        
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <h1 class="font-display text-6xl md:text-8xl font-black text-cream-white mb-6 leading-tight" data-splitting>
+                The Corleone Family
+            </h1>
+            <p class="font-body text-xl md:text-2xl text-warm-amber mb-8 font-light">
+                Explore the characters whose journey from 1901 to 1980 defined American cinema
+            </p>
+        </div>
+    </section>
+
+    <!-- Character Selection -->
+    <section class="content-section vintage-paper">
+        <div class="container mx-auto px-6">
+            <h2 class="font-display text-5xl font-bold text-warm-amber text-center mb-16">Meet the Family</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+                <div class="character-card p-6 rounded-lg cursor-pointer" onclick="showCharacterDetails('vito')">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-vintage-gold rounded-full flex items-center justify-center mx-auto mb-4 text-sepia-brown text-3xl font-bold">
+                            V
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-2">Don Vito Corleone</h3>
+                        <p class="text-cream-white text-sm mb-4">The Patriarch</p>
+                        <p class="text-cream-white text-xs leading-relaxed">
+                            Marlon Brando's iconic performance as the family patriarch who built an empire on loyalty and respect.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="character-card p-6 rounded-lg cursor-pointer" onclick="showCharacterDetails('michael')">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-vintage-gold rounded-full flex items-center justify-center mx-auto mb-4 text-sepia-brown text-3xl font-bold">
+                            M
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-2">Michael Corleone</h3>
+                        <p class="text-cream-white text-sm mb-4">The Successor</p>
+                        <p class="text-cream-white text-xs leading-relaxed">
+                            Al Pacino's transformation from war hero to ruthless Don, the heart of the trilogy.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="character-card p-6 rounded-lg cursor-pointer" onclick="showCharacterDetails('sonny')">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-vintage-gold rounded-full flex items-center justify-center mx-auto mb-4 text-sepia-brown text-3xl font-bold">
+                            S
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-2">Sonny Corleone</h3>
+                        <p class="text-cream-white text-sm mb-4">The Hothead</p>
+                        <p class="text-cream-white text-xs leading-relaxed">
+                            James Caan's portrayal of the impulsive eldest son whose temper leads to his downfall.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="character-card p-6 rounded-lg cursor-pointer" onclick="showCharacterDetails('tom')">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-vintage-gold rounded-full flex items-center justify-center mx-auto mb-4 text-sepia-brown text-3xl font-bold">
+                            T
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-2">Tom Hagen</h3>
+                        <p class="text-cream-white text-sm mb-4">The Consigliere</p>
+                        <p class="text-cream-white text-xs leading-relaxed">
+                            Robert Duvall as the adopted son and trusted advisor who provides wisdom and counsel.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="character-card p-6 rounded-lg cursor-pointer" onclick="showCharacterDetails('connie')">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-vintage-gold rounded-full flex items-center justify-center mx-auto mb-4 text-sepia-brown text-3xl font-bold">
+                            C
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-2">Connie Corleone</h3>
+                        <p class="text-cream-white text-sm mb-4">The Daughter</p>
+                        <p class="text-cream-white text-xs leading-relaxed">
+                            Talia Shire's journey from abused wife to powerful family matriarch.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="character-card p-6 rounded-lg cursor-pointer" onclick="showCharacterDetails('fredo')">
+                    <div class="text-center">
+                        <div class="w-20 h-20 bg-vintage-gold rounded-full flex items-center justify-center mx-auto mb-4 text-sepia-brown text-3xl font-bold">
+                            F
+                        </div>
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-2">Fredo Corleone</h3>
+                        <p class="text-cream-white text-sm mb-4">The Weak Link</p>
+                        <p class="text-cream-white text-xs leading-relaxed">
+                            John Cazale's heartbreaking portrayal of the middle son who never measured up.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Character Detail Modal -->
+    <div id="characterModal" class="fixed inset-0 bg-sepia-brown bg-opacity-90 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-6">
+            <div class="bg-sepia-brown border-2 border-aged-brass rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+                <div class="p-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <div>
+                            <h2 id="modalCharacterName" class="font-display text-4xl font-bold text-warm-amber mb-2"></h2>
+                            <p id="modalActorName" class="text-vintage-gold font-body text-lg mb-4"></p>
+                            <p id="modalDescription" class="text-cream-white leading-relaxed"></p>
+                        </div>
+                        <button onclick="closeCharacterModal()" class="text-cream-white hover:text-warm-amber text-3xl">×</button>
+                    </div>
+                    
+                    <div class="mb-8">
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-6">Character Timeline</h3>
+                        <div id="modalTimeline" class="timeline-container">
+                            <div class="timeline-line"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button onclick="closeCharacterModal()" class="vintage-btn px-8 py-3 rounded-lg">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Family Tree -->
+    <section class="content-section vintage-paper">
+        <div class="container mx-auto px-6">
+            <h2 class="font-display text-5xl font-bold text-warm-amber text-center mb-16">Family Tree</h2>
+            
+            <div class="family-tree">
+                <!-- Generation 1 -->
+                <div class="family-generation">
+                    <div class="family-member" onclick="showCharacterDetails('vito')">
+                        <div class="family-member-avatar">V</div>
+                        <div class="font-display text-lg font-bold text-warm-amber">Vito</div>
+                        <div class="text-cream-white text-sm">The Don</div>
+                    </div>
+                    <div class="family-member">
+                        <div class="family-member-avatar">C</div>
+                        <div class="font-display text-lg font-bold text-warm-amber">Carmela</div>
+                        <div class="text-cream-white text-sm">Wife</div>
+                    </div>
+                </div>
+                
+                <!-- Generation 2 -->
+                <div class="family-generation">
+                    <div class="family-member" onclick="showCharacterDetails('sonny')">
+                        <div class="family-member-avatar">S</div>
+                        <div class="font-display text-lg font-bold text-warm-amber">Sonny</div>
+                        <div class="text-cream-white text-sm">Eldest Son</div>
+                    </div>
+                    <div class="family-member" onclick="showCharacterDetails('fredo')">
+                        <div class="family-member-avatar">F</div>
+                        <div class="font-display text-lg font-bold text-warm-amber">Fredo</div>
+                        <div class="text-cream-white text-sm">Middle Son</div>
+                    </div>
+                    <div class="family-member" onclick="showCharacterDetails('michael')">
+                        <div class="family-member-avatar">M</div>
+                        <div class="font-display text-lg font-bold text-warm-amber">Michael</div>
+                        <div class="text-cream-white text-sm">Youngest Son</div>
+                    </div>
+                    <div class="family-member" onclick="showCharacterDetails('connie')">
+                        <div class="family-member-avatar">C</div>
+                        <div class="font-display text-lg font-bold text-warm-amber">Connie</div>
+                        <div class="text-cream-white text-sm">Daughter</div>
+                    </div>
+                    <div class="family-member" onclick="showCharacterDetails('tom')">
+                        <div class="family-member-avatar">T</div>
+                        <div class="font-display text-lg font-bold text-warm-amber">Tom</div>
+                        <div class="text-cream-white text-sm">Adopted Son</div>
+                    </div>
+                </div>
+                
+                <!-- Generation 3 -->
+                <div class="family-generation">
+                    <div class="family-member">
+                        <div class="family-member-avatar">A</div>
+                        <div class="font-display text-lg font-bold text-warm-amber">Anthony</div>
+                        <div class="text-cream-white text-sm">Michael's Son</div>
+                    </div>
+                    <div class="family-member">
+                        <div class="family-member-avatar">M</div>
+                        <div class="font-display text-lg font-bold text-warm-amber">Mary</div>
+                        <div class="text-cream-white text-sm">Michael's Daughter</div>
+                    </div>
+                    <div class="family-member">
+                        <div class="family-member-avatar">V</div>
+                        <div class="font-display text-lg font-bold text-warm-amber">Vincent</div>
+                        <div class="text-cream-white text-sm">Sonny's Son</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Character Comparison -->
+    <section class="content-section vintage-paper">
+        <div class="container mx-auto px-6">
+            <h2 class="font-display text-5xl font-bold text-warm-amber text-center mb-16">Character Comparison</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="character-card p-6 rounded-lg">
+                    <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">Vito Corleone</h3>
+                    <ul class="text-cream-white space-y-2">
+                        <li>• Built empire through respect and loyalty</li>
+                        <li>• Values family above all else</li>
+                        <li>• Wise and patient leader</li>
+                        <li>• Believes in honor and tradition</li>
+                        <li>• Seeks balance between business and family</li>
+                    </ul>
+                </div>
+                
+                <div class="character-card p-6 rounded-lg">
+                    <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">Michael Corleone</h3>
+                    <ul class="text-cream-white space-y-2">
+                        <li>• Inherits empire through necessity</li>
+                        <li>• Becomes increasingly isolated</li>
+                        <li>• Ruthless and calculating</li>
+                        <li>• Driven by protection and control</li>
+                        <li>• Sacrifices family for power</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <p class="font-accent text-xl text-cream-white italic">
+                    "The difference between Vito and Michael is that Vito never forgot where he came from, 
+                    while Michael never knew where he was going."
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="film-strip py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p class="font-body text-cream-white">
+                © 2024 The Godfather Trilogy Tribute. A celebration of cinematic excellence.
+            </p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Character-specific functionality
+        function showCharacterDetails(characterId) {
+            const character = characterData[characterId];
+            if (!character) return;
+            
+            document.getElementById('modalCharacterName').textContent = character.name;
+            document.getElementById('modalActorName').textContent = `Played by ${character.actor}`;
+            document.getElementById('modalDescription').textContent = character.description;
+            
+            // Create timeline
+            const timeline = document.getElementById('modalTimeline');
+            const timelineContent = timeline.querySelector('.timeline-line');
+            timeline.innerHTML = '<div class="timeline-line"></div>';
+            
+            character.timeline.forEach((item, index) => {
+                const timelineItem = document.createElement('div');
+                timelineItem.className = 'timeline-item';
+                timelineItem.innerHTML = `
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="bg-sepia-brown bg-opacity-80 p-4 rounded-lg border border-aged-brass">
+                            <div class="font-display text-xl font-bold text-vintage-gold mb-2">${item.year}</div>
+                            <div class="text-cream-white">${item.event}</div>
+                        </div>
+                    </div>
+                `;
+                timeline.appendChild(timelineItem);
+            });
+            
+            document.getElementById('characterModal').classList.remove('hidden');
+            
+            // Animate modal appearance
+            anime({
+                targets: '#characterModal .bg-sepia-brown',
+                scale: [0.8, 1],
+                opacity: [0, 1],
+                duration: 500,
+                easing: 'easeOutBack'
+            });
+        }
+        
+        function closeCharacterModal() {
+            anime({
+                targets: '#characterModal .bg-sepia-brown',
+                scale: [1, 0.8],
+                opacity: [1, 0],
+                duration: 300,
+                easing: 'easeInBack',
+                complete: () => {
+                    document.getElementById('characterModal').classList.add('hidden');
+                }
+            });
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate character cards on load
+            anime({
+                targets: '.character-card',
+                translateY: [50, 0],
+                opacity: [0, 1],
+                duration: 800,
+                delay: anime.stagger(100),
+                easing: 'easeOutQuad'
+            });
+            
+            // Animate family tree
+            anime({
+                targets: '.family-member',
+                scale: [0.8, 1],
+                opacity: [0, 1],
+                duration: 600,
+                delay: anime.stagger(50),
+                easing: 'easeOutBack'
+            });
+        });
+    </script>
+</body>
+</html>

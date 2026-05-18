@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iconic Scenes - The Godfather Trilogy</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@300;400;600&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sepia-brown': '#3C2415',
+                        'warm-amber': '#D4A574',
+                        'vintage-gold': '#B8860B',
+                        'rich-burgundy': '#722F37',
+                        'cream-white': '#F5F5DC',
+                        'charcoal-gray': '#36454F',
+                        'muted-olive': '#6B8E23',
+                        'aged-brass': '#CD7F32'
+                    },
+                    fontFamily: {
+                        'display': ['Playfair Display', 'serif'],
+                        'body': ['Source Sans Pro', 'sans-serif'],
+                        'accent': ['Crimson Text', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --sepia-brown: #3C2415;
+            --warm-amber: #D4A574;
+            --vintage-gold: #B8860B;
+            --rich-burgundy: #722F37;
+            --cream-white: #F5F5DC;
+            --charcoal-gray: '#36454F';
+            --muted-olive: #6B8E23;
+            --aged-brass: #CD7F32;
+        }
+        
+        body {
+            background-color: var(--sepia-brown);
+            color: var(--cream-white);
+            font-family: 'Source Sans Pro', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Film Grain Effect */
+        .film-grain::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, transparent 20%, rgba(139, 69, 19, 0.3) 21%, rgba(139, 69, 19, 0.3) 34%, transparent 35%, transparent),
+                linear-gradient(0deg, rgba(255, 255, 255, 0.1) 50%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Vintage Paper Texture */
+        .vintage-paper {
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        
+        /* Film Strip Navigation */
+        .film-strip {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--aged-brass) 5%, 
+                var(--aged-brass) 95%, 
+                transparent 100%);
+            position: relative;
+        }
+        
+        .film-strip::before,
+        .film-strip::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                var(--sepia-brown),
+                var(--sepia-brown) 10px,
+                var(--aged-brass) 10px,
+                var(--aged-brass) 15px
+            );
+        }
+        
+        .film-strip::before { left: 0; }
+        .film-strip::after { right: 0; }
+        
+        /* Scene Cards */
+        .scene-card {
+            background: linear-gradient(145deg, rgba(60, 36, 21, 0.9), rgba(54, 69, 79, 0.8));
+            border: 2px solid var(--aged-brass);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .scene-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border-color: var(--vintage-gold);
+        }
+        
+        .scene-card.active {
+            border-color: var(--vintage-gold);
+            box-shadow: 0 0 30px rgba(184, 134, 11, 0.3);
+        }
+        
+        /* Film Frame Effect */
+        .film-frame {
+            position: relative;
+            border: 8px solid var(--sepia-brown);
+            box-shadow: 
+                inset 0 0 0 2px var(--aged-brass),
+                0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .film-frame::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: repeating-linear-gradient(
+                0deg,
+                var(--aged-brass),
+                var(--aged-brass) 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            z-index: -1;
+        }
+        
+        /* Analysis Tabs */
+        .analysis-tab {
+            background: var(--charcoal-gray);
+            border: 2px solid var(--aged-brass);
+            color: var(--cream-white);
+            transition: all 0.3s ease;
+        }
+        
+        .analysis-tab.active {
+            background: var(--aged-brass);
+            color: var(--sepia-brown);
+            border-color: var(--vintage-gold);
+        }
+        
+        .analysis-tab:hover {
+            background: var(--warm-amber);
+            color: var(--sepia-brown);
+        }
+        
+        /* Vintage Button */
+        .vintage-btn {
+            background: linear-gradient(145deg, var(--aged-brass), var(--vintage-gold));
+            border: 2px solid var(--vintage-gold);
+            color: var(--sepia-brown);
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .vintage-btn:hover {
+            background: linear-gradient(145deg, var(--vintage-gold), var(--aged-brass));
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 6px 8px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* Navigation */
+        .nav-link {
+            color: var(--cream-white);
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--warm-amber);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            position: relative;
+            padding: 4rem 0;
+        }
+        
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(60, 36, 21, 0.8);
+            z-index: -1;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .scene-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .analysis-tabs {
+                flex-direction: column;
+            }
+            
+            .analysis-tab {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 film-strip py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="font-display text-2xl font-bold text-warm-amber">
+                <a href="index.html">The Godfather Trilogy</a>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="characters.html" class="nav-link">Characters</a>
+                <a href="scenes.html" class="nav-link text-warm-amber">Scenes</a>
+                <a href="quiz.html" class="nav-link">Quiz</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobileMenuBtn" class="text-cream-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="fixed top-0 left-0 w-full h-full bg-sepia-brown z-40 transform -translate-x-full transition-transform duration-300">
+        <div class="flex flex-col items-center justify-center h-full space-y-8">
+            <a href="index.html" class="nav-link text-2xl">Home</a>
+            <a href="characters.html" class="nav-link text-2xl">Characters</a>
+            <a href="scenes.html" class="nav-link text-2xl text-warm-amber">Scenes</a>
+            <a href="quiz.html" class="nav-link text-2xl">Quiz</a>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <section class="relative min-h-screen flex items-center justify-center film-grain" style="padding-top: 100px;">
+        <div class="absolute inset-0 z-0">
+            <img src="trilogy-film-strip.png" alt="Film Strip" class="w-full h-full object-cover opacity-30">
+            <div class="absolute inset-0 bg-gradient-to-r from-sepia-brown via-transparent to-sepia-brown opacity-80"></div>
+        </div>
+        
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <h1 class="font-display text-6xl md:text-8xl font-black text-cream-white mb-6 leading-tight" data-splitting>
+                Iconic Scenes
+            </h1>
+            <p class="font-body text-xl md:text-2xl text-warm-amber mb-8 font-light">
+                The moments that redefined cinema and became part of our cultural DNA
+            </p>
+        </div>
+    </section>
+
+    <!-- Scene Selection -->
+    <section class="content-section vintage-paper">
+        <div class="container mx-auto px-6">
+            <h2 class="font-display text-5xl font-bold text-warm-amber text-center mb-16">Select a Scene</h2>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+                <div class="scene-card p-6 rounded-lg" onclick="selectScene(0)">
+                    <div class="film-frame mb-4 h-32 bg-charcoal-gray flex items-center justify-center">
+                        <div class="text-vintage-gold text-4xl">🎭</div>
+                    </div>
+                    <h3 class="font-display text-xl font-bold text-warm-amber mb-2">The Wedding</h3>
+                    <p class="text-cream-white text-sm">Connie's wedding day establishes the Corleone family's power structure</p>
+                </div>
+                
+                <div class="scene-card p-6 rounded-lg" onclick="selectScene(1)">
+                    <div class="film-frame mb-4 h-32 bg-charcoal-gray flex items-center justify-center">
+                        <div class="text-vintage-gold text-4xl">🏥</div>
+                    </div>
+                    <h3 class="font-display text-xl font-bold text-warm-amber mb-2">The Hospital</h3>
+                    <p class="text-cream-white text-sm">Michael saves his father's life from a second assassination attempt</p>
+                </div>
+                
+                <div class="scene-card p-6 rounded-lg" onclick="selectScene(2)">
+                    <div class="film-frame mb-4 h-32 bg-charcoal-gray flex items-center justify-center">
+                        <div class="text-vintage-gold text-4xl">🔫</div>
+                    </div>
+                    <h3 class="font-display text-xl font-bold text-warm-amber mb-2">The Restaurant</h3>
+                    <p class="text-cream-white text-sm">Michael's first kill marks his transformation into the family business</p>
+                </div>
+                
+                <div class="scene-card p-6 rounded-lg" onclick="selectScene(3)">
+                    <div class="film-frame mb-4 h-32 bg-charcoal-gray flex items-center justify-center">
+                        <div class="text-vintage-gold text-4xl">⛪</div>
+                    </div>
+                    <h3 class="font-display text-xl font-bold text-warm-amber mb-2">The Baptism</h3>
+                    <p class="text-cream-white text-sm">Michael becomes godfather while ordering the deaths of his enemies</p>
+                </div>
+                
+                <div class="scene-card p-6 rounded-lg" onclick="selectScene(4)">
+                    <div class="film-frame mb-4 h-32 bg-charcoal-gray flex items-center justify-center">
+                        <div class="text-vintage-gold text-4xl">🌅</div>
+                    </div>
+                    <h3 class="font-display text-xl font-bold text-warm-amber mb-2">Vito's Flashback</h3>
+                    <p class="text-cream-white text-sm">Young Vito's rise to power in 1920s New York</p>
+                </div>
+                
+                <div class="scene-card p-6 rounded-lg" onclick="selectScene(5)">
+                    <div class="film-frame mb-4 h-32 bg-charcoal-gray flex items-center justify-center">
+                        <div class="text-vintage-gold text-4xl">🏛️</div>
+                    </div>
+                    <h3 class="font-display text-xl font-bold text-warm-amber mb-2">Senate Hearing</h3>
+                    <p class="text-cream-white text-sm">Michael testifies before Congress about organized crime</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene Analysis -->
+    <section class="content-section vintage-paper">
+        <div class="container mx-auto px-6">
+            <div id="sceneAnalysis" class="hidden">
+                <div class="text-center mb-12">
+                    <h2 id="sceneTitle" class="font-display text-4xl font-bold text-warm-amber mb-4"></h2>
+                    <p id="sceneFilm" class="text-vintage-gold font-body text-lg mb-4"></p>
+                    <p id="sceneDescription" class="text-cream-white max-w-3xl mx-auto leading-relaxed"></p>
+                </div>
+                
+                <div class="flex flex-wrap justify-center gap-4 mb-8">
+                    <button class="analysis-tab active px-6 py-3 rounded-lg font-body font-semibold" onclick="showAnalysis('significance')">
+                        Significance
+                    </button>
+                    <button class="analysis-tab px-6 py-3 rounded-lg font-body font-semibold" onclick="showAnalysis('cinematography')">
+                        Cinematography
+                    </button>
+                    <button class="analysis-tab px-6 py-3 rounded-lg font-body font-semibold" onclick="showAnalysis('symbolism')">
+                        Symbolism
+                    </button>
+                    <button class="analysis-tab px-6 py-3 rounded-lg font-body font-semibold" onclick="showAnalysis('trivia')">
+                        Trivia
+                    </button>
+                </div>
+                
+                <div id="analysisContent" class="bg-sepia-brown bg-opacity-80 p-8 rounded-lg border border-aged-brass">
+                    <div id="significance" class="analysis-panel">
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">Narrative Significance</h3>
+                        <p class="text-cream-white leading-relaxed" id="significanceText"></p>
+                    </div>
+                    
+                    <div id="cinematography" class="analysis-panel hidden">
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">Cinematic Techniques</h3>
+                        <p class="text-cream-white leading-relaxed" id="cinematographyText"></p>
+                    </div>
+                    
+                    <div id="symbolism" class="analysis-panel hidden">
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">Symbolism & Themes</h3>
+                        <p class="text-cream-white leading-relaxed" id="symbolismText"></p>
+                    </div>
+                    
+                    <div id="trivia" class="analysis-panel hidden">
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">Behind the Scenes</h3>
+                        <p class="text-cream-white leading-relaxed" id="triviaText"></p>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <button class="vintage-btn px-8 py-3 rounded-lg mr-4" onclick="rateScene()">
+                        Rate This Scene
+                    </button>
+                    <button class="vintage-btn px-8 py-3 rounded-lg" onclick="selectScene(-1)">
+                        Select Another Scene
+                    </button>
+                </div>
+            </div>
+            
+            <div id="scenePlaceholder" class="text-center py-16">
+                <div class="text-6xl text-warm-amber mb-6">🎬</div>
+                <h3 class="font-display text-3xl font-bold text-warm-amber mb-4">Choose a Scene to Analyze</h3>
+                <p class="text-cream-white max-w-2xl mx-auto">
+                    Select one of the iconic scenes above to explore its significance, cinematography, 
+                    symbolism, and behind-the-scenes trivia.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene Comparison -->
+    <section class="content-section vintage-paper">
+        <div class="container mx-auto px-6">
+            <h2 class="font-display text-5xl font-bold text-warm-amber text-center mb-16">Scene Comparison</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="scene-card p-6 rounded-lg">
+                    <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">The Wedding Scene</h3>
+                    <div class="space-y-3 text-cream-white">
+                        <p><strong>Function:</strong> Establishes family dynamics</p>
+                        <p><strong>Lighting:</strong> Warm, natural sunlight</p>
+                        <p><strong>Tone:</strong> Celebratory yet ominous</p>
+                        <p><strong>Key Elements:</strong> Multiple storylines, traditional values</p>
+                        <p><strong>Duration:</strong> 26 minutes</p>
+                    </div>
+                </div>
+                
+                <div class="scene-card p-6 rounded-lg">
+                    <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">The Baptism Scene</h3>
+                    <div class="space-y-3 text-cream-white">
+                        <p><strong>Function:</strong> Michael's transformation complete</p>
+                        <p><strong>Lighting:</strong> Cold, institutional</p>
+                        <p><strong>Tone:</strong> Sacred contrasted with profane</p>
+                        <p><strong>Key Elements:</strong> Cross-cutting, religious ritual</p>
+                        <p><strong>Duration:</strong> 8 minutes</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <p class="font-accent text-xl text-cream-white italic">
+                    "Both scenes use ceremony to reveal character, but while the wedding shows 
+                    Vito's world, the baptism shows Michael's transformation into something darker."
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="film-strip py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p class="font-body text-cream-white">
+                © 2024 The Godfather Trilogy Tribute. A celebration of cinematic excellence.
+            </p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        let currentScene = -1;
+        
+        const sceneAnalysisData = {
+            0: {
+                title: "The Wedding Scene",
+                film: "The Godfather (1972)",
+                description: "The film opens with Connie Corleone's wedding day, where Don Vito Corleone grants favors according to Sicilian tradition. This 26-minute sequence establishes the entire world of the Corleone family.",
+                significance: "This scene serves as the perfect introduction to the Corleone universe. It establishes the family hierarchy, Vito's power and influence, the contrast between legitimate business and criminal activities, and introduces all major characters. The wedding provides a natural way to show the scope of the family's connections and the respect they command.",
+                cinematography: "Coppola uses warm, natural lighting to create a sense of authenticity. The camera moves fluidly between the dark interior of Vito's office and the bright outdoor celebration. The contrast between light and shadow visually represents the duality of the family's life - the public celebration versus the private business dealings.",
+                symbolism: "The wedding represents the traditional values that the Corleone family claims to uphold. The Sicilian tradition of granting favors on a daughter's wedding day shows how the family uses cultural traditions to legitimize their criminal activities. The separation between the office and the party symbolizes the separation between family and business.",
+                trivia: "The wedding was filmed at a real Staten Island estate. The scenes with Marlon Brando in his office were filmed separately from the outdoor wedding scenes due to Brando's schedule. Many of the wedding guests were actual Italian-Americans from the neighborhood, adding authenticity to the celebration."
+            },
+            1: {
+                title: "The Hospital Scene",
+                film: "The Godfather (1972)",
+                description: "Michael Corleone saves his father Vito's life from a second assassination attempt, marking his first real involvement in the family business.",
+                significance: "This scene marks Michael's transformation from outsider to participant. His decision to stand by his father's side, despite having no experience in this world, shows the power of family loyalty. The scene also demonstrates Michael's natural instincts for strategy and protection.",
+                cinematography: "The hospital corridors are shot with stark, institutional lighting that creates long shadows. The camera work emphasizes Michael's isolation as he stands guard over his father. The tension is built through silence and the gradual revelation of the empty hospital.",
+                symbolism: "The hospital represents vulnerability - even the powerful Don Corleone is mortal. Michael's act of protection symbolizes the transfer of guardianship from father to son. The empty hospital corridors suggest that in the end, family must protect family.",
+                trivia: "The hospital scenes were filmed at a real hospital in New York. The tension was heightened by filming late at night when the hospital was naturally quiet. Al Pacino's performance was largely improvised, with Coppola encouraging him to show Michael's fear and determination."
+            },
+            2: {
+                title: "The Restaurant Scene",
+                film: "The Godfather (1972)",
+                description: "Michael assassinates drug lord Virgil Sollozzo and corrupt police captain McCluskey in a Bronx restaurant, completing his transformation into a killer.",
+                significance: "This is the pivotal moment where Michael crosses the line from civilian to killer. The scene shows his careful planning and cold execution, revealing the ruthless side that will define his character throughout the trilogy. It's his baptism by fire into the family business.",
+                cinematography: "The scene uses tight close-ups and quick cuts to build tension. The sound of the approaching train is used as a device to heighten anxiety. The lighting is dim and shadowy, creating a claustrophobic atmosphere. The final shots are framed to show Michael's isolation from normal society.",
+                symbolism: "The restaurant represents neutral ground that becomes a battlefield. The act of eating before killing shows Michael's ability to maintain composure under extreme pressure. The gun hidden in the bathroom symbolizes the hidden violence beneath civilized appearances.",
+                trivia: "The scene was filmed in a real restaurant in the Bronx. The train sound was added in post-production to increase tension. The gun used was a real prop, and the actors practiced extensively to ensure safety. The scene took five days to film due to its complexity."
+            },
+            3: {
+                title: "The Baptism Scene",
+                film: "The Godfather (1972)",
+                description: "Michael becomes godfather to his nephew while simultaneously ordering the assassination of all his enemies in one of cinema's most famous montages.",
+                significance: "This scene represents Michael's complete transformation into the Don. The juxtaposition of sacred ritual with violent murder shows how he has merged his public and private personas. It marks his ascension to full power and his embrace of ruthless tactics.",
+                cinematography: "Coppola uses parallel editing to cross-cut between the baptism ceremony and the assassinations. The church scenes are shot with reverent, formal compositions while the killings are shown in quick, violent cuts. The organ music provides a haunting backdrop that unifies both threads.",
+                symbolism: "The baptism represents rebirth - Michael is reborn as the Don. The holy water contrasts with the blood being spilled. The priest's words about renouncing Satan are spoken as Michael orders murders, showing his complete moral inversion. The ceremony represents both religious and criminal succession.",
+                trivia: "The scene took weeks to edit and required coordination across multiple locations. The priest was played by an actual Catholic priest. The baby in the scene was Sofia Coppola, Francis Ford Coppola's daughter. The scene has been parodied and referenced in countless films and TV shows."
+            },
+            4: {
+                title: "Vito's Flashback",
+                film: "The Godfather Part II (1974)",
+                description: "Young Vito Corleone's rise to power in 1920s New York, showing how he built his criminal empire through intelligence and respect.",
+                significance: "This parallel storyline shows the contrast between Vito's and Michael's approaches to power. Vito builds relationships and community while Michael destroys them. The flashbacks reveal that Vito became a criminal out of necessity, not choice.",
+                cinematography: "The scenes are shot with a warm, nostalgic glow that contrasts with the cold present-day scenes. The camera work is more fluid and organic, reflecting the immigrant community's vitality. The use of Italian language adds authenticity to the early 20th century setting.",
+                symbolism: "The young Vito represents the American Dream gone wrong. His transformation from innocent immigrant to crime boss shows how the system can corrupt those seeking success. The olive oil business symbolizes how legitimate and illegitimate businesses can merge.",
+                trivia: "Robert De Niro learned to speak Sicilian for the role. The scenes were filmed in various locations to recreate 1920s New York. The young Vito's story was based on Mario Puzo's research into real Italian-American immigrant experiences. De Niro won an Oscar for his performance."
+            },
+            5: {
+                title: "Senate Hearing",
+                film: "The Godfather Part II (1974)",
+                description: "Michael Corleone testifies before a Senate committee investigating organized crime, attempting to maintain his facade of legitimacy.",
+                significance: "This scene shows Michael's attempt to legitimize his empire and escape his criminal past. His testimony reveals how far he's willing to go to protect his family and business interests. The scene demonstrates his intelligence and composure under pressure.",
+                cinematography: "The hearing room is shot with cold, institutional lighting that emphasizes Michael's isolation. The camera angles emphasize the power dynamics between Michael and the senators. The formal composition contrasts with the informal power Michael wields.",
+                symbolism: "The Senate represents the legitimate government that Michael seeks to join but can never fully enter. The hearing room symbolizes the public scrutiny that threatens to expose his private world. Michael's testimony shows his ability to manipulate both legal and illegal systems.",
+                trivia: "The scenes were filmed in the actual Senate hearing room when possible. The testimony was based on real organized crime hearings from the 1950s and 60s. Al Pacino studied footage of real mobsters testifying to perfect his performance. The scene required multiple cameras to capture all the reactions."
+            }
+        };
+        
+        function selectScene(sceneIndex) {
+            if (sceneIndex === -1) {
+                // Show placeholder
+                document.getElementById('sceneAnalysis').classList.add('hidden');
+                document.getElementById('scenePlaceholder').classList.remove('hidden');
+                
+                // Remove active class from all cards
+                document.querySelectorAll('.scene-card').forEach(card => {
+                    card.classList.remove('active');
+                });
+                
+                currentScene = -1;
+                return;
+            }
+            
+            currentScene = sceneIndex;
+            const scene = sceneAnalysisData[sceneIndex];
+            
+            // Update scene info
+            document.getElementById('sceneTitle').textContent = scene.title;
+            document.getElementById('sceneFilm').textContent = scene.film;
+            document.getElementById('sceneDescription').textContent = scene.description;
+            
+            // Update analysis content
+            document.getElementById('significanceText').textContent = scene.significance;
+            document.getElementById('cinematographyText').textContent = scene.cinematography;
+            document.getElementById('symbolismText').textContent = scene.symbolism;
+            document.getElementById('triviaText').textContent = scene.trivia;
+            
+            // Show analysis section
+            document.getElementById('sceneAnalysis').classList.remove('hidden');
+            document.getElementById('scenePlaceholder').classList.add('hidden');
+            
+            // Update active scene card
+            document.querySelectorAll('.scene-card').forEach((card, index) => {
+                if (index === sceneIndex) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+            
+            // Reset to significance tab
+            showAnalysis('significance');
+            
+            // Animate appearance
+            anime({
+                targets: '#sceneAnalysis',
+                opacity: [0, 1],
+                translateY: [30, 0],
+                duration: 600,
+                easing: 'easeOutQuad'
+            });
+        }
+        
+        function showAnalysis(type) {
+            // Update active tab
+            document.querySelectorAll('.analysis-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show corresponding panel
+            document.querySelectorAll('.analysis-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+            document.getElementById(type).classList.remove('hidden');
+            
+            // Animate panel change
+            anime({
+                targets: `#${type}`,
+                opacity: [0, 1],
+                translateX: [20, 0],
+                duration: 400,
+                easing: 'easeOutQuad'
+            });
+        }
+        
+        function rateScene() {
+            // Simple rating system
+            const rating = prompt('Rate this scene from 1-10:', '10');
+            if (rating && !isNaN(rating) && rating >= 1 && rating <= 10) {
+                alert(`Thank you for rating "${sceneAnalysisData[currentScene].title}" with ${rating}/10!`);
+                
+                // Store rating (in a real app, this would go to a database)
+                localStorage.setItem(`sceneRating_${currentScene}`, rating);
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate scene cards on load
+            anime({
+                targets: '.scene-card',
+                translateY: [50, 0],
+                opacity: [0, 1],
+                duration: 800,
+                delay: anime.stagger(100),
+                easing: 'easeOutQuad'
+            });
+        });
+    </script>
+</body>
+</html>

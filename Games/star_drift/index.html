@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>深空漂移战机 - Deep Space Drift Fighter</title>
+    <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- 游戏画布 -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- 星空背景层 -->
+        <canvas id="starfield-canvas"></canvas>
+
+        <!-- 主菜单（左右分栏布局） -->
+        <div id="main-menu" class="screen active">
+            <div class="menu-bg"></div>
+            <div class="menu-container">
+                <!-- 左侧：标题和按钮 -->
+                <div class="menu-left">
+                    <h1 class="game-title">
+                        <span class="title-main">深空漂移战机</span>
+                        <span class="title-sub">DEEP SPACE DRIFT FIGHTER</span>
+                    </h1>
+                    <div class="high-score-display">
+                        <span class="high-score-label-menu">历史最高分</span>
+                        <span id="menu-high-score" class="high-score-value-menu">0</span>
+                    </div>
+                    
+                    <!-- 模式选择卡片 -->
+                    <div class="mode-selector">
+                        <div class="mode-card normal" id="btn-normal-mode">
+                            <span class="mode-icon">▶️</span>
+                            <div class="mode-title">正常模式</div>
+                            <div class="mode-desc">挑战波次，存活到底</div>
+                        </div>
+                        <div class="mode-card god" id="btn-god-mode">
+                            <span class="mode-icon">⚡</span>
+                            <div class="mode-title">无敌模式</div>
+                            <div class="mode-desc">割草解压，无限爽射</div>
+                        </div>
+                    </div>
+                    
+                    <div class="menu-buttons">
+                        <button id="btn-settings" class="menu-btn btn-tertiary">
+                            <span class="btn-icon">⚙️</span>
+                            <span class="btn-text">设置</span>
+                        </button>
+                    </div>
+                    <div class="version-info">v2.6.0</div>
+                </div>
+
+                <!-- 右侧：飞船选择和预览 -->
+                <div class="menu-right">
+                    <h2 class="ship-select-title">选择战舰</h2>
+                    <div class="ship-selector">
+                        <div class="ship-card selected" data-ship="fighter">
+                            <img src="assets/chips/our1.svg" class="ship-icon fighter-icon" alt="战斗机">
+                            <h3>战斗机</h3>
+                            <p class="ship-desc">均衡型战舰，适合新手</p>
+                            <div class="ship-stats">
+                                <div class="stat"><span>血量</span><div class="stat-bar"><div style="width:60%"></div></div></div>
+                                <div class="stat"><span>速度</span><div class="stat-bar"><div style="width:60%"></div></div></div>
+                                <div class="stat"><span>攻击</span><div class="stat-bar"><div style="width:60%"></div></div></div>
+                                <div class="stat"><span>能耗</span><div class="stat-bar"><div style="width:50%"></div></div></div>
+                            </div>
+                        </div>
+                        <div class="ship-card" data-ship="interceptor">
+                            <img src="assets/chips/our2.svg" class="ship-icon interceptor-icon" alt="拦截机">
+                            <h3>拦截机</h3>
+                            <p class="ship-desc">极速型，高机动低血量</p>
+                            <div class="ship-stats">
+                                <div class="stat"><span>血量</span><div class="stat-bar"><div style="width:40%"></div></div></div>
+                                <div class="stat"><span>速度</span><div class="stat-bar"><div style="width:100%"></div></div></div>
+                                <div class="stat"><span>攻击</span><div class="stat-bar"><div style="width:40%"></div></div></div>
+                                <div class="stat"><span>能耗</span><div class="stat-bar"><div style="width:40%"></div></div></div>
+                            </div>
+                        </div>
+                        <div class="ship-card" data-ship="destroyer">
+                            <img src="assets/chips/our3.svg" class="ship-icon destroyer-icon" alt="毁灭者">
+                            <h3>毁灭者</h3>
+                            <p class="ship-desc">重型战舰，高攻低移速</p>
+                            <div class="ship-stats">
+                                <div class="stat"><span>血量</span><div class="stat-bar"><div style="width:100%"></div></div></div>
+                                <div class="stat"><span>速度</span><div class="stat-bar"><div style="width:30%"></div></div></div>
+                                <div class="stat"><span>攻击</span><div class="stat-bar"><div style="width:100%"></div></div></div>
+                                <div class="stat"><span>能耗</span><div class="stat-bar"><div style="width:80%"></div></div></div>
+                            </div>
+                        </div>
+                        <div class="ship-card" data-ship="bomber">
+                            <img src="assets/chips/our4.svg" class="ship-icon bomber-icon" alt="轰炸机">
+                            <h3>轰炸机</h3>
+                            <p class="ship-desc">爆发型，高耗高伤害</p>
+                            <div class="ship-stats">
+                                <div class="stat"><span>血量</span><div class="stat-bar"><div style="width:80%"></div></div></div>
+                                <div class="stat"><span>速度</span><div class="stat-bar"><div style="width:40%"></div></div></div>
+                                <div class="stat"><span>攻击</span><div class="stat-bar"><div style="width:100%"></div></div></div>
+                                <div class="stat"><span>能耗</span><div class="stat-bar"><div style="width:100%"></div></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ship-preview-hint">点击卡片选择战舰，选择后立即生效</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HUD 游戏界面 -->
+        <div id="hud" class="screen">
+            <!-- 左上角信息 -->
+            <div class="hud-top-left">
+                <div class="health-bar-container">
+                    <div class="health-bar-bg">
+                        <div id="health-bar" class="health-bar-fill"></div>
+                    </div>
+                    <span id="health-text" class="health-text">100/100</span>
+                </div>
+                <div class="energy-bar-container">
+                    <div class="energy-bar-bg">
+                        <div id="energy-bar" class="energy-bar-fill"></div>
+                    </div>
+                    <span id="energy-text" class="energy-text">100/100</span>
+                </div>
+                <div class="exp-bar-container">
+                    <div class="exp-bar-bg">
+                        <div id="exp-bar" class="exp-bar-fill"></div>
+                    </div>
+                    <span id="level-text" class="level-text">Lv.1</span>
+                </div>
+                <div class="score-info">
+                    <span class="score-label">得分</span>
+                    <span id="score-value" class="score-value">0</span>
+                </div>
+                <div class="wave-info">
+                    <span class="wave-label">波次</span>
+                    <span id="wave-value" class="wave-value">1</span>
+                </div>
+                <div class="high-score-info">
+                    <span class="high-score-label">最高分</span>
+                    <span id="high-score-value" class="high-score-value">0</span>
+                </div>
+            </div>
+
+            <!-- 右上角自动瞄准开关 -->
+            <div class="hud-top-right">
+                <button id="auto-aim-toggle" class="auto-aim-btn active">
+                    <span class="aim-icon">🎯</span>
+                    <span class="aim-text">自动瞄准</span>
+                    <span class="aim-status">ON</span>
+                </button>
+            </div>
+
+            <!-- 模式标识 -->
+            <div id="mode-indicator" class="mode-indicator">
+                <span class="mode-text">正常模式</span>
+            </div>
+
+            <!-- 无敌模式倒计时 -->
+            <div id="god-mode-timer" class="god-mode-timer" style="display: none;">
+                <div class="timer-icon">⚡</div>
+                <div class="timer-content">
+                    <div class="timer-label">无敌模式</div>
+                    <div class="timer-value" id="god-timer-value">∞</div>
+                </div>
+                <!-- 进度条 -->
+                <div class="timer-progress-bar">
+                    <div class="timer-progress-fill" id="god-timer-progress"></div>
+                </div>
+            </div>
+
+            <!-- 左下虚拟摇杆 -->
+            <div id="joystick-left" class="joystick joystick-left">
+                <div class="joystick-base">
+                    <div class="joystick-knob"></div>
+                </div>
+                <span class="joystick-label">移动</span>
+            </div>
+
+            <!-- 右下虚拟摇杆 -->
+            <div id="joystick-right" class="joystick joystick-right">
+                <div class="joystick-base">
+                    <div class="joystick-knob"></div>
+                </div>
+                <span class="joystick-label">瞄准</span>
+            </div>
+
+            <!-- 右侧发射按钮 -->
+            <div id="fire-button" class="fire-button">
+                <div class="fire-button-inner">
+                    <span class="fire-icon">🔥</span>
+                    <span class="fire-text">发射</span>
+                </div>
+            </div>
+
+            <!-- 底部背包道具栏 -->
+            <div id="inventory-bar" class="inventory-bar">
+                <div class="inventory-slot" data-item="missile" title="导弹 - 追踪高伤害">
+                    <div class="slot-icon">🚀</div>
+                    <div class="slot-count" id="inv-missile">0</div>
+                    <div class="slot-name">导弹</div>
+                </div>
+                <div class="inventory-slot" data-item="shield" title="护盾 - 5秒无敌">
+                    <div class="slot-icon">🛡️</div>
+                    <div class="slot-count" id="inv-shield">0</div>
+                    <div class="slot-name">护盾</div>
+                </div>
+                <div class="inventory-slot" data-item="autoDodge" title="自动避险 - 10秒自动躲避">
+                    <div class="slot-icon">💨</div>
+                    <div class="slot-count" id="inv-autododge">0</div>
+                    <div class="slot-name">避险</div>
+                </div>
+                <div class="inventory-slot" data-item="energyCrystals" title="能源水晶 - +30能源">
+                    <div class="slot-icon">⚡</div>
+                    <div class="slot-count" id="inv-energy">0</div>
+                    <div class="slot-name">能源</div>
+                </div>
+                <div class="inventory-slot" data-item="scrapMetal" title="废金属 - +15生命">
+                    <div class="slot-icon">◆</div>
+                    <div class="slot-count" id="inv-scrap">0</div>
+                    <div class="slot-name">废铁</div>
+                </div>
+                <div class="inventory-slot" data-item="rareMinerals" title="稀有矿物 - +25生命+20能源">
+                    <div class="slot-icon">♦</div>
+                    <div class="slot-count" id="inv-mineral">0</div>
+                    <div class="slot-name">矿物</div>
+                </div>
+            </div>
+
+            <!-- 暂停按钮 -->
+            <button id="btn-pause" class="pause-btn">⏸</button>
+        </div>
+
+        <!-- 暂停菜单 -->
+        <div id="pause-menu" class="screen">
+            <div class="overlay"></div>
+            <div class="modal">
+                <h2>游戏暂停</h2>
+                <div class="modal-buttons">
+                    <button id="btn-resume" class="modal-btn btn-primary">继续游戏</button>
+                    <button id="btn-restart" class="modal-btn btn-secondary">重新开始</button>
+                    <button id="btn-quit" class="modal-btn btn-tertiary">返回主菜单</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 设置菜单 -->
+        <div id="settings-menu" class="screen">
+            <div class="overlay"></div>
+            <div class="modal">
+                <h2>设置</h2>
+                <div class="settings-list">
+                    <div class="setting-item">
+                        <span class="setting-label">音效</span>
+                        <button id="toggle-sound" class="toggle-btn active">
+                            <span class="toggle-track"></span>
+                            <span class="toggle-thumb"></span>
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">音乐</span>
+                        <button id="toggle-music" class="toggle-btn active">
+                            <span class="toggle-track"></span>
+                            <span class="toggle-thumb"></span>
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">自动瞄准</span>
+                        <button id="toggle-auto-aim-default" class="toggle-btn active">
+                            <span class="toggle-track"></span>
+                            <span class="toggle-thumb"></span>
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">振动反馈</span>
+                        <button id="toggle-vibration" class="toggle-btn active">
+                            <span class="toggle-track"></span>
+                            <span class="toggle-thumb"></span>
+                        </button>
+                    </div>
+                </div>
+                <button id="btn-settings-back" class="modal-btn btn-tertiary">返回</button>
+            </div>
+        </div>
+
+        <!-- 升级界面 -->
+        <div id="upgrade-menu" class="screen">
+            <div class="overlay"></div>
+            <div class="modal upgrade-modal">
+                <h2>战舰升级</h2>
+                <div class="upgrade-info">
+                    <span class="upgrade-level">等级 <span id="upgrade-level">1</span></span>
+                    <span class="upgrade-points">技能点: <span id="upgrade-points">0</span></span>
+                </div>
+                <div class="upgrade-grid">
+                    <div class="upgrade-item" data-upgrade="health">
+                        <div class="upgrade-icon">❤</div>
+                        <div class="upgrade-details">
+                            <h4>血量强化</h4>
+                            <p>+20 最大血量</p>
+                        </div>
+                        <button class="upgrade-btn">升级</button>
+                    </div>
+                    <div class="upgrade-item" data-upgrade="energy">
+                        <div class="upgrade-icon">⚡</div>
+                        <div class="upgrade-details">
+                            <h4>能源扩容</h4>
+                            <p>+15 最大能源</p>
+                        </div>
+                        <button class="upgrade-btn">升级</button>
+                    </div>
+                    <div class="upgrade-item" data-upgrade="damage">
+                        <div class="upgrade-icon">🔥</div>
+                        <div class="upgrade-details">
+                            <h4>火力强化</h4>
+                            <p>+3 子弹伤害</p>
+                        </div>
+                        <button class="upgrade-btn">升级</button>
+                    </div>
+                    <div class="upgrade-item" data-upgrade="speed">
+                        <div class="upgrade-icon">💨</div>
+                        <div class="upgrade-details">
+                            <h4>引擎强化</h4>
+                            <p>+0.5 最大速度</p>
+                        </div>
+                        <button class="upgrade-btn">升级</button>
+                    </div>
+                </div>
+                <button id="btn-upgrade-close" class="modal-btn btn-tertiary">继续游戏</button>
+            </div>
+        </div>
+
+        <!-- 背包界面 -->
+        <div id="inventory-menu" class="screen">
+            <div class="overlay"></div>
+            <div class="modal inventory-modal">
+                <h2>物资背包</h2>
+                <div class="inventory-grid">
+                    <div class="inventory-item">
+                        <div class="item-icon">⚡</div>
+                        <div class="item-info">
+                            <h4>能源水晶</h4>
+                            <p>数量: <span id="inv-menu-energy">0</span></p>
+                            <p class="item-effect">使用: +30能源</p>
+                        </div>
+                        <button class="use-item-btn" data-item="energyCrystals">使用</button>
+                    </div>
+                    <div class="inventory-item">
+                        <div class="item-icon">🔧</div>
+                        <div class="item-info">
+                            <h4>金属碎片</h4>
+                            <p>数量: <span id="inv-menu-scrap">0</span></p>
+                            <p class="item-effect">使用: +15血量</p>
+                        </div>
+                        <button class="use-item-btn" data-item="scrapMetal">使用</button>
+                    </div>
+                    <div class="inventory-item">
+                        <div class="item-icon">💎</div>
+                        <div class="item-info">
+                            <h4>稀有矿物</h4>
+                            <p>数量: <span id="inv-menu-mineral">0</span></p>
+                            <p class="item-effect">使用: +25血量 +20能源</p>
+                        </div>
+                        <button class="use-item-btn" data-item="rareMinerals">使用</button>
+                    </div>
+                </div>
+                <button id="btn-inventory-close" class="modal-btn btn-tertiary">关闭</button>
+            </div>
+        </div>
+
+        <!-- 升级选择弹窗（新系统） -->
+        <div id="upgrade-selection-menu" class="screen">
+            <div class="overlay"></div>
+            <div class="modal upgrade-selection-modal">
+                <h2>🎉 升级！选择强化</h2>
+                <div class="upgrade-selection-info">
+                    <span class="selection-level">等级 <span id="upgrade-selection-level">1</span></span>
+                    <span class="selection-hint">选择一个强化效果</span>
+                </div>
+                <div id="upgrade-selection-options" class="upgrade-selection-grid">
+                    <!-- 选项将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏结束界面 -->
+        <div id="game-over" class="screen">
+            <div class="overlay"></div>
+            <div class="modal game-over-modal">
+                <h2 id="game-over-title">游戏结束</h2>
+                <div class="final-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">最终得分</span>
+                        <span id="final-score" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">存活波次</span>
+                        <span id="final-wave" class="stat-value">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">击杀数</span>
+                        <span id="final-kills" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">达到等级</span>
+                        <span id="final-level" class="stat-value">1</span>
+                    </div>
+                    <div class="stat-item highlight">
+                        <span class="stat-label">历史最高</span>
+                        <span id="final-high-score" class="stat-value">0</span>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button id="btn-play-again" class="modal-btn btn-primary">再来一局</button>
+                    <button id="btn-go-menu" class="modal-btn btn-tertiary">主菜单</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 游戏脚本 -->
+    <script src="src/utils.js"></script>
+    <script src="src/vector2.js"></script>
+    <script src="src/particle.js"></script>
+    <script src="src/starfield.js"></script>
+    <script src="src/background_decorations.js"></script>
+    <script src="src/input.js"></script>
+    <script src="src/audio.js"></script>
+    <script src="src/entity.js"></script>
+    <script src="src/collectible.js"></script>
+    <script src="src/resource_loader.js"></script>
+    <script src="src/player.js"></script>
+    <script src="src/enemy.js"></script>
+    <script src="src/bullet.js"></script>
+    <script src="src/cruise_missile.js"></script>
+    <script src="src/game.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>

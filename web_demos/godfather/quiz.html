@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Quiz - The Godfather Trilogy</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@300;400;600&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sepia-brown': '#3C2415',
+                        'warm-amber': '#D4A574',
+                        'vintage-gold': '#B8860B',
+                        'rich-burgundy': '#722F37',
+                        'cream-white': '#F5F5DC',
+                        'charcoal-gray': '#36454F',
+                        'muted-olive': '#6B8E23',
+                        'aged-brass': '#CD7F32'
+                    },
+                    fontFamily: {
+                        'display': ['Playfair Display', 'serif'],
+                        'body': ['Source Sans Pro', 'sans-serif'],
+                        'accent': ['Crimson Text', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --sepia-brown: #3C2415;
+            --warm-amber: #D4A574;
+            --vintage-gold: #B8860B;
+            --rich-burgundy: #722F37;
+            --cream-white: #F5F5DC;
+            --charcoal-gray: #36454F;
+            --muted-olive: #6B8E23;
+            --aged-brass: #CD7F32;
+        }
+        
+        body {
+            background-color: var(--sepia-brown);
+            color: var(--cream-white);
+            font-family: 'Source Sans Pro', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Film Grain Effect */
+        .film-grain::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, transparent 20%, rgba(139, 69, 19, 0.3) 21%, rgba(139, 69, 19, 0.3) 34%, transparent 35%, transparent),
+                linear-gradient(0deg, rgba(255, 255, 255, 0.1) 50%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Vintage Paper Texture */
+        .vintage-paper {
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        
+        /* Film Strip Navigation */
+        .film-strip {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--aged-brass) 5%, 
+                var(--aged-brass) 95%, 
+                transparent 100%);
+            position: relative;
+        }
+        
+        .film-strip::before,
+        .film-strip::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                var(--sepia-brown),
+                var(--sepia-brown) 10px,
+                var(--aged-brass) 10px,
+                var(--aged-brass) 15px
+            );
+        }
+        
+        .film-strip::before { left: 0; }
+        .film-strip::after { right: 0; }
+        
+        /* Quiz Cards */
+        .quiz-card {
+            background: linear-gradient(145deg, rgba(60, 36, 21, 0.9), rgba(54, 69, 79, 0.8));
+            border: 2px solid var(--aged-brass);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .quiz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Difficulty Selection */
+        .difficulty-btn {
+            background: var(--charcoal-gray);
+            border: 2px solid var(--aged-brass);
+            color: var(--cream-white);
+            transition: all 0.3s ease;
+        }
+        
+        .difficulty-btn:hover,
+        .difficulty-btn.selected {
+            background: var(--aged-brass);
+            color: var(--sepia-brown);
+            border-color: var(--vintage-gold);
+        }
+        
+        /* Answer Options */
+        .answer-option {
+            background: var(--charcoal-gray);
+            border: 2px solid var(--aged-brass);
+            color: var(--cream-white);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .answer-option:hover {
+            background: var(--warm-amber);
+            color: var(--sepia-brown);
+            transform: translateX(5px);
+        }
+        
+        .answer-option.correct {
+            background: var(--muted-olive);
+            border-color: var(--muted-olive);
+        }
+        
+        .answer-option.incorrect {
+            background: var(--rich-burgundy);
+            border-color: var(--rich-burgundy);
+        }
+        
+        .answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            background: var(--charcoal-gray);
+            border: 2px solid var(--aged-brass);
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, var(--aged-brass), var(--vintage-gold));
+            transition: width 0.5s ease;
+        }
+        
+        /* Ranking System */
+        .ranking-badge {
+            background: linear-gradient(145deg, var(--vintage-gold), var(--aged-brass));
+            border: 3px solid var(--warm-amber);
+            color: var(--sepia-brown);
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Vintage Button */
+        .vintage-btn {
+            background: linear-gradient(145deg, var(--aged-brass), var(--vintage-gold));
+            border: 2px solid var(--vintage-gold);
+            color: var(--sepia-brown);
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .vintage-btn:hover {
+            background: linear-gradient(145deg, var(--vintage-gold), var(--aged-brass));
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 6px 8px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .vintage-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Navigation */
+        .nav-link {
+            color: var(--cream-white);
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--warm-amber);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            position: relative;
+            padding: 4rem 0;
+        }
+        
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(60, 36, 21, 0.8);
+            z-index: -1;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .quiz-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .answer-options {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 film-strip py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="font-display text-2xl font-bold text-warm-amber">
+                <a href="index.html">The Godfather Trilogy</a>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="characters.html" class="nav-link">Characters</a>
+                <a href="scenes.html" class="nav-link">Scenes</a>
+                <a href="quiz.html" class="nav-link text-warm-amber">Quiz</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobileMenuBtn" class="text-cream-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="fixed top-0 left-0 w-full h-full bg-sepia-brown z-40 transform -translate-x-full transition-transform duration-300">
+        <div class="flex flex-col items-center justify-center h-full space-y-8">
+            <a href="index.html" class="nav-link text-2xl">Home</a>
+            <a href="characters.html" class="nav-link text-2xl">Characters</a>
+            <a href="scenes.html" class="nav-link text-2xl">Scenes</a>
+            <a href="quiz.html" class="nav-link text-2xl text-warm-amber">Quiz</a>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <section class="relative min-h-screen flex items-center justify-center film-grain" style="padding-top: 100px;">
+        <div class="absolute inset-0 z-0">
+            <img src="vintage-theater-bg.png" alt="Vintage Theater" class="w-full h-full object-cover opacity-30">
+            <div class="absolute inset-0 bg-gradient-to-r from-sepia-brown via-transparent to-sepia-brown opacity-80"></div>
+        </div>
+        
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <h1 class="font-display text-6xl md:text-8xl font-black text-cream-white mb-6 leading-tight" data-splitting>
+                The Ultimate Quiz
+            </h1>
+            <p class="font-body text-xl md:text-2xl text-warm-amber mb-8 font-light">
+                Test your knowledge of the greatest trilogy in cinema history
+            </p>
+        </div>
+    </section>
+
+    <!-- Quiz Start Section -->
+    <section id="quizStart" class="content-section vintage-paper">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="quiz-card p-8 rounded-lg">
+                    <h2 class="font-display text-4xl font-bold text-warm-amber text-center mb-8">Choose Your Challenge</h2>
+                    
+                    <div class="grid md:grid-cols-3 gap-6 mb-8">
+                        <button class="difficulty-btn p-6 rounded-lg text-center" onclick="selectDifficulty('easy')">
+                            <div class="text-3xl mb-4">🌟</div>
+                            <h3 class="font-display text-xl font-bold mb-2">Associate</h3>
+                            <p class="text-sm">10 questions for newcomers</p>
+                        </button>
+                        
+                        <button class="difficulty-btn p-6 rounded-lg text-center" onclick="selectDifficulty('medium')">
+                            <div class="text-3xl mb-4">💼</div>
+                            <h3 class="font-display text-xl font-bold mb-2">Soldier</h3>
+                            <p class="text-sm">20 questions for fans</p>
+                        </button>
+                        
+                        <button class="difficulty-btn p-6 rounded-lg text-center" onclick="selectDifficulty('hard')">
+                            <div class="text-3xl mb-4">👑</div>
+                            <h3 class="font-display text-xl font-bold mb-2">Consigliere</h3>
+                            <p class="text-sm">30 questions for experts</p>
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button id="startQuizBtn" class="vintage-btn px-12 py-4 rounded-lg text-xl font-bold" onclick="startQuiz()" disabled>
+                            Start Quiz
+                        </button>
+                    </div>
+                    
+                    <div class="mt-8 text-center">
+                        <p class="text-cream-white text-sm">
+                            Each question is timed. Answer quickly and accurately to earn the highest rank in the family.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quiz Section -->
+    <section id="quizSection" class="content-section vintage-paper hidden">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <!-- Quiz Header -->
+                <div class="quiz-card p-6 rounded-lg mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="font-display text-2xl font-bold text-warm-amber">
+                            Question <span id="currentQuestion">1</span> of <span id="totalQuestions">20</span>
+                        </div>
+                        <div class="text-cream-white font-body">
+                            Score: <span id="currentScore" class="text-vintage-gold font-bold">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar rounded-full h-4 mb-4">
+                        <div id="progressFill" class="progress-fill h-full rounded-full" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="flex justify-between items-center text-sm text-cream-white">
+                        <div>Difficulty: <span id="currentDifficulty" class="text-warm-amber font-semibold">Medium</span></div>
+                        <div>Time: <span id="timer" class="text-vintage-gold font-bold">30s</span></div>
+                    </div>
+                </div>
+                
+                <!-- Question Card -->
+                <div class="quiz-card p-8 rounded-lg mb-6">
+                    <h3 id="questionText" class="font-accent text-2xl text-cream-white mb-8 text-center leading-relaxed">
+                        Loading question...
+                    </h3>
+                    
+                    <div id="answerOptions" class="grid md:grid-cols-2 gap-4">
+                        <!-- Answer options will be populated here -->
+                    </div>
+                    
+                    <div id="feedback" class="hidden mt-8 p-4 rounded-lg">
+                        <div id="feedbackContent"></div>
+                        <button id="nextQuestionBtn" class="vintage-btn mt-4 px-6 py-2 rounded-lg" onclick="nextQuestion()">
+                            Next Question
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="resultsSection" class="content-section vintage-paper hidden">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="quiz-card p-8 rounded-lg text-center">
+                    <div class="ranking-badge inline-block px-8 py-4 rounded-full text-2xl font-display mb-8" id="rankingBadge">
+                        Don Corleone
+                    </div>
+                    
+                    <h2 class="font-display text-5xl font-bold text-warm-amber mb-6">Quiz Complete!</h2>
+                    
+                    <div class="grid md:grid-cols-3 gap-8 mb-8">
+                        <div class="text-center">
+                            <div class="text-4xl font-display font-bold text-vintage-gold mb-2" id="finalScore">85%</div>
+                            <div class="text-cream-white">Final Score</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-display font-bold text-vintage-gold mb-2" id="correctAnswers">17/20</div>
+                            <div class="text-cream-white">Correct Answers</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-display font-bold text-vintage-gold mb-2" id="timeBonus">+5</div>
+                            <div class="text-cream-white">Time Bonus</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-sepia-brown bg-opacity-60 p-6 rounded-lg mb-8">
+                        <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">Your Corleone Family Rank</h3>
+                        <div id="rankDescription" class="text-cream-white leading-relaxed">
+                            You've proven yourself worthy of leading the family. Your knowledge of the trilogy is exceptional, 
+                            and you understand the deeper themes and symbolism that make these films masterpieces.
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button class="vintage-btn px-8 py-3 rounded-lg" onclick="retakeQuiz()">
+                            Retake Quiz
+                        </button>
+                        <button class="vintage-btn px-8 py-3 rounded-lg" onclick="shareResults()">
+                            Share Results
+                        </button>
+                        <button class="vintage-btn px-8 py-3 rounded-lg" onclick="window.location.href='index.html'">
+                            Back to Home
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="film-strip py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p class="font-body text-cream-white">
+                © 2024 The Godfather Trilogy Tribute. A celebration of cinematic excellence.
+            </p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+    <script>
+        // Comprehensive Quiz Data
+        const quizData = {
+            easy: [
+                {
+                    question: "Who played Don Vito Corleone in The Godfather?",
+                    options: ["Marlon Brando", "Al Pacino", "Robert De Niro", "James Caan"],
+                    correct: 0,
+                    explanation: "Marlon Brando won an Academy Award for his iconic portrayal of Don Vito Corleone."
+                },
+                {
+                    question: "What is the famous line from The Godfather?",
+                    options: ["I'll make him an offer he can't refuse", "Say hello to my little friend", "Here's looking at you, kid", "May the Force be with you"],
+                    correct: 0,
+                    explanation: "'I'll make him an offer he can't refuse' is one of the most famous lines in cinema history."
+                },
+                {
+                    question: "In which year was the first Godfather film released?",
+                    options: ["1970", "1972", "1974", "1976"],
+                    correct: 1,
+                    explanation: "The Godfather was released on March 15, 1972, and became the highest-grossing film of that year."
+                },
+                {
+                    question: "Who is Michael Corleone's wife?",
+                    options: ["Connie", "Kay", "Lucy", "Apollonia"],
+                    correct: 1,
+                    explanation: "Kay Adams is Michael's girlfriend and later wife, played by Diane Keaton."
+                },
+                {
+                    question: "What business does the Corleone family operate?",
+                    options: ["Banking", "Olive oil and gambling", "Construction", "Real estate"],
+                    correct: 1,
+                    explanation: "The Corleone family's legitimate front is olive oil, while their main business is gambling and other criminal activities."
+                },
+                {
+                    question: "Who directed The Godfather trilogy?",
+                    options: ["Martin Scorsese", "Francis Ford Coppola", "Steven Spielberg", "Brian De Palma"],
+                    correct: 1,
+                    explanation: "Francis Ford Coppola directed all three films in The Godfather trilogy."
+                },
+                {
+                    question: "What is the name of Vito Corleone's daughter?",
+                    options: ["Maria", "Connie", "Sophia", "Angela"],
+                    correct: 1,
+                    explanation: "Connie Corleone is Vito's only daughter, played by Talia Shire."
+                },
+                {
+                    question: "Where does Michael hide after killing Sollozzo?",
+                    options: ["Sicily", "Italy", "Canada", "Mexico"],
+                    correct: 0,
+                    explanation: "Michael hides in Sicily for two years after assassinating Sollozzo and McCluskey."
+                },
+                {
+                    question: "What is Tom Hagen's role in the family?",
+                    options: ["Bodyguard", "Lawyer", "Consigliere", "Accountant"],
+                    correct: 2,
+                    explanation: "Tom Hagen serves as the family consigliere (advisor), though he is also a lawyer."
+                },
+                {
+                    question: "How many Academy Awards did the first Godfather win?",
+                    options: ["3", "5", "7", "11"],
+                    correct: 0,
+                    explanation: "The Godfather won 3 Academy Awards: Best Picture, Best Actor (Brando), and Best Adapted Screenplay."
+                }
+            ],
+            medium: [
+                {
+                    question: "In Part II, who plays the young Vito Corleone?",
+                    options: ["Robert De Niro", "Al Pacino", "James Caan", "John Cazale"],
+                    correct: 0,
+                    explanation: "Robert De Niro won an Oscar for his portrayal of young Vito Corleone in Part II."
+                },
+                {
+                    question: "What is the name of the rival family that works with Sollozzo?",
+                    options: ["Tattaglia", "Barzini", "Cuneo", "Stracci"],
+                    correct: 0,
+                    explanation: "The Tattaglia family allies with Sollozzo in his drug business proposal."
+                },
+                {
+                    question: "In which decade does Part III take place?",
+                    options: ["1960s", "1970s", "1980s", "1990s"],
+                    correct: 2,
+                    explanation: "Part III is set in 1979-1980, focusing on Michael's attempt to legitimize the family business."
+                },
+                {
+                    question: "What is the name of Michael's son?",
+                    options: ["Anthony", "Michael Jr.", "Vito", "Carlo"],
+                    correct: 0,
+                    explanation: "Anthony Corleone is Michael's son who becomes an opera singer, rejecting the family business."
+                },
+                {
+                    question: "Who is the main antagonist in Part II?",
+                    options: ["Hyman Roth", "Moe Greene", "Carlo Rizzi", "Joey Zasa"],
+                    correct: 0,
+                    explanation: "Hyman Roth, played by Lee Strasberg, is the main antagonist in Part II."
+                },
+                {
+                    question: "What business does Michael want to move into in Las Vegas?",
+                    options: ["Hotels", "Gambling", "Entertainment", "All of the above"],
+                    correct: 3,
+                    explanation: "Michael wants to move the family into legitimate hotel and gambling operations in Las Vegas."
+                },
+                {
+                    question: "Who kills Sonny Corleone?",
+                    options: ["Barzini's men", "Tattaglia's men", "Carlo's men", "Police"],
+                    correct: 0,
+                    explanation: "Sonny is killed in an ambush at a toll booth, orchestrated by Barzini's men."
+                },
+                {
+                    question: "What is the name of Michael's first wife in Sicily?",
+                    options: ["Apollonia", "Lucia", "Maria", "Gina"],
+                    correct: 0,
+                    explanation: "Apollonia Vitelli is Michael's first wife, who is killed in a car bombing meant for Michael."
+                },
+                {
+                    question: "In Part II, where does Michael go to hide?",
+                    options: ["Cuba", "Italy", "Las Vegas", "Miami"],
+                    correct: 0,
+                    explanation: "Michael goes to Cuba during the revolution to finalize a business deal with Hyman Roth."
+                },
+                {
+                    question: "What is Fredo's fatal mistake?",
+                    options: ["He betrays Michael", "He steals money", "He kills someone", "He leaves the family"],
+                    correct: 0,
+                    explanation: "Fredo betrays Michael by helping Hyman Roth, leading to his eventual execution."
+                },
+                {
+                    question: "Who becomes the new Don at the end of Part III?",
+                    options: ["Vincent Mancini", "Anthony Corleone", "Connie", "Al Neri"],
+                    correct: 0,
+                    explanation: "Vincent Mancini, Sonny's illegitimate son, becomes the new Don with Michael's blessing."
+                },
+                {
+                    question: "What is the significance of the orange in the films?",
+                    options: ["Death symbol", "Wealth symbol", "Family symbol", "Power symbol"],
+                    correct: 0,
+                    explanation: "Oranges often appear before a death or violent event, serving as a visual foreshadowing device."
+                },
+                {
+                    question: "Who says 'Keep your friends close, but your enemies closer'?",
+                    options: ["Michael", "Vito", "Hyman Roth", "Tom Hagen"],
+                    correct: 2,
+                    explanation: "Hyman Roth gives this advice to Michael in Part II."
+                },
+                {
+                    question: "What does Michael order to be done to Carlo?",
+                    options: ["Exile", "Prison", "Death", "Beating"],
+                    correct: 2,
+                    explanation: "Michael orders Carlo's death for his role in Sonny's murder."
+                },
+                {
+                    question: "In Part III, what is Michael trying to achieve?",
+                    options: ["More power", "Redemption", "Revenge", "Wealth"],
+                    correct: 1,
+                    explanation: "Michael seeks redemption for his past sins and tries to legitimize the family business."
+                },
+                {
+                    question: "What is the name of the Corleone family's compound?",
+                    options: ["The Mall", "The Estate", "The Compound", "The Mansion"],
+                    correct: 0,
+                    explanation: "The Corleone family lives on a compound referred to as 'the mall' in the films."
+                },
+                {
+                    question: "Who is the family consigliere before Tom Hagen?",
+                    options: ["Genco Abbandando", "Salvatore Tessio", "Peter Clemenza", "Al Neri"],
+                    correct: 0,
+                    explanation: "Genco Abbandando was the original consigliere before Tom Hagen."
+                },
+                {
+                    question: "What business does the family refuse to enter?",
+                    options: ["Prostitution", "Drugs", "Arms dealing", "Human trafficking"],
+                    correct: 1,
+                    explanation: "Vito Corleone refuses to enter the drug business, calling it a 'dirty business'."
+                },
+                {
+                    question: "Who is the only person who can call Vito by his first name?",
+                    options: ["His wife", "Tom Hagen", "His brother", "No one"],
+                    correct: 0,
+                    explanation: "Only Vito's wife Carmela is shown calling him by his first name."
+                },
+                {
+                    question: "What is the significance of the baptism scene?",
+                    options: ["Michael becomes Don", "Family reunion", "Business deal", "Revenge plot"],
+                    correct: 0,
+                    explanation: "The baptism scene marks Michael's complete transformation into the Don as he eliminates all rivals."
+                }
+            ],
+            hard: [
+                {
+                    question: "What is the exact running time of the first Godfather film?",
+                    options: ["175 minutes", "177 minutes", "178 minutes", "180 minutes"],
+                    correct: 0,
+                    explanation: "The Godfather runs exactly 175 minutes (2 hours and 55 minutes)."
+                },
+                {
+                    question: "How much did Paramount pay Mario Puzo for the film rights?",
+                    options: ["$50,000", "$80,000", "$100,000", "$150,000"],
+                    correct: 1,
+                    explanation: "Paramount paid Mario Puzo $80,000 for the film rights to his novel."
+                },
+                {
+                    question: "Which actor was originally considered for the role of Michael?",
+                    options: ["Robert Redford", "Jack Nicholson", "Warren Beatty", "All of the above"],
+                    correct: 3,
+                    explanation: "Several actors were considered before Al Pacino was cast as Michael Corleone."
+                },
+                {
+                    question: "What is the name of the restaurant where Michael kills Sollozzo?",
+                    options: ["Louis' Restaurant", "Tony's Place", "The Bronx Diner", "Not specified"],
+                    correct: 0,
+                    explanation: "The restaurant is called Louis' Restaurant, located in the Bronx."
+                },
+                {
+                    question: "How many Academy Award nominations did the trilogy receive in total?",
+                    options: ["24", "28", "32", "36"],
+                    correct: 1,
+                    explanation: "The trilogy received a total of 28 Academy Award nominations."
+                },
+                {
+                    question: "What is the significance of the number 5 in the films?",
+                    options: ["Five families", "Five Dons", "Five territories", "All of the above"],
+                    correct: 3,
+                    explanation: "The number 5 represents the five Mafia families of New York and their territories."
+                },
+                {
+                    question: "Who was originally supposed to direct The Godfather?",
+                    options: ["Sergio Leone", "Peter Bogdanovich", "Costa-Gavras", "Elia Kazan"],
+                    correct: 1,
+                    explanation: "Peter Bogdanovich was originally offered the director's chair before Coppola."
+                },
+                {
+                    question: "What is the name of the horse whose head is left in Woltz's bed?",
+                    options: ["Khartoum", "Champion", "Thunder", "Midnight"],
+                    correct: 0,
+                    explanation: "The horse's name was Khartoum, a $600,000 thoroughbred."
+                },
+                {
+                    question: "How long was the gap between Part II and Part III?",
+                    options: ["14 years", "16 years", "18 years", "20 years"],
+                    correct: 1,
+                    explanation: "Part III was released 16 years after Part II, in 1990."
+                },
+                {
+                    question: "What is the significance of the scene where Vito buys fruit?",
+                    options: ["Foreshadows his death", "Shows his routine", "Establishes location", "Character development"],
+                    correct: 0,
+                    explanation: "The scene where Vito buys oranges foreshadows his assassination attempt."
+                },
+                {
+                    question: "Who composed the score for The Godfather?",
+                    options: ["Nino Rota", "Ennio Morricone", "John Williams", "Jerry Goldsmith"],
+                    correct: 0,
+                    explanation: "Nino Rota composed the iconic score, though it was initially disqualified from Oscar consideration."
+                },
+                {
+                    question: "What is the name of the actor who plays young Vito in Part II?",
+                    options: ["Robert De Niro", "Al Pacino", "James Caan", "John Cazale"],
+                    correct: 0,
+                    explanation: "Robert De Niro won an Oscar for his portrayal of young Vito Corleone."
+                },
+                {
+                    question: "How many times is the phrase 'godfather' said in the first film?",
+                    options: ["47 times", "52 times", "58 times", "65 times"],
+                    correct: 0,
+                    explanation: "The word 'godfather' is spoken 47 times in the first film."
+                },
+                {
+                    question: "What is the significance of the closing shot of Part II?",
+                    options: ["Michael's isolation", "Family reunion", "Business success", "Political power"],
+                    correct: 0,
+                    explanation: "The final shot shows Michael alone, emphasizing his complete isolation and loss of family."
+                },
+                {
+                    question: "Who was the cinematographer for all three films?",
+                    options: ["Gordon Willis", "Vittorio Storaro", "Néstor Almendros", "Michael Chapman"],
+                    correct: 0,
+                    explanation: "Gordon Willis was the cinematographer for all three Godfather films, known for his distinctive lighting."
+                },
+                {
+                    question: "What is the name of the Corleone family's rival in Part III?",
+                    options: ["Joey Zasa", "Don Altobello", "Immobiliare", "Vatican Bank"],
+                    correct: 1,
+                    explanation: "Don Altobello is the main rival who conspires against Michael in Part III."
+                },
+                {
+                    question: "How much did Part III cost to make?",
+                    options: ["$45 million", "$55 million", "$65 million", "$75 million"],
+                    correct: 1,
+                    explanation: "Part III had a budget of $55 million, making it one of the most expensive films of its time."
+                },
+                {
+                    question: "What is the significance of the opera scene in Part III?",
+                    options: ["Family reunion", "Michael's redemption", "Mary's death", "All of the above"],
+                    correct: 3,
+                    explanation: "The opera scene serves multiple purposes, culminating in Mary's death and Michael's complete loss."
+                },
+                {
+                    question: "Who was originally cast as Tom Hagen?",
+                    options: ["Robert Duvall", "Martin Sheen", "James Caan", "Al Pacino"],
+                    correct: 0,
+                    explanation: "Robert Duvall was always the first choice for Tom Hagen and gives a memorable performance."
+                },
+                {
+                    question: "What is the total running time of all three films combined?",
+                    options: ["539 minutes", "548 minutes", "558 minutes", "568 minutes"],
+                    correct: 2,
+                    explanation: "The trilogy runs approximately 558 minutes (9 hours and 18 minutes) in total."
+                }
+            ]
+        };
+        
+        // Quiz State
+        let currentQuiz = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedDifficulty = '';
+        let timeRemaining = 30;
+        let timer = null;
+        let timeBonus = 0;
+        
+        function selectDifficulty(difficulty) {
+            selectedDifficulty = difficulty;
+            
+            // Update UI
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+            
+            // Enable start button
+            document.getElementById('startQuizBtn').disabled = false;
+            
+            // Animate selection
+            anime({
+                targets: event.target,
+                scale: [1, 1.05, 1],
+                duration: 300,
+                easing: 'easeOutBack'
+            });
+        }
+        
+        function startQuiz() {
+            if (!selectedDifficulty) return;
+            
+            // Initialize quiz
+            currentQuiz = [...quizData[selectedDifficulty]];
+            currentQuiz = shuffleArray(currentQuiz);
+            currentQuestionIndex = 0;
+            score = 0;
+            timeBonus = 0;
+            
+            // Update UI
+            document.getElementById('quizStart').classList.add('hidden');
+            document.getElementById('quizSection').classList.remove('hidden');
+            document.getElementById('currentDifficulty').textContent = selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1);
+            document.getElementById('totalQuestions').textContent = currentQuiz.length;
+            
+            // Start first question
+            showQuestion();
+        }
+        
+        function showQuestion() {
+            const question = currentQuiz[currentQuestionIndex];
+            
+            // Update progress
+            const progress = ((currentQuestionIndex + 1) / currentQuiz.length) * 100;
+            document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+            document.getElementById('currentScore').textContent = score;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Show question
+            document.getElementById('questionText').textContent = question.question;
+            
+            // Create answer options
+            const optionsContainer = document.getElementById('answerOptions');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'answer-option p-4 rounded-lg text-left';
+                button.textContent = option;
+                button.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+            
+            // Hide feedback
+            document.getElementById('feedback').classList.add('hidden');
+            
+            // Start timer
+            startTimer();
+            
+            // Animate question appearance
+            anime({
+                targets: '.quiz-card',
+                scale: [0.95, 1],
+                opacity: [0.8, 1],
+                duration: 500,
+                easing: 'easeOutQuad'
+            });
+        }
+        
+        function startTimer() {
+            timeRemaining = 30;
+            document.getElementById('timer').textContent = timeRemaining + 's';
+            
+            if (timer) clearInterval(timer);
+            
+            timer = setInterval(() => {
+                timeRemaining--;
+                document.getElementById('timer').textContent = timeRemaining + 's';
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timer);
+                    selectAnswer(-1); // Time's up
+                }
+            }, 1000);
+        }
+        
+        function selectAnswer(selectedIndex) {
+            clearInterval(timer);
+            
+            const question = currentQuiz[currentQuestionIndex];
+            const isCorrect = selectedIndex === question.correct;
+            
+            // Disable all options
+            document.querySelectorAll('.answer-option').forEach((option, index) => {
+                option.disabled = true;
+                option.classList.add('disabled');
+                
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // Update score
+            if (isCorrect) {
+                score++;
+                if (timeRemaining > 20) {
+                    timeBonus += 2; // Time bonus for quick answers
+                }
+            }
+            
+            // Show feedback
+            showFeedback(isCorrect, question.explanation);
+        }
+        
+        function showFeedback(isCorrect, explanation) {
+            const feedback = document.getElementById('feedback');
+            const feedbackContent = document.getElementById('feedbackContent');
+            
+            feedbackContent.innerHTML = `
+                <div class="flex items-center mb-4">
+                    <div class="text-2xl mr-4">${isCorrect ? '✅' : '❌'}</div>
+                    <div class="font-bold ${isCorrect ? 'text-muted-olive' : 'text-rich-burgundy'}">
+                        ${isCorrect ? 'Correct!' : 'Incorrect'}
+                    </div>
+                </div>
+                <p class="text-cream-white">${explanation}</p>
+            `;
+            
+            feedback.classList.remove('hidden');
+            
+            // Animate feedback
+            anime({
+                targets: '#feedback',
+                opacity: [0, 1],
+                translateY: [20, 0],
+                duration: 400,
+                easing: 'easeOutQuad'
+            });
+        }
+        
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < currentQuiz.length) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            document.getElementById('quizSection').classList.add('hidden');
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            const percentage = Math.round(((score + timeBonus) / currentQuiz.length) * 100);
+            const correctAnswers = score;
+            const totalQuestions = currentQuiz.length;
+            
+            // Update results
+            document.getElementById('finalScore').textContent = percentage + '%';
+            document.getElementById('correctAnswers').textContent = `${correctAnswers}/${totalQuestions}`;
+            document.getElementById('timeBonus').textContent = `+${timeBonus}`;
+            
+            // Determine ranking
+            let rank = '';
+            let rankColor = '';
+            let rankDescription = '';
+            
+            if (percentage >= 90) {
+                rank = 'Don Corleone';
+                rankColor = 'text-vintage-gold';
+                rankDescription = "You've proven yourself worthy of leading the family. Your knowledge of the trilogy is exceptional, and you understand the deeper themes and symbolism that make these films masterpieces.";
+            } else if (percentage >= 75) {
+                rank = 'Consigliere';
+                rankColor = 'text-warm-amber';
+                rankDescription = "You have excellent knowledge of the trilogy and understand the complex relationships and business dealings of the Corleone family. You're a trusted advisor.";
+            } else if (percentage >= 60) {
+                rank = 'Caporegime';
+                rankColor = 'text-muted-olive';
+                rankDescription = "You know the trilogy well and understand the major plot points and characters. You're a valuable member of the family with room to grow.";
+            } else if (percentage >= 40) {
+                rank = 'Soldier';
+                rankColor = 'text-cream-white';
+                rankDescription = "You have basic knowledge of the trilogy but need to study more to truly understand the depth and complexity of these cinematic masterpieces.";
+            } else {
+                rank = 'Associate';
+                rankColor = 'text-charcoal-gray';
+                rankDescription = "You're new to the family business. Watch the trilogy again and pay attention to the details, themes, and character development that make these films legendary.";
+            }
+            
+            document.getElementById('rankingBadge').textContent = rank;
+            document.getElementById('rankingBadge').className = `ranking-badge inline-block px-8 py-4 rounded-full text-2xl font-display mb-8 ${rankColor}`;
+            document.getElementById('rankDescription').textContent = rankDescription;
+            
+            // Animate results
+            anime({
+                targets: '#resultsSection .quiz-card',
+                scale: [0.8, 1],
+                opacity: [0, 1],
+                duration: 800,
+                easing: 'easeOutBack'
+            });
+        }
+        
+        function retakeQuiz() {
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('quizStart').classList.remove('hidden');
+            
+            // Reset state
+            selectedDifficulty = '';
+            document.getElementById('startQuizBtn').disabled = true;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+        
+        function shareResults() {
+            const percentage = Math.round(((score + timeBonus) / currentQuiz.length) * 100);
+            const rank = document.getElementById('rankingBadge').textContent;
+            
+            const shareText = `I just scored ${percentage}% on The Godfather Trilogy Quiz and earned the rank of ${rank}! Can you do better?`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'The Godfather Trilogy Quiz Results',
+                    text: shareText,
+                    url: window.location.href
+                });
+            } else {
+                // Fallback for browsers without Web Share API
+                navigator.clipboard.writeText(shareText + ' ' + window.location.href);
+                alert('Results copied to clipboard!');
+            }
+        }
+        
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate difficulty cards
+            anime({
+                targets: '.difficulty-btn',
+                translateY: [50, 0],
+                opacity: [0, 1],
+                duration: 800,
+                delay: anime.stagger(200),
+                easing: 'easeOutQuad'
+            });
+        });
+    </script>
+</body>
+</html>

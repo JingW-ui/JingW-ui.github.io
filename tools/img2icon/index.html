@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Img2Icon - 图片转Icon工具</title>
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-secondary: #6b7280;
+      --primary: #4f46e5;
+      --primary-light: #e0e7ff;
+      --border: #e5e7eb;
+      --border-hover: #c7d2fe;
+      --success: #10b981;
+      --danger: #ef4444;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .header h1 .icon-badge {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 20px;
+    }
+    .header p {
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 48px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background: var(--card);
+      position: relative;
+      margin-bottom: 24px;
+    }
+    .upload-zone:hover,
+    .upload-zone.dragover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+    .upload-zone.has-file {
+      border-style: solid;
+      border-color: var(--success);
+    }
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+    .upload-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .upload-hint {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .upload-input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Preview Section */
+    .preview-section {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: none;
+    }
+    .preview-section.visible {
+      display: block;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+    .preview-grid {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .preview-item {
+      text-align: center;
+    }
+    .preview-item label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .preview-canvas-wrapper {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      background: repeating-conic-gradient(#e5e7eb 0% 25%, transparent 0% 50%) 50% / 16px 16px;
+      display: inline-block;
+    }
+    .preview-canvas {
+      image-rendering: pixelated;
+      display: block;
+    }
+    .file-info {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .file-info span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Options */
+    .options-section {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 24px;
+      margin-bottom: 24px;
+      display: none;
+    }
+    .options-section.visible {
+      display: block;
+    }
+    .option-row {
+      margin-bottom: 18px;
+    }
+    .option-row:last-child {
+      margin-bottom: 0;
+    }
+    .option-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .size-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 8px;
+    }
+    .size-btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 4px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--card);
+      color: var(--text);
+      text-align: center;
+    }
+    .size-btn:hover {
+      border-color: var(--border-hover);
+    }
+    .size-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+    .size-btn input {
+      display: none;
+    }
+
+    /* Action Buttons */
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 24px;
+      display: none;
+    }
+    .actions.visible {
+      display: flex;
+    }
+    .btn {
+      padding: 14px 32px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #4338ca;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      border-color: var(--border-hover);
+      background: var(--bg);
+    }
+
+    /* Output Preview */
+    .output-section {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      display: none;
+    }
+    .output-section.visible {
+      display: block;
+    }
+    .output-icon-preview {
+      margin: 20px auto;
+      width: 128px;
+      height: 128px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      background: repeating-conic-gradient(#e5e7eb 0% 25%, transparent 0% 50%) 50% / 12px 12px;
+      display: inline-block;
+    }
+    .output-icon-preview img {
+      width: 96px;
+      height: 96px;
+      image-rendering: pixelated;
+    }
+    .output-info {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+    .download-btn {
+      background: var(--success);
+      color: white;
+      padding: 14px 36px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .download-btn:hover {
+      background: #059669;
+      transform: translateY(-1px);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 24px 16px 40px; }
+      .header h1 { font-size: 22px; }
+      .upload-zone { padding: 32px 16px; }
+      .preview-grid { gap: 16px; justify-content: center; }
+      .actions { flex-direction: column; }
+      .btn { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><span class="icon-badge">&#x1F3BE;</span> Img2Icon</h1>
+      <p>将任意图片转换为 .ico 图标文件，纯浏览器端处理</p>
+    </div>
+
+    <!-- Upload -->
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp,image/svg+xml" class="upload-input">
+      <div class="upload-icon">&#x1F4C7;</div>
+      <div class="upload-text">点击或拖拽上传图片</div>
+      <div class="upload-hint">支持 PNG / JPG / GIF / WebP / BMP / SVG</div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-section" id="previewSection">
+      <div class="section-title">预览</div>
+      <div class="preview-grid">
+        <div class="preview-item">
+          <label>原图</label>
+          <div class="preview-canvas-wrapper">
+            <canvas id="originalCanvas" class="preview-canvas"></canvas>
+          </div>
+        </div>
+        <div class="preview-item">
+          <label>Icon 输出 (<span id="sizeLabel">256x256</span>)</label>
+          <div class="preview-canvas-wrapper">
+            <canvas id="iconCanvas" class="preview-canvas" width="96" height="96"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="file-info">
+        <span>&#x1F4C1; <strong id="fileName">-</strong></span>
+        <span>&#x1F565; <span id="imageSize">-</span></span>
+        <span>&#x1F4E4; <span id="fileSizeText">-</span></span>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="options-section" id="optionsSection">
+      <div class="section-title">输出尺寸</div>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">
+        选择要包含在 .ico 文件中的尺寸（可多选）
+      </p>
+      <div class="size-grid" id="sizeGrid">
+        <label class="size-btn active"><input type="checkbox" value="16" checked> 16x16</label>
+        <label class="size-btn active"><input type="checkbox" value="32" checked> 32x32</label>
+        <label class="size-btn active"><input type="checkbox" value="48" checked> 48x48</label>
+        <label class="size-btn active"><input type="checkbox" value="64"> 64x64</label>
+        <label class="size-btn active"><input type="checkbox" value="128" checked> 128x128</label>
+        <label class="size-btn active"><input type="checkbox" value="256"> 256x256</label>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions" id="actions">
+      <button class="btn btn-secondary" id="resetBtn">&#x21bb; 重新选择</button>
+      <button class="btn btn-primary" id="convertBtn">&#x1F3AF; 生成 ICO</button>
+    </div>
+
+    <!-- Output -->
+    <div class="output-section" id="outputSection">
+      <div class="section-title">生成结果</div>
+      <div class="output-icon-preview">
+        <img id="outputImg" alt="icon preview">
+      </div>
+      <div class="output-info" id="outputInfo">-</div>
+      <button class="download-btn" id="downloadBtn">&#x1F4E5; 下载 .ico 文件</button>
+    </div>
+
+    <div class="footer">
+      所有处理均在本地完成，图片不会上传至任何服务器
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const uploadZone = $('uploadZone');
+    const fileInput = $('fileInput');
+    const previewSection = $('previewSection');
+    const optionsSection = $('optionsSection');
+    const actions = $('actions');
+    const outputSection = $('outputSection');
+
+    let currentImage = null;
+
+    // Drag & drop
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('dragover');
+    });
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('dragover');
+    });
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) handleFile(fileInput.files[0]);
+    });
+
+    function handleFile(file) {
+      if (!file.type.startsWith('image/')) {
+        alert('请上传图片文件');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          currentImage = img;
+          showPreview(img, file);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function showPreview(img, file) {
+      // Show sections
+      uploadZone.classList.add('has-file');
+      previewSection.classList.add('visible');
+      optionsSection.classList.add('visible');
+      actions.classList.add('visible');
+      outputSection.classList.remove('visible');
+
+      // File info
+      $('fileName').textContent = file.name;
+      $('imageSize').textContent = `${img.naturalWidth} x ${img.naturalHeight}`;
+      $('fileSizeText').textContent = formatBytes(file.size);
+
+      // Draw original preview
+      const origCanvas = $('originalCanvas');
+      const maxOrigSize = 200;
+      let origW = img.naturalWidth;
+      let origH = img.naturalHeight;
+      if (origW > maxOrigSize || origH > maxOrigSize) {
+        const ratio = Math.min(maxOrigSize / origW, maxOrigSize / origH);
+        origW *= ratio;
+        origH *= ratio;
+      }
+      origCanvas.width = origW;
+      origCanvas.height = origH;
+      const origCtx = origCanvas.getContext('2d');
+      origCtx.drawImage(img, 0, 0, origW, origH);
+
+      updateIconPreview();
+    }
+
+    function getSelectedSizes() {
+      return Array.from(document.querySelectorAll('#sizeGrid input:checked'))
+        .map(el => parseInt(el.value))
+        .sort((a, b) => a - b);
+    }
+
+    function updateIconPreview() {
+      if (!currentImage) return;
+      const sizes = getSelectedSizes();
+      const maxSize = sizes.length > 0 ? Math.max(...sizes) : 256;
+      $('sizeLabel').textContent = `${maxSize}x${maxSize}`;
+
+      const iconCanvas = $('iconCanvas');
+      iconCanvas.width = 96;
+      iconCanvas.height = 96;
+      const ctx = iconCanvas.getContext('2d');
+      ctx.clearRect(0, 0, 96, 96);
+
+      // Draw scaled preview
+      ctx.drawImage(currentImage, 0, 0, 96, 96);
+    }
+
+    // Size checkboxes
+    document.getElementById('sizeGrid').addEventListener('change', (e) => {
+      if (e.target.type === 'checkbox') {
+        const btn = e.target.closest('.size-btn');
+        if (e.target.checked) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+        updateIconPreview();
+      }
+    });
+
+    // Convert button
+    $('convertBtn').addEventListener('click', async () => {
+      if (!currentImage) return;
+      const sizes = getSelectedSizes();
+      if (sizes.length === 0) {
+        alert('请至少选择一个尺寸');
+        return;
+      }
+
+      try {
+        const blob = await createICO(currentImage, sizes);
+
+        // Show result
+        const url = URL.createObjectURL(blob);
+        $('outputImg').src = url;
+        $('outputInfo').textContent = `包含尺寸: ${sizes.map(s => s + 'x' + s).join(', ')} | 文件大小: ${formatBytes(blob.size)}`;
+        outputSection.classList.add('visible');
+
+        // Download handler
+        const downloadBtn = $('downloadBtn');
+        downloadBtn.onclick = () => {
+          const a = document.createElement('a');
+          a.href = url;
+          const baseName = $('fileName').textContent.replace(/\.[^.]+$/, '');
+          a.download = baseName + '.ico';
+          a.click();
+        };
+
+        // Scroll to output
+        outputSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } catch (err) {
+        console.error(err);
+        alert('生成失败: ' + err.message);
+      }
+    });
+
+    // Reset
+    $('resetBtn').addEventListener('click', () => {
+      fileInput.value = '';
+      currentImage = null;
+      uploadZone.classList.remove('has-file');
+      previewSection.classList.remove('visible');
+      optionsSection.classList.remove('visible');
+      actions.classList.remove('visible');
+      outputSection.classList.remove('visible');
+    });
+
+    function formatBytes(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    /**
+     * Create ICO file from an image with multiple sizes.
+     * ICO format:
+     *   - ICONDIR header (6 bytes)
+     *   - ICONDIR entries (16 bytes each)
+     *   - Image data (PNG for >= 256px or always, BITMAP for smaller)
+     */
+    async function createICO(image, sizes) {
+      const numImages = sizes.length;
+
+      // ICO header
+      const header = new ArrayBuffer(6);
+      const hv = new DataView(header);
+      hv.setUint16(0, 0, true);       // Reserved
+      hv.setUint16(2, 1, true);       // Type: ICON
+      hv.setUint16(4, numImages, true);// Number of images
+
+      // Prepare each image's PNG data
+      const imageDataList = [];
+      for (let i = 0; i < numImages; i++) {
+        const size = sizes[i];
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0, size, size);
+
+        // Get PNG blob then convert to ArrayBuffer
+        const pngBlob = await new Promise(resolve =>
+          canvas.toBlob(resolve, 'image/png')
+        );
+        const buffer = await pngBlob.arrayBuffer();
+
+        imageDataList.push({
+          width: size,
+          height: size,
+          data: buffer,
+          offset: 6 + numImages * 16 + imageDataList.reduce((sum, item) => sum + item.data.byteLength, 0)
+        });
+      }
+
+      // Recalculate offsets correctly
+      let dataOffset = 6 + numImages * 16;
+      for (let i = 0; i < numImages; i++) {
+        imageDataList[i].offset = dataOffset;
+        dataOffset += imageDataList[i].data.byteLength;
+      }
+
+      // Build ICONDIR entries
+      const dirSize = numImages * 16;
+      const dirBuffer = new ArrayBuffer(dirSize);
+      const dv = new DataView(dirBuffer);
+
+      for (let i = 0; i < numImages; i++) {
+        const entry = imageDataList[i];
+        const off = i * 16;
+        dv.setUint8(off, entry.width >= 256 ? 0 : entry.width);     // Width (0 = 256)
+        dv.setUint8(off + 1, entry.height >= 256 ? 0 : entry.height); // Height (0 = 256)
+        dv.setUint8(off + 2, 0);   // Color palette
+        dv.setUint8(off + 3, 0);   // Reserved
+        dv.setUint16(off + 4, 1, true); // Color planes
+        dv.setUint16(off + 6, 32, true); // Bits per pixel (RGBA PNG)
+        dv.setUint32(off + 8, entry.data.byteLength, true); // Size of image data
+        dv.setUint32(off + 12, entry.offset, true); // Offset to image data
+      }
+
+      // Concatenate everything
+      const totalSize = 6 + dirSize + imageDataList.reduce((sum, e) => sum + e.data.byteLength, 0);
+      const result = new Uint8Array(totalSize);
+      result.set(new Uint8Array(header), 0);
+      result.set(new Uint8Array(dirBuffer), 6);
+
+      let pos = 6 + dirSize;
+      for (let i = 0; i < numImages; i++) {
+        result.set(new Uint8Array(imageDataList[i].data), pos);
+        pos += imageDataList[i].data.byteLength;
+      }
+
+      return new Blob([result], { type: 'image/x-icon' });
+    }
+  </script>
+</body>
+</html>

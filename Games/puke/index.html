@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D扑克牌 - 单玩家视角</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: radial-gradient(circle at center, #1a3a2a 0%, #0d2016 100%);
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        #canvas3d {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+        }
+
+        #canvas3d:active {
+            cursor: grabbing;
+        }
+
+        /* 顶部控制栏 */
+        #topBar {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+
+        #topBar:hover {
+            opacity: 1;
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-label {
+            font-size: 12px;
+            color: #ccc;
+            margin-right: 8px;
+            opacity: 0.8;
+        }
+
+        #cardCountInput {
+            width: 55px;
+            padding: 5px 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #cardCountInput:focus {
+            border-color: rgba(76, 175, 80, 0.5);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .menu-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+
+
+        /* 操作按钮 */
+        #actionButtons {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 6px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+            opacity: 0.85;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.8), rgba(69, 160, 73, 0.8));
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.7), rgba(11, 125, 218, 0.7));
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            opacity: 1;
+        }
+
+        .action-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 底部控制按钮 */
+        .bottom-controls {
+            position: fixed;
+            bottom: 15px;
+            z-index: 100;
+            display: flex;
+            gap: 8px;
+            opacity: 0.4;
+            transition: opacity 0.3s;
+        }
+
+        .bottom-controls:hover {
+            opacity: 0.9;
+        }
+
+        .bottom-left {
+            left: 15px;
+        }
+
+        .bottom-right {
+            right: 15px;
+        }
+
+        .control-icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .control-icon-btn:hover {
+            background: rgba(0, 0, 0, 0.7);
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="canvas3d"></canvas>
+
+        <!-- 顶部控制栏 -->
+        <div id="topBar">
+            <span class="control-label">发牌张数:</span>
+            <input type="number" id="cardCountInput" value="1" min="1" max="10">
+            <button class="action-btn btn-primary" onclick="dealCards()">发牌</button>
+            <button class="action-btn btn-secondary" onclick="flipAllCards()">开牌</button>
+        </div>
+
+        <!-- 右上角设置和语言切换按钮 -->
+        <div style="position: fixed; top: 15px; right: 15px; z-index: 100; display: flex; gap: 8px; opacity: 0.4; transition: opacity 0.3s;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='0.4'">
+            <button class="control-icon-btn" onclick="toggleLanguage()" title="切换语言" style="width: 40px; height: 40px; font-size: 12px; font-weight: bold;">EN</button>
+            <button class="control-icon-btn" onclick="toggleSettings()" title="设置" style="width: 40px; height: 40px;">⚙</button>
+        </div>
+
+        <!-- 设置面板 -->
+        <div id="settingsPanel" style="position: fixed; top: 65px; right: 15px; z-index: 100; display: none; background: rgba(0, 0, 0, 0.85); padding: 20px; border-radius: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); min-width: 200px;">
+            <div style="color: #fff; font-size: 16px; font-weight: bold; margin-bottom: 15px;">游戏设置</div>
+            <label style="display: flex; align-items: center; color: #fff; cursor: pointer; margin-bottom: 10px;">
+                <input type="checkbox" id="includeJoker" onchange="updateJokerSetting()" style="margin-right: 10px; width: 18px; height: 18px; cursor: pointer;">
+                <span>包含大小王</span>
+            </label>
+            <div style="color: rgba(255, 255, 255, 0.5); font-size: 12px; margin-top: 10px;">* 更改后需要重新发牌生效</div>
+        </div>
+
+        <!-- 底部左侧控制 -->
+        <div class="bottom-controls bottom-left">
+            <button class="control-icon-btn" onclick="prevTable()" title="上一个牌桌">◀</button>
+            <button class="control-icon-btn" onclick="nextTable()" title="下一个牌桌">▶</button>
+        </div>
+
+        <!-- 底部右侧控制 -->
+        <div class="bottom-controls bottom-right">
+            <button class="control-icon-btn" onclick="toggleRotation()" title="自动旋转">⟳</button>
+        </div>
+
+        <!-- 底部验牌按钮 -->
+        <div id="bottomBar" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; display: none;">
+            <button class="action-btn btn-primary" onclick="verifyCards()" style="padding: 10px 30px; font-size: 16px;">🔍 我要验牌</button>
+        </div>
+
+        <!-- 验牌完成提示 -->
+        <div id="verifyComplete" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; display: none; text-align: center;">
+            <button class="action-btn btn-primary" onclick="collectCards()" style="padding: 10px 30px; font-size: 16px;">牌没有问题</button>
+        </div>
+    </div>
+
+    <!-- 使用UMD版本的Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/ColladaLoader.js"></script>
+    
+    <script>
+        // ==================== 全局变量 ====================
+        let scene, camera, renderer, controls;
+        let cards = [];
+        let playerHand = [];
+        let isAnimating = false;
+        let raycaster, mouse;
+        let currentTable = 0; // 当前牌桌索引
+        let autoRotate = false; // 自动旋转
+        let tableMesh; // 牌桌网格对象
+        let includeJoker = false; // 是否包含大小王
+        let cardTextures = {}; // 存储所有卡牌贴图
+        let cardBackTexture = null; // 牌背贴图
+        let texturesLoaded = false; // 贴图是否已加载完成
+        let currentLanguage = 'zh'; // 当前语言：'zh'中文 或 'en'英文
+        let characterModel = null; // 3D角色模型
+        let carModel = null; // 3D跑车模型
+
+        const SUITS = ['♠', '♥', '♦', '♣'];
+        const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        const JOKERS = ['小王', '大王'];
+        
+        // 牌桌配置
+        const tableConfigs = [
+            {
+                name: '澳门绿',
+                bgColor: 0x0d2016,
+                tableColor: '#0d5c3b',
+                tableMid: '#0a4a2f',
+                tableDark: '#063824'
+            },
+            {
+                name: '拉斯维加斯红',
+                bgColor: 0x1a0d0d,
+                tableColor: '#8b0000',
+                tableMid: '#6b0000',
+                tableDark: '#4b0000'
+            },
+            {
+                name: '摩纳哥蓝',
+                bgColor: 0x0d0d1a,
+                tableColor: '#1e3a5f',
+                tableMid: '#162d4a',
+                tableDark: '#0e1f35'
+            },
+            {
+                name: '经典黑',
+                bgColor: 0x1a1a1a,
+                tableColor: '#2a2a2a',
+                tableMid: '#1f1f1f',
+                tableDark: '#141414'
+            }
+        ];
+
+        // ==================== 初始化3D场景 ====================
+        function initScene() {
+            scene = new THREE.Scene();
+            updateTableBackground();
+            scene.fog = new THREE.Fog(getCurrentTableConfig().bgColor, 15, 50);
+
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 6, 12);
+            camera.lookAt(0, 0, 0);
+
+            const canvas = document.getElementById('canvas3d');
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+
+            // 添加轨道控制器
+            try {
+                if (typeof THREE.OrbitControls !== 'undefined') {
+                    controls = new THREE.OrbitControls(camera, renderer.domElement);
+                    controls.target.set(0, 0, 2);  // 聚焦在卡牌区域
+                    controls.enableDamping = true;
+                    controls.dampingFactor = 0.05;
+                    controls.minDistance = 5;      // 最小距离
+                    controls.maxDistance = 25;     // 最大距离
+                    controls.maxPolarAngle = Math.PI / 2.2;  // 限制俯仰角
+                    controls.minPolarAngle = Math.PI / 6;    // 最小俯仰角
+                    controls.enablePan = true;     // 启用平移
+                    controls.panSpeed = 0.5;       // 平移速度
+                    controls.zoomSpeed = 1.2;      // 缩放速度
+                    controls.screenSpacePanning = false;
+                    console.log('OrbitControls 初始化成功');
+                } else {
+                    console.warn('OrbitControls 未加载，使用默认控制');
+                }
+            } catch (error) {
+                console.error('OrbitControls 初始化失败:', error);
+            }
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            scene.add(ambientLight);
+
+            // 主光源 - 从上方照射
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            directionalLight.position.set(5, 15, 5);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.camera.near = 0.5;
+            directionalLight.shadow.camera.far = 50;
+            directionalLight.shadow.bias = -0.001;
+            scene.add(directionalLight);
+
+            // 暖色点光源 - 营造赌场氛围
+            const warmLight = new THREE.PointLight(0xffd700, 0.8, 25);
+            warmLight.position.set(-5, 8, 5);
+            scene.add(warmLight);
+
+            // 冷色点光源 - 增加层次感
+            const coolLight = new THREE.PointLight(0x4a90e2, 0.5, 25);
+            coolLight.position.set(5, 8, -5);
+            scene.add(coolLight);
+
+            // 顶部聚光灯 - 聚焦在卡牌区域
+            const spotLight = new THREE.SpotLight(0xffffff, 1.0, 30, Math.PI / 6, 0.5);
+            spotLight.position.set(0, 12, 0);
+            spotLight.target.position.set(0, 0, 2);
+            spotLight.castShadow = true;
+            scene.add(spotLight);
+            scene.add(spotLight.target);
+
+            createTable();
+            loadCharacterModel();
+            loadCarModel();
+
+            animate();
+            
+            // 初始化射线检测用于点击交互
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+            
+            // 添加点击事件监听
+            canvas.addEventListener('click', onCardClick);
+            
+            // 加载卡牌贴图
+            loadCardTextures(() => {
+                console.log('所有卡牌贴图加载完成');
+                texturesLoaded = true;
+            });
+            
+            console.log('3D场景初始化完成');
+        }
+        
+        function getCurrentTableConfig() {
+            return tableConfigs[currentTable];
+        }
+        
+        function updateTableBackground() {
+            const config = getCurrentTableConfig();
+            scene.background = new THREE.Color(config.bgColor);
+            if (scene.fog) {
+                scene.fog.color = new THREE.Color(config.bgColor);
+            }
+        }
+        
+        function createTable() {
+            // 如果已有牌桌，先移除
+            if (tableMesh) {
+                scene.remove(tableMesh);
+            }
+            
+            const config = getCurrentTableConfig();
+            
+            // 创建牌桌纹理
+            const tableCanvas = document.createElement('canvas');
+            tableCanvas.width = 1024;
+            tableCanvas.height = 1024;
+            const tableCtx = tableCanvas.getContext('2d');
+            
+            // 渐变背景
+            const tableGradient = tableCtx.createRadialGradient(512, 512, 0, 512, 512, 700);
+            tableGradient.addColorStop(0, config.tableColor);
+            tableGradient.addColorStop(0.5, config.tableMid);
+            tableGradient.addColorStop(1, config.tableDark);
+            tableCtx.fillStyle = tableGradient;
+            tableCtx.fillRect(0, 0, 1024, 1024);
+            
+            // 添加绒布纹理效果
+            tableCtx.globalAlpha = 0.03;
+            for (let i = 0; i < 5000; i++) {
+                const x = Math.random() * 1024;
+                const y = Math.random() * 1024;
+                const size = Math.random() * 2 + 1;
+                tableCtx.fillStyle = Math.random() > 0.5 ? '#ffffff' : '#000000';
+                tableCtx.fillRect(x, y, size, size);
+            }
+            tableCtx.globalAlpha = 1.0;
+            
+            // 添加金色边框装饰
+            tableCtx.strokeStyle = '#d4af37';
+            tableCtx.lineWidth = 15;
+            tableCtx.strokeRect(30, 30, 964, 964);
+            
+            tableCtx.strokeStyle = '#f4d03f';
+            tableCtx.lineWidth = 8;
+            tableCtx.strokeRect(50, 50, 924, 924);
+            
+            // 添加角落装饰
+            tableCtx.fillStyle = '#d4af37';
+            // 左上角
+            tableCtx.beginPath();
+            tableCtx.moveTo(50, 130);
+            tableCtx.lineTo(50, 50);
+            tableCtx.lineTo(130, 50);
+            tableCtx.closePath();
+            tableCtx.fill();
+            // 右上角
+            tableCtx.beginPath();
+            tableCtx.moveTo(894, 50);
+            tableCtx.lineTo(974, 50);
+            tableCtx.lineTo(974, 130);
+            tableCtx.closePath();
+            tableCtx.fill();
+            // 左下角
+            tableCtx.beginPath();
+            tableCtx.moveTo(50, 894);
+            tableCtx.lineTo(50, 974);
+            tableCtx.lineTo(130, 974);
+            tableCtx.closePath();
+            tableCtx.fill();
+            // 右下角
+            tableCtx.beginPath();
+            tableCtx.moveTo(974, 894);
+            tableCtx.lineTo(974, 974);
+            tableCtx.lineTo(894, 974);
+            tableCtx.closePath();
+            tableCtx.fill();
+            
+            const tableTexture = new THREE.CanvasTexture(tableCanvas);
+            tableTexture.wrapS = THREE.RepeatWrapping;
+            tableTexture.wrapT = THREE.RepeatWrapping;
+            tableTexture.repeat.set(1, 1);
+            
+            const tableGeometry = new THREE.PlaneGeometry(30, 20);
+            const tableMaterial = new THREE.MeshStandardMaterial({ 
+                map: tableTexture,
+                color: 0xffffff,
+                roughness: 0.9,
+                metalness: 0.05,
+                bumpScale: 0.02
+            });
+            
+            tableMesh = new THREE.Mesh(tableGeometry, tableMaterial);
+            tableMesh.rotation.x = -Math.PI / 2;
+            tableMesh.receiveShadow = true;
+            scene.add(tableMesh);
+        }
+        
+        function nextTable() {
+            currentTable = (currentTable + 1) % tableConfigs.length;
+            updateTableBackground();
+            createTable();
+            console.log('切换到牌桌:', tableConfigs[currentTable].name);
+        }
+        
+        function prevTable() {
+            currentTable = (currentTable - 1 + tableConfigs.length) % tableConfigs.length;
+            updateTableBackground();
+            createTable();
+            console.log('切换到牌桌:', tableConfigs[currentTable].name);
+        }
+        
+        function toggleRotation() {
+            autoRotate = !autoRotate;
+            if (controls) {
+                controls.autoRotate = autoRotate;
+                controls.autoRotateSpeed = 2.0;
+            }
+        }
+        
+        function loadCharacterModel() {
+            const loader = new THREE.ColladaLoader();
+            loader.load(
+                'https://threejs.org/examples/models/collada/elf/elf.dae',
+                (collada) => {
+                    characterModel = collada.scene;
+                    
+                    // 设置角色位置和缩放
+                    characterModel.scale.set(0.6, 0.6, 0.6);
+                    characterModel.position.set(-11, 0, -7); // 放在桌子左侧
+
+                    characterModel.rotation.z = 20;
+                    
+                    scene.add(characterModel);
+                    console.log('角色模型加载成功');
+                    
+                    // 添加面部补光灯
+                    addFaceLight();
+                },
+                undefined,
+                (error) => {
+                    console.error('角色模型加载失败:', error);
+                }
+            );
+        }
+        
+        function loadCarModel() {
+            const loader = new THREE.ColladaLoader();
+            loader.load(
+                'https://threejs.org/examples/models/collada/streetfighter/streetfighter.dae',
+                (collada) => {
+                    carModel = collada.scene;
+                    
+                    // 设置跑车位置和缩放（与角色对称）
+                    carModel.scale.set(0.8, 0.8, 0.8);
+                    carModel.position.set(11, 0, -7); // 放在桌子右侧，与角色对称
+                    
+                    scene.add(carModel);
+                    console.log('跑车模型加载成功');
+                },
+                undefined,
+                (error) => {
+                    console.error('跑车模型加载失败:', error);
+                }
+            );
+        }
+        
+        function addFaceLight() {
+            if (!characterModel) return;
+            
+            // 创建聚光灯照射脸部
+            const faceSpotLight = new THREE.SpotLight(0xffffff, 0.3, 15, Math.PI / 4, 0.5);
+            faceSpotLight.position.set(-11, 3, -5); // 从角色前上方照射
+            faceSpotLight.target.position.set(-11, 1, -7); // 对准角色脸部位置
+            faceSpotLight.castShadow = true;
+            faceSpotLight.shadow.mapSize.width = 1024;
+            faceSpotLight.shadow.mapSize.height = 1024;
+            scene.add(faceSpotLight);
+            scene.add(faceSpotLight.target);
+            
+            // 添加柔和的点光源补充
+            const facePointLight = new THREE.PointLight(0xffeedd, 0.15, 8);
+            facePointLight.position.set(-10, 1.5, -6);
+            scene.add(facePointLight);
+            
+            console.log('面部补光灯已添加');
+        }
+        
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        function updateJokerSetting() {
+            includeJoker = document.getElementById('includeJoker').checked;
+            console.log('大小王设置:', includeJoker ? '包含' : '不包含');
+            // 关闭设置面板
+            document.getElementById('settingsPanel').style.display = 'none';
+        }
+
+        // ==================== 卡牌贴图加载 ====================
+        function loadCardTextures(callback) {
+            const textureLoader = new THREE.TextureLoader();
+            let loadedCount = 0;
+            const totalCards = 52; // 52张普通牌 + 1张牌背
+            
+            // 花色映射到文件名
+            const suitMap = {
+                '♠': 'spades',
+                '♥': 'hearts',
+                '♦': 'diamonds',
+                '♣': 'clubs'
+            };
+            
+            // 点数映射到文件名
+            const rankMap = {
+                'A': 'ace',
+                'J': 'jack',
+                'Q': 'queen',
+                'K': 'king'
+            };
+            
+            // 加载所有普通牌（使用SVG格式）
+            SUITS.forEach(suit => {
+                RANKS.forEach(rank => {
+                    // 构建文件名
+                    let rankStr = rankMap[rank] || rank;
+                    const suitStr = suitMap[suit];
+                    const filename = `${rankStr}_of_${suitStr}.svg`;
+                    const path = `assets/cards/${filename}`;
+                    
+                    // 创建key用于存储
+                    const key = `${rank}_${suit}`;
+                    
+                    textureLoader.load(
+                        path,
+                        (texture) => {
+                            // 设置贴图参数
+                            texture.minFilter = THREE.LinearFilter;
+                            texture.magFilter = THREE.LinearFilter;
+                            
+                            // 存储贴图
+                            cardTextures[key] = texture;
+                            
+                            loadedCount++;
+                            if (loadedCount >= totalCards && callback) {
+                                callback();
+                            }
+                        },
+                        undefined,
+                        (error) => {
+                            console.error(`加载卡牌贴图失败: ${path}`, error);
+                        }
+                    );
+                });
+            });
+            
+            // 加载牌背贴图（使用PNG格式）
+            textureLoader.load(
+                'assets/cards/back_blue.png',
+                (texture) => {
+                    texture.minFilter = THREE.LinearFilter;
+                    texture.magFilter = THREE.LinearFilter;
+                    cardBackTexture = texture;
+                    
+                    loadedCount++;
+                    if (loadedCount >= totalCards && callback) {
+                        callback();
+                    }
+                },
+                undefined,
+                (error) => {
+                    console.error('加载牌背贴图失败', error);
+                }
+            );
+        }
+
+        // ==================== 卡片创建 ====================
+        function createCardTexture(rank, suit) {
+            // 判断是否为大小王
+            const isJoker = rank === '小王' || rank === '大王';
+            
+            if (isJoker) {
+                // 大小王仍然使用Canvas绘制（因为没有对应图片）
+                return createJokerTexture(rank);
+            }
+            
+            // 从缓存中获取贴图
+            const key = `${rank}_${suit}`;
+            const texture = cardTextures[key];
+            
+            if (!texture) {
+                console.warn(`未找到卡牌贴图: ${key}，使用备用Canvas绘制`);
+                return createFallbackCardTexture(rank, suit);
+            }
+            
+            return texture;
+        }
+        
+        function createJokerTexture(rank) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 712;
+            const ctx = canvas.getContext('2d');
+            
+            const isBigJoker = rank === '大王';
+            
+            // 白色背景（与SVG卡牌一致）
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 512, 712);
+            
+            // 细黑色边框（模仿SVG的stroke样式）
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(8, 8, 496, 696);
+            
+            // 内层装饰边框
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(20, 20, 472, 672);
+            
+            // 设置颜色：大王用红色，小王用黑色
+            const mainColor = isBigJoker ? '#df0000' : '#1a1a1a';
+            const secondaryColor = isBigJoker ? '#1a1a1a' : '#df0000';
+            
+            // 左上角标识
+            ctx.fillStyle = mainColor;
+            ctx.font = 'bold 48px Arial';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText('JOKER', 28, 30);
+            
+            // 右下角标识（倒置）
+            ctx.save();
+            ctx.translate(484, 682);
+            ctx.rotate(Math.PI);
+            ctx.fillText('JOKER', 0, 0);
+            ctx.restore();
+            
+            // 中央大字 - "JOKER"
+            ctx.fillStyle = mainColor;
+            ctx.font = 'bold 120px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetX = 4;
+            ctx.shadowOffsetY = 4;
+            ctx.fillText('JOKER', 256, 356);
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+            
+            // 添加小字标注（大王/小王）
+            ctx.fillStyle = secondaryColor;
+            ctx.font = 'bold 36px Arial';
+            ctx.fillText(isBigJoker ? 'BIG' : 'SMALL', 256, 500);
+            
+            // 四角装饰星形
+            ctx.fillStyle = mainColor;
+            ctx.font = '40px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('★', 60, 120);
+            ctx.fillText('★', 452, 120);
+            ctx.fillText('★', 60, 592);
+            ctx.fillText('★', 452, 592);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            return texture;
+        }
+        
+        function createFallbackCardTexture(rank, suit) {
+            // 备用的Canvas绘制方法（当图片加载失败时使用）
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 712;
+            const ctx = canvas.getContext('2d');
+            
+            // 白色背景
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 512, 712);
+            
+            // 边框
+            ctx.strokeStyle = '#1a1a1a';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(8, 8, 496, 696);
+            
+            const isRed = (suit === '♥' || suit === '♦');
+            ctx.fillStyle = isRed ? '#cc0000' : '#000000';
+            
+            // 左上角
+            ctx.font = 'bold 80px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(rank, 30, 95);
+            ctx.font = '64px Arial';
+            ctx.fillText(suit, 30, 160);
+            
+            // 右下角（倒置）
+            ctx.save();
+            ctx.translate(482, 617);
+            ctx.rotate(Math.PI);
+            ctx.font = 'bold 80px Arial';
+            ctx.fillText(rank, 0, 0);
+            ctx.font = '64px Arial';
+            ctx.fillText(suit, 0, 65);
+            ctx.restore();
+            
+            // 中央大花色
+            ctx.font = 'bold 260px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(suit, 256, 356);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            return texture;
+        }
+
+        function createCardBackTexture() {
+            // 使用加载的牌背贴图
+            if (cardBackTexture) {
+                return cardBackTexture;
+            }
+            
+            // 如果还没加载完成，返回备用的Canvas绘制
+            return createFallbackCardBackTexture();
+        }
+        
+        function createFallbackCardBackTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 712;
+            const ctx = canvas.getContext('2d');
+
+            // 深色渐变背景
+            const gradient = ctx.createRadialGradient(256, 356, 0, 256, 356, 400);
+            gradient.addColorStop(0, '#2563eb');
+            gradient.addColorStop(0.7, '#1e40af');
+            gradient.addColorStop(1, '#1e3a8a');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 512, 712);
+
+            // 外边框
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 8;
+            ctx.strokeRect(12, 12, 488, 688);
+
+            // 内边框
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(28, 28, 456, 656);
+
+            // 装饰图案
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 7; j++) {
+                    ctx.beginPath();
+                    ctx.arc(80 + i * 90, 80 + j * 90, 28, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // 中央标志
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.font = 'bold 180px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('✦', 256, 356);
+            ctx.shadowColor = 'transparent';
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            return texture;
+        }
+
+        function createCard(rank, suit, x, y, z, delay = 0) {
+            const group = new THREE.Group();
+            const geometry = new THREE.BoxGeometry(1.6, 0.008, 2.4);
+
+            const frontTexture = createCardTexture(rank, suit);
+            const frontMaterial = new THREE.MeshStandardMaterial({ 
+                map: frontTexture,
+                roughness: 0.3,
+                metalness: 0.0,
+                emissive: 0xffffff,
+                emissiveIntensity: 0.02,
+                transparent: true,
+                alphaTest: 0.1
+            });
+
+            const backTexture = createCardBackTexture();
+            const backMaterial = new THREE.MeshStandardMaterial({ 
+                map: backTexture,
+                roughness: 0.15,
+                metalness: 0.05,
+                emissive: 0x1e40af,
+                emissiveIntensity: 0.12,
+                transparent: true,
+                alphaTest: 0.1
+            });
+
+            const sideMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xffffff,
+                roughness: 0.3,
+                metalness: 0.05,
+                emissive: 0xffffff,
+                emissiveIntensity: 0.02
+            });
+
+            // BoxGeometry的材质顺序：右、左、上、下、前、后
+            // 我们需要正面（牌面）朝上显示，所以将牌面放在顶部
+            const materials = [
+                sideMaterial,   // 右
+                sideMaterial,   // 左
+                frontMaterial,  // 上 - 牌面朝上
+                backMaterial,   // 下 - 牌背朝下
+                sideMaterial,   // 前
+                sideMaterial    // 后
+            ];
+            
+            const mesh = new THREE.Mesh(geometry, materials);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+
+            group.add(mesh);
+            
+            // 初始位置（从上方落下）- 默认背面朝上
+            group.position.set(x, y + 5, z);
+            group.rotation.x = Math.PI; // 默认翻转到背面
+            group.rotation.y = Math.random() * 0.3 - 0.15;
+            group.userData = { 
+                rank: rank, 
+                suit: suit, 
+                isFlipped: true,  // true表示背面朝上，false表示正面朝上
+                targetY: y,
+                targetRotationX: Math.PI,  // 目标旋转角度
+                delay: delay,
+                clickable: true
+            };
+
+            scene.add(group);
+
+            return {
+                group: group,
+                rank: rank,
+                suit: suit,
+                flip: function() {
+                    this.group.userData.isFlipped = !this.group.userData.isFlipped;
+                },
+                animateDeal: function() {
+                    const card = this;
+                    setTimeout(() => {
+                        let progress = 0;
+                        const animate = () => {
+                            progress += 0.05;
+                            if (progress <= 1) {
+                                const currentY = 5 + (card.group.userData.targetY - 5) * progress;
+                                card.group.position.y = currentY;
+                                // 下落时稍微旋转，落地后恢复
+                                card.group.rotation.z = (1 - progress) * 0.3;
+                                requestAnimationFrame(animate);
+                            } else {
+                                card.group.position.y = card.group.userData.targetY;
+                                card.group.rotation.z = 0;
+                            }
+                        };
+                        animate();
+                    }, delay);
+                }
+            };
+        }
+
+        // ==================== 游戏逻辑 ====================
+        function dealCards() {
+            if (isAnimating) return;
+            
+            console.log('开始发牌');
+            clearCards();
+            isAnimating = true;
+
+            const cardCount = parseInt(document.getElementById('cardCountInput').value) || 5;
+            const clampedCount = Math.max(1, Math.min(10, cardCount));
+            document.getElementById('cardCountInput').value = clampedCount;
+
+            let deck = [];
+            for (let suit of SUITS) {
+                for (let rank of RANKS) {
+                    deck.push({ rank, suit });
+                }
+            }
+
+            deck = shuffleArray(deck);
+
+            // 计算牌的排列位置
+            const totalWidth = (clampedCount - 1) * 1.8;
+            const startX = -totalWidth / 2;
+
+            for (let i = 0; i < clampedCount; i++) {
+                const cardData = deck.pop();
+                const x = startX + i * 1.8;
+                const z = 2;
+                const delay = i * 150; // 每张牌延迟150ms
+                const card = createCard(cardData.rank, cardData.suit, x, 0.02, z, delay);  // y=0.02让卡牌紧贴桌面
+                playerHand.push(card);
+                cards.push(card);
+                
+                // 触发动画
+                card.animateDeal();
+            }
+
+            setTimeout(() => {
+                isAnimating = false;
+            }, clampedCount * 150 + 500);
+        }
+
+        function resetGame() {
+            if (isAnimating) return;
+            console.log('重置游戏');
+            clearCards();
+            playerHand = [];
+            document.getElementById('bottomBar').style.display = 'none';
+        }
+
+        function flipAllCards() {
+            if (isAnimating || cards.length === 0) return;
+            
+            // 切换所有卡牌的翻转状态
+            const allFlipped = cards.every(card => card.group.userData.isFlipped);
+            
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    flipCardWithAnimation(card);
+                }, index * 100); // 依次翻转，每张间隔100ms
+            });
+            
+            // 如果所有牌都翻开了，显示验牌按钮
+            setTimeout(() => {
+                const allFaceUp = cards.every(card => !card.group.userData.isFlipped);
+                if (allFaceUp) {
+                    document.getElementById('bottomBar').style.display = 'block';
+                }
+            }, cards.length * 100 + 1000);
+        }
+        
+        function flipCardWithAnimation(card) {
+            const group = card.group;
+            const originalY = 0.02; // 桌面高度
+            
+            // 标记为正在翻转
+            group.userData.isFlipping = true;
+            
+            // 随机抛起高度（4到4.5之间）
+            const tossHeight = 4 + Math.random() * 0.5;
+            
+            // 随机旋转圈数（2到4圈）
+            const rotations = 2 + Math.floor(Math.random() * 3);
+            const targetRotation = rotations * Math.PI * 2;
+            
+            // 翻转状态切换
+            card.flip();
+            
+            let progress = 0;
+            const duration = 60; // 动画帧数
+            
+            const animate = () => {
+                progress += 1;
+                const t = progress / duration;
+                
+                if (progress <= duration) {
+                    // 使用正弦函数模拟抛物线轨迹
+                    const height = tossHeight * Math.sin(t * Math.PI);
+                    group.position.y = originalY + height;
+                    
+                    // 绕X轴旋转（短边翻转）
+                    group.rotation.x += targetRotation * 0.02;
+                    
+                    requestAnimationFrame(animate);
+                } else {
+                    // 动画结束，回到桌面
+                    group.position.y = originalY;
+                    // 确保最终角度正确
+                    const finalRotation = card.group.userData.isFlipped ? Math.PI : 0;
+                    group.rotation.x = finalRotation;
+                    // 移除翻转标记
+                    group.userData.isFlipping = false;
+                }
+            };
+            
+            animate();
+        }
+
+        // ==================== 卡牌点击交互 ====================
+        function onCardClick(event) {
+            if (isAnimating || cards.length === 0) return;
+            
+            // 计算鼠标位置
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            // 设置射线
+            raycaster.setFromCamera(mouse, camera);
+            
+            // 检测与卡牌的交叉
+            const intersects = raycaster.intersectObjects(
+                cards.map(card => card.group.children[0])
+            );
+            
+            if (intersects.length > 0) {
+                // 找到被点击的卡牌
+                const clickedMesh = intersects[0].object;
+                const clickedGroup = clickedMesh.parent;
+                
+                // 查找对应的卡牌对象
+                const clickedCard = cards.find(card => card.group === clickedGroup);
+                
+                if (clickedCard) {
+                    // 翻转卡牌
+                    flipCardWithAnimation(clickedCard);
+                    
+                    // 检查是否所有卡牌都已翻开，如果是则显示验牌按钮
+                    setTimeout(() => {
+                        const allFaceUp = cards.every(card => !card.group.userData.isFlipped);
+                        if (allFaceUp && cards.length > 0) {
+                            document.getElementById('bottomBar').style.display = 'block';
+                        }
+                    }, 1000); // 等待翻转动画完成
+                }
+            }
+        }
+
+
+
+
+        // ==================== 工具函数 ====================
+        function shuffleArray(array) {
+            // Fisher-Yates 洗牌算法，确保完全随机
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                // 使用加密级别的随机数
+                const j = Math.floor(cryptoRandom() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        // 更随机的随机数生成器
+        function cryptoRandom() {
+            // 结合多种随机源
+            const cryptoRand = typeof crypto !== 'undefined' && crypto.getRandomValues 
+                ? crypto.getRandomValues(new Uint32Array(1))[0] / 0xFFFFFFFF 
+                : Math.random();
+            
+            const timeRand = (Date.now() % 10000) / 10000;
+            const perfRand = (typeof performance !== 'undefined' && performance.now()) % 1 / 1;
+            
+            // 混合多个随机源
+            return (cryptoRand * 0.6 + Math.random() * 0.3 + timeRand * 0.05 + perfRand * 0.05) % 1;
+        }
+
+        function clearCards() {
+            cards.forEach(card => scene.remove(card.group));
+            cards = [];
+            document.getElementById('bottomBar').style.display = 'none';
+        }
+
+        // ==================== 验牌功能 ====================
+        function verifyCards() {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            document.getElementById('bottomBar').style.display = 'none';
+            
+            // 清除当前的牌
+            clearCards();
+            
+            // 创建完整的52张牌
+            createFullDeck(() => {
+                // 第一步：将所有牌堆叠在一起
+                stackCards(() => {
+                    // 第二步：抛向空中分成两份并洗牌
+                    shuffleInAir(() => {
+                        // 第三步：按大小顺序铺牌
+                        sortAndLayoutCards();
+                    });
+                });
+            });
+        }
+        
+        function createFullDeck(callback) {
+            let deck = [];
+            
+            // 添加普通牌
+            for (let suit of SUITS) {
+                for (let rank of RANKS) {
+                    deck.push({ rank, suit });
+                }
+            }
+            
+            // 如果包含大小王，添加大小王
+            if (includeJoker) {
+                for (let joker of JOKERS) {
+                    deck.push({ rank: joker, suit: '' });
+                }
+            }
+            
+            // 随机打乱
+            deck = shuffleArray(deck);
+            
+            // 创建所有卡牌，初始位置在中心上方
+            const centerX = 0;
+            const centerZ = 2;
+            
+            deck.forEach((cardData, index) => {
+                const card = createCard(cardData.rank, cardData.suit, centerX, 8 + index * 0.1, centerZ, 0);
+                card.group.userData.isFlipped = true; // 背面朝上
+                cards.push(card);
+            });
+            
+            // 等待所有卡牌创建完成后继续
+            setTimeout(callback, 500);
+        }
+        
+        function stackCards(callback) {
+            const centerX = 0;
+            const centerZ = 2;
+            const duration = 60;
+            
+            cards.forEach((card, index) => {
+                let progress = 0;
+                const startY = card.group.position.y;
+                
+                const animate = () => {
+                    progress += 1;
+                    const t = progress / duration;
+                    
+                    if (progress <= duration) {
+                        // 从空中落下堆叠
+                        card.group.position.y = startY + (3 - startY) * t;
+                        card.group.position.x = centerX + (Math.random() - 0.5) * 0.1 * (1 - t); // 逐渐对齐
+                        card.group.position.z = centerZ + (Math.random() - 0.5) * 0.1 * (1 - t);
+                        
+                        // 旋转归零
+                        card.group.rotation.x *= (1 - t * 0.5);
+                        card.group.rotation.z *= (1 - t * 0.5);
+                        
+                        requestAnimationFrame(animate);
+                    } else {
+                        card.group.position.x = centerX;
+                        card.group.position.y = 3 + index * 0.01; // 堆叠在空中（y=3）
+                        card.group.position.z = centerZ;
+                        card.group.rotation.x = Math.PI; // 背面朝上
+                        card.group.rotation.z = 0;
+                        
+                        if (index === cards.length - 1 && callback) {
+                            setTimeout(callback, 300);
+                        }
+                    }
+                };
+                
+                setTimeout(animate, index * 10);
+            });
+        }
+        
+        function shuffleInAir(callback) {
+            // 在空中进行多次洗牌动作
+            let shuffleCount = 0;
+            const maxShuffles = 8;
+            const baseHeight = 1.5; // 基础高度（再降低）
+            
+            const doShuffle = () => {
+                shuffleCount++;
+                
+                if (shuffleCount <= maxShuffles) {
+                    const tossHeight = baseHeight + Math.random() * 0.8; // 降低高度
+                    
+                    cards.forEach((card, index) => {
+                        let progress = 0;
+                        const duration = 30;
+                        
+                        // 随机决定去左边还是右边
+                        const isLeftGroup = Math.random() > 0.5;
+                        const targetX = isLeftGroup ? -4 + Math.random() * 2 : 2 + Math.random() * 2;
+                        const targetZ = 1 + Math.random() * 2;
+                        
+                        const animate = () => {
+                            progress += 1;
+                            const t = progress / duration;
+                            
+                            if (progress <= duration) {
+                                // 抛物线轨迹
+                                const height = tossHeight * Math.sin(t * Math.PI);
+                                card.group.position.y = baseHeight + height;
+                                
+                                // 水平移动
+                                card.group.position.x = targetX * t + card.group.position.x * (1 - t);
+                                card.group.position.z = targetZ * t + card.group.position.z * (1 - t);
+                                
+                                // 快速旋转
+                                card.group.rotation.x += 0.5;
+                                card.group.rotation.z += 0.3;
+                                card.group.rotation.y += 0.2;
+                                
+                                requestAnimationFrame(animate);
+                            } else {
+                                card.group.position.x = targetX;
+                                card.group.position.y = baseHeight;
+                                card.group.position.z = targetZ;
+                            }
+                        };
+                        
+                        setTimeout(animate, index * 5);
+                    });
+                    
+                    setTimeout(doShuffle, 400);
+                } else {
+                    // 洗牌完成，准备排序
+                    if (callback) {
+                        setTimeout(callback, 500);
+                    }
+                }
+            };
+            
+            doShuffle();
+        }
+        
+        function sortAndLayoutCards() {
+            // 定义牌的大小顺序
+            const rankOrder = ['小王', '大王', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            const suitOrder = ['♠', '♥', '♦', '♣'];
+            
+            // 按大小排序（相同大小的按花色排序）
+            cards.sort((a, b) => {
+                const rankDiff = rankOrder.indexOf(a.rank) - rankOrder.indexOf(b.rank);
+                if (rankDiff !== 0) return rankDiff;
+                if (a.suit && b.suit) {
+                    return suitOrder.indexOf(a.suit) - suitOrder.indexOf(b.suit);
+                }
+                return 0;
+            });
+            
+            // 分离大小王和普通牌
+            const jokers = cards.filter(card => card.rank === '小王' || card.rank === '大王');
+            const normalCards = cards.filter(card => card.rank !== '小王' && card.rank !== '大王');
+            
+            // 计算布局参数
+            const hasJokers = jokers.length > 0;
+            const rows = hasJokers ? 5 : 4; // 如果有大小王，增加一行
+            const cols = 13;
+            const spacingX = 1.8;
+            const spacingZ = 2.5;
+            const startX = -((cols - 1) * spacingX) / 2;
+            const startZ = -((rows - 1) * spacingZ) / 2 + 2;
+            
+            // 创建布局网格
+            const layout = [];
+            for (let row = 0; row < rows; row++) {
+                layout[row] = [];
+                for (let col = 0; col < cols; col++) {
+                    layout[row][col] = [];
+                }
+            }
+            
+            // 将普通牌分配到4行（黑桃、红心、方块、梅花）
+            normalCards.forEach(card => {
+                const suitIndex = suitOrder.indexOf(card.suit);
+                const rankIndex = rankOrder.indexOf(card.rank) - 2; // 减去大小王的偏移
+                if (suitIndex >= 0 && rankIndex >= 0 && rankIndex < cols) {
+                    layout[suitIndex][rankIndex].push(card);
+                }
+            });
+            
+            // 如果有大小王，放在第5行
+            if (hasJokers) {
+                jokers.forEach((card, index) => {
+                    // 小王在第1列，大王在第2列
+                    const colIndex = card.rank === '小王' ? 0 : 1;
+                    layout[4][colIndex].push(card);
+                });
+            }
+            
+            // 动画铺牌
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const group = layout[row][col];
+                    
+                    const targetX = startX + col * spacingX;
+                    const targetZ = startZ + row * spacingZ;
+                    
+                    group.forEach((card, cardIndex) => {
+                        const targetY = 0.004 + cardIndex * 0.008;
+                        
+                        let progress = 0;
+                        const duration = 50;
+                        const startY_pos = card.group.position.y;
+                        const startX_pos = card.group.position.x;
+                        const startZ_pos = card.group.position.z;
+                        
+                        const animate = () => {
+                            progress += 1;
+                            const t = progress / duration;
+                            
+                            if (progress <= duration) {
+                                card.group.position.x = startX_pos + (targetX - startX_pos) * t;
+                                card.group.position.z = startZ_pos + (targetZ - startZ_pos) * t;
+                                
+                                if (t < 0.3) {
+                                    card.group.position.y = startY_pos + (startY_pos + 1.5 - startY_pos) * (t / 0.3);
+                                } else {
+                                    const fallT = (t - 0.3) / 0.7;
+                                    card.group.position.y = (startY_pos + 1.5) + (targetY - (startY_pos + 1.5)) * fallT;
+                                }
+                                
+                                card.group.rotation.x = Math.PI * (1 - t);
+                                card.group.rotation.z *= (1 - t);
+                                card.group.rotation.y *= (1 - t);
+                                
+                                requestAnimationFrame(animate);
+                            } else {
+                                card.group.position.x = targetX;
+                                card.group.position.y = targetY;
+                                card.group.position.z = targetZ;
+                                card.group.rotation.x = 0;
+                                card.group.rotation.y = 0;
+                                card.group.rotation.z = 0;
+                                card.group.userData.isFlipped = false;
+                            }
+                        };
+                        
+                        setTimeout(animate, (row * cols + col) * 60 + cardIndex * 20);
+                    });
+                }
+            }
+            
+            // 完成后重置动画标志并显示完成提示
+            setTimeout(() => {
+                isAnimating = false;
+                document.getElementById('verifyComplete').style.display = 'block';
+            }, rows * cols * 60 + 1000);
+        }
+        
+        function collectCards() {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            document.getElementById('verifyComplete').style.display = 'none';
+            
+            // 所有牌向中心堆叠
+            const centerX = 0;
+            const centerZ = 2;
+            const cardThickness = 0.008; // 卡牌厚度
+            const duration = 50;
+            
+            cards.forEach((card, index) => {
+                let progress = 0;
+                const startX_pos = card.group.position.x;
+                const startY_pos = card.group.position.y;
+                const startZ_pos = card.group.position.z;
+                
+                // 计算目标高度：从桌面开始，每张牌叠加一个厚度
+                const targetY = cardThickness / 2 + index * cardThickness;
+                
+                // 标记为正在堆叠
+                card.group.userData.isCollecting = true;
+                
+                const animate = () => {
+                    progress += 1;
+                    const t = progress / duration;
+                    
+                    if (progress <= duration) {
+                        card.group.position.x = startX_pos + (centerX - startX_pos) * t;
+                        card.group.position.z = startZ_pos + (centerZ - startZ_pos) * t;
+                        card.group.position.y = startY_pos + (targetY - startY_pos) * t;
+                        
+                        // 翻转为背面朝上
+                        card.group.rotation.x = Math.PI * t;
+                        card.group.rotation.z *= (1 - t);
+                        
+                        requestAnimationFrame(animate);
+                    } else {
+                        card.group.position.x = centerX;
+                        card.group.position.y = targetY;
+                        card.group.position.z = centerZ;
+                        card.group.rotation.x = Math.PI; // 背面朝上
+                        card.group.rotation.z = 0;
+                        card.group.userData.isFlipped = true;
+                        // 移除堆叠标记，添加已堆叠标记
+                        card.group.userData.isCollecting = false;
+                        card.group.userData.isStacked = true;
+                        // 保存目标高度
+                        card.group.userData.stackedY = targetY;
+                    }
+                };
+                
+                setTimeout(animate, index * 10);
+            });
+            
+            // 完成后等待重新发牌
+            setTimeout(() => {
+                isAnimating = false;
+            }, cards.length * 10 + 500);
+        }
+
+        // ==================== 语言切换 ====================
+        const translations = {
+            zh: {
+                cardCountLabel: '发牌张数:',
+                dealButton: '发牌',
+                flipButton: '开牌',
+                settingsTitle: '游戏设置',
+                includeJoker: '包含大小王',
+                settingsNote: '* 更改后需要重新发牌生效',
+                verifyButton: '🔍 我要验牌',
+                verifyCompleteButton: '牌没有问题',
+                prevTable: '上一个牌桌',
+                nextTable: '下一个牌桌',
+                autoRotate: '自动旋转',
+                settings: '设置',
+                switchLanguage: '切换语言'
+            },
+            en: {
+                cardCountLabel: 'Cards:',
+                dealButton: 'Deal',
+                flipButton: 'Reveal',
+                settingsTitle: 'Game Settings',
+                includeJoker: 'Include Jokers',
+                settingsNote: '* Changes take effect after redealing',
+                verifyButton: '🔍 Verify Cards',
+                verifyCompleteButton: 'Cards OK',
+                prevTable: 'Previous Table',
+                nextTable: 'Next Table',
+                autoRotate: 'Auto Rotate',
+                settings: 'Settings',
+                switchLanguage: 'Switch Language'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+            updateLanguage();
+            
+            // 更新按钮文字
+            const langBtn = document.querySelector('button[onclick="toggleLanguage()"]');
+            if (langBtn) {
+                langBtn.textContent = currentLanguage === 'zh' ? 'EN' : '中文';
+            }
+        }
+
+        function updateLanguage() {
+            const t = translations[currentLanguage];
+            
+            // 更新顶部栏
+            const controlLabel = document.querySelector('.control-label');
+            if (controlLabel) controlLabel.textContent = t.cardCountLabel;
+            
+            const buttons = document.querySelectorAll('#topBar .action-btn');
+            if (buttons.length >= 2) {
+                buttons[0].textContent = t.dealButton;
+                buttons[1].textContent = t.flipButton;
+            }
+            
+            // 更新设置面板
+            const settingsTitle = document.querySelector('#settingsPanel div:first-child');
+            if (settingsTitle) settingsTitle.textContent = t.settingsTitle;
+            
+            const jokerLabel = document.querySelector('#includeJoker + span');
+            if (jokerLabel) jokerLabel.textContent = t.includeJoker;
+            
+            const settingsNote = document.querySelector('#settingsPanel div:last-child');
+            if (settingsNote) settingsNote.textContent = t.settingsNote;
+            
+            // 更新底部按钮
+            const verifyBtn = document.querySelector('#bottomBar .action-btn');
+            if (verifyBtn) verifyBtn.textContent = t.verifyButton;
+            
+            const completeBtn = document.querySelector('#verifyComplete .action-btn');
+            if (completeBtn) completeBtn.textContent = t.verifyCompleteButton;
+            
+            // 更新tooltip
+            const prevBtn = document.querySelector('button[onclick="prevTable()"]');
+            if (prevBtn) prevBtn.title = t.prevTable;
+            
+            const nextBtn = document.querySelector('button[onclick="nextTable()"]');
+            if (nextBtn) nextBtn.title = t.nextTable;
+            
+            const rotateBtn = document.querySelector('button[onclick="toggleRotation()"]');
+            if (rotateBtn) rotateBtn.title = t.autoRotate;
+            
+            const settingsBtn = document.querySelector('button[onclick="toggleSettings()"]');
+            if (settingsBtn) settingsBtn.title = t.settings;
+            
+            const langBtn = document.querySelector('button[onclick="toggleLanguage()"]');
+            if (langBtn) langBtn.title = t.switchLanguage;
+        }
+
+        // ==================== 动画循环 ====================
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (controls) {
+                controls.update();
+            }
+            
+            // 角色模型自动旋转
+            if (characterModel) {
+                characterModel.rotation.z += 0.01; //
+            }
+            
+            // 卡牌翻转动画和物理效果
+            const time = Date.now() * 0.001;
+            cards.forEach((card, index) => {
+                if (card.group && card.group.userData) {
+                    // 如果卡牌正在翻转动画中或正在堆叠，跳过位置重置
+                    if (card.group.userData.isFlipping || card.group.userData.isCollecting) {
+                        return;
+                    }
+                    
+                    // 如果卡牌已经堆叠好，保持在堆叠高度
+                    if (card.group.userData.isStacked) {
+                        card.group.position.y = card.group.userData.stackedY;
+                        return;
+                    }
+                    
+                    // 翻转动画 - 绕X轴旋转
+                    // isFlipped=true时旋转到PI（背面朝上），isFlipped=false时旋转到0（正面朝向镜头）
+                    const targetRotation = card.group.userData.isFlipped ? Math.PI : 0;
+                    card.group.rotation.x += (targetRotation - card.group.rotation.x) * 0.15;
+                    
+                    // 卡牌紧贴桌面，无悬浮
+                    // 卡牌厚度0.008，中心点在y=0.004时刚好贴在桌面上
+                    if (!isAnimating) {
+                        card.group.position.y = 0.004;
+                    }
+                }
+            });
+            
+            if (renderer && scene && camera) {
+                renderer.render(scene, camera);
+            }
+        }
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+
+        // ==================== 初始化 ====================
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('开始初始化...');
+            initScene();
+        });
+    </script>
+</body>
+</html>

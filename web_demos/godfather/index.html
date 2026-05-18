@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Godfather Trilogy - A Cinematic Legacy</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@300;400;600&family=Crimson+Text:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sepia-brown': '#3C2415',
+                        'warm-amber': '#D4A574',
+                        'vintage-gold': '#B8860B',
+                        'rich-burgundy': '#722F37',
+                        'cream-white': '#F5F5DC',
+                        'charcoal-gray': '#36454F',
+                        'muted-olive': '#6B8E23',
+                        'aged-brass': '#CD7F32'
+                    },
+                    fontFamily: {
+                        'display': ['Playfair Display', 'serif'],
+                        'body': ['Source Sans Pro', 'sans-serif'],
+                        'accent': ['Crimson Text', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --sepia-brown: #3C2415;
+            --warm-amber: #D4A574;
+            --vintage-gold: #B8860B;
+            --rich-burgundy: #722F37;
+            --cream-white: #F5F5DC;
+            --charcoal-gray: #36454F;
+            --muted-olive: #6B8E23;
+            --aged-brass: #CD7F32;
+        }
+        
+        body {
+            background-color: var(--sepia-brown);
+            color: var(--cream-white);
+            font-family: 'Source Sans Pro', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Film Grain Effect */
+        .film-grain::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 50%, transparent 20%, rgba(139, 69, 19, 0.3) 21%, rgba(139, 69, 19, 0.3) 34%, transparent 35%, transparent),
+                linear-gradient(0deg, rgba(255, 255, 255, 0.1) 50%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* Vintage Paper Texture */
+        .vintage-paper {
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
+        
+        /* Film Strip Navigation */
+        .film-strip {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--aged-brass) 5%, 
+                var(--aged-brass) 95%, 
+                transparent 100%);
+            position: relative;
+        }
+        
+        .film-strip::before,
+        .film-strip::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                var(--sepia-brown),
+                var(--sepia-brown) 10px,
+                var(--aged-brass) 10px,
+                var(--aged-brass) 15px
+            );
+        }
+        
+        .film-strip::before { left: 0; }
+        .film-strip::after { right: 0; }
+        
+        /* Hero Carousel Styling */
+        .splide__slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: sepia(30%) contrast(1.2) brightness(0.9);
+        }
+        
+        .splide__arrow {
+            background: var(--aged-brass);
+            border: 2px solid var(--vintage-gold);
+        }
+        
+        .splide__arrow:hover {
+            background: var(--vintage-gold);
+        }
+        
+        /* Vintage Button Styling */
+        .vintage-btn {
+            background: linear-gradient(145deg, var(--aged-brass), var(--vintage-gold));
+            border: 2px solid var(--vintage-gold);
+            color: var(--sepia-brown);
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.2),
+                0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .vintage-btn:hover {
+            background: linear-gradient(145deg, var(--vintage-gold), var(--aged-brass));
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 6px 8px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        /* Quote Animation */
+        .quote-container {
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Navigation Styling */
+        .nav-link {
+            color: var(--cream-white);
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--warm-amber);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            position: relative;
+            padding: 4rem 0;
+        }
+        
+        .content-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(60, 36, 21, 0.8);
+            z-index: -1;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+        }
+        
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--sepia-brown);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--warm-amber);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-text">Loading The Godfather Legacy...</div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 film-strip py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="font-display text-2xl font-bold text-warm-amber">
+                The Godfather Trilogy
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="characters.html" class="nav-link">Characters</a>
+                <a href="scenes.html" class="nav-link">Scenes</a>
+                <a href="quiz.html" class="nav-link">Quiz</a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobileMenuBtn" class="text-cream-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="fixed top-0 left-0 w-full h-full bg-sepia-brown z-40 transform -translate-x-full transition-transform duration-300">
+        <div class="flex flex-col items-center justify-center h-full space-y-8">
+            <a href="#home" class="nav-link text-2xl">Home</a>
+            <a href="characters.html" class="nav-link text-2xl">Characters</a>
+            <a href="scenes.html" class="nav-link text-2xl">Scenes</a>
+            <a href="quiz.html" class="nav-link text-2xl">Quiz</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-screen flex items-center justify-center film-grain">
+        <div class="absolute inset-0 z-0">
+            <div class="splide hero-carousel h-full">
+                <div class="splide__track h-full">
+                    <ul class="splide__list h-full">
+                        <li class="splide__slide">
+                            <img src="hero-godfather-study.png" alt="The Godfather Study" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-r from-sepia-brown via-transparent to-sepia-brown opacity-60"></div>
+                        </li>
+                        <li class="splide__slide">
+                            <img src="trilogy-film-strip.png" alt="Trilogy Film Strip" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-r from-sepia-brown via-transparent to-sepia-brown opacity-60"></div>
+                        </li>
+                        <li class="splide__slide">
+                            <img src="vintage-theater-bg.png" alt="Vintage Theater" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-r from-sepia-brown via-transparent to-sepia-brown opacity-60"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <h1 class="hero-title font-display text-6xl md:text-8xl font-black text-cream-white mb-6 leading-tight" data-splitting>
+                The Godfather
+            </h1>
+            <p class="hero-subtitle font-body text-xl md:text-2xl text-warm-amber mb-8 font-light">
+                A Cinematic Masterpiece That Defined American Cinema
+            </p>
+            <div class="quote-container mb-8">
+                <p class="font-accent text-2xl md:text-3xl text-cream-white italic" id="heroQuote"></p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="vintage-btn px-8 py-4 rounded-lg font-body text-lg" onclick="scrollToSection('overview')">
+                    Explore the Legacy
+                </button>
+                <button class="vintage-btn px-8 py-4 rounded-lg font-body text-lg" onclick="window.location.href='quiz.html'">
+                    Test Your Knowledge
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trilogy Overview -->
+    <section id="overview" class="content-section vintage-paper">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-5xl font-bold text-warm-amber mb-6">The Corleone Legacy</h2>
+                <p class="font-body text-xl text-cream-white max-w-3xl mx-auto leading-relaxed">
+                    Francis Ford Coppola's epic trilogy chronicles the rise and fall of the Corleone crime family, 
+                    spanning nearly a century of American history and redefining the gangster genre forever.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="text-center p-8 bg-sepia-brown bg-opacity-50 rounded-lg border border-aged-brass">
+                    <div class="text-6xl font-display font-bold text-vintage-gold mb-4">1972</div>
+                    <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">The Godfather</h3>
+                    <p class="text-cream-white leading-relaxed">
+                        The story of Vito Corleone and his family's transformation, 
+                        establishing the foundation of power and loyalty.
+                    </p>
+                </div>
+                
+                <div class="text-center p-8 bg-sepia-brown bg-opacity-50 rounded-lg border border-aged-brass">
+                    <div class="text-6xl font-display font-bold text-vintage-gold mb-4">1974</div>
+                    <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">Part II</h3>
+                    <p class="text-cream-white leading-relaxed">
+                        The parallel stories of Vito's rise and Michael's consolidation of power, 
+                        showing the cost of leadership.
+                    </p>
+                </div>
+                
+                <div class="text-center p-8 bg-sepia-brown bg-opacity-50 rounded-lg border border-aged-brass">
+                    <div class="text-6xl font-display font-bold text-vintage-gold mb-4">1990</div>
+                    <h3 class="font-display text-2xl font-bold text-warm-amber mb-4">Part III</h3>
+                    <p class="text-cream-white leading-relaxed">
+                        Michael's quest for redemption and the transfer of power 
+                        to the next generation.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="text-center">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+                    <div class="text-center">
+                        <div class="text-4xl font-display font-bold text-vintage-gold mb-2">9</div>
+                        <div class="text-cream-white font-body">Academy Awards</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-display font-bold text-vintage-gold mb-2">$517M</div>
+                        <div class="text-cream-white font-body">Box Office Total</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-display font-bold text-vintage-gold mb-2">50+</div>
+                        <div class="text-cream-white font-body">Years of Legacy</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-4xl font-display font-bold text-vintage-gold mb-2">#1</div>
+                        <div class="text-cream-white font-body">Greatest Film</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Content Navigation -->
+    <section class="content-section">
+        <div class="container mx-auto px-6">
+            <h2 class="font-display text-5xl font-bold text-warm-amber text-center mb-16">Explore the Trilogy</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="group cursor-pointer transform transition-all duration-300 hover:scale-105" onclick="window.location.href='characters.html'">
+                    <div class="relative overflow-hidden rounded-lg border-2 border-aged-brass">
+                        <img src="character-gallery.png" alt="Characters" class="w-full h-64 object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-sepia-brown via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                            <h3 class="font-display text-2xl font-bold text-warm-amber mb-2">Character Legacy</h3>
+                            <p class="text-cream-white text-sm">Explore the transformation of Michael Corleone and the Corleone family across three generations.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="group cursor-pointer transform transition-all duration-300 hover:scale-105" onclick="window.location.href='scenes.html'">
+                    <div class="relative overflow-hidden rounded-lg border-2 border-aged-brass">
+                        <img src="trilogy-film-strip.png" alt="Scenes" class="w-full h-64 object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-sepia-brown via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                            <h3 class="font-display text-2xl font-bold text-warm-amber mb-2">Iconic Scenes</h3>
+                            <p class="text-cream-white text-sm">Analyze the most memorable moments that defined cinematic history.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="group cursor-pointer transform transition-all duration-300 hover:scale-105" onclick="window.location.href='quiz.html'">
+                    <div class="relative overflow-hidden rounded-lg border-2 border-aged-brass">
+                        <img src="vintage-theater-bg.png" alt="Quiz" class="w-full h-64 object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-sepia-brown via-transparent to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 right-0 p-6">
+                            <h3 class="font-display text-2xl font-bold text-warm-amber mb-2">Ultimate Quiz</h3>
+                            <p class="text-cream-white text-sm">Test your knowledge of the trilogy that changed cinema forever.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="film-strip py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p class="font-body text-cream-white">
+                © 2024 The Godfather Trilogy Tribute. A celebration of cinematic excellence.
+            </p>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
