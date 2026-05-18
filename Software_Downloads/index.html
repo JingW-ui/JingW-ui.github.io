@@ -649,11 +649,11 @@
             const uvElement = document.getElementById('busuanzi_value_site_uv');
             
             if (todayElement && totalElement) {
-                // site_pv: 页面总访问量, site_uv: 独立访客数
+                // site_pv: 页面总访问量(每次刷新+1), site_uv: 独立访客数
                 todayElement.textContent = pvElement?.textContent || '-';
                 
-                // 总访问量装逼处理
-                const actualTotal = parseInt(uvElement?.textContent) || 0;
+                // 总访问量装逼处理 - 使用 pv (页面访问量)
+                const actualTotal = parseInt(pvElement?.textContent) || 0;
                 
                 // 检查是否已经初始化过装逼数据
                 let storedBase = localStorage.getItem('visit_base_total');
