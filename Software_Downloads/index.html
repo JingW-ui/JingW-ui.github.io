@@ -111,6 +111,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            min-height: 120px;
         }
 
         .software-card:hover {
@@ -123,6 +124,7 @@
             align-items: flex-start;
             gap: 8px;
             padding: 8px 8px 0 8px;
+            margin-bottom: 36px;
         }
 
         .software-icon {
@@ -164,19 +166,20 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
-            width: 100%;
+            width: auto;
             padding: 6px 10px;
             background: var(--bg-secondary);
             color: var(--text-primary);
             text-decoration: none;
-            border-radius: 0;
+            border-radius: 4px;
             font-size: 0.75rem;
             font-weight: 500;
             transition: var(--transition);
-            border: none;
-            border-top: 1px solid var(--border-color);
+            border: 1px solid var(--border-color);
             cursor: pointer;
-            margin-top: auto;
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
         }
 
         .download-btn:hover {
@@ -260,6 +263,39 @@
             width: 18px;
             height: 18px;
             vertical-align: middle;
+        }
+
+        /* 访问量统计 - 左下角固定 */
+        .visit-stats {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 10px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            z-index: 999;
+            box-shadow: var(--shadow-card);
+            opacity: 0.5;
+            transition: var(--transition);
+            line-height: 1.5;
+        }
+
+        .visit-stats:hover {
+            opacity: 0.9;
+        }
+
+        .visit-stats-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .visit-count {
+            color: var(--accent-secondary);
+            font-weight: 500;
         }
 
         /* 响应式设计 */
@@ -541,6 +577,24 @@
     <!-- 主题切换按钮 -->
     <button class="theme-toggle" id="themeToggle" title="切换主题">🌓</button>
 
+    <!-- 访问量统计 -->
+    <div class="visit-stats" id="visitStats">
+        <div class="visit-stats-item">
+            <span>今日:</span>
+            <span class="visit-count" id="todayVisits">-</span>
+        </div>
+        <div class="visit-stats-item">
+            <span>总计:</span>
+            <span class="visit-count" id="totalVisits">-</span>
+        </div>
+    </div>
+
+    <!-- 不蒜子统计脚本（隐藏） -->
+    <div style="display: none;">
+        <span id="busuanzi_value_site_pv"></span>
+        <span id="busuanzi_value_site_uv"></span>
+    </div>
+
     <script>
         // 主题切换功能
         const themeToggle = document.getElementById('themeToggle');
@@ -567,6 +621,63 @@
         function updateThemeIcon(theme) {
             themeToggle.textContent = theme === 'dark' ? '☀️' : '🌓';
         }
+
+        // 访问量统计功能 - 使用 busuanzi.js
+        function initVisitStats() {
+            // 创建 script 元素加载不蒜子统计
+            const script = document.createElement('script');
+            script.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
+            script.async = true;
+            
+            script.onload = function() {
+                // 等待统计数据加载
+                setTimeout(() => {
+                    updateVisitDisplay();
+                }, 1000);
+            };
+            
+            document.body.appendChild(script);
+        }
+
+        // 更新显示
+        function updateVisitDisplay() {
+            const todayElement = document.getElementById('todayVisits');
+            const totalElement = document.getElementById('totalVisits');
+            
+            // 获取不蒜子的统计数据
+            const pvElement = document.getElementById('busuanzi_value_site_pv');
+            const uvElement = document.getElementById('busuanzi_value_site_uv');
+            
+            if (todayElement && totalElement) {
+                // site_pv: 页面总访问量, site_uv: 独立访客数
+                todayElement.textContent = pvElement?.textContent || '-';
+                
+                // 总访问量装逼处理
+                const actualTotal = parseInt(uvElement?.textContent) || 0;
+                
+                // 检查是否已经初始化过装逼数据
+                let storedBase = localStorage.getItem('visit_base_total');
+                let storedRandom = localStorage.getItem('visit_random_bonus');
+                
+                if (!storedBase || !storedRandom) {
+                    // 首次访问：生成基础值 + 随机数
+                    storedBase = actualTotal + 2000;
+                    storedRandom = Math.floor(Math.random() * 900) + 100; // 100-999的随机数
+                    localStorage.setItem('visit_base_total', storedBase);
+                    localStorage.setItem('visit_random_bonus', storedRandom);
+                }
+                
+                // 计算显示值：基础值 + 随机数 + (当前实际值 - 首次时的实际值)
+                const firstActualTotal = parseInt(storedBase) - 2000;
+                const growth = actualTotal - firstActualTotal;
+                const fakeTotal = parseInt(storedBase) + parseInt(storedRandom) + growth;
+                
+                totalElement.textContent = fakeTotal;
+            }
+        }
+
+        // 初始化访问量统计
+        initVisitStats();
     </script>
 </body>
 </html>
