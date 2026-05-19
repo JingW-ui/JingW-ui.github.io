@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e9ecef 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -25,74 +25,85 @@
             max-width: 800px;
             width: 100%;
             background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             overflow: hidden;
+            position: relative;
         }
 
         .header {
-            background: #000000;
+            background: linear-gradient(135deg, #000000 0%, #333333 100%);
             color: #ffffff;
             text-align: center;
-            padding: 25px 20px;
+            padding: 15px 20px;
         }
 
         .header h1 {
-            font-size: 2em;
-            margin-bottom: 8px;
+            font-size: 1.5em;
+            margin-bottom: 5px;
             font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .header p {
-            font-size: 14px;
+            font-size: 12px;
             color: #cccccc;
         }
 
         .control-panel {
-            padding: 30px;
+            padding: 20px;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #333;
-            font-size: 16px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #222;
+            font-size: 13px;
         }
 
         .form-group input[type="text"],
-        .form-group input[type="number"] {
+        .form-group input[type="number"],
+        .form-group select {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #fff;
+        }
+
+        .form-group select {
+            cursor: pointer;
         }
 
         .form-group input[type="text"]:focus,
-        .form-group input[type="number"]:focus {
+        .form-group input[type="number"]:focus,
+        .form-group select:focus {
             outline: none;
             border-color: #000000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
         }
 
         .slider-container {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .form-group input[type="range"] {
             flex: 1;
-            height: 8px;
-            border-radius: 4px;
-            background: #ddd;
+            height: 6px;
+            border-radius: 3px;
+            background: #e0e0e0;
             outline: none;
             -webkit-appearance: none;
+            transition: all 0.3s ease;
         }
 
         .form-group input[type="range"]::-webkit-slider-thumb {
@@ -103,69 +114,104 @@
             border-radius: 50%;
             background: #000000;
             cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group input[type="range"]:hover {
+            background: #d0d0d0;
+        }
+
+        #fontSizeValue {
+            min-width: 50px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #000;
+            text-align: right;
         }
 
         .color-picker {
-            display: flex;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: end;
         }
 
         .color-group {
-            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .color-group label {
+            margin-bottom: 5px;
+            font-size: 12px;
+            font-weight: 500;
         }
 
         .color-group input[type="color"] {
             width: 100%;
-            height: 50px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            height: 36px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
             cursor: pointer;
+            padding: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .color-group input[type="color"]:hover {
+            border-color: #000000;
+        }
+
+        .style-preview {
+            background: #000000;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .preview-text {
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
         }
 
         .play-btn {
-            width: 100%;
-            padding: 14px;
-            background: #000000;
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #000000 0%, #333333 100%);
             color: #ffffff;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 100;
         }
 
         .play-btn:hover {
-            background: #333333;
+            background: linear-gradient(135deg, #333333 0%, #555555 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
         }
 
         .hint {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 8px;
             color: #666;
-            font-size: 14px;
+            font-size: 11px;
         }
 
-        .info-section {
-            background: #f5f5f5;
-            padding: 20px 25px;
-            border-top: 1px solid #e0e0e0;
-        }
 
-        .info-section h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .info-section p {
-            color: #666;
-            line-height: 1.8;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
 
         /* 弹幕全屏样式 */
         .danmu-fullscreen {
@@ -193,14 +239,18 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #000000;
+            background: linear-gradient(135deg, #000000 0%, #333333 100%);
             color: #ffffff;
             z-index: 10000;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 20px;
-            font-size: 18px;
+            padding: 30px;
+            font-size: 20px;
+        }
+
+        .rotate-hint p {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         @media (max-width: 768px) and (orientation: portrait) {
@@ -209,6 +259,50 @@
             }
         }
 
+        /* PC端优化 */
+        @media (min-width: 769px) {
+            .control-panel {
+                display: grid;
+                grid-template-columns: 1fr 1fr 150px;
+                grid-template-rows: auto auto auto;
+                gap: 12px 20px;
+                align-items: start;
+            }
+
+            .form-group:nth-child(1),
+            .form-group:nth-child(2) {
+                grid-column: 1 / -1;
+            }
+
+            .form-group:nth-child(3) {
+                grid-column: 1 / 2;
+            }
+
+            .form-group:nth-child(4) {
+                grid-column: 2 / 3;
+            }
+
+            .form-group:nth-child(5) {
+                grid-column: 1 / 3;
+            }
+
+            .form-group:nth-child(6) {
+                grid-column: 1 / 2;
+            }
+
+            .form-group:nth-child(7) {
+                grid-column: 2 / 3;
+            }
+
+            .form-group:nth-child(8) {
+                grid-column: 3;
+                grid-row: 2 / 5;
+            }
+
+
+        }
+
+        /* 移动端优化 */
         @media (max-width: 768px) {
             body {
                 padding: 0;
@@ -220,16 +314,99 @@
             }
             
             .control-panel {
-                padding: 20px;
-            }
-            
-            .color-picker {
-                flex-direction: column;
+                padding: 15px;
             }
 
             .header h1 {
-                font-size: 1.8em;
+                font-size: 1.2em;
             }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .form-group label {
+                font-size: 12px;
+            }
+
+            .form-group input[type="text"],
+            .form-group input[type="number"],
+            .form-group select {
+                padding: 8px 10px;
+                font-size: 14px;
+            }
+
+            .style-preview {
+                min-height: 60px;
+                padding: 10px;
+            }
+
+            .preview-text {
+                font-size: 18px;
+            }
+
+            .color-picker {
+                grid-template-columns: 1fr 1fr auto;
+                gap: 8px;
+            }
+
+            .color-group input[type="color"] {
+                height: 36px;
+            }
+
+            .play-btn {
+                bottom: 15px;
+                right: 15px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+
+        }
+
+        /* 小屏幕手机优化 */
+        @media (max-width: 480px) {
+            .header {
+                padding: 10px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.1em;
+            }
+
+            .control-panel {
+                padding: 12px;
+            }
+
+            .form-group {
+                margin-bottom: 10px;
+            }
+
+            .color-picker {
+                gap: 8px;
+            }
+
+            .color-group label {
+                font-size: 11px;
+            }
+
+            .play-btn {
+                bottom: 10px;
+                right: 10px;
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+
+            .style-preview {
+                min-height: 50px;
+                padding: 8px;
+            }
+
+            .preview-text {
+                font-size: 16px;
+            }
+
+
         }
     </style>
 </head>
@@ -255,6 +432,13 @@
             </div>
 
             <div class="form-group">
+                <label>样式预览：</label>
+                <div class="style-preview" id="stylePreview">
+                    <div class="preview-text" id="previewText">我爱你中国！</div>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label for="speed">播放速度（秒）：</label>
                 <input type="number" id="speed" value="8" min="1" max="30" step="0.5">
             </div>
@@ -265,6 +449,20 @@
                     <input type="range" id="fontSize" min="20" max="120" value="60">
                     <span id="fontSizeValue">60px</span>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label for="textStyle">弹幕样式：</label>
+                <select id="textStyle">
+                    <option value="normal">普通</option>
+                    <option value="bold">粗体</option>
+                    <option value="outline">描边</option>
+                    <option value="shadow">阴影</option>
+                    <option value="gradient">渐变</option>
+                    <option value="neon">霓虹灯</option>
+                    <option value="fire">火焰</option>
+                    <option value="ice">冰晶</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -280,22 +478,12 @@
                     </div>
                 </div>
             </div>
-
+            
+            <!-- 播放按钮 -->
             <button class="play-btn" onclick="startDanmu()">开始播放</button>
-            <p class="hint">双击屏幕退出弹幕模式</p>
-        </div>
-
-        <div class="info-section">
-            <h3>使用说明</h3>
-            <p>• 输入要显示的弹幕文字内容</p>
-            <p>• 调整播放速度控制文字滚动快慢</p>
-            <p>• 自定义文字大小和颜色效果</p>
-            <p>• 点击"开始播放"进入全屏模式</p>
-            <p>• 双击屏幕或按ESC键退出</p>
-            <p>• 手机端请横屏使用以获得最佳体验</p>
         </div>
     </div>
-
+    
     <!-- 弹幕全屏容器 -->
     <div class="danmu-fullscreen" id="danmuFullscreen">
         <canvas class="danmu-canvas" id="danmuCanvas"></canvas>
@@ -311,6 +499,7 @@
         let fontSize = 60;
         let textColor = '#ffffff';
         let bgColor = '#000000';
+        let textStyle = 'normal';
         let textX = 0;
         let textY = 0;
         let lastTime = 0;
@@ -318,7 +507,17 @@
         // 更新字体大小显示
         document.getElementById('fontSize').addEventListener('input', function() {
             document.getElementById('fontSizeValue').textContent = this.value + 'px';
+            updatePreview();
         });
+
+        // 监听内容、样式、颜色变化，实时更新预览
+        document.getElementById('content').addEventListener('input', updatePreview);
+        document.getElementById('textStyle').addEventListener('change', updatePreview);
+        document.getElementById('textColor').addEventListener('input', updatePreview);
+        document.getElementById('bgColor').addEventListener('input', updatePreview);
+
+        // 初始化预览
+        updatePreview();
 
         // 开始弹幕
         function startDanmu() {
@@ -333,6 +532,7 @@
             fontSize = parseInt(document.getElementById('fontSize').value) || 60;
             textColor = document.getElementById('textColor').value;
             bgColor = document.getElementById('bgColor').value;
+            textStyle = document.getElementById('textStyle').value;
 
             // 检查是否为手机端竖屏
             const isMobilePortrait = window.innerWidth <= 768 && window.innerHeight > window.innerWidth;
@@ -412,14 +612,12 @@
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // 设置文字样式
-            ctx.font = `bold ${fontSize}px Arial`;
-            ctx.fillStyle = textColor;
+            // 设置文字基本样式
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
 
-            // 绘制文字
-            ctx.fillText(danmuText, textX, textY);
+            // 根据选择的样式绘制文字
+            drawStyledText(ctx, danmuText, textX, textY, fontSize, textColor, textStyle);
 
             // 更新位置（根据速度和时间差计算）
             const pixelsPerSecond = (canvas.width + ctx.measureText(danmuText).width + 200) / scrollSpeed;
@@ -431,6 +629,189 @@
             }
 
             animationId = requestAnimationFrame(animate);
+        }
+
+        // 根据样式绘制文字
+        function drawStyledText(ctx, text, x, y, fontSize, color, style) {
+            ctx.font = `${getFontWeight(style)} ${fontSize}px Arial`;
+
+            switch (style) {
+                case 'normal':
+                    ctx.fillStyle = color;
+                    ctx.fillText(text, x, y);
+                    break;
+
+                case 'bold':
+                    ctx.font = `900 ${fontSize}px Arial`;
+                    ctx.fillStyle = color;
+                    ctx.fillText(text, x, y);
+                    break;
+
+                case 'outline':
+                    ctx.strokeStyle = invertColor(color);
+                    ctx.lineWidth = 3;
+                    ctx.strokeText(text, x, y);
+                    ctx.fillStyle = color;
+                    ctx.fillText(text, x, y);
+                    break;
+
+                case 'shadow':
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowOffsetX = 3;
+                    ctx.shadowOffsetY = 3;
+                    ctx.fillStyle = color;
+                    ctx.fillText(text, x, y);
+                    ctx.shadowColor = 'transparent';
+                    break;
+
+                case 'gradient':
+                    const gradient = ctx.createLinearGradient(x - 50, y - fontSize/2, x + 200, y + fontSize/2);
+                    gradient.addColorStop(0, color);
+                    gradient.addColorStop(0.5, brightenColor(color, 50));
+                    gradient.addColorStop(1, color);
+                    ctx.fillStyle = gradient;
+                    ctx.fillText(text, x, y);
+                    break;
+
+                case 'neon':
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = 20;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.fillStyle = color;
+                    ctx.fillText(text, x, y);
+                    ctx.shadowColor = 'transparent';
+                    break;
+
+                case 'fire':
+                    const fireGradient = ctx.createLinearGradient(x - 50, y - fontSize/2, x - 50, y + fontSize/2);
+                    fireGradient.addColorStop(0, '#ff0000');
+                    fireGradient.addColorStop(0.3, '#ff6600');
+                    fireGradient.addColorStop(0.6, '#ffff00');
+                    fireGradient.addColorStop(1, color);
+                    ctx.fillStyle = fireGradient;
+                    ctx.fillText(text, x, y);
+                    break;
+
+                case 'ice':
+                    const iceGradient = ctx.createLinearGradient(x - 50, y - fontSize/2, x + 200, y + fontSize/2);
+                    iceGradient.addColorStop(0, '#00ffff');
+                    iceGradient.addColorStop(0.3, '#0088ff');
+                    iceGradient.addColorStop(0.7, '#0044ff');
+                    iceGradient.addColorStop(1, color);
+                    ctx.fillStyle = iceGradient;
+                    ctx.fillText(text, x, y);
+                    break;
+
+                default:
+                    ctx.fillStyle = color;
+                    ctx.fillText(text, x, y);
+            }
+        }
+
+        // 获取字体粗细
+        function getFontWeight(style) {
+            switch (style) {
+                case 'bold': return '900';
+                case 'outline': return 'bold';
+                default: return 'bold';
+            }
+        }
+
+        // 颜色反相
+        function invertColor(hex) {
+            hex = hex.replace('#', '');
+            const r = (255 - parseInt(hex.substr(0, 2), 16)).toString(16).padStart(2, '0');
+            const g = (255 - parseInt(hex.substr(2, 2), 16)).toString(16).padStart(2, '0');
+            const b = (255 - parseInt(hex.substr(4, 2), 16)).toString(16).padStart(2, '0');
+            return '#' + r + g + b;
+        }
+
+        // 提亮颜色
+        function brightenColor(hex, amount) {
+            hex = hex.replace('#', '');
+            let r = Math.min(255, parseInt(hex.substr(0, 2), 16) + amount).toString(16).padStart(2, '0');
+            let g = Math.min(255, parseInt(hex.substr(2, 2), 16) + amount).toString(16).padStart(2, '0');
+            let b = Math.min(255, parseInt(hex.substr(4, 2), 16) + amount).toString(16).padStart(2, '0');
+            return '#' + r + g + b;
+        }
+
+        // 更新预览
+        function updatePreview() {
+            const content = document.getElementById('content').value || '我爱你中国！';
+            const style = document.getElementById('textStyle').value;
+            const color = document.getElementById('textColor').value;
+            const bgColor = document.getElementById('bgColor').value;
+            const fontSize = document.getElementById('fontSize').value;
+
+            const previewContainer = document.getElementById('stylePreview');
+            const previewText = document.getElementById('previewText');
+
+            // 更新预览容器背景
+            previewContainer.style.background = bgColor;
+
+            // 更新预览文字内容和基本样式
+            previewText.textContent = content;
+            previewText.style.fontSize = (parseInt(fontSize) * 0.4) + 'px';
+            previewText.style.color = color;
+
+            // 应用样式效果
+            previewText.style.fontWeight = getFontWeight(style);
+            previewText.style.textShadow = 'none';
+            previewText.style.background = 'none';
+            previewText.style.webkitBackgroundClip = 'none';
+            previewText.style.webkitTextFillColor = 'initial';
+
+            switch (style) {
+                case 'normal':
+                    // 默认样式，无需额外设置
+                    break;
+
+                case 'bold':
+                    previewText.style.fontWeight = '900';
+                    break;
+
+                case 'outline':
+                    previewText.style.textShadow = `
+                        -1px -1px 0 ${invertColor(color)},
+                        1px -1px 0 ${invertColor(color)},
+                        -1px 1px 0 ${invertColor(color)},
+                        1px 1px 0 ${invertColor(color)}
+                    `;
+                    break;
+
+                case 'shadow':
+                    previewText.style.textShadow = '3px 3px 6px rgba(0, 0, 0, 0.8)';
+                    break;
+
+                case 'gradient':
+                    previewText.style.background = `linear-gradient(45deg, ${color}, ${brightenColor(color, 50)}, ${color})`;
+                    previewText.style.webkitBackgroundClip = 'text';
+                    previewText.style.webkitTextFillColor = 'transparent';
+                    break;
+
+                case 'neon':
+                    previewText.style.textShadow = `
+                        0 0 5px ${color},
+                        0 0 10px ${color},
+                        0 0 15px ${color},
+                        0 0 20px ${color}
+                    `;
+                    break;
+
+                case 'fire':
+                    previewText.style.background = 'linear-gradient(to bottom, #ff0000, #ff6600, #ffff00, ' + color + ')';
+                    previewText.style.webkitBackgroundClip = 'text';
+                    previewText.style.webkitTextFillColor = 'transparent';
+                    break;
+
+                case 'ice':
+                    previewText.style.background = `linear-gradient(45deg, #00ffff, #0088ff, #0044ff, ${color})`;
+                    previewText.style.webkitBackgroundClip = 'text';
+                    previewText.style.webkitTextFillColor = 'transparent';
+                    break;
+            }
         }
 
         // 退出弹幕
