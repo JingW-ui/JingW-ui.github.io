@@ -80,6 +80,169 @@
       align-items: center;
     }
 
+    /* History File Selector */
+    .history-file-selector {
+      position: relative;
+      display: inline-block;
+    }
+
+    .history-file-btn {
+      padding: 8px 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .history-file-btn:hover {
+      border-color: var(--accent);
+    }
+
+    .history-file-dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      min-width: 400px;
+      max-height: 500px;
+      overflow-y: auto;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 100;
+      margin-top: 4px;
+      padding: 10px;
+    }
+
+    .history-file-dropdown.show {
+      display: block;
+    }
+
+    .history-file-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .history-file-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .clear-history-btn {
+      padding: 4px 10px;
+      background: #ff4757;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+
+    .clear-history-btn:hover {
+      background: #ff3838;
+    }
+
+    .history-file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+    }
+
+    .history-file-item {
+      position: relative;
+      background: var(--bg-tertiary);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      padding: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .history-file-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .history-file-preview {
+      width: 80px;
+      height: 80px;
+      border-radius: 4px;
+      background: white;
+      margin-bottom: 6px;
+      object-fit: contain;
+    }
+
+    .history-file-info {
+      width: 100%;
+      text-align: center;
+    }
+
+    .history-file-name {
+      font-size: 10px;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .history-file-time {
+      font-size: 9px;
+      color: var(--text-secondary);
+    }
+
+    .history-file-delete {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 71, 87, 0.9);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      font-size: 12px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      line-height: 1;
+    }
+
+    .history-file-item:hover .history-file-delete {
+      display: flex;
+    }
+
+    .history-file-delete:hover {
+      background: #ff3838;
+      transform: scale(1.1);
+    }
+
+    .history-file-empty {
+      padding: 30px 20px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 12px;
+    }
+
     .theme-toggle {
       background: var(--bg-tertiary);
       border: 1px solid var(--border);
@@ -223,8 +386,6 @@
     }
 
     /* Shape Tools */
-    }
-
     .shape-option:hover {
       color: var(--text-primary);
     }
@@ -797,6 +958,7 @@
       justify-content: center;
       overflow: auto;
       padding: 40px;
+      position: relative;
     }
 
     .canvas-container {
@@ -1761,6 +1923,102 @@
       white-space: pre-wrap;
       font-family: sans-serif;
     }
+
+    /* Responsive Layout */
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        max-height: 40vh;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .canvas-area {
+        height: 60vh;
+      }
+
+      .canvas-wrapper {
+        padding: 20px;
+      }
+
+      .tool-grid {
+        grid-template-columns: repeat(8, 1fr);
+      }
+
+      .size-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .header {
+        padding: 8px 12px;
+      }
+
+      .logo span {
+        display: none;
+      }
+
+      .header-actions {
+        gap: 4px;
+      }
+
+      .btn {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .sidebar-section {
+        padding: 10px;
+      }
+
+      .section-title {
+        font-size: 10px;
+      }
+
+      .tool-grid {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      .size-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .color-palette {
+        grid-template-columns: repeat(7, 1fr);
+      }
+
+      .canvas-info {
+        font-size: 10px;
+        gap: 8px;
+      }
+
+      .zoom-controls {
+        gap: 4px;
+      }
+
+      .zoom-btn {
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+      }
+    }
+
+    /* Canvas container responsive */
+    .canvas-container {
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    #mainCanvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
   </style>
 </head>
 
@@ -1772,6 +2030,10 @@
       <span>Icon Creator Pro</span>
     </div>
     <div class="header-actions">
+      <div class="history-file-selector">
+        <button class="history-file-btn" onclick="toggleHistoryFileDropdown()" title="历史文件">📁 历史 ▾</button>
+        <div class="history-file-dropdown" id="historyFileDropdown"></div>
+      </div>
       <button class="theme-toggle" onclick="toggleTheme()" title="切换主题" id="themeBtn">🌙</button>
       <div class="clear-dropdown">
         <button class="btn btn-secondary" onclick="toggleClearDropdown()">🗑️ 清空 ▾</button>
@@ -1939,6 +2201,16 @@
           <input type="range" class="brush-slider" min="1" max="50" value="3" id="brushSize"
             oninput="updateBrushSize(this.value)">
           <span class="brush-value" id="brushValue">3px</span>
+        </div>
+      </div>
+
+      <!-- Shape Border Width -->
+      <div class="sidebar-section">
+        <div class="section-title">📏 形状边框</div>
+        <div class="shape-border-container">
+          <input type="range" class="shape-border-slider" min="1" max="20" value="2" id="shapeBorderWidth"
+            oninput="updateShapeBorder(this.value)">
+          <span class="shape-border-value" id="shapeBorderValue">2px</span>
         </div>
       </div>
 
@@ -2189,10 +2461,7 @@
       <!-- 本地效果 - 快速风格 -->
       <div id="localStyleSection">
         <div class="section-title" style="margin-top:12px;">快速风格</div>
-        <div id="localStyleSection">
-          <div class="section-title" style="margin-top:12px;">快速风格</div>
-          <div class="ai-style-grid" id="aiStyleGrid"></div>
-        </div>
+        <div class="ai-style-grid" id="aiStyleGrid"></div>
 
         <div class="section-title" style="margin-top:20px;">自定义提示词</div>
         <textarea class="ai-prompt-input" id="aiPrompt"
@@ -2228,7 +2497,7 @@
             <div class="export-settings">
               <div class="export-setting-row">
                 <label>文件名:</label>
-                <input type="text" id="exportFilename" value="icon" placeholder="输入文件名">
+                <input type="text" id="exportFilename" placeholder="输入文件名">
               </div>
               <div class="export-setting-row">
                 <label>导出尺寸:</label>
@@ -2349,9 +2618,9 @@
       let opacity = 100;
       let lastX = 0;
       let lastY = 0;
-            let cornerRadius = 0;
+      let cornerRadius = 15;  // 默认15%圆角
       let canvasBg = 'white';  // 默认白色背景
-      let canvasBgColor = '#ffffff';
+      let canvasBgColor = '#ffffff';  // 默认白色背景色值
       let canvasBgGradient = null;
       let history = [];
       let historyIndex = -1;
@@ -2359,6 +2628,7 @@
       let isThemeDark = false;  // 默认浅色主题
       let shapeStart = null;
       let shiftPressed = false;
+      let autoSaveTimer = null;
 
       // Text tool state
       let textFont = 'sans-serif';
@@ -2417,26 +2687,51 @@
 
         exportCanvas = document.createElement('canvas');
         exportCtx = exportCanvas.getContext('2d');
+        
+        // 初始化画布
+        setupCanvas();
+        
         setupColorPalette();
         setupGradientPresets();
         setupBgGradientPresets();
         setupEventListeners();
         setupKeyboardShortcuts();
+        setupResponsiveLayout();
 
         // 初始化为浅色主题
         document.body.setAttribute('data-theme', 'light');
         document.getElementById('themeBtn').textContent = '🌙';
 
-        // 初始化白色背景
-        updateCanvasBackground();
+        // 初始化颜色显示
+        setColor(currentColor);
+        updateCurrentColorDisplay();
+        
+        // 初始化白色背景和圆角
+        setCanvasBg('white');
+        updateCornerRadius(15);
 
-        setAITab(aiMode); // Initialize AI tab from localStorage
-        renderAIStyleGrid(); // Render style buttons in AI panel
-        saveToHistory();
-        updateCornerRadius(0);
+        // 初始化AI标签页
+        setAITab(aiMode);
+        
+        // 渲染AI风格网格
+        renderAIStyleGrid();
+        
+        // 更新UI控件状态
+        updateBrushSize(brushSize);
         updateShapeBorder(2);
-        renderAIStylePreviews(); // Render style thumbnails in AI panel
-        initSFPromptChips(); // Initialize SiliconFlow prompt chips
+        setOpacity(100);
+        
+        // 渲染AI风格预览
+        renderAIStylePreviews();
+        
+        // 初始化SiliconFlow提示词芯片
+        initSFPromptChips();
+        
+        // 保存初始状态到历史记录
+        saveToHistory();
+        
+        // 加载历史文件列表
+        loadHistoryFileList();
       }
 
       // ============ Shape Drawing Helpers ============
@@ -2510,6 +2805,11 @@
         updateBrushSize(brushSize);
         updateCanvasBackground();
         updateCanvasBorderRadius();
+        
+        // 确保初始化工具按钮状态
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.tool === currentTool);
+        });
       }
 
       function setupColorPalette() {
@@ -2517,7 +2817,7 @@
         palette.innerHTML = '';
         colors.forEach((color, i) => {
           const swatch = document.createElement('div');
-          swatch.className = 'color-swatch' + (i === 5 ? ' active' : '');
+          swatch.className = 'color-swatch' + (color === currentColor ? ' active' : '');
           swatch.style.background = color;
           swatch.onclick = () => setColor(color);
           palette.appendChild(swatch);
@@ -2637,6 +2937,57 @@
             closeAllDropdowns();
           }
         });
+      }
+
+      // ============ Responsive Layout ============
+      function setupResponsiveLayout() {
+        // Handle window resize
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(() => {
+            handleWindowResize();
+          }, 250);
+        });
+
+        // Initial check
+        handleWindowResize();
+      }
+
+      function handleWindowResize() {
+        const wrapper = document.getElementById('canvasWrapper');
+        const container = document.getElementById('canvasContainer');
+        
+        if (!wrapper || !container) return;
+
+        // Get available space
+        const wrapperRect = wrapper.getBoundingClientRect();
+        const availableWidth = wrapperRect.width - 80; // Account for padding
+        const availableHeight = wrapperRect.height - 80;
+
+        // Calculate optimal zoom to fit canvas in available space
+        const maxWidth = availableWidth / canvasSize;
+        const maxHeight = availableHeight / canvasSize;
+        
+        // Only adjust zoom if it would make the canvas too large or too small
+        const currentZoomedWidth = canvasSize * zoom;
+        const currentZoomedHeight = canvasSize * zoom;
+        
+        if (currentZoomedWidth > availableWidth || currentZoomedHeight > availableHeight) {
+          // Reduce zoom to fit
+          const newZoom = Math.min(maxWidth, maxHeight);
+          zoom = Math.max(1, Math.min(newZoom, 64));
+          updateZoom();
+        } else if (currentZoomedWidth < availableWidth * 0.5 && currentZoomedHeight < availableHeight * 0.5) {
+          // Increase zoom if canvas is too small
+          const newZoom = Math.min(maxWidth, maxHeight) * 0.8;
+          zoom = Math.max(1, Math.min(newZoom, 64));
+          updateZoom();
+        }
+
+        // Update canvas display
+        mainCanvas.style.width = (canvasSize * zoom) + 'px';
+        mainCanvas.style.height = (canvasSize * zoom) + 'px';
       }
 
       // ============ Mouse/Touch Handlers ============
@@ -3122,7 +3473,10 @@
 
       function updateShapeBorder(value) {
         shapeBorderWidth = parseInt(value);
-        document.getElementById('shapeBorderValue').textContent = value + 'px';
+        const borderValueEl = document.getElementById('shapeBorderValue');
+        if (borderValueEl) {
+          borderValueEl.textContent = value + 'px';
+        }
       }
 
       function setOpacity(value) {
@@ -3317,9 +3671,9 @@
         brushSize = 3;
         shapeBorderWidth = 2;
         opacity = 100;
-        cornerRadius = 0;
+        cornerRadius = 15;  // 默认15%圆角
         canvasBg = 'white';  // 默认白色背景
-        canvasBgColor = '#ffffff';
+        canvasBgColor = '#ffffff';  // 默认白色背景色值
         canvasBgGradient = null;
 
         // Reset UI
@@ -3332,12 +3686,11 @@
         updateShapeBorder(2);
         document.getElementById('opacitySlider').value = 100;
         setOpacity(100);
-        document.getElementById('cornerSlider').value = 0;
-        updateCornerRadius(0);
+        document.getElementById('cornerSlider').value = 15;
+        updateCornerRadius(15);
 
-        // Reset background
-        document.querySelectorAll('.bg-option').forEach(opt => opt.classList.remove('active'));
-        document.querySelector('[data-bg="transparent"]')?.classList.add('active');
+        // Reset background - use setCanvasBg to properly initialize
+        setCanvasBg('white');
         document.querySelectorAll('.bg-gradient-swatch').forEach(opt => opt.classList.remove('active'));
         setBgTab('solid');
 
@@ -3359,6 +3712,7 @@
         historyIndex = -1;
 
         setupCanvas();
+        updateCanvasBackground();
         saveToHistory();
         closeAllDropdowns();
         showToast('画布已重置');
@@ -3480,7 +3834,22 @@
         if (isExporting) return;
         isExporting = true;
 
-        const filename = document.getElementById('exportFilename').value || 'icon';
+        // 如果文件名为空，使用时间戳自动生成（精确到毫秒 + 随机数）
+        let filename = document.getElementById('exportFilename').value.trim();
+        if (!filename) {
+          const now = new Date();
+          const timestamp = now.getFullYear().toString() + 
+                           String(now.getMonth() + 1).padStart(2, '0') + 
+                           String(now.getDate()).padStart(2, '0') + '_' +
+                           String(now.getHours()).padStart(2, '0') + 
+                           String(now.getMinutes()).padStart(2, '0') + 
+                           String(now.getSeconds()).padStart(2, '0') + '_' +
+                           String(now.getMilliseconds()).padStart(3, '0');
+          const randomNum = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+          filename = `icon_${timestamp}_${randomNum}`;
+          document.getElementById('exportFilename').value = filename;
+        }
+        
         const exportSizeValue = document.getElementById('exportSizeSelect').value;
         const actualSize = exportSizeValue === 'current' ? canvasSize : parseInt(exportSizeValue);
 
@@ -3525,6 +3894,8 @@
             resetExportProgress();
             closeExportModal();
             showToast(getExportFormatName(format) + ' 已导出', 2000);
+            // 导出成功后自动保存到历史
+            saveToHistoryAfterExport(filename);
           }, 500);
         } catch (err) {
           resetExportProgress();
@@ -3568,6 +3939,8 @@
           resetExportProgress();
           closeExportModal();
           showToast(`批量导出完成！${total} 个文件已保存`, 3000);
+          // 批量导出成功后自动保存到历史
+          saveToHistoryAfterExport(baseFilename);
         }, 500);
       }
 
@@ -3930,7 +4303,14 @@
 
       // ============ Drag to Desktop ============
       function startDragToDesktop() {
-        const filename = document.getElementById('exportFilename').value || 'icon';
+        // 如果文件名为空，使用时间戳自动生成
+        let filename = document.getElementById('exportFilename').value.trim();
+        if (!filename) {
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+          filename = `icon_${timestamp}`;
+          document.getElementById('exportFilename').value = filename;
+        }
+        
         const exportSizeValue = document.getElementById('exportSizeSelect').value;
         const size = exportSizeValue === 'current' ? canvasSize : parseInt(exportSizeValue);
         const radius = Math.floor(size * cornerRadius / 100);
@@ -3979,7 +4359,7 @@
 
       // ============ AI Panel ============
       let aiMode = localStorage.getItem('aiMode') || 'local';
-      let currentAITab = 'local';
+      let currentAITab = aiMode;  // 与 aiMode 保持一致
 
       function toggleAIPanel() {
         document.getElementById('aiPanel').classList.toggle('open');
@@ -4923,10 +5303,296 @@
         setTimeout(() => toast.classList.remove('show'), duration);
       }
 
+      // ============ Auto Save & History Files ============
+      function startAutoSave() {
+        // 已废弃：不再使用定时自动保存
+        console.log('startAutoSave 已废弃');
+      }
+
+      function triggerAutoSave() {
+        // 已废弃：不再使用定时自动保存
+        console.log('triggerAutoSave 已废弃');
+      }
+
+      function autoSaveToFile() {
+        try {
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+          const filename = `icon_draft_${timestamp}`;
+          
+          const projectData = {
+            filename: filename,
+            timestamp: new Date().toLocaleString('zh-CN'),
+            canvasSize: canvasSize,
+            imageData: mainCanvas.toDataURL('image/png'),
+            settings: {
+              currentColor: currentColor,
+              brushSize: brushSize,
+              opacity: opacity,
+              cornerRadius: cornerRadius,
+              canvasBg: canvasBg,
+              canvasBgColor: canvasBgColor,
+              canvasBgGradient: canvasBgGradient
+            }
+          };
+          
+          // 保存到 localStorage
+          const key = `icon_creator_history_${filename}`;
+          localStorage.setItem(key, JSON.stringify(projectData));
+          
+          // 更新历史文件列表
+          updateHistoryFileList(filename);
+          
+          console.log('自动保存成功:', filename);
+        } catch (err) {
+          console.error('自动保存失败:', err);
+        }
+      }
+
+      function saveToHistoryAfterExport(filename) {
+        try {
+          // 生成唯一的历史文件名（添加时间戳后缀避免冲突）
+          const now = new Date();
+          const uniqueSuffix = now.getTime().toString(36) + Math.random().toString(36).substr(2, 5);
+          const historyFilename = `${filename}_${uniqueSuffix}`;
+          
+          const projectData = {
+            filename: historyFilename,
+            originalName: filename,
+            timestamp: now.toLocaleString('zh-CN'),
+            canvasSize: canvasSize,
+            imageData: mainCanvas.toDataURL('image/png'),
+            settings: {
+              currentColor: currentColor,
+              brushSize: brushSize,
+              opacity: opacity,
+              cornerRadius: cornerRadius,
+              canvasBg: canvasBg,
+              canvasBgColor: canvasBgColor,
+              canvasBgGradient: canvasBgGradient
+            }
+          };
+          
+          // 保存到 localStorage
+          const key = `icon_creator_history_${historyFilename}`;
+          localStorage.setItem(key, JSON.stringify(projectData));
+          
+          // 更新历史文件列表
+          updateHistoryFileList(historyFilename);
+          
+          console.log('导出后自动保存成功:', historyFilename);
+        } catch (err) {
+          console.error('导出后自动保存失败:', err);
+        }
+      }
+
+      function updateHistoryFileList(newFilename) {
+        let fileList = JSON.parse(localStorage.getItem('icon_creator_file_list') || '[]');
+        
+        // 获取项目数据以提取原始文件名
+        const key = `icon_creator_history_${newFilename}`;
+        const data = localStorage.getItem(key);
+        let displayName = newFilename;
+        
+        if (data) {
+          try {
+            const projectData = JSON.parse(data);
+            displayName = projectData.originalName || newFilename;
+          } catch (e) {
+            console.error('解析项目数据失败:', e);
+          }
+        }
+        
+        // 检查是否已存在（基于唯一文件名）
+        const exists = fileList.some(item => item.filename === newFilename);
+        if (!exists) {
+          fileList.unshift({
+            filename: newFilename,
+            displayName: displayName,
+            timestamp: new Date().toLocaleString('zh-CN')
+          });
+          
+          // 限制最多保存20个历史文件
+          if (fileList.length > 20) {
+            fileList = fileList.slice(0, 20);
+          }
+          
+          localStorage.setItem('icon_creator_file_list', JSON.stringify(fileList));
+          loadHistoryFileList();
+        }
+      }
+
+      function loadHistoryFileList() {
+        const dropdown = document.getElementById('historyFileDropdown');
+        const fileList = JSON.parse(localStorage.getItem('icon_creator_file_list') || '[]');
+        
+        if (fileList.length === 0) {
+          dropdown.innerHTML = '<div class="history-file-empty">暂无历史文件</div>';
+          return;
+        }
+        
+        let html = `
+          <div class="history-file-header">
+            <div class="history-file-title">📁 历史文件 (${fileList.length})</div>
+            <button class="clear-history-btn" onclick="clearAllHistory()">🗑️ 清空全部</button>
+          </div>
+          <div class="history-file-grid">
+        `;
+        
+        html += fileList.map(item => `
+          <div class="history-file-item" onclick="loadHistoryFile('${item.filename}')">
+            <img class="history-file-preview" src="${getHistoryPreview(item.filename)}" alt="${item.displayName}">
+            <div class="history-file-info">
+              <div class="history-file-name" title="${item.displayName}">${item.displayName}</div>
+              <div class="history-file-time">${item.timestamp}</div>
+            </div>
+            <button class="history-file-delete" onclick="event.stopPropagation(); deleteHistoryFile('${item.filename}')" title="删除">×</button>
+          </div>
+        `).join('');
+        
+        html += '</div>';
+        dropdown.innerHTML = html;
+      }
+
+      function getHistoryPreview(filename) {
+        try {
+          const key = `icon_creator_history_${filename}`;
+          const data = localStorage.getItem(key);
+          if (!data) return '';
+          
+          const projectData = JSON.parse(data);
+          return projectData.imageData || '';
+        } catch (err) {
+          console.error('获取预览失败:', err);
+          return '';
+        }
+      }
+
+      function deleteHistoryFile(filename) {
+        try {
+          // 删除文件数据
+          const key = `icon_creator_history_${filename}`;
+          localStorage.removeItem(key);
+          
+          // 从列表中移除
+          let fileList = JSON.parse(localStorage.getItem('icon_creator_file_list') || '[]');
+          fileList = fileList.filter(item => item.filename !== filename);
+          localStorage.setItem('icon_creator_file_list', JSON.stringify(fileList));
+          
+          // 刷新显示
+          loadHistoryFileList();
+          showToast('已删除', 1500);
+        } catch (err) {
+          console.error('删除失败:', err);
+          showToast('删除失败', 2000);
+        }
+      }
+
+      function clearAllHistory() {
+        if (!confirm('确定要清空所有历史文件吗？此操作不可恢复！')) {
+          return;
+        }
+        
+        try {
+          // 获取所有历史文件
+          const fileList = JSON.parse(localStorage.getItem('icon_creator_file_list') || '[]');
+          
+          // 删除所有文件数据
+          fileList.forEach(item => {
+            const key = `icon_creator_history_${item.filename}`;
+            localStorage.removeItem(key);
+          });
+          
+          // 清空列表
+          localStorage.removeItem('icon_creator_file_list');
+          
+          // 刷新显示
+          loadHistoryFileList();
+          showToast('已清空所有历史', 2000);
+        } catch (err) {
+          console.error('清空失败:', err);
+          showToast('清空失败', 2000);
+        }
+      }
+
+      function toggleHistoryFileDropdown() {
+        const dropdown = document.getElementById('historyFileDropdown');
+        dropdown.classList.toggle('show');
+        loadHistoryFileList();
+      }
+
+      function loadHistoryFile(filename) {
+        try {
+          const key = `icon_creator_history_${filename}`;
+          const data = localStorage.getItem(key);
+          
+          if (!data) {
+            showToast('文件不存在或已删除', 3000);
+            toggleHistoryFileDropdown();
+            return;
+          }
+          
+          const projectData = JSON.parse(data);
+          
+          // 恢复画布尺寸
+          if (projectData.canvasSize !== canvasSize) {
+            canvasSize = projectData.canvasSize;
+            setupCanvas();
+          }
+          
+          // 恢复图像数据
+          const img = new Image();
+          img.onload = () => {
+            mainCtx.clearRect(0, 0, canvasSize, canvasSize);
+            mainCtx.drawImage(img, 0, 0, canvasSize, canvasSize);
+            offscreenCtx.clearRect(0, 0, canvasSize, canvasSize);
+            offscreenCtx.putImageData(mainCtx.getImageData(0, 0, canvasSize, canvasSize), 0, 0);
+            
+            // 恢复设置
+            if (projectData.settings) {
+              currentColor = projectData.settings.currentColor || '#ffffff';
+              brushSize = projectData.settings.brushSize || 3;
+              opacity = projectData.settings.opacity || 100;
+              cornerRadius = projectData.settings.cornerRadius || 0;
+              canvasBg = projectData.settings.canvasBg || 'white';
+              canvasBgColor = projectData.settings.canvasBgColor || '#ffffff';
+              canvasBgGradient = projectData.settings.canvasBgGradient || null;
+              
+              // 更新UI
+              document.getElementById('brushSize').value = brushSize;
+              updateBrushSize(brushSize);
+              document.getElementById('opacitySlider').value = opacity;
+              setOpacity(opacity);
+              document.getElementById('cornerSlider').value = cornerRadius;
+              updateCornerRadius(cornerRadius);
+              updateCanvasBackground();
+              setColor(currentColor);
+            }
+            
+            // 重置历史记录
+            history = [];
+            historyIndex = -1;
+            saveToHistory();
+            
+            showToast(`已加载: ${filename}`, 2000);
+            toggleHistoryFileDropdown();
+          };
+          img.src = projectData.imageData;
+          
+        } catch (err) {
+          console.error('加载历史文件失败:', err);
+          showToast('加载失败: ' + err.message, 3000);
+          toggleHistoryFileDropdown();
+        }
+      }
+
       // Close dropdowns when clicking outside
       document.addEventListener('click', (e) => {
         if (!e.target.closest('.clear-dropdown')) {
           closeAllDropdowns();
+        }
+        if (!e.target.closest('.history-file-selector')) {
+          const dropdown = document.getElementById('historyFileDropdown');
+          if (dropdown) dropdown.classList.remove('show');
         }
       });
 
