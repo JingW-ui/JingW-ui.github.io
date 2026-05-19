@@ -95,17 +95,18 @@
         /* 响应式设计 - 手机端优化 */
         @media (max-width: 768px) {
             body {
-                padding: 25px 15px;
+                padding: 30px 20px;
             }
 
             .page-title {
                 font-size: 2em;
-                margin-bottom: 8px;
+                margin-bottom: 15px;
             }
 
             .page-subtitle {
-                font-size: 0.95em;
+                font-size: 1em;
                 margin-bottom: 30px;
+                letter-spacing: 1.5px;
             }
 
             .games-container {
@@ -116,21 +117,40 @@
             .game-card {
                 border-radius: 12px;
             }
+            
+            .game-card:hover {
+                transform: translateY(-2px) scale(1.01);
+            }
         }
 
         /* 超小屏幕进一步优化 */
         @media (max-width: 480px) {
+            body {
+                padding: 20px 15px;
+            }
+            
             .page-title {
-                font-size: 1.7em;
+                font-size: 1.8em;
+                margin-bottom: 10px;
             }
 
             .page-subtitle {
-                font-size: 0.85em;
+                font-size: 0.9em;
+                margin-bottom: 25px;
+                letter-spacing: 1px;
             }
 
             .games-container {
-                grid-template-columns: 1fr;
-                gap: 12px;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            
+            .game-card {
+                border-radius: 10px;
+            }
+            
+            .game-image {
+                aspect-ratio: 5 / 3;
             }
         }
     </style>
@@ -188,6 +208,11 @@
         <!-- 扑克牌游戏 -->
         <div class="game-card" onclick="window.location.href='/Games/puke/'">
             <img src="assets/img/puke.webp" alt="扑克牌游戏" class="game-image">
+        </div>
+
+        <!-- Jackrabbit 跳跃兔子 -->
+        <div class="game-card" onclick="window.location.href='/Games/jackrabbit/'">
+            <img src="assets/img/jackrabbit.webp" alt="Jackrabbit 跳跃兔子" class="game-image">
         </div>
     </div>
 
