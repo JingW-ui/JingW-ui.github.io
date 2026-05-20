@@ -34,7 +34,7 @@ class Enemy extends Entity {
                 this.damage = 10;
                 this.scoreValue = 100;
                 this.radius = 14;
-                this.color = '#f87171';
+                this.color = '#664a4a';
                 this.accelerationForce = 0.5; // 提升100%
                 this.fireRate = 3; // 基础敌人也能射击
                 this.fireTimer = Utils.randomRange(0, this.fireRate);
@@ -48,7 +48,7 @@ class Enemy extends Entity {
                 this.damage = 5;
                 this.scoreValue = 150;
                 this.radius = 10;
-                this.color = '#fbbf24';
+                this.color = '#66604a';
                 this.accelerationForce = 0.8; // 提升100%
                 this.imageKey = 'enemy1';
                 break;
@@ -60,7 +60,7 @@ class Enemy extends Entity {
                 this.damage = 20;
                 this.scoreValue = 300;
                 this.radius = 20;
-                this.color = '#dc2626';
+                this.color = '#664a4a';
                 this.accelerationForce = 0.25; // 提升108%
                 this.imageKey = 'enemy2';
                 break;
@@ -72,7 +72,7 @@ class Enemy extends Entity {
                 this.damage = 15;
                 this.scoreValue = 250;
                 this.radius = 16;
-                this.color = '#e879f9';
+                this.color = '#5a5566';
                 this.accelerationForce = 0.35; // 提升94%
                 this.fireRate = 1.5; // 加快射击频率
                 this.fireTimer = Utils.randomRange(0, this.fireRate);
@@ -86,7 +86,7 @@ class Enemy extends Entity {
                 this.damage = 15;
                 this.scoreValue = 50;
                 this.radius = Utils.randomRange(15, 30);
-                this.color = '#9ca3af';
+                this.color = '#5a5a5a';
                 this.accelerationForce = 0.2; // 提升100%
                 this.rotationSpeed = Utils.randomRange(-2, 2);
                 // 为每个陨石生成独特的形状点
@@ -105,7 +105,7 @@ class Enemy extends Entity {
                 this.damage = 25;
                 this.scoreValue = 200;
                 this.radius = 12;
-                this.color = '#10b981';
+                this.color = '#4a6655';
                 this.accelerationForce = 0.3; // 提升100%
                 this.fireRate = 2.5;
                 this.fireTimer = Utils.randomRange(0, this.fireRate);
@@ -119,7 +119,7 @@ class Enemy extends Entity {
                 this.damage = 8;
                 this.scoreValue = 80;
                 this.radius = 8;
-                this.color = '#f97316';
+                this.color = '#66554a';
                 this.accelerationForce = 0.9; // 提升100%
                 this.swarmOffset = Utils.randomRange(0, Math.PI * 2);
                 this.imageKey = 'enemy1';
@@ -133,7 +133,7 @@ class Enemy extends Entity {
                 this.damage = 30;
                 this.scoreValue = 2000;
                 this.radius = 35;
-                this.color = '#ef4444';
+                this.color = '#664a4a';
                 this.accelerationForce = 0.4;
                 this.fireRate = 0.8; // 快速射击
                 this.fireTimer = Utils.randomRange(0, this.fireRate);
@@ -167,7 +167,7 @@ class Enemy extends Entity {
                 this.damage = 6;
                 this.scoreValue = 120;
                 this.radius = 11;
-                this.color = '#fbbf24';
+                this.color = '#66604a';
                 this.accelerationForce = 0.7;
                 this.imageKey = 'enemy_dinghy_small';
                 break;
@@ -180,7 +180,7 @@ class Enemy extends Entity {
                 this.damage = 12;
                 this.scoreValue = 180;
                 this.radius = 16;
-                this.color = '#60a5fa';
+                this.color = '#4a5568';
                 this.accelerationForce = 0.4;
                 this.fireRate = 2;
                 this.fireTimer = Utils.randomRange(0, this.fireRate);
@@ -195,7 +195,7 @@ class Enemy extends Entity {
                 this.damage = 18;
                 this.scoreValue = 280;
                 this.radius = 18;
-                this.color = '#f97316';
+                this.color = '#66554a';
                 this.accelerationForce = 0.35;
                 this.fireRate = 1.2;
                 this.fireTimer = Utils.randomRange(0, this.fireRate);
@@ -210,7 +210,7 @@ class Enemy extends Entity {
                 this.damage = 10;
                 this.scoreValue = 160;
                 this.radius = 13;
-                this.color = '#a78bfa';
+                this.color = '#5a5566';
                 this.accelerationForce = 0.6;
                 this.imageKey = 'enemy_ship3';
                 break;
@@ -223,7 +223,7 @@ class Enemy extends Entity {
                 this.damage = 25;
                 this.scoreValue = 400;
                 this.radius = 25;
-                this.color = '#ec4899';
+                this.color = '#5a5566';
                 this.accelerationForce = 0.2;
                 this.fireRate = 1;
                 this.fireTimer = Utils.randomRange(0, this.fireRate);
@@ -238,7 +238,7 @@ class Enemy extends Entity {
                 this.damage = 8;
                 this.scoreValue = 140;
                 this.radius = 10;
-                this.color = '#34d399';
+                this.color = '#4a6655';
                 this.accelerationForce = 0.9;
                 this.imageKey = 'enemy_ship5';
                 break;
@@ -251,7 +251,7 @@ class Enemy extends Entity {
                 this.damage = 22;
                 this.scoreValue = 450;
                 this.radius = 22;
-                this.color = '#dc2626';
+                this.color = '#664a4a';
                 this.accelerationForce = 0.25;
                 this.fireRate = 1.5;
                 this.fireTimer = Utils.randomRange(0, this.fireRate);
@@ -266,7 +266,7 @@ class Enemy extends Entity {
                 this.damage = 20;
                 this.scoreValue = 300;
                 this.radius = 17;
-                this.color = '#f59e0b';
+                this.color = '#66604a';
                 this.accelerationForce = 0.4;
                 this.fireRate = 2.5;
                 this.fireTimer = Utils.randomRange(0, this.fireRate);
@@ -281,7 +281,7 @@ class Enemy extends Entity {
                 this.damage = 15;
                 this.scoreValue = 220;
                 this.radius = 12;
-                this.color = '#8b5cf6';
+                this.color = '#554a66';
                 this.accelerationForce = 0.65;
                 this.stealth = true; // 隐形标记
                 this.imageKey = 'enemy_ship9';
@@ -295,7 +295,7 @@ class Enemy extends Entity {
                 this.damage = 8;
                 this.scoreValue = 250;
                 this.radius = 15;
-                this.color = '#10b981';
+                this.color = '#4a6655';
                 this.accelerationForce = 0.45;
                 this.fireRate = 3;
                 this.fireTimer = Utils.randomRange(0, this.fireRate);
@@ -771,7 +771,7 @@ class Enemy extends Entity {
                     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
                     ctx.fillStyle = this.color;
                     ctx.fill();
-                    ctx.strokeStyle = '#fff';
+                    ctx.strokeStyle = '#888888';
                     ctx.lineWidth = 2;
                     ctx.stroke();
                     break;
@@ -798,7 +798,7 @@ class Enemy extends Entity {
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        ctx.strokeStyle = '#fecaca';
+        ctx.strokeStyle = '#665555';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
@@ -826,7 +826,7 @@ class Enemy extends Entity {
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        ctx.strokeStyle = '#fde68a';
+        ctx.strokeStyle = '#66604a';
         ctx.lineWidth = 1.5;
         ctx.stroke();
     }
@@ -851,14 +851,14 @@ class Enemy extends Entity {
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        ctx.strokeStyle = '#fca5a5';
+        ctx.strokeStyle = '#664a4a';
         ctx.lineWidth = 2;
         ctx.stroke();
 
         // 装甲板
         ctx.beginPath();
         ctx.arc(0, 0, r * 0.5, 0, Math.PI * 2);
-        ctx.strokeStyle = '#ef4444';
+        ctx.strokeStyle = '#664a4a';
         ctx.lineWidth = 1;
         ctx.stroke();
     }
@@ -882,7 +882,7 @@ class Enemy extends Entity {
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        ctx.strokeStyle = '#f5d0fe';
+        ctx.strokeStyle = '#5a5566';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
@@ -913,7 +913,7 @@ class Enemy extends Entity {
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        ctx.strokeStyle = '#9ca3af';
+        ctx.strokeStyle = '#5a5a5a';
         ctx.lineWidth = 1;
         ctx.stroke();
 
@@ -948,7 +948,7 @@ class Enemy extends Entity {
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        ctx.strokeStyle = '#a7f3d0';
+        ctx.strokeStyle = '#4a6655';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
@@ -957,7 +957,7 @@ class Enemy extends Entity {
         ctx.arc(0, 0, r * 0.3, 0, Math.PI * 2);
         ctx.fillStyle = '#34d399';
         ctx.fill();
-        ctx.strokeStyle = '#6ee7b7';
+        ctx.strokeStyle = '#5a7a6a';
         ctx.lineWidth = 1;
         ctx.stroke();
     }
@@ -975,7 +975,7 @@ class Enemy extends Entity {
         ctx.fillStyle = gradient;
         ctx.fill();
 
-        ctx.strokeStyle = '#fed7aa';
+        ctx.strokeStyle = '#66554a';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
@@ -1021,7 +1021,7 @@ class Enemy extends Entity {
         ctx.fill();
         
         // 外圈装甲
-        ctx.strokeStyle = '#fee2e2';
+        ctx.strokeStyle = '#665555';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(0, 0, r * 0.9, 0, Math.PI * 2);
@@ -1045,7 +1045,7 @@ class Enemy extends Entity {
             ctx.beginPath();
             ctx.moveTo(x1, y1);
             ctx.lineTo(x2, y2);
-            ctx.strokeStyle = 'rgba(254, 226, 226, 0.5)';
+            ctx.strokeStyle = 'rgba(102, 85, 85, 0.5)';
             ctx.lineWidth = 2;
             ctx.stroke();
         }
@@ -1061,7 +1061,7 @@ class Enemy extends Entity {
         ctx.fillRect(-r, -r - 15, r * 2 * healthPercent, 8);
         
         // 血条边框
-        ctx.strokeStyle = '#fff';
+        ctx.strokeStyle = '#888888';
         ctx.lineWidth = 1;
         ctx.strokeRect(-r, -r - 15, r * 2, 8);
     }

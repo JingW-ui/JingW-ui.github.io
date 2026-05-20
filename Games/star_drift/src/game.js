@@ -99,6 +99,32 @@ class Game {
         if (this.bgDecorations) {
             this.bgDecorations.resize();
         }
+
+        // 移动端横屏优化
+        this.isLandscape = window.innerWidth > window.innerHeight;
+
+        // 根据屏幕方向调整UI布局
+        if (this.isLandscape) {
+            this.adjustUIForLandscape();
+        }
+    }
+
+    adjustUIForLandscape() {
+        // 横屏时的UI调整逻辑
+        const joystickLeft = document.getElementById('joystick-left');
+        const joystickRight = document.getElementById('joystick-right');
+        const fireButton = document.getElementById('fire-button');
+        const inventoryBar = document.getElementById('inventory-bar');
+
+        if (joystickLeft && joystickRight && fireButton && inventoryBar) {
+            // 调整摇杆位置适应横屏
+            if (window.innerHeight < 500) {
+                // 超窄高度优化
+                joystickLeft.style.bottom = '30px';
+                joystickRight.style.bottom = '30px';
+                fireButton.style.transform = 'translateY(-50%) scale(0.9)';
+            }
+        }
     }
 
     loadSettings() {
@@ -126,6 +152,27 @@ class Game {
     bindUIEvents() {
         // 主菜单 - 飞船选择（直接在主菜单中）
         document.querySelectorAll('.ship-card').forEach(card => {
+            // 触摸开始 - 添加反馈
+            card.addEventListener('touchstart', (e) => {
+                card.style.transform = 'scale(0.95)';
+                card.style.transition = 'transform 0.1s ease';
+            }, { passive: true });
+
+            // 触摸结束 - 恢复并触发选择
+            card.addEventListener('touchend', (e) => {
+                card.style.transform = '';
+                document.querySelectorAll('.ship-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                this.selectedShip = card.dataset.ship;
+                console.log('已选择飞船:', this.selectedShip);
+                
+                // 播放选择音效
+                if (this.audio) {
+                    this.audio.playClick();
+                }
+            }, { passive: true });
+
+            // 点击事件（PC端）
             card.addEventListener('click', () => {
                 document.querySelectorAll('.ship-card').forEach(c => c.classList.remove('selected'));
                 card.classList.add('selected');
@@ -135,15 +182,52 @@ class Game {
         });
 
         // 游戏模式按钮
-        document.getElementById('btn-normal-mode').addEventListener('click', () => {
+        const normalModeBtn = document.getElementById('btn-normal-mode');
+        const godModeBtn = document.getElementById('btn-god-mode');
+
+        // 正常模式 - 触摸反馈
+        normalModeBtn.addEventListener('touchstart', (e) => {
+            normalModeBtn.style.transform = 'scale(0.95)';
+            normalModeBtn.style.transition = 'transform 0.1s ease';
+        }, { passive: true });
+
+        normalModeBtn.addEventListener('touchend', (e) => {
+            normalModeBtn.style.transform = '';
+            this.startGame('normal');
+        }, { passive: true });
+
+        normalModeBtn.addEventListener('click', () => {
             this.startGame('normal');
         });
 
-        document.getElementById('btn-god-mode').addEventListener('click', () => {
+        // 无敌模式 - 触摸反馈
+        godModeBtn.addEventListener('touchstart', (e) => {
+            godModeBtn.style.transform = 'scale(0.95)';
+            godModeBtn.style.transition = 'transform 0.1s ease';
+        }, { passive: true });
+
+        godModeBtn.addEventListener('touchend', (e) => {
+            godModeBtn.style.transform = '';
+            this.startGame('god');
+        }, { passive: true });
+
+        godModeBtn.addEventListener('click', () => {
             this.startGame('god');
         });
 
-        document.getElementById('btn-settings').addEventListener('click', () => {
+        // 设置按钮 - 触摸反馈
+        const settingsBtn = document.getElementById('btn-settings');
+        settingsBtn.addEventListener('touchstart', (e) => {
+            settingsBtn.style.transform = 'scale(0.95)';
+            settingsBtn.style.transition = 'transform 0.1s ease';
+        }, { passive: true });
+
+        settingsBtn.addEventListener('touchend', (e) => {
+            settingsBtn.style.transform = '';
+            this.showScreen('settings-menu');
+        }, { passive: true });
+
+        settingsBtn.addEventListener('click', () => {
             this.showScreen('settings-menu');
         });
 

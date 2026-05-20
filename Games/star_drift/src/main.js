@@ -55,6 +55,53 @@
             e.preventDefault();
         });
 
+        // 移动端横屏优化
+        function handleOrientation() {
+            if (window.innerHeight > window.innerWidth) {
+                // 竖屏时提示用户旋转设备
+                const landscapeHint = document.createElement('div');
+                landscapeHint.id = 'landscape-hint';
+                landscapeHint.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.9);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 9999;
+                    color: #a0aec0;
+                    font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+                `;
+                landscapeHint.innerHTML = `
+                    <div style="font-size: 2rem; margin-bottom: 20px;">📱</div>
+                    <div style="font-size: 1.2rem; text-align: center;">
+                        请将设备横置<br>获得最佳游戏体验
+                    </div>
+                `;
+                document.body.appendChild(landscapeHint);
+
+                // 监听方向变化
+                const orientationHandler = () => {
+                    if (window.innerWidth > window.innerHeight) {
+                        const hint = document.getElementById('landscape-hint');
+                        if (hint) {
+                            hint.remove();
+                        }
+                        window.removeEventListener('resize', orientationHandler);
+                    }
+                };
+
+                window.addEventListener('resize', orientationHandler);
+            }
+        }
+
+        // 延迟执行方向检测，确保游戏已初始化
+        setTimeout(handleOrientation, 1000);
+
         // 防止右键菜单
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();

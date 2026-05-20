@@ -91,6 +91,14 @@ class InputManager {
         const container = document.getElementById('game-container');
 
         container.addEventListener('touchstart', (e) => {
+            // ❗ 关键修复：检查是否点击了UI元素
+            const target = e.target;
+            
+            // 如果点击的是UI元素（按钮、卡片等），不处理游戏输入
+            if (this.isUIElement(target)) {
+                return; // 让UI元素自己的事件处理器处理
+            }
+            
             e.preventDefault();
 
             for (let i = 0; i < e.changedTouches.length; i++) {
@@ -168,6 +176,56 @@ class InputManager {
             }
             this.firePressed = false;
         });
+    }
+
+    /**
+     * 判断是否是UI元素（不应该触发游戏输入的元素）
+     */
+    isUIElement(element) {
+        if (!element) return false;
+        
+        // 检查元素本身及其父元素是否是UI元素
+        let current = element;
+        while (current && current !== document.body) {
+            // 检查类名
+            if (current.classList) {
+                // 所有屏幕界面元素
+                if (current.classList.contains('screen') ||
+                    current.classList.contains('modal') ||
+                    current.classList.contains('overlay') ||
+                    current.classList.contains('menu-btn') ||
+                    current.classList.contains('mode-card') ||
+                    current.classList.contains('ship-card') ||
+                    current.classList.contains('toggle-btn') ||
+                    current.classList.contains('upgrade-btn') ||
+                    current.classList.contains('use-item-btn') ||
+                    current.classList.contains('inventory-slot') ||
+                    current.classList.contains('pause-btn') ||
+                    current.classList.contains('auto-aim-btn') ||
+                    current.id === 'main-menu' ||
+                    current.id === 'hud' ||
+                    current.id === 'pause-menu' ||
+                    current.id === 'settings-menu' ||
+                    current.id === 'upgrade-menu' ||
+                    current.id === 'inventory-menu' ||
+                    current.id === 'game-over' ||
+                    current.id === 'upgrade-selection-menu') {
+                    return true;
+                }
+            }
+            
+            // 检查标签名
+            if (current.tagName === 'BUTTON' || 
+                current.tagName === 'INPUT' ||
+                current.tagName === 'SELECT' ||
+                current.tagName === 'TEXTAREA') {
+                return true;
+            }
+            
+            current = current.parentElement;
+        }
+        
+        return false;
     }
 
     bindMouseEvents() {

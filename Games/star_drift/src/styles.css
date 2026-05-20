@@ -1,59 +1,59 @@
-/* ===== CSS 变量 - 统一配色系统 ===== */
+/* ===== CSS 变量 - 统一配色系统 (Dark Subtle Theme) ===== */
 :root {
-    /* 主色调 - 深空蓝紫 */
-    --primary: #6366f1;
-    --primary-light: #818cf8;
-    --primary-dark: #4f46e5;
-    --primary-glow: rgba(99, 102, 241, 0.5);
+    /* 主色调 - 深灰蓝 */
+    --primary: #4a5568;
+    --primary-light: #5a6578;
+    --primary-dark: #3a4558;
+    --primary-glow: rgba(74, 85, 104, 0.3);
 
-    /* 辅助色 - 青色 */
-    --secondary: #06b6d4;
-    --secondary-light: #22d3ee;
-    --secondary-glow: rgba(6, 182, 212, 0.4);
+    /* 辅助色 - 深灰青 */
+    --secondary: #4a5a6a;
+    --secondary-light: #5a6a7a;
+    --secondary-glow: rgba(74, 90, 106, 0.25);
 
-    /* 强调色 - 紫红 */
-    --accent: #a855f7;
-    --accent-light: #c084fc;
-    --accent-glow: rgba(168, 85, 247, 0.4);
+    /* 强调色 - 深灰紫 */
+    --accent: #556677;
+    --accent-light: #657687;
+    --accent-glow: rgba(85, 102, 119, 0.25);
 
-    /* 功能色 */
-    --success: #10b981;
-    --success-glow: rgba(16, 185, 129, 0.4);
-    --warning: #f59e0b;
-    --warning-glow: rgba(245, 158, 11, 0.4);
-    --danger: #ef4444;
-    --danger-glow: rgba(239, 68, 68, 0.4);
+    /* 功能色 - 深灰调 */
+    --success: #4a6655;
+    --success-glow: rgba(74, 102, 85, 0.25);
+    --warning: #66604a;
+    --warning-glow: rgba(102, 96, 74, 0.25);
+    --danger: #664a4a;
+    --danger-glow: rgba(102, 74, 74, 0.25);
 
-    /* 中性色 */
+    /* 中性色 - 高透明度 */
     --bg-deep: #0a0a1a;
     --bg-dark: #0f0f2a;
-    --bg-card: rgba(20, 20, 50, 0.95);
-    --bg-hover: rgba(255, 255, 255, 0.08);
-    --bg-active: rgba(255, 255, 255, 0.12);
+    --bg-card: rgba(15, 15, 35, 0.75);
+    --bg-hover: rgba(255, 255, 255, 0.05);
+    --bg-active: rgba(255, 255, 255, 0.08);
 
-    /* 文字色 */
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
+    /* 文字色 - 低对比度 */
+    --text-primary: #a0aec0;
+    --text-secondary: #718096;
+    --text-muted: #4a5568;
     --text-inverse: #0a0a1a;
 
-    /* 边框 */
-    --border-subtle: rgba(255, 255, 255, 0.08);
-    --border-medium: rgba(255, 255, 255, 0.15);
-    --border-strong: rgba(255, 255, 255, 0.25);
+    /* 边框 - 高透明度 */
+    --border-subtle: rgba(255, 255, 255, 0.04);
+    --border-medium: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.12);
 
-    /* 阴影 */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
-    --shadow-glow-primary: 0 0 30px var(--primary-glow);
-    --shadow-glow-secondary: 0 0 20px var(--secondary-glow);
-    
+    /* 阴影 - 更柔和 */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.6);
+    --shadow-glow-primary: 0 0 20px var(--primary-glow);
+    --shadow-glow-secondary: 0 0 15px var(--secondary-glow);
+
     /* 动画变量 */
     --animate-duration: 1s;
     --animate-delay: 1s;
     --animate-repeat: 1;
-    --swiper-theme-color: #007aff;
+    --swiper-theme-color: #4a5568;
     --swiper-navigation-size: 44px;
     --screen-width: 1536;
 }
@@ -66,7 +66,7 @@
     -webkit-tap-highlight-color: transparent;
     user-select: none;
     -webkit-user-select: none;
-    touch-action: none;
+    touch-action: manipulation; /* 优化触摸响应 */
 }
 
 html, body {
@@ -76,6 +76,28 @@ html, body {
     background: var(--bg-deep);
     font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
     color: var(--text-primary);
+    /* 禁止移动端默认触摸行为 */
+    -webkit-touch-callout: none;
+    overscroll-behavior: none;
+}
+
+/* 移动端横屏提示（可选） */
+@media screen and (orientation: portrait) and (max-width: 600px) {
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 9999;
+        display: none; /* 默认不显示，需要时启用 */
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 20px;
+    }
 }
 
 #game-container {
@@ -308,7 +330,7 @@ canvas {
 
 .mode-card {
     position: relative;
-    padding: 16px;
+    padding: 12px 8px;
     border-radius: 16px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -318,53 +340,53 @@ canvas {
 
 /* 正常模式卡片 */
 .mode-card.normal {
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.1));
-    border: 2px solid var(--primary);
-    box-shadow: 
-        0 0 20px var(--primary-glow),
-        inset 0 0 20px rgba(99, 102, 241, 0.1);
+    background: linear-gradient(135deg, rgba(74, 85, 104, 0.1), rgba(58, 69, 88, 0.08));
+    border: 1px solid var(--border-medium);
+    box-shadow:
+        0 0 10px var(--primary-glow),
+        inset 0 0 10px rgba(74, 85, 104, 0.05);
 }
 
 .mode-card.normal:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 
-        0 0 30px var(--primary-glow),
-        0 8px 40px rgba(99, 102, 241, 0.4),
-        inset 0 0 30px rgba(99, 102, 241, 0.2);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow:
+        0 0 15px var(--primary-glow),
+        0 4px 20px rgba(74, 85, 104, 0.2),
+        inset 0 0 15px rgba(74, 85, 104, 0.1);
 }
 
 /* 无敌模式卡片 */
 .mode-card.god {
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(8, 145, 178, 0.1));
-    border: 2px solid var(--secondary);
-    box-shadow: 
-        0 0 20px var(--secondary-glow),
-        inset 0 0 20px rgba(6, 182, 212, 0.1);
+    background: linear-gradient(135deg, rgba(74, 90, 106, 0.1), rgba(58, 74, 90, 0.08));
+    border: 1px solid var(--border-medium);
+    box-shadow:
+        0 0 10px var(--secondary-glow),
+        inset 0 0 10px rgba(74, 90, 106, 0.05);
 }
 
 .mode-card.god:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 
-        0 0 30px var(--secondary-glow),
-        0 8px 40px rgba(6, 182, 212, 0.4),
-        inset 0 0 30px rgba(6, 182, 212, 0.2);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow:
+        0 0 15px var(--secondary-glow),
+        0 4px 20px rgba(74, 90, 106, 0.2),
+        inset 0 0 15px rgba(74, 90, 106, 0.1);
 }
 
 .mode-icon {
-    font-size: 2.5rem;
-    margin-bottom: 8px;
+    font-size: 2rem;
+    margin-bottom: 6px;
     display: block;
 }
 
 .mode-title {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 .mode-desc {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-secondary);
     opacity: 0.8;
 }
@@ -421,62 +443,62 @@ canvas {
     height: 300px;
 }
 
-/* 主按钮 - 蓝紫渐变 */
+/* 主按钮 - 深灰渐变 */
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-dark), var(--primary));
     color: var(--text-primary);
-    box-shadow: 
-        0 4px 20px var(--primary-glow),
-        inset 0 0 15px rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(99, 102, 241, 0.6);
+    box-shadow:
+        0 2px 10px var(--primary-glow),
+        inset 0 0 8px rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-medium);
 }
 
 .btn-primary:hover,
 .btn-primary:active {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 
-        0 6px 30px var(--primary-glow),
-        0 0 40px rgba(99, 102, 241, 0.4),
-        inset 0 0 20px rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px) scale(1.01);
+    box-shadow:
+        0 3px 15px var(--primary-glow),
+        0 0 20px rgba(74, 85, 104, 0.2),
+        inset 0 0 12px rgba(255, 255, 255, 0.08);
     border-color: var(--primary-light);
 }
 
-/* 次要按钮 - 青色渐变 */
+/* 次要按钮 - 深灰青渐变 */
 .btn-secondary {
-    background: linear-gradient(135deg, #0891b2, var(--secondary));
+    background: linear-gradient(135deg, #3a4a5a, var(--secondary));
     color: var(--text-primary);
-    box-shadow: 
-        0 4px 20px var(--secondary-glow),
-        inset 0 0 15px rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(6, 182, 212, 0.6);
+    box-shadow:
+        0 2px 10px var(--secondary-glow),
+        inset 0 0 8px rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-medium);
 }
 
 .btn-secondary:hover,
 .btn-secondary:active {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 
-        0 6px 30px var(--secondary-glow),
-        0 0 40px rgba(6, 182, 212, 0.4),
-        inset 0 0 20px rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px) scale(1.01);
+    box-shadow:
+        0 3px 15px var(--secondary-glow),
+        0 0 20px rgba(74, 90, 106, 0.2),
+        inset 0 0 12px rgba(255, 255, 255, 0.08);
     border-color: var(--secondary-light);
 }
 
-/* 第三按钮 - 半透明黑色 */
+/* 第三按钮 - 高透明黑色 */
 .btn-tertiary {
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.4);
     color: var(--text-secondary);
-    border: 1px solid var(--border-medium);
-    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-subtle);
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
 }
 
 .btn-tertiary:hover,
 .btn-tertiary:active {
-    background: rgba(10, 10, 30, 0.9);
-    border-color: var(--primary);
-    transform: translateY(-2px);
-    box-shadow: 
-        0 0 20px var(--primary-glow),
-        inset 0 0 15px rgba(99, 102, 241, 0.1);
+    background: rgba(10, 10, 30, 0.6);
+    border-color: var(--border-medium);
+    transform: translateY(-1px);
+    box-shadow:
+        0 0 10px var(--primary-glow),
+        inset 0 0 8px rgba(74, 85, 104, 0.08);
 }
 
 .btn-icon {
@@ -879,32 +901,32 @@ canvas {
 }
 
 .joystick-base {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    background: rgba(10, 10, 26, 0.5);
-    border: 2px solid var(--border-medium);
+    background: rgba(10, 10, 26, 0.3);
+    border: 1px solid var(--border-subtle);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(3px);
 }
 
 .joystick-knob {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--primary-light), var(--primary));
-    border: 2px solid rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     position: absolute;
     transition: transform 0.05s linear;
-    box-shadow: 0 0 15px var(--primary-glow);
+    box-shadow: 0 0 8px var(--primary-glow);
 }
 
 .joystick.active .joystick-base {
-    background: rgba(99, 102, 241, 0.1);
-    border-color: var(--primary-light);
+    background: rgba(74, 85, 104, 0.15);
+    border-color: var(--border-medium);
 }
 
 .joystick-label {
@@ -1305,12 +1327,12 @@ canvas {
     background: transparent;
     border: none;
     border-radius: 16px;
-    padding: 16px;
+    padding: 12px;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     text-align: center;
     box-shadow: none;
-    min-height: 220px;
+    min-height: 180px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -1328,7 +1350,7 @@ canvas {
     animation: shipFloat 3s ease-in-out infinite;
     margin-bottom: 8px;
     width: 100%;
-    height: 120px;
+    height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1370,20 +1392,20 @@ canvas {
 
 .ship-card h3 {
     color: var(--text-primary);
-    font-size: 1rem;
-    margin: 8px 0 4px;
+    font-size: 0.9rem;
+    margin: 6px 0 3px;
 }
 
 .ship-desc {
     color: var(--text-muted);
-    font-size: 0.7rem;
-    margin-bottom: 8px;
+    font-size: 0.65rem;
+    margin-bottom: 6px;
 }
 
 .ship-icon {
     margin-bottom: 8px;
     width: 100%;
-    height: 120px;
+    height: 90px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1617,27 +1639,323 @@ canvas {
     }
 
     .joystick-base {
-        width: 80px;
-        height: 80px;
+        width: 70px;
+        height: 70px;
     }
 
     .joystick-knob {
-        width: 32px;
-        height: 32px;
-    }
-
-    .joystick-left {
-        left: 20px;
-        bottom: 60px;
-    }
-
-    .joystick-right {
-        right: 20px;
-        bottom: 60px;
+        width: 28px;
+        height: 28px;
     }
 
     .health-bar-bg {
         width: 100px;
+    }
+}
+
+/* 移动端竖屏额外优化 */
+@media screen and (orientation: portrait) and (max-width: 480px) {
+    /* 主菜单优化 */
+    #main-menu {
+        padding: 15px;
+    }
+
+    .menu-container {
+        gap: 20px;
+    }
+
+    .menu-left {
+        gap: 15px;
+    }
+
+    .game-title {
+        margin-bottom: 10px;
+    }
+
+    .title-main {
+        font-size: 1.5rem;
+    }
+
+    .title-sub {
+        font-size: 0.55rem;
+    }
+
+    .high-score-display {
+        margin-bottom: 8px;
+    }
+
+    .high-score-value-menu {
+        font-size: 1.3rem;
+    }
+
+    /* 模式选择卡片 - 紧凑 */
+    .mode-selector {
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .mode-card {
+        padding: 10px 8px;
+        border-radius: 12px;
+    }
+
+    .mode-icon {
+        font-size: 1.6rem;
+        margin-bottom: 4px;
+    }
+
+    .mode-title {
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+    }
+
+    .mode-desc {
+        font-size: 0.52rem;
+    }
+
+    /* 按钮 */
+    .menu-buttons {
+        gap: 8px;
+    }
+
+    .menu-btn {
+        padding: 10px 14px;
+        gap: 8px;
+    }
+
+    .btn-icon {
+        font-size: 1rem;
+    }
+
+    .btn-text {
+        font-size: 0.8rem;
+    }
+
+    /* 飞船选择器 - 紧凑布局 */
+    .ship-select-title {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+    }
+
+    .ship-selector {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        max-width: 100%;
+    }
+
+    .ship-card {
+        min-height: 125px;
+        padding: 8px;
+        border-radius: 12px;
+    }
+
+    .ship-card .ship-icon {
+        height: 58px;
+        margin-bottom: 4px;
+    }
+
+    .ship-card h3 {
+        font-size: 0.72rem;
+        margin: 4px 0 2px;
+    }
+
+    .ship-desc {
+        font-size: 0.48rem;
+        margin-bottom: 4px;
+        line-height: 1.2;
+    }
+
+    .ship-stats {
+        gap: 2px;
+    }
+
+    .ship-stats .stat {
+        font-size: 0.4rem;
+        gap: 2px;
+    }
+
+    .ship-stats .stat span {
+        width: 18px;
+    }
+
+    .stat-bar {
+        height: 2px;
+    }
+
+    .ship-preview-hint {
+        font-size: 0.58rem;
+        margin-top: 6px;
+    }
+
+    /* 左上角HUD紧凑化 */
+    .hud-top-left {
+        top: 12px;
+        left: 12px;
+        gap: 6px;
+    }
+
+    .health-bar-bg {
+        width: 90px;
+        height: 12px;
+    }
+
+    .energy-bar-bg {
+        width: 90px;
+        height: 8px;
+    }
+
+    .exp-bar-bg {
+        width: 70px;
+        height: 5px;
+    }
+
+    .health-text,
+    .energy-text {
+        font-size: 0.65rem;
+    }
+
+    .level-text {
+        font-size: 0.6rem;
+    }
+
+    .score-value,
+    .wave-value {
+        font-size: 0.85rem;
+    }
+
+    .score-label,
+    .wave-label {
+        font-size: 0.65rem;
+    }
+
+    /* 虚拟摇杆 */
+    .joystick {
+        bottom: 70px;
+    }
+
+    .joystick-left {
+        left: 25px;
+    }
+
+    .joystick-right {
+        right: 25px;
+    }
+
+    .joystick-base {
+        width: 65px;
+        height: 65px;
+    }
+
+    .joystick-knob {
+        width: 26px;
+        height: 26px;
+    }
+
+    .joystick-label {
+        font-size: 0.6rem;
+    }
+
+    /* 发射按钮 */
+    .fire-button {
+        width: 55px;
+        height: 55px;
+        right: 15px;
+    }
+
+    .fire-icon {
+        font-size: 1.2rem;
+    }
+
+    .fire-text {
+        font-size: 0.5rem;
+    }
+
+    /* 背包栏 */
+    .inventory-bar {
+        bottom: 8px;
+        gap: 5px;
+        padding: 5px 8px;
+    }
+
+    .inventory-slot {
+        width: 42px;
+        height: 52px;
+    }
+
+    .slot-icon {
+        font-size: 1.05rem;
+    }
+
+    .slot-count {
+        font-size: 0.7rem;
+    }
+
+    .slot-name {
+        font-size: 0.48rem;
+    }
+}
+
+/* ===== 超小屏幕极致优化（iPhone SE等） ===== */
+@media screen and (max-width: 375px) {
+    /* 主菜单标题 */
+    .title-main {
+        font-size: 1.3rem;
+    }
+
+    .title-sub {
+        font-size: 0.48rem;
+    }
+
+    /* 模式卡片更小 */
+    .mode-card {
+        padding: 8px 6px;
+    }
+
+    .mode-icon {
+        font-size: 1.4rem;
+    }
+
+    .mode-title {
+        font-size: 0.72rem;
+    }
+
+    .mode-desc {
+        font-size: 0.48rem;
+    }
+
+    /* 飞船卡片更小 */
+    .ship-card {
+        min-height: 110px;
+        padding: 6px;
+    }
+
+    .ship-card .ship-icon {
+        height: 50px;
+    }
+
+    .ship-card h3 {
+        font-size: 0.65rem;
+    }
+
+    .ship-desc {
+        font-size: 0.45rem;
+    }
+
+    .ship-stats .stat {
+        font-size: 0.38rem;
+    }
+
+    .ship-stats .stat span {
+        width: 16px;
+    }
+
+    /* 按钮 */
+    .menu-btn {
+        padding: 8px 12px;
+    }
+
+    .btn-text {
+        font-size: 0.72rem;
     }
 }
 
@@ -1651,13 +1969,306 @@ canvas {
     }
 
     .joystick-base {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
     }
 
     .joystick-knob {
-        width: 48px;
-        height: 48px;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* ===== 横屏模式优化 - 通用横屏 ===== */
+@media screen and (orientation: landscape) {
+    .joystick-left {
+        left: 30px;
+        bottom: 40px;
+    }
+
+    .joystick-right {
+        right: 80px;
+        bottom: 40px;
+    }
+
+    .fire-button {
+        right: 15px;
+        width: 50px;
+        height: 50px;
+    }
+
+    .fire-icon {
+        font-size: 1.2rem;
+    }
+
+    .fire-text {
+        font-size: 0.5rem;
+    }
+
+    .inventory-bar {
+        bottom: 5px;
+        gap: 4px;
+        padding: 4px 8px;
+    }
+
+    .inventory-slot {
+        width: 40px;
+        height: 50px;
+    }
+
+    .slot-icon {
+        font-size: 1rem;
+    }
+
+    .slot-count {
+        font-size: 0.7rem;
+    }
+
+    .slot-name {
+        font-size: 0.45rem;
+    }
+
+    .hud-top-left {
+        top: 10px;
+        left: 10px;
+        gap: 4px;
+    }
+
+    .health-bar-bg {
+        width: 100px;
+        height: 10px;
+    }
+
+    .energy-bar-bg {
+        width: 100px;
+        height: 8px;
+    }
+
+    .exp-bar-bg {
+        width: 80px;
+        height: 4px;
+    }
+
+    .score-value, .wave-value {
+        font-size: 0.8rem;
+    }
+
+    .health-text, .energy-text, .level-text {
+        font-size: 0.6rem;
+    }
+
+    .hud-top-right {
+        top: 10px;
+        right: 10px;
+    }
+
+    .auto-aim-btn {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+    }
+}
+
+/* ===== 移动端横屏极致紧凑布局 ===== */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    /* 左上角HUD - 极致紧凑 */
+    .hud-top-left {
+        top: 8px;
+        left: 8px;
+        gap: 3px;
+    }
+
+    .health-bar-container,
+    .energy-bar-container,
+    .exp-bar-container {
+        gap: 4px;
+    }
+
+    .health-bar-bg {
+        width: 80px;
+        height: 8px;
+    }
+
+    .energy-bar-bg {
+        width: 80px;
+        height: 6px;
+    }
+
+    .exp-bar-bg {
+        width: 60px;
+        height: 4px;
+    }
+
+    .health-text,
+    .energy-text {
+        font-size: 0.55rem;
+    }
+
+    .level-text {
+        font-size: 0.55rem;
+    }
+
+    .score-info,
+    .wave-info,
+    .high-score-info {
+        gap: 4px;
+    }
+
+    .score-label,
+    .wave-label,
+    .high-score-label {
+        font-size: 0.55rem;
+    }
+
+    .score-value,
+    .wave-value {
+        font-size: 0.7rem;
+    }
+
+    .high-score-value {
+        font-size: 0.65rem;
+    }
+
+    /* 右上角自动瞄准 */
+    .hud-top-right {
+        top: 8px;
+        right: 8px;
+    }
+
+    .auto-aim-btn {
+        padding: 4px 8px;
+        gap: 4px;
+    }
+
+    .aim-icon {
+        font-size: 0.85rem;
+    }
+
+    .aim-text {
+        font-size: 0.6rem;
+    }
+
+    .aim-status {
+        font-size: 0.55rem;
+        padding: 1px 4px;
+    }
+
+    /* 暂停按钮 */
+    .pause-btn {
+        top: 8px;
+        width: 30px;
+        height: 30px;
+        font-size: 0.85rem;
+    }
+
+    /* 虚拟摇杆 - 缩小尺寸 */
+    .joystick {
+        bottom: 50px;
+    }
+
+    .joystick-left {
+        left: 15px;
+    }
+
+    .joystick-right {
+        right: 60px;
+    }
+
+    .joystick-base {
+        width: 55px;
+        height: 55px;
+    }
+
+    .joystick-knob {
+        width: 22px;
+        height: 22px;
+    }
+
+    .joystick-label {
+        font-size: 0.55rem;
+        margin-top: 3px;
+    }
+
+    /* 发射按钮 - 右侧居中 */
+    .fire-button {
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 45px;
+        height: 45px;
+    }
+
+    .fire-button:hover,
+    .fire-button:active,
+    .fire-button.pressed {
+        transform: translateY(-50%) scale(1.05);
+    }
+
+    .fire-icon {
+        font-size: 1.1rem;
+    }
+
+    .fire-text {
+        font-size: 0.45rem;
+    }
+
+    /* 底部背包栏 - 三列紧凑布局 */
+    .inventory-bar {
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        gap: 3px;
+        padding: 3px 6px;
+        max-width: 280px;
+    }
+
+    .inventory-slot {
+        width: 35px;
+        height: 42px;
+        padding: 2px;
+    }
+
+    .slot-icon {
+        font-size: 0.9rem;
+        margin-top: 1px;
+    }
+
+    .slot-count {
+        font-size: 0.65rem;
+    }
+
+    .slot-name {
+        font-size: 0.4rem;
+        line-height: 1;
+    }
+
+    /* 无敌模式倒计时 */
+    .god-mode-timer {
+        top: 50px;
+        padding: 6px 12px;
+        min-width: 140px;
+        gap: 8px;
+    }
+
+    .timer-icon {
+        font-size: 1.3rem;
+    }
+
+    .timer-label {
+        font-size: 0.55rem;
+    }
+
+    .timer-value {
+        font-size: 1.1rem;
+    }
+
+    /* 模式标识 */
+    .mode-indicator {
+        top: 50%;
+    }
+
+    .mode-text {
+        font-size: 0.65rem;
+        letter-spacing: 2px;
     }
 }
 
@@ -1672,25 +2283,42 @@ canvas {
     animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* 触摸反馈动画 */
+@keyframes touchFeedback {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.touch-feedback {
+    animation: touchFeedback 0.2s ease-out;
+}
+
 /* ===== 发射按钮 ===== */
 .fire-button {
     position: absolute;
-    right: 40px;
+    right: 20px;
     top: 50%;
     transform: translateY(-50%);
     z-index: 20;
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    background: rgba(239, 68, 68, 0.2);
-    border: 3px solid rgba(239, 68, 68, 0.6);
+    background: rgba(102, 74, 74, 0.3);
+    border: 2px solid var(--border-medium);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    backdrop-filter: blur(5px);
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+    backdrop-filter: blur(3px);
+    box-shadow: 0 0 10px var(--danger-glow);
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
@@ -1699,30 +2327,30 @@ canvas {
 .fire-button:hover,
 .fire-button:active,
 .fire-button.pressed {
-    background: rgba(239, 68, 68, 0.4);
-    border-color: rgba(239, 68, 68, 0.9);
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+    background: rgba(102, 74, 74, 0.5);
+    border-color: var(--border-strong);
+    transform: translateY(-50%) scale(1.05);
+    box-shadow: 0 0 15px var(--danger-glow);
 }
 
 .fire-button-inner {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 1px;
 }
 
 .fire-icon {
-    font-size: 1.8rem;
-    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.8));
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 4px rgba(102, 74, 74, 0.6));
 }
 
 .fire-text {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.9);
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+    font-size: 0.55rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(102, 74, 74, 0.6);
 }
 
 /* 发射按钮脉冲动画 */
@@ -1797,55 +2425,255 @@ canvas {
 
 @media (max-width: 600px) {
     .ship-selector {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
     }
 
     .ship-card {
-        min-height: 150px;
+        min-height: 130px;
+        padding: 8px;
+    }
+
+    .ship-card .ship-icon {
+        height: 60px;
+    }
+
+    .ship-card h3 {
+        font-size: 0.75rem;
+    }
+
+    .ship-desc {
+        font-size: 0.5rem;
+    }
+
+    .ship-stats .stat {
+        font-size: 0.45rem;
+    }
+
+    /* 模式选择卡片也缩小 */
+    .mode-selector {
+        gap: 8px;
+    }
+
+    .mode-card {
+        padding: 10px 8px;
+    }
+
+    .mode-icon {
+        font-size: 1.6rem;
+    }
+
+    .mode-title {
+        font-size: 0.8rem;
+    }
+
+    .mode-desc {
+        font-size: 0.55rem;
+    }
+}
+
+/* ===== 移动端横屏主菜单优化 ===== */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    #main-menu {
+        padding: 8px 12px;
+    }
+
+    .menu-container {
+        flex-direction: row;
+        height: 92vh;
+        gap: 12px;
+    }
+
+    .menu-left {
+        flex: 0 0 38%;
+        gap: 10px;
+        padding: 8px;
+    }
+
+    .menu-right {
+        flex: 0 0 60%;
+        gap: 8px;
+        padding: 8px;
+    }
+
+    /* 标题缩小 */
+    .game-title {
+        margin-bottom: 6px;
+    }
+
+    .title-main {
+        font-size: 1.1rem;
+        letter-spacing: 1.5px;
+    }
+
+    .title-sub {
+        font-size: 0.5rem;
+        letter-spacing: 2px;
+        margin-top: 3px;
+    }
+
+    /* 最高分显示 */
+    .high-score-display {
+        margin-bottom: 5px;
+        gap: 2px;
+    }
+
+    .high-score-label-menu {
+        font-size: 0.55rem;
+    }
+
+    .high-score-value-menu {
+        font-size: 1rem;
+    }
+
+    /* 模式选择卡片 - 极致紧凑 */
+    .mode-selector {
+        gap: 6px;
+        margin-bottom: 6px;
+    }
+
+    .mode-card {
+        padding: 8px 6px;
+        border-radius: 10px;
+    }
+
+    .mode-icon {
+        font-size: 1.4rem;
+        margin-bottom: 3px;
+    }
+
+    .mode-title {
+        font-size: 0.7rem;
+        margin-bottom: 2px;
+    }
+
+    .mode-desc {
+        font-size: 0.5rem;
+        line-height: 1.2;
+    }
+
+    /* 按钮缩小 */
+    .menu-buttons {
+        gap: 6px;
+    }
+
+    .menu-btn {
+        padding: 8px 12px;
+        gap: 6px;
+        border-radius: 10px;
+    }
+
+    .btn-icon {
+        font-size: 0.95rem;
+    }
+
+    .btn-text {
+        font-size: 0.75rem;
+    }
+
+    .version-info {
+        font-size: 0.55rem;
+        margin-top: 8px;
+    }
+
+    /* 右侧飞船选择 - 极致紧凑 */
+    .ship-select-title {
+        font-size: 1rem;
+        margin-bottom: 5px;
+    }
+
+    .ship-selector {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        max-width: 100%;
+    }
+
+    .ship-card {
+        min-height: 115px;
+        padding: 8px;
+        border-radius: 10px;
+    }
+
+    .ship-card .ship-icon {
+        height: 55px;
+        margin-bottom: 4px;
+    }
+
+    .ship-card h3 {
+        font-size: 0.7rem;
+        margin: 4px 0 2px;
+    }
+
+    .ship-desc {
+        font-size: 0.48rem;
+        margin-bottom: 4px;
+        line-height: 1.2;
+    }
+
+    .ship-stats {
+        gap: 2px;
+    }
+
+    .ship-stats .stat {
+        font-size: 0.4rem;
+        gap: 2px;
+    }
+
+    .ship-stats .stat span {
+        width: 18px;
+    }
+
+    .stat-bar {
+        height: 2px;
+    }
+
+    .ship-preview-hint {
+        font-size: 0.55rem;
+        margin-top: 5px;
     }
 }
 
 /* ===== 底部背包道具栏 ===== */
 .inventory-bar {
     position: absolute;
-    bottom: 20px;
+    bottom: 10px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
-    gap: 10px;
-    padding: 10px 15px;
-    background: rgba(0, 0, 0, 0.7);
-    border: 2px solid var(--border-medium);
-    border-radius: 12px;
+    gap: 6px;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
     z-index: 20;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(5px);
 }
 
 .inventory-slot {
     position: relative;
-    width: 60px;
-    height: 70px;
-    background: rgba(20, 20, 50, 0.8);
-    border: 2px solid var(--border-subtle);
-    border-radius: 8px;
+    width: 45px;
+    height: 55px;
+    background: rgba(15, 15, 35, 0.6);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 5px;
+    padding: 3px;
 }
 
 .inventory-slot:hover {
-    border-color: var(--primary);
-    background: rgba(30, 30, 70, 0.9);
-    transform: translateY(-3px);
-    box-shadow: 0 4px 12px var(--primary-glow);
+    border-color: var(--border-medium);
+    background: rgba(25, 25, 45, 0.7);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px var(--primary-glow);
 }
 
 .inventory-slot:active {
-    transform: translateY(-1px) scale(0.95);
+    transform: translateY(0px) scale(0.95);
 }
 
 /* 使用动画 */
@@ -1910,25 +2738,27 @@ canvas {
 }
 
 .slot-icon {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin-top: 2px;
+    opacity: 0.8;
 }
 
 .slot-count {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: var(--text-primary);
-    text-shadow: 0 0 8px var(--primary-glow);
+    text-shadow: 0 0 4px var(--primary-glow);
 }
 
 .slot-name {
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     color: var(--text-secondary);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+    opacity: 0.8;
 }
 
 /* 响应式调整 */
@@ -2120,5 +2950,209 @@ canvas {
     
     .option-info h4 {
         font-size: 1.1rem;
+    }
+}
+
+/* ===== 移动端横屏弹窗优化 ===== */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    .modal {
+        padding: 15px 20px;
+        min-width: 250px;
+        max-width: 85%;
+        max-height: 85vh;
+        overflow-y: auto;
+    }
+
+    .modal h2 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+    }
+
+    .modal-buttons {
+        gap: 8px;
+    }
+
+    .modal-btn {
+        padding: 10px 16px;
+        font-size: 0.85rem;
+    }
+
+    /* 设置界面 */
+    .settings-list {
+        gap: 10px;
+    }
+
+    .setting-item {
+        padding: 5px 0;
+    }
+
+    .setting-label {
+        font-size: 0.8rem;
+    }
+
+    .toggle-btn {
+        width: 42px;
+        height: 24px;
+    }
+
+    .toggle-thumb {
+        width: 18px;
+        height: 18px;
+        top: 3px;
+        left: 3px;
+    }
+
+    .toggle-btn.active .toggle-thumb {
+        transform: translateX(18px);
+    }
+
+    /* 升级界面 */
+    .upgrade-modal {
+        max-width: 320px;
+    }
+
+    .upgrade-info {
+        padding: 0 5px;
+        gap: 10px;
+    }
+
+    .upgrade-level,
+    .upgrade-points {
+        font-size: 0.9rem;
+    }
+
+    .upgrade-grid {
+        gap: 8px;
+    }
+
+    .upgrade-item {
+        padding: 10px;
+    }
+
+    .upgrade-icon {
+        font-size: 1.2rem;
+        margin-bottom: 3px;
+    }
+
+    .upgrade-details h4 {
+        font-size: 0.75rem;
+        margin-bottom: 2px;
+    }
+
+    .upgrade-details p {
+        font-size: 0.6rem;
+        margin-bottom: 6px;
+    }
+
+    .upgrade-btn {
+        padding: 5px 12px;
+        font-size: 0.7rem;
+    }
+
+    /* 背包界面 */
+    .inventory-modal {
+        max-width: 320px;
+    }
+
+    .inventory-grid {
+        gap: 8px;
+    }
+
+    .inventory-item {
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .item-icon {
+        font-size: 1.4rem;
+        width: 35px;
+    }
+
+    .item-info h4 {
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+    }
+
+    .item-info p {
+        font-size: 0.65rem;
+    }
+
+    .item-effect {
+        font-size: 0.6rem !important;
+    }
+
+    .use-item-btn {
+        padding: 5px 12px;
+        font-size: 0.7rem;
+    }
+
+    /* 游戏结束界面 */
+    .game-over-modal {
+        max-width: 320px;
+    }
+
+    .final-stats {
+        gap: 8px;
+        padding: 5px 0;
+    }
+
+    .stat-item {
+        padding: 6px 12px;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+    }
+
+    .stat-value {
+        font-size: 1rem;
+    }
+
+    /* 升级选择弹窗 */
+    .upgrade-selection-modal {
+        padding: 15px 20px;
+        max-width: 90%;
+    }
+
+    .upgrade-selection-modal h2 {
+        font-size: 1.4rem;
+        margin-bottom: 12px;
+    }
+
+    .upgrade-selection-info {
+        margin-bottom: 15px;
+        padding: 10px 15px;
+    }
+
+    .selection-level {
+        font-size: 1rem;
+    }
+
+    .selection-hint {
+        font-size: 0.8rem;
+    }
+
+    .upgrade-selection-grid {
+        gap: 10px;
+        padding: 5px 0;
+    }
+
+    .upgrade-option-card {
+        padding: 12px;
+        min-width: 140px;
+    }
+
+    .option-icon {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+    }
+
+    .option-info h4 {
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+    }
+
+    .option-info p {
+        font-size: 0.7rem;
     }
 }

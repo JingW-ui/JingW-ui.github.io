@@ -19,85 +19,85 @@ class Collectible extends Entity {
     setupByType() {
         switch (this.type) {
             case 'energy':
-                this.color = '#22d3ee';
-                this.glowColor = 'rgba(6, 182, 212, 0.5)';
+                this.color = '#4a5a6a';
+                this.glowColor = 'rgba(74, 90, 106, 0.3)';
                 this.value = 20;
                 this.radius = 10;
                 break;
 
             case 'energyLarge':
-                this.color = '#06b6d4';
-                this.glowColor = 'rgba(6, 182, 212, 0.7)';
+                this.color = '#5a6a7a';
+                this.glowColor = 'rgba(90, 106, 122, 0.4)';
                 this.value = 50;
                 this.radius = 14;
                 break;
 
             case 'exp':
-                this.color = '#a855f7';
-                this.glowColor = 'rgba(168, 85, 247, 0.5)';
+                this.color = '#5a5a6a';
+                this.glowColor = 'rgba(90, 90, 106, 0.3)';
                 this.value = 15;
                 this.radius = 8;
                 break;
 
             case 'expLarge':
-                this.color = '#c084fc';
-                this.glowColor = 'rgba(192, 132, 252, 0.6)';
+                this.color = '#6a6a7a';
+                this.glowColor = 'rgba(106, 106, 122, 0.4)';
                 this.value = 40;
                 this.radius = 12;
                 break;
 
             case 'health':
-                this.color = '#10b981';
-                this.glowColor = 'rgba(16, 185, 129, 0.5)';
+                this.color = '#4a6a5a';
+                this.glowColor = 'rgba(74, 106, 90, 0.3)';
                 this.value = 25;
                 this.radius = 10;
                 break;
 
             case 'scrapMetal':
-                this.color = '#9ca3af';
-                this.glowColor = 'rgba(156, 163, 175, 0.4)';
+                this.color = '#5a5a5a';
+                this.glowColor = 'rgba(90, 90, 90, 0.25)';
                 this.value = 1;
                 this.radius = 8;
                 break;
 
             case 'rareMineral':
-                this.color = '#f59e0b';
-                this.glowColor = 'rgba(245, 158, 11, 0.5)';
+                this.color = '#66604a';
+                this.glowColor = 'rgba(102, 96, 74, 0.3)';
                 this.value = 1;
                 this.radius = 10;
                 break;
 
             case 'missile':
-                this.color = '#ef4444';
-                this.glowColor = 'rgba(239, 68, 68, 0.6)';
+                this.color = '#664a4a';
+                this.glowColor = 'rgba(102, 74, 74, 0.35)';
                 this.value = 1;
                 this.radius = 12;
                 break;
 
             case 'shield':
-                this.color = '#3b82f6';
-                this.glowColor = 'rgba(59, 130, 246, 0.6)';
+                this.color = '#4a5568';
+                this.glowColor = 'rgba(74, 85, 104, 0.35)';
                 this.value = 1;
                 this.radius = 11;
                 break;
 
             case 'autoDodge':
-                this.color = '#10b981';
-                this.glowColor = 'rgba(16, 185, 129, 0.6)';
+                this.color = '#4a6655';
+                this.glowColor = 'rgba(74, 102, 85, 0.35)';
                 this.value = 1;
                 this.radius = 11;
                 break;
 
             case 'timeCrystal':
-                this.color = '#f472b6';
-                this.glowColor = 'rgba(244, 114, 182, 0.7)';
+                this.color = '#5a5566';
+                this.glowColor = 'rgba(90, 85, 102, 0.4)';
                 this.value = 5; // 增加5秒
                 this.radius = 13;
                 break;
 
             default:
-                this.color = '#22d3ee';
-                this.glowColor = 'rgba(6, 182, 212, 0.5)';
+                this.color = '#4a5a6a';
+                this.glowColor = 'rgba(74, 90, 106, 0.3)';
                 this.value = 20;
                 this.radius = 10;
         }
@@ -164,14 +164,14 @@ class Collectible extends Entity {
         ctx.arc(0, 0, this.radius * pulse, 0, Math.PI * 2);
         ctx.fill();
 
-        // 高光
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        // 高光 - 降低亮度
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.beginPath();
         ctx.arc(-this.radius * 0.2, -this.radius * 0.2, this.radius * 0.3, 0, Math.PI * 2);
         ctx.fill();
 
-        // 绘制图标符号
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        // 绘制图标符号 - 使用柔和的颜色
+        ctx.fillStyle = 'rgba(200, 200, 200, 0.7)';
         ctx.font = `bold ${this.radius}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -196,16 +196,16 @@ class Collectible extends Entity {
                 symbol = '♦';
                 break;
             case 'missile':
-                symbol = '🚀';
+                symbol = '▶';
                 break;
             case 'shield':
-                symbol = '🛡️';
+                symbol = '◈';
                 break;
             case 'autoDodge':
-                symbol = '💨';
+                symbol = '⟳';
                 break;
             case 'timeCrystal':
-                symbol = '⏳';
+                symbol = '◷';
                 break;
         }
         ctx.fillText(symbol, 0, 1);

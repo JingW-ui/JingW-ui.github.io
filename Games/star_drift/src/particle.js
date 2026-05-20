@@ -10,7 +10,7 @@ class ParticleSystem {
     /**
      * 创建爆炸效果
      */
-    createExplosion(x, y, color = '#ff6600', count = 20, speed = 3) {
+    createExplosion(x, y, color = '#5a4a4a', count = 20, speed = 3) {
         for (let i = 0; i < count; i++) {
             const angle = (Math.PI * 2 / count) * i + Utils.randomRange(-0.3, 0.3);
             const velocity = Utils.randomRange(speed * 0.5, speed * 1.5);
@@ -38,7 +38,7 @@ class ParticleSystem {
                 y + Utils.randomRange(-3, 3),
                 Math.cos(spreadAngle) * speed,
                 Math.sin(spreadAngle) * speed,
-                Utils.randomChoice(['#6366f1', '#818cf8', '#a5b4fc']),
+                Utils.randomChoice(['#4a5568', '#5a6578', '#6a7588']),
                 Utils.randomRange(0.2, 0.5),
                 Utils.randomRange(2, 4),
                 true
@@ -49,7 +49,7 @@ class ParticleSystem {
     /**
      * 创建击中火花
      */
-    createHitSpark(x, y, color = '#ffff00') {
+    createHitSpark(x, y, color = '#777777') {
         for (let i = 0; i < 8; i++) {
             const angle = Utils.randomRange(0, Math.PI * 2);
             const speed = Utils.randomRange(1, 4);
@@ -75,7 +75,7 @@ class ParticleSystem {
                 x, y,
                 Math.cos(angle) * speed,
                 Math.sin(angle) * speed,
-                '#ffcc00',
+                '#66604a',
                 Utils.randomRange(0.3, 0.7),
                 Utils.randomRange(2, 5)
             ));
@@ -94,12 +94,12 @@ class ParticleSystem {
                 x, y,
                 Math.cos(angle) * speed,
                 Math.sin(angle) * speed,
-                '#3b82f6',
+                '#4a5568',
                 Utils.randomRange(0.5, 1.0),
                 Utils.randomRange(3, 6)
             ));
         }
-        
+
         // 内层闪光
         for (let i = 0; i < 10; i++) {
             const angle = Utils.randomRange(0, Math.PI * 2);
@@ -108,7 +108,7 @@ class ParticleSystem {
                 x + Math.cos(angle) * dist,
                 y + Math.sin(angle) * dist,
                 0, 0,
-                '#60a5fa',
+                '#5a6578',
                 Utils.randomRange(0.3, 0.6),
                 Utils.randomRange(2, 4)
             ));
@@ -126,7 +126,7 @@ class ParticleSystem {
                 x, y,
                 Math.cos(angle) * speed,
                 Math.sin(angle) * speed,
-                '#10b981',
+                '#4a6655',
                 Utils.randomRange(0.4, 0.8),
                 Utils.randomRange(2, 5)
             ));
@@ -144,7 +144,7 @@ class ParticleSystem {
                 x, y,
                 Math.cos(angle) * speed,
                 Math.sin(angle) * speed,
-                '#22d3ee',
+                '#4a5a6a',
                 Utils.randomRange(0.4, 0.8),
                 Utils.randomRange(2, 4)
             ));
@@ -158,7 +158,7 @@ class ParticleSystem {
                 x + offsetX,
                 y + offsetY,
                 0, -2,
-                '#06b6d4',
+                '#5a6a7a',
                 Utils.randomRange(0.3, 0.6),
                 Utils.randomRange(1, 3)
             ));
@@ -176,7 +176,7 @@ class ParticleSystem {
                 x + offsetX,
                 y,
                 0, -3,
-                '#10b981',
+                '#4a6a5a',
                 Utils.randomRange(0.5, 1.0),
                 Utils.randomRange(3, 6)
             ));
@@ -189,7 +189,7 @@ class ParticleSystem {
                 x + Math.cos(angle) * 15,
                 y + Math.sin(angle) * 15,
                 0, 0,
-                '#34d399',
+                '#5a7a6a',
                 Utils.randomRange(0.4, 0.7),
                 Utils.randomRange(2, 4)
             ));
@@ -207,7 +207,7 @@ class ParticleSystem {
                 x, y,
                 Math.cos(angle) * speed,
                 Math.sin(angle) * speed,
-                '#f59e0b',
+                '#66604a',
                 Utils.randomRange(0.3, 0.7),
                 Utils.randomRange(3, 7)
             ));
