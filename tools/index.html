@@ -294,7 +294,7 @@
             width: 100%;
             height: 100%;
             z-index: 9999;
-            pointer-events: auto;
+            pointer-events: none; /* 默认不拦截点击,让点击穿透到下层 */
         }
 
         .footer a {
@@ -1332,56 +1332,7 @@
                 }
             }
 
-            handleCanvasClick(e) {
-                const rect = this.canvas.getBoundingClientRect();
-                const clickX = e.clientX - rect.left;
-                const clickY = e.clientY - rect.top;
-
-                console.log('Canvas clicked at:', clickX, clickY); // 调试信息
-
-                // 检查是否点击到任何图标
-                for (let i = this.icons.length - 1; i >= 0; i--) {
-                    const icon = this.icons[i];
-                    if (!icon.loaded || !icon.visible) continue;
-
-                    const iconCenterX = icon.x + icon.size / 2;
-                    const iconCenterY = icon.y + icon.size / 2;
-                    const distance = Math.sqrt(
-                        Math.pow(clickX - iconCenterX, 2) + 
-                        Math.pow(clickY - iconCenterY, 2)
-                    );
-
-                    console.log('Icon', i, 'distance:', distance, 'threshold:', icon.size / 2 + 5); // 调试信息
-
-                    // 如果点击在图标范围内（稍微扩大一点点击区域）
-                    if (distance < icon.size / 2 + 5) {
-                        console.log('Icon clicked! Creating shatter effect'); // 调试信息
-                        
-                        // 保存图标路径用于重生
-                        const iconPath = icon.img.src;
-                        
-                        // 创建破碎效果
-                        this.createShatterParticles(
-                            iconCenterX, 
-                            iconCenterY, 
-                            icon.size, 
-                            icon.img
-                        );
-                        
-                        // 移除图标
-                        this.icons.splice(i, 1);
-                        
-                        // 延迟后重生新图标
-                        setTimeout(() => {
-                            this.respawnIcon(iconPath);
-                        }, 2000 + Math.random() * 1000); // 2-3秒后重生
-                        
-                        // 阻止事件继续传播
-                        e.stopPropagation();
-                        return;
-                    }
-                }
-            }
+            
 
             respawnIcon(iconPath) {
                 // 从两侧随机重生
@@ -1422,27 +1373,71 @@
                     this.mouse.x = e.clientX;
                     this.mouse.y = e.clientY;
                 });
-
-                // 触摸事件（移动端）
+            
+                // 触摸事件(移动端)
                 window.addEventListener('touchmove', (e) => {
                     if (e.touches.length > 0) {
                         this.mouse.x = e.touches[0].clientX;
                         this.mouse.y = e.touches[0].clientY;
                     }
                 });
-
+            
                 // 点击画布破碎图标 - 使用捕获阶段确保优先处理
-                this.canvas.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.handleCanvasClick(e);
-                }, true);
-
+                // 注意:由于canvas默认pointer-events:none,这里需要通过其他方式检测点击
+                document.addEventListener('click', (e) => {
+                    // 检查点击位置是否有图标
+                    const rect = this.canvas.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const clickY = e.clientY - rect.top;
+                                
+                    // 遍历检查是否点击到任何图标
+                    for (let i = this.icons.length - 1; i >= 0; i--) {
+                        const icon = this.icons[i];
+                        if (!icon.loaded || !icon.visible) continue;
+            
+                        const iconCenterX = icon.x + icon.size / 2;
+                        const iconCenterY = icon.y + icon.size / 2;
+                        const distance = Math.sqrt(
+                            Math.pow(clickX - iconCenterX, 2) + 
+                            Math.pow(clickY - iconCenterY, 2)
+                        );
+            
+                        // 如果点击在图标范围内
+                        if (distance < icon.size / 2 + 5) {
+                            console.log('Icon clicked! Creating shatter effect');
+                                        
+                            // 保存图标路径用于重生
+                            const iconPath = icon.img.src;
+                                        
+                            // 创建破碎效果
+                            this.createShatterParticles(
+                                iconCenterX, 
+                                iconCenterY, 
+                                icon.size, 
+                                icon.img
+                            );
+                                        
+                            // 移除图标
+                            this.icons.splice(i, 1);
+                                        
+                            // 延迟后重生新图标
+                            setTimeout(() => {
+                                this.respawnIcon(iconPath);
+                            }, 2000 + Math.random() * 1000); // 2-3秒后重生
+                                        
+                            // 阻止事件继续传播,防止触发下层元素的点击
+                            e.stopPropagation();
+                            e.preventDefault();
+                            return;
+                        }
+                    }
+                }, true); // 使用捕获阶段
+            
                 // 窗口resize
                 window.addEventListener('resize', () => {
                     this.resize();
                 });
-
+            
                 // 页面滚动时重新收集元素位置
                 let scrollTimeout;
                 window.addEventListener('scroll', () => {
