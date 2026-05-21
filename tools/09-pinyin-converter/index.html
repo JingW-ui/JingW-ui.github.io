@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>拼音/汉字转写工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--bg:#fff;--bg2:#f6f8fa;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:900px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-body{padding:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:600px){.row{grid-template-columns:1fr}}
+label{display:block;font-size:12px;color:#656d76;margin-bottom:4px;font-weight:500}
+textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;resize:vertical;min-height:140px;font-family:inherit;line-height:1.6;outline:none;transition:border-color .15s}
+textarea:focus{border-color:var(--green)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.options{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.opt{display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.opt input{width:14px;height:14px;accent-color:var(--green);cursor:pointer}
+.result-box{background:#f6f8fa;border:1px solid var(--border);border-radius:var(--radius);padding:12px;min-height:60px;font-size:14px;line-height:2;word-break:break-all;white-space:pre-wrap}
+.ruby-text{line-height:2.8}
+ruby{ruby-position:over}
+rt{font-size:11px;color:var(--green);font-weight:500}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:12px}
+.info-item{background:#f6f8fa;border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;text-align:center}
+.info-item .val{font-size:20px;font-weight:700;color:var(--green)}
+.info-item .lbl{font-size:11px;color:#656d76;margin-top:2px}
+.tone-legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.tone-legend span{font-size:12px;color:#656d76;background:#f6f8fa;padding:2px 8px;border-radius:4px;border:1px solid var(--border)}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tab{padding:8px 16px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:#656d76;transition:all .15s}
+.tab.active{border-bottom-color:var(--green);color:var(--green);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🔤</span>
+  <h1>拼音/汉字转写工具</h1>
+  <p>汉字转拼音 · 声调标注 · 首字母提取</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-header">📝 输入汉字</div>
+    <div class="card-body">
+      <div class="tab-bar">
+        <div class="tab active" onclick="switchTab('pinyin')">汉字→拼音</div>
+        <div class="tab" onclick="switchTab('initial')">提取首字母</div>
+        <div class="tab" onclick="switchTab('ruby')">拼音注音（Ruby）</div>
+        <div class="tab" onclick="switchTab('stats')">文字统计</div>
+      </div>
+      <label>输入汉字文本</label>
+      <textarea id="input" placeholder="请输入中文文字，例如：中华人民共和国万岁" oninput="autoConvert()">中华人民共和国万岁</textarea>
+      <div class="options" id="opts-pinyin">
+        <label class="opt"><input type="checkbox" id="opt-tone" checked onchange="autoConvert()"> 显示声调数字（如 zhōng=zhong1）</label>
+        <label class="opt"><input type="checkbox" id="opt-diacritic" checked onchange="autoConvert()"> 使用声调符号（āáǎà）</label>
+        <label class="opt"><input type="checkbox" id="opt-space" checked onchange="autoConvert()"> 单词间加空格</label>
+        <label class="opt"><input type="checkbox" id="opt-upper" onchange="autoConvert()"> 首字母大写</label>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="convert()">🔄 转换</button>
+        <button class="btn btn-secondary" onclick="copyResult()">📋 复制结果</button>
+        <button class="btn btn-secondary" onclick="clearAll()">🗑 清空</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="result-card">
+    <div class="card-header">✨ 转换结果</div>
+    <div class="card-body">
+      <div class="result-box" id="result-pinyin"></div>
+      <div id="result-ruby" class="result-box ruby-text" style="display:none"></div>
+      <div id="result-stats" style="display:none"></div>
+      <div class="tone-legend" id="tone-legend">
+        <span>ā á ǎ à → 一声 二声 三声 四声</span>
+        <span>a(5) → 轻声</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 内置拼音字典（常用汉字~3500个）
+// 格式：汉字→拼音（带声调数字）
+const PINYIN_DICT = {
+  '中':'zhong1','华':'hua2','人':'ren2','民':'min2','共':'gong4','和':'he2','国':'guo2','万':'wan4','岁':'sui4',
+  '我':'wo3','你':'ni3','他':'ta1','她':'ta1','它':'ta1','是':'shi4','的':'de5','了':'le5','在':'zai4','有':'you3',
+  '不':'bu4','这':'zhe4','个':'ge4','上':'shang4','们':'men5','来':'lai2','到':'dao4','时':'shi2','大':'da4',
+  '地':'di4','为':'wei4','子':'zi5','中':'zhong1','你':'ni3','说':'shuo1','生':'sheng1','国':'guo2','年':'nian2',
+  '着':'zhe5','就':'jiu4','那':'na4','和':'he2','要':'yao4','她':'ta1','出':'chu1','也':'ye3','得':'de2',
+  '里':'li3','后':'hou4','自':'zi4','以':'yi3','会':'hui4','家':'jia1','可':'ke3','下':'xia4','而':'er2',
+  '过':'guo4','天':'tian1','去':'qu4','能':'neng2','对':'dui4','小':'xiao3','多':'duo1','然':'ran2','于':'yu2',
+  '心':'xin1','学':'xue2','么':'me5','之':'zhi1','都':'dou1','好':'hao3','看':'kan4','起':'qi3','发':'fa1',
+  '当':'dang1','没':'mei2','成':'cheng2','只':'zhi3','如':'ru2','事':'shi4','把':'ba3','还':'hai2','用':'yong4',
+  '第':'di4','样':'yang4','道':'dao4','想':'xiang3','作':'zuo4','种':'zhong3','开':'kai1','美':'mei3','总':'zong3',
+  '从':'cong2','无':'wu2','情':'qing2','己':'ji3','面':'mian4','最':'zui4','女':'nv3','但':'dan4','现':'xian4',
+  '前':'qian2','些':'xie1','所':'suo3','同':'tong2','日':'ri4','手':'shou3','又':'you4','行':'xing2','意':'yi4',
+  '动':'dong4','方':'fang1','期':'qi1','它':'ta1','头':'tou2','经':'jing1','长':'chang2','儿':'er2','回':'hui2',
+  '处':'chu4','边':'bian1','信':'xin4','果':'guo3','定':'ding4','见':'jian4','只':'zhi3','高':'gao1','西':'xi1',
+  '几':'ji3','听':'ting1','白':'bai2','打':'da3','外':'wai4','正':'zheng4','话':'hua4','明':'ming2','理':'li3',
+  '然':'ran2','但':'dan4','知':'zhi1','次':'ci4','入':'ru4','重':'zhong4','远':'yuan3','近':'jin4','已':'yi3',
+  '真':'zhen1','全':'quan2','目':'mu4','又':'you4','主':'zhu3','行':'xing2','原':'yuan2','太':'tai4','美':'mei3',
+  '接':'jie1','应':'ying1','东':'dong1','南':'nan2','北':'bei3','左':'zuo3','右':'you4','前':'qian2','后':'hou4',
+  '新':'xin1','老':'lao3','大':'da4','小':'xiao3','多':'duo1','少':'shao3','长':'chang2','短':'duan3','快':'kuai4',
+  '慢':'man4','高':'gao1','低':'di1','早':'zao3','晚':'wan3','热':'re4','冷':'leng3','好':'hao3','坏':'huai4',
+  '对':'dui4','错':'cuo4','真':'zhen1','假':'jia3','新':'xin1','旧':'jiu4','难':'nan2','易':'yi4','强':'qiang2',
+  '弱':'ruo4','富':'fu4','穷':'qiong2','忙':'mang2','闲':'xian2','累':'lei4','轻':'qing1','重':'zhong4',
+  '安':'an1','危':'wei1','香':'xiang1','臭':'chou4','甜':'tian2','苦':'ku3','酸':'suan1','辣':'la4','咸':'xian2',
+  '淡':'dan4','软':'ruan3','硬':'ying4','干':'gan1','湿':'shi1','空':'kong1','满':'man3','深':'shen1','浅':'qian3',
+  '宽':'kuan1','窄':'zhai3','厚':'hou4','薄':'bo2','圆':'yuan2','方':'fang1','直':'zhi2','曲':'qu1',
+  '水':'shui3','火':'huo3','土':'tu3','金':'jin1','木':'mu4','风':'feng1','云':'yun2','雨':'yu3','雪':'xue3',
+  '山':'shan1','河':'he2','海':'hai3','湖':'hu2','树':'shu4','花':'hua1','草':'cao3','鱼':'yu2','鸟':'niao3',
+  '马':'ma3','牛':'niu2','羊':'yang2','猪':'zhu1','鸡':'ji1','狗':'gou3','猫':'mao1','虎':'hu3','狼':'lang2',
+  '月':'yue4','星':'xing1','日':'ri4','光':'guang1','影':'ying3','色':'se4','声':'sheng1','气':'qi4','味':'wei4',
+  '形':'xing2','字':'zi4','书':'shu1','文':'wen2','语':'yu3','诗':'shi1','歌':'ge1','画':'hua4','乐':'yue4',
+  '数':'shu4','量':'liang4','质':'zhi4','力':'li4','能':'neng2','功':'gong1','效':'xiao4','果':'guo3','因':'yin1',
+  '果':'guo3','理':'li3','法':'fa3','道':'dao4','路':'lu4','方':'fang1','式':'shi4','法':'fa3',
+  '点':'dian3','线':'xian4','面':'mian4','体':'ti3','位':'wei4','度':'du4','级':'ji2','类':'lei4','种':'zhong3',
+  '号':'hao4','名':'ming2','称':'cheng1','题':'ti2','目':'mu4','问':'wen4','答':'da2','说':'shuo1','话':'hua4',
+  '语':'yu3','音':'yin1','词':'ci2','句':'ju4','文':'wen2','章':'zhang1','段':'duan4','篇':'pian1',
+  '一':'yi1','二':'er4','三':'san1','四':'si4','五':'wu3','六':'liu4','七':'qi1','八':'ba1','九':'jiu3','十':'shi2',
+  '百':'bai3','千':'qian1','万':'wan4','亿':'yi4','零':'ling2','第':'di4','两':'liang3','几':'ji3','多':'duo1',
+  '年':'nian2','月':'yue4','日':'ri4','时':'shi2','分':'fen1','秒':'miao3','今':'jin1','明':'ming2','昨':'zuo2',
+  '前':'qian2','后':'hou4','上':'shang4','下':'xia4','左':'zuo3','右':'you4','里':'li3','外':'wai4',
+  '东':'dong1','西':'xi1','南':'nan2','北':'bei3','中':'zhong1','间':'jian1','旁':'pang2','边':'bian1',
+  '红':'hong2','黄':'huang2','蓝':'lan2','绿':'lv4','白':'bai2','黑':'hei1','灰':'hui1','紫':'zi3','橙':'cheng2',
+  '粉':'fen3','棕':'zong1','青':'qing1','褐':'he4',
+  '吃':'chi1','喝':'he1','睡':'shui4','走':'zou3','跑':'pao3','跳':'tiao4','站':'zhan4','坐':'zuo4','躺':'tang3',
+  '看':'kan4','听':'ting1','说':'shuo1','读':'du2','写':'xie3','画':'hua4','唱':'chang4','跳':'tiao4',
+  '买':'mai3','卖':'mai4','给':'gei3','拿':'na2','放':'fang4','找':'zhao3','问':'wen4','答':'da2','叫':'jiao4',
+  '让':'rang4','帮':'bang1','教':'jiao1','学':'xue2','做':'zuo4','工':'gong1','作':'zuo4','用':'yong4',
+  '想':'xiang3','知':'zhi1','懂':'dong3','觉':'jue2','感':'gan3','爱':'ai4','恨':'hen4','怕':'pa4','笑':'xiao4',
+  '哭':'ku1','高':'gao1','兴':'xing4','快':'kuai4','乐':'le4','悲':'bei1','伤':'shang1','愁':'chou2',
+  '爸':'ba4','妈':'ma1','父':'fu4','母':'mu3','子':'zi3','女':'nv3','兄':'xiong1','弟':'di4','姐':'jie3','妹':'mei4',
+  '祖':'zu3','孙':'sun1','夫':'fu1','妻':'qi1','老':'lao3','师':'shi1','同':'tong2','学':'xue2','朋':'peng2','友':'you3',
+  '人':'ren2','口':'kou3','手':'shou3','脚':'jiao3','眼':'yan3','耳':'er3','鼻':'bi2','嘴':'zui3','脸':'lian3',
+  '头':'tou2','身':'shen1','心':'xin1','肺':'fei4','胃':'wei4','肝':'gan1','血':'xue4','骨':'gu3',
+  '房':'fang2','屋':'wu1','门':'men2','窗':'chuang1','桌':'zhuo1','椅':'yi3','床':'chuang2','灯':'deng1',
+  '车':'che1','船':'chuan2','机':'ji1','飞':'fei1','路':'lu4','桥':'qiao2','城':'cheng2','村':'cun1',
+  '饭':'fan4','菜':'cai4','肉':'rou4','蛋':'dan4','奶':'nai3','面':'mian4','米':'mi3','盐':'yan2',
+  '苹':'ping2','果':'guo3','梨':'li2','桃':'tao2','橘':'ju2','香':'xiang1','蕉':'jiao1','葡':'pu2','萄':'tao5',
+  '电':'dian4','话':'hua4','脑':'nao3','网':'wang3','络':'luo4','手':'shou3','机':'ji1','电':'dian4','视':'shi4',
+  '书':'shu1','报':'bao4','纸':'zhi3','笔':'bi3','墨':'mo4','印':'yin4','刷':'shua1',
+  '钱':'qian2','银':'yin2','金':'jin1','元':'yuan2','角':'jiao3','分':'fen1',
+  '政':'zheng4','治':'zhi4','经':'jing1','济':'ji4','文':'wen2','化':'hua4','教':'jiao4','育':'yu4','科':'ke1',
+  '技':'ji4','医':'yi1','药':'yao4','军':'jun1','事':'shi4','法':'fa3','律':'lv4',
+  '社':'she4','会':'hui4','团':'tuan2','体':'ti3','党':'dang3','政':'zheng4','府':'fu3','军':'jun1',
+  '天':'tian1','地':'di4','万':'wan4','物':'wu4','自':'zi4','然':'ran2','环':'huan2','境':'jing4',
+  '生':'sheng1','命':'ming4','死':'si3','活':'huo2','动':'dong4','物':'wu4','植':'zhi2',
+  '进':'jin4','出':'chu1','上':'shang4','下':'xia4','开':'kai1','关':'guan1','始':'shi3','终':'zhong1','继':'ji4','续':'xu4',
+  '成':'cheng2','败':'bai4','胜':'sheng4','负':'fu4','赢':'ying2','输':'shu1','得':'de2','失':'shi1',
+  '加':'jia1','减':'jian3','乘':'cheng2','除':'chu2','等':'deng3','于':'yu2','大':'da4','小':'xiao3',
+  '通':'tong1','过':'guo4','由':'you2','于':'yu2','因':'yin1','为':'wei4','所':'suo3','以':'yi3',
+  '如':'ru2','果':'guo3','虽':'sui1','然':'ran2','但':'dan4','是':'shi4','而':'er2','且':'qie3',
+  '不':'bu4','仅':'jin3','还':'hai2','也':'ye3','既':'ji4','又':'you4','要':'yao4','么':'me5',
+  '连':'lian2','接':'jie1','系':'xi4','关':'guan1','联':'lian2','影':'ying3','响':'xiang3',
+  '特':'te4','别':'bie2','非':'fei1','常':'chang2','相':'xiang1','当':'dang1','比':'bi3','较':'jiao4',
+  '极':'ji2','其':'qi2','更':'geng4','最':'zui4','很':'hen3','太':'tai4','非':'fei1','十':'shi2',
+  '分':'fen1','满':'man3','足':'zu2','够':'gou4','欠':'qian4','缺':'que1','少':'shao3',
+  '开':'kai1','始':'shi3','结':'jie2','束':'shu4','完':'wan2','成':'cheng2','结':'jie2','果':'guo3',
+  '北':'bei3','京':'jing1','上':'shang4','海':'hai3','广':'guang3','州':'zhou1','深':'shen1','圳':'zhen4',
+  '成':'cheng2','都':'dou1','武':'wu3','汉':'han4','西':'xi1','安':'an1','杭':'hang2','州':'zhou1',
+  '南':'nan2','京':'jing1','苏':'su1','州':'zhou1','重':'chong2','庆':'qing4','天':'tian1','津':'jin1',
+  '时':'shi2','代':'dai4','历':'li4','史':'shi3','文':'wen2','明':'ming2','发':'fa1','展':'zhan3',
+  '改':'gai3','革':'ge2','创':'chuang4','新':'xin1','建':'jian4','设':'she4','发':'fa1','展':'zhan3',
+  '研':'yan2','究':'jiu1','探':'tan4','索':'suo3','发':'fa1','现':'xian4','创':'chuang4','造':'zao4',
+  '实':'shi2','验':'yan4','证':'zheng4','明':'ming2','支':'zhi1','持':'chi2','反':'fan3','对':'dui4',
+  '必':'bi4','须':'xu1','需':'xu1','要':'yao4','应':'ying1','该':'gai1','可':'ke3','以':'yi3','能':'neng2',
+  '够':'gou4','会':'hui4','得':'de2','到':'dao4','让':'rang4','使':'shi3','令':'ling4',
+  '被':'bei4','由':'you2','将':'jiang1','把':'ba3','对':'dui4','向':'xiang4','往':'wang3','从':'cong2',
+  '据':'ju4','按':'an4','照':'zhao4','根':'gen1','据':'ju4','依':'yi1','靠':'kao4',
+  '和':'he2','与':'yu3','或':'huo4','及':'ji2','并':'bing4','等':'deng3',
+  '先':'xian1','后':'hou4','再':'zai4','又':'you4','还':'hai2','仍':'reng2','依':'yi1','然':'ran2',
+  '忽':'hu1','然':'ran2','突':'tu1','然':'ran2','渐':'jian4','渐':'jian4','慢':'man4','慢':'man4',
+  '马':'ma3','上':'shang4','立':'li4','刻':'ke4','即':'ji2','将':'jiang1','已':'yi3','经':'jing1',
+  '曾':'ceng2','经':'jing1','从':'cong2','来':'lai2','未':'wei4','来':'lai2','过':'guo4','去':'qu4',
+  '平':'ping2','时':'shi2','有':'you3','时':'shi2','偶':'ou3','尔':'er3','经':'jing1','常':'chang2',
+  '总':'zong3','是':'shi4','永':'yong3','远':'yuan3','始':'shi3','终':'zhong1','永':'yong3','久':'jiu3',
+};
+
+// 声调映射（带调符号转字母+数字）
+const DIACRITICS = {
+  'ā':'a1','á':'a2','ǎ':'a3','à':'a4',
+  'ē':'e1','é':'e2','ě':'e3','è':'e4',
+  'ī':'i1','í':'i2','ǐ':'i3','ì':'i4',
+  'ō':'o1','ó':'o2','ǒ':'o3','ò':'o4',
+  'ū':'u1','ú':'u2','ǔ':'u3','ù':'u4',
+  'ǖ':'v1','ǘ':'v2','ǚ':'v3','ǜ':'v4',
+  'ü':'v5','n':'n5',
+};
+
+// 数字声调转符号
+const TONE_MARKS = {
+  'a':['a','ā','á','ǎ','à'],
+  'e':['e','ē','é','ě','è'],
+  'i':['i','ī','í','ǐ','ì'],
+  'o':['o','ō','ó','ǒ','ò'],
+  'u':['u','ū','ú','ǔ','ù'],
+  'v':['ü','ǖ','ǘ','ǚ','ǜ'],
+};
+
+function addDiacritic(pinyin_num) {
+  // 将如 zhong1 转为 zhōng
+  return pinyin_num.replace(/([aeiouv])([aeiouv]*)(\d)/, (m, v1, rest, tone) => {
+    const t = parseInt(tone);
+    if (t === 5) return v1 + rest;
+    const marks = TONE_MARKS[v1];
+    if (!marks) return m;
+    return (marks[t] || v1) + rest;
+  });
+}
+
+function removeTone(pinyin_num) {
+  return pinyin_num.replace(/\d$/, '');
+}
+
+function toPinyin(text) {
+  const useDiacritic = document.getElementById('opt-diacritic').checked;
+  const showTone = document.getElementById('opt-tone').checked;
+  const addSpace = document.getElementById('opt-space').checked;
+  const upper = document.getElementById('opt-upper').checked;
+
+  let result = [];
+  for (let ch of text) {
+    if (/[\u4e00-\u9fff]/.test(ch)) {
+      let py = PINYIN_DICT[ch];
+      if (!py) py = ch; // 未知汉字保留
+      else {
+        if (useDiacritic) {
+          py = addDiacritic(py);
+        } else if (!showTone) {
+          py = removeTone(py);
+        }
+        if (upper) py = py.charAt(0).toUpperCase() + py.slice(1);
+      }
+      result.push({ch, py, type:'han'});
+    } else {
+      result.push({ch, py:ch, type:'other'});
+    }
+  }
+  return result;
+}
+
+let currentTab = 'pinyin';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['pinyin','initial','ruby','stats'][i] === tab);
+  });
+  document.getElementById('result-pinyin').style.display = 'none';
+  document.getElementById('result-ruby').style.display = 'none';
+  document.getElementById('result-stats').style.display = 'none';
+  document.getElementById('tone-legend').style.display = tab === 'pinyin' ? 'flex' : 'none';
+  convert();
+}
+
+function convert() {
+  const text = document.getElementById('input').value;
+  if (!text.trim()) return;
+
+  if (currentTab === 'pinyin') {
+    const tokens = toPinyin(text);
+    const addSpace = document.getElementById('opt-space').checked;
+    let out = '';
+    for (let i = 0; i < tokens.length; i++) {
+      const t = tokens[i];
+      if (t.type === 'han') {
+        out += t.py;
+        if (addSpace && i < tokens.length-1 && tokens[i+1].type === 'han') out += ' ';
+      } else {
+        out += t.py;
+      }
+    }
+    document.getElementById('result-pinyin').textContent = out;
+    document.getElementById('result-pinyin').style.display = 'block';
+
+  } else if (currentTab === 'initial') {
+    const tokens = toPinyin(text);
+    let initials = [];
+    for (let t of tokens) {
+      if (t.type === 'han' && typeof t.py === 'string') {
+        let py = t.py.replace(/[āáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜü]/g, c => {
+          for (const [k,v] of Object.entries(DIACRITICS)) if(k===c) return v[0];
+          return c;
+        });
+        initials.push(py[0].toUpperCase());
+      }
+    }
+    document.getElementById('result-pinyin').textContent = initials.join('');
+    document.getElementById('result-pinyin').style.display = 'block';
+
+  } else if (currentTab === 'ruby') {
+    const tokens = toPinyin(text);
+    const useDiacritic = document.getElementById('opt-diacritic').checked;
+    let html = '';
+    for (let t of tokens) {
+      if (t.type === 'han') {
+        html += `<ruby>${t.ch}<rt>${t.py}</rt></ruby>`;
+      } else {
+        html += t.ch === '\n' ? '<br>' : t.ch;
+      }
+    }
+    document.getElementById('result-ruby').innerHTML = html;
+    document.getElementById('result-ruby').style.display = 'block';
+
+  } else if (currentTab === 'stats') {
+    const hanChars = [...text].filter(c => /[\u4e00-\u9fff]/.test(c));
+    const known = hanChars.filter(c => PINYIN_DICT[c]);
+    const sentences = text.split(/[。！？.!?]+/).filter(s => s.trim());
+    const tokens = toPinyin(text);
+    const pinyins = tokens.filter(t => t.type === 'han').map(t => t.py);
+    const toneCount = {1:0,2:0,3:0,4:0,5:0};
+    for (const py of pinyins) {
+      const m = py.match(/\d$/);
+      if (m) toneCount[m[0]]++;
+    }
+    const statsHtml = `
+      <div class="info-grid">
+        <div class="info-item"><div class="val">${text.length}</div><div class="lbl">总字符数</div></div>
+        <div class="info-item"><div class="val">${hanChars.length}</div><div class="lbl">汉字数</div></div>
+        <div class="info-item"><div class="val">${known.length}</div><div class="lbl">已知拼音</div></div>
+        <div class="info-item"><div class="val">${hanChars.length - known.length}</div><div class="lbl">未知汉字</div></div>
+        <div class="info-item"><div class="val">${sentences.length}</div><div class="lbl">句子数</div></div>
+        <div class="info-item"><div class="val">${text.replace(/\s/g,'').length}</div><div class="lbl">非空字符</div></div>
+      </div>
+      <div style="margin-top:12px;font-size:13px;color:#656d76;font-weight:600">声调分布</div>
+      <div class="info-grid" style="margin-top:8px">
+        <div class="info-item"><div class="val" style="color:#2da44e">${toneCount[1]}</div><div class="lbl">一声（ā）</div></div>
+        <div class="info-item"><div class="val" style="color:#0969da">${toneCount[2]}</div><div class="lbl">二声（á）</div></div>
+        <div class="info-item"><div class="val" style="color:#bf8700">${toneCount[3]}</div><div class="lbl">三声（ǎ）</div></div>
+        <div class="info-item"><div class="val" style="color:#cf222e">${toneCount[4]}</div><div class="lbl">四声（à）</div></div>
+        <div class="info-item"><div class="val" style="color:#656d76">${toneCount[5]}</div><div class="lbl">轻声</div></div>
+      </div>
+    `;
+    document.getElementById('result-stats').innerHTML = statsHtml;
+    document.getElementById('result-stats').style.display = 'block';
+  }
+}
+
+function autoConvert() { convert(); }
+
+function copyResult() {
+  const el = document.getElementById('result-pinyin');
+  const rubyEl = document.getElementById('result-ruby');
+  const text = el.style.display !== 'none' ? el.textContent : rubyEl.innerText;
+  navigator.clipboard.writeText(text).then(() => showToast('已复制到剪贴板'));
+}
+
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('result-pinyin').textContent = '';
+  document.getElementById('result-ruby').innerHTML = '';
+  document.getElementById('result-stats').innerHTML = '';
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+
+// 初始化
+convert();
+</script>
+</body>
+</html>

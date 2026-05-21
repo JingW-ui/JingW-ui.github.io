@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>图片滤镜工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:1100px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:16px}
+.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all .2s}
+.dropzone:hover{border-color:var(--green);background:#f0fff4}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.layout{display:grid;grid-template-columns:1fr 280px;gap:16px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+.canvas-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:#e8e8e8;min-height:200px;display:flex;align-items:center;justify-content:center}
+canvas{max-width:100%;max-height:500px;display:block}
+.preset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.preset-btn{border:2px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all .15s;text-align:center;padding-bottom:6px;background:#fff}
+.preset-btn.active{border-color:var(--green)}
+.preset-btn:hover:not(.active){border-color:#9be9a8}
+.preset-btn .pname{font-size:11px;margin-top:4px;color:#656d76;font-weight:500}
+.preset-preview{width:100%;height:52px;background:#ddd;object-fit:cover}
+.slider-row{margin-bottom:10px}
+.slider-row label{display:flex;justify-content:space-between;font-size:12px;color:#656d76;font-weight:500;margin-bottom:3px}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:#d1f0d8;border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--green);cursor:pointer}
+.section{font-size:11px;font-weight:600;color:#656d76;margin:12px 0 6px;text-transform:uppercase;letter-spacing:.5px;border-top:1px solid var(--border);padding-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🎨</span>
+  <h1>图片滤镜工具</h1>
+  <p>亮度/对比度/饱和度 · 预设滤镜 · 实时预览</p>
+</header>
+<div class="container">
+  <div class="card" id="upload-card">
+    <div class="card-header">📁 上传图片</div>
+    <div class="card-body">
+      <div class="dropzone" onclick="document.getElementById('file-input').click()"
+        ondragover="event.preventDefault();this.style.borderColor='#2da44e'"
+        ondragleave="this.style.borderColor=''"
+        ondrop="handleDrop(event)">
+        <div style="font-size:48px;margin-bottom:12px">🎨</div>
+        <p style="color:#656d76">点击选择图片或拖拽到此处</p>
+      </div>
+      <input type="file" id="file-input" accept="image/*" style="display:none" onchange="loadImage(this.files[0])">
+    </div>
+  </div>
+
+  <div class="card" id="editor-card" style="display:none">
+    <div class="card-header">
+      <span>✏️ 滤镜编辑</span>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button class="btn btn-secondary" style="font-size:12px;padding:4px 10px" onclick="resetFilters()">🔄 重置</button>
+        <button class="btn btn-secondary" style="font-size:12px;padding:4px 10px" onclick="document.getElementById('file-input').click()">重新上传</button>
+        <button class="btn btn-primary" style="font-size:12px;padding:4px 12px" onclick="downloadResult()">⬇️ 下载</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="layout">
+        <div>
+          <div class="canvas-wrap">
+            <canvas id="main-canvas"></canvas>
+          </div>
+          <div id="img-size-info" style="margin-top:6px;font-size:12px;color:#656d76;text-align:center"></div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#656d76;margin-bottom:6px">🎨 预设滤镜</div>
+          <div class="preset-grid" id="preset-grid">
+            <div class="preset-btn active" onclick="applyPreset('normal',this)"><div class="preset-preview" id="prev-normal"></div><div class="pname">原图</div></div>
+            <div class="preset-btn" onclick="applyPreset('grayscale',this)"><div class="preset-preview" id="prev-grayscale"></div><div class="pname">黑白</div></div>
+            <div class="preset-btn" onclick="applyPreset('sepia',this)"><div class="preset-preview" id="prev-sepia"></div><div class="pname">怀旧</div></div>
+            <div class="preset-btn" onclick="applyPreset('vivid',this)"><div class="preset-preview" id="prev-vivid"></div><div class="pname">鲜艳</div></div>
+            <div class="preset-btn" onclick="applyPreset('cool',this)"><div class="preset-preview" id="prev-cool"></div><div class="pname">冷色调</div></div>
+            <div class="preset-btn" onclick="applyPreset('warm',this)"><div class="preset-preview" id="prev-warm"></div><div class="pname">暖色调</div></div>
+            <div class="preset-btn" onclick="applyPreset('fade',this)"><div class="preset-preview" id="prev-fade"></div><div class="pname">褪色</div></div>
+            <div class="preset-btn" onclick="applyPreset('sharp',this)"><div class="preset-preview" id="prev-sharp"></div><div class="pname">锐化</div></div>
+          </div>
+
+          <div class="section">基础调整</div>
+          <div class="slider-row"><label><span>亮度</span><span id="brightness-val">0</span></label>
+            <input type="range" id="brightness" min="-100" max="100" value="0" oninput="updateVal('brightness');applyFilters()"></div>
+          <div class="slider-row"><label><span>对比度</span><span id="contrast-val">0</span></label>
+            <input type="range" id="contrast" min="-100" max="100" value="0" oninput="updateVal('contrast');applyFilters()"></div>
+          <div class="slider-row"><label><span>饱和度</span><span id="saturation-val">0</span></label>
+            <input type="range" id="saturation" min="-100" max="100" value="0" oninput="updateVal('saturation');applyFilters()"></div>
+          <div class="slider-row"><label><span>色相偏移°</span><span id="hue-val">0</span></label>
+            <input type="range" id="hue" min="-180" max="180" value="0" oninput="updateVal('hue');applyFilters()"></div>
+
+          <div class="section">模糊 & 锐化</div>
+          <div class="slider-row"><label><span>模糊</span><span id="blur-val">0</span></label>
+            <input type="range" id="blur" min="0" max="20" value="0" oninput="updateVal('blur');applyFilters()"></div>
+
+          <div class="section">高级</div>
+          <div class="slider-row"><label><span>不透明度 %</span><span id="opacity-val">100</span></label>
+            <input type="range" id="opacity" min="0" max="100" value="100" oninput="updateVal('opacity');applyFilters()"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let origImage = null;
+
+const PRESETS = {
+  normal:    { brightness:0, contrast:0, saturation:0, hue:0, blur:0, opacity:100 },
+  grayscale: { brightness:0, contrast:10, saturation:-100, hue:0, blur:0, opacity:100 },
+  sepia:     { brightness:10, contrast:5, saturation:-70, hue:30, blur:0, opacity:100 },
+  vivid:     { brightness:5, contrast:20, saturation:60, hue:0, blur:0, opacity:100 },
+  cool:      { brightness:0, contrast:10, saturation:20, hue:-30, blur:0, opacity:100 },
+  warm:      { brightness:5, contrast:5, saturation:10, hue:20, blur:0, opacity:100 },
+  fade:      { brightness:20, contrast:-30, saturation:-40, hue:0, blur:0, opacity:100 },
+  sharp:     { brightness:0, contrast:30, saturation:10, hue:0, blur:0, opacity:100 },
+};
+
+function handleDrop(e) {
+  e.preventDefault();
+  loadImage(e.dataTransfer.files[0]);
+}
+
+function loadImage(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      origImage = img;
+      document.getElementById('upload-card').style.display = 'none';
+      document.getElementById('editor-card').style.display = 'block';
+      document.getElementById('img-size-info').textContent = `${img.width} × ${img.height} px`;
+      resetFilters();
+      setTimeout(generatePreviewThumbs, 100);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function getCSSFilter() {
+  const b = parseInt(document.getElementById('brightness').value);
+  const c = parseInt(document.getElementById('contrast').value);
+  const s = parseInt(document.getElementById('saturation').value);
+  const h = parseInt(document.getElementById('hue').value);
+  const bl = parseInt(document.getElementById('blur').value);
+  const op = parseInt(document.getElementById('opacity').value);
+  return [
+    `brightness(${100+b}%)`,
+    `contrast(${100+c}%)`,
+    `saturate(${100+s}%)`,
+    `hue-rotate(${h}deg)`,
+    bl > 0 ? `blur(${bl}px)` : '',
+    op < 100 ? `opacity(${op}%)` : '',
+  ].filter(Boolean).join(' ');
+}
+
+function applyFilters() {
+  if (!origImage) return;
+  const canvas = document.getElementById('main-canvas');
+  const wrap = canvas.parentElement;
+  const maxW = wrap.clientWidth - 2;
+  const scale = Math.min(1, maxW / origImage.width);
+  canvas.width = Math.round(origImage.width * scale);
+  canvas.height = Math.round(origImage.height * scale);
+  const ctx = canvas.getContext('2d');
+  ctx.filter = getCSSFilter();
+  ctx.drawImage(origImage, 0, 0, canvas.width, canvas.height);
+  ctx.filter = 'none';
+}
+
+function updateVal(id) {
+  document.getElementById(id+'-val').textContent = document.getElementById(id).value;
+}
+
+function applyPreset(name, el) {
+  const p = PRESETS[name];
+  if (!p) return;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  Object.entries(p).forEach(([key, val]) => {
+    const inp = document.getElementById(key);
+    if (inp) { inp.value = val; updateVal(key); }
+  });
+  applyFilters();
+}
+
+function resetFilters() {
+  applyPreset('normal', document.querySelector('.preset-btn'));
+}
+
+function generatePreviewThumbs() {
+  Object.entries(PRESETS).forEach(([name, preset]) => {
+    const thumbEl = document.getElementById('prev-'+name);
+    if (!thumbEl || !origImage) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = 100; canvas.height = 60;
+    const ctx = canvas.getContext('2d');
+    const { brightness:b, contrast:c, saturation:s, hue:h, blur:bl, opacity:op } = preset;
+    ctx.filter = [
+      `brightness(${100+b}%)`,`contrast(${100+c}%)`,`saturate(${100+s}%)`,`hue-rotate(${h}deg)`,
+      bl>0?`blur(${bl}px)`:'', op<100?`opacity(${op}%)`:'',
+    ].filter(Boolean).join(' ');
+    ctx.drawImage(origImage, 0, 0, 100, 60);
+    thumbEl.style.backgroundImage = `url(${canvas.toDataURL()})`;
+    thumbEl.style.backgroundSize = 'cover';
+    thumbEl.style.backgroundPosition = 'center';
+  });
+}
+
+function downloadResult() {
+  const canvas = document.getElementById('main-canvas');
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = origImage.width;
+  outCanvas.height = origImage.height;
+  const ctx = outCanvas.getContext('2d');
+  ctx.filter = getCSSFilter();
+  ctx.drawImage(origImage, 0, 0);
+  outCanvas.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'filtered.jpg';
+    a.click();
+  }, 'image/jpeg', 0.9);
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+</script>
+</body>
+</html>

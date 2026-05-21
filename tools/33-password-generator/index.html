@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>密码生成器 / 强度检测</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --red:#cf222e; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+  .hi { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; }
+  header h1 { font-size:18px; font-weight:600; }
+  .main { flex:1; padding:20px 24px; max-width:800px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:16px; }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); }
+  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; }
+  .card-body { padding:18px; }
+  .password-display { display:flex; gap:8px; align-items:center; }
+  .pw-box { flex:1; padding:14px 18px; border:2px solid var(--border); border-radius:var(--radius); font-family:'Consolas',monospace; font-size:20px; letter-spacing:2px; background:var(--bg2); color:var(--text); overflow-x:auto; white-space:nowrap; cursor:pointer; user-select:all; }
+  .pw-box:hover { border-color:var(--green); }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:8px 16px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn:hover { background:var(--bg3); }
+  .btn-primary { background:var(--green); color:white; border-color:var(--green); }
+  .btn-primary:hover { background:var(--green2); }
+  .option-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+  .option-item { display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius); cursor:pointer; transition:all .15s; }
+  .option-item:hover { border-color:var(--green); background:#f0fdf4; }
+  .option-item input[type=checkbox] { accent-color:var(--green); width:16px; height:16px; cursor:pointer; }
+  .option-label { font-size:13px; font-weight:500; }
+  .option-sub { font-size:11px; color:var(--text2); font-family:monospace; }
+  .slider-row { display:flex; align-items:center; gap:12px; margin-top:14px; }
+  .slider-row label { font-size:13px; color:var(--text2); white-space:nowrap; }
+  input[type=range] { flex:1; accent-color:var(--green); }
+  .length-val { font-size:20px; font-weight:700; color:var(--green); width:40px; text-align:center; }
+  .strength-bar { margin-top:16px; }
+  .strength-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .strength-label { font-size:13px; color:var(--text2); width:60px; }
+  .strength-track { flex:1; height:8px; background:var(--bg3); border-radius:4px; overflow:hidden; }
+  .strength-fill { height:100%; border-radius:4px; transition:all .4s; }
+  .strength-text { font-size:13px; font-weight:600; width:50px; }
+  .strength-0 { background:#ccc; }
+  .strength-1 { background:var(--red); }
+  .strength-2 { background:#ff9f43; }
+  .strength-3 { background:#ffd700; }
+  .strength-4 { background:#2db55d; }
+  .strength-5 { background:var(--green); }
+  .check-input { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Consolas',monospace; font-size:15px; letter-spacing:2px; background:var(--bg); color:var(--text); outline:none; transition:border-color .15s; }
+  .check-input:focus { border-color:var(--green); }
+  .checks { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:12px; font-size:12px; }
+  .check-item { display:flex; align-items:center; gap:6px; padding:5px 8px; border-radius:4px; }
+  .check-item.pass { background:#dafbe1; color:#1a7f37; }
+  .check-item.fail { background:#ffebe9; color:var(--red); }
+  .batch-output { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius); font-family:monospace; font-size:13px; min-height:120px; resize:vertical; background:var(--bg2); color:var(--text); outline:none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="hi">🔑</div>
+  <div>
+    <h1>密码生成器 / 强度检测</h1>
+  </div>
+</header>
+
+<div class="main">
+  <!-- 生成器 -->
+  <div class="card">
+    <div class="card-header">🔑 密码生成</div>
+    <div class="card-body">
+      <div class="password-display">
+        <div class="pw-box" id="pwResult" onclick="copyPw()" title="点击复制">点击生成按钮</div>
+        <button class="btn" onclick="copyPw()">⎘</button>
+        <button class="btn btn-primary" onclick="generatePw()">🎲 生成</button>
+      </div>
+      <div class="slider-row">
+        <label>密码长度：</label>
+        <span class="length-val" id="lengthVal">16</span>
+        <input type="range" id="lengthSlider" min="4" max="128" value="16" oninput="document.getElementById('lengthVal').textContent=this.value; generatePw()">
+      </div>
+      <div class="option-grid">
+        <label class="option-item">
+          <input type="checkbox" id="opt-upper" checked onchange="generatePw()">
+          <div><div class="option-label">大写字母</div><div class="option-sub">A-Z</div></div>
+        </label>
+        <label class="option-item">
+          <input type="checkbox" id="opt-lower" checked onchange="generatePw()">
+          <div><div class="option-label">小写字母</div><div class="option-sub">a-z</div></div>
+        </label>
+        <label class="option-item">
+          <input type="checkbox" id="opt-number" checked onchange="generatePw()">
+          <div><div class="option-label">数字</div><div class="option-sub">0-9</div></div>
+        </label>
+        <label class="option-item">
+          <input type="checkbox" id="opt-symbol" checked onchange="generatePw()">
+          <div><div class="option-label">特殊符号</div><div class="option-sub">!@#$%^&*</div></div>
+        </label>
+        <label class="option-item">
+          <input type="checkbox" id="opt-noambig" onchange="generatePw()">
+          <div><div class="option-label">排除歧义字符</div><div class="option-sub">0Ol1I</div></div>
+        </label>
+        <label class="option-item">
+          <input type="checkbox" id="opt-norepeat" onchange="generatePw()">
+          <div><div class="option-label">不重复字符</div><div class="option-sub">每个字符最多出现1次</div></div>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 强度检测 -->
+  <div class="card">
+    <div class="card-header">🔍 密码强度检测</div>
+    <div class="card-body">
+      <input type="password" class="check-input" id="checkInput" placeholder="输入需要检测的密码..." oninput="checkStrength()">
+      <div class="strength-bar">
+        <div class="strength-row">
+          <span class="strength-label">强度：</span>
+          <div class="strength-track"><div class="strength-fill" id="strengthFill" style="width:0"></div></div>
+          <span class="strength-text" id="strengthText" style="color:var(--text2);">-</span>
+        </div>
+      </div>
+      <div class="checks" id="pwChecks">
+        <div class="check-item fail" id="chk-len">✕ 至少8个字符</div>
+        <div class="check-item fail" id="chk-upper">✕ 包含大写字母</div>
+        <div class="check-item fail" id="chk-lower">✕ 包含小写字母</div>
+        <div class="check-item fail" id="chk-num">✕ 包含数字</div>
+        <div class="check-item fail" id="chk-sym">✕ 包含特殊符号</div>
+        <div class="check-item fail" id="chk-long">✕ 长度≥12（更安全）</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 批量生成 -->
+  <div class="card">
+    <div class="card-header">📦 批量生成</div>
+    <div class="card-body">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+        <label style="font-size:13px;">数量：<input type="number" id="batchCount" value="10" min="1" max="1000" style="width:70px;padding:5px 10px;border:1px solid var(--border);border-radius:4px;font-size:13px;"></label>
+        <label style="font-size:13px;">长度：<input type="number" id="batchLen" value="16" min="4" max="128" style="width:70px;padding:5px 10px;border:1px solid var(--border);border-radius:4px;font-size:13px;"></label>
+        <button class="btn btn-primary" onclick="batchGenerate()">▶ 批量生成</button>
+        <button class="btn" onclick="copyBatch()">⎘ 复制全部</button>
+      </div>
+      <textarea class="batch-output" id="batchOutput" readonly></textarea>
+    </div>
+  </div>
+</div>
+
+<script>
+const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const LOWER = 'abcdefghijklmnopqrstuvwxyz';
+const NUMBERS = '0123456789';
+const SYMBOLS = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+const AMBIG = '0Ol1I';
+
+function getCharset() {
+  let chars = '';
+  if (document.getElementById('opt-upper').checked) chars += UPPER;
+  if (document.getElementById('opt-lower').checked) chars += LOWER;
+  if (document.getElementById('opt-number').checked) chars += NUMBERS;
+  if (document.getElementById('opt-symbol').checked) chars += SYMBOLS;
+  if (document.getElementById('opt-noambig').checked) chars = chars.split('').filter(c => !AMBIG.includes(c)).join('');
+  return chars;
+}
+
+function generateOne(len) {
+  const chars = getCharset();
+  if (!chars) return '';
+  const noRepeat = document.getElementById('opt-norepeat').checked;
+  const arr = [];
+  const available = chars.split('');
+  const maxLen = noRepeat ? Math.min(len, available.length) : len;
+  for (let i = 0; i < maxLen; i++) {
+    const idx = Math.floor(Math.random() * available.length);
+    arr.push(available[idx]);
+    if (noRepeat) available.splice(idx, 1);
+  }
+  // 确保包含所有所选类别
+  return arr.join('');
+}
+
+function generatePw() {
+  const len = parseInt(document.getElementById('lengthSlider').value);
+  const pw = generateOne(len);
+  document.getElementById('pwResult').textContent = pw || '请至少选择一种字符类型';
+}
+
+function copyPw() {
+  const v = document.getElementById('pwResult').textContent;
+  if (v && v !== '请至少选择一种字符类型' && v !== '点击生成按钮') {
+    navigator.clipboard.writeText(v).then(() => showToast('密码已复制'));
+  }
+}
+
+const strengthLabels = ['','极弱','弱','中等','强','极强'];
+const strengthColors = ['#ccc','var(--red)','#ff9f43','#ffd700','#2db55d','var(--green)'];
+
+function checkStrength() {
+  const pw = document.getElementById('checkInput').value;
+  let score = 0;
+  const checks = {
+    len: pw.length >= 8,
+    upper: /[A-Z]/.test(pw),
+    lower: /[a-z]/.test(pw),
+    num: /[0-9]/.test(pw),
+    sym: /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(pw),
+    long: pw.length >= 12,
+  };
+  if (checks.len) score++;
+  if (checks.upper) score++;
+  if (checks.lower) score++;
+  if (checks.num) score++;
+  if (checks.sym) score++;
+  if (!checks.len) score = Math.min(score, 1);
+
+  const fill = document.getElementById('strengthFill');
+  fill.style.width = (score / 5 * 100) + '%';
+  fill.className = 'strength-fill strength-' + score;
+  const textEl = document.getElementById('strengthText');
+  textEl.textContent = pw ? (strengthLabels[score] || '极弱') : '-';
+  textEl.style.color = strengthColors[score];
+
+  const setChk = (id, pass, text) => {
+    const el = document.getElementById(id);
+    el.className = 'check-item ' + (pass ? 'pass' : 'fail');
+    el.textContent = (pass ? '✓ ' : '✕ ') + text;
+  };
+  setChk('chk-len', checks.len, '至少8个字符');
+  setChk('chk-upper', checks.upper, '包含大写字母');
+  setChk('chk-lower', checks.lower, '包含小写字母');
+  setChk('chk-num', checks.num, '包含数字');
+  setChk('chk-sym', checks.sym, '包含特殊符号');
+  setChk('chk-long', checks.long, '长度≥12（更安全）');
+}
+
+function batchGenerate() {
+  const count = Math.min(parseInt(document.getElementById('batchCount').value)||10, 1000);
+  const len = parseInt(document.getElementById('batchLen').value)||16;
+  const passwords = Array.from({length:count}, () => generateOne(len));
+  document.getElementById('batchOutput').value = passwords.join('\n');
+}
+
+function copyBatch() {
+  const v = document.getElementById('batchOutput').value;
+  if (v) navigator.clipboard.writeText(v).then(() => showToast('已复制'));
+}
+
+function showToast(msg) {
+  let t=document.getElementById('_toast');
+  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',1800);
+}
+
+generatePw();
+</script>
+</body>
+</html>

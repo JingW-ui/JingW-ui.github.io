@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>农历/公历转换工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:900px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-body{padding:20px}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{padding:8px 20px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:#656d76;transition:all .15s}
+.tab.active{border-bottom-color:var(--green);color:var(--green);font-weight:600}
+.date-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;color:#656d76;font-weight:500}
+input[type=date],input[type=number],select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none;transition:border-color .15s}
+input:focus,select:focus{border-color:var(--green)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.result-box{background:linear-gradient(135deg,#f0fff4,#f6f8fa);border:1px solid #9be9a8;border-radius:var(--radius);padding:20px;margin-top:20px}
+.result-main{font-size:28px;font-weight:700;color:#1a7f37;margin-bottom:12px;line-height:1.3}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px}
+.result-item{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px}
+.result-item .lbl{font-size:11px;color:#656d76;margin-bottom:4px}
+.result-item .val{font-size:14px;font-weight:600;color:#1f2328}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-top:12px}
+.cal-head{text-align:center;padding:6px;font-size:12px;font-weight:600;color:#656d76}
+.cal-day{text-align:center;padding:6px 4px;border-radius:4px;cursor:pointer;transition:all .15s;font-size:13px}
+.cal-day:hover{background:#f0fff4}
+.cal-day.today{background:var(--green);color:#fff;font-weight:700}
+.cal-day.selected{background:#dff4e0;color:#1a7f37;font-weight:600}
+.cal-day.other-month{color:#ccc}
+.cal-day .lunar{font-size:10px;color:#bf8700;margin-top:1px}
+.cal-day.today .lunar{color:#fff}
+.cal-nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cal-nav-btn{background:none;border:none;cursor:pointer;font-size:18px;color:var(--green);padding:4px 8px}
+.festival-dot{width:5px;height:5px;border-radius:50%;background:#cf222e;margin:0 auto;margin-top:2px}
+.festival{font-size:10px;color:#cf222e;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🏮</span>
+  <h1>农历/公历转换工具</h1>
+  <p>公历↔农历 · 万年历 · 节气 · 传统节日</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+      <div class="tab-bar">
+        <div class="tab active" onclick="switchTab('solar2lunar')">公历 → 农历</div>
+        <div class="tab" onclick="switchTab('lunar2solar')">农历 → 公历</div>
+        <div class="tab" onclick="switchTab('calendar')">万年历</div>
+      </div>
+
+      <!-- 公历→农历 -->
+      <div id="panel-solar2lunar">
+        <div class="date-row">
+          <div class="field">
+            <label>选择公历日期</label>
+            <input type="date" id="solar-date" value="">
+          </div>
+          <button class="btn btn-primary" onclick="convertSolar2Lunar()">🔄 转换为农历</button>
+          <button class="btn btn-secondary" onclick="setToday('solar-date')">📅 今天</button>
+        </div>
+        <div id="solar-result" class="result-box" style="display:none"></div>
+      </div>
+
+      <!-- 农历→公历 -->
+      <div id="panel-lunar2solar" style="display:none">
+        <div class="date-row">
+          <div class="field">
+            <label>农历年份</label>
+            <input type="number" id="lunar-year" value="2024" min="1900" max="2100" style="width:90px">
+          </div>
+          <div class="field">
+            <label>农历月</label>
+            <select id="lunar-month">
+              <option value="1">正月</option><option value="2">二月</option><option value="3">三月</option>
+              <option value="4">四月</option><option value="5">五月</option><option value="6">六月</option>
+              <option value="7">七月</option><option value="8">八月</option><option value="9">九月</option>
+              <option value="10">十月</option><option value="11">冬月</option><option value="12">腊月</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>农历日</label>
+            <select id="lunar-day">
+              <option value="1">初一</option><option value="2">初二</option><option value="3">初三</option>
+              <option value="4">初四</option><option value="5">初五</option><option value="6">初六</option>
+              <option value="7">初七</option><option value="8">初八</option><option value="9">初九</option>
+              <option value="10">初十</option><option value="11">十一</option><option value="12">十二</option>
+              <option value="13">十三</option><option value="14">十四</option><option value="15">十五</option>
+              <option value="16">十六</option><option value="17">十七</option><option value="18">十八</option>
+              <option value="19">十九</option><option value="20">二十</option><option value="21">廿一</option>
+              <option value="22">廿二</option><option value="23">廿三</option><option value="24">廿四</option>
+              <option value="25">廿五</option><option value="26">廿六</option><option value="27">廿七</option>
+              <option value="28">廿八</option><option value="29">廿九</option><option value="30">三十</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>是否闰月</label>
+            <select id="lunar-leap"><option value="0">否</option><option value="1">是（闰）</option></select>
+          </div>
+          <button class="btn btn-primary" onclick="convertLunar2Solar()">🔄 转换为公历</button>
+        </div>
+        <div id="lunar-result" class="result-box" style="display:none"></div>
+      </div>
+
+      <!-- 万年历 -->
+      <div id="panel-calendar" style="display:none">
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)">◀</button>
+          <span id="cal-title" style="font-weight:600;font-size:15px"></span>
+          <button class="cal-nav-btn" onclick="changeMonth(1)">▶</button>
+        </div>
+        <div class="cal-grid">
+          <div class="cal-head">日</div><div class="cal-head">一</div><div class="cal-head">二</div>
+          <div class="cal-head">三</div><div class="cal-head">四</div><div class="cal-head">五</div><div class="cal-head">六</div>
+          <div id="cal-days"></div>
+        </div>
+        <div id="cal-detail" style="margin-top:12px;padding:12px;background:#f6f8fa;border-radius:var(--radius);font-size:13px;color:#656d76">点击日期查看详情</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">📚 节气 & 传统节日参考</div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px">
+        <div>
+          <div style="font-weight:600;margin-bottom:8px;color:#656d76">🌿 二十四节气</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px" id="solar-terms"></div>
+        </div>
+        <div>
+          <div style="font-weight:600;margin-bottom:8px;color:#656d76">🎊 传统节日</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px" id="festivals"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ 农历核心算法 ============
+// 数据来源：寿星万年历算法
+const lunarInfo = [
+  0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+  0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+  0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+  0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+  0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+  0x06ca0,0x0b550,0x15355,0x04da0,0x0a5d0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,
+  0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+  0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,
+  0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+  0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06aa0,0x0a6b6,0x056a0,0x02b60,0x09570,
+  0x052b2,0x0a950,0x0e952,0x06ca0,0x0b557,0x056a0,0x04b60,0x0a5b5,0x025b0,0x092d0,
+  0x0d2b0,0x0a950,0x0b255,0x06b20,0x0ada0
+];
+
+const Gan = ['甲','乙','丙','丁','戊','己','庚','辛','壬','癸'];
+const Zhi = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'];
+const Animals = ['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'];
+const monthNames = ['正','二','三','四','五','六','七','八','九','十','冬','腊'];
+const dayNames = ['初一','初二','初三','初四','初五','初六','初七','初八','初九','初十',
+  '十一','十二','十三','十四','十五','十六','十七','十八','十九','二十',
+  '廿一','廿二','廿三','廿四','廿五','廿六','廿七','廿八','廿九','三十'];
+
+function leapMonth(y) { return lunarInfo[y-1900] & 0xf; }
+function leapDays(y) { return leapMonth(y) ? ((lunarInfo[y-1900] & 0x10000) ? 30 : 29) : 0; }
+function monthDays(y, m) { return (lunarInfo[y-1900] & (0x10000>>m)) ? 30 : 29; }
+function yearDays(y) {
+  let sum = 348;
+  for(let i=0x8000; i>0x8; i>>=1) sum += (lunarInfo[y-1900] & i) ? 1 : 0;
+  return sum + leapDays(y);
+}
+
+function solar2Lunar(y, m, d) {
+  let offset = (Date.UTC(y,m-1,d) - Date.UTC(1900,0,31)) / 86400000;
+  let i, temp=0;
+  for(i=1900; i<2101 && offset>0; i++) { temp=yearDays(i); offset-=temp; }
+  if(offset<0) { offset+=temp; i--; }
+  let lunarYear=i, leap=leapMonth(i), isLeap=false;
+  for(i=1; i<13 && offset>0; i++) {
+    if(leap>0 && i===(leap+1) && !isLeap) { --i; isLeap=true; temp=leapDays(lunarYear); }
+    else temp=monthDays(lunarYear, i);
+    if(isLeap && i===(leap+1)) isLeap=false;
+    offset-=temp;
+  }
+  if(offset===0 && leap>0 && i===leap+1) {
+    if(isLeap) isLeap=false; else { isLeap=true; --i; }
+  }
+  if(offset<0) { offset+=temp; --i; }
+  return { year:lunarYear, month:i, day:offset+1, isLeap,
+    gzYear: Gan[(lunarYear-4)%10]+Zhi[(lunarYear-4)%12],
+    animal: Animals[(lunarYear-4)%12] };
+}
+
+function getLunarStr(lunar) {
+  const pre = lunar.isLeap ? '闰' : '';
+  return `${lunar.gzYear}年（${lunar.animal}年）${pre}${monthNames[lunar.month-1]}月${dayNames[lunar.day-1]}`;
+}
+
+// 节气名称和大约公历日期（简化）
+const SOLAR_TERMS = [
+  {name:'小寒',month:1,day:6},{name:'大寒',month:1,day:20},{name:'立春',month:2,day:4},
+  {name:'雨水',month:2,day:19},{name:'惊蛰',month:3,day:6},{name:'春分',month:3,day:21},
+  {name:'清明',month:4,day:5},{name:'谷雨',month:4,day:20},{name:'立夏',month:5,day:6},
+  {name:'小满',month:5,day:21},{name:'芒种',month:6,day:6},{name:'夏至',month:6,day:21},
+  {name:'小暑',month:7,day:7},{name:'大暑',month:7,day:23},{name:'立秋',month:8,day:7},
+  {name:'处暑',month:8,day:23},{name:'白露',month:9,day:8},{name:'秋分',month:9,day:23},
+  {name:'寒露',month:10,day:8},{name:'霜降',month:10,day:23},{name:'立冬',month:11,day:7},
+  {name:'小雪',month:11,day:22},{name:'大雪',month:12,day:7},{name:'冬至',month:12,day:22},
+];
+
+const LUNAR_FESTIVALS = [
+  {month:1,day:1,name:'🎊 春节'},{month:1,day:15,name:'🏮 元宵节'},
+  {month:5,day:5,name:'🐉 端午节'},{month:7,day:7,name:'💕 七夕节'},
+  {month:7,day:15,name:'👻 中元节'},{month:8,day:15,name:'🌕 中秋节'},
+  {month:9,day:9,name:'🌼 重阳节'},{month:12,day:30,name:'🎆 除夕'},
+];
+
+const SOLAR_FESTIVALS = [
+  {month:1,day:1,name:'🎉 元旦'},{month:2,day:14,name:'💝 情人节'},
+  {month:3,day:8,name:'👩 妇女节'},{month:4,day:1,name:'🤡 愚人节'},
+  {month:5,day:1,name:'👷 劳动节'},{month:6,day:1,name:'🧒 儿童节'},
+  {month:9,day:10,name:'👨‍🏫 教师节'},{month:10,day:1,name:'🇨🇳 国庆节'},
+  {month:12,day:25,name:'🎄 圣诞节'},
+];
+
+const WEEK_NAMES = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+
+let calYear, calMonth;
+const now = new Date();
+
+function switchTab(tab) {
+  ['solar2lunar','lunar2solar','calendar'].forEach(t => {
+    document.getElementById('panel-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['solar2lunar','lunar2solar','calendar'][i]===tab);
+  });
+  if (tab === 'calendar') renderCalendar();
+}
+
+function setToday(id) {
+  const d = new Date();
+  document.getElementById(id).value = d.toISOString().split('T')[0];
+}
+
+function convertSolar2Lunar() {
+  const val = document.getElementById('solar-date').value;
+  if (!val) { showToast('请选择日期'); return; }
+  const [y,m,d] = val.split('-').map(Number);
+  const lunar = solar2Lunar(y,m,d);
+  const date = new Date(y,m-1,d);
+  const weekStr = WEEK_NAMES[date.getDay()];
+  const lunarStr = getLunarStr(lunar);
+
+  // 查节日
+  const solarFest = SOLAR_FESTIVALS.find(f => f.month===m && f.day===d);
+  const lunarFest = LUNAR_FESTIVALS.find(f => f.month===lunar.month && f.day===lunar.day);
+  const solarTerm = SOLAR_TERMS.find(t => t.month===m && Math.abs(t.day-d)<=1);
+
+  const festHtml = [solarFest?.name, lunarFest?.name, solarTerm?.name].filter(Boolean)
+    .map(f => `<span style="background:#fff3cd;color:#856404;padding:2px 8px;border-radius:10px;font-size:12px">${f}</span>`).join(' ');
+
+  document.getElementById('solar-result').style.display = 'block';
+  document.getElementById('solar-result').innerHTML = `
+    <div class="result-main">${lunarStr}</div>
+    <div style="color:#656d76;font-size:14px;margin-bottom:10px">${y}年${m}月${d}日 ${weekStr} ${festHtml||''}</div>
+    <div class="result-grid">
+      <div class="result-item"><div class="lbl">干支纪年</div><div class="val">${lunar.gzYear}年</div></div>
+      <div class="result-item"><div class="lbl">生肖</div><div class="val">${lunar.animal}年</div></div>
+      <div class="result-item"><div class="lbl">农历月份</div><div class="val">${lunar.isLeap?'闰':''}${monthNames[lunar.month-1]}月</div></div>
+      <div class="result-item"><div class="lbl">农历日</div><div class="val">${dayNames[lunar.day-1]}</div></div>
+      <div class="result-item"><div class="lbl">星期</div><div class="val">${weekStr}</div></div>
+      <div class="result-item"><div class="lbl">闰月</div><div class="val">${lunar.isLeap?'是':'否'}</div></div>
+    </div>
+  `;
+}
+
+function convertLunar2Solar() {
+  // 简化：通过遍历找对应公历日期
+  const ly = parseInt(document.getElementById('lunar-year').value);
+  const lm = parseInt(document.getElementById('lunar-month').value);
+  const ld = parseInt(document.getElementById('lunar-day').value);
+
+  // 搜索该年前后公历日期
+  let found = null;
+  for (let y = ly; y <= ly+1; y++) {
+    for (let m = 1; m <= 12; m++) {
+      for (let d = 1; d <= 31; d++) {
+        const dt = new Date(y, m-1, d);
+        if (dt.getMonth() !== m-1) break;
+        const lunar = solar2Lunar(y, m, d);
+        if (lunar.year === ly && lunar.month === lm && lunar.day === ld) {
+          found = {y, m, d, lunar};
+          break;
+        }
+      }
+      if (found) break;
+    }
+    if (found) break;
+  }
+
+  const resEl = document.getElementById('lunar-result');
+  if (!found) {
+    resEl.style.display = 'block';
+    resEl.innerHTML = '<div style="color:#cf222e">未找到对应公历日期，请检查农历日期是否有效</div>';
+    return;
+  }
+  const {y,m,d,lunar} = found;
+  const date = new Date(y,m-1,d);
+  const weekStr = WEEK_NAMES[date.getDay()];
+  resEl.style.display = 'block';
+  resEl.innerHTML = `
+    <div class="result-main">${y}年${m}月${d}日</div>
+    <div style="color:#656d76;font-size:14px;margin-bottom:10px">${weekStr}</div>
+    <div class="result-grid">
+      <div class="result-item"><div class="lbl">公历年</div><div class="val">${y}年</div></div>
+      <div class="result-item"><div class="lbl">公历月</div><div class="val">${m}月</div></div>
+      <div class="result-item"><div class="lbl">公历日</div><div class="val">${d}日</div></div>
+      <div class="result-item"><div class="lbl">星期</div><div class="val">${weekStr}</div></div>
+      <div class="result-item"><div class="lbl">干支年</div><div class="val">${lunar.gzYear}年</div></div>
+      <div class="result-item"><div class="lbl">生肖</div><div class="val">${lunar.animal}年</div></div>
+    </div>
+  `;
+}
+
+function changeMonth(delta) {
+  calMonth += delta;
+  if (calMonth > 12) { calMonth = 1; calYear++; }
+  if (calMonth < 1) { calMonth = 12; calYear--; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  calYear = calYear || now.getFullYear();
+  calMonth = calMonth || now.getMonth()+1;
+  document.getElementById('cal-title').textContent = `${calYear} 年 ${calMonth} 月`;
+
+  const firstDay = new Date(calYear, calMonth-1, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth, 0).getDate();
+  const daysInPrevMonth = new Date(calYear, calMonth-1, 0).getDate();
+
+  let html = '';
+  // 上月补位
+  for (let i = firstDay-1; i >= 0; i--) {
+    const d = daysInPrevMonth - i;
+    html += `<div class="cal-day other-month">${d}</div>`;
+  }
+  // 本月
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = calYear===now.getFullYear() && calMonth===now.getMonth()+1 && d===now.getDate();
+    const lunar = solar2Lunar(calYear, calMonth, d);
+    const lunarDay = lunar.day===1 ? (lunar.isLeap?'闰':'')+monthNames[lunar.month-1]+'月' : dayNames[lunar.day-1];
+    const solarFest = SOLAR_FESTIVALS.find(f => f.month===calMonth && f.day===d);
+    const lunarFest = LUNAR_FESTIVALS.find(f => f.month===lunar.month && f.day===lunar.day);
+    const festName = solarFest?.name?.slice(2) || lunarFest?.name?.slice(2) || '';
+    html += `<div class="cal-day${isToday?' today':''}" onclick="showDayDetail(${calYear},${calMonth},${d})">
+      <div>${d}</div>
+      <div class="lunar">${festName || lunarDay}</div>
+      ${(solarFest||lunarFest)&&!isToday?'<div class="festival-dot"></div>':''}
+    </div>`;
+  }
+  // 下月补位
+  const remaining = 42 - firstDay - daysInMonth;
+  for (let d = 1; d <= remaining; d++) {
+    html += `<div class="cal-day other-month">${d}</div>`;
+  }
+
+  document.getElementById('cal-days').innerHTML = html;
+}
+
+function showDayDetail(y, m, d) {
+  const lunar = solar2Lunar(y, m, d);
+  const date = new Date(y, m-1, d);
+  const weekStr = WEEK_NAMES[date.getDay()];
+  const lunarStr = getLunarStr(lunar);
+  const solarFest = SOLAR_FESTIVALS.find(f => f.month===m && f.day===d);
+  const lunarFest = LUNAR_FESTIVALS.find(f => f.month===lunar.month && f.day===lunar.day);
+  const solarTerm = SOLAR_TERMS.find(t => t.month===m && Math.abs(t.day-d)<=1);
+  let info = `<b>${y}年${m}月${d}日 ${weekStr}</b>｜农历：${lunarStr}`;
+  if (solarFest) info += `｜${solarFest.name}`;
+  if (lunarFest) info += `｜${lunarFest.name}`;
+  if (solarTerm) info += `｜🌿 ${solarTerm.name}`;
+  document.getElementById('cal-detail').innerHTML = info;
+}
+
+// 初始化
+document.getElementById('solar-date').value = now.toISOString().split('T')[0];
+document.getElementById('lunar-year').value = now.getFullYear();
+
+document.getElementById('solar-terms').innerHTML = SOLAR_TERMS.map(t =>
+  `<span style="background:#f0fff4;border:1px solid #9be9a8;padding:2px 8px;border-radius:4px;font-size:12px;color:#1a7f37">${t.name}</span>`
+).join('');
+document.getElementById('festivals').innerHTML = [...LUNAR_FESTIVALS,...SOLAR_FESTIVALS].map(f =>
+  `<span style="background:#fff3cd;border:1px solid #f0d060;padding:2px 8px;border-radius:4px;font-size:12px;color:#856404">${f.name}</span>`
+).join('');
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+</script>
+</body>
+</html>

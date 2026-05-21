@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON 格式化 / 校验工具</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f6f8fa;
+    --bg-tertiary: #f0f2f5;
+    --border: #d0d7de;
+    --border-light: #e8eaed;
+    --text: #1f2328;
+    --text-secondary: #656d76;
+    --text-muted: #9198a1;
+    --green: #2da44e;
+    --green-hover: #2c974b;
+    --green-active: #298e46;
+    --red: #cf222e;
+    --red-bg: #fff0ee;
+    --blue: #0969da;
+    --yellow: #9a6700;
+    --yellow-bg: #fff8c5;
+    --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: var(--bg-secondary);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+  }
+  .header-icon {
+    width: 32px; height: 32px;
+    background: var(--green);
+    border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 16px; font-weight: bold;
+  }
+  header h1 { font-size: 18px; font-weight: 600; color: var(--text); }
+  header p { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
+  .toolbar {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn:hover { background: var(--bg-tertiary); border-color: #b0b7bf; }
+  .btn-primary {
+    background: var(--green); color: white; border-color: var(--green);
+  }
+  .btn-primary:hover { background: var(--green-hover); border-color: var(--green-hover); }
+  .btn-primary:active { background: var(--green-active); }
+  .btn-danger { color: var(--red); }
+  .btn-danger:hover { background: #fff0ee; border-color: #ffc1c0; }
+  .sep { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+  select {
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  select:focus { outline: 2px solid var(--green); outline-offset: 1px; }
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 16px;
+    gap: 12px;
+    min-height: 0;
+  }
+  @media (max-width: 768px) {
+    .main { grid-template-columns: 1fr; }
+  }
+  .panel {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .panel-header {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-secondary);
+  }
+  .panel-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+  .panel-actions { display: flex; gap: 6px; }
+  .btn-sm {
+    padding: 3px 10px;
+    font-size: 12px;
+  }
+  textarea, .output-area {
+    flex: 1;
+    padding: 14px 16px;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    border: none;
+    outline: none;
+    resize: none;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 400px;
+  }
+  .output-area {
+    overflow: auto;
+    white-space: pre;
+    word-break: break-all;
+    white-space: pre-wrap;
+  }
+  .status-bar {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 8px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .status-item { display: flex; align-items: center; gap: 5px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted); }
+  .status-dot.ok { background: var(--green); }
+  .status-dot.err { background: var(--red); }
+  .error-msg {
+    margin: 0 16px 12px;
+    padding: 10px 14px;
+    background: var(--red-bg);
+    border: 1px solid #ffc1c0;
+    border-radius: var(--radius);
+    color: var(--red);
+    font-size: 13px;
+    display: none;
+  }
+  .error-msg.show { display: block; }
+  .tag {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+  .tag.ok { background: #dafbe1; color: #1a7f37; border-color: #9fdbab; }
+  .tag.err { background: var(--red-bg); color: var(--red); border-color: #ffc1c0; }
+
+  /* JSON syntax highlight */
+  .json-key { color: #0550ae; }
+  .json-string { color: #0a3069; }
+  .json-number { color: #0550ae; }
+  .json-bool { color: #9a3480; }
+  .json-null { color: #9a3480; }
+
+  /* Tree view */
+  .tree-node { padding-left: 20px; }
+  .tree-toggle { cursor: pointer; user-select: none; color: var(--text-secondary); }
+  .tree-toggle:hover { color: var(--text); }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border-light);
+    padding: 0 16px;
+    background: var(--bg-secondary);
+  }
+  .tab {
+    padding: 8px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    margin-bottom: -1px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--text); border-bottom-color: var(--green); font-weight: 500; }
+  .tab-content { display: none; flex: 1; overflow: auto; }
+  .tab-content.active { display: flex; flex-direction: column; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-icon">{}</div>
+  <div>
+    <h1>JSON 格式化 / 校验工具</h1>
+    <p>JSON 格式化、压缩、语法校验、键值折叠、JSON 转 CSV/XML</p>
+  </div>
+</header>
+
+<div class="toolbar">
+  <button class="btn btn-primary" onclick="formatJSON()">▶ 格式化</button>
+  <button class="btn" onclick="compressJSON()">⬡ 压缩</button>
+  <button class="btn" onclick="validateJSON()">✓ 校验</button>
+  <div class="sep"></div>
+  <label style="font-size:13px;color:var(--text-secondary);">缩进：</label>
+  <select id="indentSize" onchange="formatJSON()">
+    <option value="2">2 空格</option>
+    <option value="4">4 空格</option>
+    <option value="tab">Tab</option>
+  </select>
+  <div class="sep"></div>
+  <button class="btn" onclick="convertToCSV()">→ CSV</button>
+  <button class="btn" onclick="convertToXML()">→ XML</button>
+  <div class="sep"></div>
+  <button class="btn btn-danger" onclick="clearAll()">✕ 清空</button>
+  <button class="btn" onclick="loadSample()">📋 示例</button>
+  <button class="btn" onclick="copyOutput()">⎘ 复制结果</button>
+</div>
+
+<div class="main">
+  <!-- 输入面板 -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">输入 JSON</span>
+      <div class="panel-actions">
+        <span class="tag" id="inputStatus">等待输入</span>
+      </div>
+    </div>
+    <textarea id="inputArea" placeholder='在此粘贴或输入 JSON 内容...&#10;&#10;示例：{"name":"Alice","age":25}' oninput="onInputChange()"></textarea>
+  </div>
+
+  <!-- 输出面板 -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">输出结果</span>
+      <div class="panel-actions">
+        <span class="tag" id="outputStatus">-</span>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('formatted',this)">格式化</div>
+      <div class="tab" onclick="switchTab('highlight',this)">高亮</div>
+      <div class="tab" onclick="switchTab('convert',this)">转换结果</div>
+    </div>
+    <div id="tab-formatted" class="tab-content active">
+      <div class="error-msg" id="errorMsg"></div>
+      <div class="output-area" id="outputArea"></div>
+    </div>
+    <div id="tab-highlight" class="tab-content">
+      <div class="output-area" id="highlightArea" style="font-family:'JetBrains Mono','Consolas',monospace;font-size:13px;"></div>
+    </div>
+    <div id="tab-convert" class="tab-content">
+      <div class="output-area" id="convertArea" style="font-family:'JetBrains Mono','Consolas',monospace;font-size:13px;color:var(--text-secondary);"></div>
+    </div>
+  </div>
+</div>
+
+<div class="status-bar">
+  <div class="status-item">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">就绪</span>
+  </div>
+  <div class="status-item">字符数：<b id="charCount">0</b></div>
+  <div class="status-item">行数：<b id="lineCount">0</b></div>
+  <div class="status-item">大小：<b id="sizeInfo">0 B</b></div>
+</div>
+
+<script>
+function getIndent() {
+  const v = document.getElementById('indentSize').value;
+  return v === 'tab' ? '\t' : parseInt(v);
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorMsg');
+  el.textContent = '✕ ' + msg;
+  el.classList.add('show');
+  setStatus('err', '无效 JSON');
+  document.getElementById('outputStatus').className = 'tag err';
+  document.getElementById('outputStatus').textContent = '校验失败';
+  document.getElementById('inputStatus').className = 'tag err';
+  document.getElementById('inputStatus').textContent = '格式错误';
+}
+
+function hideError() {
+  document.getElementById('errorMsg').classList.remove('show');
+}
+
+function setStatus(type, text) {
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot ' + (type === 'ok' ? 'ok' : type === 'err' ? 'err' : '');
+  document.getElementById('statusText').textContent = text;
+}
+
+function updateStats(text) {
+  document.getElementById('charCount').textContent = text.length.toLocaleString();
+  document.getElementById('lineCount').textContent = text.split('\n').length.toLocaleString();
+  const bytes = new Blob([text]).size;
+  document.getElementById('sizeInfo').textContent = bytes < 1024 ? bytes + ' B' : (bytes/1024).toFixed(1) + ' KB';
+}
+
+function parseInput() {
+  const raw = document.getElementById('inputArea').value.trim();
+  if (!raw) throw new Error('请输入 JSON 内容');
+  return JSON.parse(raw);
+}
+
+function formatJSON() {
+  hideError();
+  const raw = document.getElementById('inputArea').value.trim();
+  if (!raw) return;
+  try {
+    const obj = JSON.parse(raw);
+    const indent = getIndent();
+    const formatted = JSON.stringify(obj, null, indent);
+    document.getElementById('outputArea').textContent = formatted;
+    document.getElementById('outputStatus').className = 'tag ok';
+    document.getElementById('outputStatus').textContent = '格式化完成';
+    document.getElementById('inputStatus').className = 'tag ok';
+    document.getElementById('inputStatus').textContent = '有效 JSON';
+    setStatus('ok', '格式化成功');
+    updateStats(formatted);
+    renderHighlight(obj);
+  } catch(e) {
+    showError(e.message);
+  }
+}
+
+function compressJSON() {
+  hideError();
+  try {
+    const obj = parseInput();
+    const compressed = JSON.stringify(obj);
+    document.getElementById('outputArea').textContent = compressed;
+    document.getElementById('outputStatus').className = 'tag ok';
+    document.getElementById('outputStatus').textContent = '压缩完成';
+    setStatus('ok', '压缩成功');
+    updateStats(compressed);
+    switchTab('formatted', document.querySelector('.tab'));
+  } catch(e) {
+    showError(e.message);
+  }
+}
+
+function validateJSON() {
+  hideError();
+  const raw = document.getElementById('inputArea').value.trim();
+  if (!raw) { setStatus('', '请先输入内容'); return; }
+  try {
+    const obj = JSON.parse(raw);
+    const typeInfo = Array.isArray(obj) ? `数组（${obj.length} 项）` : `对象（${Object.keys(obj).length} 个键）`;
+    document.getElementById('outputArea').textContent = `✓ JSON 校验通过\n\n类型：${typeInfo}\n字符数：${raw.length}\n字节数：${new Blob([raw]).size}`;
+    document.getElementById('outputStatus').className = 'tag ok';
+    document.getElementById('outputStatus').textContent = '校验通过';
+    document.getElementById('inputStatus').className = 'tag ok';
+    document.getElementById('inputStatus').textContent = '有效 JSON';
+    setStatus('ok', '校验通过 - ' + typeInfo);
+  } catch(e) {
+    showError(e.message);
+    document.getElementById('outputArea').textContent = '✕ 校验失败\n\n' + e.message;
+  }
+}
+
+function syntaxHighlight(json) {
+  json = json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+    let cls = 'json-number';
+    if (/^"/.test(match)) {
+      if (/:$/.test(match)) cls = 'json-key';
+      else cls = 'json-string';
+    } else if (/true|false/.test(match)) {
+      cls = 'json-bool';
+    } else if (/null/.test(match)) {
+      cls = 'json-null';
+    }
+    return '<span class="' + cls + '">' + match + '</span>';
+  });
+}
+
+function renderHighlight(obj) {
+  const indent = getIndent();
+  const formatted = JSON.stringify(obj, null, indent);
+  document.getElementById('highlightArea').innerHTML = syntaxHighlight(formatted);
+}
+
+function convertToCSV() {
+  hideError();
+  try {
+    const obj = parseInput();
+    let arr = Array.isArray(obj) ? obj : [obj];
+    if (arr.length === 0) { showError('数组为空'); return; }
+    const keys = [...new Set(arr.flatMap(item => Object.keys(item || {})))];
+    const header = keys.map(k => `"${k}"`).join(',');
+    const rows = arr.map(item =>
+      keys.map(k => {
+        const v = item[k];
+        if (v === null || v === undefined) return '';
+        const s = typeof v === 'object' ? JSON.stringify(v) : String(v);
+        return `"${s.replace(/"/g,'""')}"`;
+      }).join(',')
+    );
+    const csv = [header, ...rows].join('\n');
+    document.getElementById('convertArea').textContent = csv;
+    switchTab('convert', document.querySelectorAll('.tab')[2]);
+    setStatus('ok', 'JSON → CSV 转换成功');
+  } catch(e) { showError(e.message); }
+}
+
+function convertToXML() {
+  hideError();
+  try {
+    const obj = parseInput();
+    function toXML(val, tag = 'item', indent = '') {
+      if (Array.isArray(val)) {
+        return val.map(v => toXML(v, tag, indent)).join('\n');
+      } else if (typeof val === 'object' && val !== null) {
+        const children = Object.entries(val).map(([k,v]) =>
+          indent + '  ' + toXML(v, k, indent + '  ')
+        ).join('\n');
+        return `${indent}<${tag}>\n${children}\n${indent}</${tag}>`;
+      } else {
+        return `${indent}<${tag}>${val}</${tag}>`;
+      }
+    }
+    const xml = '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n' +
+      (Array.isArray(obj)
+        ? obj.map(item => toXML(item, 'item', '  ')).join('\n')
+        : Object.entries(obj).map(([k,v]) => toXML(v, k, '  ')).join('\n')
+      ) + '\n</root>';
+    document.getElementById('convertArea').textContent = xml;
+    switchTab('convert', document.querySelectorAll('.tab')[2]);
+    setStatus('ok', 'JSON → XML 转换成功');
+  } catch(e) { showError(e.message); }
+}
+
+function clearAll() {
+  document.getElementById('inputArea').value = '';
+  document.getElementById('outputArea').textContent = '';
+  document.getElementById('highlightArea').innerHTML = '';
+  document.getElementById('convertArea').textContent = '';
+  hideError();
+  setStatus('', '就绪');
+  document.getElementById('charCount').textContent = '0';
+  document.getElementById('lineCount').textContent = '0';
+  document.getElementById('sizeInfo').textContent = '0 B';
+  document.getElementById('inputStatus').className = 'tag';
+  document.getElementById('inputStatus').textContent = '等待输入';
+  document.getElementById('outputStatus').className = 'tag';
+  document.getElementById('outputStatus').textContent = '-';
+}
+
+function loadSample() {
+  const sample = {
+    "name": "Alice",
+    "age": 28,
+    "active": true,
+    "address": {
+      "city": "Shanghai",
+      "zip": "200000"
+    },
+    "tags": ["developer", "designer"],
+    "score": null
+  };
+  document.getElementById('inputArea').value = JSON.stringify(sample);
+  formatJSON();
+}
+
+function copyOutput() {
+  const activeTab = document.querySelector('.tab-content.active');
+  let text = '';
+  if (activeTab.id === 'tab-formatted') text = document.getElementById('outputArea').textContent;
+  else if (activeTab.id === 'tab-highlight') text = document.getElementById('highlightArea').textContent;
+  else text = document.getElementById('convertArea').textContent;
+  if (!text) { setStatus('', '没有可复制的内容'); return; }
+  navigator.clipboard.writeText(text).then(() => setStatus('ok', '已复制到剪贴板'));
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function onInputChange() {
+  const val = document.getElementById('inputArea').value;
+  updateStats(val);
+  if (!val.trim()) {
+    document.getElementById('inputStatus').className = 'tag';
+    document.getElementById('inputStatus').textContent = '等待输入';
+    hideError();
+    return;
+  }
+  try {
+    JSON.parse(val);
+    document.getElementById('inputStatus').className = 'tag ok';
+    document.getElementById('inputStatus').textContent = '有效 JSON';
+    hideError();
+  } catch(e) {
+    document.getElementById('inputStatus').className = 'tag err';
+    document.getElementById('inputStatus').textContent = '格式错误';
+  }
+}
+
+// 支持 Ctrl+Enter 格式化
+document.getElementById('inputArea').addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); formatJSON(); }
+});
+</script>
+</body>
+</html>

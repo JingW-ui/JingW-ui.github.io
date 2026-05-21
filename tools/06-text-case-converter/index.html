@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文本大小写 / 格式转换工具</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif; background: var(--bg2); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+  .header-icon { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:14px; }
+  header h1 { font-size:18px; font-weight:600; }
+  header p { font-size:13px; color:var(--text2); }
+  .main { flex:1; padding:20px 24px; display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media(max-width:768px) { .main { grid-template-columns:1fr; } }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column; }
+  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; display:flex; justify-content:space-between; align-items:center; }
+  .card-body { padding:16px 18px; flex:1; display:flex; flex-direction:column; gap:10px; }
+  textarea { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Consolas',monospace; font-size:13px; line-height:1.6; resize:vertical; min-height:130px; background:var(--bg); color:var(--text); transition:border-color .15s; }
+  textarea:focus { outline:none; border-color:var(--green); box-shadow:0 0 0 3px rgba(45,164,78,.12); }
+  .btn-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .btn { display:inline-flex; align-items:center; justify-content:center; gap:5px; padding:8px 14px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn:hover { background:var(--bg3); }
+  .btn-primary { background:var(--green); color:white; border-color:var(--green); }
+  .btn-primary:hover { background:var(--green2); }
+  .btn-wide { grid-column:span 2; }
+  .result-box { padding:10px 14px; background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); font-family:'Consolas',monospace; font-size:13px; line-height:1.6; word-break:break-all; min-height:40px; color:var(--text); white-space:pre-wrap; }
+  .label { font-size:12px; color:var(--text2); font-weight:500; margin-bottom:4px; }
+  .actions { display:flex; gap:8px; }
+  .badge { font-size:11px; padding:2px 8px; border-radius:12px; background:var(--bg3); color:var(--text2); border:1px solid var(--border); }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-icon">Aa</div>
+  <div>
+    <h1>文本大小写 / 格式转换工具</h1>
+    <p>大小写互换、驼峰/下划线/短横线命名互转、首字母大写</p>
+  </div>
+</header>
+
+<div class="main">
+  <!-- 基础大小写 -->
+  <div class="card">
+    <div class="card-header"><span>大小写转换</span></div>
+    <div class="card-body">
+      <div>
+        <div class="label">输入文本</div>
+        <textarea id="caseInput" placeholder="输入文本内容...">Hello World, this is a TEXT conversion TOOL!</textarea>
+      </div>
+      <div class="btn-grid">
+        <button class="btn" onclick="convert('upper')">全部大写 ABC</button>
+        <button class="btn" onclick="convert('lower')">全部小写 abc</button>
+        <button class="btn" onclick="convert('title')">首字母大写 Title</button>
+        <button class="btn" onclick="convert('toggle')">大小写切换 aBC</button>
+        <button class="btn" onclick="convert('sentence')">句首大写</button>
+        <button class="btn" onclick="convert('invert')">大小写翻转</button>
+      </div>
+      <div>
+        <div class="label">转换结果</div>
+        <div class="result-box" id="caseResult">-</div>
+        <div class="actions" style="margin-top:8px;">
+          <button class="btn btn-primary" style="font-size:12px;padding:5px 12px;" onclick="copyResult('caseResult')">⎘ 复制</button>
+          <button class="btn" style="font-size:12px;padding:5px 12px;" onclick="useAsInput()">→ 作为输入</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 命名格式转换 -->
+  <div class="card">
+    <div class="card-header"><span>命名格式转换</span></div>
+    <div class="card-body">
+      <div>
+        <div class="label">输入文本（任意格式）</div>
+        <textarea id="nameInput" placeholder="如：helloWorld 或 hello_world 或 hello-world...">helloWorldThisIsATest</textarea>
+      </div>
+      <div class="btn-grid">
+        <button class="btn" onclick="namingConvert('camel')">🐫 camelCase</button>
+        <button class="btn" onclick="namingConvert('pascal')">Pascal Case</button>
+        <button class="btn" onclick="namingConvert('snake')">🐍 snake_case</button>
+        <button class="btn" onclick="namingConvert('kebab')">🍢 kebab-case</button>
+        <button class="btn" onclick="namingConvert('constant')">CONSTANT_CASE</button>
+        <button class="btn" onclick="namingConvert('dot')">dot.case</button>
+        <button class="btn btn-wide" onclick="namingConvert('space')">空 格 分 隔</button>
+      </div>
+      <div>
+        <div class="label">转换结果</div>
+        <div class="result-box" id="nameResult">-</div>
+        <div class="actions" style="margin-top:8px;">
+          <button class="btn btn-primary" style="font-size:12px;padding:5px 12px;" onclick="copyResult('nameResult')">⎘ 复制</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 批量一键转换 -->
+  <div class="card" style="grid-column:span 2;">
+    <div class="card-header">
+      <span>批量命名转换（多行输入，每行独立处理）</span>
+      <button class="btn btn-primary" style="font-size:12px;padding:5px 14px;" onclick="batchConvert()">▶ 转换</button>
+    </div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr auto 1fr 1fr 1fr 1fr;gap:12px;align-items:start;">
+        <div>
+          <div class="label">输入（每行一个）</div>
+          <textarea id="batchInput" rows="8" placeholder="userName&#10;get_user_info&#10;fetch-user-data&#10;GetUserProfile">userName
+get_user_info
+fetch-user-data
+GetUserProfile</textarea>
+        </div>
+        <div style="padding-top:28px;">
+          <div style="font-size:20px;color:var(--text2);">→</div>
+        </div>
+        <div>
+          <div class="label">camelCase</div>
+          <textarea id="batchCamel" rows="8" readonly style="background:var(--bg2);"></textarea>
+        </div>
+        <div>
+          <div class="label">PascalCase</div>
+          <textarea id="batchPascal" rows="8" readonly style="background:var(--bg2);"></textarea>
+        </div>
+        <div>
+          <div class="label">snake_case</div>
+          <textarea id="batchSnake" rows="8" readonly style="background:var(--bg2);"></textarea>
+        </div>
+        <div>
+          <div class="label">kebab-case</div>
+          <textarea id="batchKebab" rows="8" readonly style="background:var(--bg2);"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function tokenize(str) {
+  // 拆分为词组
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1 $2')  // camel/pascal
+    .replace(/[_\-\.]+/g, ' ')              // snake/kebab/dot
+    .toLowerCase()
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function namingConvert(type) {
+  const input = document.getElementById('nameInput').value;
+  const words = tokenize(input);
+  let result = '';
+  switch(type) {
+    case 'camel': result = words[0] + words.slice(1).map(w => w[0].toUpperCase() + w.slice(1)).join(''); break;
+    case 'pascal': result = words.map(w => w[0].toUpperCase() + w.slice(1)).join(''); break;
+    case 'snake': result = words.join('_'); break;
+    case 'kebab': result = words.join('-'); break;
+    case 'constant': result = words.join('_').toUpperCase(); break;
+    case 'dot': result = words.join('.'); break;
+    case 'space': result = words.join(' '); break;
+  }
+  document.getElementById('nameResult').textContent = result;
+}
+
+function convert(type) {
+  const input = document.getElementById('caseInput').value;
+  let result = '';
+  switch(type) {
+    case 'upper': result = input.toUpperCase(); break;
+    case 'lower': result = input.toLowerCase(); break;
+    case 'title': result = input.replace(/\b\w/g, c => c.toUpperCase()); break;
+    case 'toggle': result = input.split('').map(c => c === c.toUpperCase() ? c.toLowerCase() : c.toUpperCase()).join(''); break;
+    case 'sentence': result = input.toLowerCase().replace(/(^\s*\w|[.!?]\s+\w)/g, c => c.toUpperCase()); break;
+    case 'invert': result = input.split('').map(c => { const u=c.toUpperCase(),l=c.toLowerCase(); return c===u?l:u; }).join(''); break;
+  }
+  document.getElementById('caseResult').textContent = result;
+}
+
+function useAsInput() {
+  document.getElementById('caseInput').value = document.getElementById('caseResult').textContent;
+}
+
+function batchConvert() {
+  const lines = document.getElementById('batchInput').value.split('\n');
+  const convs = {camel:[], pascal:[], snake:[], kebab:[]};
+  lines.forEach(line => {
+    if (!line.trim()) { Object.values(convs).forEach(a => a.push('')); return; }
+    const words = tokenize(line.trim());
+    convs.camel.push(words[0] + words.slice(1).map(w=>w[0].toUpperCase()+w.slice(1)).join(''));
+    convs.pascal.push(words.map(w=>w[0].toUpperCase()+w.slice(1)).join(''));
+    convs.snake.push(words.join('_'));
+    convs.kebab.push(words.join('-'));
+  });
+  document.getElementById('batchCamel').value = convs.camel.join('\n');
+  document.getElementById('batchPascal').value = convs.pascal.join('\n');
+  document.getElementById('batchSnake').value = convs.snake.join('\n');
+  document.getElementById('batchKebab').value = convs.kebab.join('\n');
+}
+
+function copyResult(id) {
+  const text = document.getElementById(id).textContent;
+  if (text && text !== '-') navigator.clipboard.writeText(text).then(() => showToast('已复制'));
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t=document.createElement('div'); t.id='_toast'; t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent=msg; t.style.opacity='1'; clearTimeout(t._to); t._to=setTimeout(()=>t.style.opacity='0',1800);
+}
+
+// 初始化批量转换
+batchConvert();
+</script>
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>正则表达式测试器</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --red:#cf222e; --blue:#0969da; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+  .header-icon { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; }
+  header h1 { font-size:18px; font-weight:600; }
+  header p { font-size:13px; color:var(--text2); }
+  .main { flex:1; padding:20px 24px; display:flex; flex-direction:column; gap:16px; max-width:1100px; margin:0 auto; width:100%; }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); }
+  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
+  .card-body { padding:16px 18px; }
+  .regex-input-row { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
+  .regex-wrap { display:flex; align-items:center; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; flex:1; transition:border-color .15s; }
+  .regex-wrap:focus-within { border-color:var(--green); box-shadow:0 0 0 3px rgba(45,164,78,.12); }
+  .regex-slash { padding:8px 10px; background:var(--bg2); color:var(--text2); font-family:monospace; font-size:16px; font-weight:bold; }
+  .regex-wrap input { flex:1; padding:8px 4px; border:none; outline:none; font-family:'Consolas',monospace; font-size:14px; background:var(--bg); color:var(--text); }
+  .flags-input { width:80px; padding:8px 10px; border:none; outline:none; font-family:'Consolas',monospace; font-size:14px; background:var(--bg2); color:var(--text); }
+  .flag-btns { display:flex; gap:4px; flex-wrap:wrap; }
+  .flag-btn { padding:4px 10px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text2); font-size:12px; cursor:pointer; font-family:monospace; transition:all .15s; }
+  .flag-btn:hover { background:var(--bg3); }
+  .flag-btn.active { background:#dafbe1; color:var(--green); border-color:#9fdbab; }
+  textarea { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Consolas',monospace; font-size:13px; line-height:1.7; resize:vertical; min-height:100px; background:var(--bg); color:var(--text); transition:border-color .15s; }
+  textarea:focus { outline:none; border-color:var(--green); box-shadow:0 0 0 3px rgba(45,164,78,.12); }
+  .highlight-area { padding:10px 14px; font-family:'Consolas',monospace; font-size:13px; line-height:1.7; white-space:pre-wrap; word-break:break-all; border:1px solid var(--border); border-radius:var(--radius); min-height:60px; background:var(--bg); }
+  mark { background:#fff3b0; color:inherit; border-radius:2px; padding:0 1px; border-bottom:2px solid #f1c40f; }
+  mark.current { background:#ff9f43; }
+  .status-tag { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:12px; font-size:12px; }
+  .tag-ok { background:#dafbe1; color:var(--green); border:1px solid #9fdbab; }
+  .tag-err { background:#ffebe9; color:var(--red); border:1px solid #ffc1c0; }
+  .tag-warn { background:#fff3b0; color:#9a6700; border:1px solid #e3b341; }
+  .match-list { max-height:200px; overflow-y:auto; }
+  .match-item { display:flex; gap:12px; padding:6px 10px; border-bottom:1px solid var(--bg3); font-family:monospace; font-size:12px; align-items:center; }
+  .match-item:hover { background:var(--bg2); }
+  .match-idx { width:60px; color:var(--text2); flex-shrink:0; }
+  .match-pos { width:100px; color:var(--text2); flex-shrink:0; }
+  .match-val { color:var(--blue); font-weight:500; }
+  .match-groups { color:var(--text2); font-size:11px; }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn:hover { background:var(--bg3); }
+  .btn-primary { background:var(--green); color:white; border-color:var(--green); }
+  .btn-primary:hover { background:var(--green2); }
+  /* 模板库 */
+  .tpl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:8px; }
+  .tpl-item { padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius); cursor:pointer; transition:all .15s; }
+  .tpl-item:hover { border-color:var(--green); background:#f0fdf4; }
+  .tpl-name { font-size:13px; font-weight:500; margin-bottom:3px; }
+  .tpl-pattern { font-family:monospace; font-size:11px; color:var(--blue); word-break:break-all; }
+  .replace-row { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; margin-bottom:10px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-icon">.*</div>
+  <div>
+    <h1>正则表达式测试器</h1>
+    <p>正则匹配测试、分组提取、替换预览、常用正则模板库</p>
+  </div>
+</header>
+
+<div class="main">
+  <!-- 正则输入 -->
+  <div class="card">
+    <div class="card-header">
+      <span>正则表达式</span>
+      <div id="regexStatus" class="status-tag tag-warn">等待输入</div>
+    </div>
+    <div class="card-body">
+      <div class="regex-input-row">
+        <div class="regex-wrap">
+          <span class="regex-slash">/</span>
+          <input type="text" id="regexPattern" placeholder="输入正则表达式..." oninput="runTest()">
+          <span class="regex-slash">/</span>
+          <input type="text" id="regexFlags" class="flags-input" value="g" placeholder="gim..." oninput="runTest()">
+        </div>
+        <button class="btn" onclick="clearRegex()">✕</button>
+      </div>
+      <div class="flag-btns">
+        <span style="font-size:12px;color:var(--text2);margin-right:4px;">标志：</span>
+        <button class="flag-btn active" id="flag-g" onclick="toggleFlag('g',this)" title="全局匹配">g 全局</button>
+        <button class="flag-btn" id="flag-i" onclick="toggleFlag('i',this)" title="忽略大小写">i 忽略大小写</button>
+        <button class="flag-btn" id="flag-m" onclick="toggleFlag('m',this)" title="多行模式">m 多行</button>
+        <button class="flag-btn" id="flag-s" onclick="toggleFlag('s',this)" title=". 匹配换行">s 点匹配换行</button>
+        <button class="flag-btn" id="flag-u" onclick="toggleFlag('u',this)" title="Unicode">u Unicode</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 测试文本 & 匹配高亮 -->
+  <div class="card">
+    <div class="card-header">
+      <span>测试文本</span>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span id="matchSummary" style="font-size:12px;color:var(--text2);">-</span>
+        <button class="btn" style="padding:4px 10px;font-size:12px;" onclick="loadSampleText()">示例文本</button>
+      </div>
+    </div>
+    <div class="card-body" style="display:grid;grid-template-columns:1fr;gap:12px;">
+      <div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">输入文本（直接编辑）</div>
+        <textarea id="testText" rows="6" placeholder="在此输入或粘贴测试文本..." oninput="runTest()">Hello World! My email is test@example.com and phone is +86-138-0000-1234.
+Visit https://www.example.com for more info.
+Date: 2024-01-15, Price: $99.99</textarea>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">匹配高亮结果</div>
+        <div class="highlight-area" id="highlightResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 匹配详情 -->
+  <div class="card" id="matchDetailCard" style="display:none;">
+    <div class="card-header"><span>匹配详情</span><span id="matchCount" style="font-size:12px;color:var(--text2);"></span></div>
+    <div class="match-list" id="matchList"></div>
+  </div>
+
+  <!-- 替换预览 -->
+  <div class="card">
+    <div class="card-header"><span>替换预览</span></div>
+    <div class="card-body">
+      <div class="replace-row">
+        <div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:5px;">替换为（支持 $1 $2 等分组引用）</div>
+          <input type="text" id="replaceStr" placeholder="替换内容，如：[$1]、REPLACED..." style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-family:monospace;font-size:13px;background:var(--bg);color:var(--text);outline:none;" oninput="runReplace()">
+        </div>
+        <div style="padding-top:22px;font-size:20px;color:var(--text2);">→</div>
+        <div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:5px;">替换结果</div>
+          <div class="highlight-area" id="replaceResult" style="min-height:36px;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" style="font-size:12px;padding:5px 14px;" onclick="copyReplace()">⎘ 复制替换结果</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 模板库 -->
+  <div class="card">
+    <div class="card-header"><span>常用正则模板库</span><span style="font-size:12px;color:var(--text2);">点击模板直接填入</span></div>
+    <div class="card-body">
+      <div class="tpl-grid" id="tplGrid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const templates = [
+  { name: '邮箱地址', pattern: '[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}', flags: 'g' },
+  { name: 'URL 网址', pattern: 'https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{2,256}\\.[a-z]{2,6}\\b([-a-zA-Z0-9@:%_\\+.~#?&//=]*)', flags: 'gi' },
+  { name: '手机号（中国）', pattern: '1[3-9]\\d{9}', flags: 'g' },
+  { name: 'IP 地址', pattern: '(?:\\d{1,3}\\.){3}\\d{1,3}', flags: 'g' },
+  { name: '日期 YYYY-MM-DD', pattern: '\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])', flags: 'g' },
+  { name: '时间 HH:MM:SS', pattern: '(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d', flags: 'g' },
+  { name: 'HTML 标签', pattern: '<[^>]+>', flags: 'g' },
+  { name: '十六进制颜色', pattern: '#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})', flags: 'g' },
+  { name: '整数', pattern: '-?\\d+', flags: 'g' },
+  { name: '浮点数', pattern: '-?\\d+\\.\\d+', flags: 'g' },
+  { name: '中文字符', pattern: '[\\u4e00-\\u9fa5]+', flags: 'g' },
+  { name: 'UUID', pattern: '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', flags: 'gi' },
+  { name: '银行卡号', pattern: '\\d{16,19}', flags: 'g' },
+  { name: '邮政编码', pattern: '[1-9]\\d{5}', flags: 'g' },
+  { name: 'MD5 哈希', pattern: '[0-9a-fA-F]{32}', flags: 'g' },
+  { name: '空行', pattern: '^\\s*$', flags: 'gm' },
+];
+
+// 渲染模板
+const grid = document.getElementById('tplGrid');
+templates.forEach(t => {
+  const div = document.createElement('div');
+  div.className = 'tpl-item';
+  div.innerHTML = `<div class="tpl-name">${t.name}</div><div class="tpl-pattern">${escHtml(t.pattern)}</div>`;
+  div.onclick = () => {
+    document.getElementById('regexPattern').value = t.pattern;
+    document.getElementById('regexFlags').value = t.flags;
+    syncFlagBtns(t.flags);
+    runTest();
+  };
+  grid.appendChild(div);
+});
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toggleFlag(flag, btn) {
+  const flagsEl = document.getElementById('regexFlags');
+  let flags = flagsEl.value;
+  if (flags.includes(flag)) flags = flags.replace(flag, '');
+  else flags += flag;
+  flagsEl.value = flags;
+  syncFlagBtns(flags);
+  runTest();
+}
+function syncFlagBtns(flags) {
+  ['g','i','m','s','u'].forEach(f => {
+    const btn = document.getElementById('flag-' + f);
+    if (btn) btn.classList.toggle('active', flags.includes(f));
+  });
+}
+
+function runTest() {
+  const pattern = document.getElementById('regexPattern').value;
+  const flags = document.getElementById('regexFlags').value;
+  const text = document.getElementById('testText').value;
+  const statusEl = document.getElementById('regexStatus');
+
+  if (!pattern) {
+    statusEl.className = 'status-tag tag-warn'; statusEl.textContent = '等待输入';
+    document.getElementById('highlightResult').textContent = text;
+    document.getElementById('matchDetailCard').style.display = 'none';
+    document.getElementById('matchSummary').textContent = '-';
+    return;
+  }
+
+  let regex;
+  try {
+    regex = new RegExp(pattern, flags);
+    statusEl.className = 'status-tag tag-ok'; statusEl.textContent = '✓ 有效正则';
+  } catch(e) {
+    statusEl.className = 'status-tag tag-err'; statusEl.textContent = '✕ ' + e.message;
+    document.getElementById('highlightResult').textContent = text;
+    return;
+  }
+
+  // 匹配
+  const matches = [...text.matchAll(new RegExp(pattern, flags.includes('g') ? flags : flags+'g'))];
+  document.getElementById('matchSummary').textContent = `共 ${matches.length} 个匹配`;
+
+  // 高亮
+  let html = '', lastIdx = 0;
+  matches.forEach((m, i) => {
+    const start = m.index, end = start + m[0].length;
+    html += escHtml(text.slice(lastIdx, start));
+    html += `<mark title="匹配 ${i+1}: ${escHtml(m[0])}">${escHtml(m[0])}</mark>`;
+    lastIdx = end;
+  });
+  html += escHtml(text.slice(lastIdx));
+  document.getElementById('highlightResult').innerHTML = html || escHtml(text);
+
+  // 匹配列表
+  if (matches.length > 0) {
+    document.getElementById('matchDetailCard').style.display = 'block';
+    document.getElementById('matchCount').textContent = matches.length + ' 个匹配';
+    const listEl = document.getElementById('matchList');
+    listEl.innerHTML = '';
+    matches.slice(0, 100).forEach((m, i) => {
+      const groups = m.slice(1).length ? `分组：[${m.slice(1).map(g => g===undefined?'undefined':'"'+g+'"').join(', ')}]` : '';
+      const div = document.createElement('div');
+      div.className = 'match-item';
+      div.innerHTML = `<span class="match-idx">#${i+1}</span><span class="match-pos">位置 ${m.index}~${m.index+m[0].length}</span><span class="match-val">${escHtml(m[0])}</span><span class="match-groups">${escHtml(groups)}</span>`;
+      listEl.appendChild(div);
+    });
+    if (matches.length > 100) listEl.innerHTML += `<div class="match-item" style="color:var(--text2);">... 仅显示前 100 个匹配</div>`;
+  } else {
+    document.getElementById('matchDetailCard').style.display = 'none';
+  }
+
+  runReplace();
+}
+
+function runReplace() {
+  const pattern = document.getElementById('regexPattern').value;
+  const flags = document.getElementById('regexFlags').value;
+  const text = document.getElementById('testText').value;
+  const rep = document.getElementById('replaceStr').value;
+  if (!pattern) { document.getElementById('replaceResult').textContent = text; return; }
+  try {
+    const regex = new RegExp(pattern, flags);
+    const result = text.replace(regex, rep);
+    document.getElementById('replaceResult').textContent = result;
+  } catch(e) { document.getElementById('replaceResult').textContent = text; }
+}
+
+function clearRegex() {
+  document.getElementById('regexPattern').value = '';
+  document.getElementById('regexFlags').value = 'g';
+  syncFlagBtns('g');
+  runTest();
+}
+
+function copyReplace() {
+  const v = document.getElementById('replaceResult').textContent;
+  navigator.clipboard.writeText(v).then(() => showToast('已复制'));
+}
+
+function loadSampleText() {
+  document.getElementById('testText').value = `Hello World! My email is test@example.com and phone is +86-138-0000-1234.
+Visit https://www.example.com for more info.
+Date: 2024-01-15, Price: $99.99, Color: #FF5733
+UUID: 550e8400-e29b-41d4-a716-446655440000`;
+  runTest();
+}
+
+function showToast(msg) {
+  let t=document.getElementById('_toast');
+  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',1800);
+}
+
+// 初始化
+runTest();
+</script>
+</body>
+</html>

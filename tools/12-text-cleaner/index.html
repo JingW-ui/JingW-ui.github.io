@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>文本去重/清洗工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:1000px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600}
+.card-body{padding:16px}
+.ops-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.op-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s}
+.op-item:hover{background:#f6f8fa}
+.op-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--green);margin-top:2px;cursor:pointer;flex-shrink:0}
+.op-item-text h4{font-size:13px;font-weight:500}
+.op-item-text p{font-size:11px;color:#656d76;margin-top:2px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.row{grid-template-columns:1fr}}
+label{display:block;font-size:12px;color:#656d76;margin-bottom:4px;font-weight:500}
+textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;resize:vertical;min-height:240px;font-family:inherit;line-height:1.6;outline:none;transition:border-color .15s}
+textarea:focus{border-color:var(--green)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.stats-bar{display:flex;gap:16px;flex-wrap:wrap;padding:10px 16px;background:#f6f8fa;border-top:1px solid var(--border);font-size:12px;color:#656d76}
+.stat-item{display:flex;gap:4px}
+.stat-item b{color:#1a7f37}
+.diff-badge{background:#dff4e0;color:#1a7f37;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600}
+.diff-badge.red{background:#ffe3e6;color:#cf222e}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🧹</span>
+  <h1>文本去重/清洗工具</h1>
+  <p>去重 · 去空格 · 批量替换 · 格式整理</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-header">⚙️ 清洗操作（可多选）</div>
+    <div class="card-body">
+      <div class="ops-grid">
+        <label class="op-item"><input type="checkbox" id="op-dedup" checked><div class="op-item-text"><h4>🔄 行去重</h4><p>删除重复行，保留第一次出现</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-sort"><div class="op-item-text"><h4>🔢 行排序</h4><p>按字母顺序对行进行排序</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-trim-line"><div class="op-item-text"><h4>✂️ 去行首尾空格</h4><p>移除每行首尾的空白字符</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-empty"><div class="op-item-text"><h4>🗑 删除空行</h4><p>删除所有空白行</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-extra-space"><div class="op-item-text"><h4>📦 合并多余空格</h4><p>将连续空格压缩为单个</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-full-half"><div class="op-item-text"><h4>🔡 全角转半角</h4><p>全角字母数字标点转半角</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-cn-punc"><div class="op-item-text"><h4>，。转英文标点</h4><p>中文标点替换为对应英文标点</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-no-punc"><div class="op-item-text"><h4>🚫 删除标点符号</h4><p>移除所有标点和特殊字符</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-no-number"><div class="op-item-text"><h4>🔢 删除数字</h4><p>移除所有数字字符</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-no-english"><div class="op-item-text"><h4>🔤 删除英文</h4><p>移除所有英文字母</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-to-upper"><div class="op-item-text"><h4>AA 全部大写</h4><p>英文字母转为大写</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-to-lower"><div class="op-item-text"><h4>aa 全部小写</h4><p>英文字母转为小写</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-add-num"><div class="op-item-text"><h4>📝 添加行号</h4><p>在每行前添加序号</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-reverse"><div class="op-item-text"><h4>↕️ 行反转</h4><p>反转所有行的顺序</p></div></label>
+        <label class="op-item"><input type="checkbox" id="op-shuffle"><div class="op-item-text"><h4>🎲 行随机排序</h4><p>随机打乱所有行顺序</p></div></label>
+      </div>
+      <div style="margin-top:12px;padding:10px;background:#f6f8fa;border:1px solid var(--border);border-radius:var(--radius)">
+        <div style="font-size:12px;font-weight:600;margin-bottom:8px;color:#656d76">📝 自定义替换</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input type="text" id="rep-from" placeholder="查找内容" style="flex:1;min-width:120px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;outline:none">
+          <span style="color:#656d76;font-size:13px">→</span>
+          <input type="text" id="rep-to" placeholder="替换为（空=删除）" style="flex:1;min-width:120px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;outline:none">
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="rep-regex" style="accent-color:var(--green)"> 正则</label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div>
+          <label>输入文本</label>
+          <textarea id="input" placeholder="在此粘贴需要清洗的文本..." oninput="updateStats()"></textarea>
+        </div>
+        <div>
+          <label>清洗结果</label>
+          <textarea id="output" placeholder="清洗结果显示在这里..." readonly style="background:#f8fff9"></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="process()">🧹 开始清洗</button>
+        <button class="btn btn-secondary" onclick="copyOutput()">📋 复制结果</button>
+        <button class="btn btn-secondary" onclick="swapIO()">⇄ 结果→输入</button>
+        <button class="btn btn-secondary" onclick="clearAll()">🗑 清空</button>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-item">输入：<b id="in-lines">0</b> 行 / <b id="in-chars">0</b> 字符</div>
+      <div class="stat-item">输出：<b id="out-lines">0</b> 行 / <b id="out-chars">0</b> 字符</div>
+      <div id="diff-info"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function process() {
+  let text = document.getElementById('input').value;
+  if (!text) { showToast('请先输入文本'); return; }
+
+  // 自定义替换
+  const repFrom = document.getElementById('rep-from').value;
+  const repTo = document.getElementById('rep-to').value;
+  if (repFrom) {
+    const useRegex = document.getElementById('rep-regex').checked;
+    try {
+      const re = useRegex ? new RegExp(repFrom, 'g') : repFrom;
+      text = useRegex ? text.replace(re, repTo) : text.split(repFrom).join(repTo);
+    } catch(e) { showToast('正则表达式错误：' + e.message); return; }
+  }
+
+  // 全角转半角
+  if (document.getElementById('op-full-half').checked) {
+    text = text.replace(/[\uff01-\uff5e]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+              .replace(/\u3000/g, ' ');
+  }
+
+  // 中文标点转英文
+  if (document.getElementById('op-cn-punc').checked) {
+    const map = {'，':',','。':'.','！':'!','？':'?','；':';','：':':','（':'(','）':')','【':'[','】':']','「':'"','」':'"','『':"'",'』':"'",'、':','};
+    for (const [k,v] of Object.entries(map)) text = text.split(k).join(v);
+  }
+
+  // 合并多余空格
+  if (document.getElementById('op-extra-space').checked) {
+    text = text.replace(/[^\S\n]+/g, ' ');
+  }
+
+  // 删除标点
+  if (document.getElementById('op-no-punc').checked) {
+    text = text.replace(/[^\w\s\u4e00-\u9fff]/g, '');
+  }
+
+  // 删除数字
+  if (document.getElementById('op-no-number').checked) {
+    text = text.replace(/\d/g, '');
+  }
+
+  // 删除英文
+  if (document.getElementById('op-no-english').checked) {
+    text = text.replace(/[a-zA-Z]/g, '');
+  }
+
+  // 大小写
+  if (document.getElementById('op-to-upper').checked) text = text.toUpperCase();
+  if (document.getElementById('op-to-lower').checked) text = text.toLowerCase();
+
+  // 按行处理
+  let lines = text.split('\n');
+
+  // 行首尾空格
+  if (document.getElementById('op-trim-line').checked) {
+    lines = lines.map(l => l.trim());
+  }
+
+  // 删除空行
+  if (document.getElementById('op-empty').checked) {
+    lines = lines.filter(l => l.trim() !== '');
+  }
+
+  // 行去重
+  if (document.getElementById('op-dedup').checked) {
+    const seen = new Set();
+    lines = lines.filter(l => {
+      if (seen.has(l)) return false;
+      seen.add(l); return true;
+    });
+  }
+
+  // 排序
+  if (document.getElementById('op-sort').checked) {
+    lines = lines.sort((a, b) => a.localeCompare(b, 'zh-CN'));
+  }
+
+  // 行反转
+  if (document.getElementById('op-reverse').checked) {
+    lines = lines.reverse();
+  }
+
+  // 随机排序
+  if (document.getElementById('op-shuffle').checked) {
+    for (let i = lines.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [lines[i], lines[j]] = [lines[j], lines[i]];
+    }
+  }
+
+  // 添加行号
+  if (document.getElementById('op-add-num').checked) {
+    const pad = String(lines.length).length;
+    lines = lines.map((l, i) => `${String(i+1).padStart(pad,'0')}. ${l}`);
+  }
+
+  const result = lines.join('\n');
+  document.getElementById('output').value = result;
+  updateOutStats(result);
+}
+
+function updateStats() {
+  const v = document.getElementById('input').value;
+  document.getElementById('in-lines').textContent = v ? v.split('\n').length : 0;
+  document.getElementById('in-chars').textContent = v.length;
+}
+
+function updateOutStats(text) {
+  const lines = text ? text.split('\n').length : 0;
+  const chars = text.length;
+  document.getElementById('out-lines').textContent = lines;
+  document.getElementById('out-chars').textContent = chars;
+  const inChars = document.getElementById('input').value.length;
+  const diff = inChars - chars;
+  if (diff > 0) {
+    document.getElementById('diff-info').innerHTML = `<span class="diff-badge">节省 ${diff} 字符</span>`;
+  } else if (diff < 0) {
+    document.getElementById('diff-info').innerHTML = `<span class="diff-badge red">增加 ${-diff} 字符</span>`;
+  }
+}
+
+function copyOutput() {
+  navigator.clipboard.writeText(document.getElementById('output').value).then(() => showToast('已复制'));
+}
+
+function swapIO() {
+  const inEl = document.getElementById('input');
+  const outEl = document.getElementById('output');
+  inEl.value = outEl.value;
+  updateStats();
+  document.getElementById('output').value = '';
+  document.getElementById('out-lines').textContent = '0';
+  document.getElementById('out-chars').textContent = '0';
+}
+
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('output').value = '';
+  updateStats();
+  document.getElementById('out-lines').textContent = '0';
+  document.getElementById('out-chars').textContent = '0';
+  document.getElementById('diff-info').innerHTML = '';
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+</script>
+</body>
+</html>

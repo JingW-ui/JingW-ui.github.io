@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>词频统计工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:1100px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-body{padding:16px}
+textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;resize:vertical;min-height:160px;font-family:inherit;line-height:1.6;outline:none;transition:border-color .15s}
+textarea:focus{border-color:var(--green)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.opt{display:inline-flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:4px 8px;border:1px solid var(--border);border-radius:var(--radius)}
+.opt input{accent-color:var(--green)}
+.layout{display:grid;grid-template-columns:1fr 300px;gap:16px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f6f8fa;padding:8px 12px;text-align:left;font-weight:600;border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:#f0f2f5}
+td{padding:7px 12px;border-bottom:1px solid #f0f2f5;vertical-align:middle}
+tr:hover td{background:#f8fff9}
+.bar-cell{width:120px}
+.bar{height:10px;background:#d1f0d8;border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;background:var(--green);border-radius:5px;transition:width .3s}
+.rank-badge{display:inline-block;width:24px;height:24px;border-radius:50%;background:#dff4e0;color:#1a7f37;font-size:11px;font-weight:700;text-align:center;line-height:24px}
+.rank-badge.top1{background:#ffd700;color:#7d4f00}
+.rank-badge.top2{background:#c0c0c0;color:#444}
+.rank-badge.top3{background:#cd7f32;color:#fff}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sum-item{background:#f6f8fa;border:1px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center}
+.sum-item .val{font-size:22px;font-weight:700;color:var(--green)}
+.sum-item .lbl{font-size:11px;color:#656d76;margin-top:2px}
+.cloud{display:flex;flex-wrap:wrap;gap:6px;padding:12px}
+.cloud-word{padding:3px 10px;border-radius:20px;cursor:pointer;transition:all .15s;font-weight:500;border:1px solid transparent}
+.cloud-word:hover{transform:scale(1.05)}
+.stopwords-info{font-size:11px;color:#656d76;margin-top:4px}
+select{padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;background:#fff;outline:none}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">📊</span>
+  <h1>词频统计工具</h1>
+  <p>字符/单词/中文词语 · 可视化排行</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-header">📝 输入文本</div>
+    <div class="card-body">
+      <textarea id="input" placeholder="在此粘贴需要统计词频的文本...&#10;支持中文、英文，自动分词统计"></textarea>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="analyze()">📊 统计分析</button>
+        <button class="btn btn-secondary" onclick="copyTable()">📋 复制表格</button>
+        <button class="btn btn-secondary" onclick="clearAll()">🗑 清空</button>
+        <label class="opt"><input type="checkbox" id="opt-ignore-case" checked> 忽略大小写</label>
+        <label class="opt"><input type="checkbox" id="opt-stop" checked> 过滤停用词</label>
+        <label class="opt"><input type="checkbox" id="opt-cn"> 中文单字统计</label>
+        <div style="display:flex;align-items:center;gap:4px">
+          <span style="font-size:12px;color:#656d76">统计模式：</span>
+          <select id="mode">
+            <option value="word">英文单词</option>
+            <option value="char">字符</option>
+            <option value="cn">中文词语</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <span style="font-size:12px;color:#656d76">显示前</span>
+          <select id="top-n">
+            <option value="20">20</option>
+            <option value="50" selected>50</option>
+            <option value="100">100</option>
+            <option value="0">全部</option>
+          </select>
+          <span style="font-size:12px;color:#656d76">个</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <span>📋 词频排行</span>
+          <span id="total-words" style="font-size:12px;color:#656d76;font-weight:400">共 0 种词</span>
+        </div>
+        <div class="table-wrap">
+          <table id="freq-table">
+            <thead>
+              <tr>
+                <th onclick="sortBy('rank')">排名</th>
+                <th onclick="sortBy('word')">词语</th>
+                <th onclick="sortBy('count')">频次 ↓</th>
+                <th onclick="sortBy('pct')">占比</th>
+                <th class="bar-cell">频率条</th>
+              </tr>
+            </thead>
+            <tbody id="freq-body">
+              <tr><td colspan="5" style="text-align:center;padding:32px;color:#656d76">请输入文本后点击"统计分析"</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">📈 统计摘要</div>
+        <div class="card-body">
+          <div class="summary-grid">
+            <div class="sum-item"><div class="val" id="s-total">0</div><div class="lbl">总词数</div></div>
+            <div class="sum-item"><div class="val" id="s-unique">0</div><div class="lbl">不重复词</div></div>
+            <div class="sum-item"><div class="val" id="s-chars">0</div><div class="lbl">总字符</div></div>
+            <div class="sum-item"><div class="val" id="s-lines">0</div><div class="lbl">总行数</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">☁️ 词云（前50）</div>
+        <div class="cloud" id="word-cloud"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 英文停用词
+const EN_STOP = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','shall','can','need','dare','used','it','its','this','that','these','those','i','you','he','she','we','they','me','him','her','us','them','my','your','his','our','their','mine','yours','hers','ours','theirs','not','no','nor','so','yet','both','either','neither','each','every','all','any','few','more','most','other','some','such','than','too','very','just','about','above','after','before','between','into','through','during','against','without','within','along','following','across','behind','beyond','plus','except','up','out','around','down','off','above','over','under']);
+
+// 中文停用词
+const CN_STOP = new Set(['的','了','是','在','我','有','和','就','不','人','都','一','一个','上','也','很','到','说','要','去','你','会','着','没有','看','好','自己','这','那','么','些','而','被','把','个','它','她','他','们','等','所','及','与','之','为','以','但','对','且','又','若','则','用','年','来','中','大','国','里','地','出','生','可','下','内','还','过','后','时','从','如','何','其','起','就','作']);
+
+let freqData = [];
+let sortKey = 'count';
+let sortAsc = false;
+
+const COLORS = ['#2da44e','#0969da','#bf8700','#cf222e','#8250df','#1b7c83','#953800'];
+
+function tokenize(text) {
+  const mode = document.getElementById('mode').value;
+  const ignoreCase = document.getElementById('opt-ignore-case').checked;
+  const useStop = document.getElementById('opt-stop').checked;
+
+  if (mode === 'char') {
+    return [...text].filter(c => c.trim()).map(c => ignoreCase ? c.toLowerCase() : c);
+  } else if (mode === 'cn') {
+    // 中文：每个汉字单独计
+    const chars = [...text].filter(c => /[\u4e00-\u9fff]/.test(c));
+    return useStop ? chars.filter(c => !CN_STOP.has(c)) : chars;
+  } else {
+    // 英文单词
+    let words = text.match(/[a-zA-Z']+/g) || [];
+    if (ignoreCase) words = words.map(w => w.toLowerCase());
+    if (useStop) words = words.filter(w => !EN_STOP.has(w.toLowerCase()));
+    // 也统计中文词语（简单切分）
+    const cnWords = text.match(/[\u4e00-\u9fff]{2,6}/g) || [];
+    const cnFiltered = useStop ? cnWords.filter(w => !CN_STOP.has(w)) : cnWords;
+    return [...words, ...cnFiltered];
+  }
+}
+
+function analyze() {
+  const text = document.getElementById('input').value;
+  if (!text.trim()) { showToast('请先输入文本'); return; }
+
+  const tokens = tokenize(text);
+  const freq = {};
+  for (const t of tokens) freq[t] = (freq[t] || 0) + 1;
+
+  const total = tokens.length;
+  freqData = Object.entries(freq).map(([word, count]) => ({
+    word, count, pct: (count/total*100).toFixed(2)+'%'
+  }));
+  freqData.sort((a,b) => b.count - a.count);
+
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-unique').textContent = freqData.length;
+  document.getElementById('s-chars').textContent = text.length;
+  document.getElementById('s-lines').textContent = text.split('\n').length;
+  document.getElementById('total-words').textContent = `共 ${freqData.length} 种词`;
+
+  renderTable();
+  renderCloud();
+}
+
+function renderTable() {
+  const topN = parseInt(document.getElementById('top-n').value) || 9999;
+  let data = [...freqData];
+  data.sort((a, b) => {
+    const va = a[sortKey === 'pct' ? 'count' : sortKey] || 0;
+    const vb = b[sortKey === 'pct' ? 'count' : sortKey] || 0;
+    if (sortKey === 'word') return sortAsc ? a.word.localeCompare(b.word) : b.word.localeCompare(a.word);
+    return sortAsc ? va - vb : vb - va;
+  });
+  const shown = topN ? data.slice(0, topN) : data;
+  const maxCount = shown.length > 0 ? shown[0].count : 1;
+
+  const ranks = {0:'top1',1:'top2',2:'top3'};
+  const tbody = document.getElementById('freq-body');
+  tbody.innerHTML = shown.map((item, i) => {
+    const rankClass = ranks[i] || '';
+    const pct = (item.count / maxCount * 100).toFixed(0);
+    const color = COLORS[i % COLORS.length];
+    return `<tr>
+      <td><span class="rank-badge ${rankClass}">${i+1}</span></td>
+      <td><b>${escHtml(item.word)}</b></td>
+      <td><b style="color:${color}">${item.count}</b></td>
+      <td>${item.pct}</td>
+      <td class="bar-cell"><div class="bar"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="5" style="text-align:center;padding:24px;color:#656d76">无结果</td></tr>';
+}
+
+function renderCloud() {
+  const shown = freqData.slice(0, 50);
+  if (shown.length === 0) { document.getElementById('word-cloud').innerHTML = ''; return; }
+  const max = shown[0].count;
+  const cloud = document.getElementById('word-cloud');
+  cloud.innerHTML = shown.map((item, i) => {
+    const scale = 0.7 + (item.count / max) * 1.3;
+    const color = COLORS[i % COLORS.length];
+    const bg = color + '18';
+    return `<span class="cloud-word" style="font-size:${Math.round(scale*13)}px;color:${color};background:${bg};border-color:${color}40" title="${item.word}: ${item.count}次">${escHtml(item.word)}</span>`;
+  }).join('');
+}
+
+function sortBy(key) {
+  if (sortKey === key) sortAsc = !sortAsc;
+  else { sortKey = key; sortAsc = false; }
+  renderTable();
+}
+
+function copyTable() {
+  if (freqData.length === 0) { showToast('没有数据可复制'); return; }
+  const lines = ['排名\t词语\t频次\t占比', ...freqData.map((item,i) => `${i+1}\t${item.word}\t${item.count}\t${item.pct}`)];
+  navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('表格已复制（TSV格式）'));
+}
+
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('freq-body').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:32px;color:#656d76">请输入文本后点击"统计分析"</td></tr>';
+  document.getElementById('word-cloud').innerHTML = '';
+  ['s-total','s-unique','s-chars','s-lines'].forEach(id => document.getElementById(id).textContent = '0');
+  document.getElementById('total-words').textContent = '共 0 种词';
+  freqData = [];
+}
+
+function escHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+</script>
+</body>
+</html>

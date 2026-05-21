@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>图片裁剪/尺寸调整工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:1000px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:16px}
+.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all .2s}
+.dropzone:hover{border-color:var(--green);background:#f0fff4}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.layout{display:grid;grid-template-columns:1fr 280px;gap:16px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+.canvas-wrap{position:relative;overflow:hidden;background:#e8e8e8;border:1px solid var(--border);border-radius:var(--radius);min-height:200px;display:flex;align-items:center;justify-content:center;cursor:crosshair}
+canvas#main-canvas{display:block;max-width:100%}
+.crop-overlay{position:absolute;border:2px solid #2da44e;background:rgba(45,164,78,0.1);cursor:move;pointer-events:none}
+.crop-handle{position:absolute;width:10px;height:10px;background:#2da44e;border:2px solid #fff;border-radius:2px}
+.crop-handle.nw{top:-5px;left:-5px;cursor:nw-resize}
+.crop-handle.ne{top:-5px;right:-5px;cursor:ne-resize}
+.crop-handle.sw{bottom:-5px;left:-5px;cursor:sw-resize}
+.crop-handle.se{bottom:-5px;right:-5px;cursor:se-resize}
+.side-panel label{display:block;font-size:12px;color:#656d76;margin-bottom:4px;font-weight:500}
+input[type=number]{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;outline:none}
+input:focus{border-color:var(--green)}
+select{width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.info-box{background:#f6f8fa;border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:12px;color:#656d76;margin-bottom:10px}
+.info-box div{margin-bottom:4px}
+.preview-canvas{max-width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#f0f0f0}
+.ratio-btns{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.ratio-btn{padding:3px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px;cursor:pointer;transition:all .15s;background:#fff}
+.ratio-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+.section-title{font-size:12px;font-weight:600;color:#656d76;margin:12px 0 6px;text-transform:uppercase;letter-spacing:.5px}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">✂️</span>
+  <h1>图片裁剪/尺寸调整工具</h1>
+  <p>可视化裁剪 · 等比缩放 · 旋转翻转</p>
+</header>
+<div class="container">
+  <div class="card" id="upload-card">
+    <div class="card-header">📁 上传图片</div>
+    <div class="card-body">
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()"
+        ondragover="event.preventDefault();this.style.borderColor='#2da44e'"
+        ondragleave="this.style.borderColor=''"
+        ondrop="handleDrop(event)">
+        <div style="font-size:48px;margin-bottom:12px">🖼️</div>
+        <p style="color:#656d76">点击选择图片或拖拽到此处</p>
+        <div style="font-size:12px;color:#aaa;margin-top:6px">支持 JPG、PNG、WebP、GIF</div>
+      </div>
+      <input type="file" id="file-input" accept="image/*" style="display:none" onchange="loadImage(this.files[0])">
+    </div>
+  </div>
+
+  <div class="card" id="editor-card" style="display:none">
+    <div class="card-header">
+      <span>✏️ 编辑图片</span>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button class="btn btn-secondary" style="font-size:12px;padding:4px 10px" onclick="document.getElementById('file-input').click()">重新上传</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="layout">
+        <div>
+          <div class="canvas-wrap" id="canvas-wrap">
+            <canvas id="main-canvas"></canvas>
+            <div class="crop-overlay" id="crop-overlay" style="display:none">
+              <div class="crop-handle nw" data-handle="nw"></div>
+              <div class="crop-handle ne" data-handle="ne"></div>
+              <div class="crop-handle sw" data-handle="sw"></div>
+              <div class="crop-handle se" data-handle="se"></div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-primary" onclick="applyOps()" id="apply-btn">✅ 应用并预览</button>
+            <button class="btn btn-secondary" onclick="downloadResult()">⬇️ 下载结果</button>
+            <button class="btn btn-secondary" onclick="resetImage()">🔄 重置</button>
+          </div>
+        </div>
+        <div class="side-panel">
+          <div class="section-title">📐 尺寸调整</div>
+          <div class="form-row">
+            <div><label>宽度(px)</label><input type="number" id="out-w" placeholder="宽"></div>
+            <div><label>高度(px)</label><input type="number" id="out-h" placeholder="高"></div>
+          </div>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;margin-bottom:10px">
+            <input type="checkbox" id="keep-ratio" checked style="accent-color:var(--green)">保持宽高比
+          </label>
+          <div class="section-title">✂️ 裁剪区域</div>
+          <div class="form-row">
+            <div><label>X（左）</label><input type="number" id="crop-x" value="0"></div>
+            <div><label>Y（上）</label><input type="number" id="crop-y" value="0"></div>
+          </div>
+          <div class="form-row">
+            <div><label>宽度</label><input type="number" id="crop-w" value="0"></div>
+            <div><label>高度</label><input type="number" id="crop-h" value="0"></div>
+          </div>
+          <div class="ratio-btns">
+            <span class="ratio-btn" onclick="setRatio(1,1)">1:1</span>
+            <span class="ratio-btn" onclick="setRatio(4,3)">4:3</span>
+            <span class="ratio-btn" onclick="setRatio(16,9)">16:9</span>
+            <span class="ratio-btn" onclick="setRatio(3,2)">3:2</span>
+            <span class="ratio-btn" onclick="setRatio(0,0)">自由</span>
+          </div>
+          <div class="section-title">🔄 变换</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px">
+            <button class="btn btn-secondary" style="font-size:12px;justify-content:center" onclick="rotate(-90)">↺ 左旋90°</button>
+            <button class="btn btn-secondary" style="font-size:12px;justify-content:center" onclick="rotate(90)">↻ 右旋90°</button>
+            <button class="btn btn-secondary" style="font-size:12px;justify-content:center" onclick="flip('h')">↔ 水平翻转</button>
+            <button class="btn btn-secondary" style="font-size:12px;justify-content:center" onclick="flip('v')">↕ 垂直翻转</button>
+          </div>
+          <div class="section-title">💾 输出格式</div>
+          <select id="save-format"><option value="image/jpeg">JPEG</option><option value="image/png">PNG</option><option value="image/webp">WebP</option></select>
+          <div style="margin-top:6px;display:flex;align-items:center;gap:6px">
+            <label style="font-size:12px;color:#656d76">质量：</label>
+            <input type="range" id="save-quality" min="1" max="100" value="90" style="flex:1;height:4px" oninput="document.getElementById('qual-val').textContent=this.value+'%'">
+            <span id="qual-val" style="font-size:12px;color:#656d76;width:32px">90%</span>
+          </div>
+          <div class="info-box" id="img-info" style="margin-top:10px"></div>
+        </div>
+      </div>
+      <div class="card" id="preview-card" style="display:none;margin-top:0">
+        <div class="card-header">👁️ 输出预览</div>
+        <div class="card-body" style="text-align:center">
+          <canvas id="preview-canvas" class="preview-canvas"></canvas>
+          <div id="preview-info" style="font-size:12px;color:#656d76;margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let origImage = null;
+let rotation = 0;
+let flipH = false, flipV = false;
+let cropRatio = 0;
+
+function handleDrop(e) {
+  e.preventDefault();
+  loadImage(e.dataTransfer.files[0]);
+}
+
+function loadImage(file) {
+  if (!file || !file.type.startsWith('image/')) { showToast('请选择图片文件'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      origImage = img;
+      rotation = 0; flipH = false; flipV = false;
+      document.getElementById('upload-card').style.display = 'none';
+      document.getElementById('editor-card').style.display = 'block';
+      document.getElementById('out-w').value = img.width;
+      document.getElementById('out-h').value = img.height;
+      document.getElementById('crop-w').value = img.width;
+      document.getElementById('crop-h').value = img.height;
+      document.getElementById('crop-x').value = 0;
+      document.getElementById('crop-y').value = 0;
+      document.getElementById('img-info').innerHTML = `
+        <div>文件名：${file.name}</div>
+        <div>原始尺寸：${img.width} × ${img.height} px</div>
+        <div>文件大小：${(file.size/1024).toFixed(1)} KB</div>
+        <div>类型：${file.type}</div>
+      `;
+      drawCanvas();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function drawCanvas() {
+  if (!origImage) return;
+  const canvas = document.getElementById('main-canvas');
+  const wrap = document.getElementById('canvas-wrap');
+  const maxW = wrap.clientWidth - 32;
+  const scale = Math.min(1, maxW / origImage.width);
+  
+  let dw = origImage.width, dh = origImage.height;
+  if (rotation === 90 || rotation === 270) [dw, dh] = [dh, dw];
+  const displayScale = Math.min(1, maxW / dw);
+  canvas.width = Math.round(dw * displayScale);
+  canvas.height = Math.round(dh * displayScale);
+  
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(canvas.width/2, canvas.height/2);
+  ctx.rotate(rotation * Math.PI / 180);
+  if (flipH) ctx.scale(-1, 1);
+  if (flipV) ctx.scale(1, -1);
+  ctx.drawImage(origImage, -origImage.width*displayScale/2, -origImage.height*displayScale/2, origImage.width*displayScale, origImage.height*displayScale);
+  ctx.restore();
+}
+
+function rotate(deg) {
+  rotation = (rotation + deg + 360) % 360;
+  drawCanvas();
+}
+
+function flip(dir) {
+  if (dir === 'h') flipH = !flipH;
+  else flipV = !flipV;
+  drawCanvas();
+}
+
+function setRatio(w, h) {
+  document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  cropRatio = (w && h) ? w/h : 0;
+  if (cropRatio && origImage) {
+    const cw = Math.min(origImage.width, origImage.height * cropRatio);
+    const ch = Math.round(cw / cropRatio);
+    document.getElementById('crop-w').value = Math.round(cw);
+    document.getElementById('crop-h').value = ch;
+  }
+}
+
+document.getElementById('out-w').addEventListener('input', function() {
+  if (document.getElementById('keep-ratio').checked && origImage) {
+    const ratio = origImage.height / origImage.width;
+    document.getElementById('out-h').value = Math.round(this.value * ratio);
+  }
+});
+document.getElementById('out-h').addEventListener('input', function() {
+  if (document.getElementById('keep-ratio').checked && origImage) {
+    const ratio = origImage.width / origImage.height;
+    document.getElementById('out-w').value = Math.round(this.value * ratio);
+  }
+});
+
+function applyOps() {
+  if (!origImage) return;
+  const cropX = parseInt(document.getElementById('crop-x').value) || 0;
+  const cropY = parseInt(document.getElementById('crop-y').value) || 0;
+  let cropW = parseInt(document.getElementById('crop-w').value) || origImage.width;
+  let cropH = parseInt(document.getElementById('crop-h').value) || origImage.height;
+  const outW = parseInt(document.getElementById('out-w').value) || cropW;
+  const outH = parseInt(document.getElementById('out-h').value) || cropH;
+
+  // 限制裁剪区域
+  cropW = Math.min(cropW, origImage.width - cropX);
+  cropH = Math.min(cropH, origImage.height - cropY);
+
+  const canvas = document.getElementById('preview-canvas');
+  canvas.width = outW; canvas.height = outH;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, outW, outH);
+  ctx.save();
+  ctx.translate(outW/2, outH/2);
+  ctx.rotate(rotation * Math.PI / 180);
+  if (flipH) ctx.scale(-1, 1);
+  if (flipV) ctx.scale(1, -1);
+
+  // 应用裁剪
+  const sx = cropX, sy = cropY, sw = cropW, sh = cropH;
+  const scaleX = outW / sw, scaleY = outH / sh;
+  const sc = Math.min(scaleX, scaleY);
+  ctx.drawImage(origImage, sx, sy, sw, sh, -sw*sc/2, -sh*sc/2, sw*sc, sh*sc);
+  ctx.restore();
+
+  document.getElementById('preview-card').style.display = 'block';
+  document.getElementById('preview-info').textContent = `输出尺寸：${outW} × ${outH} px`;
+  showToast('已应用变换，点击"下载结果"保存');
+}
+
+function downloadResult() {
+  const canvas = document.getElementById('preview-canvas');
+  if (canvas.width === 0) { applyOps(); return; }
+  const fmt = document.getElementById('save-format').value;
+  const quality = parseInt(document.getElementById('save-quality').value) / 100;
+  const ext = fmt.split('/')[1] === 'jpeg' ? 'jpg' : fmt.split('/')[1];
+  canvas.toBlob(blob => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'cropped.' + ext; a.click();
+  }, fmt, quality);
+}
+
+function resetImage() {
+  if (!origImage) return;
+  rotation = 0; flipH = false; flipV = false;
+  document.getElementById('out-w').value = origImage.width;
+  document.getElementById('out-h').value = origImage.height;
+  document.getElementById('crop-x').value = 0;
+  document.getElementById('crop-y').value = 0;
+  document.getElementById('crop-w').value = origImage.width;
+  document.getElementById('crop-h').value = origImage.height;
+  drawCanvas();
+  document.getElementById('preview-card').style.display = 'none';
+  showToast('已重置');
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+</script>
+</body>
+</html>

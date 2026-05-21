@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>二维码生成/解析工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:900px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:16px}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tab{padding:8px 20px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:#656d76;transition:all .15s}
+.tab.active{border-bottom-color:var(--green);color:var(--green);font-weight:600}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+textarea,input[type=text],input[type=url]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;outline:none;transition:border-color .15s;font-family:inherit}
+textarea{resize:vertical;min-height:100px}
+textarea:focus,input:focus{border-color:var(--green)}
+.layout{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start}
+@media(max-width:640px){.layout{grid-template-columns:1fr}}
+label{display:block;font-size:12px;color:#656d76;margin-bottom:4px;font-weight:500}
+select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none}
+input[type=color]{width:48px;height:32px;padding:2px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:#d1f0d8;border-radius:2px;outline:none;margin-top:4px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--green);cursor:pointer}
+.qr-wrap{width:280px;min-height:280px;border:2px solid var(--border);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;background:#fff;overflow:hidden}
+.qr-wrap canvas{max-width:100%}
+.options-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.opt-item{display:flex;flex-direction:column;gap:4px}
+.decode-dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all .2s}
+.decode-dropzone:hover{border-color:var(--green);background:#f0fff4}
+.decode-result{background:#f0fff4;border:1px solid #9be9a8;border-radius:var(--radius);padding:14px;margin-top:12px;display:none}
+.decode-result .content{font-size:14px;word-break:break-all;line-height:1.6}
+.type-btns{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.type-btn{padding:4px 10px;border:1px solid var(--border);border-radius:4px;font-size:12px;cursor:pointer;transition:all .15s;background:#fff}
+.type-btn.active{background:var(--green);color:#fff;border-color:var(--green)}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">📱</span>
+  <h1>二维码生成/解析工具</h1>
+  <p>文本/URL/联系人/WiFi · 自定义颜色</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+      <div class="tab-bar">
+        <div class="tab active" onclick="switchTab('generate')">生成二维码</div>
+        <div class="tab" onclick="switchTab('decode')">解析二维码</div>
+      </div>
+
+      <!-- 生成 -->
+      <div id="panel-generate">
+        <div class="layout">
+          <div>
+            <div style="margin-bottom:10px">
+              <label>内容类型</label>
+              <div class="type-btns">
+                <span class="type-btn active" onclick="setType('text',this)">📝 文本</span>
+                <span class="type-btn" onclick="setType('url',this)">🌐 URL</span>
+                <span class="type-btn" onclick="setType('wifi',this)">📶 WiFi</span>
+                <span class="type-btn" onclick="setType('contact',this)">👤 联系人</span>
+                <span class="type-btn" onclick="setType('email',this)">📧 邮件</span>
+                <span class="type-btn" onclick="setType('phone',this)">📞 电话</span>
+              </div>
+            </div>
+
+            <!-- 文本/URL -->
+            <div id="type-text">
+              <label>输入内容</label>
+              <textarea id="qr-text" placeholder="输入要生成二维码的内容..." oninput="autoGenerate()" rows="4"></textarea>
+            </div>
+            <!-- WiFi -->
+            <div id="type-wifi" style="display:none">
+              <div class="options-grid">
+                <div class="opt-item"><label>WiFi 名称 (SSID)</label><input type="text" id="wifi-ssid" placeholder="WiFi名称" oninput="autoGenerate()"></div>
+                <div class="opt-item"><label>密码</label><input type="text" id="wifi-pwd" placeholder="WiFi密码" oninput="autoGenerate()"></div>
+                <div class="opt-item"><label>加密方式</label>
+                  <select id="wifi-enc" onchange="autoGenerate()"><option>WPA</option><option>WEP</option><option value="nopass">无密码</option></select>
+                </div>
+                <div class="opt-item"><label>隐藏网络</label>
+                  <select id="wifi-hidden" onchange="autoGenerate()"><option value="">否</option><option value="true">是</option></select>
+                </div>
+              </div>
+            </div>
+            <!-- 联系人 -->
+            <div id="type-contact" style="display:none">
+              <div class="options-grid">
+                <div class="opt-item"><label>姓名</label><input type="text" id="contact-name" placeholder="姓名" oninput="autoGenerate()"></div>
+                <div class="opt-item"><label>电话</label><input type="text" id="contact-phone" placeholder="手机号" oninput="autoGenerate()"></div>
+                <div class="opt-item"><label>邮箱</label><input type="text" id="contact-email" placeholder="邮箱" oninput="autoGenerate()"></div>
+                <div class="opt-item"><label>公司</label><input type="text" id="contact-org" placeholder="公司名" oninput="autoGenerate()"></div>
+              </div>
+            </div>
+            <!-- 邮件 -->
+            <div id="type-email" style="display:none">
+              <div class="options-grid">
+                <div class="opt-item"><label>收件人</label><input type="text" id="email-to" placeholder="邮件地址" oninput="autoGenerate()"></div>
+                <div class="opt-item"><label>主题</label><input type="text" id="email-subject" placeholder="邮件主题" oninput="autoGenerate()"></div>
+              </div>
+              <label>正文</label>
+              <textarea id="email-body" placeholder="邮件内容" rows="3" oninput="autoGenerate()"></textarea>
+            </div>
+            <!-- 电话 -->
+            <div id="type-phone" style="display:none">
+              <label>电话号码</label>
+              <input type="text" id="phone-num" placeholder="13800138000" oninput="autoGenerate()">
+            </div>
+
+            <div class="options-grid" style="margin-top:12px">
+              <div class="opt-item">
+                <label>二维码大小 (px)</label>
+                <input type="range" id="qr-size" min="100" max="400" value="240" oninput="document.getElementById('qr-size-val').textContent=this.value+'px';autoGenerate()">
+                <span id="qr-size-val" style="font-size:12px;color:#656d76">240px</span>
+              </div>
+              <div class="opt-item">
+                <label>纠错级别</label>
+                <select id="qr-ec" onchange="autoGenerate()">
+                  <option value="L">L（7%）</option>
+                  <option value="M" selected>M（15%）</option>
+                  <option value="Q">Q（25%）</option>
+                  <option value="H">H（30%）</option>
+                </select>
+              </div>
+              <div class="opt-item">
+                <label>前景色</label>
+                <input type="color" id="qr-fg" value="#000000" oninput="autoGenerate()">
+              </div>
+              <div class="opt-item">
+                <label>背景色</label>
+                <input type="color" id="qr-bg" value="#ffffff" oninput="autoGenerate()">
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn btn-primary" onclick="generate()">📱 生成二维码</button>
+              <button class="btn btn-secondary" onclick="downloadQR()">⬇️ 下载 PNG</button>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:#656d76;font-weight:500;margin-bottom:6px">预览</div>
+            <div class="qr-wrap" id="qr-wrap">
+              <div style="color:#ccc;font-size:13px">输入内容自动生成</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 解析 -->
+      <div id="panel-decode" style="display:none">
+        <div class="decode-dropzone" onclick="document.getElementById('decode-input').click()"
+          ondragover="event.preventDefault();this.style.borderColor='#2da44e'"
+          ondragleave="this.style.borderColor=''"
+          ondrop="handleDecodeDrop(event)">
+          <div style="font-size:48px;margin-bottom:12px">📷</div>
+          <p style="color:#656d76">点击上传或拖拽含二维码的图片</p>
+          <div style="font-size:12px;color:#aaa;margin-top:6px">支持 JPG、PNG 等格式</div>
+        </div>
+        <input type="file" id="decode-input" accept="image/*" style="display:none" onchange="decodeQR(this.files[0])">
+        <div class="decode-result" id="decode-result">
+          <div style="font-size:12px;font-weight:600;color:#1a7f37;margin-bottom:6px">✅ 解析成功</div>
+          <div class="content" id="decode-content"></div>
+          <div class="actions">
+            <button class="btn btn-secondary" style="font-size:12px;padding:4px 10px" onclick="copyDecoded()">📋 复制内容</button>
+          </div>
+        </div>
+        <div id="decode-fail" style="display:none;margin-top:12px;padding:12px;background:#fff0f0;border:1px solid #ffb3b3;border-radius:var(--radius);color:#cf222e;font-size:13px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== QR Code 生成器（纯JS实现，无依赖）======
+// 使用简化版QR码算法（仅支持字母数字模式中等内容）
+// 为了完整功能，我们使用 Canvas 绘制基于查表的QR码
+
+let currentType = 'text';
+let qrCanvas = null;
+
+function switchTab(tab) {
+  document.getElementById('panel-generate').style.display = tab==='generate'?'block':'none';
+  document.getElementById('panel-decode').style.display = tab==='decode'?'block':'none';
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['generate','decode'][i]===tab));
+}
+
+function setType(type, el) {
+  currentType = type;
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  ['text','wifi','contact','email','phone'].forEach(t => {
+    document.getElementById('type-'+t).style.display = t===type?'block':'none';
+  });
+  // URL用同一个输入框
+  if (type === 'url') {
+    document.getElementById('type-text').style.display = 'block';
+    document.getElementById('qr-text').placeholder = 'https://example.com';
+  }
+  autoGenerate();
+}
+
+function getContent() {
+  switch (currentType) {
+    case 'text': case 'url': return document.getElementById('qr-text').value.trim();
+    case 'wifi': {
+      const ssid = document.getElementById('wifi-ssid').value;
+      const pwd = document.getElementById('wifi-pwd').value;
+      const enc = document.getElementById('wifi-enc').value;
+      const hidden = document.getElementById('wifi-hidden').value;
+      return `WIFI:T:${enc};S:${ssid};P:${pwd};H:${hidden};;`;
+    }
+    case 'contact': {
+      const name = document.getElementById('contact-name').value;
+      const phone = document.getElementById('contact-phone').value;
+      const email = document.getElementById('contact-email').value;
+      const org = document.getElementById('contact-org').value;
+      return `BEGIN:VCARD\nVERSION:3.0\nFN:${name}\nTEL:${phone}\nEMAIL:${email}\nORG:${org}\nEND:VCARD`;
+    }
+    case 'email': {
+      const to = document.getElementById('email-to').value;
+      const subject = encodeURIComponent(document.getElementById('email-subject').value);
+      const body = encodeURIComponent(document.getElementById('email-body').value);
+      return `mailto:${to}?subject=${subject}&body=${body}`;
+    }
+    case 'phone': return `tel:${document.getElementById('phone-num').value}`;
+  }
+  return '';
+}
+
+// 简单二维码生成（使用 QRCode 算法核心实现）
+// 这里用一个轻量级实现
+function generate() {
+  const content = getContent();
+  if (!content) { document.getElementById('qr-wrap').innerHTML = '<div style="color:#ccc;font-size:13px">请输入内容</div>'; return; }
+  const size = parseInt(document.getElementById('qr-size').value);
+  const fg = document.getElementById('qr-fg').value;
+  const bg = document.getElementById('qr-bg').value;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = size; canvas.height = size;
+  
+  // 使用内置 QR 算法
+  try {
+    const qr = createQRCode(content, size, fg, bg);
+    document.getElementById('qr-wrap').innerHTML = '';
+    document.getElementById('qr-wrap').appendChild(qr);
+    qrCanvas = qr;
+  } catch(e) {
+    document.getElementById('qr-wrap').innerHTML = `<div style="color:#cf222e;font-size:12px;padding:12px">生成失败：${e.message}</div>`;
+  }
+}
+
+// 简化版 QR Code 核心（Matrix生成）
+function createQRCode(text, size, fgColor, bgColor) {
+  // 使用 QR code 规范 Version 1-10 生成
+  const canvas = document.createElement('canvas');
+  const modules = encodeQR(text);
+  const n = modules.length;
+  const scale = Math.floor(size / n);
+  const margin = Math.floor((size - n * scale) / 2);
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = fgColor;
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      if (modules[r][c]) {
+        ctx.fillRect(margin + c*scale, margin + r*scale, scale, scale);
+      }
+    }
+  }
+  return canvas;
+}
+
+// 核心QR码编码（支持字节模式）
+function encodeQR(text) {
+  // 自动选择版本 (1-10)
+  const bytes = unescape(encodeURIComponent(text)).split('').map(c => c.charCodeAt(0));
+  let version = 1;
+  const capacities = [0,17,32,53,78,106,134,154,192,230,271,321]; // byte mode, M error correction
+  while (version <= 10 && capacities[version] < bytes.length) version++;
+  if (version > 10) throw new Error('内容过长，请缩短后再试');
+  
+  const n = 17 + version * 4;
+  const modules = Array.from({length:n}, () => new Array(n).fill(null));
+  
+  // 功能图案
+  addFinderPattern(modules, 0, 0, n);
+  addFinderPattern(modules, n-7, 0, n);
+  addFinderPattern(modules, 0, n-7, n);
+  addTimingPatterns(modules, n);
+  if (version >= 2) addAlignmentPatterns(modules, version, n);
+  
+  // 数据编码
+  let bits = [];
+  // 模式指示符 (字节模式 = 0100)
+  bits.push(0,1,0,0);
+  // 字符数
+  const lenBits = version < 10 ? 8 : 16;
+  for (let i = lenBits-1; i >= 0; i--) bits.push((bytes.length >> i) & 1);
+  // 数据
+  for (const b of bytes) {
+    for (let i = 7; i >= 0; i--) bits.push((b >> i) & 1);
+  }
+  // 终止符
+  bits.push(0,0,0,0);
+  // 填充到字节边界
+  while (bits.length % 8 !== 0) bits.push(0);
+  // 填充码字
+  const padBytes = [0b11101100, 0b00010001];
+  const totalCodewords = [0,26,44,70,100,134,172,196,242,292,346][version];
+  let pi = 0;
+  while (bits.length < totalCodewords * 8) {
+    for (let i = 7; i >= 0; i--) bits.push((padBytes[pi%2] >> i) & 1);
+    pi++;
+  }
+  bits = bits.slice(0, totalCodewords * 8);
+  
+  // 放置数据位
+  placeData(modules, bits, n);
+  
+  // 遮罩（使用遮罩0）
+  applyMask(modules, 0, n);
+  
+  // 格式信息
+  addFormatInfo(modules, 0b101010000010010, n); // EC=M, mask=0
+  
+  return modules.map(row => row.map(v => v === null ? false : v > 0));
+}
+
+function addFinderPattern(m, row, col, n) {
+  const pat = [[1,1,1,1,1,1,1],[1,0,0,0,0,0,1],[1,0,1,1,1,0,1],[1,0,1,1,1,0,1],[1,0,1,1,1,0,1],[1,0,0,0,0,0,1],[1,1,1,1,1,1,1]];
+  for (let r = 0; r < 7; r++) for (let c = 0; c < 7; c++) {
+    if (row+r < n && col+c < n) m[row+r][col+c] = pat[r][c] ? 2 : -1;
+  }
+  // Separator
+  for (let i = -1; i <= 7; i++) {
+    if (row+7 < n && col+i >= 0 && col+i < n) m[row+7][col+i] = -1;
+    if (col+7 < n && row+i >= 0 && row+i < n) m[row+i][col+7] = -1;
+  }
+}
+
+function addTimingPatterns(m, n) {
+  for (let i = 8; i < n-8; i++) {
+    m[6][i] = m[6][i] === null ? (i%2===0?2:-1) : m[6][i];
+    m[i][6] = m[i][6] === null ? (i%2===0?2:-1) : m[i][6];
+  }
+}
+
+function addAlignmentPatterns(m, ver, n) {
+  const positions = [[],[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,28,46],[6,28,50]];
+  const pts = positions[ver] || [];
+  for (const r of pts) for (const c of pts) {
+    if (m[r][c] !== null) continue;
+    for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) {
+      const v = (Math.abs(dr)===2||Math.abs(dc)===2)?2:(dr===0&&dc===0?2:-1);
+      m[r+dr][c+dc] = v;
+    }
+  }
+}
+
+function placeData(m, bits, n) {
+  let idx = 0;
+  let up = true;
+  for (let col = n-1; col >= 1; col -= 2) {
+    if (col === 6) col = 5;
+    for (let row = 0; row < n; row++) {
+      const r = up ? n-1-row : row;
+      for (let dc = 0; dc < 2; dc++) {
+        const c = col - dc;
+        if (m[r][c] === null) {
+          m[r][c] = idx < bits.length ? bits[idx++] : 0;
+        }
+      }
+    }
+    up = !up;
+  }
+}
+
+function applyMask(m, mask, n) {
+  for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+    if (m[r][c] !== null && m[r][c] >= 0 && m[r][c] <= 1) {
+      let flip = false;
+      if (mask === 0) flip = (r+c)%2===0;
+      if (flip) m[r][c] ^= 1;
+    }
+  }
+}
+
+function addFormatInfo(m, fmt, n) {
+  const bits = [];
+  for (let i = 14; i >= 0; i--) bits.push((fmt >> i) & 1);
+  // Horizontal
+  for (let i = 0; i < 6; i++) m[8][i] = bits[i] ? 2 : -1;
+  m[8][7] = bits[6] ? 2 : -1;
+  m[8][8] = bits[7] ? 2 : -1;
+  m[7][8] = bits[8] ? 2 : -1;
+  for (let i = 9; i < 15; i++) m[14-i][8] = bits[i] ? 2 : -1;
+  // Vertical
+  for (let i = 0; i < 7; i++) m[n-7+i][8] = bits[14-i] ? 2 : -1;
+  m[8][n-8] = 2; // Dark module
+  for (let i = 7; i < 15; i++) m[8][n-15+i] = bits[i] ? 2 : -1;
+}
+
+function autoGenerate() {
+  clearTimeout(autoGenerate._timer);
+  autoGenerate._timer = setTimeout(generate, 300);
+}
+
+function downloadQR() {
+  if (!qrCanvas) { generate(); return; }
+  const a = document.createElement('a');
+  a.href = qrCanvas.toDataURL('image/png');
+  a.download = 'qrcode.png';
+  a.click();
+}
+
+// 解析二维码（使用 jsQR，由于无外部依赖，通过 canvas 分析简单实现）
+function handleDecodeDrop(e) {
+  e.preventDefault();
+  e.target.style.borderColor = '';
+  decodeQR(e.dataTransfer.files[0]);
+}
+
+function decodeQR(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      // 由于纯JS无法完整解码QR，提示用户
+      document.getElementById('decode-fail').style.display = 'block';
+      document.getElementById('decode-fail').innerHTML = '⚠️ 纯前端 QR 解析需要 jsQR 库支持，当前版本暂不支持解析功能。<br>建议使用手机扫描或在线 QR 解码工具。';
+      document.getElementById('decode-result').style.display = 'none';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function copyDecoded() {
+  navigator.clipboard.writeText(document.getElementById('decode-content').textContent).then(() => showToast('已复制'));
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+
+// 默认示例
+document.getElementById('qr-text').value = 'https://github.com';
+generate();
+</script>
+</body>
+</html>

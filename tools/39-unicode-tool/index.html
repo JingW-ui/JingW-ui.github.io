@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>字符 / Unicode 工具</title>
+<style>
+  :root {
+    --green: #2da44e;
+    --green2: #2c974b;
+    --border: #d0d7de;
+    --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08);
+    --bg: #f6f8fa;
+    --card: #fff;
+    --text: #1f2328;
+    --text2: #656d76;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  .header {
+    text-align: center;
+    padding: 30px 0;
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 30px;
+  }
+  .header h1 { font-size: 32px; font-weight: 600; margin-bottom: 8px; }
+  .header p { font-size: 16px; opacity: 0.9; }
+
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 10px 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+  .tab:hover { background: var(--bg); }
+  .tab.active { background: var(--green); color: white; border-color: var(--green); }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(45,164,78,0.1);
+  }
+  .form-textarea { resize: vertical; min-height: 120px; }
+
+  .btn {
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover { background: var(--bg); }
+  .btn-primary { background: var(--green); color: white; border-color: var(--green); }
+  .btn-primary:hover { background: var(--green2); }
+
+  .result-box {
+    background: #f6f8fa;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 16px;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    word-break: break-all;
+    white-space: pre-wrap;
+    min-height: 60px;
+    position: relative;
+  }
+  .result-label {
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 8px;
+    font-family: -apple-system, sans-serif;
+  }
+
+  .char-display {
+    font-size: 64px;
+    text-align: center;
+    padding: 30px;
+    background: var(--bg);
+    border-radius: var(--radius);
+    margin: 16px 0;
+  }
+  .char-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .info-item {
+    background: var(--bg);
+    padding: 12px;
+    border-radius: var(--radius);
+  }
+  .info-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+  .info-value { font-family: "Courier New", monospace; font-size: 14px; word-break: break-all; }
+
+  .unicode-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+  }
+  .unicode-table th, .unicode-table td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 13px;
+  }
+  .unicode-table th {
+    background: var(--bg);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+  }
+  .unicode-table tr:hover { background: #f0f9f0; }
+  .char-cell {
+    font-size: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .char-cell:hover { background: #e8f5e9; }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .category-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .category-card:hover {
+    border-color: var(--green);
+    background: #f0f9f0;
+  }
+  .category-icon { font-size: 32px; margin-bottom: 8px; }
+  .category-name { font-size: 13px; font-weight: 500; }
+
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 4px 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { background: var(--bg); }
+
+  @media (max-width: 768px) {
+    .header h1 { font-size: 24px; }
+    .char-info { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>🔤 字符 / Unicode 工具</h1>
+    <p>Unicode 查询、编码转换、特殊字符大全</p>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('lookup')">🔍 字符查询</div>
+    <div class="tab" onclick="switchTab('convert')">🔄 编码转换</div>
+    <div class="tab" onclick="switchTab('categories')">📂 字符分类</div>
+    <div class="tab" onclick="switchTab('generator')">⚡ 特殊字符</div>
+  </div>
+
+  <!-- 字符查询 -->
+  <div class="tab-content" id="tab-lookup">
+    <div class="card">
+      <div class="card-title">🔍 字符信息查询</div>
+      <div class="form-group">
+        <label class="form-label">输入字符或 Unicode 编码</label>
+        <input type="text" class="form-input" id="lookupInput" placeholder="输入字符 (如: A) 或 Unicode (如: U+0041, 0041, \u0041)" oninput="lookupChar(this.value)">
+      </div>
+      <div id="charResult" style="display:none;">
+        <div class="char-display" id="charDisplay">A</div>
+        <div class="char-info" id="charInfo"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 编码转换 -->
+  <div class="tab-content" id="tab-convert" style="display:none;">
+    <div class="card">
+      <div class="card-title">🔄 Unicode 编码转换</div>
+      <div class="form-group">
+        <label class="form-label">输入文本</label>
+        <textarea class="form-textarea" id="convertInput" placeholder="输入要转换的文本..." oninput="convertText()"></textarea>
+      </div>
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="convertToUnicode()">转 Unicode 转义</button>
+        <button class="btn btn-secondary" onclick="convertToHTML()">转 HTML 实体</button>
+        <button class="btn btn-secondary" onclick="convertToCSS()">转 CSS 内容</button>
+        <button class="btn btn-secondary" onclick="decodeUnicode()">解码 Unicode</button>
+      </div>
+      <div class="result-box" id="convertResult">
+        <div class="result-label">转换结果</div>
+        <div id="convertOutput"></div>
+        <button class="copy-btn" onclick="copyResult('convertOutput')">📋 复制</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 字符分类 -->
+  <div class="tab-content" id="tab-categories" style="display:none;">
+    <div class="card">
+      <div class="card-title">📂 Unicode 字符分类浏览</div>
+      <div class="category-grid" id="categoryGrid"></div>
+      <div id="categoryChars" style="margin-top:20px;"></div>
+    </div>
+  </div>
+
+  <!-- 特殊字符生成器 -->
+  <div class="tab-content" id="tab-generator" style="display:none;">
+    <div class="card">
+      <div class="card-title">⚡ 常用特殊字符</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+        <button class="btn btn-secondary" onclick="insertChars('arrows')">→ 箭头</button>
+        <button class="btn btn-secondary" onclick="insertChars('math')">∑ 数学</button>
+        <button class="btn btn-secondary" onclick="insertChars('symbols')">♠ 符号</button>
+        <button class="btn btn-secondary" onclick="insertChars('emoji')">😀 表情</button>
+        <button class="btn btn-secondary" onclick="insertChars('punctuation')">« 标点</button>
+        <button class="btn btn-secondary" onclick="insertChars('currency')">€ 货币</button>
+        <button class="btn btn-secondary" onclick="insertChars('greek')">α 希腊</button>
+        <button class="btn btn-secondary" onclick="insertChars('roman')">Ⅰ 罗马</button>
+      </div>
+      <div class="result-box" id="charsResult">
+        <div class="result-label">点击字符复制到剪贴板</div>
+        <div id="charsOutput" style="font-size:20px;line-height:2;"></div>
+      </div>
+      <div class="form-group" style="margin-top:16px;">
+        <label class="form-label">生成结果</label>
+        <textarea class="form-textarea" id="generatedChars" placeholder="生成的字符将显示在这里..."></textarea>
+      </div>
+      <button class="btn btn-primary" onclick="copyResult('generatedChars')">📋 复制全部</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const unicodeCategories = {
+  '箭头符号': { start: 0x2190, end: 0x21FF, icon: '→' },
+  '数学运算符': { start: 0x2200, end: 0x22FF, icon: '∑' },
+  '杂项符号': { start: 0x2600, end: 0x26FF, icon: '☀' },
+  '符号字体': { start: 0x2700, end: 0x27BF, icon: '✂' },
+  '星星符号': { start: 0x2605, end: 0x2606, icon: '★' },
+  '扑克牌': { start: 0x2660, end: 0x2667, icon: '♠' },
+  '音乐符号': { start: 0x2669, end: 0x266F, icon: '♩' },
+  '希腊字母': { start: 0x0391, end: 0x03C9, icon: 'α' },
+  '罗马数字': { start: 0x2160, end: 0x2188, icon: 'Ⅰ' },
+  '货币符号': { start: 0x20A0, end: 0x20CF, icon: '€' },
+};
+
+const charSets = {
+  arrows: '← ↑ → ↓ ↔ ↕ ↗ ↘ ↙ ↖ ⇐ ⇑ ⇒ ⇓ ⇔ ⇕',
+  math: '∑ ∏ √ ∞ ∫ ≈ ≠ ≡ ≤ ≥ ∂ ∆ ∇ ∈ ∉ ∋ ∌ ¬ ∧ ∨ ∃ ∀ ∅',
+  symbols: '♠ ♡ ♢ ♣ ♤ ♥ ♦ ♧ ♀ ♂ ♪ ♫ ☼ ☽ ☾ ☀ ☁ ☂ ⚡ ⚓ ⚔ ⚙',
+  emoji: '😀 😃 😄 😁 😆 😅 🤣 😂 🙂 🙃 😉 😊 😇 🥰 😍 🤩 😘',
+  punctuation: '« » ‹ › „ " " ' ' ‚ — – … † ‡ • ° ′ ″',
+  currency: '€ £ ¥ ¢ ₹ ₩ ₽ ₿ ¤ ¢',
+  greek: 'Α Β Γ Δ Ε Ζ Η Θ Ι Κ Λ Μ Ν Ξ Ο Π Ρ Σ Τ Υ Φ Χ Ψ Ω α β γ δ ε ζ η θ ι κ λ μ ν ξ ο π ρ σ τ υ φ χ ψ ω',
+  roman: 'Ⅰ Ⅱ Ⅲ Ⅳ Ⅴ Ⅵ Ⅶ Ⅷ Ⅸ Ⅹ Ⅺ Ⅻ Ⅼ Ⅽ Ⅾ Ⅿ ⅰ ⅱ ⅲ ⅳ ⅴ ⅵ ⅶ ⅷ ⅸ ⅹ ⅺ ⅻ ⅼ ⅽ ⅾ ⅿ',
+};
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+  event.target.classList.add('active');
+  document.getElementById('tab-' + tab).style.display = 'block';
+
+  if (tab === 'categories') loadCategories();
+}
+
+function lookupChar(input) {
+  if (!input) {
+    document.getElementById('charResult').style.display = 'none';
+    return;
+  }
+
+  let char, code;
+
+  if (input.startsWith('U+') || input.startsWith('u+')) {
+    code = parseInt(input.replace(/^[Uu]\+/, ''), 16);
+    char = String.fromCodePoint(code);
+  } else if (input.startsWith('\\u')) {
+    code = parseInt(input.replace(/^\\u/, ''), 16);
+    char = String.fromCodePoint(code);
+  } else if (/^[0-9a-fA-F]{4,6}$/.test(input)) {
+    code = parseInt(input, 16);
+    char = String.fromCodePoint(code);
+  } else {
+    char = input[0];
+    code = char.codePointAt(0);
+  }
+
+  document.getElementById('charDisplay').textContent = char;
+  document.getElementById('charResult').style.display = 'block';
+
+  const info = [
+    { label: '字符', value: char },
+    { label: 'Unicode', value: 'U+' + code.toString(16).toUpperCase().padStart(4, '0') },
+    { label: '十进制', value: code },
+    { label: '十六进制', value: '0x' + code.toString(16).toUpperCase() },
+    { label: 'UTF-16', value: '\\u' + code.toString(16).toUpperCase().padStart(4, '0') },
+    { label: 'HTML 实体', value: '&#' + code + ';' },
+    { label: 'CSS', value: '\\' + code.toString(16).toUpperCase().padStart(4, '0') },
+    { label: '名称', value: getUnicodeName(code) },
+  ];
+
+  document.getElementById('charInfo').innerHTML = info.map(i => `
+    <div class="info-item">
+      <div class="info-label">${i.label}</div>
+      <div class="info-value">${i.value}</div>
+    </div>
+  `).join('');
+}
+
+function getUnicodeName(code) {
+  if (code >= 0x4E00 && code <= 0x9FFF) return 'CJK 统一表意文字';
+  if (code >= 0x3040 && code <= 0x309F) return '平假名';
+  if (code >= 0x30A0 && code <= 0x30FF) return '片假名';
+  if (code >= 0xAC00 && code <= 0xD7AF) return '韩文音节';
+  if (code >= 0x0370 && code <= 0x03FF) return '希腊字母';
+  if (code >= 0x0400 && code <= 0x04FF) return '西里尔字母';
+  if (code < 128) return 'ASCII';
+  return 'Unicode 字符';
+}
+
+function convertText() {
+  // Auto convert on input
+}
+
+function convertToUnicode() {
+  const text = document.getElementById('convertInput').value;
+  const result = text.split('').map(c => {
+    const code = c.codePointAt(0);
+    return code > 127 ? '\\u' + code.toString(16).toUpperCase().padStart(4, '0') : c;
+  }).join('');
+  document.getElementById('convertOutput').textContent = result;
+}
+
+function convertToHTML() {
+  const text = document.getElementById('convertInput').value;
+  const result = text.split('').map(c => {
+    const code = c.codePointAt(0);
+    return code > 127 ? '&#' + code + ';' : c;
+  }).join('');
+  document.getElementById('convertOutput').textContent = result;
+}
+
+function convertToCSS() {
+  const text = document.getElementById('convertInput').value;
+  const result = text.split('').map(c => {
+    const code = c.codePointAt(0);
+    return code > 127 ? '\\' + code.toString(16).toUpperCase().padStart(4, '0') + ' ' : c;
+  }).join('');
+  document.getElementById('convertOutput').textContent = '"' + result.trim() + '"';
+}
+
+function decodeUnicode() {
+  const text = document.getElementById('convertInput').value;
+  const result = text.replace(/\\u([0-9a-fA-F]{4})/g, (_, code) => {
+    return String.fromCodePoint(parseInt(code, 16));
+  });
+  document.getElementById('convertOutput').textContent = result;
+}
+
+function loadCategories() {
+  const grid = document.getElementById('categoryGrid');
+  grid.innerHTML = Object.entries(unicodeCategories).map(([name, cat]) => `
+    <div class="category-card" onclick="showCategory('${name}')">
+      <div class="category-icon">${cat.icon}</div>
+      <div class="category-name">${name}</div>
+    </div>
+  `).join('');
+}
+
+function showCategory(name) {
+  const cat = unicodeCategories[name];
+  const chars = [];
+  for (let i = cat.start; i <= cat.end; i++) {
+    chars.push(String.fromCodePoint(i));
+  }
+
+  document.getElementById('categoryChars').innerHTML = `
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">${name}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:24px;">
+        ${chars.map(c => `<span class="char-cell" onclick="copyChar('${c.charCodeAt(0).toString(16).toUpperCase()}')" title="U+${c.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')}">${c}</span>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function insertChars(type) {
+  const chars = charSets[type];
+  if (!chars) return;
+
+  const output = document.getElementById('charsOutput');
+  output.innerHTML = chars.split(' ').map(c => `
+    <span style="cursor:pointer;padding:4px 8px;margin:2px;display:inline-block;" onclick="copyCharOnly('${c}')" title="点击复制">${c}</span>
+  `).join('');
+
+  document.getElementById('generatedChars').value = chars.split(' ').join(' ');
+}
+
+function copyChar(code) {
+  const char = String.fromCodePoint(parseInt(code, 16));
+  navigator.clipboard.writeText(char).then(() => showToast('✅ 已复制: ' + char));
+}
+
+function copyCharOnly(char) {
+  navigator.clipboard.writeText(char).then(() => showToast('✅ 已复制: ' + char));
+}
+
+function copyResult(id) {
+  const el = document.getElementById(id);
+  const text = el.tagName === 'TEXTAREA' ? el.value : el.textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('✅ 已复制到剪贴板'));
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {
+    position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
+    background: '#24292f', color: 'white', padding: '10px 20px',
+    borderRadius: '6px', fontSize: '14px', zIndex: '9999',
+    boxShadow: '0 4px 12px rgba(0,0,0,.15)'
+  });
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2000);
+}
+
+// Initialize
+loadCategories();
+</script>
+</body>
+</html>

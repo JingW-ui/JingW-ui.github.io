@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>字数统计工具</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+  .header-icon { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; }
+  header h1 { font-size:18px; font-weight:600; }
+  header p { font-size:13px; color:var(--text2); }
+  .main { flex:1; padding:20px 24px; display:grid; grid-template-columns:1fr 340px; gap:16px; max-width:1100px; margin:0 auto; width:100%; }
+  @media(max-width:900px) { .main { grid-template-columns:1fr; } }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); }
+  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; display:flex; justify-content:space-between; align-items:center; }
+  .card-body { padding:16px 18px; }
+  textarea { width:100%; padding:12px 16px; border:1px solid var(--border); border-radius:var(--radius); font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; font-size:14px; line-height:1.8; resize:none; min-height:400px; height:100%; background:var(--bg); color:var(--text); outline:none; }
+  textarea:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(45,164,78,.12); }
+  .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .stat-item { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:14px 16px; }
+  .stat-label { font-size:11px; color:var(--text2); font-weight:500; text-transform:uppercase; letter-spacing:.5px; margin-bottom:6px; }
+  .stat-value { font-size:26px; font-weight:700; color:var(--text); line-height:1; }
+  .stat-value.green { color:var(--green); }
+  .stat-sub { font-size:11px; color:var(--text2); margin-top:4px; }
+  .reading-card { margin-top:10px; background:linear-gradient(135deg,#f0fdf4,#dcfce7); border:1px solid #9fdbab; border-radius:var(--radius); padding:14px 16px; }
+  .reading-title { font-size:12px; color:#1a7f37; font-weight:600; margin-bottom:8px; }
+  .reading-items { display:flex; flex-direction:column; gap:5px; }
+  .reading-item { display:flex; justify-content:space-between; font-size:13px; }
+  .reading-item b { color:#1a7f37; }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn:hover { background:var(--bg3); }
+  .btn-primary { background:var(--green); color:white; border-color:var(--green); }
+  .btn-primary:hover { background:var(--green2); }
+  .top-words { margin-top:10px; }
+  .word-bar { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+  .word-name { width:80px; font-size:12px; font-family:monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .word-track { flex:1; height:8px; background:var(--bg3); border-radius:4px; overflow:hidden; }
+  .word-fill { height:100%; background:var(--green); border-radius:4px; transition:width .3s; }
+  .word-count { width:30px; text-align:right; font-size:11px; color:var(--text2); }
+  .char-breakdown { margin-top:10px; }
+  .breakdown-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--bg3); font-size:13px; }
+  .breakdown-row:last-child { border-bottom:none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-icon">#</div>
+  <div>
+    <h1>字数统计工具</h1>
+    <p>中英文字数、字符数、空格/行数统计、阅读时长估算</p>
+  </div>
+</header>
+
+<div class="main">
+  <div class="card" style="display:flex;flex-direction:column;">
+    <div class="card-header">
+      <span>文本输入</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" style="font-size:12px;padding:4px 10px;" onclick="loadSample()">示例</button>
+        <button class="btn" style="font-size:12px;padding:4px 10px;" onclick="clearText()">✕ 清空</button>
+        <button class="btn btn-primary" style="font-size:12px;padding:4px 10px;" onclick="copyStats()">⎘ 复制统计</button>
+      </div>
+    </div>
+    <div style="flex:1;padding:0;">
+      <textarea id="textInput" placeholder="在此粘贴或输入文本内容，统计结果实时更新..." oninput="updateStats()"></textarea>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    <!-- 统计数字 -->
+    <div class="card">
+      <div class="card-header">统计结果</div>
+      <div class="card-body">
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-label">总字符数</div>
+            <div class="stat-value green" id="s-total">0</div>
+            <div class="stat-sub">含空格标点</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">有效字符</div>
+            <div class="stat-value" id="s-effective">0</div>
+            <div class="stat-sub">去空白后</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">中文字数</div>
+            <div class="stat-value" id="s-zh">0</div>
+            <div class="stat-sub">汉字数量</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">英文单词</div>
+            <div class="stat-value" id="s-words">0</div>
+            <div class="stat-sub">空白分隔</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">行数</div>
+            <div class="stat-value" id="s-lines">0</div>
+            <div class="stat-sub" id="s-nonblank">非空 0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">段落数</div>
+            <div class="stat-value" id="s-para">0</div>
+            <div class="stat-sub">双换行分隔</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">空格数</div>
+            <div class="stat-value" id="s-space">0</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-label">数字字符</div>
+            <div class="stat-value" id="s-digit">0</div>
+          </div>
+        </div>
+
+        <!-- 阅读时间 -->
+        <div class="reading-card" id="readingCard" style="display:none;">
+          <div class="reading-title">📖 阅读时长估算</div>
+          <div class="reading-items">
+            <div class="reading-item"><span>普通阅读（500字/分）</span><b id="r-normal">-</b></div>
+            <div class="reading-item"><span>快速阅读（1000字/分）</span><b id="r-fast">-</b></div>
+            <div class="reading-item"><span>朗读（250字/分）</span><b id="r-speak">-</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 字符构成 -->
+    <div class="card">
+      <div class="card-header">字符构成</div>
+      <div class="card-body">
+        <div class="char-breakdown" id="charBreakdown">
+          <div class="breakdown-row"><span>中文字符</span><span id="b-zh">0 (0%)</span></div>
+          <div class="breakdown-row"><span>英文字母</span><span id="b-en">0 (0%)</span></div>
+          <div class="breakdown-row"><span>数字</span><span id="b-num">0 (0%)</span></div>
+          <div class="breakdown-row"><span>空白字符</span><span id="b-space">0 (0%)</span></div>
+          <div class="breakdown-row"><span>标点符号</span><span id="b-punct">0 (0%)</span></div>
+          <div class="breakdown-row"><span>其他</span><span id="b-other">0 (0%)</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 高频词 -->
+    <div class="card">
+      <div class="card-header">高频词 Top 10</div>
+      <div class="card-body">
+        <div id="topWords" style="color:var(--text2);font-size:13px;">输入文本后显示</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function updateStats() {
+  const text = document.getElementById('textInput').value;
+  const total = text.length;
+  const effective = text.replace(/\s/g, '').length;
+  const zh = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+  const en = (text.match(/[a-zA-Z]/g) || []).length;
+  const digits = (text.match(/\d/g) || []).length;
+  const spaces = (text.match(/\s/g) || []).length;
+  const lines = text ? text.split('\n').length : 0;
+  const nonblank = text.split('\n').filter(l => l.trim()).length;
+  const para = text.split(/\n\n+/).filter(p => p.trim()).length;
+  const words = text.trim() ? text.trim().split(/[\s\u3000]+/).filter(w => /[a-zA-Z0-9\u4e00-\u9fa5]/.test(w)).length : 0;
+  const punct = (text.match(/[\u3000-\u303f\uff00-\uffef\u2000-\u206f!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/g) || []).length;
+  const other = total - zh - en - digits - spaces - punct;
+
+  document.getElementById('s-total').textContent = total.toLocaleString();
+  document.getElementById('s-effective').textContent = effective.toLocaleString();
+  document.getElementById('s-zh').textContent = zh.toLocaleString();
+  document.getElementById('s-words').textContent = words.toLocaleString();
+  document.getElementById('s-lines').textContent = lines.toLocaleString();
+  document.getElementById('s-nonblank').textContent = `非空 ${nonblank}`;
+  document.getElementById('s-para').textContent = para.toLocaleString();
+  document.getElementById('s-space').textContent = spaces.toLocaleString();
+  document.getElementById('s-digit').textContent = digits.toLocaleString();
+
+  // 字符构成
+  const pct = n => total > 0 ? `${n} (${(n/total*100).toFixed(1)}%)` : `${n} (0%)`;
+  document.getElementById('b-zh').textContent = pct(zh);
+  document.getElementById('b-en').textContent = pct(en);
+  document.getElementById('b-num').textContent = pct(digits);
+  document.getElementById('b-space').textContent = pct(spaces);
+  document.getElementById('b-punct').textContent = pct(punct);
+  document.getElementById('b-other').textContent = pct(Math.max(0,other));
+
+  // 阅读时间
+  const reading = document.getElementById('readingCard');
+  if (total > 0) {
+    reading.style.display = 'block';
+    const cnt = zh + words;
+    document.getElementById('r-normal').textContent = fmtTime(cnt / 500);
+    document.getElementById('r-fast').textContent = fmtTime(cnt / 1000);
+    document.getElementById('r-speak').textContent = fmtTime(cnt / 250);
+  } else {
+    reading.style.display = 'none';
+  }
+
+  // 高频词
+  updateTopWords(text);
+}
+
+function fmtTime(minutes) {
+  if (minutes < 1) return '< 1 分钟';
+  if (minutes < 60) return Math.ceil(minutes) + ' 分钟';
+  return Math.floor(minutes/60) + ' 小时 ' + Math.round(minutes%60) + ' 分钟';
+}
+
+function updateTopWords(text) {
+  const words = text.toLowerCase()
+    .replace(/[^\u4e00-\u9fa5a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 1 && !/^\d+$/.test(w));
+  const freq = {};
+  words.forEach(w => freq[w] = (freq[w]||0) + 1);
+  const sorted = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0, 10);
+  const el = document.getElementById('topWords');
+  if (sorted.length === 0) { el.textContent = '输入文本后显示'; return; }
+  const max = sorted[0][1];
+  el.innerHTML = sorted.map(([w, c]) => `
+    <div class="word-bar">
+      <span class="word-name" title="${escHtml(w)}">${escHtml(w)}</span>
+      <div class="word-track"><div class="word-fill" style="width:${(c/max*100).toFixed(0)}%"></div></div>
+      <span class="word-count">${c}</span>
+    </div>
+  `).join('');
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function clearText() { document.getElementById('textInput').value = ''; updateStats(); }
+
+function copyStats() {
+  const text = document.getElementById('textInput').value;
+  if (!text) return;
+  const stats = [
+    '字数统计报告',
+    '─────────────',
+    `总字符数：${text.length}`,
+    `中文字数：${(text.match(/[\u4e00-\u9fa5]/g)||[]).length}`,
+    `英文单词：${text.trim()?text.trim().split(/[\s\u3000]+/).filter(w=>/[a-zA-Z]/.test(w)).length:0}`,
+    `行数：${text.split('\n').length}`,
+    `空格数：${(text.match(/\s/g)||[]).length}`,
+  ].join('\n');
+  navigator.clipboard.writeText(stats).then(() => showToast('统计结果已复制'));
+}
+
+function loadSample() {
+  document.getElementById('textInput').value = `人工智能（Artificial Intelligence，AI）是计算机科学的一个重要分支，致力于研究和开发能够模拟人类智能行为的理论与方法。
+
+近年来，随着深度学习技术的突破，AI 在图像识别、自然语言处理、语音识别等领域取得了令人瞩目的成就。大语言模型（Large Language Models, LLMs）的兴起更是将 AI 的应用推向了新的高度。
+
+从 GPT-3 到 GPT-4，从 BERT 到 LLaMA，这些模型参数量从数十亿到数千亿不等，展现出惊人的语言理解和生成能力。这不仅改变了我们与计算机交互的方式，也深刻影响了教育、医疗、法律、创意产业等众多领域的工作模式。
+
+然而，AI 的快速发展也带来了一系列值得深思的问题，包括数据隐私、算法偏见、就业影响以及 AI 安全等方面。如何在拥抱 AI 带来的便利与效率的同时，建立有效的监管机制和伦理框架，将是人类社会未来面临的重要挑战。`;
+  updateStats();
+}
+
+function showToast(msg) {
+  let t=document.getElementById('_toast');
+  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',1800);
+}
+
+updateStats();
+</script>
+</body>
+</html>

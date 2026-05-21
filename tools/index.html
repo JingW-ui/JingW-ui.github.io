@@ -93,10 +93,71 @@
             margin-top: 0.3rem;
         }
 
+        /* 搜索框 */
+        .search-container {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            transition: var(--transition);
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.1);
+        }
+
+        [data-theme="dark"] .search-box:focus {
+            box-shadow: 0 0 0 2px rgba(224, 224, 224, 0.1);
+        }
+
+        /* 分类标签 */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-tab {
+            padding: 6px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .category-tab:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-secondary);
+        }
+
+        .category-tab.active {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+            border-color: var(--accent-primary);
+        }
+
         /* 工具网格 */
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 8px;
             padding: 0;
         }
@@ -111,12 +172,29 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            min-height: 120px;
+            min-height: 85px;
+            cursor: pointer;
+            text-decoration: none;
         }
 
         .tool-card:hover {
             border-color: #cccccc;
             box-shadow: var(--shadow-card);
+            transform: translateY(-2px);
+        }
+
+        .tool-label {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            padding: 1px 4px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 2px;
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            z-index: 1;
+            line-height: 1.2;
         }
 
         .tool-card-header {
@@ -124,19 +202,20 @@
             align-items: flex-start;
             gap: 8px;
             padding: 8px 8px 0 8px;
-            margin-bottom: 36px;
+            margin-bottom: 0;
+            padding-right: 50px;
         }
 
         .tool-icon {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
+            width: 34px;
+            height: 34px;
+            min-width: 28px;
             background: var(--bg-secondary);
             border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 16px;
             border: 1px solid var(--border-color);
             overflow: hidden;
         }
@@ -153,49 +232,22 @@
         }
 
         .tool-name {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             line-height: 1.3;
         }
 
         .tool-description {
             color: var(--text-secondary);
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             line-height: 1.35;
             margin-bottom: 0;
-            padding-bottom: 8px;
+            padding-bottom: 4px;
         }
 
-        .visit-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            width: auto;
-            padding: 6px 10px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            text-decoration: none;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            transition: var(--transition);
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-        }
 
-        .visit-btn:hover {
-            background: var(--bg-hover);
-        }
-
-        .visit-icon {
-            font-size: 0.85rem;
-        }
 
         /* 主题切换按钮 - 底部固定 */
         .theme-toggle {
@@ -232,6 +284,17 @@
             border-top: 1px solid var(--border-color);
             color: var(--text-muted);
             font-size: 0.75rem;
+        }
+
+        /* 蒙太奇动画画布 */
+        #montageCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            pointer-events: auto;
         }
 
         .footer a {
@@ -300,13 +363,57 @@
                 font-size: 1.6rem;
             }
 
+            /* 分类标签紧凑布局 */
+            .category-tabs {
+                gap: 4px;
+                margin-bottom: 0.8rem;
+            }
+
+            .category-tab {
+                padding: 4px 10px;
+                font-size: 0.7rem;
+            }
+
+            /* 工具网格 - 每行两个卡片 */
             .tools-grid {
-                grid-template-columns: 1fr;
-                gap: 8px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            /* 工具卡片紧凑化 */
+            .tool-card {
+                min-height: 75px;
+            }
+
+            .tool-label {
+                top: 3px;
+                right: 3px;
+                padding: 1px 3px;
+                font-size: 0.5rem;
             }
 
             .tool-card-header {
                 padding: 6px 6px 0 6px;
+                padding-right: 45px;
+                gap: 6px;
+            }
+
+            .tool-icon {
+                width: 28px;
+                height: 28px;
+                min-width: 28px;
+                font-size: 14px;
+            }
+
+            .tool-name {
+                font-size: 0.72rem;
+                margin-bottom: 1px;
+            }
+
+            .tool-description {
+                font-size: 0.58rem;
+                line-height: 1.3;
+                padding-bottom: 3px;
             }
         }
     </style>
@@ -318,14 +425,30 @@
             <h1><span class="highlight">工具箱</span>实用小工具集合</h1>
             <p class="subtitle">便捷高效的在线工具，提升您的工作效率</p>
             <div class="stats-banner">
-                📦 共收录 6 个实用工具
+                📦 共收录 46 个实用工具
             </div>
         </div>
 
+        <!-- 搜索框 -->
+        <div class="search-container">
+            <input type="text" class="search-box" id="searchBox" placeholder="搜索工具名称或描述...">
+        </div>
+
+        <!-- 分类标签 -->
+        <div class="category-tabs">
+            <div class="category-tab active" data-category="all">全部</div>
+            <div class="category-tab" data-category="image">图片类</div>
+            <div class="category-tab" data-category="text">字符类</div>
+            <div class="category-tab" data-category="time">时间类</div>
+            <div class="category-tab" data-category="calc">计算进制类</div>
+            <div class="category-tab" data-category="other">其他实用工具</div>
+        </div>
+
         <!-- 工具网格 -->
-        <div class="tools-grid">
+        <div class="tools-grid" id="toolsGrid">
             <!-- 笔记工具 -->
-            <div class="tool-card">
+            <a href="/tools/biji/" class="tool-card" data-category="other" data-name="笔记工具" data-desc="便捷的在线笔记应用，支持文本编辑和保存功能">
+                <span class="tool-label">其他实用工具</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/logo/biji.webp" alt="笔记工具"></div>
                     <div class="tool-content">
@@ -333,14 +456,11 @@
                         <p class="tool-description">便捷的在线笔记应用，支持文本编辑和保存功能</p>
                     </div>
                 </div>
-                <a href="/tools/biji/" class="visit-btn">
-                    <span class="visit-icon">→</span>
-                    访问工具
-                </a>
-            </div>
+            </a>
 
             <!-- 图标创建工具 -->
-            <div class="tool-card">
+            <a href="/tools/create_icon/" class="tool-card" data-category="image" data-name="图标创建" data-desc="在线创建和自定义图标，支持多种格式导出">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/logo/create_icon.webp" alt="图标创建"></div>
                     <div class="tool-content">
@@ -348,14 +468,11 @@
                         <p class="tool-description">在线创建和自定义图标，支持多种格式导出</p>
                     </div>
                 </div>
-                <a href="/tools/create_icon/" class="visit-btn">
-                    <span class="visit-icon">→</span>
-                    访问工具
-                </a>
-            </div>
+            </a>
 
             <!-- 图片转图标工具 -->
-            <div class="tool-card">
+            <a href="/tools/img2icon/" class="tool-card" data-category="image" data-name="图片转图标" data-desc="将普通图片转换为图标格式，支持批量处理">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/logo/img2icon.webp" alt="图片转图标"></div>
                     <div class="tool-content">
@@ -363,14 +480,11 @@
                         <p class="tool-description">将普通图片转换为图标格式，支持批量处理</p>
                     </div>
                 </div>
-                <a href="/tools/img2icon/" class="visit-btn">
-                    <span class="visit-icon">→</span>
-                    访问工具
-                </a>
-            </div>
+            </a>
 
             <!-- 图片转PDF工具 -->
-            <div class="tool-card">
+            <a href="/tools/img2pdf/" class="tool-card" data-category="image" data-name="图片转PDF" data-desc="将图片文件转换为PDF文档，保持高质量输出">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/logo/img2pdf.webp" alt="图片转PDF"></div>
                     <div class="tool-content">
@@ -378,14 +492,11 @@
                         <p class="tool-description">将图片文件转换为PDF文档，保持高质量输出</p>
                     </div>
                 </div>
-                <a href="/tools/img2pdf/" class="visit-btn">
-                    <span class="visit-icon">→</span>
-                    访问工具
-                </a>
-            </div>
+            </a>
 
             <!-- 硬币抛掷工具 -->
-            <div class="tool-card">
+            <a href="/tools/coin/" class="tool-card" data-category="other" data-name="硬币抛掷" data-desc="在线抛硬币决策工具，支持自定义硬币贴图">
+                <span class="tool-label">其他实用工具</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/logo/coin.webp" alt="硬币抛掷"></div>
                     <div class="tool-content">
@@ -393,14 +504,11 @@
                         <p class="tool-description">在线抛硬币决策工具，支持自定义硬币贴图</p>
                     </div>
                 </div>
-                <a href="/tools/coin/" class="visit-btn">
-                    <span class="visit-icon">→</span>
-                    访问工具
-                </a>
-            </div>
+            </a>
 
             <!-- 弹幕工具 -->
-            <div class="tool-card">
+            <a href="/tools/danmu/" class="tool-card" data-category="other" data-name="显示弹幕" data-desc="创建和生成视频弹幕效果，支持多种样式和动画">
+                <span class="tool-label">其他实用工具</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/logo/danmu.webp" alt="显示弹幕"></div>
                     <div class="tool-content">
@@ -408,11 +516,487 @@
                         <p class="tool-description">创建和生成视频弹幕效果，支持多种样式和动画</p>
                     </div>
                 </div>
-                <a href="/tools/danmu/" class="visit-btn">
-                    <span class="visit-icon">→</span>
-                    访问工具
-                </a>
-            </div>
+            </a>
+
+            <!-- 01 JSON 格式化 -->
+            <a href="/tools/01-json-formatter/" class="tool-card" data-category="text" data-name="JSON 格式化" data-desc="JSON 格式化、校验、压缩，支持转换为 CSV 和 XML">
+                <span class="tool-label">字符类</span>
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (0).webp" alt="JSON 格式化"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">JSON 格式化</h3>
+                        <p class="tool-description">JSON 格式化、校验、压缩，支持转换为 CSV 和 XML</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 02 URL 编解码 -->
+            <a href="/tools/02-url-encoder/" class="tool-card" data-category="text" data-name="URL 编解码" data-desc="URL 编码、解码、参数解析与拼接的一站式工具">
+                <span class="tool-label">字符类</span>
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (1).webp" alt="URL 编解码"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">URL 编解码</h3>
+                        <p class="tool-description">URL 编码、解码、参数解析与拼接的一站式工具</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 03 Base64 编解码 -->
+            <a href="/tools/03-base64-codec/" class="tool-card" data-category="text" data-name="Base64 编解码" data-desc="文本和图片的 Base64 编解码，支持批量处理">
+                <span class="tool-label">字符类</span>
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (2).webp" alt="Base64 编解码"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">Base64 编解码</h3>
+                        <p class="tool-description">文本和图片的 Base64 编解码，支持批量处理</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 04 Markdown 编辑器 -->
+            <a href="/tools/04-markdown-editor/" class="tool-card" data-category="text" data-name="Markdown 编辑器" data-desc="实时预览的 Markdown 编辑器，支持导出 HTML">
+                <span class="tool-label">字符类</span>
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (3).webp" alt="Markdown 编辑器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">Markdown 编辑器</h3>
+                        <p class="tool-description">实时预览的 Markdown 编辑器，支持导出 HTML</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 05 文本对比 -->
+            <a href="/tools/05-text-diff/" class="tool-card" data-category="text" data-name="文本对比" data-desc="对比两段文本的差异，高亮显示不同之处">
+                <span class="tool-label">字符类</span>
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (4).webp" alt="文本对比"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">文本对比</h3>
+                        <p class="tool-description">对比两段文本的差异，高亮显示不同之处</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 06 文本大小写转换 -->
+            <a href="/tools/06-text-case-converter/" class="tool-card" data-category="text" data-name="文本大小写转换" data-desc="英文文本大小写转换，支持多种格式">
+                <span class="tool-label">字符类</span>
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (5).webp" alt="文本大小写转换"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">文本大小写转换</h3>
+                        <p class="tool-description">英文文本大小写转换，支持多种格式</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 07 正则表达式测试 -->
+            <a href="/tools/07-regex-tester/" class="tool-card" data-category="text" data-name="正则表达式测试" data-desc="在线测试正则表达式，实时显示匹配结果">
+                <span class="tool-label">字符类</span>
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (6).webp" alt="正则表达式测试"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">正则表达式测试</h3>
+                        <p class="tool-description">在线测试正则表达式，实时显示匹配结果</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 08 字数统计 -->
+            <a href="/tools/08-word-counter/" class="tool-card" data-category="text" data-name="字数统计" data-desc="统计文本的字符数、单词数、行数等信息">
+                <span class="tool-label">字符类</span>
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (7).webp" alt="字数统计"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">字数统计</h3>
+                        <p class="tool-description">统计文本的字符数、单词数、行数等信息</p>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 09 拼音转换 -->
+            <a href="/tools/09-pinyin-converter/" class="tool-card" data-category="text" data-name="拼音转换" data-desc="中文转拼音，支持多种拼音格式">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (8).webp" alt="拼音转换"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">拼音转换</h3>
+                        <p class="tool-description">中文转拼音，支持多种拼音格式</p>
+                        <span class="tool-label">字符类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 10 代码格式化 -->
+            <a href="/tools/10-code-formatter/" class="tool-card" data-category="text" data-name="代码格式化" data-desc="格式化 HTML、CSS、JavaScript 等代码">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (9).webp" alt="代码格式化"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">代码格式化</h3>
+                        <p class="tool-description">格式化 HTML、CSS、JavaScript 等代码</p>
+                        <span class="tool-label">字符类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 11 加密解密工具 -->
+            <a href="/tools/11-crypto-tool/" class="tool-card" data-category="text" data-name="加密解密工具" data-desc="MD5、SHA、AES 等常用加密算法">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (10).webp" alt="加密解密工具"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">加密解密工具</h3>
+                        <p class="tool-description">MD5、SHA、AES 等常用加密算法</p>
+                        <span class="tool-label">字符类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 12 文本清理 -->
+            <a href="/tools/12-text-cleaner/" class="tool-card" data-category="text" data-name="文本清理" data-desc="清理文本中的多余空格、换行和特殊字符">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (11).webp" alt="文本清理"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">文本清理</h3>
+                        <p class="tool-description">清理文本中的多余空格、换行和特殊字符</p>
+                        <span class="tool-label">字符类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 13 词频统计 -->
+            <a href="/tools/13-word-frequency/" class="tool-card" data-category="text" data-name="词频统计" data-desc="统计文本中各词汇出现的频率">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (12).webp" alt="词频统计"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">词频统计</h3>
+                        <p class="tool-description">统计文本中各词汇出现的频率</p>
+                        <span class="tool-label">字符类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 14 编码转换 -->
+            <a href="/tools/14-encoding-converter/" class="tool-card" data-category="text" data-name="编码转换" data-desc="UTF-8、GBK、ASCII 等字符编码转换">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (13).webp" alt="编码转换"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">编码转换</h3>
+                        <p class="tool-description">UTF-8、GBK、ASCII 等字符编码转换</p>
+                        <span class="tool-label">字符类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 15 时间戳转换 -->
+            <a href="/tools/15-timestamp-converter/" class="tool-card" data-category="time" data-name="时间戳转换" data-desc="Unix 时间戳与日期时间互相转换">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (14).webp" alt="时间戳转换"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">时间戳转换</h3>
+                        <p class="tool-description">Unix 时间戳与日期时间互相转换</p>
+                        <span class="tool-label">时间类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 16 农历日历 -->
+            <a href="/tools/16-lunar-calendar/" class="tool-card" data-category="time" data-name="农历日历" data-desc="公历农历互转，查询节气和节日">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (15).webp" alt="农历日历"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">农历日历</h3>
+                        <p class="tool-description">公历农历互转，查询节气和节日</p>
+                        <span class="tool-label">时间类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 17 倒计时器 -->
+            <a href="/tools/17-countdown-timer/" class="tool-card" data-category="time" data-name="倒计时器" data-desc="设置目标时间，实时显示倒计时">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (16).webp" alt="倒计时器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">倒计时器</h3>
+                        <p class="tool-description">设置目标时间，实时显示倒计时</p>
+                        <span class="tool-label">时间类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 18 日期差计算器 -->
+            <a href="/tools/18-date-diff-calculator/" class="tool-card" data-category="time" data-name="日期差计算器" data-desc="计算两个日期之间的天数差">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (17).webp" alt="日期差计算器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">日期差计算器</h3>
+                        <p class="tool-description">计算两个日期之间的天数差</p>
+                        <span class="tool-label">时间类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 19 图片压缩 -->
+            <a href="/tools/19-image-compressor/" class="tool-card" data-category="image" data-name="图片压缩" data-desc="压缩图片文件大小，保持画质">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (18).webp" alt="图片压缩"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">图片压缩</h3>
+                        <p class="tool-description">压缩图片文件大小，保持画质</p>
+                        <span class="tool-label">图片类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 20 图片裁剪 -->
+            <a href="/tools/20-image-cropper/" class="tool-card" data-category="image" data-name="图片裁剪" data-desc="在线裁剪图片，支持自定义尺寸">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (19).webp" alt="图片裁剪"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">图片裁剪</h3>
+                        <p class="tool-description">在线裁剪图片，支持自定义尺寸</p>
+                        <span class="tool-label">图片类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 21 图片转 Base64 -->
+            <a href="/tools/21-image-to-base64/" class="tool-card" data-category="image" data-name="图片转 Base64" data-desc="将图片转换为 Base64 编码字符串">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (20).webp" alt="图片转 Base64"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">图片转 Base64</h3>
+                        <p class="tool-description">将图片转换为 Base64 编码字符串</p>
+                        <span class="tool-label">图片类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 22 颜色选择器 -->
+            <a href="/tools/22-color-picker/" class="tool-card" data-category="image" data-name="颜色选择器" data-desc="选取颜色，获取 HEX、RGB、HSL 值">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (21).webp" alt="颜色选择器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">颜色选择器</h3>
+                        <p class="tool-description">选取颜色，获取 HEX、RGB、HSL 值</p>
+                        <span class="tool-label">图片类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 23 图片拼接 -->
+            <a href="/tools/23-image-stitcher/" class="tool-card" data-category="image" data-name="图片拼接" data-desc="将多张图片拼接成一张长图">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (22).webp" alt="图片拼接"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">图片拼接</h3>
+                        <p class="tool-description">将多张图片拼接成一张长图</p>
+                        <span class="tool-label">图片类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 24 背景移除 -->
+            <a href="/tools/24-bg-remover/" class="tool-card" data-category="image" data-name="背景移除" data-desc="智能移除图片背景，生成透明背景">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (23).webp" alt="背景移除"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">背景移除</h3>
+                        <p class="tool-description">智能移除图片背景，生成透明背景</p>
+                        <span class="tool-label">图片类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 25 图片滤镜 -->
+            <a href="/tools/25-image-filter/" class="tool-card" data-category="image" data-name="图片滤镜" data-desc="为图片添加各种滤镜效果">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (24).webp" alt="图片滤镜"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">图片滤镜</h3>
+                        <p class="tool-description">为图片添加各种滤镜效果</p>
+                        <span class="tool-label">图片类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 26 二维码工具 -->
+            <a href="/tools/26-qrcode-tool/" class="tool-card" data-category="image" data-name="二维码工具" data-desc="生成和识别二维码，支持自定义样式">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (25).webp" alt="二维码工具"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">二维码工具</h3>
+                        <p class="tool-description">生成和识别二维码，支持自定义样式</p>
+                        <span class="tool-label">图片类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 27 进制转换 -->
+            <a href="/tools/27-base-converter/" class="tool-card" data-category="calc" data-name="进制转换" data-desc="二进制、八进制、十进制、十六进制互转">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (26).webp" alt="进制转换"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">进制转换</h3>
+                        <p class="tool-description">二进制、八进制、十进制、十六进制互转</p>
+                        <span class="tool-label">计算进制类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 28 科学计算器 -->
+            <a href="/tools/28-scientific-calculator/" class="tool-card" data-category="calc" data-name="科学计算器" data-desc="支持三角函数、对数等科学计算">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (27).webp" alt="科学计算器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">科学计算器</h3>
+                        <p class="tool-description">支持三角函数、对数等科学计算</p>
+                        <span class="tool-label">计算进制类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 29 单位换算 -->
+            <a href="/tools/29-unit-converter/" class="tool-card" data-category="calc" data-name="单位换算" data-desc="长度、重量、温度等常用单位换算">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (28).webp" alt="单位换算"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">单位换算</h3>
+                        <p class="tool-description">长度、重量、温度等常用单位换算</p>
+                        <span class="tool-label">计算进制类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 30 BMI 计算器 -->
+            <a href="/tools/30-bmi-calculator/" class="tool-card" data-category="calc" data-name="BMI 计算器" data-desc="根据身高体重计算 BMI 指数">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (29).webp" alt="BMI 计算器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">BMI 计算器</h3>
+                        <p class="tool-description">根据身高体重计算 BMI 指数</p>
+                        <span class="tool-label">计算进制类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 31 贷款计算器 -->
+            <a href="/tools/31-loan-calculator/" class="tool-card" data-category="calc" data-name="贷款计算器" data-desc="计算等额本息和等额本金还款方式">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (30).webp" alt="贷款计算器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">贷款计算器</h3>
+                        <p class="tool-description">计算等额本息和等额本金还款方式</p>
+                        <span class="tool-label">计算进制类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 32 随机数生成器 -->
+            <a href="/tools/32-random-generator/" class="tool-card" data-category="other" data-name="随机数生成器" data-desc="生成指定范围的随机数或随机字符串">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (31).webp" alt="随机数生成器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">随机数生成器</h3>
+                        <p class="tool-description">生成指定范围的随机数或随机字符串</p>
+                        <span class="tool-label">其他实用工具</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 33 密码生成器 -->
+            <a href="/tools/33-password-generator/" class="tool-card" data-category="other" data-name="密码生成器" data-desc="生成高强度随机密码，可自定义规则">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (32).webp" alt="密码生成器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">密码生成器</h3>
+                        <p class="tool-description">生成高强度随机密码，可自定义规则</p>
+                        <span class="tool-label">其他实用工具</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 34 文件预览器 -->
+            <a href="/tools/34-file-previewer/" class="tool-card" data-category="other" data-name="文件预览器" data-desc="在线预览图片、PDF、文本等文件">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (33).webp" alt="文件预览器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">文件预览器</h3>
+                        <p class="tool-description">在线预览图片、PDF、文本等文件</p>
+                        <span class="tool-label">其他实用工具</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 35 待办清单 -->
+            <a href="/tools/35-todo-list/" class="tool-card" data-category="other" data-name="待办清单" data-desc="简洁的待办事项管理工具">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (34).webp" alt="待办清单"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">待办清单</h3>
+                        <p class="tool-description">简洁的待办事项管理工具</p>
+                        <span class="tool-label">其他实用工具</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 36 屏幕尺子 -->
+            <a href="/tools/36-screen-ruler/" class="tool-card" data-category="other" data-name="屏幕尺子" data-desc="在屏幕上测量像素距离">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (35).webp" alt="屏幕尺子"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">屏幕尺子</h3>
+                        <p class="tool-description">在屏幕上测量像素距离</p>
+                        <span class="tool-label">其他实用工具</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 37 文件哈希校验 -->
+            <a href="/tools/37-file-hash-checker/" class="tool-card" data-category="other" data-name="文件哈希校验" data-desc="计算文件的 MD5、SHA1、SHA256 哈希值">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (36).webp" alt="文件哈希校验"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">文件哈希校验</h3>
+                        <p class="tool-description">计算文件的 MD5、SHA1、SHA256 哈希值</p>
+                        <span class="tool-label">其他实用工具</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 38 画板 -->
+            <a href="/tools/38-drawing-board/" class="tool-card" data-category="image" data-name="画板" data-desc="在线绘图工具，支持多种画笔和颜色">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (37).webp" alt="画板"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">画板</h3>
+                        <p class="tool-description">在线绘图工具，支持多种画笔和颜色</p>
+                        <span class="tool-label">图片类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 39 Unicode 工具 -->
+            <a href="/tools/39-unicode-tool/" class="tool-card" data-category="text" data-name="Unicode 工具" data-desc="字符与 Unicode 编码互相转换">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (38).webp" alt="Unicode 工具"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">Unicode 工具</h3>
+                        <p class="tool-description">字符与 Unicode 编码互相转换</p>
+                        <span class="tool-label">字符类</span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 40 Lorem 生成器 -->
+            <a href="/tools/40-lorem-generator/" class="tool-card" data-category="text" data-name="Lorem 生成器" data-desc="生成占位文本，支持段落和单词数量自定义">
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (39).webp" alt="Lorem 生成器"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">Lorem 生成器</h3>
+                        <p class="tool-description">生成占位文本，支持段落和单词数量自定义</p>
+                        <span class="tool-label">字符类</span>
+                    </div>
+                </div>
+            </a>
         </div>
 
         <!-- 页脚 -->
@@ -442,6 +1026,9 @@
             <span class="visit-count" id="totalVisits">-</span>
         </div>
     </div>
+
+    <!-- 蒙太奇动画画布（背景层） -->
+    <canvas id="montageCanvas"></canvas>
 
     <!-- 不蒜子统计脚本（隐藏） -->
     <div style="display: none;">
@@ -532,6 +1119,693 @@
 
         // 初始化访问量统计
         initVisitStats();
+
+        // 蒙太奇动画系统 - 与页面元素交互
+        class MontageAnimation {
+            constructor() {
+                this.canvas = document.getElementById('montageCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.icons = [];
+                this.particles = []; // 破碎粒子
+                this.pageElements = []; // 存储页面可碰撞元素
+                this.mouse = { x: -1000, y: -1000 };
+                this.animationId = null;
+                this.isActive = true;
+                
+                this.init();
+            }
+
+            init() {
+                this.resize();
+                this.collectPageElements();
+                this.createIcons();
+                this.bindEvents();
+                this.animate();
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.collectPageElements(); // 重新收集页面元素位置
+            }
+
+            collectPageElements() {
+                // 收集所有可能与图标碰撞的页面元素
+                this.pageElements = [];
+                
+                // 工具卡片
+                const cards = document.querySelectorAll('.tool-card');
+                cards.forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    this.pageElements.push({
+                        type: 'card',
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height,
+                        element: card
+                    });
+                });
+
+                // 标题区域
+                const titleSection = document.querySelector('.title-section');
+                if (titleSection) {
+                    const rect = titleSection.getBoundingClientRect();
+                    this.pageElements.push({
+                        type: 'title',
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height
+                    });
+                }
+
+                // 搜索框
+                const searchBox = document.querySelector('.search-container');
+                if (searchBox) {
+                    const rect = searchBox.getBoundingClientRect();
+                    this.pageElements.push({
+                        type: 'search',
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height
+                    });
+                }
+
+                // 分类标签
+                const categoryTabs = document.querySelector('.category-tabs');
+                if (categoryTabs) {
+                    const rect = categoryTabs.getBoundingClientRect();
+                    this.pageElements.push({
+                        type: 'tabs',
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height
+                    });
+                }
+
+                // 页脚
+                const footer = document.querySelector('.footer');
+                if (footer) {
+                    const rect = footer.getBoundingClientRect();
+                    this.pageElements.push({
+                        type: 'footer',
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height
+                    });
+                }
+
+                // 主题切换按钮
+                const themeToggle = document.querySelector('.theme-toggle');
+                if (themeToggle) {
+                    const rect = themeToggle.getBoundingClientRect();
+                    this.pageElements.push({
+                        type: 'button',
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height
+                    });
+                }
+
+                // 访问量统计
+                const visitStats = document.querySelector('.visit-stats');
+                if (visitStats) {
+                    const rect = visitStats.getBoundingClientRect();
+                    this.pageElements.push({
+                        type: 'stats',
+                        x: rect.left,
+                        y: rect.top,
+                        width: rect.width,
+                        height: rect.height
+                    });
+                }
+            }
+
+            createIcons() {
+                // 收集所有工具图标路径
+                const iconPaths = [
+                    '/tools/assets/logo/biji.webp',
+                    '/tools/assets/logo/coin.webp',
+                    '/tools/assets/logo/create_icon.webp',
+                    '/tools/assets/logo/danmu.webp',
+                    '/tools/assets/logo/img2icon.webp',
+                    '/tools/assets/logo/img2pdf.webp'
+                ];
+
+                // 添加40个工具图标
+                for (let i = 0; i < 40; i++) {
+                    iconPaths.push(`/tools/assets/tool_40_icon/图片生成数量 (${i}).webp`);
+                }
+
+                // 创建25个物理图标对象，统一大小为40px，分5批出现
+                const count = 25;
+                const batchSize = 5; // 每批5个
+                const batchDelay = 800; // 每批间隔800ms
+                const uniformSize = 40; // 统一大小40px
+
+                for (let i = 0; i < count; i++) {
+                    const path = iconPaths[Math.floor(Math.random() * iconPaths.length)];
+                    const img = new Image();
+                    // 启用高质量图像加载
+                    img.decoding = 'async';
+                    img.src = path;
+                    
+                    const batchIndex = Math.floor(i / batchSize); // 批次索引
+                    const fromLeft = Math.random() > 0.5; // 随机从左侧或右侧出现
+                    
+                    const icon = {
+                        img: img,
+                        x: fromLeft ? -uniformSize : this.canvas.width + uniformSize, // 从屏幕外开始
+                        y: -Math.random() * 300 - 50 - (batchIndex * 150), // 不同批次从不同高度开始
+                        vx: fromLeft ? (2 + Math.random() * 3) : -(2 + Math.random() * 3), // 水平速度朝向中间
+                        vy: Math.random() * 2 + 1, // 初始垂直速度
+                        size: uniformSize, // 统一大小
+                        rotation: Math.random() * Math.PI * 2,
+                        rotationSpeed: (Math.random() - 0.5) * 0.15,
+                        mass: 1, // 统一质量
+                        restitution: 0.5 + Math.random() * 0.25,
+                        loaded: false,
+                        settled: false,
+                        delay: batchIndex * batchDelay, // 延迟出现时间
+                        visible: false // 是否可见
+                    };
+
+                    img.onload = () => {
+                        icon.loaded = true;
+                        // 根据延迟时间设置可见性
+                        setTimeout(() => {
+                            icon.visible = true;
+                        }, icon.delay);
+                    };
+
+                    this.icons.push(icon);
+                }
+            }
+
+            createShatterParticles(x, y, size, img) {
+                // 创建破碎粒子效果
+                const particleCount = 8 + Math.floor(Math.random() * 4); // 8-12个碎片
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (Math.PI * 2 / particleCount) * i + Math.random() * 0.5;
+                    const speed = 2 + Math.random() * 4;
+                    const particleSize = size * (0.3 + Math.random() * 0.4); // 碎片大小
+                    
+                    this.particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed - 2, // 向上抛起
+                        size: particleSize,
+                        rotation: Math.random() * Math.PI * 2,
+                        rotationSpeed: (Math.random() - 0.5) * 0.3,
+                        life: 1.0, // 生命值（透明度）
+                        decay: 0.015 + Math.random() * 0.01, // 衰减速度
+                        img: img,
+                        gravity: 0.3
+                    });
+                }
+            }
+
+            handleCanvasClick(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const clickX = e.clientX - rect.left;
+                const clickY = e.clientY - rect.top;
+
+                console.log('Canvas clicked at:', clickX, clickY); // 调试信息
+
+                // 检查是否点击到任何图标
+                for (let i = this.icons.length - 1; i >= 0; i--) {
+                    const icon = this.icons[i];
+                    if (!icon.loaded || !icon.visible) continue;
+
+                    const iconCenterX = icon.x + icon.size / 2;
+                    const iconCenterY = icon.y + icon.size / 2;
+                    const distance = Math.sqrt(
+                        Math.pow(clickX - iconCenterX, 2) + 
+                        Math.pow(clickY - iconCenterY, 2)
+                    );
+
+                    console.log('Icon', i, 'distance:', distance, 'threshold:', icon.size / 2 + 5); // 调试信息
+
+                    // 如果点击在图标范围内（稍微扩大一点点击区域）
+                    if (distance < icon.size / 2 + 5) {
+                        console.log('Icon clicked! Creating shatter effect'); // 调试信息
+                        
+                        // 保存图标路径用于重生
+                        const iconPath = icon.img.src;
+                        
+                        // 创建破碎效果
+                        this.createShatterParticles(
+                            iconCenterX, 
+                            iconCenterY, 
+                            icon.size, 
+                            icon.img
+                        );
+                        
+                        // 移除图标
+                        this.icons.splice(i, 1);
+                        
+                        // 延迟后重生新图标
+                        setTimeout(() => {
+                            this.respawnIcon(iconPath);
+                        }, 2000 + Math.random() * 1000); // 2-3秒后重生
+                        
+                        // 阻止事件继续传播
+                        e.stopPropagation();
+                        return;
+                    }
+                }
+            }
+
+            respawnIcon(iconPath) {
+                // 从两侧随机重生
+                const fromLeft = Math.random() > 0.5;
+                const uniformSize = 40;
+                
+                const img = new Image();
+                img.decoding = 'async';
+                img.src = iconPath;
+                
+                const icon = {
+                    img: img,
+                    x: fromLeft ? -uniformSize : this.canvas.width + uniformSize,
+                    y: -Math.random() * 200 - 50, // 从上方开始
+                    vx: fromLeft ? (2 + Math.random() * 3) : -(2 + Math.random() * 3),
+                    vy: Math.random() * 2 + 1,
+                    size: uniformSize,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.15,
+                    mass: 1,
+                    restitution: 0.5 + Math.random() * 0.25,
+                    loaded: false,
+                    settled: false,
+                    visible: true // 立即显示
+                };
+
+                img.onload = () => {
+                    icon.loaded = true;
+                };
+
+                this.icons.push(icon);
+                console.log('Icon respawned! Total icons:', this.icons.length);
+            }
+
+            bindEvents() {
+                // 鼠标移动事件
+                window.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.clientX;
+                    this.mouse.y = e.clientY;
+                });
+
+                // 触摸事件（移动端）
+                window.addEventListener('touchmove', (e) => {
+                    if (e.touches.length > 0) {
+                        this.mouse.x = e.touches[0].clientX;
+                        this.mouse.y = e.touches[0].clientY;
+                    }
+                });
+
+                // 点击画布破碎图标 - 使用捕获阶段确保优先处理
+                this.canvas.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.handleCanvasClick(e);
+                }, true);
+
+                // 窗口resize
+                window.addEventListener('resize', () => {
+                    this.resize();
+                });
+
+                // 页面滚动时重新收集元素位置
+                let scrollTimeout;
+                window.addEventListener('scroll', () => {
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        this.collectPageElements();
+                    }, 100);
+                });
+            }
+
+            checkCollisionWithElement(icon, element) {
+                // 检查图标是否与页面元素碰撞
+                const iconCenterX = icon.x + icon.size / 2;
+                const iconCenterY = icon.y + icon.size / 2;
+                const iconRadius = icon.size / 2;
+
+                // 计算元素中心点
+                const elemCenterX = element.x + element.width / 2;
+                const elemCenterY = element.y + element.height / 2;
+
+                // 找到最近的点
+                const closestX = Math.max(element.x, Math.min(iconCenterX, element.x + element.width));
+                const closestY = Math.max(element.y, Math.min(iconCenterY, element.y + element.height));
+
+                // 计算距离
+                const dx = iconCenterX - closestX;
+                const dy = iconCenterY - closestY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < iconRadius && distance > 0) {
+                    // 碰撞发生
+                    const angle = Math.atan2(dy, dx);
+                    const overlap = iconRadius - distance;
+
+                    // 推开图标
+                    icon.x += Math.cos(angle) * overlap;
+                    icon.y += Math.sin(angle) * overlap;
+
+                    // 反弹速度
+                    const normalX = dx / distance;
+                    const normalY = dy / distance;
+                    
+                    // 计算反射速度
+                    const dotProduct = icon.vx * normalX + icon.vy * normalY;
+                    icon.vx -= 2 * dotProduct * normalX;
+                    icon.vy -= 2 * dotProduct * normalY;
+                    
+                    // 应用弹性系数和摩擦
+                    icon.vx *= icon.restitution * 0.8;
+                    icon.vy *= icon.restitution * 0.8;
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            updatePhysics() {
+                const gravity = 0.4;
+                const friction = 0.98;
+                const mouseRepelRadius = 120;
+                const mouseRepelForce = 1.5;
+
+                this.icons.forEach((icon, index) => {
+                    if (!icon.loaded || !icon.visible) return; // 未加载或不可见的图标跳过
+
+                    // 如果图标已经静止且不在鼠标附近，跳过物理计算
+                    if (icon.settled) {
+                        const dx = icon.x + icon.size / 2 - this.mouse.x;
+                        const dy = icon.y + icon.size / 2 - this.mouse.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance > mouseRepelRadius * 1.5) {
+                            return; // 保持静止
+                        }
+                        icon.settled = false; // 被鼠标唤醒
+                    }
+
+                    // 应用重力
+                    icon.vy += gravity;
+
+                    // 应用空气阻力
+                    icon.vx *= friction;
+                    icon.vy *= friction;
+
+                    // 鼠标排斥力
+                    const dx = icon.x + icon.size / 2 - this.mouse.x;
+                    const dy = icon.y + icon.size / 2 - this.mouse.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < mouseRepelRadius && distance > 0) {
+                        const force = (mouseRepelRadius - distance) / mouseRepelRadius;
+                        const angle = Math.atan2(dy, dx);
+                        icon.vx += Math.cos(angle) * force * mouseRepelForce;
+                        icon.vy += Math.sin(angle) * force * mouseRepelForce;
+                    }
+
+                    // 更新位置
+                    icon.x += icon.vx;
+                    icon.y += icon.vy;
+
+                    // 更新旋转
+                    icon.rotation += icon.rotationSpeed;
+
+                    // 与页面元素碰撞检测
+                    let collided = false;
+                    for (const element of this.pageElements) {
+                        if (this.checkCollisionWithElement(icon, element)) {
+                            collided = true;
+                        }
+                    }
+
+                    // 边界碰撞检测
+                    if (icon.y + icon.size > this.canvas.height) {
+                        icon.y = this.canvas.height - icon.size;
+                        icon.vy *= -icon.restitution;
+                        icon.rotationSpeed *= 0.7;
+                        collided = true;
+                    }
+
+                    if (icon.y < 0) {
+                        icon.y = 0;
+                        icon.vy *= -icon.restitution;
+                    }
+
+                    if (icon.x < 0) {
+                        icon.x = 0;
+                        icon.vx *= -icon.restitution;
+                    }
+                    if (icon.x + icon.size > this.canvas.width) {
+                        icon.x = this.canvas.width - icon.size;
+                        icon.vx *= -icon.restitution;
+                    }
+
+                    // 图标之间的碰撞检测
+                    for (let j = index + 1; j < this.icons.length; j++) {
+                        const other = this.icons[j];
+                        if (!other.loaded) continue;
+
+                        const dx = (icon.x + icon.size / 2) - (other.x + other.size / 2);
+                        const dy = (icon.y + icon.size / 2) - (other.y + other.size / 2);
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const minDistance = (icon.size + other.size) / 2;
+
+                        if (distance < minDistance && distance > 0) {
+                            const angle = Math.atan2(dy, dx);
+                            const overlap = minDistance - distance;
+                            
+                            const separationX = Math.cos(angle) * overlap * 0.5;
+                            const separationY = Math.sin(angle) * overlap * 0.5;
+                            
+                            icon.x += separationX;
+                            icon.y += separationY;
+                            other.x -= separationX;
+                            other.y -= separationY;
+
+                            const totalMass = icon.mass + other.mass;
+                            const newVx1 = ((icon.mass - other.mass) * icon.vx + 2 * other.mass * other.vx) / totalMass;
+                            const newVy1 = ((icon.mass - other.mass) * icon.vy + 2 * other.mass * other.vy) / totalMass;
+                            const newVx2 = ((other.mass - icon.mass) * other.vx + 2 * icon.mass * icon.vx) / totalMass;
+                            const newVy2 = ((other.mass - icon.mass) * other.vy + 2 * icon.mass * icon.vy) / totalMass;
+
+                            icon.vx = newVx1 * icon.restitution;
+                            icon.vy = newVy1 * icon.restitution;
+                            other.vx = newVx2 * other.restitution;
+                            other.vy = newVy2 * other.restitution;
+                        }
+                    }
+
+                    // 检查是否应该静止
+                    if (!collided && Math.abs(icon.vx) < 0.1 && Math.abs(icon.vy) < 0.1 && icon.y > this.canvas.height - icon.size - 5) {
+                        icon.settled = true;
+                        icon.vx = 0;
+                        icon.vy = 0;
+                        icon.rotationSpeed = 0;
+                    }
+                });
+
+                // 更新破碎粒子
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    const p = this.particles[i];
+                    
+                    // 应用重力
+                    p.vy += p.gravity;
+                    
+                    // 更新位置
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    
+                    // 更新旋转
+                    p.rotation += p.rotationSpeed;
+                    
+                    // 减少生命值
+                    p.life -= p.decay;
+                    
+                    // 移除死亡的粒子
+                    if (p.life <= 0) {
+                        this.particles.splice(i, 1);
+                    }
+                }
+            }
+
+            draw() {
+                // 清空画布
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // 启用高质量渲染
+                this.ctx.imageSmoothingEnabled = true;
+                this.ctx.imageSmoothingQuality = 'high';
+
+                // 绘制所有图标
+                this.icons.forEach(icon => {
+                    if (!icon.loaded || !icon.visible) return; // 只绘制可见的图标
+
+                    this.ctx.save();
+                    
+                    // 移动到图标中心并旋转
+                    this.ctx.translate(icon.x + icon.size / 2, icon.y + icon.size / 2);
+                    this.ctx.rotate(icon.rotation);
+                    
+                    // 创建圆角裁剪区域
+                    const radius = 8; // 圆角半径（与图标大小成比例）
+                    const halfSize = icon.size / 2;
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(-halfSize + radius, -halfSize);
+                    this.ctx.lineTo(halfSize - radius, -halfSize);
+                    this.ctx.quadraticCurveTo(halfSize, -halfSize, halfSize, -halfSize + radius);
+                    this.ctx.lineTo(halfSize, halfSize - radius);
+                    this.ctx.quadraticCurveTo(halfSize, halfSize, halfSize - radius, halfSize);
+                    this.ctx.lineTo(-halfSize + radius, halfSize);
+                    this.ctx.quadraticCurveTo(-halfSize, halfSize, -halfSize, halfSize - radius);
+                    this.ctx.lineTo(-halfSize, -halfSize + radius);
+                    this.ctx.quadraticCurveTo(-halfSize, -halfSize, -halfSize + radius, -halfSize);
+                    this.ctx.closePath();
+                    
+                    // 应用裁剪
+                    this.ctx.clip();
+                    
+                    // 绘制白色背景（防止透明图标显示问题）
+                    this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-card');
+                    this.ctx.fillRect(-halfSize, -halfSize, icon.size, icon.size);
+                    
+                    // 绘制阴影（在裁剪之前）
+                    this.ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+                    this.ctx.shadowBlur = 4;
+                    this.ctx.shadowOffsetX = 1;
+                    this.ctx.shadowOffsetY = 1;
+                    
+                    // 绘制图标（使用精确坐标避免模糊）
+                    this.ctx.drawImage(
+                        icon.img, 
+                        Math.round(-halfSize), 
+                        Math.round(-halfSize), 
+                        icon.size, 
+                        icon.size
+                    );
+                    
+                    // 添加边框增强清晰度
+                    this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.08)';
+                    this.ctx.lineWidth = 0.5;
+                    this.ctx.stroke();
+                    
+                    this.ctx.restore();
+                });
+
+                // 绘制破碎粒子
+                this.particles.forEach(p => {
+                    this.ctx.save();
+                    
+                    this.ctx.globalAlpha = p.life;
+                    this.ctx.translate(p.x, p.y);
+                    this.ctx.rotate(p.rotation);
+                    
+                    // 绘制碎片阴影
+                    this.ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+                    this.ctx.shadowBlur = 3;
+                    this.ctx.shadowOffsetX = 1;
+                    this.ctx.shadowOffsetY = 1;
+                    
+                    // 绘制碎片（使用原始图片的一部分）
+                    this.ctx.drawImage(
+                        p.img,
+                        -p.size / 2,
+                        -p.size / 2,
+                        p.size,
+                        p.size
+                    );
+                    
+                    this.ctx.restore();
+                });
+            }
+
+            animate() {
+                if (!this.isActive) return;
+
+                this.updatePhysics();
+                this.draw();
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+
+            stop() {
+                this.isActive = false;
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+            }
+        }
+
+        // 页面加载完成后启动蒙太奇动画
+        window.addEventListener('load', () => {
+            new MontageAnimation();
+        });
+
+        // 搜索和分类过滤功能
+        const searchBox = document.getElementById('searchBox');
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const toolCards = document.querySelectorAll('.tool-card');
+        let currentCategory = 'all';
+        let currentSearch = '';
+
+        // 搜索功能
+        searchBox.addEventListener('input', (e) => {
+            currentSearch = e.target.value.toLowerCase();
+            filterTools();
+        });
+
+        // 分类标签点击事件
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有active类
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                // 添加active类到当前标签
+                tab.classList.add('active');
+                // 更新当前分类
+                currentCategory = tab.dataset.category;
+                filterTools();
+            });
+        });
+
+        // 过滤工具函数
+        function filterTools() {
+            toolCards.forEach(card => {
+                const category = card.dataset.category;
+                const name = card.dataset.name.toLowerCase();
+                const desc = card.dataset.desc.toLowerCase();
+                
+                // 检查分类匹配
+                const categoryMatch = currentCategory === 'all' || category === currentCategory;
+                
+                // 检查搜索匹配
+                const searchMatch = !currentSearch || 
+                    name.includes(currentSearch) || 
+                    desc.includes(currentSearch);
+                
+                // 显示或隐藏卡片
+                if (categoryMatch && searchMatch) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
     </script>
 </body>
 </html>

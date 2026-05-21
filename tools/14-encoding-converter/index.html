@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>编码转换工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:900px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:16px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:620px){.row{grid-template-columns:1fr}}
+label{display:block;font-size:12px;color:#656d76;margin-bottom:4px;font-weight:500}
+textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;resize:vertical;min-height:200px;font-family:Consolas,monospace;line-height:1.6;outline:none;transition:border-color .15s}
+textarea:focus{border-color:var(--green)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.enc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:12px}
+.enc-card{border:2px solid var(--border);border-radius:var(--radius);padding:8px 10px;cursor:pointer;transition:all .15s;text-align:center}
+.enc-card.active{border-color:var(--green);background:#f0fff4}
+.enc-card:hover:not(.active){background:#f6f8fa}
+.enc-card h4{font-size:13px;font-weight:600}
+.enc-card p{font-size:11px;color:#656d76;margin-top:2px}
+.direction{display:flex;align-items:center;gap:12px;padding:10px 0;flex-wrap:wrap}
+select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none}
+select:focus{border-color:var(--green)}
+.arrow{font-size:20px;color:var(--green);font-weight:700}
+.info-box{background:#f0fff4;border:1px solid #9be9a8;border-radius:var(--radius);padding:10px 14px;font-size:12px;color:#1a7f37;margin-bottom:12px}
+.warn-box{background:#fff8e1;border:1px solid #f0d060;border-radius:var(--border);padding:10px 14px;font-size:12px;color:#7d4f00;border-radius:var(--radius);margin-bottom:12px}
+.hex-display{font-family:Consolas,monospace;font-size:12px;background:#f6f8fa;border:1px solid var(--border);border-radius:var(--radius);padding:10px;max-height:100px;overflow-y:auto;word-break:break-all;color:#656d76;margin-top:8px}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🔄</span>
+  <h1>编码转换工具</h1>
+  <p>UTF-8 · GBK · Latin1 · URL编码 · HTML实体</p>
+</header>
+<div class="container">
+  <div class="info-box">ℹ️ 浏览器原生仅支持 UTF-8，GBK/GB2312 转换通过 TextEncoder/TextDecoder 实现。若需精确 GBK 二进制转换，建议使用服务端工具。</div>
+
+  <div class="card">
+    <div class="card-header">🧰 选择转换类型</div>
+    <div class="card-body">
+      <div class="enc-grid">
+        <div class="enc-card active" onclick="selectType('url')" data-type="url">
+          <h4>🌐 URL 编码</h4><p>百分号编码</p>
+        </div>
+        <div class="enc-card" onclick="selectType('html')" data-type="html">
+          <h4>🏷️ HTML 实体</h4><p>&amp;lt; &amp;gt; &amp;amp;</p>
+        </div>
+        <div class="enc-card" onclick="selectType('unicode-esc')" data-type="unicode-esc">
+          <h4>🔠 Unicode 转义</h4><p>\uXXXX 格式</p>
+        </div>
+        <div class="enc-card" onclick="selectType('hex-bytes')" data-type="hex-bytes">
+          <h4>🔢 UTF-8 十六进制</h4><p>字节序列</p>
+        </div>
+        <div class="enc-card" onclick="selectType('gbk-sim')" data-type="gbk-sim">
+          <h4>📄 GBK 模拟</h4><p>编码点显示</p>
+        </div>
+        <div class="enc-card" onclick="selectType('bin')" data-type="bin">
+          <h4>💾 二进制</h4><p>01 编码</p>
+        </div>
+        <div class="enc-card" onclick="selectType('punycode')" data-type="punycode">
+          <h4>🌍 Punycode</h4><p>国际化域名</p>
+        </div>
+        <div class="enc-card" onclick="selectType('jwt-decode')" data-type="jwt-decode">
+          <h4>🎫 JWT 解码</h4><p>解析 JWT Payload</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">📝 输入 / 输出</div>
+    <div class="card-body">
+      <div id="url-opts" class="direction">
+        <span style="font-size:13px;font-weight:500">模式：</span>
+        <select id="url-mode">
+          <option value="encode">编码（encode）</option>
+          <option value="decode">解码（decode）</option>
+          <option value="encode-component">encodeURIComponent</option>
+          <option value="decode-component">decodeURIComponent</option>
+        </select>
+      </div>
+      <div class="row">
+        <div>
+          <label>输入文本</label>
+          <textarea id="input" placeholder="在此输入需要转换的文本..."></textarea>
+          <div id="in-hex" class="hex-display" style="display:none"></div>
+        </div>
+        <div>
+          <label>转换结果</label>
+          <textarea id="output" placeholder="转换结果显示在这里..." readonly style="background:#f8fff9"></textarea>
+          <div id="out-hex" class="hex-display" style="display:none"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="doConvert()">🔄 转换</button>
+        <button class="btn btn-secondary" onclick="swapIO()">⇄ 互换</button>
+        <button class="btn btn-secondary" onclick="copyOutput()">📋 复制结果</button>
+        <button class="btn btn-secondary" onclick="clearAll()">🗑 清空</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">🔍 字符详情</div>
+    <div class="card-body" id="char-detail" style="font-size:13px;color:#656d76">输入文本后点击"转换"查看字符详情</div>
+  </div>
+</div>
+
+<script>
+let currentType = 'url';
+
+function selectType(type) {
+  currentType = type;
+  document.querySelectorAll('.enc-card').forEach(c => c.classList.remove('active'));
+  document.querySelector(`[data-type="${type}"]`).classList.add('active');
+  document.getElementById('url-opts').style.display = type === 'url' ? 'flex' : 'none';
+  document.getElementById('in-hex').style.display = type === 'hex-bytes' ? 'block' : 'none';
+  document.getElementById('out-hex').style.display = type === 'hex-bytes' ? 'block' : 'none';
+}
+
+// URL编码
+function doURL(text) {
+  const mode = document.getElementById('url-mode').value;
+  try {
+    switch (mode) {
+      case 'encode': return encodeURI(text);
+      case 'decode': return decodeURI(text);
+      case 'encode-component': return encodeURIComponent(text);
+      case 'decode-component': return decodeURIComponent(text);
+    }
+  } catch(e) { return '错误：' + e.message; }
+}
+
+// HTML实体
+function encHTML(s) {
+  return s.replace(/[&<>"'`]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
+}
+function decHTML(s) {
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = s;
+  return textarea.value;
+}
+
+// Unicode转义
+function encUnicode(s) {
+  return [...s].map(c => `\\u${c.charCodeAt(0).toString(16).padStart(4,'0')}`).join('');
+}
+function decUnicode(s) {
+  return s.replace(/\\u([0-9a-fA-F]{4})/gi, (_, h) => String.fromCharCode(parseInt(h, 16)));
+}
+
+// UTF-8十六进制
+function encHexUTF8(s) {
+  const enc = new TextEncoder();
+  const bytes = enc.encode(s);
+  return Array.from(bytes).map(b => b.toString(16).padStart(2,'0')).join(' ');
+}
+function decHexUTF8(s) {
+  const hex = s.trim().split(/\s+/);
+  const bytes = new Uint8Array(hex.map(h => parseInt(h, 16)));
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
+// GBK模拟（显示码点）
+function gbkSim(s) {
+  const result = [];
+  for (const ch of s) {
+    const cp = ch.codePointAt(0);
+    if (cp > 127) {
+      result.push(`[U+${cp.toString(16).toUpperCase().padStart(4,'0')}]`);
+    } else {
+      result.push(ch);
+    }
+  }
+  return result.join('');
+}
+
+// 二进制
+function encBin(s) {
+  return [...s].map(c => c.charCodeAt(0).toString(2).padStart(8,'0')).join(' ');
+}
+function decBin(s) {
+  return s.trim().split(/\s+/).map(b => String.fromCharCode(parseInt(b,2))).join('');
+}
+
+// Punycode（简单模拟）
+function encPunycode(domain) {
+  try {
+    const anchor = document.createElement('a');
+    anchor.href = 'http://' + domain;
+    return anchor.hostname;
+  } catch(e) { return domain; }
+}
+
+// JWT解码
+function decodeJWT(token) {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return '错误：不是有效的 JWT 格式（需要3段）';
+    const header = JSON.parse(atob(parts[0].replace(/-/g,'+').replace(/_/g,'/')));
+    const payload = JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+    return JSON.stringify({ header, payload }, null, 2);
+  } catch(e) { return '错误：' + e.message; }
+}
+
+function doConvert() {
+  const text = document.getElementById('input').value;
+  if (!text.trim()) { showToast('请先输入文本'); return; }
+  let result = '';
+  switch (currentType) {
+    case 'url': result = doURL(text); break;
+    case 'html': result = encHTML(text) + '\n\n--- 解码 ---\n' + decHTML(text); break;
+    case 'unicode-esc': {
+      const decoded = decUnicode(text);
+      const encoded = encUnicode(text);
+      result = text === decoded ? encoded : decoded;
+      break;
+    }
+    case 'hex-bytes': {
+      // 检查是否是十六进制输入
+      const isHex = /^[0-9a-fA-F\s]+$/.test(text.trim());
+      if (isHex && text.trim().includes(' ')) {
+        result = decHexUTF8(text);
+      } else {
+        result = encHexUTF8(text);
+      }
+      document.getElementById('in-hex').textContent = 'UTF-8 字节: ' + encHexUTF8(text);
+      break;
+    }
+    case 'gbk-sim': result = gbkSim(text); break;
+    case 'bin': {
+      const isBin = /^[01\s]+$/.test(text.trim());
+      result = isBin && text.includes(' ') ? decBin(text) : encBin(text);
+      break;
+    }
+    case 'punycode': result = encPunycode(text); break;
+    case 'jwt-decode': result = decodeJWT(text.trim()); break;
+  }
+  document.getElementById('output').value = result;
+  showCharDetail(text);
+}
+
+function showCharDetail(text) {
+  const sample = [...text].slice(0, 10);
+  const rows = sample.map(c => {
+    const cp = c.codePointAt(0);
+    const enc = new TextEncoder();
+    const bytes = enc.encode(c);
+    const hexBytes = Array.from(bytes).map(b => b.toString(16).padStart(2,'0').toUpperCase()).join(' ');
+    return `<span style="display:inline-block;margin:4px;padding:4px 8px;background:#f6f8fa;border:1px solid var(--border);border-radius:4px;font-size:12px"><b style="font-size:16px">${escHtml(c)}</b> U+${cp.toString(16).toUpperCase().padStart(4,'0')} [${hexBytes}]</span>`;
+  }).join('');
+  const more = text.length > 10 ? `<span style="font-size:12px;color:#656d76"> 仅显示前10个字符</span>` : '';
+  document.getElementById('char-detail').innerHTML = rows + more;
+}
+
+function swapIO() {
+  const a = document.getElementById('input').value;
+  document.getElementById('input').value = document.getElementById('output').value;
+  document.getElementById('output').value = a;
+}
+
+function copyOutput() {
+  navigator.clipboard.writeText(document.getElementById('output').value).then(() => showToast('已复制'));
+}
+
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('output').value = '';
+  document.getElementById('char-detail').textContent = '输入文本后点击"转换"查看字符详情';
+}
+
+function escHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+
+selectType('url');
+</script>
+</body>
+</html>

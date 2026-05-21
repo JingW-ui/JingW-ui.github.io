@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>图片压缩工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:1000px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:16px}
+.dropzone{border:2px dashed var(--border);border-radius:var(--radius);padding:40px;text-align:center;cursor:pointer;transition:all .2s;background:#fafafa}
+.dropzone:hover,.dropzone.drag{border-color:var(--green);background:#f0fff4}
+.dropzone .icon{font-size:48px;margin-bottom:12px}
+.dropzone p{color:#656d76;font-size:14px}
+.dropzone .hint{font-size:12px;color:#aaa;margin-top:6px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.btn-sm{padding:4px 10px;font-size:12px}
+.controls{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.control-item{display:flex;flex-direction:column;gap:4px}
+.control-item label{font-size:12px;color:#656d76;font-weight:500}
+input[type=range]{-webkit-appearance:none;width:200px;height:6px;background:#d1f0d8;border-radius:3px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--green);cursor:pointer}
+select{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none}
+input[type=number]{padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;width:80px;outline:none}
+.img-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.img-grid{grid-template-columns:1fr}}
+.img-panel{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.img-panel-header{background:#f6f8fa;padding:8px 12px;font-size:12px;font-weight:600;color:#656d76;display:flex;justify-content:space-between;align-items:center}
+.img-preview{width:100%;max-height:320px;object-fit:contain;background:#f0f0f0;display:block}
+.img-info{padding:10px 12px;font-size:12px;color:#656d76;border-top:1px solid var(--border);background:#fafafa}
+.info-row{display:flex;justify-content:space-between;margin-bottom:4px}
+.savings{background:#dff4e0;color:#1a7f37;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700}
+.savings.red{background:#ffe3e6;color:#cf222e}
+.batch-list{max-height:300px;overflow-y:auto}
+.batch-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid #f0f2f5;font-size:13px}
+.batch-item img{width:40px;height:40px;object-fit:cover;border-radius:4px;border:1px solid var(--border)}
+.batch-item .name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.batch-item .size{color:#656d76;font-size:12px;white-space:nowrap}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🗜️</span>
+  <h1>图片压缩工具</h1>
+  <p>纯前端 Canvas 压缩 · 支持批量处理</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-header">⚙️ 压缩参数</div>
+    <div class="card-body">
+      <div class="controls">
+        <div class="control-item">
+          <label>压缩质量：<b id="quality-val">80</b>%</label>
+          <input type="range" id="quality" min="1" max="100" value="80" oninput="document.getElementById('quality-val').textContent=this.value">
+        </div>
+        <div class="control-item">
+          <label>输出格式</label>
+          <select id="output-format">
+            <option value="image/jpeg">JPEG（最小体积）</option>
+            <option value="image/png">PNG（无损）</option>
+            <option value="image/webp">WebP（现代格式）</option>
+          </select>
+        </div>
+        <div class="control-item">
+          <label>最大宽度（px，0=不限）</label>
+          <input type="number" id="max-width" value="0" min="0">
+        </div>
+        <div class="control-item">
+          <label>最大高度（px，0=不限）</label>
+          <input type="number" id="max-height" value="0" min="0">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">📁 选择图片</div>
+    <div class="card-body">
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('file-input').click()"
+        ondragover="e=>{e.preventDefault();this.classList.add('drag')}" 
+        ondragleave="this.classList.remove('drag')"
+        ondrop="handleDrop(event)">
+        <div class="icon">🖼️</div>
+        <p>点击选择图片，或将图片拖拽到此处</p>
+        <div class="hint">支持 JPG、PNG、WebP、GIF · 可多选批量处理</div>
+      </div>
+      <input type="file" id="file-input" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)">
+    </div>
+  </div>
+
+  <div class="card" id="result-card" style="display:none">
+    <div class="card-header">
+      <span>✨ 压缩结果</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="downloadAll()">⬇️ 全部下载</button>
+        <button class="btn btn-secondary btn-sm" onclick="clearResults()">🗑 清空</button>
+      </div>
+    </div>
+    <div id="results-container"></div>
+  </div>
+</div>
+
+<script>
+let processedFiles = [];
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropzone').classList.remove('drag');
+  handleFiles(e.dataTransfer.files);
+}
+
+function handleFiles(files) {
+  if (!files.length) return;
+  processedFiles = [];
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('results-container').innerHTML = '<div style="padding:20px;text-align:center;color:#656d76">处理中...</div>';
+  
+  const arr = Array.from(files).filter(f => f.type.startsWith('image/'));
+  if (!arr.length) { showToast('请选择图片文件'); return; }
+  
+  let done = 0;
+  const results = new Array(arr.length);
+  
+  arr.forEach((file, idx) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        compress(img, file, idx, arr.length, results, () => {
+          done++;
+          if (done === arr.length) renderResults(results);
+        });
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function compress(img, file, idx, total, results, cb) {
+  const quality = parseInt(document.getElementById('quality').value) / 100;
+  const fmt = document.getElementById('output-format').value;
+  const maxW = parseInt(document.getElementById('max-width').value) || Infinity;
+  const maxH = parseInt(document.getElementById('max-height').value) || Infinity;
+
+  let w = img.width, h = img.height;
+  if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+  if (h > maxH) { w = Math.round(w * maxH / h); h = maxH; }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, w, h);
+
+  canvas.toBlob(blob => {
+    const origSize = file.size;
+    const newSize = blob.size;
+    const ratio = ((1 - newSize / origSize) * 100).toFixed(1);
+    const ext = fmt.split('/')[1] === 'jpeg' ? 'jpg' : fmt.split('/')[1];
+    const newName = file.name.replace(/\.[^.]+$/, '') + '_compressed.' + ext;
+    
+    results[idx] = {
+      origName: file.name, newName, blob,
+      origSize, newSize, ratio,
+      origW: img.width, origH: img.height, newW: w, newH: h,
+      origUrl: URL.createObjectURL(file),
+      newUrl: URL.createObjectURL(blob)
+    };
+    processedFiles[idx] = results[idx];
+    cb();
+  }, fmt, quality);
+}
+
+function formatSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/1024/1024).toFixed(2) + ' MB';
+}
+
+function renderResults(results) {
+  let html = '';
+  results.forEach((r, i) => {
+    if (!r) return;
+    const savedClass = parseFloat(r.ratio) > 0 ? '' : ' red';
+    if (results.length === 1) {
+      // 单图对比视图
+      html = `
+        <div class="card-body">
+          <div class="img-grid">
+            <div class="img-panel">
+              <div class="img-panel-header"><span>原始图片</span><span>${formatSize(r.origSize)}</span></div>
+              <img class="img-preview" src="${r.origUrl}" alt="原始">
+              <div class="img-info">
+                <div class="info-row"><span>文件名：</span><span>${r.origName}</span></div>
+                <div class="info-row"><span>尺寸：</span><span>${r.origW} × ${r.origH} px</span></div>
+                <div class="info-row"><span>大小：</span><span>${formatSize(r.origSize)}</span></div>
+              </div>
+            </div>
+            <div class="img-panel">
+              <div class="img-panel-header"><span>压缩结果</span><span class="savings${savedClass}">${parseFloat(r.ratio)>0?'节省':'增加'} ${Math.abs(r.ratio)}%</span></div>
+              <img class="img-preview" src="${r.newUrl}" alt="压缩后">
+              <div class="img-info">
+                <div class="info-row"><span>文件名：</span><span>${r.newName}</span></div>
+                <div class="info-row"><span>尺寸：</span><span>${r.newW} × ${r.newH} px</span></div>
+                <div class="info-row"><span>大小：</span><span>${formatSize(r.newSize)}</span></div>
+                <div style="margin-top:8px;display:flex;gap:8px">
+                  <button class="btn btn-primary btn-sm" onclick="downloadFile(${i})">⬇️ 下载</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      html += `
+        <div class="batch-item">
+          <img src="${r.newUrl}" alt="">
+          <div class="name">${r.origName}</div>
+          <div class="size">${formatSize(r.origSize)} → ${formatSize(r.newSize)}</div>
+          <span class="savings${savedClass}">${parseFloat(r.ratio)>0?'-':'+'} ${Math.abs(r.ratio)}%</span>
+          <button class="btn btn-secondary btn-sm" onclick="downloadFile(${i})">⬇️</button>
+        </div>
+      `;
+    }
+  });
+  if (results.length > 1) {
+    const totalOrig = results.reduce((s,r)=>s+(r?.origSize||0),0);
+    const totalNew = results.reduce((s,r)=>s+(r?.newSize||0),0);
+    const totalRatio = ((1-totalNew/totalOrig)*100).toFixed(1);
+    html = `<div class="card-body">
+      <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;font-size:13px">
+        <span>共 ${results.length} 张</span>
+        <span>原始：${formatSize(totalOrig)}</span>
+        <span>压缩后：${formatSize(totalNew)}</span>
+        <span class="savings">${parseFloat(totalRatio)>0?'节省':'增加'} ${Math.abs(totalRatio)}%</span>
+      </div>
+    </div>
+    <div class="batch-list">${html}</div>`;
+  }
+  document.getElementById('results-container').innerHTML = html;
+}
+
+function downloadFile(idx) {
+  const r = processedFiles[idx];
+  if (!r) return;
+  const a = document.createElement('a');
+  a.href = r.newUrl;
+  a.download = r.newName;
+  a.click();
+}
+
+function downloadAll() {
+  processedFiles.forEach((r, i) => {
+    if (r) setTimeout(() => downloadFile(i), i * 300);
+  });
+}
+
+function clearResults() {
+  processedFiles = [];
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('results-container').innerHTML = '';
+  document.getElementById('file-input').value = '';
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+</script>
+</body>
+</html>

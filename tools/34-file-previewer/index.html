@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>本地文件预览器</title>
+<style>
+  :root {
+    --green: #2da44e;
+    --green2: #2c974b;
+    --border: #d0d7de;
+    --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08);
+    --bg: #f6f8fa;
+    --card: #fff;
+    --text: #1f2328;
+    --text2: #656d76;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  .header {
+    text-align: center;
+    padding: 30px 0;
+    background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 30px;
+  }
+  .header h1 { font-size: 32px; font-weight: 600; margin-bottom: 8px; }
+  .header p { font-size: 16px; opacity: 0.9; }
+
+  .upload-area {
+    background: var(--card);
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 60px 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 20px;
+  }
+  .upload-area:hover, .upload-area.drag-over {
+    border-color: var(--green);
+    background: #f0f9f0;
+  }
+  .upload-area .icon { font-size: 64px; margin-bottom: 16px; }
+  .upload-area h3 { font-size: 20px; margin-bottom: 8px; color: var(--text); }
+  .upload-area p { color: var(--text2); font-size: 14px; }
+  .upload-area input { display: none; }
+
+  .file-info {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: none;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .file-info.show { display: flex; }
+  .file-icon { font-size: 40px; }
+  .file-details { flex: 1; }
+  .file-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .file-meta { font-size: 13px; color: var(--text2); }
+
+  .toolbar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .toolbar.show { display: flex; }
+
+  .btn {
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--text);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover { background: var(--bg); }
+  .btn-primary { background: var(--green); color: white; border-color: var(--green); }
+  .btn-primary:hover { background: var(--green2); }
+  .btn-secondary { background: var(--bg); }
+
+  .preview-container {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: none;
+    overflow: hidden;
+  }
+  .preview-container.show { display: block; }
+
+  .preview-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .preview-content {
+    padding: 20px;
+    max-height: 70vh;
+    overflow: auto;
+  }
+
+  /* TXT */
+  .txt-preview {
+    white-space: pre-wrap;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  /* JSON */
+  .json-preview {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 16px;
+    border-radius: var(--radius);
+    font-family: "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+  .json-key { color: #9cdcfe; }
+  .json-string { color: #ce9178; }
+  .json-number { color: #b5cea8; }
+  .json-boolean { color: #569cd6; }
+  .json-null { color: #569cd6; }
+
+  /* CSV */
+  .csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .csv-table th, .csv-table td {
+    border: 1px solid var(--border);
+    padding: 8px 12px;
+    text-align: left;
+  }
+  .csv-table th {
+    background: var(--bg);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  .csv-table tr:hover { background: #f6f8fa; }
+
+  /* Markdown */
+  .md-preview h1 { font-size: 28px; margin: 20px 0 10px; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
+  .md-preview h2 { font-size: 24px; margin: 18px 0 9px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+  .md-preview h3 { font-size: 20px; margin: 16px 0 8px; }
+  .md-preview p { margin: 10px 0; line-height: 1.6; }
+  .md-preview code {
+    background: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: "Courier New", monospace;
+    font-size: 90%;
+  }
+  .md-preview pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 16px;
+    border-radius: var(--radius);
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+  .md-preview pre code { background: none; padding: 0; color: inherit; }
+  .md-preview blockquote {
+    border-left: 4px solid var(--green);
+    padding: 10px 16px;
+    margin: 10px 0;
+    background: #f0f9f0;
+  }
+  .md-preview ul, .md-preview ol { margin: 10px 0; padding-left: 30px; }
+  .md-preview li { margin: 5px 0; }
+  .md-preview a { color: var(--green); text-decoration: none; }
+  .md-preview a:hover { text-decoration: underline; }
+  .md-preview img { max-width: 100%; border-radius: var(--radius); }
+  .md-preview table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+  .md-preview th, .md-preview td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+  .md-preview th { background: var(--bg); font-weight: 600; }
+
+  /* Image */
+  .image-preview {
+    text-align: center;
+  }
+  .image-preview img {
+    max-width: 100%;
+    max-height: 60vh;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text2);
+  }
+  .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+  }
+
+  @media (max-width: 768px) {
+    .header h1 { font-size: 24px; }
+    .upload-area { padding: 40px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📂 本地文件预览器</h1>
+    <p>预览 TXT、CSV、JSON、Markdown、图片等文件，无需上传</p>
+  </div>
+
+  <div class="upload-area" id="uploadArea">
+    <div class="icon">📁</div>
+    <h3>点击或拖拽文件到此处</h3>
+    <p>支持 TXT、CSV、JSON、MD、HTML、CSS、JS、图片等格式</p>
+    <input type="file" id="fileInput" accept=".txt,.csv,.json,.md,.markdown,.html,.css,.js,.ts,.tsx,.jsx,.xml,.yaml,.yml,.png,.jpg,.jpeg,.gif,.svg,.webp">
+  </div>
+
+  <div class="file-info" id="fileInfo">
+    <div class="file-icon" id="fileIcon">📄</div>
+    <div class="file-details">
+      <div class="file-name" id="fileName">-</div>
+      <div class="file-meta" id="fileMeta">-</div>
+    </div>
+    <button class="btn btn-secondary" onclick="clearFile()">🗑️ 清除</button>
+  </div>
+
+  <div class="toolbar" id="toolbar">
+    <button class="btn btn-secondary" onclick="searchInFile()">🔍 搜索</button>
+    <button class="btn btn-secondary" onclick="downloadFile()">💾 下载</button>
+    <button class="btn btn-secondary" onclick="copyContent()">📋 复制内容</button>
+    <div class="search-box" id="searchBox" style="display:none;">
+      <input type="text" id="searchInput" placeholder="输入搜索关键词..." oninput="performSearch(this.value)">
+    </div>
+  </div>
+
+  <div class="preview-container" id="previewContainer">
+    <div class="preview-header">
+      <span id="previewTitle">预览</span>
+      <span id="previewInfo" style="font-weight: normal; color: var(--text2);"></span>
+    </div>
+    <div class="preview-content" id="previewContent">
+      <div class="empty-state">
+        <div class="icon">👆</div>
+        <p>选择文件开始预览</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentFile = null;
+let currentContent = '';
+let originalContent = '';
+
+const uploadArea = document.getElementById('uploadArea');
+const fileInput = document.getElementById('fileInput');
+
+uploadArea.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files[0]) loadFile(e.target.files[0]);
+});
+
+uploadArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  uploadArea.classList.add('drag-over');
+});
+uploadArea.addEventListener('dragleave', () => {
+  uploadArea.classList.remove('drag-over');
+});
+uploadArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  uploadArea.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+});
+
+function loadFile(file) {
+  currentFile = file;
+  const ext = file.name.split('.').pop().toLowerCase();
+  const size = formatFileSize(file.size);
+
+  document.getElementById('fileIcon').textContent = getFileIcon(ext);
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('fileMeta').textContent = `${size} | ${file.type || '未知类型'} | 修改时间: ${new Date(file.lastModified).toLocaleString()}`;
+  document.getElementById('fileInfo').classList.add('show');
+  document.getElementById('toolbar').classList.add('show');
+  document.getElementById('previewContainer').classList.add('show');
+
+  const reader = new FileReader();
+
+  if (['png','jpg','jpeg','gif','svg','webp','bmp','ico'].includes(ext)) {
+    reader.onload = (e) => displayImage(e.target.result, file);
+    reader.readAsDataURL(file);
+  } else if (['txt','md','markdown','html','css','js','ts','tsx','jsx','json','csv','xml','yaml','yml','sh','bat','ps1','sql','log'].includes(ext)) {
+    reader.onload = (e) => displayText(e.target.result, ext);
+    reader.readAsText(file);
+  } else {
+    reader.onload = (e) => displayBinary(file);
+    reader.readAsArrayBuffer(file);
+  }
+}
+
+function displayText(content, ext) {
+  originalContent = content;
+  currentContent = content;
+
+  const container = document.getElementById('previewContent');
+  const title = document.getElementById('previewTitle');
+  const info = document.getElementById('previewInfo');
+
+  const lines = content.split('\n').length;
+  const chars = content.length;
+  info.textContent = `${lines} 行 | ${chars} 字符`;
+
+  if (ext === 'json') {
+    title.textContent = 'JSON 预览';
+    try {
+      const parsed = JSON.parse(content);
+      container.innerHTML = `<pre class="json-preview">${syntaxHighlightJson(JSON.stringify(parsed, null, 2))}</pre>`;
+    } catch {
+      title.textContent = '文本预览 (JSON 格式错误)';
+      container.innerHTML = `<div class="txt-preview">${escapeHtml(content)}</div>`;
+    }
+  } else if (ext === 'csv') {
+    title.textContent = 'CSV 预览';
+    container.innerHTML = parseCSV(content);
+  } else if (ext === 'md' || ext === 'markdown') {
+    title.textContent = 'Markdown 预览';
+    container.innerHTML = `<div class="md-preview">${parseMarkdown(content)}</div>`;
+  } else if (ext === 'html') {
+    title.textContent = 'HTML 源码预览';
+    container.innerHTML = `<pre class="json-preview">${escapeHtml(content)}</pre>`;
+  } else {
+    title.textContent = '文本预览';
+    container.innerHTML = `<div class="txt-preview">${escapeHtml(content)}</div>`;
+  }
+}
+
+function displayImage(dataUrl, file) {
+  const container = document.getElementById('previewContent');
+  const title = document.getElementById('previewTitle');
+  const info = document.getElementById('previewInfo');
+
+  title.textContent = '图片预览';
+  info.textContent = `${file.name}`;
+
+  const img = new Image();
+  img.onload = () => {
+    info.textContent = `${img.width} × ${img.height} px | ${formatFileSize(file.size)}`;
+    container.innerHTML = `<div class="image-preview"><img src="${dataUrl}" alt="${file.name}"></div>`;
+  };
+  img.src = dataUrl;
+}
+
+function displayBinary(file) {
+  const container = document.getElementById('previewContent');
+  const title = document.getElementById('previewTitle');
+  title.textContent = '无法预览';
+  container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>此文件类型无法在浏览器中预览</p><p style="margin-top:8px;font-size:14px;color:var(--text2);">文件: ${file.name}<br>大小: ${formatFileSize(file.size)}</p></div>`;
+}
+
+function parseCSV(content) {
+  const lines = content.split('\n').filter(l => l.trim());
+  if (lines.length === 0) return '<div class="empty-state"><p>文件为空</p></div>';
+
+  let table = '<table class="csv-table">';
+  lines.forEach((line, i) => {
+    const cells = parseCSVLine(line);
+    table += '<tr>';
+    cells.forEach(cell => {
+      if (i === 0) table += `<th>${escapeHtml(cell)}</th>`;
+      else table += `<td>${escapeHtml(cell)}</td>`;
+    });
+    table += '</tr>';
+  });
+  table += '</table>';
+  return table;
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+function parseMarkdown(text) {
+  // Simple Markdown parser
+  let html = text
+    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code>$1</code>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^- (.*$)/gim, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+
+  return '<div>' + html + '</div>';
+}
+
+function syntaxHighlightJson(json) {
+  return json.replace(/("(\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
+    let cls = 'json-number';
+    if (/^"/.test(match)) {
+      cls = /:$/.test(match) ? 'json-key' : 'json-string';
+    } else if (/true|false/.test(match)) {
+      cls = 'json-boolean';
+    } else if (/null/.test(match)) {
+      cls = 'json-null';
+    }
+    return `<span class="${cls}">${match}</span>`;
+  });
+}
+
+function searchInFile() {
+  const box = document.getElementById('searchBox');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  if (box.style.display === 'block') {
+    document.getElementById('searchInput').focus();
+  }
+}
+
+function performSearch(keyword) {
+  if (!keyword) {
+    displayText(originalContent, currentFile.name.split('.').pop().toLowerCase());
+    return;
+  }
+
+  const regex = new RegExp(`(${escapeRegExp(keyword)})`, 'gi');
+  const highlighted = originalContent.replace(regex, '<mark style="background:#fff3cd;padding:1px 2px;border-radius:2px;">$1</mark>');
+  displayText(highlighted, currentFile.name.split('.').pop().toLowerCase());
+}
+
+function copyContent() {
+  if (!currentContent) return;
+  navigator.clipboard.writeText(originalContent).then(() => {
+    showToast('✅ 内容已复制到剪贴板');
+  });
+}
+
+function downloadFile() {
+  if (!currentFile) return;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(currentFile);
+  a.download = currentFile.name;
+  a.click();
+  showToast('✅ 开始下载文件');
+}
+
+function clearFile() {
+  currentFile = null;
+  currentContent = '';
+  originalContent = '';
+  fileInput.value = '';
+  document.getElementById('fileInfo').classList.remove('show');
+  document.getElementById('toolbar').classList.remove('show');
+  document.getElementById('previewContainer').classList.remove('show');
+  document.getElementById('searchBox').style.display = 'none';
+  document.getElementById('previewContent').innerHTML = '<div class="empty-state"><div class="icon">👆</div><p>选择文件开始预览</p></div>';
+}
+
+function getFileIcon(ext) {
+  const icons = {
+    'txt': '📝', 'md': '📝', 'json': '📋', 'csv': '📊',
+    'html': '🌐', 'css': '🎨', 'js': '📜', 'ts': '📜',
+    'png': '🖼️', 'jpg': '🖼️', 'jpeg': '🖼️', 'gif': '🖼️', 'svg': '🖼️',
+    'pdf': '📕', 'zip': '📦', 'mp3': '🎵', 'mp4': '🎬'
+  };
+  return icons[ext] || '📄';
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 B';
+  const k = 1024;
+  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {
+    position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
+    background: '#24292f', color: 'white', padding: '10px 20px',
+    borderRadius: '6px', fontSize: '14px', zIndex: '9999',
+    boxShadow: '0 4px 12px rgba(0,0,0,.15)'
+  });
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2000);
+}
+</script>
+</body>
+</html>

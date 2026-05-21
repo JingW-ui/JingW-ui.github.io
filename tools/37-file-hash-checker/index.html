@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文件哈希校验工具</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --red:#cf222e; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+  .hi { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; }
+  header h1 { font-size:18px; font-weight:600; }
+  header p { font-size:13px; color:var(--text2); }
+  .main { flex:1; padding:20px 24px; max-width:900px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:16px; }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); }
+  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; }
+  .card-body { padding:18px; }
+  .drop-zone { border:2px dashed var(--border); border-radius:8px; padding:48px 24px; text-align:center; cursor:pointer; transition:all .2s; }
+  .drop-zone:hover,.drop-zone.dragover { border-color:var(--green); background:rgba(45,164,78,.04); }
+  .drop-zone input[type=file] { display:none; }
+  .file-icon { font-size:48px; margin-bottom:12px; }
+  .drop-text { font-size:15px; font-weight:500; margin-bottom:4px; }
+  .drop-sub { font-size:13px; color:var(--text2); }
+  .hash-table { width:100%; border-collapse:collapse; font-size:14px; }
+  .hash-table th { background:var(--bg2); padding:10px 16px; text-align:left; font-size:12px; color:var(--text2); font-weight:600; text-transform:uppercase; border-bottom:1px solid var(--border); }
+  .hash-table td { padding:10px 16px; border-bottom:1px solid var(--bg3); font-family:'Consolas',monospace; word-break:break-all; }
+  .hash-table tr:last-child td { border-bottom:none; }
+  .hash-name { font-family:inherit; font-weight:600; color:var(--text); }
+  .copy-btn { padding:2px 8px; font-size:11px; border:1px solid var(--border); border-radius:4px; background:var(--bg); cursor:pointer; }
+  .copy-btn:hover { background:var(--bg3); }
+  .progress-row { display:flex; align-items:center; gap:12px; }
+  .progress-bar { flex:1; height:6px; background:var(--bg3); border-radius:3px; overflow:hidden; }
+  .progress-fill { height:100%; background:var(--green); border-radius:3px; transition:width .1s; }
+  .verify-row { display:flex; gap:8px; align-items:center; }
+  .verify-input { flex:1; padding:8px 14px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Consolas',monospace; font-size:13px; background:var(--bg); color:var(--text); outline:none; }
+  .verify-input:focus { border-color:var(--green); }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:7px 16px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn:hover { background:var(--bg3); }
+  .btn-primary { background:var(--green); color:white; border-color:var(--green); }
+  .btn-primary:hover { background:var(--green2); }
+  .verify-ok { padding:8px 14px; border-radius:var(--radius); background:#dafbe1; color:#1a7f37; font-size:13px; font-weight:500; }
+  .verify-fail { padding:8px 14px; border-radius:var(--radius); background:#ffebe9; color:var(--red); font-size:13px; font-weight:500; }
+  .file-info { display:flex; gap:20px; font-size:13px; color:var(--text2); padding:12px 0; flex-wrap:wrap; }
+  .file-info b { color:var(--text); }
+</style>
+</head>
+<body>
+<header>
+  <div class="hi">#</div>
+  <div>
+    <h1>文件哈希校验工具</h1>
+    <p>本地文件 MD5/SHA-1/SHA-256/SHA-512 计算，纯前端无需上传</p>
+  </div>
+</header>
+
+<div class="main">
+  <!-- 文件上传 -->
+  <div class="card">
+    <div class="card-header">📁 选择文件</div>
+    <div class="card-body">
+      <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
+           ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+        <input type="file" id="fileInput" onchange="handleFile(this.files[0])">
+        <div class="file-icon">📁</div>
+        <div class="drop-text">点击选择文件或拖拽到此处</div>
+        <div class="drop-sub">支持任意类型文件 · 文件不会上传到服务器</div>
+      </div>
+      <div class="file-info" id="fileInfo" style="display:none;"></div>
+      <div class="progress-row" id="progressRow" style="display:none;margin-top:12px;">
+        <span style="font-size:13px;color:var(--text2);">计算中...</span>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0"></div></div>
+        <span style="font-size:13px;color:var(--text2);" id="progressText">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 哈希结果 -->
+  <div class="card" id="hashResultCard" style="display:none;">
+    <div class="card-header">🔐 哈希计算结果</div>
+    <div class="card-body" style="padding:0;">
+      <table class="hash-table">
+        <thead>
+          <tr><th>算法</th><th>哈希值</th><th>操作</th></tr>
+        </thead>
+        <tbody id="hashResultBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 校验 -->
+  <div class="card" id="verifyCard" style="display:none;">
+    <div class="card-header">✅ 哈希校验</div>
+    <div class="card-body">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:10px;">将已知哈希值粘贴到下方进行比对验证（自动检测算法）</div>
+      <div class="verify-row">
+        <input type="text" class="verify-input" id="verifyInput" placeholder="粘贴已知哈希值（MD5/SHA-1/SHA-256/SHA-512）...">
+        <button class="btn btn-primary" onclick="verify()">✓ 校验</button>
+      </div>
+      <div id="verifyResult" style="margin-top:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('dragover'); }
+function onDragLeave(e) { document.getElementById('dropZone').classList.remove('dragover'); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) handleFile(file);
+}
+
+let computedHashes = {};
+
+async function handleFile(file) {
+  if (!file) return;
+  computedHashes = {};
+  document.getElementById('fileInfo').style.display = 'flex';
+  document.getElementById('fileInfo').innerHTML = `
+    <span>文件名：<b>${escHtml(file.name)}</b></span>
+    <span>大小：<b>${fmtSize(file.size)}</b></span>
+    <span>类型：<b>${file.type || '未知'}</b></span>
+    <span>修改时间：<b>${new Date(file.lastModified).toLocaleString('zh-CN')}</b></span>
+  `;
+  document.getElementById('hashResultCard').style.display = 'none';
+  document.getElementById('verifyCard').style.display = 'none';
+  document.getElementById('progressRow').style.display = 'flex';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('progressText').textContent = '0%';
+
+  try {
+    const algorithms = ['MD5', 'SHA-1', 'SHA-256', 'SHA-512'];
+    const buffer = await readFileBuffer(file);
+    const tbody = document.getElementById('hashResultBody');
+    tbody.innerHTML = '';
+
+    for (let i = 0; i < algorithms.length; i++) {
+      const algo = algorithms[i];
+      let hash;
+      if (algo === 'MD5') {
+        hash = md5(buffer);
+      } else {
+        const digestBuffer = await crypto.subtle.digest(algo, buffer);
+        hash = bufferToHex(digestBuffer);
+      }
+      computedHashes[algo] = hash;
+      tbody.innerHTML += `<tr>
+        <td class="hash-name">${algo}</td>
+        <td id="hash-${algo}">${hash}</td>
+        <td><button class="copy-btn" onclick="navigator.clipboard.writeText('${hash}').then(()=>showToast('已复制'))">复制</button></td>
+      </tr>`;
+      const pct = Math.round((i+1)/algorithms.length*100);
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressText').textContent = pct + '%';
+    }
+    document.getElementById('hashResultCard').style.display = 'block';
+    document.getElementById('verifyCard').style.display = 'block';
+    document.getElementById('progressRow').style.display = 'none';
+  } catch(e) {
+    document.getElementById('progressRow').style.display = 'none';
+    showToast('计算失败: ' + e.message);
+  }
+}
+
+function readFileBuffer(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function bufferToHex(buffer) {
+  return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+function verify() {
+  const input = document.getElementById('verifyInput').value.trim().toLowerCase();
+  if (!input) return;
+  const result = document.getElementById('verifyResult');
+  let found = false;
+  for (const [algo, hash] of Object.entries(computedHashes)) {
+    if (hash.toLowerCase() === input) {
+      result.innerHTML = `<div class="verify-ok">✅ 校验通过！匹配算法：${algo} — 文件完整性验证成功</div>`;
+      found = true; break;
+    }
+  }
+  if (!found) result.innerHTML = `<div class="verify-fail">❌ 校验失败！输入的哈希值与任何算法的计算结果均不匹配</div>`;
+}
+
+function fmtSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  if (bytes < 1024*1024*1024) return (bytes/1024/1024).toFixed(1) + ' MB';
+  return (bytes/1024/1024/1024).toFixed(2) + ' GB';
+}
+
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showToast(msg) {
+  let t=document.getElementById('_toast');
+  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',1800);
+}
+
+// MD5 implementation (simplified)
+function md5(buffer) {
+  const arr = new Uint8Array(buffer);
+  // Use a basic MD5 implementation
+  function safeAdd(x,y){var lsw=(x&0xffff)+(y&0xffff),msw=(x>>16)+(y>>16)+(lsw>>16);return(msw<<16)|(lsw&0xffff);}
+  function bitRotateLeft(num,cnt){return(num<<cnt)|(num>>>(32-cnt));}
+  function md5cmn(q,a,b,x,s,t){return safeAdd(bitRotateLeft(safeAdd(safeAdd(a,q),safeAdd(x,t)),s),b);}
+  function md5ff(a,b,c,d,x,s,t){return md5cmn((b&c)|((~b)&d),a,b,x,s,t);}
+  function md5gg(a,b,c,d,x,s,t){return md5cmn((b&d)|(c&(~d)),a,b,x,s,t);}
+  function md5hh(a,b,c,d,x,s,t){return md5cmn(b^c^d,a,b,x,s,t);}
+  function md5ii(a,b,c,d,x,s,t){return md5cmn(c^(b|(~d)),a,b,x,s,t);}
+
+  const n = arr.length;
+  const words = [];
+  for(let i=0;i<n;i++) words[i>>2]|=arr[i]<<((i%4)*8);
+  words[n>>2]|=0x80<<((n%4)*8);
+  words[(((n+64)>>>9)<<4)+14]=n*8;
+
+  let a=1732584193,b=-271733879,c=-1732584194,d=271733878;
+  for(let i=0;i<words.length;i+=16){
+    const oa=a,ob=b,oc=c,od=d;
+    a=md5ff(a,b,c,d,words[i],7,-680876936);d=md5ff(d,a,b,c,words[i+1],12,-389564586);c=md5ff(c,d,a,b,words[i+2],17,606105819);b=md5ff(b,c,d,a,words[i+3],22,-1044525330);
+    a=md5ff(a,b,c,d,words[i+4],7,-176418897);d=md5ff(d,a,b,c,words[i+5],12,1200080426);c=md5ff(c,d,a,b,words[i+6],17,-1473231341);b=md5ff(b,c,d,a,words[i+7],22,-45705983);
+    a=md5ff(a,b,c,d,words[i+8],7,1770035416);d=md5ff(d,a,b,c,words[i+9],12,-1958414417);c=md5ff(c,d,a,b,words[i+10],17,-42063);b=md5ff(b,c,d,a,words[i+11],22,-1990404162);
+    a=md5ff(a,b,c,d,words[i+12],7,1804603682);d=md5ff(d,a,b,c,words[i+13],12,-40341101);c=md5ff(c,d,a,b,words[i+14],17,-1502002290);b=md5ff(b,c,d,a,words[i+15],22,1236535329);
+    a=md5gg(a,b,c,d,words[i+1],5,-165796510);d=md5gg(d,a,b,c,words[i+6],9,-1069501632);c=md5gg(c,d,a,b,words[i+11],14,643717713);b=md5gg(b,c,d,a,words[i],20,-373897302);
+    a=md5gg(a,b,c,d,words[i+5],5,-701558691);d=md5gg(d,a,b,c,words[i+10],9,38016083);c=md5gg(c,d,a,b,words[i+15],14,-660478335);b=md5gg(b,c,d,a,words[i+4],20,-405537848);
+    a=md5gg(a,b,c,d,words[i+9],5,568446438);d=md5gg(d,a,b,c,words[i+14],9,-1019803690);c=md5gg(c,d,a,b,words[i+3],14,-187363961);b=md5gg(b,c,d,a,words[i+8],20,1163531501);
+    a=md5gg(a,b,c,d,words[i+13],5,-1444681467);d=md5gg(d,a,b,c,words[i+2],9,-51403784);c=md5gg(c,d,a,b,words[i+7],14,1735328473);b=md5gg(b,c,d,a,words[i+12],20,-1926607734);
+    a=md5hh(a,b,c,d,words[i+5],4,-378558);d=md5hh(d,a,b,c,words[i+8],11,-2022574463);c=md5hh(c,d,a,b,words[i+11],16,1839030562);b=md5hh(b,c,d,a,words[i+14],23,-35309556);
+    a=md5hh(a,b,c,d,words[i+1],4,-1530992060);d=md5hh(d,a,b,c,words[i+4],11,1272893353);c=md5hh(c,d,a,b,words[i+7],16,-155497632);b=md5hh(b,c,d,a,words[i+10],23,-1094730640);
+    a=md5hh(a,b,c,d,words[i+13],4,681279174);d=md5hh(d,a,b,c,words[i],11,-358537222);c=md5hh(c,d,a,b,words[i+3],16,-722521979);b=md5hh(b,c,d,a,words[i+6],23,76029189);
+    a=md5hh(a,b,c,d,words[i+9],4,-640364487);d=md5hh(d,a,b,c,words[i+12],11,-421815835);c=md5hh(c,d,a,b,words[i+15],16,530742520);b=md5hh(b,c,d,a,words[i+2],23,-995338651);
+    a=md5ii(a,b,c,d,words[i],6,-198630844);d=md5ii(d,a,b,c,words[i+7],10,1126891415);c=md5ii(c,d,a,b,words[i+14],15,-1416354905);b=md5ii(b,c,d,a,words[i+5],21,-57434055);
+    a=md5ii(a,b,c,d,words[i+12],6,1700485571);d=md5ii(d,a,b,c,words[i+3],10,-1894986606);c=md5ii(c,d,a,b,words[i+10],15,-1051523);b=md5ii(b,c,d,a,words[i+1],21,-2054922799);
+    a=md5ii(a,b,c,d,words[i+8],6,1873313359);d=md5ii(d,a,b,c,words[i+15],10,-30611744);c=md5ii(c,d,a,b,words[i+6],15,-1560198380);b=md5ii(b,c,d,a,words[i+13],21,1309151649);
+    a=md5ii(a,b,c,d,words[i+4],6,-145523070);d=md5ii(d,a,b,c,words[i+11],10,-1120210379);c=md5ii(c,d,a,b,words[i+2],15,718787259);b=md5ii(b,c,d,a,words[i+9],21,-343485551);
+    a=safeAdd(a,oa);b=safeAdd(b,ob);c=safeAdd(c,oc);d=safeAdd(d,od);
+  }
+  return [a,b,c,d].map(n=>(n>>>0).toString(16).padStart(8,'0').match(/../g).map(h=>h.split('').reverse().join('')).join('')).join('');
+}
+</script>
+</body>
+</html>

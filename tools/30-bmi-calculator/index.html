@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BMI/体脂计算器</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:860px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-body{padding:20px}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{padding:8px 20px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:#656d76;transition:all .15s}
+.tab.active{border-bottom-color:var(--green);color:var(--green);font-weight:600}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:16px}
+.form-item{display:flex;flex-direction:column;gap:6px}
+label{font-size:12px;color:#656d76;font-weight:500}
+input[type=number]{padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:15px;font-weight:600;outline:none;transition:border-color .15s;width:100%}
+input:focus{border-color:var(--green)}
+select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none;width:100%}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.result-box{display:none;background:linear-gradient(135deg,#f0fff4,#f6f8fa);border:1px solid #9be9a8;border-radius:var(--radius);padding:20px;margin-top:16px}
+.bmi-main{text-align:center;margin-bottom:20px}
+.bmi-value{font-size:64px;font-weight:800;color:#1a7f37;line-height:1}
+.bmi-label{font-size:18px;color:#656d76;margin-top:6px;font-weight:500}
+.bmi-bar{position:relative;margin:16px 0;height:24px;border-radius:12px;overflow:hidden;background:linear-gradient(to right,#3b82f6,#22c55e,#facc15,#f97316,#ef4444);cursor:pointer}
+.bmi-pointer{position:absolute;top:-4px;width:32px;height:32px;background:#fff;border:3px solid #1a7f37;border-radius:50%;transform:translateX(-50%);transition:left .5s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.bmi-labels{display:flex;justify-content:space-between;font-size:10px;color:#656d76;margin-top:4px}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:16px}
+.info-item{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center}
+.info-item .val{font-size:20px;font-weight:700;color:var(--green)}
+.info-item .lbl{font-size:11px;color:#656d76;margin-top:2px}
+.reference-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.reference-table th{background:#f6f8fa;padding:8px 12px;text-align:left;font-weight:600;border-bottom:2px solid var(--border)}
+.reference-table td{padding:7px 12px;border-bottom:1px solid #f0f2f5}
+.reference-table tr.current td{background:#f0fff4;font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">⚖️</span>
+  <h1>BMI/体脂计算器</h1>
+  <p>BMI · 体脂率 · 理想体重 · 热量需求</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+      <div class="tab-bar">
+        <div class="tab active" onclick="switchTab('bmi')">BMI 计算</div>
+        <div class="tab" onclick="switchTab('bodyfat')">体脂率</div>
+        <div class="tab" onclick="switchTab('calorie')">热量需求</div>
+        <div class="tab" onclick="switchTab('ideal')">理想体重</div>
+      </div>
+
+      <!-- BMI -->
+      <div id="panel-bmi">
+        <div class="form-grid">
+          <div class="form-item"><label>身高 (cm)</label><input type="number" id="height" value="170" min="50" max="300" step="0.1"></div>
+          <div class="form-item"><label>体重 (kg)</label><input type="number" id="weight" value="65" min="10" max="500" step="0.1"></div>
+          <div class="form-item"><label>性别</label>
+            <select id="gender"><option value="m">男性</option><option value="f">女性</option></select>
+          </div>
+          <div class="form-item"><label>年龄</label><input type="number" id="age" value="25" min="1" max="120"></div>
+        </div>
+        <button class="btn btn-primary" onclick="calcBMI()">⚖️ 计算 BMI</button>
+        <div class="result-box" id="bmi-result">
+          <div class="bmi-main">
+            <div class="bmi-value" id="bmi-val">0</div>
+            <div class="bmi-label" id="bmi-status">-</div>
+          </div>
+          <div style="padding:0 8px">
+            <div class="bmi-bar" id="bmi-bar">
+              <div class="bmi-pointer" id="bmi-pointer" style="left:0%"></div>
+            </div>
+            <div class="bmi-labels">
+              <span>偏瘦 &lt;18.5</span><span>正常 18.5-24</span><span>超重 24-28</span><span>肥胖 &gt;28</span>
+            </div>
+          </div>
+          <div class="info-grid" id="bmi-info-grid"></div>
+        </div>
+      </div>
+
+      <!-- 体脂率 -->
+      <div id="panel-bodyfat" style="display:none">
+        <div class="form-grid">
+          <div class="form-item"><label>身高 (cm)</label><input type="number" id="bf-height" value="170" min="50" max="300"></div>
+          <div class="form-item"><label>体重 (kg)</label><input type="number" id="bf-weight" value="65" min="10" max="500"></div>
+          <div class="form-item"><label>腰围 (cm)</label><input type="number" id="waist" value="80" min="30" max="200"></div>
+          <div class="form-item"><label>颈围 (cm)</label><input type="number" id="neck" value="38" min="20" max="80"></div>
+          <div class="form-item" id="hip-wrap">
+            <label>臀围 (cm)（女性）</label><input type="number" id="hip" value="90" min="50" max="200">
+          </div>
+          <div class="form-item"><label>性别</label>
+            <select id="bf-gender" onchange="document.getElementById('hip-wrap').style.display=this.value==='f'?'flex':'none'">
+              <option value="m">男性</option><option value="f">女性</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="calcBodyFat()">🧮 计算体脂率</button>
+        <div class="result-box" id="bf-result">
+          <div class="bmi-main">
+            <div class="bmi-value" id="bf-val">0%</div>
+            <div class="bmi-label" id="bf-status">-</div>
+          </div>
+          <div class="info-grid" id="bf-grid"></div>
+        </div>
+      </div>
+
+      <!-- 热量需求 -->
+      <div id="panel-calorie" style="display:none">
+        <div class="form-grid">
+          <div class="form-item"><label>身高 (cm)</label><input type="number" id="cal-h" value="170" min="50" max="300"></div>
+          <div class="form-item"><label>体重 (kg)</label><input type="number" id="cal-w" value="65" min="10" max="500"></div>
+          <div class="form-item"><label>年龄</label><input type="number" id="cal-age" value="25" min="1" max="120"></div>
+          <div class="form-item"><label>性别</label>
+            <select id="cal-gender"><option value="m">男性</option><option value="f">女性</option></select>
+          </div>
+          <div class="form-item"><label>活动水平</label>
+            <select id="activity">
+              <option value="1.2">久坐（几乎不运动）</option>
+              <option value="1.375">轻度（每周1-3天）</option>
+              <option value="1.55" selected>中度（每周3-5天）</option>
+              <option value="1.725">高强度（每周6-7天）</option>
+              <option value="1.9">极高（体力劳动/运动员）</option>
+            </select>
+          </div>
+          <div class="form-item"><label>目标</label>
+            <select id="cal-goal">
+              <option value="maintain">维持体重</option>
+              <option value="lose">减肥（减500kcal/天）</option>
+              <option value="gain">增肌（加500kcal/天）</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="calcCalorie()">🔥 计算热量</button>
+        <div class="result-box" id="cal-result">
+          <div class="bmi-main">
+            <div class="bmi-value" id="cal-val">0</div>
+            <div class="bmi-label">千卡/天（推荐摄入量）</div>
+          </div>
+          <div class="info-grid" id="cal-grid"></div>
+        </div>
+      </div>
+
+      <!-- 理想体重 -->
+      <div id="panel-ideal" style="display:none">
+        <div class="form-grid">
+          <div class="form-item"><label>身高 (cm)</label><input type="number" id="ideal-h" value="170" min="50" max="300"></div>
+          <div class="form-item"><label>性别</label>
+            <select id="ideal-gender"><option value="m">男性</option><option value="f">女性</option></select>
+          </div>
+          <div class="form-item"><label>体型</label>
+            <select id="body-frame"><option value="small">小体型</option><option value="medium" selected>中体型</option><option value="large">大体型</option></select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="calcIdeal()">📊 计算理想体重</button>
+        <div class="result-box" id="ideal-result">
+          <div class="info-grid" id="ideal-grid"></div>
+          <div id="ideal-table"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">📋 BMI 参考表（中国标准）</div>
+    <div class="card-body">
+      <table class="reference-table">
+        <thead><tr><th>分类</th><th>BMI 范围</th><th>健康风险</th></tr></thead>
+        <tbody>
+          <tr><td><span class="dot" style="background:#3b82f6"></span>偏瘦</td><td>&lt; 18.5</td><td>低体重，营养不良风险</td></tr>
+          <tr><td><span class="dot" style="background:#22c55e"></span>正常</td><td>18.5 - 24.0</td><td>健康范围，风险最低</td></tr>
+          <tr><td><span class="dot" style="background:#facc15"></span>超重</td><td>24.0 - 28.0</td><td>有一定健康风险</td></tr>
+          <tr><td><span class="dot" style="background:#f97316"></span>轻度肥胖</td><td>28.0 - 30.0</td><td>健康风险较高</td></tr>
+          <tr><td><span class="dot" style="background:#ef4444"></span>中重度肥胖</td><td>&gt; 30.0</td><td>健康风险高</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  ['bmi','bodyfat','calorie','ideal'].forEach(t => {
+    document.getElementById('panel-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['bmi','bodyfat','calorie','ideal'][i]===tab);
+  });
+}
+
+function calcBMI() {
+  const h = parseFloat(document.getElementById('height').value) / 100;
+  const w = parseFloat(document.getElementById('weight').value);
+  const gender = document.getElementById('gender').value;
+  const age = parseInt(document.getElementById('age').value);
+  if (!h || !w) { showToast('请输入身高和体重'); return; }
+  
+  const bmi = w / (h * h);
+  let status, color;
+  if (bmi < 18.5) { status = '偏瘦'; color = '#3b82f6'; }
+  else if (bmi < 24) { status = '正常'; color = '#22c55e'; }
+  else if (bmi < 28) { status = '超重'; color = '#facc15'; }
+  else if (bmi < 30) { status = '轻度肥胖'; color = '#f97316'; }
+  else { status = '肥胖'; color = '#ef4444'; }
+  
+  document.getElementById('bmi-val').textContent = bmi.toFixed(1);
+  document.getElementById('bmi-val').style.color = color;
+  document.getElementById('bmi-status').textContent = status;
+  document.getElementById('bmi-result').style.display = 'block';
+  
+  // 指针位置 (BMI 12-40 映射到 0%-100%)
+  const pct = Math.min(100, Math.max(0, (bmi - 12) / (40 - 12) * 100));
+  document.getElementById('bmi-pointer').style.left = pct + '%';
+  
+  // 理想体重范围
+  const idealLow = (18.5 * h * h).toFixed(1);
+  const idealHigh = (24 * h * h).toFixed(1);
+  const weightDiff = (w - 24 * h * h).toFixed(1);
+  
+  // 基础代谢率
+  let bmr;
+  if (gender === 'm') bmr = 88.362 + 13.397*w + 4.799*h*100 - 5.677*age;
+  else bmr = 447.593 + 9.247*w + 3.098*h*100 - 4.330*age;
+  
+  document.getElementById('bmi-info-grid').innerHTML = `
+    <div class="info-item"><div class="val">${bmi.toFixed(1)}</div><div class="lbl">BMI 值</div></div>
+    <div class="info-item"><div class="val">${idealLow}-${idealHigh}</div><div class="lbl">理想体重(kg)</div></div>
+    <div class="info-item"><div class="val">${parseFloat(weightDiff) > 0 ? '+' : ''}${weightDiff}</div><div class="lbl">超出理想(kg)</div></div>
+    <div class="info-item"><div class="val">${Math.round(bmr)}</div><div class="lbl">基础代谢(kcal)</div></div>
+  `;
+}
+
+function calcBodyFat() {
+  const h = parseFloat(document.getElementById('bf-height').value);
+  const w = parseFloat(document.getElementById('bf-weight').value);
+  const waist = parseFloat(document.getElementById('waist').value);
+  const neck = parseFloat(document.getElementById('neck').value);
+  const hip = parseFloat(document.getElementById('hip').value);
+  const gender = document.getElementById('bf-gender').value;
+  
+  let bf;
+  if (gender === 'm') {
+    bf = 86.010 * Math.log10(waist - neck) - 70.041 * Math.log10(h) + 36.76;
+  } else {
+    bf = 163.205 * Math.log10(waist + hip - neck) - 97.684 * Math.log10(h) - 78.387;
+  }
+  bf = Math.max(0, Math.min(60, bf));
+  
+  let status;
+  if (gender === 'm') {
+    if (bf < 6) status = '必须脂肪';
+    else if (bf < 14) status = '运动员';
+    else if (bf < 18) status = '健身';
+    else if (bf < 25) status = '正常';
+    else status = '肥胖';
+  } else {
+    if (bf < 14) status = '必须脂肪';
+    else if (bf < 21) status = '运动员';
+    else if (bf < 25) status = '健身';
+    else if (bf < 32) status = '正常';
+    else status = '肥胖';
+  }
+  
+  const fatMass = (w * bf / 100).toFixed(1);
+  const leanMass = (w - parseFloat(fatMass)).toFixed(1);
+  
+  document.getElementById('bf-val').textContent = bf.toFixed(1) + '%';
+  document.getElementById('bf-status').textContent = status;
+  document.getElementById('bf-result').style.display = 'block';
+  document.getElementById('bf-grid').innerHTML = `
+    <div class="info-item"><div class="val">${bf.toFixed(1)}%</div><div class="lbl">体脂率</div></div>
+    <div class="info-item"><div class="val">${fatMass} kg</div><div class="lbl">脂肪重量</div></div>
+    <div class="info-item"><div class="val">${leanMass} kg</div><div class="lbl">去脂体重</div></div>
+    <div class="info-item"><div class="val">${status}</div><div class="lbl">体型分类</div></div>
+  `;
+}
+
+function calcCalorie() {
+  const h = parseFloat(document.getElementById('cal-h').value);
+  const w = parseFloat(document.getElementById('cal-w').value);
+  const age = parseInt(document.getElementById('cal-age').value);
+  const gender = document.getElementById('cal-gender').value;
+  const activity = parseFloat(document.getElementById('activity').value);
+  const goal = document.getElementById('cal-goal').value;
+  
+  let bmr;
+  if (gender === 'm') bmr = 88.362 + 13.397*w + 4.799*h - 5.677*age;
+  else bmr = 447.593 + 9.247*w + 3.098*h - 4.330*age;
+  
+  let tdee = bmr * activity;
+  let target = tdee;
+  if (goal === 'lose') target -= 500;
+  if (goal === 'gain') target += 500;
+  
+  document.getElementById('cal-val').textContent = Math.round(target);
+  document.getElementById('cal-result').style.display = 'block';
+  document.getElementById('cal-grid').innerHTML = `
+    <div class="info-item"><div class="val">${Math.round(bmr)}</div><div class="lbl">基础代谢(BMR)</div></div>
+    <div class="info-item"><div class="val">${Math.round(tdee)}</div><div class="lbl">维持热量(TDEE)</div></div>
+    <div class="info-item"><div class="val">${Math.round(target/4)}</div><div class="lbl">蛋白质(g/天)</div></div>
+    <div class="info-item"><div class="val">${Math.round(target*0.3/9)}</div><div class="lbl">脂肪(g/天)</div></div>
+    <div class="info-item"><div class="val">${Math.round(target*0.5/4)}</div><div class="lbl">碳水(g/天)</div></div>
+    <div class="info-item"><div class="val">${goal==='maintain'?'维持':goal==='lose'?'减重':'增肌'}</div><div class="lbl">目标</div></div>
+  `;
+}
+
+function calcIdeal() {
+  const h = parseFloat(document.getElementById('ideal-h').value);
+  const gender = document.getElementById('ideal-gender').value;
+  const frame = document.getElementById('body-frame').value;
+  
+  // Broca公式
+  const broca = gender === 'm' ? (h - 100) * 0.9 : (h - 100) * 0.85;
+  // BMI公式（正常范围中间值）
+  const bmiIdeal = 21 * (h/100) ** 2;
+  // Robinson公式
+  const robinson = gender === 'm' ? 52 + 1.9*(h/2.54 - 60) : 49 + 1.7*(h/2.54 - 60);
+  
+  const adjustments = {small: -5, medium: 0, large: 5};
+  const adj = adjustments[frame];
+  
+  document.getElementById('ideal-result').style.display = 'block';
+  document.getElementById('ideal-grid').innerHTML = `
+    <div class="info-item"><div class="val">${broca.toFixed(1)} kg</div><div class="lbl">Broca公式</div></div>
+    <div class="info-item"><div class="val">${bmiIdeal.toFixed(1)} kg</div><div class="lbl">BMI标准法</div></div>
+    <div class="info-item"><div class="val">${robinson.toFixed(1)} kg</div><div class="lbl">Robinson公式</div></div>
+    <div class="info-item"><div class="val">${(bmiIdeal + adj - 3).toFixed(1)}-${(bmiIdeal + adj + 3).toFixed(1)}</div><div class="lbl">综合建议范围</div></div>
+  `;
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+</script>
+</body>
+</html>

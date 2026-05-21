@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>乱数假文生成器</title>
+<style>
+  :root {
+    --green: #2da44e;
+    --green2: #2c974b;
+    --border: #d0d7de;
+    --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08);
+    --bg: #f6f8fa;
+    --card: #fff;
+    --text: #1f2328;
+    --text2: #656d76;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  .header {
+    text-align: center;
+    padding: 30px 0;
+    background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 30px;
+  }
+  .header h1 { font-size: 32px; font-weight: 600; margin-bottom: 8px; }
+  .header p { font-size: 16px; opacity: 0.9; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(45,164,78,0.1);
+  }
+  .form-textarea { resize: vertical; min-height: 200px; }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover { background: var(--bg); }
+  .btn-primary { background: var(--green); color: white; border-color: var(--green); }
+  .btn-primary:hover { background: var(--green2); }
+
+  .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .result-box {
+    background: #f6f8fa;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-top: 16px;
+    font-size: 14px;
+    line-height: 1.8;
+    word-break: break-all;
+    white-space: pre-wrap;
+    min-height: 100px;
+    max-height: 500px;
+    overflow: auto;
+    position: relative;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    padding: 4px 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { background: var(--bg); }
+
+  .stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text2);
+    flex-wrap: wrap;
+  }
+  .stat-item { display: flex; align-items: center; gap: 4px; }
+
+  .preset-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .preset-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .preset-card:hover {
+    border-color: var(--green);
+    background: #f0f9f0;
+  }
+  .preset-card.active {
+    border-color: var(--green);
+    background: #e8f5e9;
+  }
+  .preset-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .preset-desc { font-size: 12px; color: var(--text2); }
+
+  .preview-area {
+    background: white;
+    padding: 40px;
+    border-radius: var(--radius);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-top: 16px;
+  }
+  .preview-area h1 { font-size: 28px; margin-bottom: 16px; }
+  .preview-area h2 { font-size: 24px; margin: 20px 0 12px; }
+  .preview-area p { line-height: 1.8; margin-bottom: 12px; color: #333; }
+  .preview-area blockquote {
+    border-left: 4px solid var(--green);
+    padding: 12px 16px;
+    margin: 16px 0;
+    background: #f0f9f0;
+    border-radius: 0 var(--radius) var(--radius) 0;
+  }
+
+  @media (max-width: 768px) {
+    .header h1 { font-size: 24px; }
+    .form-row { grid-template-columns: 1fr; }
+    .preview-area { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📄 乱数假文生成器</h1>
+    <p>生成 Lorem Ipsum、中文假文等占位文本</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⚙️ 生成设置</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">文本类型</label>
+        <select class="form-select" id="textType" onchange="updatePreview()">
+          <option value="lorem">Lorem Ipsum (拉丁文)</option>
+          <option value="chinese">中文假文</option>
+          <option value="cicero">西塞罗 (古典拉丁文)</option>
+          <option value="custom">自定义文本</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">输出格式</label>
+        <select class="form-select" id="outputFormat">
+          <option value="paragraphs">段落</option>
+          <option value="sentences">句子</option>
+          <option value="words">单词/词语</option>
+          <option value="chars">字符</option>
+          <option value="list">列表</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">生成数量</label>
+        <input type="number" class="form-input" id="count" value="5" min="1" max="100">
+      </div>
+      <div class="form-group">
+        <label class="form-label">每段句子数 (仅段落模式)</label>
+        <input type="number" class="form-input" id="sentencesPerPara" value="5" min="1" max="20">
+      </div>
+    </div>
+
+    <div class="form-group" id="customGroup" style="display:none;">
+      <label class="form-label">自定义文本源 (用做随机摘取)</label>
+      <textarea class="form-textarea" id="customText" placeholder="输入自定义文本，生成时将随机摘取..."></textarea>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn btn-primary" onclick="generate()">⚡ 生成文本</button>
+      <button class="btn btn-secondary" onclick="copyResult()">📋 复制结果</button>
+      <button class="btn btn-secondary" onclick="clearResult()">🗑️ 清除</button>
+      <button class="btn btn-secondary" onclick="downloadResult()">💾 下载 TXT</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 生成结果</div>
+    <div class="result-box" id="resultBox">
+      <span style="color:var(--text2);">点击"生成文本"开始...</span>
+      <button class="copy-btn" onclick="copyResult()" style="display:none;" id="copyBtn">📋 复制</button>
+    </div>
+    <div class="stats" id="stats" style="display:none;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">👁️ 预览效果</div>
+    <div style="margin-bottom:12px;">
+      <button class="btn btn-secondary" onclick="setPreview('article')">📰 文章</button>
+      <button class="btn btn-secondary" onclick="setPreview('card')">🃏 卡片</button>
+      <button class="btn btn-secondary" onclick="setPreview('quote')">💬 引用</button>
+    </div>
+    <div class="preview-area" id="previewArea">
+      <p style="color:var(--text2);text-align:center;padding:40px 0;">生成文本后查看预览效果</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💡 快速预设</div>
+    <div class="preset-grid">
+      <div class="preset-card" onclick="applyPreset('blog')">
+        <div class="preset-name">📰 博客文章</div>
+        <div class="preset-desc">3段，每段5句</div>
+      </div>
+      <div class="preset-card" onclick="applyPreset('product')">
+        <div class="preset-name">🛍️ 产品描述</div>
+        <div class="preset-desc">2段，每段3句</div>
+      </div>
+      <div class="preset-card" onclick="applyPreset('headline')">
+        <div class="preset-name">📢 标题文案</div>
+        <div class="preset-desc">5个短句</div>
+      </div>
+      <div class="preset-card" onclick="applyPreset('meta')">
+        <div class="preset-name">🔍 Meta 描述</div>
+        <div class="preset-desc">1段，150字符内</div>
+      </div>
+      <div class="preset-card" onclick="applyPreset('email')">
+        <div class="preset-name">✉️ 邮件正文</div>
+        <div class="preset-desc">3段，正式语气</div>
+      </div>
+      <div class="preset-card" onclick="applyPreset('code')">
+        <div class="preset-name">💻 代码注释</div>
+        <div class="preset-desc">简短描述</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const loremWords = [
+  'Lorem','ipsum','dolor','sit','amet','consectetur','adipiscing','elit',
+  'sed','do','eiusmod','tempor','incididunt','ut','labore','et','dolore',
+  'magna','aliqua','Ut','enim','ad','minim','veniam','quis','nostrud',
+  'exercitation','ullamco','laboris','nisi','ut','aliquip','ex','ea',
+  'commodo','consequat','Duis','aute','irure','dolor','in','reprehenderit',
+  'in','voluptate','velit','esse','cillum','dolore','eu','fugiat','nulla',
+  'pariatur','Excepteur','sint','occaecat','cupidatat','non','proident'
+];
+
+const chineseTexts = [
+  '随着科技的飞速发展，人工智能已经深入到我们生活的方方面面。',
+  '在设计领域，用户体验始终是最重要的考量因素之一。',
+  '现代前端开发需要掌握多种技术栈，包括HTML、CSS和JavaScript。',
+  '数据可视化可以帮助我们从复杂的数据中发现有价值的洞察。',
+  '云计算技术的普及使得企业能够更灵活地扩展其IT基础设施。',
+  '移动优先的设计理念已经成为现代网页设计的标准。',
+  '开源软件社区为全球开发者提供了宝贵的协作平台。',
+  '机器学习算法的不断进步正在改变我们对数据的处理方式。',
+  '响应式设计确保了网站在各种设备上都能提供良好的用户体验。',
+  '区块链技术有望在金融、供应链等领域带来革命性的变化。',
+  '自动驾驶技术的发展将大大提高道路安全性并减少交通事故。',
+  '物联网设备数量的激增为智能家居和智慧城市提供了基础。',
+  '量子计算一旦实现商业化，将彻底改变密码学和数据分析。',
+  '5G网络的部署为远程工作和在线教育提供了新的可能性。',
+  '可持续发展已成为全球企业战略中不可或缺的一部分。'
+];
+
+const ciceroText = [
+  'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium.',
+  'Totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt.',
+  'Explicabo nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.',
+  'Sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.',
+  'Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit.'
+];
+
+function generate() {
+  const type = document.getElementById('textType').value;
+  const format = document.getElementById('outputFormat').value;
+  const count = parseInt(document.getElementById('count').value) || 5;
+  const sentencesPerPara = parseInt(document.getElementById('sentencesPerPara').value) || 5;
+
+  let result = '';
+
+  switch(format) {
+    case 'paragraphs':
+      result = generateParagraphs(type, count, sentencesPerPara);
+      break;
+    case 'sentences':
+      result = generateSentences(type, count);
+      break;
+    case 'words':
+      result = generateWords(type, count);
+      break;
+    case 'chars':
+      result = generateChars(type, count);
+      break;
+    case 'list':
+      result = generateList(type, count);
+      break;
+  }
+
+  displayResult(result);
+}
+
+function generateParagraphs(type, count, sentencesPerPara) {
+  let paragraphs = [];
+  for (let i = 0; i < count; i++) {
+    let sentences = [];
+    for (let j = 0; j < sentencesPerPara; j++) {
+      sentences.push(generateSentence(type));
+    }
+    paragraphs.push(sentences.join(' '));
+  }
+  return paragraphs.join('\n\n');
+}
+
+function generateSentences(type, count) {
+  let sentences = [];
+  for (let i = 0; i < count; i++) {
+    sentences.push(generateSentence(type));
+  }
+  return sentences.join(' ');
+}
+
+function generateWords(type, count) {
+  let words = [];
+  for (let i = 0; i < count; i++) {
+    if (type === 'chinese') {
+      words.push(chineseTexts[Math.floor(Math.random() * chineseTexts.length)].slice(0, 2));
+    } else {
+      words.push(loremWords[Math.floor(Math.random() * loremWords.length)]);
+    }
+  }
+  return words.join(type === 'chinese' ? '' : ' ');
+}
+
+function generateChars(type, count) {
+  const text = type === 'chinese' ? chineseTexts.join('') : loremWords.join('');
+  let result = '';
+  for (let i = 0; i < count; i++) {
+    result += text[Math.floor(Math.random() * text.length)];
+  }
+  return result;
+}
+
+function generateList(type, count) {
+  let items = [];
+  for (let i = 0; i < count; i++) {
+    items.push('• ' + generateSentence(type));
+  }
+  return items.join('\n');
+}
+
+function generateSentence(type) {
+  switch(type) {
+    case 'lorem':
+      return generateLoremSentence();
+    case 'chinese':
+      return chineseTexts[Math.floor(Math.random() * chineseTexts.length)];
+    case 'cicero':
+      return ciceroText[Math.floor(Math.random() * ciceroText.length)];
+    case 'custom':
+      const custom = document.getElementById('customText').value;
+      if (custom) {
+        const lines = custom.split('\n').filter(l => l.trim());
+        return lines[Math.floor(Math.random() * lines.length)] || '请在自定义文本中输入内容';
+      }
+      return '请在自定义文本中输入内容';
+    default:
+      return generateLoremSentence();
+  }
+}
+
+function generateLoremSentence() {
+  const wordCount = Math.floor(Math.random() * 15) + 5;
+  let words = [];
+  for (let i = 0; i < wordCount; i++) {
+    words.push(loremWords[Math.floor(Math.random() * loremWords.length)]);
+  }
+  let sentence = words.join(' ');
+  return sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.';
+}
+
+function displayResult(text) {
+  const box = document.getElementById('resultBox');
+  const copyBtn = document.getElementById('copyBtn');
+
+  box.innerHTML = escapeHtml(text).replace(/\n/g, '<br>');
+  copyBtn.style.display = 'block';
+
+  document.getElementById('copyBtn').onclick = () => copyResult();
+
+  updateStats(text);
+  updatePreview(text);
+}
+
+function updateStats(text) {
+  const stats = document.getElementById('stats');
+  stats.style.display = 'flex';
+
+  const chars = text.length;
+  const charsNoSpace = text.replace(/\s/g, '').length;
+  const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+  const sentences = text.split(/[.!?。！？]+/).filter(s => s.trim()).length;
+  const paragraphs = text.split(/\n\n/).filter(p => p.trim()).length;
+
+  stats.innerHTML = `
+    <div class="stat-item">📝 字符数: ${chars}</div>
+    <div class="stat-item">🔤 字符数(不含空格): ${charsNoSpace}</div>
+    <div class="stat-item">📊 词数: ${words}</div>
+    <div class="stat-item">💬 句子数: ${sentences}</div>
+    <div class="stat-item">📄 段落数: ${Math.max(paragraphs, 1)}</div>
+  `;
+}
+
+function updatePreview(text) {
+  const area = document.getElementById('previewArea');
+  const type = document.getElementById('textType').value;
+
+  const paragraphs = text.split('\n\n').filter(p => p.trim());
+
+  let html = '';
+  if (paragraphs.length > 0) {
+    paragraphs.forEach((p, i) => {
+      if (i === 0) {
+        html += `<h2>${type === 'chinese' ? '标题示例' : 'Sample Heading'}</h2>`;
+      }
+      html += `<p>${escapeHtml(p).replace(/\n/g, '<br>')}</p>`;
+    });
+  } else {
+    html = `<p>${escapeHtml(text)}</p>`;
+  }
+
+  area.innerHTML = html;
+}
+
+function setPreview(type) {
+  // This function can be extended to show different preview layouts
+  showToast('✅ 预览模式: ' + type);
+}
+
+function copyResult() {
+  const text = document.getElementById('resultBox').textContent;
+  if (!text || text.includes('点击"生成文本"开始')) {
+    showToast('⚠️ 请先生成文本');
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✅ 已复制到剪贴板');
+  });
+}
+
+function clearResult() {
+  document.getElementById('resultBox').innerHTML = '<span style="color:var(--text2);">点击"生成文本"开始...</span>';
+  document.getElementById('copyBtn').style.display = 'none';
+  document.getElementById('stats').style.display = 'none';
+  document.getElementById('previewArea').innerHTML = '<p style="color:var(--text2);text-align:center;padding:40px 0;">生成文本后查看预览效果</p>';
+}
+
+function downloadResult() {
+  const text = document.getElementById('resultBox').textContent;
+  if (!text || text.includes('点击"生成文本"开始')) {
+    showToast('⚠️ 请先生成文本');
+    return;
+  }
+
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'lorem-ipsum.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ 文件已下载');
+}
+
+function applyPreset(type) {
+  switch(type) {
+    case 'blog':
+      document.getElementById('count').value = 3;
+      document.getElementById('sentencesPerPara').value = 5;
+      document.getElementById('outputFormat').value = 'paragraphs';
+      break;
+    case 'product':
+      document.getElementById('count').value = 2;
+      document.getElementById('sentencesPerPara').value = 3;
+      document.getElementById('outputFormat').value = 'paragraphs';
+      break;
+    case 'headline':
+      document.getElementById('count').value = 5;
+      document.getElementById('outputFormat').value = 'sentences';
+      break;
+    case 'meta':
+      document.getElementById('count').value = 1;
+      document.getElementById('outputFormat').value = 'chars';
+      document.getElementById('textType').value = 'chinese';
+      break;
+    case 'email':
+      document.getElementById('count').value = 3;
+      document.getElementById('sentencesPerPara').value = 4;
+      document.getElementById('outputFormat').value = 'paragraphs';
+      break;
+    case 'code':
+      document.getElementById('count').value = 3;
+      document.getElementById('outputFormat').value = 'sentences';
+      break;
+  }
+
+  document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+  event.target.closest('.preset-card').classList.add('active');
+
+  generate();
+}
+
+function updatePreview() {
+  const type = document.getElementById('textType').value;
+  const customGroup = document.getElementById('customGroup');
+  customGroup.style.display = type === 'custom' ? 'block' : 'none';
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, {
+    position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
+    background: '#24292f', color: 'white', padding: '10px 20px',
+    borderRadius: '6px', fontSize: '14px', zIndex: '9999',
+    boxShadow: '0 4px 12px rgba(0,0,0,.15)'
+  });
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2000);
+}
+
+// Initialize
+updatePreview();
+</script>
+</body>
+</html>

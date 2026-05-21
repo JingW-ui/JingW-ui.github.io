@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>时间戳转换工具</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+  .hi { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; }
+  header h1 { font-size:18px; font-weight:600; }
+  header p { font-size:13px; color:var(--text2); }
+  .main { flex:1; padding:20px 24px; max-width:900px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:16px; }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); }
+  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; display:flex; justify-content:space-between; align-items:center; }
+  .card-body { padding:18px; }
+  .row { display:flex; gap:10px; align-items:flex-end; margin-bottom:14px; flex-wrap:wrap; }
+  label { font-size:12px; color:var(--text2); font-weight:500; display:block; margin-bottom:5px; }
+  input[type=text], input[type=number], select { padding:8px 14px; border:1px solid var(--border); border-radius:var(--radius); font-size:14px; font-family:inherit; background:var(--bg); color:var(--text); outline:none; transition:border-color .15s; }
+  input[type=text]:focus, input[type=number]:focus, select:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(45,164,78,.12); }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:8px 16px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn:hover { background:var(--bg3); }
+  .btn-primary { background:var(--green); color:white; border-color:var(--green); }
+  .btn-primary:hover { background:var(--green2); }
+  .result-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .result-item { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:12px 16px; }
+  .result-label { font-size:11px; color:var(--text2); font-weight:500; margin-bottom:5px; text-transform:uppercase; letter-spacing:.4px; }
+  .result-value { font-size:15px; font-weight:600; font-family:monospace; color:var(--text); word-break:break-all; cursor:pointer; }
+  .result-value:hover { color:var(--green); }
+  .now-bar { display:flex; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid var(--bg3); margin-bottom:14px; flex-wrap:wrap; }
+  .now-item { font-size:13px; }
+  .now-label { color:var(--text2); }
+  .now-value { font-family:monospace; font-weight:600; }
+  .batch-area textarea { width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:var(--radius); font-family:monospace; font-size:13px; resize:vertical; min-height:80px; background:var(--bg); color:var(--text); outline:none; }
+  .batch-area textarea:focus { border-color:var(--green); }
+  .tz-select { flex:1; min-width:160px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="hi">⏱</div>
+  <div>
+    <h1>时间戳转换工具</h1>
+    <p>时间戳 ↔ 本地时间/UTC、时区转换、批量处理</p>
+  </div>
+</header>
+
+<div class="main">
+  <!-- 当前时间 -->
+  <div class="card">
+    <div class="card-header">
+      <span>当前时间</span>
+      <button class="btn btn-primary" style="font-size:12px;padding:4px 12px;" onclick="refreshNow()">🔄 刷新</button>
+    </div>
+    <div class="card-body">
+      <div class="now-bar" id="nowBar"></div>
+      <div class="result-grid" id="nowGrid"></div>
+    </div>
+  </div>
+
+  <!-- 时间戳 → 时间 -->
+  <div class="card">
+    <div class="card-header">时间戳 → 可读时间</div>
+    <div class="card-body">
+      <div class="row">
+        <div style="flex:1;min-width:200px;">
+          <label>时间戳（秒或毫秒）</label>
+          <input type="text" id="ts2dt-ts" placeholder="如：1700000000 或 1700000000000" style="width:100%;">
+        </div>
+        <div>
+          <label>时区</label>
+          <select id="ts2dt-tz" class="tz-select">
+            <option value="Asia/Shanghai">Asia/Shanghai (UTC+8)</option>
+            <option value="UTC">UTC</option>
+            <option value="America/New_York">America/New_York</option>
+            <option value="Europe/London">Europe/London</option>
+            <option value="Europe/Paris">Europe/Paris</option>
+            <option value="Asia/Tokyo">Asia/Tokyo</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="ts2dt()">转换</button>
+        <button class="btn" onclick="useCurrent()">用当前时间戳</button>
+      </div>
+      <div class="result-grid" id="ts2dt-result"></div>
+    </div>
+  </div>
+
+  <!-- 时间 → 时间戳 -->
+  <div class="card">
+    <div class="card-header">可读时间 → 时间戳</div>
+    <div class="card-body">
+      <div class="row">
+        <div style="flex:1;min-width:200px;">
+          <label>日期时间</label>
+          <input type="text" id="dt2ts-dt" placeholder="如：2024-01-15 08:30:00" style="width:100%;" value="">
+        </div>
+        <div>
+          <label>时区</label>
+          <select id="dt2ts-tz" class="tz-select">
+            <option value="Asia/Shanghai">Asia/Shanghai (UTC+8)</option>
+            <option value="UTC">UTC</option>
+            <option value="America/New_York">America/New_York</option>
+            <option value="Europe/London">Europe/London</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="dt2ts()">转换</button>
+        <button class="btn" onclick="useNowDt()">用当前时间</button>
+      </div>
+      <div class="result-grid" id="dt2ts-result"></div>
+    </div>
+  </div>
+
+  <!-- 批量处理 -->
+  <div class="card">
+    <div class="card-header">批量时间戳处理</div>
+    <div class="card-body batch-area">
+      <div class="row" style="margin-bottom:10px;">
+        <div style="flex:1;">
+          <label>批量输入（每行一个时间戳）</label>
+          <textarea id="batch-input" placeholder="1700000000&#10;1700000001&#10;1700000002"></textarea>
+        </div>
+        <div style="flex:1;">
+          <label>转换结果</label>
+          <textarea id="batch-output" readonly style="background:var(--bg2);"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-primary" onclick="batchConvert()">▶ 批量转换</button>
+        <button class="btn" onclick="copyBatch()">⎘ 复制结果</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function pad2(n) { return String(n).padStart(2,'0'); }
+
+function fmtDate(d) {
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+}
+
+function fmtDateTZ(ts, tz) {
+  try {
+    return new Intl.DateTimeFormat('zh-CN', {
+      timeZone: tz,
+      year:'numeric',month:'2-digit',day:'2-digit',
+      hour:'2-digit',minute:'2-digit',second:'2-digit',
+      hour12: false
+    }).format(new Date(ts)).replace(/\//g,'-');
+  } catch(e) { return '格式错误'; }
+}
+
+function refreshNow() {
+  const now = new Date();
+  const tsMs = now.getTime();
+  const tsS = Math.floor(tsMs / 1000);
+  document.getElementById('nowBar').innerHTML = `
+    <span class="now-item"><span class="now-label">本地时间 </span><span class="now-value">${fmtDate(now)}</span></span>
+    <span class="now-item"><span class="now-label">UTC </span><span class="now-value">${now.toUTCString()}</span></span>
+  `;
+  document.getElementById('nowGrid').innerHTML = makeGrid([
+    ['Unix 时间戳（秒）', tsS],
+    ['Unix 时间戳（毫秒）', tsMs],
+    ['ISO 8601', now.toISOString()],
+    ['星期', ['日','一','二','三','四','五','六'][now.getDay()]],
+    ['UTC偏移', now.toTimeString().match(/GMT[+-]\d{4}/)?.[0] || ''],
+    ['年/周数', `${now.getFullYear()} 年第 ${getWeekNumber(now)} 周`],
+  ]);
+}
+
+function getWeekNumber(d) {
+  const d2 = new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));
+  const dayNum = d2.getUTCDay() || 7;
+  d2.setUTCDate(d2.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d2.getUTCFullYear(),0,1));
+  return Math.ceil((((d2 - yearStart) / 86400000) + 1) / 7);
+}
+
+function makeGrid(items) {
+  return items.map(([label, value]) =>
+    `<div class="result-item"><div class="result-label">${label}</div><div class="result-value" onclick="copyVal(this)" title="点击复制">${value}</div></div>`
+  ).join('');
+}
+
+function copyVal(el) {
+  navigator.clipboard.writeText(el.textContent).then(() => showToast('已复制: ' + el.textContent.slice(0,30)));
+}
+
+function ts2dt() {
+  let ts = document.getElementById('ts2dt-ts').value.trim();
+  const tz = document.getElementById('ts2dt-tz').value;
+  if (!ts) return;
+  let ms = parseInt(ts);
+  if (ms < 1e12) ms *= 1000;
+  const d = new Date(ms);
+  if (isNaN(d.getTime())) { document.getElementById('ts2dt-result').innerHTML = '<div style="color:red;padding:10px;">无效时间戳</div>'; return; }
+  document.getElementById('ts2dt-result').innerHTML = makeGrid([
+    ['本地时间 (' + tz + ')', fmtDateTZ(ms, tz)],
+    ['UTC 时间', d.toUTCString()],
+    ['ISO 8601', d.toISOString()],
+    ['毫秒时间戳', ms],
+    ['Unix 秒', Math.floor(ms/1000)],
+    ['相对时间', relTime(ms)],
+  ]);
+}
+
+function relTime(ms) {
+  const diff = ms - Date.now();
+  const abs = Math.abs(diff);
+  const future = diff > 0;
+  if (abs < 60000) return '刚刚';
+  if (abs < 3600000) return (future?'约 ':'') + Math.round(abs/60000) + ' 分钟' + (future?'后':'前');
+  if (abs < 86400000) return (future?'约 ':'') + Math.round(abs/3600000) + ' 小时' + (future?'后':'前');
+  return (future?'约 ':'') + Math.round(abs/86400000) + ' 天' + (future?'后':'前');
+}
+
+function useCurrent() {
+  document.getElementById('ts2dt-ts').value = Math.floor(Date.now()/1000);
+  ts2dt();
+}
+
+function dt2ts() {
+  const dt = document.getElementById('dt2ts-dt').value.trim();
+  if (!dt) return;
+  try {
+    const d = new Date(dt.replace(/-/g,'/'));
+    if (isNaN(d.getTime())) throw new Error('无法解析时间');
+    const ms = d.getTime();
+    document.getElementById('dt2ts-result').innerHTML = makeGrid([
+      ['Unix 秒', Math.floor(ms/1000)],
+      ['Unix 毫秒', ms],
+      ['ISO 8601', d.toISOString()],
+      ['UTC 时间', d.toUTCString()],
+    ]);
+  } catch(e) { document.getElementById('dt2ts-result').innerHTML = `<div style="color:red;padding:10px;">解析失败: ${e.message}</div>`; }
+}
+
+function useNowDt() {
+  const now = new Date();
+  document.getElementById('dt2ts-dt').value = fmtDate(now);
+  dt2ts();
+}
+
+function batchConvert() {
+  const lines = document.getElementById('batch-input').value.split('\n');
+  const results = lines.map(line => {
+    const ts = line.trim();
+    if (!ts) return '';
+    let ms = parseInt(ts);
+    if (isNaN(ms)) return `${ts} → 无效`;
+    if (ms < 1e12) ms *= 1000;
+    return `${ts} → ${new Date(ms).toLocaleString('zh-CN')}`;
+  });
+  document.getElementById('batch-output').value = results.join('\n');
+}
+
+function copyBatch() {
+  const v = document.getElementById('batch-output').value;
+  if (v) navigator.clipboard.writeText(v).then(() => showToast('已复制'));
+}
+
+function showToast(msg) {
+  let t=document.getElementById('_toast');
+  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',1800);
+}
+
+// 初始化
+refreshNow();
+setInterval(refreshNow, 1000);
+useNowDt();
+</script>
+</body>
+</html>

@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>屏幕标尺工具</title>
+<style>
+  :root {
+    --green: #2da44e;
+    --green2: #2c974b;
+    --border: #d0d7de;
+    --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08);
+    --bg: #f6f8fa;
+    --card: #fff;
+    --text: #1f2328;
+    --text2: #656d76;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%);
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
+    position: relative;
+  }
+  .header h1 { font-size: 20px; font-weight: 600; }
+  .header-right { display: flex; gap: 12px; align-items: center; }
+
+  .btn {
+    padding: 6px 14px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: var(--radius);
+    background: rgba(255,255,255,0.15);
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn:hover { background: rgba(255,255,255,0.25); }
+
+  .controls {
+    position: fixed;
+    top: 60px;
+    left: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    z-index: 1000;
+    width: 260px;
+  }
+  .control-group { margin-bottom: 16px; }
+  .control-group:last-child { margin-bottom: 0; }
+  .control-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .control-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+  }
+  .control-option:hover { background: var(--bg); }
+  .control-option.active { background: #e8f5e9; color: var(--green); font-weight: 500; }
+  .control-option input[type="checkbox"] { cursor: pointer; }
+
+  select, input[type="number"] {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  .info-panel {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    z-index: 1000;
+    min-width: 200px;
+  }
+  .info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--bg);
+  }
+  .info-item:last-child { border-bottom: none; }
+  .info-label { color: var(--text2); }
+  .info-value { font-weight: 600; font-family: "Courier New", monospace; }
+
+  /* Ruler Styles */
+  .ruler-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .ruler-horizontal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 40px;
+    background: linear-gradient(to bottom, #fff 0%, #f8f9fa 100%);
+    border-bottom: 2px solid #333;
+    pointer-events: auto;
+    cursor: crosshair;
+  }
+
+  .ruler-vertical {
+    position: fixed;
+    top: 40px;
+    left: 0;
+    width: 40px;
+    height: calc(100vh - 40px);
+    background: linear-gradient(to right, #fff 0%, #f8f9fa 100%);
+    border-right: 2px solid #333;
+    pointer-events: auto;
+    cursor: crosshair;
+  }
+
+  .ruler-mark-h {
+    position: absolute;
+    bottom: 0;
+    width: 1px;
+    background: #333;
+    transform: translateX(-0.5px);
+  }
+  .ruler-mark-h.major { height: 20px; }
+  .ruler-mark-h.medium { height: 12px; background: #666; }
+  .ruler-mark-h.minor { height: 6px; background: #999; }
+
+  .ruler-mark-v {
+    position: absolute;
+    right: 0;
+    height: 1px;
+    background: #333;
+    transform: translateY(-0.5px);
+  }
+  .ruler-mark-v.major { width: 20px; }
+  .ruler-mark-v.medium { width: 12px; background: #666; }
+  .ruler-mark-v.minor { width: 6px; background: #999; }
+
+  .ruler-label-h {
+    position: absolute;
+    top: 4px;
+    font-size: 10px;
+    color: #333;
+    transform: translateX(-50%);
+    font-family: "Courier New", monospace;
+  }
+  .ruler-label-v {
+    position: absolute;
+    right: 4px;
+    font-size: 10px;
+    color: #333;
+    transform: translateY(-50%);
+    font-family: "Courier New", monospace;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+
+  .crosshair {
+    position: fixed;
+    pointer-events: none;
+    z-index: 99;
+  }
+  .crosshair-h {
+    width: 100vw;
+    height: 1px;
+    background: rgba(255, 0, 0, 0.5);
+    border-top: 1px dashed rgba(255, 0, 0, 0.3);
+  }
+  .crosshair-v {
+    width: 1px;
+    height: 100vh;
+    background: rgba(255, 0, 0, 0.5);
+    border-left: 1px dashed rgba(255, 0, 0, 0.3);
+  }
+
+  .dimension-box {
+    position: fixed;
+    border: 2px solid #ff0000;
+    background: rgba(255, 0, 0, 0.05);
+    pointer-events: none;
+    z-index: 98;
+    display: none;
+  }
+  .dimension-label {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff0000;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: "Courier New", monospace;
+    white-space: nowrap;
+  }
+
+  .grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 97;
+    display: none;
+  }
+  .grid-line {
+    position: absolute;
+    background: rgba(0, 100, 255, 0.15);
+  }
+  .grid-line.vertical { width: 1px; height: 100vh; }
+  .grid-line.horizontal { width: 100vw; height: 1px; }
+
+  .color-picker-overlay {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border: 2px solid white;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99;
+    display: none;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.3);
+  }
+
+  .zoom-lens {
+    position: fixed;
+    width: 150px;
+    height: 150px;
+    border: 2px solid #333;
+    border-radius: 50%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 96;
+    display: none;
+    background: white;
+  }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>📏 屏幕标尺工具</h1>
+  <div class="header-right">
+    <button class="btn" onclick="toggleCrosshair()">⊕ 十字线</button>
+    <button class="btn" onclick="toggleGrid()">▦ 网格</button>
+    <button class="btn" onclick="clearMeasure()">✖ 清除</button>
+    <button class="btn" onclick="toggleHelp()">? 帮助</button>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="control-group">
+    <div class="control-label">标尺单位</div>
+    <select id="unitSelect" onchange="updateRulers()">
+      <option value="px">像素 (px)</option>
+      <option value="cm">厘米 (cm)</option>
+      <option value="mm">毫米 (mm)</option>
+      <option value="in">英寸 (in)</option>
+    </select>
+  </div>
+
+  <div class="control-group">
+    <div class="control-label">功能模式</div>
+    <div class="control-option" onclick="setMode('ruler')">
+      <input type="radio" name="mode" value="ruler" checked>
+      <span>📏 标尺测量</span>
+    </div>
+    <div class="control-option" onclick="setMode('measure')">
+      <input type="radio" name="mode" value="measure">
+      <span>📐 区域测量</span>
+    </div>
+    <div class="control-option" onclick="setMode('color')">
+      <input type="radio" name="mode" value="color">
+      <span>🎨 取色器</span>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="control-label">选项</div>
+    <div class="control-option">
+      <input type="checkbox" id="showCrosshair" onchange="toggleCrosshair()">
+      <span>显示十字线</span>
+    </div>
+    <div class="control-option">
+      <input type="checkbox" id="showGrid" onchange="toggleGrid()">
+      <span>显示网格</span>
+    </div>
+    <div class="control-option">
+      <input type="checkbox" id="snapToGrid" onchange="updateGrid()">
+      <span>吸附到网格</span>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="control-label">网格间距</div>
+    <input type="number" id="gridSize" value="20" min="5" max="200" step="5" onchange="updateGrid()">
+  </div>
+</div>
+
+<div class="info-panel">
+  <div class="control-label" style="margin-bottom:12px;">实时信息</div>
+  <div class="info-item">
+    <span class="info-label">X 坐标</span>
+    <span class="info-value" id="posX">0</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">Y 坐标</span>
+    <span class="info-value" id="posY">0</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">屏幕宽</span>
+    <span class="info-value" id="screenW">0</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">屏幕高</span>
+    <span class="info-value" id="screenH">0</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">DPI</span>
+    <span class="info-value" id="dpi">96</span>
+  </div>
+  <hr style="margin:12px 0;border:none;border-top:1px solid var(--border);">
+  <div class="info-item">
+    <span class="info-label">宽度</span>
+    <span class="info-value" id="measureW">-</span>
+  </div>
+  <div class="info-item">
+    <span class="info-label">高度</span>
+    <span class="info-value" id="measureH">-</span>
+  </div>
+  <div id="colorInfo" style="display:none;">
+    <hr style="margin:12px 0;border:none;border-top:1px solid var(--border);">
+    <div class="info-item">
+      <span class="info-label">颜色</span>
+      <span class="info-value" id="colorValue">#000000</span>
+    </div>
+  </div>
+</div>
+
+<div class="ruler-container" id="rulerContainer">
+  <div class="ruler-horizontal" id="rulerH"></div>
+  <div class="ruler-vertical" id="rulerV"></div>
+</div>
+
+<div class="crosshair" id="crosshairH" style="display:none;"><div class="crosshair-h" id="chH"></div></div>
+<div class="crosshair" id="crosshairV" style="display:none;"><div class="crosshair-v" id="chV"></div></div>
+
+<div class="grid-overlay" id="gridOverlay"></div>
+<div class="dimension-box" id="dimensionBox"><div class="dimension-label" id="dimensionLabel"></div></div>
+<div class="color-picker-overlay" id="colorPicker"></div>
+
+<div id="helpModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:2000;align-items:center;justify-content:center;">
+  <div style="background:white;padding:30px;border-radius:12px;max-width:600px;max-height:80vh;overflow:auto;">
+    <h2 style="margin-bottom:16px;">📏 屏幕标尺工具 - 使用帮助</h2>
+    <h3 style="margin:16px 0 8px;font-size:16px;">功能说明</h3>
+    <ul style="line-height:1.8;color:var(--text2);">
+      <li><strong>标尺测量</strong>：移动鼠标查看实时坐标，顶部和左侧显示像素标尺</li>
+      <li><strong>区域测量</strong>：按住鼠标拖拽测量区域宽高</li>
+      <li><strong>取色器</strong>：点击获取屏幕上任意位置的颜色值（需截图权限）</li>
+    </ul>
+    <h3 style="margin:16px 0 8px;font-size:16px;">快捷键</h3>
+    <ul style="line-height:1.8;color:var(--text2);">
+      <li><kbd>空格</kbd> - 切换十字线显示</li>
+      <li><kbd>G</kbd> - 切换网格显示</li>
+      <li><kbd>Esc</kbd> - 清除测量/关闭帮助</li>
+    </ul>
+    <button class="btn btn-primary" onclick="toggleHelp()" style="margin-top:20px;padding:8px 20px;background:var(--green);color:white;border:none;border-radius:6px;cursor:pointer;">关闭</button>
+  </div>
+</div>
+
+<script>
+let mode = 'ruler';
+let measuring = false;
+let startX, startY;
+let crosshairVisible = false;
+let gridVisible = false;
+
+const rulerH = document.getElementById('rulerH');
+const rulerV = document.getElementById('rulerV');
+const crosshairH = document.getElementById('crosshairH');
+const crosshairV = document.getElementById('crosshairV');
+const dimensionBox = document.getElementById('dimensionBox');
+const gridOverlay = document.getElementById('gridOverlay');
+const colorPicker = document.getElementById('colorPicker');
+
+// Initialize
+updateRulers();
+updateScreenInfo();
+updateGrid();
+
+document.addEventListener('mousemove', (e) => {
+  const x = e.clientX;
+  const y = e.clientY;
+
+  document.getElementById('posX').textContent = x;
+  document.getElementById('posY').textContent = y;
+
+  // Crosshair
+  if (crosshairVisible) {
+    crosshairH.style.display = 'block';
+    crosshairV.style.display = 'block';
+    document.getElementById('chH').style.top = y + 'px';
+    document.getElementById('chV').style.left = x + 'px';
+  }
+
+  // Measuring
+  if (measuring && mode === 'measure') {
+    const w = Math.abs(x - startX);
+    const h = Math.abs(y - startY);
+    const left = Math.min(x, startX);
+    const top = Math.min(y, startY);
+
+    dimensionBox.style.display = 'block';
+    dimensionBox.style.left = left + 'px';
+    dimensionBox.style.top = top + 'px';
+    dimensionBox.style.width = w + 'px';
+    dimensionBox.style.height = h + 'px';
+    document.getElementById('dimensionLabel').textContent = `${w} × ${h} px`;
+    document.getElementById('measureW').textContent = w + 'px';
+    document.getElementById('measureH').textContent = h + 'px';
+  }
+
+  // Color picker
+  if (mode === 'color') {
+    colorPicker.style.display = 'block';
+    colorPicker.style.left = (x - 10) + 'px';
+    colorPicker.style.top = (y - 10) + 'px';
+  }
+});
+
+document.addEventListener('mousedown', (e) => {
+  if (mode === 'measure') {
+    measuring = true;
+    startX = e.clientX;
+    startY = e.clientY;
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  measuring = false;
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    toggleCrosshair();
+  } else if (e.key === 'g' || e.key === 'G') {
+    toggleGrid();
+  } else if (e.key === 'Escape') {
+    clearMeasure();
+    document.getElementById('helpModal').style.display = 'none';
+  }
+});
+
+function updateRulers() {
+  const unit = document.getElementById('unitSelect').value;
+  const dpi = window.devicePixelRatio * 96 || 96;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  // Horizontal ruler
+  rulerH.innerHTML = '';
+  const pxPerUnit = getPxPerUnit(unit);
+  for (let i = 0; i < w; i += pxPerUnit / 10) {
+    const mark = document.createElement('div');
+    mark.className = 'ruler-mark-h';
+    mark.style.left = i + 'px';
+
+    if (i % (pxPerUnit * 10) < 1) {
+      mark.classList.add('major');
+      const label = document.createElement('div');
+      label.className = 'ruler-label-h';
+      label.textContent = Math.round(i / pxPerUnit);
+      label.style.left = i + 'px';
+      rulerH.appendChild(label);
+    } else if (i % (pxPerUnit * 5) < 1) {
+      mark.classList.add('medium');
+    } else {
+      mark.classList.add('minor');
+    }
+    rulerH.appendChild(mark);
+  }
+
+  // Vertical ruler
+  rulerV.innerHTML = '';
+  for (let i = 0; i < h; i += pxPerUnit / 10) {
+    const mark = document.createElement('div');
+    mark.className = 'ruler-mark-v';
+    mark.style.top = i + 'px';
+
+    if (i % (pxPerUnit * 10) < 1) {
+      mark.classList.add('major');
+      const label = document.createElement('div');
+      label.className = 'ruler-label-v';
+      label.textContent = Math.round(i / pxPerUnit);
+      label.style.top = i + 'px';
+      rulerV.appendChild(label);
+    } else if (i % (pxPerUnit * 5) < 1) {
+      mark.classList.add('medium');
+    } else {
+      mark.classList.add('minor');
+    }
+    rulerV.appendChild(mark);
+  }
+}
+
+function getPxPerUnit(unit) {
+  const dpi = 96;
+  switch(unit) {
+    case 'cm': return dpi / 2.54;
+    case 'mm': return dpi / 25.4;
+    case 'in': return dpi;
+    default: return 1;
+  }
+}
+
+function updateScreenInfo() {
+  document.getElementById('screenW').textContent = window.innerWidth + 'px';
+  document.getElementById('screenH').textContent = window.innerHeight + 'px';
+  document.getElementById('dpi').textContent = Math.round(window.devicePixelRatio * 96);
+}
+
+function toggleCrosshair() {
+  crosshairVisible = !crosshairVisible;
+  document.getElementById('showCrosshair').checked = crosshairVisible;
+  if (!crosshairVisible) {
+    crosshairH.style.display = 'none';
+    crosshairV.style.display = 'none';
+  }
+}
+
+function toggleGrid() {
+  gridVisible = !gridVisible;
+  document.getElementById('showGrid').checked = gridVisible;
+  gridOverlay.style.display = gridVisible ? 'block' : 'none';
+  if (gridVisible) updateGrid();
+}
+
+function updateGrid() {
+  gridOverlay.innerHTML = '';
+  const size = parseInt(document.getElementById('gridSize').value) || 20;
+
+  for (let x = 0; x < window.innerWidth; x += size) {
+    const line = document.createElement('div');
+    line.className = 'grid-line vertical';
+    line.style.left = x + 'px';
+    gridOverlay.appendChild(line);
+  }
+
+  for (let y = 0; y < window.innerHeight; y += size) {
+    const line = document.createElement('div');
+    line.className = 'grid-line horizontal';
+    line.style.top = y + 'px';
+    gridOverlay.appendChild(line);
+  }
+}
+
+function setMode(newMode) {
+  mode = newMode;
+  document.querySelectorAll('input[name="mode"]').forEach(r => r.checked = r.value === newMode);
+  document.querySelectorAll('.control-option').forEach(opt => {
+    opt.classList.toggle('active', opt.querySelector('input')?.value === newMode);
+  });
+
+  if (mode !== 'color') {
+    colorPicker.style.display = 'none';
+    document.getElementById('colorInfo').style.display = 'none';
+  } else {
+    document.getElementById('colorInfo').style.display = 'block';
+  }
+}
+
+function clearMeasure() {
+  measuring = false;
+  dimensionBox.style.display = 'none';
+  document.getElementById('measureW').textContent = '-';
+  document.getElementById('measureH').textContent = '-';
+}
+
+function toggleHelp() {
+  const modal = document.getElementById('helpModal');
+  modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+}
+
+// Set initial mode
+setMode('ruler');
+
+window.addEventListener('resize', () => {
+  updateRulers();
+  updateScreenInfo();
+  if (gridVisible) updateGrid();
+});
+</script>
+</body>
+</html>

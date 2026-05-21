@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简易画板工具</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+  header { background:var(--bg); border-bottom:1px solid var(--border); padding:8px 20px; display:flex; align-items:center; gap:12px; flex-shrink:0; box-shadow:var(--shadow); }
+  .hi { width:28px; height:28px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:14px; }
+  header h1 { font-size:16px; font-weight:600; }
+  .toolbar { background:var(--bg); border-bottom:1px solid var(--border); padding:6px 16px; display:flex; gap:6px; align-items:center; flex-shrink:0; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:4px; padding:5px 10px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:12px; cursor:pointer; transition:all .12s; font-family:inherit; }
+  .btn:hover { background:var(--bg3); }
+  .btn.active { background:#dafbe1; border-color:#9fdbab; color:var(--green); }
+  .btn-primary { background:var(--green); color:white; border-color:var(--green); }
+  .btn-primary:hover { background:var(--green2); }
+  .sep { width:1px; height:20px; background:var(--border); margin:0 2px; }
+  .canvas-area { flex:1; overflow:hidden; display:flex; align-items:center; justify-content:center; padding:8px; background:var(--bg3); }
+  canvas { background:white; box-shadow:0 2px 12px rgba(0,0,0,.12); cursor:crosshair; display:block; max-width:100%; max-height:100%; }
+  input[type=color] { width:32px; height:32px; border:1px solid var(--border); border-radius:var(--radius); cursor:pointer; padding:2px; }
+  input[type=range] { width:80px; accent-color:var(--green); }
+  .size-label { font-size:11px; color:var(--text2); min-width:20px; }
+  select { padding:4px 8px; border:1px solid var(--border); border-radius:var(--radius); font-size:12px; background:var(--bg); color:var(--text); font-family:inherit; outline:none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="hi">✏</div>
+  <h1>简易画板工具</h1>
+</header>
+
+<div class="toolbar">
+  <!-- 工具 -->
+  <button class="btn active" id="tool-pen" onclick="setTool('pen',this)" title="画笔">✏ 画笔</button>
+  <button class="btn" id="tool-eraser" onclick="setTool('eraser',this)" title="橡皮擦">⬜ 橡皮</button>
+  <button class="btn" id="tool-line" onclick="setTool('line',this)">╱ 直线</button>
+  <button class="btn" id="tool-rect" onclick="setTool('rect',this)">⬜ 矩形</button>
+  <button class="btn" id="tool-circle" onclick="setTool('circle',this)">◯ 圆形</button>
+  <button class="btn" id="tool-fill" onclick="setTool('fill',this)">🪣 填充</button>
+  <button class="btn" id="tool-text" onclick="setTool('text',this)">T 文字</button>
+  <div class="sep"></div>
+  <!-- 颜色 -->
+  <label style="font-size:11px;color:var(--text2);">颜色：</label>
+  <input type="color" id="colorPicker" value="#000000" oninput="updateColor()">
+  <input type="color" id="bgColorPicker" value="#ffffff" title="背景色">
+  <!-- 预设颜色 -->
+  <div id="colorPresets"></div>
+  <div class="sep"></div>
+  <!-- 粗细 -->
+  <label class="size-label">粗细：</label>
+  <input type="range" id="sizeSlider" min="1" max="50" value="4" oninput="updateSize()">
+  <span class="size-label" id="sizeLabel">4</span>
+  <div class="sep"></div>
+  <!-- 透明度 -->
+  <label class="size-label">透明：</label>
+  <input type="range" id="alphaSlider" min="0" max="100" value="100" oninput="updateAlpha()">
+  <span class="size-label" id="alphaLabel">100%</span>
+  <div class="sep"></div>
+  <!-- 操作 -->
+  <button class="btn" onclick="undo()">↩ 撤销</button>
+  <button class="btn" onclick="redo()">↪ 重做</button>
+  <button class="btn" onclick="clearCanvas()">🗑 清空</button>
+  <div class="sep"></div>
+  <button class="btn btn-primary" onclick="saveCanvas()">⬇ 保存</button>
+  <button class="btn" onclick="copyCanvas()">⎘ 复制</button>
+  <button class="btn" onclick="loadImage()">📂 导入</button>
+  <select id="canvasSize" onchange="resizeCanvas()">
+    <option value="800x600">800×600</option>
+    <option value="1280x720">1280×720</option>
+    <option value="1920x1080">1920×1080</option>
+    <option value="1000x1000">1000×1000（正方）</option>
+    <option value="500x500">500×500</option>
+  </select>
+</div>
+
+<div class="canvas-area" id="canvasArea">
+  <canvas id="drawCanvas"></canvas>
+</div>
+
+<input type="file" id="fileInput" accept="image/*" style="display:none;" onchange="handleImageLoad(this)">
+
+<script>
+const canvas = document.getElementById('drawCanvas');
+const ctx = canvas.getContext('2d');
+let tool = 'pen';
+let drawing = false;
+let startX, startY;
+let history = [];
+let historyIndex = -1;
+let currentColor = '#000000';
+let currentSize = 4;
+let currentAlpha = 1;
+let snapshot = null;
+
+const presetColors = ['#000000','#ffffff','#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899','#6b7280'];
+
+function initPresets() {
+  const div = document.getElementById('colorPresets');
+  presetColors.forEach(c => {
+    const btn = document.createElement('div');
+    btn.style.cssText = `width:18px;height:18px;border-radius:3px;cursor:pointer;background:${c};border:1px solid rgba(0,0,0,.2);display:inline-block;margin:0 1px;`;
+    btn.onclick = () => { document.getElementById('colorPicker').value = c; updateColor(); };
+    div.appendChild(btn);
+  });
+}
+
+function initCanvas(w=800, h=600) {
+  canvas.width = w;
+  canvas.height = h;
+  ctx.fillStyle = document.getElementById('bgColorPicker').value;
+  ctx.fillRect(0,0,w,h);
+  saveHistory();
+}
+
+function resizeCanvas() {
+  const [w,h] = document.getElementById('canvasSize').value.split('x').map(Number);
+  initCanvas(w, h);
+}
+
+function saveHistory() {
+  history = history.slice(0, historyIndex+1);
+  history.push(canvas.toDataURL());
+  historyIndex++;
+  if (history.length > 50) { history.shift(); historyIndex--; }
+}
+
+function undo() {
+  if (historyIndex > 0) { historyIndex--; loadHistoryFrame(history[historyIndex]); }
+}
+function redo() {
+  if (historyIndex < history.length-1) { historyIndex++; loadHistoryFrame(history[historyIndex]); }
+}
+function loadHistoryFrame(dataUrl) {
+  const img = new Image();
+  img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); };
+  img.src = dataUrl;
+}
+
+function setTool(t, btn) {
+  tool = t;
+  document.querySelectorAll('.btn[id^=tool-]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  canvas.style.cursor = t==='eraser'?'cell':t==='fill'?'copy':t==='text'?'text':'crosshair';
+}
+
+function updateColor() { currentColor = document.getElementById('colorPicker').value; }
+function updateSize() {
+  currentSize = +document.getElementById('sizeSlider').value;
+  document.getElementById('sizeLabel').textContent = currentSize;
+}
+function updateAlpha() {
+  currentAlpha = +document.getElementById('alphaSlider').value / 100;
+  document.getElementById('alphaLabel').textContent = (+document.getElementById('alphaSlider').value) + '%';
+}
+
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+}
+
+canvas.addEventListener('mousedown', startDraw);
+canvas.addEventListener('mousemove', draw);
+canvas.addEventListener('mouseup', endDraw);
+canvas.addEventListener('mouseleave', endDraw);
+canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e); }, {passive:false});
+canvas.addEventListener('touchmove', e => { e.preventDefault(); draw(e); }, {passive:false});
+canvas.addEventListener('touchend', endDraw);
+
+function startDraw(e) {
+  drawing = true;
+  const pos = getPos(e);
+  startX = pos.x; startY = pos.y;
+  if (['line','rect','circle'].includes(tool)) snapshot = ctx.getImageData(0,0,canvas.width,canvas.height);
+  if (tool === 'fill') { floodFill(Math.round(startX), Math.round(startY)); drawing=false; return; }
+  if (tool === 'text') { addText(Math.round(startX), Math.round(startY)); drawing=false; return; }
+  ctx.beginPath();
+  ctx.moveTo(startX, startY);
+}
+
+function draw(e) {
+  if (!drawing) return;
+  const pos = getPos(e);
+  ctx.globalAlpha = currentAlpha;
+  ctx.strokeStyle = tool==='eraser' ? '#ffffff' : currentColor;
+  ctx.fillStyle = currentColor;
+  ctx.lineWidth = tool==='eraser' ? currentSize*2 : currentSize;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  if (tool === 'pen' || tool === 'eraser') {
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  } else if (snapshot) {
+    ctx.putImageData(snapshot, 0, 0);
+    ctx.beginPath();
+    if (tool === 'line') {
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(pos.x, pos.y);
+      ctx.stroke();
+    } else if (tool === 'rect') {
+      const w = pos.x - startX, h = pos.y - startY;
+      ctx.strokeRect(startX, startY, w, h);
+    } else if (tool === 'circle') {
+      const rx = Math.abs(pos.x-startX)/2, ry = Math.abs(pos.y-startY)/2;
+      ctx.ellipse(startX+(pos.x-startX)/2, startY+(pos.y-startY)/2, rx, ry, 0, 0, Math.PI*2);
+      ctx.stroke();
+    }
+  }
+}
+
+function endDraw() {
+  if (drawing) { drawing = false; snapshot = null; ctx.globalAlpha = 1; saveHistory(); }
+}
+
+function floodFill(x, y) {
+  const imgData = ctx.getImageData(0,0,canvas.width,canvas.height);
+  const data = imgData.data;
+  const idx = (y * canvas.width + x) * 4;
+  const targetR=data[idx],targetG=data[idx+1],targetB=data[idx+2],targetA=data[idx+3];
+  const fillColor = hexToRgba(currentColor);
+  if (targetR===fillColor.r&&targetG===fillColor.g&&targetB===fillColor.b) return;
+  const stack = [[x,y]];
+  while (stack.length) {
+    const [cx,cy] = stack.pop();
+    const ci = (cy*canvas.width+cx)*4;
+    if (cx<0||cx>=canvas.width||cy<0||cy>=canvas.height) continue;
+    if (data[ci]!==targetR||data[ci+1]!==targetG||data[ci+2]!==targetB||data[ci+3]!==targetA) continue;
+    data[ci]=fillColor.r;data[ci+1]=fillColor.g;data[ci+2]=fillColor.b;data[ci+3]=255;
+    stack.push([cx+1,cy],[cx-1,cy],[cx,cy+1],[cx,cy-1]);
+  }
+  ctx.putImageData(imgData,0,0);
+  saveHistory();
+}
+
+function hexToRgba(hex) {
+  const r=/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+  return r?{r:parseInt(r[1],16),g:parseInt(r[2],16),b:parseInt(r[3],16)}:{r:0,g:0,b:0};
+}
+
+function addText(x, y) {
+  const text = prompt('输入文字：');
+  if (!text) return;
+  ctx.globalAlpha = currentAlpha;
+  ctx.font = `${currentSize*4}px sans-serif`;
+  ctx.fillStyle = currentColor;
+  ctx.fillText(text, x, y);
+  ctx.globalAlpha = 1;
+  saveHistory();
+}
+
+function clearCanvas() {
+  ctx.fillStyle = document.getElementById('bgColorPicker').value;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  saveHistory();
+}
+
+function saveCanvas() {
+  const a = document.createElement('a');
+  a.href = canvas.toDataURL('image/png');
+  a.download = 'drawing-' + Date.now() + '.png';
+  a.click();
+}
+
+function copyCanvas() {
+  canvas.toBlob(blob => {
+    navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(() => showToast('图片已复制到剪贴板'));
+  });
+}
+
+function loadImage() { document.getElementById('fileInput').click(); }
+function handleImageLoad(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.onload = () => { ctx.drawImage(img,0,0,canvas.width,canvas.height); saveHistory(); };
+  img.src = URL.createObjectURL(file);
+}
+
+function showToast(msg) {
+  let t=document.getElementById('_toast');
+  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',1800);
+}
+
+initPresets();
+initCanvas();
+</script>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>图片拼接工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:1000px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:16px}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.layout{display:grid;grid-template-columns:1fr 260px;gap:16px}
+@media(max-width:768px){.layout{grid-template-columns:1fr}}
+.img-list{display:flex;flex-direction:column;gap:6px;min-height:100px}
+.img-item{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);background:#fff;cursor:grab;transition:all .15s;position:relative}
+.img-item:hover{background:#f6f8fa;border-color:var(--green)}
+.img-item.dragging{opacity:.5;border-style:dashed}
+.img-item img{width:44px;height:44px;object-fit:cover;border-radius:4px;border:1px solid var(--border);flex-shrink:0}
+.img-item .info{flex:1;overflow:hidden}
+.img-item .name{font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.img-item .meta{font-size:11px;color:#656d76;margin-top:2px}
+.img-item .del-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#656d76;font-size:16px;padding:2px;line-height:1}
+.img-item .del-btn:hover{color:#cf222e}
+.dropzone-mini{border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;cursor:pointer;transition:all .2s;font-size:13px;color:#656d76}
+.dropzone-mini:hover{border-color:var(--green);background:#f0fff4}
+.options label{display:block;font-size:12px;color:#656d76;margin-bottom:4px;font-weight:500}
+input[type=number],select{width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none;margin-bottom:10px}
+input:focus,select:focus{border-color:var(--green)}
+input[type=color]{width:100%;height:36px;padding:2px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer}
+.section{font-size:12px;font-weight:600;color:#656d76;margin:12px 0 6px;text-transform:uppercase}
+.preview-wrap{border:1px solid var(--border);border-radius:var(--radius);overflow:auto;max-height:500px;background:#e8e8e8;display:flex;align-items:center;justify-content:center}
+canvas#result-canvas{display:block;max-width:100%}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🧩</span>
+  <h1>图片拼接工具</h1>
+  <p>横向/纵向拼接 · 网格布局 · 自定义间距</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+      <div class="layout">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#656d76;margin-bottom:8px">📸 图片列表（可拖拽排序）</div>
+          <div class="img-list" id="img-list"></div>
+          <div class="dropzone-mini" style="margin-top:8px" onclick="document.getElementById('file-input').click()"
+            ondragover="event.preventDefault();this.style.borderColor='#2da44e'"
+            ondragleave="this.style.borderColor=''"
+            ondrop="handleDrop(event)">
+            ➕ 点击添加图片（可多选）
+          </div>
+          <input type="file" id="file-input" accept="image/*" multiple style="display:none" onchange="addFiles(this.files)">
+          <div class="actions">
+            <button class="btn btn-primary" onclick="stitch()">🧩 开始拼接</button>
+            <button class="btn btn-secondary" onclick="clearAll()">🗑 清空</button>
+          </div>
+        </div>
+        <div class="options">
+          <div class="section">布局方式</div>
+          <select id="direction">
+            <option value="h">横向拼接（从左到右）</option>
+            <option value="v">纵向拼接（从上到下）</option>
+            <option value="grid">网格拼接</option>
+          </select>
+          <div id="grid-opts" style="display:none">
+            <label>每行图片数</label>
+            <input type="number" id="cols" value="2" min="1" max="10">
+          </div>
+          <div class="section">对齐方式</div>
+          <select id="align">
+            <option value="start">顶部/左侧对齐</option>
+            <option value="center">居中对齐</option>
+            <option value="end">底部/右侧对齐</option>
+            <option value="stretch">拉伸填充</option>
+          </select>
+          <div class="section">间距 & 背景</div>
+          <label>图片间距 (px)</label>
+          <input type="number" id="gap" value="0" min="0">
+          <label>外边距 (px)</label>
+          <input type="number" id="padding" value="0" min="0">
+          <label>背景颜色</label>
+          <input type="color" id="bg-color" value="#ffffff">
+          <div class="section">输出设置</div>
+          <label>缩放比例 (%)</label>
+          <input type="number" id="scale" value="100" min="10" max="400">
+          <label>输出格式</label>
+          <select id="out-fmt">
+            <option value="image/jpeg">JPEG</option>
+            <option value="image/png" selected>PNG</option>
+            <option value="image/webp">WebP</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="result-card" style="display:none">
+    <div class="card-header">
+      <span>✨ 拼接结果</span>
+      <button class="btn btn-primary" style="font-size:12px;padding:4px 12px" onclick="downloadResult()">⬇️ 下载</button>
+    </div>
+    <div class="card-body">
+      <div class="preview-wrap">
+        <canvas id="result-canvas"></canvas>
+      </div>
+      <div id="result-info" style="margin-top:8px;font-size:12px;color:#656d76"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let images = [];
+let dragIdx = -1;
+
+document.getElementById('direction').addEventListener('change', function() {
+  document.getElementById('grid-opts').style.display = this.value === 'grid' ? 'block' : 'none';
+});
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.target.style.borderColor = '';
+  addFiles(e.dataTransfer.files);
+}
+
+function addFiles(files) {
+  Array.from(files).filter(f => f.type.startsWith('image/')).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        images.push({ file, img, src: e.target.result });
+        renderList();
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderList() {
+  const list = document.getElementById('img-list');
+  if (images.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = images.map((item, i) => `
+    <div class="img-item" draggable="true" data-idx="${i}"
+      ondragstart="dragStart(${i})" ondragover="dragOver(event,${i})" ondragend="dragEnd()" ondrop="drop(${i})">
+      <img src="${item.src}" alt="">
+      <div class="info">
+        <div class="name">${item.file.name}</div>
+        <div class="meta">${item.img.width} × ${item.img.height} px · ${(item.file.size/1024).toFixed(1)} KB</div>
+      </div>
+      <button class="del-btn" onclick="removeImg(${i},event)">×</button>
+    </div>
+  `).join('');
+}
+
+function removeImg(i, e) {
+  e.stopPropagation();
+  images.splice(i, 1);
+  renderList();
+}
+
+function dragStart(i) { dragIdx = i; }
+function dragEnd() { dragIdx = -1; document.querySelectorAll('.img-item').forEach(el => el.classList.remove('dragging')); }
+function dragOver(e, i) {
+  e.preventDefault();
+  if (dragIdx === i || dragIdx < 0) return;
+  const moved = images.splice(dragIdx, 1)[0];
+  images.splice(i, 0, moved);
+  dragIdx = i;
+  renderList();
+}
+function drop(i) { dragEnd(); }
+
+function clearAll() {
+  images = [];
+  renderList();
+  document.getElementById('result-card').style.display = 'none';
+}
+
+function stitch() {
+  if (images.length < 2) { showToast('请至少添加 2 张图片'); return; }
+  const dir = document.getElementById('direction').value;
+  const align = document.getElementById('align').value;
+  const gap = parseInt(document.getElementById('gap').value) || 0;
+  const pad = parseInt(document.getElementById('padding').value) || 0;
+  const scalePct = parseInt(document.getElementById('scale').value) || 100;
+  const scale = scalePct / 100;
+  const bg = document.getElementById('bg-color').value;
+
+  const canvas = document.getElementById('result-canvas');
+  const ctx = canvas.getContext('2d');
+  const imgs = images.map(item => item.img);
+
+  let cw, ch;
+  let positions = [];
+
+  if (dir === 'h') {
+    const maxH = Math.max(...imgs.map(i => i.height));
+    let x = pad;
+    imgs.forEach((img, i) => {
+      let y = pad;
+      if (align === 'center') y = pad + (maxH - img.height) / 2;
+      else if (align === 'end') y = pad + maxH - img.height;
+      else if (align === 'stretch') { positions.push({x, y: pad, w: img.width, h: maxH}); x += img.width + gap; return; }
+      positions.push({x, y, w: img.width, h: img.height});
+      x += img.width + gap;
+    });
+    cw = x - gap + pad;
+    ch = maxH + pad * 2;
+  } else if (dir === 'v') {
+    const maxW = Math.max(...imgs.map(i => i.width));
+    let y = pad;
+    imgs.forEach((img, i) => {
+      let x = pad;
+      if (align === 'center') x = pad + (maxW - img.width) / 2;
+      else if (align === 'end') x = pad + maxW - img.width;
+      else if (align === 'stretch') { positions.push({x: pad, y, w: maxW, h: img.height}); y += img.height + gap; return; }
+      positions.push({x, y, w: img.width, h: img.height});
+      y += img.height + gap;
+    });
+    cw = maxW + pad * 2;
+    ch = y - gap + pad;
+  } else { // grid
+    const cols = Math.max(1, parseInt(document.getElementById('cols').value) || 2);
+    const rows = Math.ceil(imgs.length / cols);
+    const cellW = Math.max(...imgs.map(i => i.width));
+    const cellH = Math.max(...imgs.map(i => i.height));
+    imgs.forEach((img, i) => {
+      const col = i % cols, row = Math.floor(i / cols);
+      let x = pad + col * (cellW + gap);
+      let y = pad + row * (cellH + gap);
+      if (align === 'center') { x += (cellW - img.width)/2; y += (cellH - img.height)/2; }
+      positions.push({x, y, w: img.width, h: img.height, cellW, cellH});
+    });
+    cw = pad * 2 + cols * cellW + (cols-1) * gap;
+    ch = pad * 2 + rows * cellH + (rows-1) * gap;
+  }
+
+  canvas.width = Math.round(cw * scale);
+  canvas.height = Math.round(ch * scale);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.scale(scale, scale);
+  positions.forEach((pos, i) => {
+    ctx.drawImage(imgs[i], pos.x, pos.y, pos.w, pos.h);
+  });
+  ctx.restore();
+
+  document.getElementById('result-card').style.display = 'block';
+  document.getElementById('result-info').textContent = `输出尺寸：${canvas.width} × ${canvas.height} px`;
+}
+
+function downloadResult() {
+  const canvas = document.getElementById('result-canvas');
+  const fmt = document.getElementById('out-fmt').value;
+  const ext = fmt.split('/')[1] === 'jpeg' ? 'jpg' : fmt.split('/')[1];
+  canvas.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'stitched.' + ext;
+    a.click();
+  }, fmt, 0.95);
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+</script>
+</body>
+</html>

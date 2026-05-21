@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>随机数生成器</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:900px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:16px}
+.tab-bar{display:flex;flex-wrap:wrap;gap:4px;padding:10px 16px;background:#f6f8fa;border-bottom:1px solid var(--border)}
+.tab{padding:5px 14px;border-radius:var(--radius);border:1px solid var(--border);font-size:12px;cursor:pointer;transition:all .15s;background:#fff}
+.tab.active{background:var(--green);color:#fff;border-color:var(--green)}
+.form-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:4px}
+label{font-size:12px;color:#656d76;font-weight:500}
+input[type=number],input[type=text]{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;outline:none;transition:border-color .15s}
+input:focus{border-color:var(--green)}
+select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.big-number{font-size:72px;font-weight:800;color:var(--green);text-align:center;padding:24px;letter-spacing:4px;cursor:pointer;user-select:all;transition:all .2s;font-variant-numeric:tabular-nums}
+.big-number:hover{background:#f0fff4;border-radius:var(--radius)}
+.result-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding:12px;background:#f6f8fa;border:1px solid var(--border);border-radius:var(--radius);min-height:60px}
+.num-chip{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:4px 12px;font-size:14px;font-weight:600;font-family:Consolas,monospace;cursor:pointer;transition:all .15s}
+.num-chip:hover{border-color:var(--green);color:var(--green)}
+.dice-wrap{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:16px}
+.die{width:80px;height:80px;border:3px solid var(--green);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:40px;background:#fff;cursor:pointer;transition:all .2s;user-select:none}
+.die:hover,.die:active{transform:scale(0.95);background:#f0fff4}
+.die.rolling{animation:roll .3s ease-out}
+@keyframes roll{0%{transform:rotate(0) scale(1.1)}50%{transform:rotate(15deg) scale(0.9)}100%{transform:rotate(0) scale(1)}}
+.coin{width:100px;height:100px;border-radius:50%;border:4px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;transition:all .3s;margin:0 auto;background:#fff}
+.coin.heads{background:linear-gradient(135deg,#ffd700,#ffb300)}
+.coin.tails{background:linear-gradient(135deg,#c0c0c0,#a0a0a0)}
+.coin:hover{transform:scale(1.05)}
+.color-swatch{width:120px;height:80px;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.uuid-box{font-family:Consolas,monospace;font-size:16px;background:#f6f8fa;border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-top:8px;cursor:pointer;word-break:break-all;line-height:2;letter-spacing:1px}
+.uuid-box:hover{border-color:var(--green);background:#f0fff4}
+.opt{display:inline-flex;align-items:center;gap:4px;font-size:12px;cursor:pointer}
+.opt input{accent-color:var(--green)}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🎲</span>
+  <h1>随机数生成器</h1>
+  <p>整数 · UUID · 随机字符串 · 掷骰子 · 抽号</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="tab-bar" id="tab-bar">
+      <div class="tab active" onclick="switchTab('int',this)">🔢 随机整数</div>
+      <div class="tab" onclick="switchTab('float',this)">📊 随机小数</div>
+      <div class="tab" onclick="switchTab('uuid',this)">🔑 UUID</div>
+      <div class="tab" onclick="switchTab('string',this)">🔤 随机字符串</div>
+      <div class="tab" onclick="switchTab('pick',this)">🎯 随机抽取</div>
+      <div class="tab" onclick="switchTab('dice',this)">🎲 掷骰子</div>
+      <div class="tab" onclick="switchTab('coin',this)">🪙 抛硬币</div>
+      <div class="tab" onclick="switchTab('color',this)">🎨 随机颜色</div>
+    </div>
+    <div class="card-body">
+
+      <!-- 随机整数 -->
+      <div id="panel-int">
+        <div class="form-row">
+          <div class="field"><label>最小值</label><input type="number" id="int-min" value="1"></div>
+          <div class="field"><label>最大值</label><input type="number" id="int-max" value="100"></div>
+          <div class="field"><label>生成数量</label><input type="number" id="int-count" value="1" min="1" max="1000"></div>
+          <label class="opt"><input type="checkbox" id="int-nodup"> 不重复</label>
+        </div>
+        <button class="btn btn-primary" onclick="genInt()">🎲 生成</button>
+        <div class="big-number" id="int-single" onclick="genInt()" title="点击重新生成">?</div>
+        <div id="int-list" class="result-list" style="display:none"></div>
+      </div>
+
+      <!-- 随机小数 -->
+      <div id="panel-float" style="display:none">
+        <div class="form-row">
+          <div class="field"><label>最小值</label><input type="number" id="f-min" value="0" step="any"></div>
+          <div class="field"><label>最大值</label><input type="number" id="f-max" value="1" step="any"></div>
+          <div class="field"><label>小数位数</label><input type="number" id="f-decimal" value="4" min="0" max="15"></div>
+          <div class="field"><label>数量</label><input type="number" id="f-count" value="1" min="1" max="100"></div>
+        </div>
+        <button class="btn btn-primary" onclick="genFloat()">🎲 生成</button>
+        <div class="big-number" id="float-single" onclick="genFloat()" style="font-size:48px">?</div>
+        <div id="float-list" class="result-list" style="display:none"></div>
+      </div>
+
+      <!-- UUID -->
+      <div id="panel-uuid" style="display:none">
+        <div class="form-row">
+          <div class="field"><label>版本</label>
+            <select id="uuid-version"><option value="4">UUID v4（随机）</option><option value="custom">自定义格式</option></select>
+          </div>
+          <div class="field"><label>生成数量</label><input type="number" id="uuid-count" value="5" min="1" max="50"></div>
+        </div>
+        <button class="btn btn-primary" onclick="genUUID()">🔑 生成</button>
+        <button class="btn btn-secondary" onclick="copyUUIDs()">📋 复制全部</button>
+        <div id="uuid-list" style="margin-top:12px"></div>
+      </div>
+
+      <!-- 随机字符串 -->
+      <div id="panel-string" style="display:none">
+        <div class="form-row">
+          <div class="field"><label>长度</label><input type="number" id="str-len" value="16" min="1" max="256"></div>
+          <div class="field"><label>数量</label><input type="number" id="str-count" value="3" min="1" max="50"></div>
+        </div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+          <label class="opt"><input type="checkbox" id="str-upper" checked> 大写字母</label>
+          <label class="opt"><input type="checkbox" id="str-lower" checked> 小写字母</label>
+          <label class="opt"><input type="checkbox" id="str-digit" checked> 数字</label>
+          <label class="opt"><input type="checkbox" id="str-special"> 特殊符号</label>
+          <label class="opt"><input type="checkbox" id="str-noambig"> 去除易混淆(0OIl)</label>
+        </div>
+        <div class="field" style="margin-bottom:12px">
+          <label>自定义字符集（留空使用上方选项）</label>
+          <input type="text" id="str-charset" placeholder="例如：ABCDEF0123456789" style="width:100%">
+        </div>
+        <button class="btn btn-primary" onclick="genString()">🔤 生成</button>
+        <div id="str-list" class="result-list" style="margin-top:12px"></div>
+      </div>
+
+      <!-- 随机抽取 -->
+      <div id="panel-pick" style="display:none">
+        <div style="margin-bottom:10px">
+          <label style="font-size:12px;color:#656d76;font-weight:500;margin-bottom:4px;display:block">候选列表（每行一个）</label>
+          <textarea id="pick-list" style="width:100%;min-height:120px;padding:10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;resize:vertical;outline:none;font-family:inherit" placeholder="苹果&#10;香蕉&#10;橙子&#10;西瓜&#10;草莓" oninput="updatePickCount()">苹果
+香蕉
+橙子
+西瓜
+草莓
+葡萄
+芒果</textarea>
+        </div>
+        <div class="form-row">
+          <div class="field"><label>抽取数量</label><input type="number" id="pick-count" value="1" min="1"></div>
+          <label class="opt"><input type="checkbox" id="pick-nodup" checked> 不重复</label>
+          <span id="pick-total" style="font-size:12px;color:#656d76;align-self:center"></span>
+        </div>
+        <button class="btn btn-primary" onclick="pickRandom()">🎯 随机抽取</button>
+        <div id="pick-result" class="result-list" style="margin-top:12px"></div>
+      </div>
+
+      <!-- 骰子 -->
+      <div id="panel-dice" style="display:none">
+        <div class="form-row">
+          <div class="field"><label>骰子数量</label><input type="number" id="dice-count" value="2" min="1" max="10"></div>
+          <div class="field"><label>骰子面数</label>
+            <select id="dice-faces"><option value="6" selected>D6（标准）</option><option value="4">D4</option><option value="8">D8</option><option value="10">D10</option><option value="12">D12</option><option value="20">D20</option><option value="100">D100</option></select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="rollDice()">🎲 掷骰子</button>
+        <div class="dice-wrap" id="dice-display"></div>
+        <div id="dice-total" style="text-align:center;font-size:18px;font-weight:700;color:var(--green);margin-top:8px"></div>
+      </div>
+
+      <!-- 硬币 -->
+      <div id="panel-coin" style="display:none">
+        <div style="text-align:center;margin:12px 0">
+          <div class="coin" id="coin" onclick="flipCoin()">🟡</div>
+          <div id="coin-result" style="margin-top:16px;font-size:20px;font-weight:700;color:var(--green)">点击硬币抛掷</div>
+          <div id="coin-stats" style="margin-top:8px;font-size:12px;color:#656d76"></div>
+        </div>
+        <div style="text-align:center;margin-top:12px">
+          <button class="btn btn-primary" onclick="flipCoin()">🪙 抛硬币</button>
+          <button class="btn btn-secondary" onclick="flipMany(10)">抛10次</button>
+          <button class="btn btn-secondary" onclick="resetCoinStats()">🔄 重置统计</button>
+        </div>
+      </div>
+
+      <!-- 随机颜色 -->
+      <div id="panel-color" style="display:none">
+        <div class="form-row">
+          <div class="field"><label>数量</label><input type="number" id="color-count" value="6" min="1" max="50"></div>
+          <label class="opt"><input type="checkbox" id="color-pastel"> 只生成浅色</label>
+          <label class="opt"><input type="checkbox" id="color-dark"> 只生成深色</label>
+        </div>
+        <button class="btn btn-primary" onclick="genColors()">🎨 生成颜色</button>
+        <div id="color-grid" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px"></div>
+      </div>
+
+    </div>
+    <div class="card-header" style="justify-content:flex-end;border-top:1px solid var(--border);border-bottom:none">
+      <button class="btn btn-secondary" style="font-size:12px;padding:4px 12px" onclick="copyLast()">📋 复制结果</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DICE_FACES = ['⚀','⚁','⚂','⚃','⚄','⚅'];
+let coinHeads = 0, coinTails = 0;
+let lastResult = '';
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  ['int','float','uuid','string','pick','dice','coin','color'].forEach(t => {
+    document.getElementById('panel-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+}
+
+function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+function genInt() {
+  const min = parseInt(document.getElementById('int-min').value);
+  const max = parseInt(document.getElementById('int-max').value);
+  const count = parseInt(document.getElementById('int-count').value) || 1;
+  const nodup = document.getElementById('int-nodup').checked;
+  
+  if (min > max) { showToast('最小值不能大于最大值'); return; }
+  
+  let nums = [];
+  if (nodup) {
+    const pool = Array.from({length: max-min+1}, (_,i) => min+i);
+    for (let i = pool.length-1; i > 0; i--) { const j = rand(0,i); [pool[i],pool[j]] = [pool[j],pool[i]]; }
+    nums = pool.slice(0, Math.min(count, pool.length));
+  } else {
+    nums = Array.from({length:count}, () => rand(min, max));
+  }
+  
+  if (count === 1) {
+    document.getElementById('int-single').textContent = nums[0];
+    document.getElementById('int-list').style.display = 'none';
+  } else {
+    document.getElementById('int-single').textContent = `共 ${nums.length} 个`;
+    document.getElementById('int-list').style.display = 'flex';
+    document.getElementById('int-list').innerHTML = nums.map(n => `<div class="num-chip" onclick="navigator.clipboard.writeText('${n}');showToast('已复制 ${n}')">${n}</div>`).join('');
+  }
+  lastResult = nums.join(', ');
+}
+
+function genFloat() {
+  const min = parseFloat(document.getElementById('f-min').value);
+  const max = parseFloat(document.getElementById('f-max').value);
+  const dec = parseInt(document.getElementById('f-decimal').value);
+  const count = parseInt(document.getElementById('f-count').value) || 1;
+  
+  const nums = Array.from({length:count}, () => (Math.random()*(max-min)+min).toFixed(dec));
+  
+  if (count === 1) {
+    document.getElementById('float-single').textContent = nums[0];
+    document.getElementById('float-list').style.display = 'none';
+  } else {
+    document.getElementById('float-single').textContent = nums[0];
+    document.getElementById('float-list').style.display = 'flex';
+    document.getElementById('float-list').innerHTML = nums.map(n => `<div class="num-chip">${n}</div>`).join('');
+  }
+  lastResult = nums.join('\n');
+}
+
+function genUUID() {
+  const count = Math.min(50, parseInt(document.getElementById('uuid-count').value) || 5);
+  const uuids = Array.from({length:count}, () => uuid4());
+  document.getElementById('uuid-list').innerHTML = uuids.map(u =>
+    `<div class="uuid-box" onclick="navigator.clipboard.writeText('${u}');showToast('已复制')">${u}</div>`
+  ).join('');
+  lastResult = uuids.join('\n');
+}
+
+function uuid4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random()*16|0;
+    return (c==='x' ? r : (r&0x3|0x8)).toString(16);
+  });
+}
+
+function copyUUIDs() {
+  navigator.clipboard.writeText(lastResult).then(() => showToast('已复制'));
+}
+
+function genString() {
+  const len = parseInt(document.getElementById('str-len').value) || 16;
+  const count = parseInt(document.getElementById('str-count').value) || 3;
+  const customCharset = document.getElementById('str-charset').value;
+  
+  let charset = customCharset;
+  if (!charset) {
+    if (document.getElementById('str-upper').checked) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if (document.getElementById('str-lower').checked) charset += 'abcdefghijklmnopqrstuvwxyz';
+    if (document.getElementById('str-digit').checked) charset += '0123456789';
+    if (document.getElementById('str-special').checked) charset += '!@#$%^&*-_=+[]{}|;:,.<>?';
+    if (document.getElementById('str-noambig').checked) charset = charset.replace(/[0OIl1]/g, '');
+  }
+  if (!charset) { showToast('请至少选择一种字符类型'); return; }
+  
+  const strs = Array.from({length:count}, () =>
+    Array.from({length:len}, () => charset[Math.floor(Math.random()*charset.length)]).join('')
+  );
+  document.getElementById('str-list').innerHTML = strs.map(s =>
+    `<div class="num-chip" style="font-family:Consolas,monospace;font-size:12px" onclick="navigator.clipboard.writeText('${s}');showToast('已复制')">${s}</div>`
+  ).join('');
+  lastResult = strs.join('\n');
+}
+
+function updatePickCount() {
+  const lines = document.getElementById('pick-list').value.split('\n').filter(l => l.trim());
+  document.getElementById('pick-total').textContent = `共 ${lines.length} 个`;
+  document.getElementById('pick-count').max = lines.length;
+}
+
+function pickRandom() {
+  const items = document.getElementById('pick-list').value.split('\n').filter(l => l.trim());
+  const count = Math.min(parseInt(document.getElementById('pick-count').value)||1, items.length);
+  const nodup = document.getElementById('pick-nodup').checked;
+  
+  let picked = [];
+  if (nodup) {
+    const shuffled = [...items].sort(() => Math.random()-0.5);
+    picked = shuffled.slice(0, count);
+  } else {
+    picked = Array.from({length:count}, () => items[Math.floor(Math.random()*items.length)]);
+  }
+  
+  document.getElementById('pick-result').innerHTML = picked.map((item,i) =>
+    `<div class="num-chip" style="font-size:14px">${i===0?'🎯 ':''}${item}</div>`
+  ).join('');
+  lastResult = picked.join(', ');
+}
+
+function rollDice() {
+  const count = parseInt(document.getElementById('dice-count').value) || 1;
+  const faces = parseInt(document.getElementById('dice-faces').value) || 6;
+  const results = Array.from({length:count}, () => rand(1, faces));
+  
+  const wrap = document.getElementById('dice-display');
+  wrap.innerHTML = results.map(r => {
+    const emoji = faces === 6 && r <= 6 ? DICE_FACES[r-1] : r;
+    return `<div class="die">${emoji}</div>`;
+  }).join('');
+  wrap.querySelectorAll('.die').forEach(el => {
+    el.classList.add('rolling');
+    setTimeout(() => el.classList.remove('rolling'), 300);
+  });
+  
+  const total = results.reduce((a,b)=>a+b,0);
+  document.getElementById('dice-total').textContent = count > 1 ? `合计：${total}` : '';
+  lastResult = results.join(', ');
+}
+
+function flipCoin() {
+  const heads = Math.random() < 0.5;
+  const coin = document.getElementById('coin');
+  coin.className = 'coin ' + (heads?'heads':'tails');
+  coin.textContent = heads ? '👑' : '🔵';
+  document.getElementById('coin-result').textContent = heads ? '🟡 正面（Heads）' : '⚪ 反面（Tails）';
+  heads ? coinHeads++ : coinTails++;
+  const total = coinHeads + coinTails;
+  document.getElementById('coin-stats').textContent = `正面 ${coinHeads}次 (${(coinHeads/total*100).toFixed(0)}%) | 反面 ${coinTails}次 (${(coinTails/total*100).toFixed(0)}%)`;
+  lastResult = heads ? '正面' : '反面';
+}
+
+function flipMany(n) {
+  for (let i = 0; i < n; i++) { if (Math.random()<0.5) coinHeads++; else coinTails++; }
+  const total = coinHeads + coinTails;
+  document.getElementById('coin-stats').textContent = `正面 ${coinHeads}次 (${(coinHeads/total*100).toFixed(0)}%) | 反面 ${coinTails}次 (${(coinTails/total*100).toFixed(0)}%)`;
+  document.getElementById('coin-result').textContent = `抛了 ${n} 次`;
+}
+
+function resetCoinStats() { coinHeads = 0; coinTails = 0; document.getElementById('coin-stats').textContent = ''; document.getElementById('coin-result').textContent = '点击硬币抛掷'; document.getElementById('coin').className='coin'; document.getElementById('coin').textContent='🟡'; }
+
+function genColors() {
+  const count = parseInt(document.getElementById('color-count').value) || 6;
+  const pastel = document.getElementById('color-pastel').checked;
+  const dark = document.getElementById('color-dark').checked;
+  
+  const colors = Array.from({length:count}, () => {
+    let r, g, b;
+    if (pastel) { r = rand(180, 255); g = rand(180, 255); b = rand(180, 255); }
+    else if (dark) { r = rand(0, 100); g = rand(0, 100); b = rand(0, 100); }
+    else { r = rand(0, 255); g = rand(0, 255); b = rand(0, 255); }
+    const hex = '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('').toUpperCase();
+    return { hex, r, g, b };
+  });
+  
+  document.getElementById('color-grid').innerHTML = colors.map(c => {
+    const textColor = (c.r*0.299 + c.g*0.587 + c.b*0.114) > 128 ? '#000' : '#fff';
+    return `<div class="color-swatch" style="background:${c.hex};color:${textColor}" onclick="navigator.clipboard.writeText('${c.hex}');showToast('已复制 ${c.hex}')">${c.hex}</div>`;
+  }).join('');
+  lastResult = colors.map(c => c.hex).join('\n');
+}
+
+function copyLast() {
+  if (!lastResult) { showToast('没有可复制的内容'); return; }
+  navigator.clipboard.writeText(lastResult).then(() => showToast('已复制'));
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+
+// 初始化
+updatePickCount();
+genInt();
+</script>
+</body>
+</html>

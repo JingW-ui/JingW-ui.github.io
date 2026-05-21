@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>单位换算工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:900px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:16px}
+.cat-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px;background:#f6f8fa;border-bottom:1px solid var(--border)}
+.cat-tab{padding:4px 12px;border-radius:var(--radius);border:1px solid var(--border);font-size:12px;cursor:pointer;transition:all .15s;background:#fff}
+.cat-tab.active{background:var(--green);color:#fff;border-color:var(--green)}
+.cat-tab:hover:not(.active){background:#f0f2f5}
+.convert-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
+.field{display:flex;flex-direction:column;gap:4px;flex:1;min-width:140px}
+label{font-size:12px;color:#656d76;font-weight:500;margin-bottom:3px}
+input[type=number]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:15px;font-weight:600;outline:none;transition:border-color .15s}
+input:focus{border-color:var(--green)}
+select{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none}
+select:focus{border-color:var(--green)}
+.swap-btn{background:var(--green);color:#fff;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.swap-btn:hover{background:var(--green2)}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.result-item{background:#f6f8fa;border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;cursor:pointer;transition:all .15s}
+.result-item:hover{border-color:var(--green);background:#f0fff4}
+.result-item .unit{font-size:11px;color:#656d76;margin-bottom:3px}
+.result-item .val{font-size:15px;font-weight:700;color:#1a7f37;word-break:break-all}
+.result-item .formula{font-size:10px;color:#aaa;margin-top:2px}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">📏</span>
+  <h1>单位换算工具</h1>
+  <p>长度·重量·温度·面积·体积·速度·时间·数据</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="cat-tabs" id="cat-tabs"></div>
+    <div class="card-body">
+      <div class="convert-row">
+        <div class="field">
+          <label>输入值</label>
+          <input type="number" id="input-val" value="1" oninput="doConvert()" step="any">
+        </div>
+        <div class="field">
+          <label>从</label>
+          <select id="from-unit" onchange="doConvert()"></select>
+        </div>
+        <button class="swap-btn" onclick="swapUnits()">⇄</button>
+        <div class="field">
+          <label>到</label>
+          <select id="to-unit" onchange="doConvert()"></select>
+        </div>
+      </div>
+      <div id="single-result" style="font-size:24px;font-weight:800;color:var(--green);margin:12px 0;padding:12px;background:#f0fff4;border:1px solid #9be9a8;border-radius:var(--radius)"></div>
+      <div style="font-size:12px;color:#656d76;font-weight:600;margin-bottom:8px">全部换算结果（点击复制）</div>
+      <div class="result-grid" id="result-grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CATEGORIES = {
+  '📏 长度': {
+    units: {
+      '千米(km)': 1000, '米(m)': 1, '分米(dm)': 0.1, '厘米(cm)': 0.01, '毫米(mm)': 0.001,
+      '微米(μm)': 1e-6, '纳米(nm)': 1e-9, '英里(mi)': 1609.344, '码(yd)': 0.9144,
+      '英尺(ft)': 0.3048, '英寸(in)': 0.0254, '海里(nmi)': 1852, '光年(ly)': 9.461e15,
+    }
+  },
+  '⚖️ 重量': {
+    units: {
+      '吨(t)': 1000000, '千克(kg)': 1000, '克(g)': 1, '毫克(mg)': 0.001,
+      '微克(μg)': 1e-6, '磅(lb)': 453.592, '盎司(oz)': 28.3495, '克拉(ct)': 0.2,
+      '市斤': 500, '市两': 50,
+    }
+  },
+  '🌡️ 温度': {
+    special: true,
+    units: ['摄氏度(°C)', '华氏度(°F)', '开尔文(K)', '兰氏度(°R)']
+  },
+  '📐 面积': {
+    units: {
+      '平方千米(km²)': 1e6, '平方米(m²)': 1, '平方分米(dm²)': 0.01,
+      '平方厘米(cm²)': 1e-4, '平方毫米(mm²)': 1e-6,
+      '公顷(ha)': 10000, '亩': 666.667, '平方英里(mi²)': 2.59e6,
+      '英亩(ac)': 4046.86, '平方英尺(ft²)': 0.0929, '平方英寸(in²)': 6.452e-4,
+    }
+  },
+  '🧴 体积': {
+    units: {
+      '立方米(m³)': 1000, '升(L)': 1, '毫升(mL)': 0.001,
+      '立方厘米(cm³)': 0.001, '立方英尺(ft³)': 28.3168, '立方英寸(in³)': 0.016387,
+      '加仑(US,gal)': 3.78541, '品脱(US,pt)': 0.473176, '液盎司(fl oz)': 0.029574,
+    }
+  },
+  '⚡ 速度': {
+    units: {
+      '米/秒(m/s)': 1, '千米/时(km/h)': 1/3.6, '英里/时(mph)': 0.44704,
+      '节(kn)': 0.514444, '马赫(Ma)': 340, '光速(c)': 3e8,
+    }
+  },
+  '⏱️ 时间': {
+    units: {
+      '年(yr)': 31536000, '月(mo)': 2592000, '周(wk)': 604800,
+      '天(d)': 86400, '小时(h)': 3600, '分钟(min)': 60,
+      '秒(s)': 1, '毫秒(ms)': 0.001, '微秒(μs)': 1e-6, '纳秒(ns)': 1e-9,
+    }
+  },
+  '💾 数据': {
+    units: {
+      'bit': 1, 'Byte': 8, 'KB': 8*1024, 'MB': 8*1024**2,
+      'GB': 8*1024**3, 'TB': 8*1024**4, 'PB': 8*1024**5,
+    }
+  },
+  '⚡ 功率': {
+    units: {
+      '瓦(W)': 1, '千瓦(kW)': 1000, '兆瓦(MW)': 1e6,
+      '马力(hp)': 745.7, '千卡/时(kcal/h)': 1.163,
+    }
+  },
+  '🔋 能量': {
+    units: {
+      '焦耳(J)': 1, '千焦(kJ)': 1000, '卡路里(cal)': 4.184,
+      '千卡(kcal)': 4184, '千瓦时(kWh)': 3.6e6, '电子伏(eV)': 1.602e-19,
+    }
+  },
+};
+
+let currentCat = '📏 长度';
+
+// 渲染分类标签
+document.getElementById('cat-tabs').innerHTML = Object.keys(CATEGORIES).map((cat, i) =>
+  `<div class="cat-tab ${i===0?'active':''}" onclick="switchCat('${cat.replace(/'/g,"\\'")}',this)">${cat}</div>`
+).join('');
+
+function switchCat(cat, el) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+  loadUnits();
+}
+
+function loadUnits() {
+  const catData = CATEGORIES[currentCat];
+  const units = catData.special ? catData.units : Object.keys(catData.units);
+  const fromSel = document.getElementById('from-unit');
+  const toSel = document.getElementById('to-unit');
+  fromSel.innerHTML = units.map((u,i) => `<option value="${u}">${u}</option>`).join('');
+  toSel.innerHTML = units.map((u,i) => `<option value="${u}" ${i===1?'selected':''}>${u}</option>`).join('');
+  doConvert();
+}
+
+function getToBase(unit) {
+  const catData = CATEGORIES[currentCat];
+  if (catData.special) return null;
+  return catData.units[unit] || 1;
+}
+
+function convertTemp(val, from, to) {
+  // 先转为摄氏度
+  let celsius;
+  switch (from) {
+    case '摄氏度(°C)': celsius = val; break;
+    case '华氏度(°F)': celsius = (val-32)*5/9; break;
+    case '开尔文(K)': celsius = val - 273.15; break;
+    case '兰氏度(°R)': celsius = (val - 491.67) * 5/9; break;
+  }
+  switch (to) {
+    case '摄氏度(°C)': return celsius;
+    case '华氏度(°F)': return celsius*9/5+32;
+    case '开尔文(K)': return celsius + 273.15;
+    case '兰氏度(°R)': return (celsius + 273.15) * 9/5;
+  }
+}
+
+function doConvert() {
+  const val = parseFloat(document.getElementById('input-val').value);
+  if (isNaN(val)) { document.getElementById('single-result').textContent = '请输入数值'; return; }
+  
+  const fromUnit = document.getElementById('from-unit').value;
+  const toUnit = document.getElementById('to-unit').value;
+  const catData = CATEGORIES[currentCat];
+  
+  let result, allResults = [];
+  
+  if (catData.special) {
+    // 温度
+    result = convertTemp(val, fromUnit, toUnit);
+    allResults = catData.units.map(u => ({ unit: u, val: convertTemp(val, fromUnit, u) }));
+  } else {
+    const fromBase = catData.units[fromUnit];
+    const toBase = catData.units[toUnit];
+    const baseVal = val * fromBase;
+    result = baseVal / toBase;
+    allResults = Object.entries(catData.units).map(([u, b]) => ({ unit: u, val: baseVal / b }));
+  }
+  
+  document.getElementById('single-result').textContent = `${formatNum(result)} ${toUnit}`;
+  
+  document.getElementById('result-grid').innerHTML = allResults.map(item => `
+    <div class="result-item" onclick="navigator.clipboard.writeText('${formatNum(item.val)}').then(()=>showToast('已复制'))">
+      <div class="unit">${item.unit}</div>
+      <div class="val">${formatNum(item.val)}</div>
+    </div>
+  `).join('');
+}
+
+function formatNum(n) {
+  if (Math.abs(n) >= 1e15 || (Math.abs(n) < 1e-6 && n !== 0)) return n.toExponential(4);
+  if (Number.isInteger(n)) return n.toLocaleString();
+  const s = parseFloat(n.toPrecision(8)).toString();
+  return parseFloat(s).toLocaleString('en-US', {maximumSignificantDigits:8});
+}
+
+function swapUnits() {
+  const from = document.getElementById('from-unit');
+  const to = document.getElementById('to-unit');
+  const tmp = from.value;
+  from.value = to.value;
+  to.value = tmp;
+  doConvert();
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+
+loadUnits();
+</script>
+</body>
+</html>

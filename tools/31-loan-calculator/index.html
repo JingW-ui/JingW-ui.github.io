@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>房贷/利息计算器</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:900px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:20px}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{padding:8px 20px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:#656d76;transition:all .15s}
+.tab.active{border-bottom-color:var(--green);color:var(--green);font-weight:600}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:16px}
+.form-item{display:flex;flex-direction:column;gap:5px}
+label{font-size:12px;color:#656d76;font-weight:500}
+input[type=number]{padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;font-weight:600;outline:none;width:100%;transition:border-color .15s}
+input:focus{border-color:var(--green)}
+select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none;width:100%}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.result-box{background:linear-gradient(135deg,#f0fff4,#f6f8fa);border:1px solid #9be9a8;border-radius:var(--radius);padding:16px;margin-top:16px;display:none}
+.result-main{font-size:36px;font-weight:800;color:#1a7f37;margin-bottom:4px}
+.result-sub{font-size:13px;color:#656d76;margin-bottom:16px}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:16px}
+.result-item{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center}
+.result-item .val{font-size:18px;font-weight:700;color:var(--green)}
+.result-item .lbl{font-size:11px;color:#656d76;margin-top:2px}
+.amort-table{max-height:300px;overflow-y:auto;margin-top:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#f6f8fa;padding:7px 10px;text-align:right;font-weight:600;border-bottom:2px solid var(--border);position:sticky;top:0}
+th:first-child{text-align:left}
+td{padding:6px 10px;border-bottom:1px solid #f5f5f5;text-align:right}
+td:first-child{text-align:left}
+tr:hover td{background:#f8fff9}
+.pie-chart{width:180px;height:180px;border-radius:50%;margin:0 auto;position:relative}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🏠</span>
+  <h1>房贷/利息计算器</h1>
+  <p>等额本息 · 等额本金 · 利息计算 · 还款计划</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+      <div class="tab-bar">
+        <div class="tab active" onclick="switchTab('mortgage')">房贷计算</div>
+        <div class="tab" onclick="switchTab('interest')">利息计算</div>
+        <div class="tab" onclick="switchTab('compound')">复利计算</div>
+      </div>
+
+      <!-- 房贷 -->
+      <div id="panel-mortgage">
+        <div class="form-grid">
+          <div class="form-item"><label>贷款总额 (万元)</label><input type="number" id="loan-amount" value="100" min="1" step="1"></div>
+          <div class="form-item"><label>贷款年限</label>
+            <select id="loan-years">
+              <option value="10">10年</option><option value="15">15年</option>
+              <option value="20">20年</option><option value="25">25年</option>
+              <option value="30" selected>30年</option>
+            </select>
+          </div>
+          <div class="form-item"><label>年利率 (%)</label><input type="number" id="loan-rate" value="3.95" min="0.01" step="0.01"></div>
+          <div class="form-item"><label>还款方式</label>
+            <select id="repay-type">
+              <option value="equal">等额本息</option>
+              <option value="principal">等额本金</option>
+            </select>
+          </div>
+          <div class="form-item"><label>首付比例 (%)</label><input type="number" id="down-pct" value="30" min="0" max="100"></div>
+          <div class="form-item"><label>房屋总价 (万元)</label><input type="number" id="house-price" value="143" min="1" step="1"></div>
+        </div>
+        <button class="btn btn-primary" onclick="calcMortgage()">🏠 计算房贷</button>
+        <div class="result-box" id="mortgage-result">
+          <div class="result-main" id="m-monthly">0 元/月</div>
+          <div class="result-sub" id="m-sub"></div>
+          <div class="result-grid" id="m-grid"></div>
+          <div style="font-size:12px;font-weight:600;color:#656d76;margin-bottom:8px">📊 还款计划（前12个月）</div>
+          <div class="amort-table" id="amort-table"></div>
+        </div>
+      </div>
+
+      <!-- 利息计算 -->
+      <div id="panel-interest" style="display:none">
+        <div class="form-grid">
+          <div class="form-item"><label>本金 (元)</label><input type="number" id="principal" value="100000" min="1"></div>
+          <div class="form-item"><label>年利率 (%)</label><input type="number" id="int-rate" value="3.0" min="0.01" step="0.01"></div>
+          <div class="form-item"><label>存款年限</label><input type="number" id="int-years" value="3" min="1" max="50"></div>
+          <div class="form-item"><label>计息方式</label>
+            <select id="int-type">
+              <option value="simple">单利</option>
+              <option value="compound">复利（年复利）</option>
+              <option value="monthly">复利（月复利）</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="calcInterest()">💰 计算利息</button>
+        <div class="result-box" id="interest-result">
+          <div class="result-main" id="int-val">0 元</div>
+          <div class="result-sub">到期利息</div>
+          <div class="result-grid" id="int-grid"></div>
+        </div>
+      </div>
+
+      <!-- 复利 -->
+      <div id="panel-compound" style="display:none">
+        <div class="form-grid">
+          <div class="form-item"><label>初始本金 (元)</label><input type="number" id="cp-principal" value="10000" min="1"></div>
+          <div class="form-item"><label>每月追加 (元，0=不追加）</label><input type="number" id="cp-monthly" value="1000" min="0"></div>
+          <div class="form-item"><label>年化收益率 (%)</label><input type="number" id="cp-rate" value="8" min="0.01" step="0.1"></div>
+          <div class="form-item"><label>投资年限</label><input type="number" id="cp-years" value="20" min="1" max="50"></div>
+        </div>
+        <button class="btn btn-primary" onclick="calcCompound()">📈 计算复利</button>
+        <div class="result-box" id="compound-result">
+          <div class="result-main" id="cp-val">0 元</div>
+          <div class="result-sub">期末总资产</div>
+          <div class="result-grid" id="cp-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(tab) {
+  ['mortgage','interest','compound'].forEach(t => {
+    document.getElementById('panel-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['mortgage','interest','compound'][i]===tab);
+  });
+}
+
+function fmtMoney(n) {
+  return n.toLocaleString('zh-CN', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function calcMortgage() {
+  const totalPrice = parseFloat(document.getElementById('house-price').value) * 10000;
+  const downPct = parseFloat(document.getElementById('down-pct').value) / 100;
+  const loanAmount = parseFloat(document.getElementById('loan-amount').value) * 10000;
+  const years = parseInt(document.getElementById('loan-years').value);
+  const annualRate = parseFloat(document.getElementById('loan-rate').value) / 100;
+  const monthlyRate = annualRate / 12;
+  const n = years * 12;
+  const type = document.getElementById('repay-type').value;
+
+  let monthlyPayment, totalPayment, totalInterest;
+
+  if (type === 'equal') {
+    // 等额本息
+    monthlyPayment = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, n) / (Math.pow(1 + monthlyRate, n) - 1);
+    totalPayment = monthlyPayment * n;
+    totalInterest = totalPayment - loanAmount;
+  } else {
+    // 等额本金 - 第一个月
+    const monthlyPrincipal = loanAmount / n;
+    monthlyPayment = monthlyPrincipal + loanAmount * monthlyRate;
+    totalInterest = monthlyRate * loanAmount / n * (n + 1) / 2;
+    totalPayment = loanAmount + totalInterest;
+  }
+
+  document.getElementById('m-monthly').textContent = `${fmtMoney(monthlyPayment)} 元/月`;
+  document.getElementById('m-sub').textContent = type === 'principal' ? '（等额本金首月，逐月递减）' : '（每月固定）';
+  document.getElementById('mortgage-result').style.display = 'block';
+
+  const downPayment = totalPrice * downPct;
+  document.getElementById('m-grid').innerHTML = `
+    <div class="result-item"><div class="val">${fmtMoney(monthlyPayment)}</div><div class="lbl">月供(元)</div></div>
+    <div class="result-item"><div class="val">${fmtMoney(loanAmount/10000)}万</div><div class="lbl">贷款总额</div></div>
+    <div class="result-item"><div class="val">${fmtMoney(totalInterest/10000)}万</div><div class="lbl">利息总额</div></div>
+    <div class="result-item"><div class="val">${fmtMoney(totalPayment/10000)}万</div><div class="lbl">还款总额</div></div>
+    <div class="result-item"><div class="val">${fmtMoney(downPayment/10000)}万</div><div class="lbl">首付金额</div></div>
+    <div class="result-item"><div class="val">${(totalInterest/loanAmount*100).toFixed(1)}%</div><div class="lbl">利息占比</div></div>
+  `;
+
+  // 还款明细表（前12个月）
+  let tableHtml = '<table><thead><tr><th>期数</th><th>月供</th><th>本金</th><th>利息</th><th>剩余本金</th></tr></thead><tbody>';
+  let remaining = loanAmount;
+  const showMonths = Math.min(n, 12);
+  for (let i = 1; i <= showMonths; i++) {
+    let interest = remaining * monthlyRate;
+    let principal;
+    if (type === 'equal') {
+      principal = monthlyPayment - interest;
+    } else {
+      principal = loanAmount / n;
+    }
+    remaining -= principal;
+    tableHtml += `<tr><td>${i}月</td><td>${fmtMoney(principal+interest)}</td><td>${fmtMoney(principal)}</td><td>${fmtMoney(interest)}</td><td>${fmtMoney(Math.max(0,remaining))}</td></tr>`;
+  }
+  if (n > 12) tableHtml += `<tr><td colspan="5" style="text-align:center;color:#656d76;padding:8px">... 共 ${n} 期 ...</td></tr>`;
+  tableHtml += '</tbody></table>';
+  document.getElementById('amort-table').innerHTML = tableHtml;
+}
+
+function calcInterest() {
+  const p = parseFloat(document.getElementById('principal').value);
+  const r = parseFloat(document.getElementById('int-rate').value) / 100;
+  const t = parseInt(document.getElementById('int-years').value);
+  const type = document.getElementById('int-type').value;
+
+  let total, interest;
+  if (type === 'simple') {
+    interest = p * r * t;
+    total = p + interest;
+  } else if (type === 'compound') {
+    total = p * Math.pow(1 + r, t);
+    interest = total - p;
+  } else { // monthly
+    total = p * Math.pow(1 + r/12, t*12);
+    interest = total - p;
+  }
+
+  document.getElementById('int-val').textContent = `${fmtMoney(interest)} 元`;
+  document.getElementById('interest-result').style.display = 'block';
+  document.getElementById('int-grid').innerHTML = `
+    <div class="result-item"><div class="val">${fmtMoney(p)}</div><div class="lbl">本金(元)</div></div>
+    <div class="result-item"><div class="val">${fmtMoney(interest)}</div><div class="lbl">利息(元)</div></div>
+    <div class="result-item"><div class="val">${fmtMoney(total)}</div><div class="lbl">本息合计(元)</div></div>
+    <div class="result-item"><div class="val">${(interest/p*100).toFixed(2)}%</div><div class="lbl">实际收益率</div></div>
+  `;
+}
+
+function calcCompound() {
+  const p = parseFloat(document.getElementById('cp-principal').value);
+  const monthly = parseFloat(document.getElementById('cp-monthly').value) || 0;
+  const r = parseFloat(document.getElementById('cp-rate').value) / 100;
+  const years = parseInt(document.getElementById('cp-years').value);
+  const n = years * 12;
+  const mr = r / 12;
+
+  let total = p * Math.pow(1+mr, n);
+  if (monthly > 0) {
+    total += monthly * (Math.pow(1+mr, n) - 1) / mr;
+  }
+  const totalInput = p + monthly * n;
+  const profit = total - totalInput;
+
+  document.getElementById('cp-val').textContent = `${fmtMoney(total)} 元`;
+  document.getElementById('compound-result').style.display = 'block';
+  document.getElementById('cp-grid').innerHTML = `
+    <div class="result-item"><div class="val">${fmtMoney(totalInput)}</div><div class="lbl">累计投入(元)</div></div>
+    <div class="result-item"><div class="val">${fmtMoney(profit)}</div><div class="lbl">累计收益(元)</div></div>
+    <div class="result-item"><div class="val">${fmtMoney(total)}</div><div class="lbl">期末资产(元)</div></div>
+    <div class="result-item"><div class="val">${(profit/totalInput*100).toFixed(1)}%</div><div class="lbl">总收益率</div></div>
+    <div class="result-item"><div class="val">${years}年</div><div class="lbl">投资年限</div></div>
+    <div class="result-item"><div class="val">${((Math.pow(total/totalInput,1/years)-1)*100).toFixed(2)}%</div><div class="lbl">年化收益率</div></div>
+  `;
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+</script>
+</body>
+</html>

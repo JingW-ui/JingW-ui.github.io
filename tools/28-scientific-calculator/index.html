@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>科学计算器</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px; }
+  header { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); width:100%; max-width:480px; margin-bottom:16px; }
+  .hi { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold; }
+  header h1 { font-size:18px; font-weight:600; }
+  .calc { background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow); width:100%; max-width:480px; overflow:hidden; }
+  .display { background:#1f2328; padding:16px 20px; }
+  .expr { font-size:13px; color:#9198a1; font-family:monospace; min-height:20px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .screen { font-size:40px; font-weight:300; color:#fff; text-align:right; font-family:'Courier New',monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; line-height:1.2; }
+  .history { max-height:100px; overflow-y:auto; padding:8px 12px; background:var(--bg2); border-bottom:1px solid var(--border); }
+  .history-item { font-size:11px; font-family:monospace; color:var(--text2); text-align:right; padding:2px 0; cursor:pointer; }
+  .history-item:hover { color:var(--text); }
+  .btn-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--border); }
+  .c-btn { padding:16px 8px; border:none; background:var(--bg); color:var(--text); font-size:16px; cursor:pointer; transition:all .1s; font-family:inherit; }
+  .c-btn:hover { background:var(--bg3); }
+  .c-btn:active { transform:scale(.95); }
+  .c-btn.op { background:var(--bg2); color:#0969da; font-weight:600; }
+  .c-btn.fn { background:var(--bg2); color:#7c3aed; font-size:13px; }
+  .c-btn.eq { background:var(--green); color:white; font-size:20px; font-weight:bold; }
+  .c-btn.eq:hover { background:var(--green2); }
+  .c-btn.clr { color:var(--red, #cf222e); font-weight:600; }
+  .c-btn.num { font-weight:500; font-size:18px; }
+  .c-btn.zero { grid-column:span 2; }
+  .mode-row { display:flex; background:var(--bg2); border-bottom:1px solid var(--border); }
+  .mode-btn { flex:1; padding:8px; font-size:12px; border:none; background:none; cursor:pointer; color:var(--text2); font-family:inherit; border-bottom:2px solid transparent; transition:all .15s; }
+  .mode-btn.active { color:var(--text); border-bottom-color:var(--green); background:var(--bg); }
+</style>
+</head>
+<body>
+<header>
+  <div class="hi">∑</div>
+  <div><h1>科学计算器</h1></div>
+</header>
+
+<div class="calc">
+  <div class="display">
+    <div class="expr" id="expr"></div>
+    <div class="screen" id="screen">0</div>
+  </div>
+  <div class="history" id="history" title="点击历史记录可重新输入"></div>
+  <div class="mode-row">
+    <button class="mode-btn active" id="mode-basic" onclick="setMode('basic')">基础</button>
+    <button class="mode-btn" id="mode-sci" onclick="setMode('sci')">科学</button>
+    <button class="mode-btn" id="mode-prog" onclick="setMode('prog')">程序员</button>
+  </div>
+  <div id="btn-area"></div>
+</div>
+
+<script>
+let display = '0';
+let expr = '';
+let memory = 0;
+let history = [];
+let currentMode = 'basic';
+let waitingOp = false;
+
+const layouts = {
+  basic: [
+    ['MC','MR','M+','M-','MS'],
+    ['C','±','%','⌫','÷'],
+    ['7','8','9','×','√'],
+    ['4','5','6','-','x²'],
+    ['1','2','3','+','='],
+    ['0','0','.','','='],
+  ],
+  sci: [
+    ['MC','MR','M+','M-','MS'],
+    ['sin','cos','tan','log','ln'],
+    ['asin','acos','atan','10ˣ','eˣ'],
+    ['x²','x³','xʸ','√','∛'],
+    ['(',')','^','π','e'],
+    ['C','±','%','⌫','÷'],
+    ['7','8','9','×','='],
+    ['4','5','6','-','='],
+    ['1','2','3','+','='],
+    ['0','0','.','','='],
+  ],
+  prog: [
+    ['BIN','OCT','DEC','HEX',''],
+    ['C','⌫','','','÷'],
+    ['7','8','9','×','AND'],
+    ['4','5','6','-','OR'],
+    ['1','2','3','+','XOR'],
+    ['0','0','.','NOT','='],
+  ],
+};
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('mode-' + mode).classList.add('active');
+  renderButtons();
+}
+
+function renderButtons() {
+  const area = document.getElementById('btn-area');
+  area.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'btn-grid';
+  const buttons = getButtons();
+  buttons.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'c-btn';
+    btn.textContent = b.label;
+    if (b.label === '=') btn.classList.add('eq');
+    else if (['÷','×','-','+','^','AND','OR','XOR'].includes(b.label)) btn.classList.add('op');
+    else if (['sin','cos','tan','log','ln','asin','acos','atan','√','∛','x²','x³','xʸ','10ˣ','eˣ'].includes(b.label)) btn.classList.add('fn');
+    else if (['C','⌫','MC','MR','M+','M-','MS'].includes(b.label)) btn.classList.add('clr');
+    else if (/^[0-9]$/.test(b.label)) btn.classList.add('num');
+    if (b.wide) btn.classList.add('zero');
+    if (b.label) btn.onclick = () => handleBtn(b.label);
+    else btn.style.background = 'var(--bg3)';
+    grid.appendChild(btn);
+  });
+  area.appendChild(grid);
+}
+
+function getButtons() {
+  return [
+    {label:'MC'},{label:'MR'},{label:'M+'},{label:'M-'},{label:'MS'},
+    ...(currentMode === 'sci' ? [
+      {label:'sin'},{label:'cos'},{label:'tan'},{label:'log'},{label:'ln'},
+      {label:'asin'},{label:'acos'},{label:'atan'},{label:'10ˣ'},{label:'eˣ'},
+      {label:'x²'},{label:'x³'},{label:'xʸ'},{label:'√'},{label:'∛'},
+      {label:'('},{label:')'},{label:'^'},{label:'π'},{label:'e'},
+    ] : currentMode === 'prog' ? [
+      {label:'BIN'},{label:'OCT'},{label:'DEC'},{label:'HEX'},{label:''},
+      {label:''},{label:''},{label:''},{label:''},{label:'NOT'},
+    ] : []),
+    {label:'C'},{label:'±'},{label:'%'},{label:'⌫'},{label:'÷'},
+    {label:'7'},{label:'8'},{label:'9'},{label:'×'},
+    ...(currentMode === 'sci' ? [{label:''}] : [{label:'√'}]),
+    {label:'4'},{label:'5'},{label:'6'},{label:'-'},
+    ...(currentMode === 'sci' ? [{label:''}] : [{label:'x²'}]),
+    {label:'1'},{label:'2'},{label:'3'},{label:'+'},{label:'='},
+    {label:'0',wide:true},{label:'.'},
+    ...(currentMode === 'sci' ? [] : [{label:''}]),
+    {label:'='},
+  ];
+}
+
+function updateDisplay() {
+  document.getElementById('screen').textContent = display;
+  document.getElementById('expr').textContent = expr;
+}
+
+function handleBtn(label) {
+  switch(label) {
+    case 'C': display = '0'; expr = ''; waitingOp = false; break;
+    case '⌫': display = display.length > 1 ? display.slice(0,-1) : '0'; break;
+    case '=': calculate(); break;
+    case '±': display = display.startsWith('-') ? display.slice(1) : '-' + display; break;
+    case '%': display = String(parseFloat(display) / 100); break;
+    case '.': if (!display.includes('.')) display += '.'; break;
+    case '÷': appendOp('/'); break;
+    case '×': appendOp('*'); break;
+    case '-': appendOp('-'); break;
+    case '+': appendOp('+'); break;
+    case '^': appendOp('**'); break;
+    case 'xʸ': appendOp('**'); break;
+    case '√': display = String(Math.sqrt(parseFloat(display))); break;
+    case '∛': display = String(Math.cbrt(parseFloat(display))); break;
+    case 'x²': display = String(Math.pow(parseFloat(display),2)); break;
+    case 'x³': display = String(Math.pow(parseFloat(display),3)); break;
+    case 'sin': display = String(round(Math.sin(toRad(parseFloat(display))))); break;
+    case 'cos': display = String(round(Math.cos(toRad(parseFloat(display))))); break;
+    case 'tan': display = String(round(Math.tan(toRad(parseFloat(display))))); break;
+    case 'asin': display = String(round(toDeg(Math.asin(parseFloat(display))))); break;
+    case 'acos': display = String(round(toDeg(Math.acos(parseFloat(display))))); break;
+    case 'atan': display = String(round(toDeg(Math.atan(parseFloat(display))))); break;
+    case 'log': display = String(round(Math.log10(parseFloat(display)))); break;
+    case 'ln': display = String(round(Math.log(parseFloat(display)))); break;
+    case '10ˣ': display = String(Math.pow(10, parseFloat(display))); break;
+    case 'eˣ': display = String(Math.exp(parseFloat(display))); break;
+    case 'π': display = String(Math.PI); break;
+    case 'e': display = String(Math.E); break;
+    case '(': expr += display !== '0' ? display + '(' : '('; display = '0'; return;
+    case ')': expr += display + ')'; display = '0'; break;
+    case 'MC': memory = 0; break;
+    case 'MR': display = String(memory); break;
+    case 'M+': memory += parseFloat(display); break;
+    case 'M-': memory -= parseFloat(display); break;
+    case 'MS': memory = parseFloat(display); break;
+    case 'BIN': display = parseInt(display).toString(2); break;
+    case 'OCT': display = parseInt(display).toString(8); break;
+    case 'DEC': display = String(parseInt(display)); break;
+    case 'HEX': display = parseInt(display).toString(16).toUpperCase(); break;
+    case 'NOT': display = String(~parseInt(display)); break;
+    case 'AND': appendOp('&'); break;
+    case 'OR': appendOp('|'); break;
+    case 'XOR': appendOp('^'); break;
+    default:
+      if (/^[0-9]$/.test(label)) {
+        if (display === '0' || waitingOp) { display = label; waitingOp = false; }
+        else display += label;
+      }
+  }
+  updateDisplay();
+}
+
+function appendOp(op) {
+  expr = (expr || display) + ' ' + op + ' ';
+  display = '0';
+  waitingOp = true;
+}
+
+function calculate() {
+  const fullExpr = (expr || '') + display;
+  try {
+    const result = Function('"use strict"; return (' + fullExpr + ')')();
+    const resStr = String(round(result));
+    history.unshift(fullExpr + ' = ' + resStr);
+    if (history.length > 20) history.pop();
+    renderHistory();
+    display = resStr;
+    expr = fullExpr + ' =';
+    waitingOp = true;
+  } catch(e) { display = 'Error'; expr = ''; }
+  updateDisplay();
+}
+
+function toRad(deg) { return deg * Math.PI / 180; }
+function toDeg(rad) { return rad * 180 / Math.PI; }
+function round(n) { return Math.round(n * 1e10) / 1e10; }
+
+function renderHistory() {
+  const el = document.getElementById('history');
+  el.innerHTML = history.slice(0,10).map(h =>
+    `<div class="history-item" onclick="useHistory('${h.split(' = ')[1]}')">${h}</div>`
+  ).join('');
+}
+
+function useHistory(val) { display = val; updateDisplay(); }
+
+// 键盘支持
+document.addEventListener('keydown', e => {
+  const map = {Enter:'=',Backspace:'⌫',Escape:'C','+':`+`,'-':'-','*':'×','/':'÷','%':'%','.':'.'};
+  if (map[e.key]) { handleBtn(map[e.key]); e.preventDefault(); }
+  else if (/^[0-9]$/.test(e.key)) handleBtn(e.key);
+});
+
+renderButtons();
+updateDisplay();
+</script>
+</body>
+</html>

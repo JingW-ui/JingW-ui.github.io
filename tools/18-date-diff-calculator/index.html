@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>日期差计算工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:900px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.card-body{padding:20px}
+.date-row{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:12px;color:#656d76;font-weight:500}
+input[type=date],input[type=datetime-local]{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;background:#fff;outline:none;transition:border-color .15s}
+input:focus{border-color:var(--green)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.result-box{background:linear-gradient(135deg,#f0fff4,#f6f8fa);border:1px solid #9be9a8;border-radius:var(--radius);padding:24px;margin-top:20px}
+.result-main{font-size:48px;font-weight:800;color:#1a7f37;text-align:center;margin-bottom:8px}
+.result-unit{font-size:16px;color:#656d76;text-align:center;margin-bottom:20px}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.result-item{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center}
+.result-item .val{font-size:20px;font-weight:700;color:var(--green)}
+.result-item .lbl{font-size:11px;color:#656d76;margin-top:3px}
+.timeline{position:relative;padding:16px 0;margin-top:16px}
+.timeline::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--border);transform:translateX(-50%)}
+.tl-item{display:flex;justify-content:flex-end;padding-right:calc(50% + 16px);margin-bottom:12px;position:relative}
+.tl-item.right{justify-content:flex-start;padding-right:0;padding-left:calc(50% + 16px)}
+.tl-dot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid #fff;box-shadow:var(--shadow);z-index:1}
+.tl-content{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;font-size:13px;max-width:200px;box-shadow:var(--shadow)}
+.tl-content .date{font-weight:600;color:var(--green);font-size:12px}
+.age-section{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;color:#656d76}
+.progress-bar{height:8px;background:#d1f0d8;border-radius:4px;margin-top:4px;overflow:hidden}
+.progress-fill{height:100%;background:var(--green);border-radius:4px;transition:width .5s}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{padding:8px 20px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:#656d76;transition:all .15s}
+.tab.active{border-bottom-color:var(--green);color:var(--green);font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">📅</span>
+  <h1>日期差计算工具</h1>
+  <p>天数差 · 精确时间差 · 年龄计算 · 工作日</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-body">
+      <div class="tab-bar">
+        <div class="tab active" onclick="switchTab('diff')">日期差计算</div>
+        <div class="tab" onclick="switchTab('age')">年龄计算</div>
+        <div class="tab" onclick="switchTab('add')">日期加减</div>
+        <div class="tab" onclick="switchTab('workdays')">工作日计算</div>
+      </div>
+
+      <!-- 日期差 -->
+      <div id="panel-diff">
+        <div class="date-row">
+          <div class="field">
+            <label>开始日期</label>
+            <input type="date" id="date1">
+          </div>
+          <div style="font-size:24px;color:#656d76;padding-bottom:8px">→</div>
+          <div class="field">
+            <label>结束日期</label>
+            <input type="date" id="date2">
+          </div>
+          <button class="btn btn-primary" onclick="calcDiff()">计算</button>
+          <button class="btn btn-secondary" onclick="swapDates()">⇄ 互换</button>
+          <button class="btn btn-secondary" onclick="setTodayDiff()">📅 今天到年末</button>
+        </div>
+        <div id="diff-result" style="display:none">
+          <div class="result-box">
+            <div class="result-main" id="diff-days">0</div>
+            <div class="result-unit" id="diff-sign">天</div>
+            <div class="result-grid" id="diff-grid"></div>
+          </div>
+          <div class="timeline" id="diff-timeline"></div>
+        </div>
+      </div>
+
+      <!-- 年龄计算 -->
+      <div id="panel-age" style="display:none">
+        <div class="date-row">
+          <div class="field">
+            <label>出生日期</label>
+            <input type="date" id="birth-date">
+          </div>
+          <div class="field">
+            <label>参考日期（默认今天）</label>
+            <input type="date" id="ref-date">
+          </div>
+          <button class="btn btn-primary" onclick="calcAge()">计算年龄</button>
+        </div>
+        <div id="age-result" style="display:none">
+          <div class="result-box">
+            <div class="result-main" id="age-years">0</div>
+            <div class="result-unit">周岁</div>
+            <div class="result-grid" id="age-grid"></div>
+            <div class="age-section" id="age-extra"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 日期加减 -->
+      <div id="panel-add" style="display:none">
+        <div class="date-row" style="flex-wrap:wrap;gap:12px">
+          <div class="field">
+            <label>基准日期</label>
+            <input type="date" id="base-date">
+          </div>
+          <div class="field">
+            <label>操作</label>
+            <select id="add-op" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;outline:none">
+              <option value="+">加</option>
+              <option value="-">减</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>数量</label>
+            <input type="number" id="add-num" value="30" min="0" style="width:80px;padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;outline:none">
+          </div>
+          <div class="field">
+            <label>单位</label>
+            <select id="add-unit" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;outline:none">
+              <option value="days">天</option>
+              <option value="weeks">周</option>
+              <option value="months">月</option>
+              <option value="years">年</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="calcAdd()">计算</button>
+        </div>
+        <div id="add-result" class="result-box" style="display:none;margin-top:20px"></div>
+      </div>
+
+      <!-- 工作日 -->
+      <div id="panel-workdays" style="display:none">
+        <div class="date-row">
+          <div class="field">
+            <label>开始日期</label>
+            <input type="date" id="wdate1">
+          </div>
+          <div class="field">
+            <label>结束日期</label>
+            <input type="date" id="wdate2">
+          </div>
+          <button class="btn btn-primary" onclick="calcWorkdays()">计算工作日</button>
+        </div>
+        <div id="workday-result" class="result-box" style="display:none;margin-top:20px"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const now = new Date();
+const today = now.toISOString().split('T')[0];
+
+// 初始化日期
+document.getElementById('date1').value = today;
+const yearEnd = `${now.getFullYear()}-12-31`;
+document.getElementById('date2').value = yearEnd;
+document.getElementById('birth-date').value = '';
+document.getElementById('ref-date').value = today;
+document.getElementById('base-date').value = today;
+document.getElementById('wdate1').value = today;
+document.getElementById('wdate2').value = new Date(now.getTime() + 30*86400000).toISOString().split('T')[0];
+
+function switchTab(tab) {
+  ['diff','age','add','workdays'].forEach(t => {
+    document.getElementById('panel-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['diff','age','add','workdays'][i]===tab);
+  });
+}
+
+function parseDateLocal(str) {
+  const [y,m,d] = str.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+
+function setTodayDiff() {
+  document.getElementById('date1').value = today;
+  document.getElementById('date2').value = `${now.getFullYear()}-12-31`;
+  calcDiff();
+}
+
+function swapDates() {
+  const a = document.getElementById('date1').value;
+  document.getElementById('date1').value = document.getElementById('date2').value;
+  document.getElementById('date2').value = a;
+}
+
+function calcDiff() {
+  const d1 = document.getElementById('date1').value;
+  const d2 = document.getElementById('date2').value;
+  if (!d1 || !d2) { showToast('请选择两个日期'); return; }
+
+  const dt1 = parseDateLocal(d1);
+  const dt2 = parseDateLocal(d2);
+  const msPerDay = 86400000;
+  const diff = dt2 - dt1;
+  const absDiff = Math.abs(diff);
+  const days = Math.round(absDiff / msPerDay);
+  const sign = diff < 0 ? '（倒计时）前' : diff > 0 ? '之后' : '同一天';
+
+  const weeks = Math.floor(days / 7);
+  const remainDays = days % 7;
+  const months = (dt2.getFullYear() - dt1.getFullYear()) * 12 + (dt2.getMonth() - dt1.getMonth());
+  const years = Math.floor(Math.abs(months) / 12);
+
+  document.getElementById('diff-result').style.display = 'block';
+  document.getElementById('diff-days').textContent = days;
+  document.getElementById('diff-sign').textContent = `天 ${sign}`;
+  document.getElementById('diff-grid').innerHTML = `
+    <div class="result-item"><div class="val">${days}</div><div class="lbl">总天数</div></div>
+    <div class="result-item"><div class="val">${weeks}</div><div class="lbl">完整周数</div></div>
+    <div class="result-item"><div class="val">${remainDays}</div><div class="lbl">剩余天数</div></div>
+    <div class="result-item"><div class="val">${Math.abs(months)}</div><div class="lbl">总月数（约）</div></div>
+    <div class="result-item"><div class="val">${years}</div><div class="lbl">年数（约）</div></div>
+    <div class="result-item"><div class="val">${(days * 24).toLocaleString()}</div><div class="lbl">总小时</div></div>
+    <div class="result-item"><div class="val">${(days * 24 * 60).toLocaleString()}</div><div class="lbl">总分钟</div></div>
+    <div class="result-item"><div class="val">${(days * 86400).toLocaleString()}</div><div class="lbl">总秒数</div></div>
+  `;
+
+  // 时间线
+  const [y1,m1,d1s] = d1.split('-');
+  const [y2,m2,d2s] = d2.split('-');
+  document.getElementById('diff-timeline').innerHTML = `
+    <div class="tl-item">
+      <div class="tl-content"><div class="date">开始日期</div><div>${y1}年${parseInt(m1)}月${parseInt(d1s)}日</div></div>
+      <div class="tl-dot"></div>
+    </div>
+    <div class="tl-item right">
+      <div class="tl-dot"></div>
+      <div class="tl-content"><div class="date">结束日期</div><div>${y2}年${parseInt(m2)}月${parseInt(d2s)}日</div></div>
+    </div>
+  `;
+}
+
+function calcAge() {
+  const birth = document.getElementById('birth-date').value;
+  const ref = document.getElementById('ref-date').value || today;
+  if (!birth) { showToast('请选择出生日期'); return; }
+
+  const dt1 = parseDateLocal(birth);
+  const dt2 = parseDateLocal(ref);
+
+  if (dt1 > dt2) { showToast('出生日期不能晚于参考日期'); return; }
+
+  let ageY = dt2.getFullYear() - dt1.getFullYear();
+  let ageM = dt2.getMonth() - dt1.getMonth();
+  let ageD = dt2.getDate() - dt1.getDate();
+  if (ageD < 0) { ageM--; ageD += new Date(dt2.getFullYear(), dt2.getMonth(), 0).getDate(); }
+  if (ageM < 0) { ageY--; ageM += 12; }
+
+  const totalDays = Math.round((dt2 - dt1) / 86400000);
+  const totalWeeks = Math.floor(totalDays / 7);
+
+  // 下次生日
+  let nextBirthday = new Date(dt2.getFullYear(), dt1.getMonth(), dt1.getDate());
+  if (nextBirthday <= dt2) nextBirthday.setFullYear(dt2.getFullYear() + 1);
+  const daysToNext = Math.round((nextBirthday - dt2) / 86400000);
+
+  // 年龄进度（在当岁的进度）
+  const lastBirthday = new Date(dt2.getFullYear(), dt1.getMonth(), dt1.getDate());
+  if (lastBirthday > dt2) lastBirthday.setFullYear(dt2.getFullYear()-1);
+  const yearDays = Math.round((nextBirthday - lastBirthday) / 86400000);
+  const passedDays = Math.round((dt2 - lastBirthday) / 86400000);
+  const progress = Math.round(passedDays / yearDays * 100);
+
+  document.getElementById('age-result').style.display = 'block';
+  document.getElementById('age-years').textContent = ageY;
+  document.getElementById('age-grid').innerHTML = `
+    <div class="result-item"><div class="val">${ageY}</div><div class="lbl">周岁</div></div>
+    <div class="result-item"><div class="val">${ageM}</div><div class="lbl">剩余月数</div></div>
+    <div class="result-item"><div class="val">${ageD}</div><div class="lbl">剩余天数</div></div>
+    <div class="result-item"><div class="val">${totalDays.toLocaleString()}</div><div class="lbl">已活天数</div></div>
+    <div class="result-item"><div class="val">${totalWeeks.toLocaleString()}</div><div class="lbl">已活周数</div></div>
+    <div class="result-item"><div class="val">${daysToNext}</div><div class="lbl">距下次生日</div></div>
+  `;
+  document.getElementById('age-extra').innerHTML = `
+    <div>当前岁龄进度：${progress}%</div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${progress}%"></div></div>
+    <div style="margin-top:6px">📅 下次生日：${nextBirthday.getFullYear()}年${nextBirthday.getMonth()+1}月${nextBirthday.getDate()}日（还有 ${daysToNext} 天）</div>
+  `;
+}
+
+function calcAdd() {
+  const base = document.getElementById('base-date').value;
+  const op = document.getElementById('add-op').value;
+  const num = parseInt(document.getElementById('add-num').value) || 0;
+  const unit = document.getElementById('add-unit').value;
+  if (!base) { showToast('请选择基准日期'); return; }
+
+  const dt = parseDateLocal(base);
+  const delta = op === '+' ? num : -num;
+
+  let result;
+  switch (unit) {
+    case 'days': result = new Date(dt.getTime() + delta * 86400000); break;
+    case 'weeks': result = new Date(dt.getTime() + delta * 7 * 86400000); break;
+    case 'months': result = new Date(dt.getFullYear(), dt.getMonth() + delta, dt.getDate()); break;
+    case 'years': result = new Date(dt.getFullYear() + delta, dt.getMonth(), dt.getDate()); break;
+  }
+
+  const WEEKS = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+  const resEl = document.getElementById('add-result');
+  resEl.style.display = 'block';
+  resEl.innerHTML = `
+    <div class="result-main" style="font-size:32px">${result.getFullYear()}年${result.getMonth()+1}月${result.getDate()}日</div>
+    <div style="text-align:center;color:#656d76;margin-bottom:12px">${WEEKS[result.getDay()]}</div>
+    <div class="result-grid">
+      <div class="result-item"><div class="val">${result.getFullYear()}</div><div class="lbl">年</div></div>
+      <div class="result-item"><div class="val">${result.getMonth()+1}</div><div class="lbl">月</div></div>
+      <div class="result-item"><div class="val">${result.getDate()}</div><div class="lbl">日</div></div>
+      <div class="result-item"><div class="val">${WEEKS[result.getDay()]}</div><div class="lbl">星期</div></div>
+    </div>
+  `;
+}
+
+function calcWorkdays() {
+  const d1 = document.getElementById('wdate1').value;
+  const d2 = document.getElementById('wdate2').value;
+  if (!d1 || !d2) { showToast('请选择日期范围'); return; }
+
+  const dt1 = parseDateLocal(d1);
+  const dt2 = parseDateLocal(d2);
+  if (dt1 > dt2) { showToast('开始日期不能晚于结束日期'); return; }
+
+  let workdays = 0, weekends = 0, total = 0;
+  let cur = new Date(dt1);
+  while (cur <= dt2) {
+    const day = cur.getDay();
+    total++;
+    if (day === 0 || day === 6) weekends++;
+    else workdays++;
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  const resEl = document.getElementById('workday-result');
+  resEl.style.display = 'block';
+  resEl.innerHTML = `
+    <div class="result-main" style="font-size:36px">${workdays}</div>
+    <div style="text-align:center;color:#656d76;margin-bottom:12px">个工作日</div>
+    <div class="result-grid">
+      <div class="result-item"><div class="val">${total}</div><div class="lbl">总天数</div></div>
+      <div class="result-item"><div class="val">${workdays}</div><div class="lbl">工作日</div></div>
+      <div class="result-item"><div class="val">${weekends}</div><div class="lbl">周末天数</div></div>
+      <div class="result-item"><div class="val">${Math.round(total/7)}</div><div class="lbl">完整周数</div></div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:#656d76">* 仅统计周一至周五，未考虑法定节假日调休</div>
+  `;
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+
+// 自动计算今天到年末
+calcDiff();
+</script>
+</body>
+</html>

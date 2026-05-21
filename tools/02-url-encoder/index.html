@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>URL 编解码工具</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #ffffff; --bg-secondary: #f6f8fa; --bg-tertiary: #f0f2f5;
+    --border: #d0d7de; --border-light: #e8eaed;
+    --text: #1f2328; --text-secondary: #656d76; --text-muted: #9198a1;
+    --green: #2da44e; --green-hover: #2c974b;
+    --red: #cf222e; --red-bg: #fff0ee;
+    --blue: #0969da; --radius: 6px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif; background: var(--bg-secondary); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+  header { background: var(--bg); border-bottom: 1px solid var(--border); padding: 12px 24px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow); }
+  .header-icon { width: 32px; height: 32px; background: var(--green); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: bold; }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header p { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
+  .main { flex: 1; padding: 20px 24px; max-width: 1100px; margin: 0 auto; width: 100%; }
+  .section { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; box-shadow: var(--shadow); }
+  .section-header { padding: 12px 20px; background: var(--bg-secondary); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .section-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .section-subtitle { font-size: 12px; color: var(--text-secondary); }
+  .section-body { padding: 16px 20px; }
+  .io-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; }
+  @media(max-width:700px) { .io-row { grid-template-columns: 1fr; } .io-arrows { display: flex; flex-direction: row; gap: 8px; } }
+  textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius); font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; line-height: 1.6; resize: vertical; min-height: 90px; background: var(--bg); color: var(--text); transition: border-color 0.15s; }
+  textarea:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(45,164,78,0.12); }
+  .io-arrows { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; border-radius: var(--radius); border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 13px; cursor: pointer; transition: all 0.15s; font-family: inherit; white-space: nowrap; }
+  .btn:hover { background: var(--bg-tertiary); }
+  .btn-primary { background: var(--green); color: white; border-color: var(--green); }
+  .btn-primary:hover { background: var(--green-hover); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+  .label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; }
+  .actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  /* URL 解析 */
+  .url-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .url-table td, .url-table th { padding: 8px 14px; border-bottom: 1px solid var(--border-light); text-align: left; }
+  .url-table th { background: var(--bg-secondary); font-weight: 600; color: var(--text-secondary); font-size: 12px; width: 130px; }
+  .url-table td { font-family: 'Consolas', monospace; color: var(--blue); }
+  .url-table tr:last-child td, .url-table tr:last-child th { border-bottom: none; }
+  /* URL 拼接 */
+  .build-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .build-row input { flex: 1; padding: 7px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: inherit; background: var(--bg); color: var(--text); }
+  .build-row input:focus { outline: none; border-color: var(--green); }
+  .build-result { padding: 10px 14px; background: var(--bg-secondary); border: 1px solid var(--border); border-radius: var(--radius); font-family: 'Consolas', monospace; font-size: 13px; word-break: break-all; margin-top: 8px; color: var(--blue); min-height: 36px; }
+  .params-area { display: flex; flex-direction: column; gap: 8px; }
+  .param-pair { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; }
+  .param-pair input { padding: 7px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; font-family: inherit; background: var(--bg); color: var(--text); }
+  .param-pair input:focus { outline: none; border-color: var(--green); }
+  .btn-icon { padding: 6px 10px; font-size: 14px; color: var(--red); border-color: var(--border); }
+  .btn-icon:hover { background: var(--red-bg); border-color: #ffc1c0; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-icon">🔗</div>
+  <div>
+    <h1>URL 编解码工具</h1>
+    <p>URL 编码/解码、参数解析、URL 拼接、URL 安全 Base64</p>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- URL 编解码 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🔤 URL 编码 / 解码</span>
+      <span class="section-subtitle">encodeURIComponent / decodeURIComponent</span>
+    </div>
+    <div class="section-body">
+      <div class="io-row">
+        <div>
+          <div class="label">原始文本</div>
+          <textarea id="rawText" placeholder="输入需要编码的文本或 URL..." oninput="autoEncode()"></textarea>
+        </div>
+        <div class="io-arrows">
+          <button class="btn btn-primary btn-sm" onclick="encodeURL()">编码 →</button>
+          <button class="btn btn-sm" onclick="decodeURL()">← 解码</button>
+        </div>
+        <div>
+          <div class="label">编码结果</div>
+          <textarea id="encodedText" placeholder="编码后的 URL 将显示在这里..." oninput="autoDecode()"></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="encodeURI_()">encodeURI</button>
+        <button class="btn btn-sm" onclick="encodeURIComp()">encodeURIComponent</button>
+        <button class="btn btn-sm" onclick="decodeURL()">解码</button>
+        <button class="btn btn-sm" onclick="copyEncode()">⎘ 复制结果</button>
+        <button class="btn btn-sm" onclick="swapText()">⇄ 互换</button>
+        <button class="btn btn-sm" onclick="clearEncode()">✕ 清空</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- URL 参数解析 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🔍 URL 参数解析</span>
+      <span class="section-subtitle">解析 URL 各组成部分及查询参数</span>
+    </div>
+    <div class="section-body">
+      <div class="label">输入完整 URL</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <input id="parseUrl" type="text" style="flex:1;padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;background:var(--bg);color:var(--text);" placeholder="https://example.com/path?name=Alice&age=25#section" oninput="parseURLLive()">
+        <button class="btn btn-primary btn-sm" onclick="parseURLLive()">解析</button>
+      </div>
+      <table class="url-table" id="urlParseTable">
+        <tr><th>组成部分</th><td id="p-waiting" colspan="99" style="color:var(--text-muted);font-family:inherit;">请输入 URL 后点击解析</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- URL 拼接 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🔧 URL 拼接构建</span>
+      <span class="section-subtitle">可视化构建带参数的 URL</span>
+    </div>
+    <div class="section-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div>
+          <div class="label">基础 URL</div>
+          <input id="baseUrl" type="text" style="width:100%;padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;" placeholder="https://api.example.com/v1/users" oninput="buildURL()">
+        </div>
+        <div>
+          <div class="label">路径（可选）</div>
+          <input id="pathUrl" type="text" style="width:100%;padding:8px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:inherit;" placeholder="/profile" oninput="buildURL()">
+        </div>
+      </div>
+      <div class="label">查询参数</div>
+      <div class="params-area" id="paramsArea"></div>
+      <div class="actions">
+        <button class="btn btn-primary btn-sm" onclick="addParam()">+ 添加参数</button>
+        <button class="btn btn-sm" onclick="buildURL()">🔧 构建</button>
+        <button class="btn btn-sm" onclick="copyBuild()">⎘ 复制</button>
+      </div>
+      <div class="label" style="margin-top:12px;">构建结果</div>
+      <div class="build-result" id="buildResult">填写以上内容后自动生成</div>
+    </div>
+  </div>
+
+  <!-- URL 安全 Base64 -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">🔐 URL 安全 Base64</span>
+      <span class="section-subtitle">使用 - 和 _ 替换标准 Base64 中的 + 和 / </span>
+    </div>
+    <div class="section-body">
+      <div class="io-row">
+        <div>
+          <div class="label">原始文本</div>
+          <textarea id="b64Raw" placeholder="输入需要编码的文本..."></textarea>
+        </div>
+        <div class="io-arrows">
+          <button class="btn btn-primary btn-sm" onclick="b64Encode()">编码 →</button>
+          <button class="btn btn-sm" onclick="b64Decode()">← 解码</button>
+        </div>
+        <div>
+          <div class="label">URL 安全 Base64</div>
+          <textarea id="b64Result" placeholder="Base64 结果..."></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-sm" onclick="copyB64()">⎘ 复制结果</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ===== URL 编解码 =====
+function encodeURL() {
+  const raw = document.getElementById('rawText').value;
+  document.getElementById('encodedText').value = encodeURIComponent(raw);
+}
+function encodeURI_() {
+  const raw = document.getElementById('rawText').value;
+  document.getElementById('encodedText').value = encodeURI(raw);
+}
+function encodeURIComp() { encodeURL(); }
+function decodeURL() {
+  const enc = document.getElementById('encodedText').value;
+  try { document.getElementById('rawText').value = decodeURIComponent(enc); }
+  catch(e) { try { document.getElementById('rawText').value = decodeURI(enc); } catch(e2) { alert('解码失败：' + e2.message); } }
+}
+function autoEncode() { /* 实时编码已在按钮操作中处理 */ }
+function autoDecode() { /* 可根据需求添加实时解码 */ }
+function swapText() {
+  const a = document.getElementById('rawText').value;
+  const b = document.getElementById('encodedText').value;
+  document.getElementById('rawText').value = b;
+  document.getElementById('encodedText').value = a;
+}
+function copyEncode() {
+  const v = document.getElementById('encodedText').value;
+  if (v) navigator.clipboard.writeText(v).then(() => showToast('已复制'));
+}
+function clearEncode() {
+  document.getElementById('rawText').value = '';
+  document.getElementById('encodedText').value = '';
+}
+
+// ===== URL 解析 =====
+function parseURLLive() {
+  const url = document.getElementById('parseUrl').value.trim();
+  const table = document.getElementById('urlParseTable');
+  if (!url) {
+    table.innerHTML = '<tr><th>组成部分</th><td style="color:var(--text-muted);font-family:inherit;">请输入 URL</td></tr>';
+    return;
+  }
+  try {
+    let fullUrl = url;
+    if (!/^https?:\/\//i.test(url) && !/^\/\//.test(url)) fullUrl = 'https://' + url;
+    const u = new URL(fullUrl);
+    const params = [];
+    u.searchParams.forEach((v, k) => params.push({ k, v }));
+    let rows = `
+      <tr><th>协议 (protocol)</th><td>${u.protocol}</td></tr>
+      <tr><th>主机 (host)</th><td>${u.host}</td></tr>
+      <tr><th>域名 (hostname)</th><td>${u.hostname}</td></tr>
+      <tr><th>端口 (port)</th><td>${u.port || '(默认)'}</td></tr>
+      <tr><th>路径 (pathname)</th><td>${u.pathname}</td></tr>
+      <tr><th>查询串 (search)</th><td>${u.search || '(无)'}</td></tr>
+      <tr><th>锚点 (hash)</th><td>${u.hash || '(无)'}</td></tr>
+    `;
+    if (params.length > 0) {
+      rows += '<tr><th rowspan="' + params.length + '">参数列表</th><td>' +
+        params.map((p,i) => `<span style="color:var(--text);">${escHtml(p.k)}</span> = <span style="color:#2da44e;">${escHtml(decodeURIComponent(p.v))}</span>`).join('</td></tr><tr><td>') +
+        '</td></tr>';
+    }
+    table.innerHTML = rows;
+  } catch(e) {
+    table.innerHTML = `<tr><th>错误</th><td style="color:var(--red);font-family:inherit;">${e.message}</td></tr>`;
+  }
+}
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ===== URL 拼接 =====
+let paramCount = 0;
+function addParam() {
+  const id = ++paramCount;
+  const div = document.createElement('div');
+  div.className = 'param-pair'; div.id = 'param-' + id;
+  div.innerHTML = `
+    <input type="text" placeholder="参数名 (key)" oninput="buildURL()">
+    <input type="text" placeholder="参数值 (value)" oninput="buildURL()">
+    <button class="btn btn-icon" onclick="removeParam(${id})">✕</button>
+  `;
+  document.getElementById('paramsArea').appendChild(div);
+  buildURL();
+}
+function removeParam(id) {
+  const el = document.getElementById('param-' + id);
+  if (el) el.remove();
+  buildURL();
+}
+function buildURL() {
+  const base = document.getElementById('baseUrl').value.trim();
+  const path = document.getElementById('pathUrl').value.trim();
+  if (!base) { document.getElementById('buildResult').textContent = '请填写基础 URL'; return; }
+  let url = base;
+  if (path) url = url.replace(/\/$/, '') + (path.startsWith('/') ? '' : '/') + path;
+  const params = [];
+  document.querySelectorAll('.param-pair').forEach(pair => {
+    const inputs = pair.querySelectorAll('input');
+    const k = inputs[0].value.trim();
+    const v = inputs[1].value.trim();
+    if (k) params.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));
+  });
+  if (params.length) url += (url.includes('?') ? '&' : '?') + params.join('&');
+  document.getElementById('buildResult').textContent = url;
+}
+function copyBuild() {
+  const v = document.getElementById('buildResult').textContent;
+  if (v && v !== '填写以上内容后自动生成') navigator.clipboard.writeText(v).then(() => showToast('已复制'));
+}
+
+// ===== URL 安全 Base64 =====
+function b64Encode() {
+  const raw = document.getElementById('b64Raw').value;
+  try {
+    const encoded = btoa(unescape(encodeURIComponent(raw)))
+      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    document.getElementById('b64Result').value = encoded;
+  } catch(e) { alert('编码失败：' + e.message); }
+}
+function b64Decode() {
+  const enc = document.getElementById('b64Result').value;
+  try {
+    let padded = enc.replace(/-/g, '+').replace(/_/g, '/');
+    while (padded.length % 4) padded += '=';
+    document.getElementById('b64Raw').value = decodeURIComponent(escape(atob(padded)));
+  } catch(e) { alert('解码失败：' + e.message); }
+}
+function copyB64() {
+  const v = document.getElementById('b64Result').value;
+  if (v) navigator.clipboard.writeText(v).then(() => showToast('已复制'));
+}
+
+// Toast 提示
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_toast';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity 0.3s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg; t.style.opacity = '1';
+  clearTimeout(t._to);
+  t._to = setTimeout(() => { t.style.opacity = '0'; }, 1800);
+}
+
+// 初始化添加一个参数行
+addParam();
+</script>
+</body>
+</html>

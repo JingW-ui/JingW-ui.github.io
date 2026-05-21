@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>代码格式化工具</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+:root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--bg:#fff;--bg2:#f6f8fa;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:#656d76;margin-left:auto}
+.container{max-width:1100px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-body{padding:16px}
+.toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 16px;background:#f6f8fa;border-bottom:1px solid var(--border)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--green);color:#fff}
+.btn-primary:hover{background:var(--green2)}
+.btn-secondary{background:#fff;color:#1f2328;border:1px solid var(--border)}
+.btn-secondary:hover{background:#f0f2f5}
+.btn-danger{background:#fff;color:#cf222e;border:1px solid var(--border)}
+.btn-danger:hover{background:#fff0f0}
+select,input[type=number]{padding:5px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:#fff;outline:none;cursor:pointer}
+select:focus,input:focus{border-color:var(--green)}
+.editor-wrap{display:grid;grid-template-columns:1fr 1fr;gap:0;min-height:480px}
+@media(max-width:700px){.editor-wrap{grid-template-columns:1fr}}
+.pane{display:flex;flex-direction:column;border-right:1px solid var(--border)}
+.pane:last-child{border-right:none}
+.pane-header{padding:8px 14px;background:#f6f8fa;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:#656d76;display:flex;align-items:center;justify-content:space-between}
+.code-area{flex:1;width:100%;padding:12px;border:none;outline:none;font-size:13px;font-family:'Fira Code','Cascadia Code',Consolas,monospace;resize:none;background:#fff;line-height:1.6;tab-size:2;white-space:pre}
+.code-area:focus{background:#fafffe}
+.code-output{flex:1;padding:12px;font-size:13px;font-family:'Fira Code','Cascadia Code',Consolas,monospace;overflow:auto;background:#f8fff9;line-height:1.6;white-space:pre;word-break:break-all}
+.stats-bar{padding:6px 14px;background:#f6f8fa;border-top:1px solid var(--border);font-size:12px;color:#656d76;display:flex;gap:16px;flex-wrap:wrap}
+.badge{display:inline-block;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:600;background:#dff4e0;color:#1a7f37}
+.badge-err{background:#ffe3e6;color:#cf222e}
+.lang-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.lang-tab{padding:3px 10px;border-radius:4px;font-size:12px;cursor:pointer;border:1px solid transparent;color:#656d76;transition:all .15s}
+.lang-tab.active{background:#2da44e;color:#fff;border-color:#2da44e}
+.lang-tab:hover:not(.active){background:#f0f2f5;border-color:var(--border)}
+</style>
+</head>
+<body>
+<header>
+  <span style="font-size:24px">🎨</span>
+  <h1>代码格式化工具</h1>
+  <p>JSON · HTML · CSS · JS · SQL · XML</p>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="toolbar">
+      <div class="lang-tabs" id="lang-tabs">
+        <div class="lang-tab active" onclick="setLang('json')">JSON</div>
+        <div class="lang-tab" onclick="setLang('html')">HTML</div>
+        <div class="lang-tab" onclick="setLang('css')">CSS</div>
+        <div class="lang-tab" onclick="setLang('js')">JS</div>
+        <div class="lang-tab" onclick="setLang('sql')">SQL</div>
+        <div class="lang-tab" onclick="setLang('xml')">XML</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-left:8px">
+        <label style="font-size:12px;color:#656d76">缩进</label>
+        <select id="indent-size">
+          <option value="2" selected>2 空格</option>
+          <option value="4">4 空格</option>
+          <option value="tab">Tab</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="format()">⚡ 格式化</button>
+      <button class="btn btn-secondary" onclick="minify()">📦 压缩</button>
+      <button class="btn btn-secondary" onclick="copyOutput()">📋 复制</button>
+      <button class="btn btn-danger" onclick="clearAll()">🗑 清空</button>
+    </div>
+    <div class="editor-wrap">
+      <div class="pane">
+        <div class="pane-header">
+          <span>📝 输入代码</span>
+          <span id="in-stats" class="badge">0 行</span>
+        </div>
+        <textarea class="code-area" id="input" placeholder="粘贴代码到此处..." oninput="updateStats()" spellcheck="false"></textarea>
+      </div>
+      <div class="pane">
+        <div class="pane-header">
+          <span>✨ 格式化结果</span>
+          <span id="out-badge" class="badge">就绪</span>
+        </div>
+        <div class="code-output" id="output">// 点击"格式化"按钮查看结果</div>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <span id="msg">请选择语言并粘贴代码</span>
+      <span>输入：<b id="in-chars">0</b> 字符</span>
+      <span>输出：<b id="out-chars">0</b> 字符</span>
+      <span id="ratio-info"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">💡 快速示例</div>
+    <div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-secondary" onclick="loadExample('json')">JSON 示例</button>
+      <button class="btn btn-secondary" onclick="loadExample('html')">HTML 示例</button>
+      <button class="btn btn-secondary" onclick="loadExample('css')">CSS 示例</button>
+      <button class="btn btn-secondary" onclick="loadExample('sql')">SQL 示例</button>
+      <button class="btn btn-secondary" onclick="loadExample('xml')">XML 示例</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentLang = 'json';
+
+const EXAMPLES = {
+  json: `{"name":"张三","age":30,"skills":["JavaScript","Python","Go"],"address":{"city":"北京","district":"海淀区"},"active":true}`,
+  html: `<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><title>示例页面</title><style>body{margin:0;padding:20px;font-family:sans-serif}.container{max-width:800px;margin:0 auto}</style></head><body><div class="container"><h1>Hello World</h1><p>这是一个<strong>HTML示例</strong>页面。</p><ul><li>列表项1</li><li>列表项2</li><li>列表项3</li></ul></div></body></html>`,
+  css: `.container{max-width:1200px;margin:0 auto;padding:0 20px}.header{background:#2da44e;color:#fff;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}.nav a{color:#fff;text-decoration:none;padding:8px 16px;border-radius:4px;transition:background .2s}.nav a:hover{background:rgba(255,255,255,.15)}@media(max-width:768px){.container{padding:0 12px}.header{flex-direction:column;gap:12px}}`,
+  sql: `SELECT u.id,u.name,u.email,COUNT(o.id) AS order_count,SUM(o.amount) AS total_amount FROM users u LEFT JOIN orders o ON u.id=o.user_id WHERE u.created_at>='2024-01-01' AND u.status='active' GROUP BY u.id,u.name,u.email HAVING COUNT(o.id)>0 ORDER BY total_amount DESC LIMIT 20;`,
+  xml: `<?xml version="1.0" encoding="UTF-8"?><root><users><user id="1"><name>张三</name><age>30</age><email>zhangsan@example.com</email><roles><role>admin</role><role>user</role></roles></user><user id="2"><name>李四</name><age>25</age><email>lisi@example.com</email></user></users></root>`,
+};
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-tab').forEach(t => {
+    t.classList.toggle('active', t.textContent.toLowerCase() === lang || (lang==='js' && t.textContent==='JS'));
+  });
+  document.getElementById('input').placeholder = `粘贴 ${lang.toUpperCase()} 代码到此处...`;
+}
+
+function updateStats() {
+  const v = document.getElementById('input').value;
+  const lines = v ? v.split('\n').length : 0;
+  document.getElementById('in-stats').textContent = lines + ' 行';
+  document.getElementById('in-chars').textContent = v.length;
+}
+
+function getIndent() {
+  const v = document.getElementById('indent-size').value;
+  return v === 'tab' ? '\t' : ' '.repeat(parseInt(v));
+}
+
+// ===== JSON 格式化 =====
+function formatJSON(code, indent) {
+  const obj = JSON.parse(code);
+  return JSON.stringify(obj, null, indent);
+}
+function minifyJSON(code) {
+  const obj = JSON.parse(code);
+  return JSON.stringify(obj);
+}
+
+// ===== HTML 格式化（简易） =====
+function formatHTML(code, indent) {
+  const selfClose = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)$/i;
+  let result = '';
+  let level = 0;
+  // 简单token解析
+  const tokens = code.match(/<[^>]+>|[^<]+/g) || [];
+  for (let t of tokens) {
+    t = t.trim();
+    if (!t) continue;
+    if (t.startsWith('</')) {
+      level = Math.max(0, level - 1);
+      result += indent.repeat(level) + t + '\n';
+    } else if (t.startsWith('<') && !t.startsWith('<!') && !t.startsWith('<?')) {
+      const tagName = (t.match(/<([a-zA-Z][a-zA-Z0-9-]*)/) || [])[1] || '';
+      result += indent.repeat(level) + t + '\n';
+      if (!t.endsWith('/>') && !selfClose.test(tagName)) level++;
+    } else if (t.startsWith('<!--')) {
+      result += indent.repeat(level) + t + '\n';
+    } else if (t.startsWith('<!') || t.startsWith('<?')) {
+      result += t + '\n';
+    } else {
+      if (t.length > 0) result += indent.repeat(level) + t + '\n';
+    }
+  }
+  return result.trim();
+}
+function minifyHTML(code) {
+  return code.replace(/\s+/g,' ').replace(/>\s+</g,'><').trim();
+}
+
+// ===== CSS 格式化 =====
+function formatCSS(code, indent) {
+  let result = '';
+  let level = 0;
+  const tokens = code.split(/([{}:;,])/);
+  let i = 0;
+  // 简易处理
+  code = code.replace(/\s+/g,' ').replace(/\s*{\s*/g,' {\n').replace(/\s*}\s*/g,'}\n').replace(/\s*;\s*/g,';\n').replace(/\s*,\s*/g,',\n');
+  const lines = code.split('\n');
+  for (let line of lines) {
+    line = line.trim();
+    if (!line) continue;
+    if (line.endsWith('{')) {
+      result += indent.repeat(level) + line + '\n';
+      level++;
+    } else if (line === '}') {
+      level = Math.max(0, level - 1);
+      result += indent.repeat(level) + line + '\n';
+    } else {
+      result += indent.repeat(level) + line + '\n';
+    }
+  }
+  return result.trim();
+}
+function minifyCSS(code) {
+  return code.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\s+/g,' ').replace(/\s*([{}:;,])\s*/g,'$1').trim();
+}
+
+// ===== SQL 格式化 =====
+function formatSQL(code, indent) {
+  const keywords = ['SELECT','FROM','WHERE','JOIN','LEFT JOIN','RIGHT JOIN','INNER JOIN','OUTER JOIN','ON','AND','OR','NOT','IN','BETWEEN','LIKE','ORDER BY','GROUP BY','HAVING','LIMIT','OFFSET','INSERT INTO','VALUES','UPDATE','SET','DELETE','CREATE','DROP','ALTER','INDEX','UNION','DISTINCT','AS','CASE','WHEN','THEN','ELSE','END'];
+  // 规范化
+  let sql = code.replace(/\s+/g,' ').trim();
+  const mainKw = ['SELECT','FROM','WHERE','GROUP BY','HAVING','ORDER BY','LIMIT','JOIN','LEFT JOIN','RIGHT JOIN','INNER JOIN','UNION','INSERT INTO','UPDATE','SET','DELETE'];
+  for (const kw of mainKw) {
+    const re = new RegExp('\\b' + kw + '\\b', 'gi');
+    sql = sql.replace(re, '\n' + kw);
+  }
+  const lines = sql.split('\n').map(l => l.trim()).filter(l => l);
+  let result = '';
+  let level = 0;
+  for (let line of lines) {
+    const upper = line.toUpperCase();
+    if (upper.startsWith('SELECT') || upper.startsWith('FROM') || upper.startsWith('WHERE') || upper.startsWith('GROUP') || upper.startsWith('HAVING') || upper.startsWith('ORDER') || upper.startsWith('LIMIT') || upper.startsWith('JOIN') || upper.startsWith('LEFT') || upper.startsWith('RIGHT') || upper.startsWith('INNER')) {
+      result += line + '\n';
+    } else {
+      result += indent + line + '\n';
+    }
+  }
+  return result.trim().toUpperCase();
+}
+function minifySQL(code) {
+  return code.replace(/\s+/g,' ').trim();
+}
+
+// ===== XML 格式化 =====
+function formatXML(code, indent) {
+  let result = '';
+  let level = 0;
+  const tokens = code.match(/<\?[^?]*\?>|<!--[\s\S]*?-->|<\/[^>]+>|<[^>]+\/>|<[^>]+>|[^<]+/g) || [];
+  for (let t of tokens) {
+    t = t.trim();
+    if (!t) continue;
+    if (t.startsWith('<?') || t.startsWith('<!--')) {
+      result += indent.repeat(level) + t + '\n';
+    } else if (t.startsWith('</')) {
+      level = Math.max(0, level - 1);
+      result += indent.repeat(level) + t + '\n';
+    } else if (t.startsWith('<') && t.endsWith('/>')) {
+      result += indent.repeat(level) + t + '\n';
+    } else if (t.startsWith('<')) {
+      result += indent.repeat(level) + t + '\n';
+      level++;
+    } else {
+      if (t.trim()) result += indent.repeat(level) + t.trim() + '\n';
+    }
+  }
+  return result.trim();
+}
+function minifyXML(code) {
+  return code.replace(/>\s+</g,'><').replace(/\s+/g,' ').trim();
+}
+
+// ===== JS 格式化（简易）=====
+function formatJS(code, indent) {
+  let result = '';
+  let level = 0;
+  let inString = false;
+  let strChar = '';
+  let i = 0;
+  while (i < code.length) {
+    const c = code[i];
+    if (inString) {
+      result += c;
+      if (c === strChar && code[i-1] !== '\\') inString = false;
+      i++; continue;
+    }
+    if (c === '"' || c === "'" || c === '`') { inString = true; strChar = c; result += c; i++; continue; }
+    if (c === '{') { result += c + '\n' + indent.repeat(++level); i++; continue; }
+    if (c === '}') { level = Math.max(0, level-1); result = result.trimEnd() + '\n' + indent.repeat(level) + c; i++; continue; }
+    if (c === ';') { result += c + '\n' + indent.repeat(level); i++; continue; }
+    if (c === '\n') { result += '\n' + indent.repeat(level); while(i+1 < code.length && code[i+1] === '\n') i++; i++; continue; }
+    result += c; i++;
+  }
+  return result.trim();
+}
+function minifyJS(code) {
+  return code.replace(/\/\/[^\n]*/g,'').replace(/\/\*[\s\S]*?\*\//g,'').replace(/\s+/g,' ').replace(/\s*([{}();:,=+\-*/<>!&|])\s*/g,'$1').trim();
+}
+
+function format() {
+  const code = document.getElementById('input').value.trim();
+  if (!code) { showToast('请先输入代码'); return; }
+  const indent = getIndent();
+  const outEl = document.getElementById('output');
+  const badge = document.getElementById('out-badge');
+  try {
+    let result = '';
+    switch (currentLang) {
+      case 'json': result = formatJSON(code, indent); break;
+      case 'html': result = formatHTML(code, indent); break;
+      case 'css': result = formatCSS(code, indent); break;
+      case 'sql': result = formatSQL(code, indent); break;
+      case 'xml': result = formatXML(code, indent); break;
+      case 'js': result = formatJS(code, indent); break;
+    }
+    outEl.textContent = result;
+    badge.textContent = '✓ 成功';
+    badge.className = 'badge';
+    document.getElementById('out-chars').textContent = result.length;
+    const ratio = ((1 - result.length / code.length) * 100).toFixed(1);
+    document.getElementById('ratio-info').textContent = parseFloat(ratio) < 0 ? `体积增加 ${Math.abs(ratio)}%` : '';
+    document.getElementById('msg').textContent = `格式化成功！共 ${result.split('\n').length} 行`;
+  } catch (e) {
+    outEl.textContent = '❌ 格式化失败：' + e.message;
+    badge.textContent = '✗ 错误';
+    badge.className = 'badge badge-err';
+    document.getElementById('msg').textContent = '请检查代码语法是否正确';
+  }
+}
+
+function minify() {
+  const code = document.getElementById('input').value.trim();
+  if (!code) { showToast('请先输入代码'); return; }
+  const outEl = document.getElementById('output');
+  const badge = document.getElementById('out-badge');
+  try {
+    let result = '';
+    switch (currentLang) {
+      case 'json': result = minifyJSON(code); break;
+      case 'html': result = minifyHTML(code); break;
+      case 'css': result = minifyCSS(code); break;
+      case 'sql': result = minifySQL(code); break;
+      case 'xml': result = minifyXML(code); break;
+      case 'js': result = minifyJS(code); break;
+    }
+    outEl.textContent = result;
+    badge.textContent = '📦 已压缩';
+    badge.className = 'badge';
+    document.getElementById('out-chars').textContent = result.length;
+    const saved = code.length - result.length;
+    const ratio = ((saved / code.length) * 100).toFixed(1);
+    document.getElementById('ratio-info').textContent = `节省 ${ratio}%（${saved} 字符）`;
+    document.getElementById('msg').textContent = `压缩完成！从 ${code.length} → ${result.length} 字符`;
+  } catch (e) {
+    outEl.textContent = '❌ 压缩失败：' + e.message;
+    badge.textContent = '✗ 错误';
+    badge.className = 'badge badge-err';
+  }
+}
+
+function copyOutput() {
+  const text = document.getElementById('output').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('已复制到剪贴板'));
+}
+
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('output').textContent = '// 点击"格式化"按钮查看结果';
+  document.getElementById('in-stats').textContent = '0 行';
+  document.getElementById('in-chars').textContent = '0';
+  document.getElementById('out-chars').textContent = '0';
+  document.getElementById('ratio-info').textContent = '';
+  document.getElementById('msg').textContent = '请选择语言并粘贴代码';
+  document.getElementById('out-badge').textContent = '就绪';
+  document.getElementById('out-badge').className = 'badge';
+}
+
+function loadExample(lang) {
+  setLang(lang);
+  document.getElementById('input').value = EXAMPLES[lang] || '';
+  updateStats();
+  format();
+}
+
+function showToast(msg) {
+  let t = document.getElementById('_toast');
+  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+}
+</script>
+</body>
+</html>

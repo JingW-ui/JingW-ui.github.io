@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>倒计时 / 正计时工具</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --red:#cf222e; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+  .hi { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:18px; }
+  header h1 { font-size:18px; font-weight:600; }
+  .main { flex:1; padding:20px 24px; display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:1000px; margin:0 auto; width:100%; }
+  @media(max-width:700px) { .main { grid-template-columns:1fr; } }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); }
+  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; }
+  .card-body { padding:20px 18px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+  .timer-display { font-size:60px; font-weight:700; font-family:'Courier New',monospace; letter-spacing:4px; color:var(--text); text-align:center; line-height:1; }
+  .timer-display.running { color:var(--green); }
+  .timer-display.finished { color:var(--red); animation:blink 1s infinite; }
+  @keyframes blink { 50% { opacity:.4; } }
+  .progress-bar { width:100%; height:8px; background:var(--bg3); border-radius:4px; overflow:hidden; }
+  .progress-fill { height:100%; background:var(--green); border-radius:4px; transition:width .5s; }
+  .progress-fill.low { background:#ff9f43; }
+  .progress-fill.critical { background:var(--red); }
+  .btn-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:8px 20px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:14px; cursor:pointer; transition:all .15s; font-family:inherit; font-weight:500; }
+  .btn:hover { background:var(--bg3); }
+  .btn-primary { background:var(--green); color:white; border-color:var(--green); min-width:80px; }
+  .btn-primary:hover { background:var(--green2); }
+  .btn-danger { background:var(--red); color:white; border-color:var(--red); }
+  .btn-danger:hover { background:#b91c1c; }
+  .set-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; width:100%; }
+  .set-col { text-align:center; }
+  .set-col label { font-size:11px; color:var(--text2); display:block; margin-bottom:4px; }
+  .set-col input { width:100%; padding:8px; border:1px solid var(--border); border-radius:var(--radius); font-size:18px; font-weight:600; text-align:center; font-family:'Courier New',monospace; background:var(--bg); color:var(--text); outline:none; }
+  .set-col input:focus { border-color:var(--green); }
+  .preset-btns { display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
+  .preset-btn { padding:4px 12px; border:1px solid var(--border); border-radius:12px; font-size:12px; cursor:pointer; background:var(--bg); color:var(--text2); transition:all .15s; }
+  .preset-btn:hover { border-color:var(--green); color:var(--green); background:#f0fdf4; }
+  /* 正计时 */
+  .stopwatch-display { font-size:56px; font-weight:700; font-family:'Courier New',monospace; letter-spacing:2px; color:var(--text); }
+  .stopwatch-display.running { color:var(--green); }
+  .lap-list { width:100%; max-height:180px; overflow-y:auto; }
+  .lap-item { display:flex; justify-content:space-between; padding:6px 12px; border-bottom:1px solid var(--bg3); font-size:13px; font-family:monospace; }
+  .lap-item:nth-child(odd) { background:var(--bg2); }
+  .lap-item .lap-num { color:var(--text2); }
+  .lap-item .lap-diff { color:var(--green); }
+  .title-row { width:100%; display:flex; justify-content:space-between; align-items:center; }
+  .timer-name { font-size:13px; color:var(--text2); }
+</style>
+</head>
+<body>
+<header>
+  <div class="hi">⏰</div>
+  <div>
+    <h1>倒计时 / 正计时工具</h1>
+  </div>
+</header>
+
+<div class="main">
+  <!-- 倒计时 -->
+  <div class="card">
+    <div class="card-header">⏳ 倒计时</div>
+    <div class="card-body">
+      <div class="set-row" id="cdSetRow">
+        <div class="set-col">
+          <label>小时</label>
+          <input type="number" id="cd-h" min="0" max="99" value="0" oninput="resetCountdown()">
+        </div>
+        <div class="set-col">
+          <label>分钟</label>
+          <input type="number" id="cd-m" min="0" max="59" value="5" oninput="resetCountdown()">
+        </div>
+        <div class="set-col">
+          <label>秒</label>
+          <input type="number" id="cd-s" min="0" max="59" value="0" oninput="resetCountdown()">
+        </div>
+      </div>
+      <div class="preset-btns">
+        <span style="font-size:12px;color:var(--text2);">快速设定：</span>
+        <button class="preset-btn" onclick="setPreset(0,1,0)">1分钟</button>
+        <button class="preset-btn" onclick="setPreset(0,3,0)">3分钟</button>
+        <button class="preset-btn" onclick="setPreset(0,5,0)">5分钟</button>
+        <button class="preset-btn" onclick="setPreset(0,10,0)">10分钟</button>
+        <button class="preset-btn" onclick="setPreset(0,25,0)">25分钟🍅</button>
+        <button class="preset-btn" onclick="setPreset(1,0,0)">1小时</button>
+      </div>
+      <div class="timer-display" id="cd-display">00:05:00</div>
+      <div class="progress-bar"><div class="progress-fill" id="cd-progress" style="width:100%"></div></div>
+      <div id="cd-label" style="font-size:13px;color:var(--text2);">准备就绪</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="cd-start-btn" onclick="toggleCountdown()">▶ 开始</button>
+        <button class="btn" onclick="resetCountdown()">↺ 重置</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 正计时 -->
+  <div class="card">
+    <div class="card-header">⏱ 正计时（秒表）</div>
+    <div class="card-body">
+      <div class="stopwatch-display" id="sw-display">00:00:00.00</div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="sw-start-btn" onclick="toggleStopwatch()">▶ 开始</button>
+        <button class="btn" onclick="lapStopwatch()" id="sw-lap-btn" disabled>📍 计次</button>
+        <button class="btn btn-danger" onclick="resetStopwatch()">↺ 重置</button>
+      </div>
+      <div class="lap-list" id="lap-list" style="display:none;width:100%;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 倒计时 =====
+let cdTimer = null;
+let cdTotal = 0;
+let cdRemain = 0;
+let cdRunning = false;
+
+function getCdTotal() {
+  const h = parseInt(document.getElementById('cd-h').value) || 0;
+  const m = parseInt(document.getElementById('cd-m').value) || 0;
+  const s = parseInt(document.getElementById('cd-s').value) || 0;
+  return h * 3600 + m * 60 + s;
+}
+
+function setPreset(h, m, s) {
+  document.getElementById('cd-h').value = h;
+  document.getElementById('cd-m').value = m;
+  document.getElementById('cd-s').value = s;
+  resetCountdown();
+}
+
+function resetCountdown() {
+  clearInterval(cdTimer);
+  cdRunning = false;
+  cdTotal = getCdTotal();
+  cdRemain = cdTotal;
+  updateCdDisplay(cdRemain);
+  document.getElementById('cd-progress').style.width = '100%';
+  document.getElementById('cd-progress').className = 'progress-fill';
+  document.getElementById('cd-start-btn').textContent = '▶ 开始';
+  document.getElementById('cd-display').className = 'timer-display';
+  document.getElementById('cd-label').textContent = '准备就绪';
+}
+
+function updateCdDisplay(secs) {
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  document.getElementById('cd-display').textContent =
+    String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+function toggleCountdown() {
+  if (cdRunning) {
+    clearInterval(cdTimer);
+    cdRunning = false;
+    document.getElementById('cd-start-btn').textContent = '▶ 继续';
+    document.getElementById('cd-display').className = 'timer-display';
+    document.getElementById('cd-label').textContent = '已暂停';
+  } else {
+    if (cdRemain <= 0) resetCountdown();
+    cdTotal = cdTotal || getCdTotal();
+    cdRunning = true;
+    document.getElementById('cd-start-btn').textContent = '⏸ 暂停';
+    document.getElementById('cd-display').className = 'timer-display running';
+    document.getElementById('cd-label').textContent = '倒计时中...';
+    cdTimer = setInterval(() => {
+      cdRemain--;
+      updateCdDisplay(cdRemain);
+      const pct = cdTotal > 0 ? (cdRemain / cdTotal * 100) : 0;
+      const bar = document.getElementById('cd-progress');
+      bar.style.width = pct + '%';
+      bar.className = 'progress-fill' + (pct < 10 ? ' critical' : pct < 30 ? ' low' : '');
+      if (cdRemain <= 0) {
+        clearInterval(cdTimer);
+        cdRunning = false;
+        document.getElementById('cd-display').className = 'timer-display finished';
+        document.getElementById('cd-start-btn').textContent = '▶ 重新开始';
+        document.getElementById('cd-label').textContent = '🎉 时间到！';
+        // 页面标题提醒
+        document.title = '⏰ 时间到！- 倒计时工具';
+        try { new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAA...').play(); } catch(e) {}
+      }
+    }, 1000);
+  }
+}
+
+// ===== 正计时 =====
+let swTimer = null;
+let swStart = 0;
+let swElapsed = 0;
+let swRunning = false;
+let lapTimes = [];
+let lastLap = 0;
+
+function toggleStopwatch() {
+  if (swRunning) {
+    clearInterval(swTimer);
+    swRunning = false;
+    swElapsed += Date.now() - swStart;
+    document.getElementById('sw-start-btn').textContent = '▶ 继续';
+    document.getElementById('sw-display').className = 'stopwatch-display';
+  } else {
+    swStart = Date.now();
+    swRunning = true;
+    document.getElementById('sw-start-btn').textContent = '⏸ 暂停';
+    document.getElementById('sw-display').className = 'stopwatch-display running';
+    document.getElementById('sw-lap-btn').disabled = false;
+    swTimer = setInterval(updateSw, 10);
+  }
+}
+
+function updateSw() {
+  const total = swElapsed + (swRunning ? Date.now() - swStart : 0);
+  const ms = total % 1000;
+  const s = Math.floor(total / 1000) % 60;
+  const m = Math.floor(total / 60000) % 60;
+  const h = Math.floor(total / 3600000);
+  document.getElementById('sw-display').textContent =
+    String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' +
+    String(s).padStart(2,'0') + '.' + String(Math.floor(ms/10)).padStart(2,'0');
+}
+
+function lapStopwatch() {
+  const total = swElapsed + (swRunning ? Date.now() - swStart : 0);
+  const diff = total - lastLap;
+  lastLap = total;
+  lapTimes.push({ total, diff });
+  const ll = document.getElementById('lap-list');
+  ll.style.display = 'block';
+  const item = document.createElement('div');
+  item.className = 'lap-item';
+  item.innerHTML = `<span class="lap-num">#${lapTimes.length}</span><span>${fmtMs(total)}</span><span class="lap-diff">+${fmtMs(diff)}</span>`;
+  ll.insertBefore(item, ll.firstChild);
+}
+
+function fmtMs(ms) {
+  const s = Math.floor(ms/1000)%60, m = Math.floor(ms/60000)%60, h = Math.floor(ms/3600000);
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')+'.'+String(Math.floor((ms%1000)/10)).padStart(2,'0');
+}
+
+function resetStopwatch() {
+  clearInterval(swTimer);
+  swRunning = false; swElapsed = 0; swStart = 0; lapTimes = []; lastLap = 0;
+  document.getElementById('sw-display').textContent = '00:00:00.00';
+  document.getElementById('sw-display').className = 'stopwatch-display';
+  document.getElementById('sw-start-btn').textContent = '▶ 开始';
+  document.getElementById('sw-lap-btn').disabled = true;
+  document.getElementById('lap-list').innerHTML = '';
+  document.getElementById('lap-list').style.display = 'none';
+}
+
+resetCountdown();
+</script>
+</body>
+</html>
