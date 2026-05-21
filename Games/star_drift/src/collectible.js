@@ -119,13 +119,24 @@ class Collectible extends Entity {
         // 磁力吸引：当玩家靠近时，收集物向玩家移动
         if (player && player.isAlive()) {
             const dist = this.position.distance(player.position);
-            const magnetRange = 80; // 磁力范围
+            
+            // 不同类型的物品有不同的磁力范围
+            let magnetRange;
+            switch (this.type) {
+                case 'exp':
+                case 'expLarge':
+                    magnetRange = 50;  // 经验球磁力范围较小，防止过快收集
+                    break;
+                default:
+                    magnetRange = 80;  // 其他物品正常磁力范围
+                    break;
+            }
             
             if (dist < magnetRange) {
                 // 计算朝向玩家的方向
                 const direction = Vector2.sub(player.position, this.position).normalized();
                 // 距离越近，吸引速度越快
-                const attractSpeed = (1 - dist / magnetRange) * 200; // 最大200像素/秒
+                const attractSpeed = (1 - dist / magnetRange) * 150; // 降低最大速度：200 → 150
                 const moveVector = Vector2.multiply(direction, attractSpeed * deltaTime);
                 this.position.add(moveVector);
             }

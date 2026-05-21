@@ -43,7 +43,13 @@ class Player extends Entity {
         // 等级系统
         this.level = 1;
         this.experience = 0;
-        this.expToNextLevel = 100;
+        // 经验值配置（可通过调参界面调整）
+        this.expConfig = {
+            initialExp: 150,           // 初始经验需求
+            expGrowthRate: 1.35,       // 经验增长系数
+            expFromScoreRatio: 0.05    // 得分转经验的比例（scoreValue * ratio）- 降低到0.05
+        };
+        this.expToNextLevel = this.expConfig.initialExp;
         this.skillPoints = 0;
 
         // 保存基础属性（用于百分比计算）
@@ -100,10 +106,11 @@ class Player extends Entity {
         this.autoDodgeActive = false;   // 自动避险是否激活
         this.autoDodgeTimer = 0;        // 自动避险剩余时间
         
-        // 巡航导弹自动发射
-        this.cruiseMissileFireRate = 1.5; // 导弹发射间隔（秒）- 无数量限制
-        this.cruiseMissileTimer = 0;      // 导弹发射计时器
-        this.currentMissileType = '004';  // 当前装备的导弹类型
+        // 巡航导弹自动发射（需要升级解锁）
+        this.cruiseMissileEnabled = false;  // 巡航导弹自动发射是否启用（默认关闭，需要升级解锁）
+        this.cruiseMissileFireRate = 1.5;   // 导弹发射间隔（秒）
+        this.cruiseMissileTimer = 0;        // 导弹发射计时器
+        this.currentMissileType = '004';    // 当前装备的导弹类型
     }
 
     setupShipType() {
@@ -287,8 +294,8 @@ class Player extends Entity {
         // 巡航导弹自动发射计时器
         this.cruiseMissileTimer -= deltaTime;
         
-        // 尝试自动发射巡航导弹（独立于普通射击）
-        if (this.cruiseMissileTimer <= 0 && this.canFireCruiseMissile()) {
+        // 尝试自动发射巡航导弹（只有解锁后才能自动发射）
+        if (this.cruiseMissileEnabled && this.cruiseMissileTimer <= 0 && this.canFireCruiseMissile()) {
             this.fireCruiseMissile();
         }
         
@@ -788,16 +795,25 @@ class Player extends Entity {
      * 添加经验值
      */
     addExperience(exp) {
+        const oldLevel = this.level;
         this.experience += exp;
         let hasItemReward = false;
+        let leveledUp = false;
         while (this.experience >= this.expToNextLevel) {
             this.experience -= this.expToNextLevel;
             const itemReward = this.levelUp();
             if (itemReward) {
                 hasItemReward = true;
             }
+            leveledUp = true; // 标记已升级
         }
-        return hasItemReward;
+        
+        // 调试日志：显示经验获取和升级信息
+        if (exp > 0) {
+            console.log(`📊 获得经验: +${exp.toFixed(1)} | 当前: ${this.experience.toFixed(0)}/${this.expToNextLevel} | 等级: Lv.${oldLevel}→Lv.${this.level}`);
+        }
+        
+        return leveledUp; // 返回是否升级（而不是是否有物品奖励）
     }
 
     /**
@@ -814,7 +830,8 @@ class Player extends Entity {
                 icon: '❄️',
                 type: 'bullet_effect',
                 effect: 'freeze',
-                value: 0.3
+                value: 0.3,
+                weight: 1 // 权重
             },
             {
                 id: 'homing',
@@ -823,7 +840,8 @@ class Player extends Entity {
                 icon: '🎯',
                 type: 'bullet_effect',
                 effect: 'homing',
-                value: true
+                value: true,
+                weight: 3 // 提高权重：更容易抽到
             },
             {
                 id: 'burn',
@@ -832,7 +850,8 @@ class Player extends Entity {
                 icon: '🔥',
                 type: 'bullet_effect',
                 effect: 'burn',
-                value: { duration: 3, damagePerSec: 5 }
+                value: { duration: 3, damagePerSec: 5 },
+                weight: 1
             },
             {
                 id: 'short_circuit',
@@ -841,7 +860,8 @@ class Player extends Entity {
                 icon: '⚡',
                 type: 'bullet_effect',
                 effect: 'short_circuit',
-                value: 2
+                value: 2,
+                weight: 1
             },
             {
                 id: 'ricochet',
@@ -850,7 +870,8 @@ class Player extends Entity {
                 icon: '🔄',
                 type: 'bullet_effect',
                 effect: 'ricochet',
-                value: 2
+                value: 2,
+                weight: 1
             },
             {
                 id: 'elongated',
@@ -859,7 +880,8 @@ class Player extends Entity {
                 icon: '💠',
                 type: 'bullet_effect',
                 effect: 'elongated',
-                value: 2.5
+                value: 2.5,
+                weight: 1
             },
             
             // 飞船属性升级
@@ -870,7 +892,8 @@ class Player extends Entity {
                 icon: '💨',
                 type: 'ship_attribute',
                 attribute: 'speed',
-                value: 0.15
+                value: 0.15,
+                weight: 1
             },
             {
                 id: 'energy_boost',
@@ -879,7 +902,8 @@ class Player extends Entity {
                 icon: '⚡',
                 type: 'ship_attribute',
                 attribute: 'energy',
-                value: 0.20
+                value: 0.20,
+                weight: 1
             },
             {
                 id: 'control_boost',
@@ -888,7 +912,8 @@ class Player extends Entity {
                 icon: '🎮',
                 type: 'ship_attribute',
                 attribute: 'rotationSpeed',
-                value: 0.25
+                value: 0.25,
+                weight: 1
             },
             {
                 id: 'health_boost',
@@ -897,7 +922,8 @@ class Player extends Entity {
                 icon: '❤️',
                 type: 'ship_attribute',
                 attribute: 'health',
-                value: 25
+                value: 25,
+                weight: 1
             },
             {
                 id: 'damage_boost',
@@ -906,7 +932,8 @@ class Player extends Entity {
                 icon: '💥',
                 type: 'ship_attribute',
                 attribute: 'damage',
-                value: 0.20
+                value: 0.20,
+                weight: 1
             },
             {
                 id: 'fire_rate_boost',
@@ -915,17 +942,19 @@ class Player extends Entity {
                 icon: '🔫',
                 type: 'ship_attribute',
                 attribute: 'fireRate',
-                value: 0.15
+                value: 0.15,
+                weight: 1
             },
             
-            // 特殊能力
+            // 特殊能力 - 提高子弹裂变权重
             {
                 id: 'split2',
                 name: '子弹裂变 ×2',
                 description: '每次发射2颗子弹',
                 icon: '🔱',
                 type: 'bullet_split',
-                value: 2
+                value: 2,
+                weight: 3 // 提高权重：更容易抽到
             },
             {
                 id: 'split3',
@@ -933,7 +962,8 @@ class Player extends Entity {
                 description: '每次发射3颗子弹',
                 icon: '⚡',
                 type: 'bullet_split',
-                value: 3
+                value: 3,
+                weight: 2 // 提高权重：更容易抽到
             },
             {
                 id: 'ray',
@@ -941,7 +971,8 @@ class Player extends Entity {
                 description: '子弹变为穿透射线',
                 icon: '✨',
                 type: 'bullet_type',
-                value: 'ray'
+                value: 'ray',
+                weight: 1
             },
             
             // 巡航导弹解锁选项
@@ -951,7 +982,8 @@ class Player extends Entity {
                 description: '穿透导弹 - 连续穿过3个敌人',
                 icon: '🚀',
                 type: 'missile_unlock',
-                missileType: '006'
+                missileType: '006',
+                weight: 1
             },
             {
                 id: 'unlock_011',
@@ -959,7 +991,8 @@ class Player extends Entity {
                 description: '范围+穿透组合导弹',
                 icon: '💣',
                 type: 'missile_unlock',
-                missileType: '011'
+                missileType: '011',
+                weight: 1
             },
             {
                 id: 'unlock_013',
@@ -967,7 +1000,8 @@ class Player extends Entity {
                 description: '裂变加速弹 - 快速摧毁就近敌人',
                 icon: '⚡',
                 type: 'missile_unlock',
-                missileType: '013'
+                missileType: '013',
+                weight: 1
             },
             {
                 id: 'unlock_023',
@@ -975,7 +1009,8 @@ class Player extends Entity {
                 description: '终极导弹 - 范围+穿透10+裂变',
                 icon: '🌟',
                 type: 'missile_unlock',
-                missileType: '023'
+                missileType: '023',
+                weight: 1
             },
             
             // 巡航导弹类型切换
@@ -985,7 +1020,8 @@ class Player extends Entity {
                 description: '穿透导弹 - 连续穿过3个敌人',
                 icon: '🚀',
                 type: 'missile_switch',
-                missileType: '006'
+                missileType: '006',
+                weight: 1
             },
             {
                 id: 'switch_011',
@@ -993,7 +1029,8 @@ class Player extends Entity {
                 description: '范围+穿透组合导弹',
                 icon: '💣',
                 type: 'missile_switch',
-                missileType: '011'
+                missileType: '011',
+                weight: 1
             },
             {
                 id: 'switch_013',
@@ -1001,7 +1038,8 @@ class Player extends Entity {
                 description: '裂变加速弹 - 快速摧毁就近敌人',
                 icon: '⚡',
                 type: 'missile_switch',
-                missileType: '013'
+                missileType: '013',
+                weight: 1
             },
             {
                 id: 'switch_023',
@@ -1009,21 +1047,47 @@ class Player extends Entity {
                 description: '终极导弹 - 范围+穿透10+裂变',
                 icon: '🌟',
                 type: 'missile_switch',
-                missileType: '023'
+                missileType: '023',
+                weight: 1
             }
         ];
         
-        // 随机选择3-4个选项
+        // 使用权重随机选择3-4个选项
         const optionCount = Utils.randomInt(3, 4);
         const selectedOptions = [];
         const usedIndices = new Set();
         
         while (selectedOptions.length < optionCount) {
-            const index = Utils.randomInt(0, allOptions.length - 1);
-            if (!usedIndices.has(index)) {
-                usedIndices.add(index);
-                selectedOptions.push(allOptions[index]);
+            // 加权随机选择
+            const totalWeight = allOptions.reduce((sum, opt, idx) => {
+                return usedIndices.has(idx) ? sum : sum + (opt.weight || 1);
+            }, 0);
+            
+            let random = Math.random() * totalWeight;
+            let selectedIndex = -1;
+            
+            for (let i = 0; i < allOptions.length; i++) {
+                if (usedIndices.has(i)) continue;
+                
+                const weight = allOptions[i].weight || 1;
+                random -= weight;
+                
+                if (random <= 0) {
+                    selectedIndex = i;
+                    break;
+                }
             }
+            
+            // 如果没选中（理论上不会发生），使用普通随机
+            if (selectedIndex === -1) {
+                selectedIndex = Utils.randomInt(0, allOptions.length - 1);
+                while (usedIndices.has(selectedIndex)) {
+                    selectedIndex = Utils.randomInt(0, allOptions.length - 1);
+                }
+            }
+            
+            usedIndices.add(selectedIndex);
+            selectedOptions.push(allOptions[selectedIndex]);
         }
         
         return selectedOptions;
@@ -1156,7 +1220,8 @@ class Player extends Entity {
     levelUp() {
         this.level++;
         this.skillPoints++;
-        this.expToNextLevel = Math.floor(this.expToNextLevel * 1.5);
+        // 使用配置的增长系数
+        this.expToNextLevel = Math.floor(this.expToNextLevel * this.expConfig.expGrowthRate);
 
         // 升级基础奖励
         this.maxHealth += 10;
@@ -1170,10 +1235,11 @@ class Player extends Entity {
         
         let hasItemReward = false;
         
-        // 02级默认解锁004导弹（无数量限制）
+        // 02级默认解锁004导弹，并启用自动发射功能
         if (this.level === 2) {
             this.unlockMissile('004');
-            console.log('🚀 等级2奖励：解锁004范围导弹（无限制发射）');
+            this.cruiseMissileEnabled = true;  // 启用巡航导弹自动发射
+            console.log('🚀 等级2奖励：解锁004范围导弹 + 启用自动发射功能');
             hasItemReward = true;
         }
         
@@ -2141,6 +2207,11 @@ class Player extends Entity {
     unlockMissile(missileType) {
         if (!this.inventory.unlockedMissiles.includes(missileType)) {
             this.inventory.unlockedMissiles.push(missileType);
+            // 首次解锁任何导弹时，启用自动发射功能
+            if (this.inventory.unlockedMissiles.length === 1) {
+                this.cruiseMissileEnabled = true;
+                console.log('🚀 首次解锁导弹，启用自动发射功能！');
+            }
             console.log(`解锁新导弹: ${missileType}`);
             return true;
         }

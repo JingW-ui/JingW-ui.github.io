@@ -281,11 +281,12 @@ class CruiseMissile extends Entity {
             enemy.color
         );
         
-        // 增加分数和经验
+        // 增加分数和击杀数
         if (this.owner === 'player' && window.game.player) {
             window.game.player.addScore(enemy.scoreValue);
             window.game.player.addKill();
-            window.game.player.addExperience(enemy.scoreValue / 10);
+            // 注意：不在这里给经验，经验通过收集经验球获得
+            // 避免双重经验获取（敌人死亡给经验 + 收集经验球再给经验）
             
             // 掉落收集物
             window.game.spawnCollectibles(enemy.position, enemy.type);
@@ -372,6 +373,9 @@ class CruiseMissile extends Entity {
         
         // 如果有爆炸半径，造成范围伤害
         if (this.explosionRadius > 0) {
+            // 记录已处理的敌人，防止重复计算
+            const processedEnemies = new Set();
+            
             for (const enemy of enemies) {
                 if (!enemy.isAlive()) continue;
                 
@@ -388,7 +392,9 @@ class CruiseMissile extends Entity {
                         window.game.particles.createHitSpark(enemy.position.x, enemy.position.y);
                     }
                     
-                    if (died) {
+                    // 使用敌人对象本身作为标识，防止重复处理
+                    if (died && !processedEnemies.has(enemy)) {
+                        processedEnemies.add(enemy);
                         this.handleEnemyDeath(enemy, enemies);
                     }
                 }

@@ -281,6 +281,12 @@
                             <span class="toggle-thumb"></span>
                         </button>
                     </div>
+                    <div class="setting-item setting-button-item">
+                        <button id="btn-open-exp-config" class="modal-btn btn-secondary full-width">
+                            <span class="btn-icon">⚙️</span>
+                            <span class="btn-text">经验值系统调参</span>
+                        </button>
+                    </div>
                 </div>
                 <button id="btn-settings-back" class="modal-btn btn-tertiary">返回</button>
             </div>
@@ -382,6 +388,57 @@
                 </div>
                 <div id="upgrade-selection-options" class="upgrade-selection-grid">
                     <!-- 选项将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 经验值调参界面 -->
+        <div id="exp-config-menu" class="screen">
+            <div class="overlay"></div>
+            <div class="modal exp-config-modal">
+                <h2>⚙️ 经验值系统调参</h2>
+                <div class="exp-config-info">
+                    <p class="config-hint">调整以下参数来平衡升级速度</p>
+                </div>
+                <div class="exp-config-controls">
+                    <div class="config-item">
+                        <label for="config-initial-exp">初始经验需求 (Lv.1→2)</label>
+                        <div class="config-slider-container">
+                            <input type="range" id="config-initial-exp" min="50" max="500" step="10" value="150">
+                            <span id="config-initial-exp-value" class="config-value">150</span>
+                        </div>
+                        <p class="config-desc">第一级升级所需的经验值，越小升级越快</p>
+                    </div>
+                    
+                    <div class="config-item">
+                        <label for="config-exp-growth">经验增长系数</label>
+                        <div class="config-slider-container">
+                            <input type="range" id="config-exp-growth" min="1.1" max="2.0" step="0.05" value="1.35">
+                            <span id="config-exp-growth-value" class="config-value">1.35</span>
+                        </div>
+                        <p class="config-desc">每级经验需求的增长倍数，越大后期越难升级</p>
+                    </div>
+                    
+                    <div class="config-item">
+                        <label for="config-exp-ratio">得分转经验比例</label>
+                        <div class="config-slider-container">
+                            <input type="range" id="config-exp-ratio" min="0.05" max="0.3" step="0.01" value="0.05">
+                            <span id="config-exp-ratio-value" class="config-value">0.05</span>
+                        </div>
+                        <p class="config-desc">敌人得分转换为经验的比例，越大获得经验越多</p>
+                    </div>
+                    
+                    <div class="config-preview">
+                        <h4>📊 升级预览</h4>
+                        <div id="exp-preview-table" class="exp-preview-table">
+                            <!-- 动态生成预览表格 -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button id="btn-exp-config-reset" class="modal-btn btn-secondary">恢复默认</button>
+                    <button id="btn-exp-config-apply" class="modal-btn btn-primary">应用设置</button>
+                    <button id="btn-exp-config-back" class="modal-btn btn-tertiary">取消</button>
                 </div>
             </div>
         </div>

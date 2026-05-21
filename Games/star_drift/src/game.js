@@ -85,6 +85,9 @@ class Game {
         
         // 绑定升级选择按钮事件
         this.bindUpgradeSelectionEvents();
+        
+        // 绑定经验值调参界面事件
+        this.bindExpConfigEvents();
 
         // 开始游戏循环
         requestAnimationFrame((t) => this.gameLoop(t));
@@ -334,6 +337,63 @@ class Game {
             });
         }
     }
+    
+    /**
+     * 绑定经验值调参界面事件
+     */
+    bindExpConfigEvents() {
+        // 打开调参界面
+        const openBtn = document.getElementById('btn-open-exp-config');
+        if (openBtn) {
+            openBtn.addEventListener('click', () => {
+                this.openExpConfigMenu();
+            });
+        }
+        
+        // 滑块事件
+        const sliders = [
+            { id: 'config-initial-exp', valueId: 'config-initial-exp-value' },
+            { id: 'config-exp-growth', valueId: 'config-exp-growth-value' },
+            { id: 'config-exp-ratio', valueId: 'config-exp-ratio-value' }
+        ];
+        
+        sliders.forEach(({ id, valueId }) => {
+            const slider = document.getElementById(id);
+            const valueDisplay = document.getElementById(valueId);
+            
+            if (slider && valueDisplay) {
+                slider.addEventListener('input', (e) => {
+                    const value = parseFloat(e.target.value);
+                    valueDisplay.textContent = value.toFixed(2).replace(/\.00$/, '');
+                    this.updateExpPreview();
+                });
+            }
+        });
+        
+        // 恢复默认按钮
+        const resetBtn = document.getElementById('btn-exp-config-reset');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                this.resetExpConfig();
+            });
+        }
+        
+        // 应用设置按钮
+        const applyBtn = document.getElementById('btn-exp-config-apply');
+        if (applyBtn) {
+            applyBtn.addEventListener('click', () => {
+                this.applyExpConfig();
+            });
+        }
+        
+        // 取消按钮
+        const backBtn = document.getElementById('btn-exp-config-back');
+        if (backBtn) {
+            backBtn.addEventListener('click', () => {
+                this.closeExpConfigMenu();
+            });
+        }
+    }
 
     bindToggle(id, settingKey, callback) {
         const btn = document.getElementById(id);
@@ -380,6 +440,13 @@ class Game {
         
         // 设置全局引用，让player可以访问particles
         window.game = this;
+        
+        // 加载保存的经验值配置
+        const savedExpConfig = Utils.loadData('expConfig');
+        if (savedExpConfig && this.player) {
+            this.player.expConfig = { ...this.player.expConfig, ...savedExpConfig };
+            console.log('✅ 已加载保存的经验值配置:', this.player.expConfig);
+        }
 
         // 无敌模式设置
         if (mode === 'god') {
@@ -823,7 +890,7 @@ class Game {
                     // 增加分数和击杀数
                     this.player.addScore(enemy.scoreValue);
                     this.player.addKill();
-                    const leveledUp = this.player.addExperience(enemy.scoreValue / 10);
+                    const leveledUp = this.player.addExperience(enemy.scoreValue * this.player.expConfig.expFromScoreRatio);
                     if (leveledUp) {
                         this.updateInventoryUI();
                         this.checkLevelUpSelection();
@@ -1124,13 +1191,9 @@ class Game {
         this.player.addScore(enemy.scoreValue);
         this.player.addKill();
         
-        // 处理升级
-        const leveledUp = this.player.addExperience(enemy.scoreValue / 10);
-        if (leveledUp) {
-            this.updateInventoryUI();
-            this.checkLevelUpSelection();
-        }
-
+        // 注意：不在这里给经验，经验通过收集经验球获得
+        // 避免双重经验获取（敌人死亡给经验 + 收集经验球再给经验）
+        
         Utils.vibrate(30);
     }
 
@@ -1143,13 +1206,13 @@ class Game {
                 this.player.rechargeEnergy(effect.value);
                 break;
             case 'exp':
-                const hasItemReward = this.player.addExperience(effect.value);
-                if (hasItemReward) {
+                const leveledUp = this.player.addExperience(effect.value);
+                if (leveledUp) {
                     // 如果升级获得道具奖励，更新背包UI
                     this.updateInventoryUI();
+                    // 检查是否触发升级选择（防重复）
+                    this.checkLevelUpSelection();
                 }
-                // 检查是否触发升级选择
-                this.checkLevelUpSelection();
                 break;
             case 'health':
                 this.player.heal(effect.value);
@@ -1178,8 +1241,15 @@ class Game {
     checkLevelUpSelection() {
         if (!this.player) return;
         
+        // 防止重复触发：如果已经在升级界面，不再触发
+        if (this.state === 'upgrade_selection') {
+            console.log('升级弹窗已显示，跳过重复触发');
+            return;
+        }
+        
         // 如果有技能点未使用，显示升级选择
         if (this.player.skillPoints > 0 && this.state === 'playing') {
+            console.log(`检测到 ${this.player.skillPoints} 个技能点，触发升级选择`);
             this.state = 'upgrade_selection';
             this.showUpgradeSelection();
         }
@@ -1274,14 +1344,140 @@ class Game {
         this.showScreen('hud');
         this.state = 'playing';
         
-        // 只有当还有未使用的技能点时，才检查是否需要再次弹出
-        // （例如一次性升多级的情况）
+        // 如果还有未使用的技能点，继续弹出下一个升级选项
+        // （处理一次性升多级的情况）
         if (this.player.skillPoints > 0) {
-            console.warn(`还有 ${this.player.skillPoints} 个未使用的技能点`);
-            // 不自动弹出，让玩家按U键手动打开升级界面
+            console.log(`还有 ${this.player.skillPoints} 个技能点，继续显示升级选择`);
+            // 延迟一小段时间再显示下一个，避免连续弹窗太快
+            setTimeout(() => {
+                if (this.player.skillPoints > 0 && this.state === 'playing') {
+                    this.state = 'upgrade_selection';
+                    this.showUpgradeSelection();
+                }
+            }, 300); // 300ms 延迟
         } else {
             console.log('所有技能点已使用完毕');
         }
+    }
+    
+    /**
+     * 打开经验值调参界面
+     */
+    openExpConfigMenu() {
+        // 加载当前配置
+        const config = this.player ? this.player.expConfig : {
+            initialExp: 150,
+            expGrowthRate: 1.35,
+            expFromScoreRatio: 0.05  // 更新默认值为0.05
+        };
+        
+        document.getElementById('config-initial-exp').value = config.initialExp;
+        document.getElementById('config-initial-exp-value').textContent = config.initialExp;
+        
+        document.getElementById('config-exp-growth').value = config.expGrowthRate;
+        document.getElementById('config-exp-growth-value').textContent = config.expGrowthRate.toFixed(2);
+        
+        document.getElementById('config-exp-ratio').value = config.expFromScoreRatio;
+        document.getElementById('config-exp-ratio-value').textContent = config.expFromScoreRatio.toFixed(2);
+        
+        // 更新预览表格
+        this.updateExpPreview();
+        
+        // 显示界面
+        this.showScreen('exp-config-menu');
+    }
+    
+    /**
+     * 关闭经验值调参界面
+     */
+    closeExpConfigMenu() {
+        if (this.state === 'playing') {
+            this.showScreen('hud');
+        } else {
+            this.showScreen('settings-menu');
+        }
+    }
+    
+    /**
+     * 恢复默认配置
+     */
+    resetExpConfig() {
+        document.getElementById('config-initial-exp').value = 150;
+        document.getElementById('config-initial-exp-value').textContent = '150';
+        
+        document.getElementById('config-exp-growth').value = 1.35;
+        document.getElementById('config-exp-growth-value').textContent = '1.35';
+        
+        document.getElementById('config-exp-ratio').value = 0.05;  // 更新默认值
+        document.getElementById('config-exp-ratio-value').textContent = '0.05';
+        
+        this.updateExpPreview();
+    }
+    
+    /**
+     * 应用配置
+     */
+    applyExpConfig() {
+        if (!this.player) return;
+        
+        const newConfig = {
+            initialExp: parseInt(document.getElementById('config-initial-exp').value),
+            expGrowthRate: parseFloat(document.getElementById('config-exp-growth').value),
+            expFromScoreRatio: parseFloat(document.getElementById('config-exp-ratio').value)
+        };
+        
+        // 应用到玩家对象
+        this.player.expConfig = newConfig;
+        
+        // 如果是新游戏，重置当前经验需求
+        if (this.player.level === 1) {
+            this.player.expToNextLevel = newConfig.initialExp;
+        }
+        
+        console.log('✅ 经验值配置已更新:', newConfig);
+        
+        // 保存配置到localStorage
+        Utils.saveData('expConfig', newConfig);
+        
+        // 关闭界面
+        this.closeExpConfigMenu();
+    }
+    
+    /**
+     * 更新经验值预览表格
+     */
+    updateExpPreview() {
+        const initialExp = parseInt(document.getElementById('config-initial-exp').value);
+        const growthRate = parseFloat(document.getElementById('config-exp-growth').value);
+        const ratio = parseFloat(document.getElementById('config-exp-ratio').value);
+        
+        const previewTable = document.getElementById('exp-preview-table');
+        if (!previewTable) return;
+        
+        // 生成前20级的预览数据
+        let html = '<table>';
+        html += '<thead><tr><th>等级</th><th>所需经验</th><th>累计经验</th><th>预估击杀数</th></tr></thead>';
+        html += '<tbody>';
+        
+        let currentExp = initialExp;
+        let totalExp = 0;
+        
+        for (let level = 1; level <= 20; level++) {
+            totalExp += currentExp;
+            const estimatedKills = Math.ceil(currentExp / (100 * ratio)); // 假设平均敌人得分100
+            
+            html += `<tr>`;
+            html += `<td>Lv.${level}→${level + 1}</td>`;
+            html += `<td>${currentExp}</td>`;
+            html += `<td>${totalExp}</td>`;
+            html += `<td>~${estimatedKills}个</td>`;
+            html += `</tr>`;
+            
+            currentExp = Math.floor(currentExp * growthRate);
+        }
+        
+        html += '</tbody></table>';
+        previewTable.innerHTML = html;
     }
 
     updateUpgradeUI() {
