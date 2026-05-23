@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>像素风上课抽签器</title>
+<!-- 引入像素字体 -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet"/>
+<!-- 引入五彩纸屑特效库 -->
+<script src="https://image.uc.cn/s/uae/g/3n/mos-production/cdn.jsdelivr.net/npm/canvas-confetti/1.6.0/dist/confetti.browser.min.js"></script>
+<!-- 引入SheetJS库用于Excel处理 -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<style>
+        :root {
+            --bg-color: #f5f5f5; /* 灰白背景 */
+            --screen-bg: #2d3748; /* 深灰蓝 */
+            --screen-active: #4a5568; /* 稍浅的灰色 */
+            --primary-color: #2f855a; /* 绿色 */
+            --primary-shadow: #276749; /* 深绿色 */
+            --secondary-color: #2b6cb0; /* 蓝色 */
+            --secondary-shadow: #2c5282; /* 深蓝色 */
+            --text-color: #e2e8f0; /* 浅灰色文字 */
+            --highlight: #48bb78; /* 亮绿色 */
+            --pixel-border: 4px solid #1a202c; /* 深灰色边框 */
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: var(--bg-color);
+            color: #2d3748; /* 深灰色文字 */
+            font-family: 'Press Start 2P', cursive; /* 像素字体 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            image-rendering: pixelated;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #edf2f7; /* 浅灰白 */
+            border: 4px solid #2d3748; /* 深灰边框 */
+            box-shadow:
+                -4px 0 0 0 #a0aec0,
+                4px 0 0 0 #ffffff,
+                0 -4px 0 0 #ffffff,
+                0 4px 0 0 #a0aec0,
+                8px 8px 0 0 rgba(45,55,72,0.3);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            text-align: center;
+            color: #2d3748; /* 深灰色 */
+            text-shadow: 2px 2px 0 #ffffff;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* 主屏幕区域 */
+        .screen-container {
+            background-color: #4a5568; /* 中灰色 */
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: inset 2px 2px 5px rgba(26,32,44,0.3);
+        }
+
+        .screen {
+            background-color: var(--screen-bg);
+            border: var(--pixel-border);
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 2px 2px 0 rgba(0,0,0,0.2);
+        }
+
+        /* 扫描线效果 */
+        .screen::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+            background-size: 100% 4px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .student-name {
+            font-size: 2rem;
+            color: var(--text-color);
+            text-align: center;
+            z-index: 1;
+            word-break: break-all;
+            padding: 10px;
+            line-height: 1.2;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-color);
+            margin-top: 10px;
+            background-color: var(--screen-bg);
+            padding: 10px;
+            border: var(--pixel-border);
+        }
+
+        /* 按钮区域 */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 10px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.8rem;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            text-transform: uppercase;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: translate(2px, 2px);
+        }
+
+        .btn-draw {
+            background-color: var(--primary-color);
+            box-shadow:
+                inset -4px -4px 0px var(--primary-shadow),
+                inset 4px 4px 0px #ff6659,
+                0 4px 0 var(--primary-shadow);
+        }
+
+        .btn-draw:active {
+            box-shadow:
+                inset -2px -2px 0px var(--primary-shadow),
+                inset 2px 2px 0px #ff6659,
+                0 2px 0 var(--primary-shadow);
+        }
+
+        .btn-reset {
+            background-color: var(--secondary-color);
+            box-shadow:
+                inset -4px -4px 0px var(--secondary-shadow),
+                inset 4px 4px 0px #66bb6a,
+                0 4px 0 var(--secondary-shadow);
+        }
+
+        .btn-reset:active {
+            box-shadow:
+                inset -2px -2px 0px var(--secondary-shadow),
+                inset 2px 2px 0px #66bb6a,
+                0 2px 0 var(--secondary-shadow);
+        }
+
+        .btn:disabled {
+            background-color: #777;
+            box-shadow: none;
+            color: #aaa;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 历史记录区域 */
+        .history-section {
+            border-top: 4px solid #a0aec0; /* 浅灰色 */
+            padding-top: 15px;
+        }
+
+        .history-title {
+            font-size: 0.7rem;
+            color: #2d3748; /* 深灰色 */
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #2d3748; /* 深灰背景 */
+            padding: 10px;
+            border: 2px solid #4a5568; /* 中灰色边框 */
+        }
+
+        /* 自定义滚动条 */
+        .history-grid::-webkit-scrollbar {
+            width: 10px;
+        }
+        .history-grid::-webkit-scrollbar-track {
+            background: #333;
+        }
+        .history-grid::-webkit-scrollbar-thumb {
+            background: #888;
+            border: 1px solid #000;
+        }
+
+        .history-item {
+            background-color: #4a5568; /* 中灰色 */
+            color: #e2e8f0; /* 浅灰色文字 */
+            font-size: 0.6rem;
+            padding: 5px;
+            text-align: center;
+            border: 2px solid #2d3748; /* 深灰边框 */
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .history-item:hover {
+            background-color: #2f855a; /* 绿色高亮 */
+        }
+
+        /* 隐藏的数据导入区域 */
+        .import-zone {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 1000;
+            transition: opacity 0.3s;
+        }
+
+        .import-zone:hover {
+            opacity: 0.3;
+        }
+
+        /* 隐藏的导入模态框 */
+        .import-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .import-modal.show {
+            display: flex;
+        }
+
+        .import-content {
+            background: #1a202c;
+            padding: 30px;
+            border-radius: 4px;
+            max-width: 600px;
+            width: 90%;
+            color: #e2e8f0;
+            border: 4px solid #2d3748;
+            box-shadow: 0 0 20px rgba(72, 187, 120, 0.3);
+        }
+
+        .import-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #2d3748;
+        }
+
+        .import-tab {
+            padding: 10px 15px;
+            background: none;
+            border: none;
+            color: #718096;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            transition: all 0.2s;
+        }
+
+        .import-tab:hover {
+            color: #a0aec0;
+        }
+
+        .import-tab.active {
+            color: #48bb78;
+            border-bottom: 2px solid #48bb78;
+        }
+
+        .import-panel {
+            display: none;
+        }
+
+        .import-panel.active {
+            display: block;
+        }
+
+        .import-textarea {
+            width: 100%;
+            height: 120px;
+            background: #2d3748;
+            border: 2px solid #4a5568;
+            color: #e2e8f0;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.7rem;
+            margin-bottom: 15px;
+            resize: vertical;
+        }
+
+        .import-textarea:focus {
+            outline: none;
+            border-color: #48bb78;
+        }
+
+        .import-btn {
+            background: #2f855a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+            margin-right: 10px;
+            margin-top: 5px;
+            box-shadow: 0 3px 0 #276749;
+        }
+
+        .import-btn:hover {
+            background: #276749;
+        }
+
+        .import-btn:active {
+            box-shadow: 0 1px 0 #276749;
+            transform: translateY(2px);
+        }
+
+        .import-btn.secondary {
+            background: #4a5568;
+            box-shadow: 0 3px 0 #2d3748;
+        }
+
+        .import-btn.secondary:hover {
+            background: #2d3748;
+        }
+
+        .drag-drop-zone {
+            border: 2px dashed #4a5568;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #2d3748;
+        }
+
+        .drag-drop-zone.drag-over {
+            border-color: #48bb78;
+            background: rgba(72, 187, 120, 0.1);
+        }
+
+        .drag-drop-zone-text {
+            font-size: 0.6rem;
+            color: #a0aec0;
+            line-height: 1.8;
+        }
+
+        .student-list-preview {
+            max-height: 150px;
+            overflow-y: auto;
+            background: #2d3748;
+            padding: 10px;
+            border: 2px solid #4a5568;
+            margin-top: 10px;
+        }
+
+        .student-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 8px;
+            margin-bottom: 5px;
+            background: #1a202c;
+            border: 1px solid #4a5568;
+            font-size: 0.6rem;
+        }
+
+        .student-list-item button {
+            background: #e53e3e;
+            color: white;
+            border: none;
+            padding: 3px 8px;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+        }
+
+        .student-list-item button:hover {
+            background: #c53030;
+        }
+
+        .add-student-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .add-student-input {
+            flex: 1;
+            background: #2d3748;
+            border: 2px solid #4a5568;
+            color: #e2e8f0;
+            padding: 8px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6rem;
+        }
+
+        .add-student-input:focus {
+            outline: none;
+            border-color: #48bb78;
+        }
+
+        .export-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #2d3748;
+        }
+
+        .info-text {
+            font-size: 0.5rem;
+            color: #718096;
+            margin-top: 10px;
+            line-height: 1.6;
+        }
+
+        /* 右下角隐蔽提示 */
+        .hint-carousel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(45, 55, 72, 0.9);
+            border: 2px solid #4a5568;
+            padding: 10px 15px;
+            font-size: 0.5rem;
+            color: #718096;
+            z-index: 100;
+            max-width: 250px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .hint-carousel:hover {
+            opacity: 1;
+            border-color: #48bb78;
+            color: #a0aec0;
+        }
+
+        .hint-text {
+            line-height: 1.6;
+            animation: fadeInOut 8s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.4; }
+            10%, 90% { opacity: 1; }
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* 抽签时的动画类 */
+        .rolling {
+            animation: glitch 0.2s infinite;
+            color: var(--highlight);
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 480px) {
+            .student-name { font-size: 1.5rem; }
+            .btn { font-size: 0.7rem; padding: 12px 5px; }
+            .container { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+<!-- 隐藏的导入模态框 - 通过特殊操作触发 -->
+<div class="import-modal" id="import-modal">
+    <div class="import-content">
+        <h3 style="margin-top: 0; color: #48bb78; font-size: 0.8rem;">⚙️ DATA MANAGER</h3>
+
+        <div class="import-tabs">
+            <button class="import-tab active" data-tab="text">TEXT</button>
+            <button class="import-tab" data-tab="excel">EXCEL</button>
+            <button class="import-tab" data-tab="json">JSON</button>
+            <button class="import-tab" data-tab="manual">MANUAL</button>
+            <button class="import-tab" data-tab="export">EXPORT</button>
+        </div>
+
+        <!-- 文本导入面板 -->
+        <div class="import-panel active" id="panel-text">
+            <textarea class="import-textarea" id="text-input" placeholder="每行一个名字&#10;例如：&#10;张三&#10;李四&#10;王五"></textarea>
+            <button class="import-btn" onclick="importFromText()">IMPORT</button>
+            <button class="import-btn secondary" onclick="closeImportModal()">CANCEL</button>
+        </div>
+
+        <!-- Excel导入面板 -->
+        <div class="import-panel" id="panel-excel">
+            <div class="drag-drop-zone" id="drop-zone">
+                <div class="drag-drop-zone-text">
+                    📁 DRAG & DROP EXCEL FILE HERE<br>
+                    or click to select file<br>
+                    <span style="font-size: 0.5rem; color: #718096;">Supports: .xlsx, .xls, .csv</span>
+                </div>
+            </div>
+            <input type="file" id="excel-input" accept=".xlsx,.xls,.csv" style="display: none;">
+            <div id="file-info" style="font-size: 0.6rem; color: #a0aec0; margin-bottom: 10px;"></div>
+            <button class="import-btn secondary" onclick="closeImportModal()">CANCEL</button>
+        </div>
+
+        <!-- JSON导入面板 -->
+        <div class="import-panel" id="panel-json">
+            <textarea class="import-textarea" id="json-input" placeholder='JSON数组格式&#10;例如：&#10;["张三", "李四", "王五"]'></textarea>
+            <button class="import-btn" onclick="importFromJSON()">IMPORT</button>
+            <button class="import-btn secondary" onclick="closeImportModal()">CANCEL</button>
+        </div>
+
+        <!-- 手动管理面板 -->
+        <div class="import-panel" id="panel-manual">
+            <div class="add-student-input-group">
+                <input type="text" class="add-student-input" id="manual-input" placeholder="输入名字..." onkeypress="if(event.key==='Enter') addStudentManual()">
+                <button class="import-btn" onclick="addStudentManual()">ADD</button>
+            </div>
+            <div class="student-list-preview" id="student-list-preview">
+                <!-- 动态生成学生列表 -->
+            </div>
+            <div class="info-text">
+                💡 Click × to remove a student<br>
+                Total: <span id="total-count">0</span> students
+            </div>
+            <button class="import-btn secondary" onclick="closeImportModal()" style="margin-top: 10px;">CLOSE</button>
+        </div>
+
+        <!-- 导出面板 -->
+        <div class="import-panel" id="panel-export">
+            <div style="text-align: center; padding: 20px;">
+                <div style="font-size: 0.6rem; color: #a0aec0; margin-bottom: 20px;">
+                    Current student list: <span id="export-count" style="color: #48bb78;">0</span> students
+                </div>
+                <button class="import-btn" onclick="exportToText()">EXPORT TXT</button>
+                <button class="import-btn" onclick="exportToJSON()">EXPORT JSON</button>
+                <button class="import-btn" onclick="exportToExcel()">EXPORT EXCEL</button>
+            </div>
+            <button class="import-btn secondary" onclick="closeImportModal()">CLOSE</button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+<header>
+<h1>LUCKY DRAW</h1>
+<div style="font-size: 0.6rem; color: #555; margin-top: 5px;">CLASSROOM EDITION</div>
+</header>
+<main>
+<div class="screen-container">
+<div aria-live="polite" class="screen">
+<div class="student-name" id="display-area">READY</div>
+</div>
+<div class="status-bar">
+<span id="status-text">STATUS: IDLE</span>
+<span id="count-text">REMAINING: 56</span>
+</div>
+</div>
+<div class="controls">
+<button class="btn btn-draw" id="draw-btn">抽签 (DRAW)</button>
+<button class="btn btn-reset" id="reset-btn">重置 (RESET)</button>
+</div>
+<div class="history-section">
+<div class="history-title">PICKED STUDENTS</div>
+<div class="history-grid" id="history-grid">
+<!-- 历史记录动态插入 -->
+</div>
+</div>
+</main>
+</div>
+
+<!-- 右下角隐蔽提示 -->
+<div class="hint-carousel" id="hint-carousel" title="Click to open data manager">
+    <div class="hint-text" id="hint-text">💡 Ctrl+Alt+D: Data Manager</div>
+</div>
+
+<script>
+        // 学生名单数据 (56人)
+        let initialStudents = [
+            "王伟", "李芳", "张强", "刘艳", "陈明", "杨洋", "赵军", "黄洁",
+            "周勇", "吴静", "徐磊", "孙悦", "马超", "朱婷", "胡峰", "郭涵",
+            "罗军", "高琳", "林涛", "何霞", "郑凯", "梁爽", "谢宇", "宋茜",
+            "唐龙", "许诺", "韩冰", "冯源", "邓杰", "曹敏", "彭飞", "曾佳",
+            "萧然", "田甜", "董浩", "潘多", "袁征", "于萌", "叶帆", "蒋薇",
+            "蔡晨", "贾博", "丁艺", "魏然", "薛坤", "杜鹃", "阎肃", "余倩",
+            "孟凡", "金灿", "陆远", "邵青", "汪洋", "龙腾", "段誉"
+        ];
+
+        // 状态管理
+        let remainingStudents = [...initialStudents];
+        let isRolling = false;
+        let rollInterval;
+
+        // DOM 元素
+        const displayArea = document.getElementById('display-area');
+        const drawBtn = document.getElementById('draw-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const countText = document.getElementById('count-text');
+        const statusText = document.getElementById('status-text');
+        const historyGrid = document.getElementById('history-grid');
+
+        // 初始化
+        function init() {
+            updateCount();
+            renderHistory();
+        }
+
+        // 更新剩余人数显示
+        function updateCount() {
+            countText.textContent = `REMAINING: ${remainingStudents.length}`;
+        }
+
+        // 渲染历史记录 (反向显示，最新的在最前)
+        function renderHistory() {
+            historyGrid.innerHTML = '';
+            // 计算已抽取的学生
+            const picked = initialStudents.filter(s => !remainingStudents.includes(s));
+
+            picked.forEach(name => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.textContent = name;
+                historyGrid.appendChild(div);
+            });
+        }
+
+        // 抽签逻辑
+        function startDraw() {
+            if (isRolling) return;
+            if (remainingStudents.length === 0) {
+                displayArea.textContent = "EMPTY!";
+                displayArea.classList.add('rolling');
+                setTimeout(() => displayArea.classList.remove('rolling'), 500);
+                return;
+            }
+
+            isRolling = true;
+            drawBtn.disabled = true;
+            resetBtn.disabled = true;
+            statusText.textContent = "STATUS: ROLLING...";
+            displayArea.classList.add('rolling');
+
+            // 视觉滚动效果
+            let speed = 50;
+            let counter = 0;
+            const totalRolls = 20; // 滚动多少次后停下
+
+            rollInterval = setInterval(() => {
+                // 随机显示一个名字作为动画效果
+                const randomIndex = Math.floor(Math.random() * remainingStudents.length);
+                displayArea.textContent = remainingStudents[randomIndex];
+
+                counter++;
+                if (counter >= totalRolls) {
+                    finalizeDraw();
+                }
+            }, speed);
+        }
+
+        // 确定最终结果
+        function finalizeDraw() {
+            clearInterval(rollInterval);
+
+            // 真正的随机抽取逻辑
+            const winnerIndex = Math.floor(Math.random() * remainingStudents.length);
+            const winnerName = remainingStudents[winnerIndex];
+
+            // 从剩余名单中移除
+            remainingStudents.splice(winnerIndex, 1);
+
+            // 更新UI
+            displayArea.textContent = winnerName;
+            displayArea.classList.remove('rolling');
+            statusText.textContent = "STATUS: WINNER!";
+            updateCount();
+            renderHistory();
+
+            // 触发五彩纸屑特效
+            triggerConfetti();
+
+            // 恢复按钮状态
+            isRolling = false;
+            drawBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+
+        // 重置逻辑
+        function resetApp() {
+            if (isRolling) return;
+
+            // 简单的确认机制（非原生alert，使用UI状态变化）
+            // 这里为了流畅体验直接重置，并给视觉反馈
+            remainingStudents = [...initialStudents];
+            displayArea.textContent = "READY";
+            statusText.textContent = "STATUS: IDLE";
+            updateCount();
+            renderHistory();
+
+            // 按钮点击反馈动画
+            resetBtn.style.transform = "scale(0.95)";
+            setTimeout(() => resetBtn.style.transform = "scale(1)", 100);
+        }
+
+        // 五彩纸屑特效配置
+        function triggerConfetti() {
+            const count = 200;
+            const defaults = {
+                origin: { y: 0.7 }
+            };
+
+            function fire(particleRatio, opts) {
+                confetti(Object.assign({}, defaults, opts, {
+                    particleCount: Math.floor(count * particleRatio)
+                }));
+            }
+
+            fire(0.25, { spread: 26, startVelocity: 55, colors: ['#ff0055', '#00e436'] });
+            fire(0.2, { spread: 60, colors: ['#ffcc00', '#00ccff'] });
+            fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+            fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+            fire(0.1, { spread: 120, startVelocity: 45 });
+        }
+
+        // 数据导入相关功能
+        const importZone = document.getElementById('import-zone');
+        const importModal = document.getElementById('import-modal');
+
+        // 多种隐蔽方式触发导入功能
+        function setupImportTriggers() {
+            // 1. 快捷键触发 (Ctrl+Alt+D)
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.altKey && e.key === 'd') {
+                    e.preventDefault();
+                    openImportModal();
+                }
+            });
+
+            // 2. 连续点击标题3次
+            let clickCount = 0;
+            let clickTimer;
+            document.querySelector('h1').addEventListener('click', function() {
+                clickCount++;
+                clearTimeout(clickTimer);
+                if (clickCount >= 3) {
+                    openImportModal();
+                    clickCount = 0;
+                }
+                clickTimer = setTimeout(() => clickCount = 0, 800);
+            });
+
+            // 3. 在剩余人数显示上右键
+            countText.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                openImportModal();
+            });
+
+            // 4. 重置按钮长按 (3秒)
+            let resetPressTimer;
+            resetBtn.addEventListener('mousedown', function() {
+                resetPressTimer = setTimeout(() => {
+                    openImportModal();
+                }, 3000);
+            });
+
+            resetBtn.addEventListener('mouseup', function() {
+                clearTimeout(resetPressTimer);
+            });
+
+            resetBtn.addEventListener('mouseleave', function() {
+                clearTimeout(resetPressTimer);
+            });
+
+            // 5. 历史记录区域双击 + Shift键
+            historyGrid.addEventListener('dblclick', function(e) {
+                if (e.shiftKey) {
+                    openImportModal();
+                }
+            });
+        }
+
+        function openImportModal() {
+            importModal.classList.add('show');
+            document.getElementById('text-input').focus();
+        }
+
+        // 关闭模态框
+        function closeImportModal() {
+            importModal.classList.remove('show');
+            // 重置所有输入
+            document.getElementById('text-input').value = '';
+            document.getElementById('json-input').value = '';
+            document.getElementById('excel-input').value = '';
+            document.getElementById('file-info').textContent = '';
+            document.getElementById('manual-input').value = '';
+        }
+
+        // 切换导入方式标签
+        function setupImportTabs() {
+            const tabs = document.querySelectorAll('.import-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const target = this.getAttribute('data-tab');
+
+                    // 切换标签激活状态
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // 切换面板
+                    document.querySelectorAll('.import-panel').forEach(panel => {
+                        panel.classList.remove('active');
+                    });
+                    document.getElementById(`panel-${target}`).classList.add('active');
+
+                    // 如果切换到手动管理面板，刷新列表
+                    if (target === 'manual') {
+                        updateStudentListPreview();
+                    }
+                    // 如果切换到导出面板，更新计数
+                    if (target === 'export') {
+                        document.getElementById('export-count').textContent = initialStudents.length;
+                    }
+                });
+            });
+        }
+
+        // 文本导入
+        function importFromText() {
+            const input = document.getElementById('text-input').value.trim();
+            if (!input) {
+                showNotification('Please enter data');
+                return;
+            }
+
+            const names = input.split('\n').map(name => name.trim()).filter(name => name);
+            if (names.length === 0) {
+                showNotification('No valid data found');
+                return;
+            }
+
+            updateStudentList(names);
+            closeImportModal();
+            showNotification(`Imported ${names.length} students`);
+        }
+
+        // Excel导入
+        function setupExcelImport() {
+            const dropZone = document.getElementById('drop-zone');
+            const excelInput = document.getElementById('excel-input');
+            const fileInfo = document.getElementById('file-info');
+
+            // 点击选择文件
+            dropZone.addEventListener('click', () => excelInput.click());
+
+            // 拖拽事件
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('drag-over');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('drag-over');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleExcelFile(files[0]);
+                }
+            });
+
+            // 文件选择
+            excelInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleExcelFile(e.target.files[0]);
+                }
+            });
+
+            function handleExcelFile(file) {
+                fileInfo.textContent = `Selected: ${file.name}`;
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        
+                        // 读取第一个工作表
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        
+                        // 提取所有非空字符串
+                        const names = [];
+                        jsonData.forEach(row => {
+                            row.forEach(cell => {
+                                if (cell && typeof cell === 'string' && cell.trim()) {
+                                    names.push(cell.trim());
+                                }
+                            });
+                        });
+
+                        if (names.length === 0) {
+                            showNotification('No valid data found in file');
+                            return;
+                        }
+
+                        updateStudentList(names);
+                        closeImportModal();
+                        showNotification(`Imported ${names.length} students from Excel`);
+                    } catch (error) {
+                        showNotification('Error reading file: ' + error.message);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        }
+
+        // JSON导入
+        function importFromJSON() {
+            const input = document.getElementById('json-input').value.trim();
+            if (!input) {
+                showNotification('Please enter JSON data');
+                return;
+            }
+
+            try {
+                const names = JSON.parse(input);
+                if (!Array.isArray(names)) {
+                    showNotification('Invalid format: must be an array');
+                    return;
+                }
+
+                const validNames = names.map(name => String(name).trim()).filter(name => name);
+                if (validNames.length === 0) {
+                    showNotification('No valid data found');
+                    return;
+                }
+
+                updateStudentList(validNames);
+                closeImportModal();
+                showNotification(`Imported ${validNames.length} students`);
+            } catch (e) {
+                showNotification('JSON parse error: ' + e.message);
+            }
+        }
+
+        // 手动添加学生
+        function addStudentManual() {
+            const input = document.getElementById('manual-input');
+            const name = input.value.trim();
+            
+            if (!name) {
+                showNotification('Please enter a name');
+                return;
+            }
+
+            if (initialStudents.includes(name)) {
+                showNotification('Name already exists');
+                return;
+            }
+
+            initialStudents.push(name);
+            remainingStudents = [...initialStudents];
+            input.value = '';
+            updateStudentListPreview();
+            updateCount();
+            renderHistory();
+            showNotification(`Added: ${name}`);
+        }
+
+        // 删除学生
+        function removeStudent(index) {
+            const name = initialStudents[index];
+            initialStudents.splice(index, 1);
+            remainingStudents = [...initialStudents];
+            updateStudentListPreview();
+            updateCount();
+            renderHistory();
+            showNotification(`Removed: ${name}`);
+        }
+
+        // 更新学生列表预览
+        function updateStudentListPreview() {
+            const preview = document.getElementById('student-list-preview');
+            const totalCount = document.getElementById('total-count');
+            
+            preview.innerHTML = '';
+            totalCount.textContent = initialStudents.length;
+
+            initialStudents.forEach((name, index) => {
+                const item = document.createElement('div');
+                item.className = 'student-list-item';
+                item.innerHTML = `
+                    <span>${name}</span>
+                    <button onclick="removeStudent(${index})">×</button>
+                `;
+                preview.appendChild(item);
+            });
+        }
+
+        // 导出为文本
+        function exportToText() {
+            const content = initialStudents.join('\n');
+            downloadFile(content, 'students.txt', 'text/plain');
+            showNotification('Exported to TXT');
+        }
+
+        // 导出为JSON
+        function exportToJSON() {
+            const content = JSON.stringify(initialStudents, null, 2);
+            downloadFile(content, 'students.json', 'application/json');
+            showNotification('Exported to JSON');
+        }
+
+        // 导出为Excel
+        function exportToExcel() {
+            const ws = XLSX.utils.aoa_to_sheet([['Name'], ...initialStudents.map(name => [name])]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Students');
+            XLSX.writeFile(wb, 'students.xlsx');
+            showNotification('Exported to Excel');
+        }
+
+        // 下载文件辅助函数
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 显示通知（替代alert）
+        function showNotification(message) {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #2f855a;
+                color: white;
+                padding: 15px 20px;
+                border: 2px solid #48bb78;
+                font-family: 'Press Start 2P', cursive;
+                font-size: 0.6rem;
+                z-index: 3000;
+                box-shadow: 0 4px 0 #276749;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            // 2秒后自动消失
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 2000);
+        }
+
+        // 添加通知动画
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(400px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // 更新学生列表
+        function updateStudentList(newNames) {
+            initialStudents = newNames;
+            remainingStudents = [...initialStudents];
+
+            // 重置显示
+            displayArea.textContent = "READY";
+            statusText.textContent = "STATUS: IDLE";
+            updateCount();
+            renderHistory();
+
+            // 显示导入成功的视觉反馈
+            const originalColor = container.style.backgroundColor;
+            container.style.backgroundColor = '#2f855a';
+            container.style.transition = 'background-color 0.3s';
+            setTimeout(() => {
+                container.style.backgroundColor = originalColor;
+            }, 300);
+
+            console.log(`成功导入 ${newNames.length} 个名字`);
+        }
+
+        // 事件监听
+        drawBtn.addEventListener('click', startDraw);
+        resetBtn.addEventListener('click', resetApp);
+
+        // 设置导入功能
+        setupImportTriggers();
+        setupImportTabs();
+        setupExcelImport();
+
+        // 点击模态框外部关闭
+        importModal.addEventListener('click', function(e) {
+            if (e.target === importModal) {
+                closeImportModal();
+            }
+        });
+
+        // 启动初始化
+        init();
+
+        // 右下角提示轮播功能
+        function setupHintCarousel() {
+            const hints = [
+                '💡 Ctrl+Alt+D: Data Manager',
+                '👆 Click title 3x: Open settings',
+                '🖱️ Right-click count: Import data',
+                '⏱️ Hold RESET 3s: Data manager',
+                '⇧ Shift+Double click history'
+            ];
+            
+            let currentIndex = 0;
+            const hintText = document.getElementById('hint-text');
+            const hintCarousel = document.getElementById('hint-carousel');
+            
+            // 每4秒切换一次提示
+            setInterval(() => {
+                currentIndex = (currentIndex + 1) % hints.length;
+                hintText.style.opacity = '0';
+                
+                setTimeout(() => {
+                    hintText.textContent = hints[currentIndex];
+                    hintText.style.opacity = '1';
+                }, 300);
+            }, 4000);
+            
+            // 点击提示直接打开数据管理器
+            hintCarousel.addEventListener('click', openImportModal);
+            
+            // 添加淡入淡出过渡
+            hintText.style.transition = 'opacity 0.3s ease';
+        }
+
+        setupHintCarousel();
+
+    </script>
+</body>
+</html>
