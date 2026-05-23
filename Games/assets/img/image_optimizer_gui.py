@@ -99,7 +99,7 @@ class ImageOptimizerGUI:
         
         # 减少颜色深度
         self.reduce_colors_var = tk.BooleanVar(value=False)
-        reduce_check = ttk.Checkbutton(param_frame, text="减少颜色深度(PNG)",
+        reduce_check = ttk.Checkbutton(param_frame, text="减少颜色深度(PNG，可显著减小文件)",
                                       variable=self.reduce_colors_var)
         reduce_check.grid(row=3, column=0, columnspan=2, sticky=tk.W, pady=5)
         
@@ -109,6 +109,8 @@ class ImageOptimizerGUI:
         color_spinbox = ttk.Spinbox(param_frame, from_=2, to=256, increment=1,
                                    textvariable=self.color_count_var, width=10)
         color_spinbox.grid(row=4, column=1, sticky=tk.W, padx=(10, 0), pady=5)
+        ttk.Label(param_frame, text="(推荐128-256)", 
+                 foreground="gray").grid(row=4, column=2, sticky=tk.W, padx=(5, 0), pady=5)
         
         # 移除元数据
         self.remove_metadata_var = tk.BooleanVar(value=True)
@@ -245,21 +247,45 @@ class ImageOptimizerGUI:
             new_height = max(1, int(original_height * scale_factor))
             img = img.resize((new_width, new_height), Image.LANCZOS)
         
-        # 2. 移除元数据
+        # 2. 移除元数据并处理颜色模式
         if remove_metadata:
-            if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
-                clean_img = Image.new(img.mode, img.size)
+            # JPEG不支持透明通道，需要转换为RGB
+            if output_format == 'JPEG':
+                if img.mode in ('RGBA', 'LA', 'P'):
+                    # 创建白色背景
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    if img.mode == 'P':
+                        img = img.convert('RGBA')
+                    # 使用alpha通道作为mask粘贴
+                    if img.mode in ('RGBA', 'LA'):
+                        background.paste(img, mask=img.split()[-1])
+                    else:
+                        background.paste(img)
+                    img = background
+                elif img.mode != 'RGB':
+                    # 其他模式（如L）转换为RGB
+                    img = img.convert('RGB')
             else:
-                clean_img = Image.new('RGB' if img.mode != 'L' else 'L', img.size)
-            clean_img.paste(img)
-            img = clean_img
+                # 非JPEG格式，保留原有逻辑
+                if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
+                    clean_img = Image.new(img.mode, img.size)
+                else:
+                    clean_img = Image.new('RGB' if img.mode != 'L' else 'L', img.size)
+                clean_img.paste(img)
+                img = clean_img
         
-        # 3. 减少颜色深度（仅对PNG有效）
+        # 3. 减少颜色深度（对PNG有效，可显著减小文件大小）
         if reduce_colors and output_format == 'PNG':
             if img.mode != 'P':
                 img = img.convert('P', palette=Image.ADAPTIVE, colors=color_count)
             else:
                 img = img.quantize(colors=color_count, method=2)
+        elif output_format == 'PNG' and not reduce_colors:
+            # 即使不减少颜色，也对RGB图片进行优化处理
+            # 如果原图是JPEG(RGB)，转换为PNG时可以考虑降低色彩深度
+            if img.mode == 'RGB' and scale_factor < 1.0:
+                # 如果进行了缩放，可以选择性地减少颜色以提升压缩率
+                pass  # 保持原样，让用户自己决定是否减少颜色
         
         return img
     
@@ -272,15 +298,23 @@ class ImageOptimizerGUI:
             if img.mode in ('RGBA', 'LA'):
                 save_kwargs['lossless'] = False
         elif output_format == 'PNG':
-            save_kwargs = {'format': 'PNG', 'optimize': True}
+            # PNG优化参数：使用最高压缩级别
+            save_kwargs = {
+                'format': 'PNG', 
+                'optimize': True,
+                'compress_level': 9  # 最高压缩级别(0-9)
+            }
         elif output_format == 'JPEG':
             save_kwargs = {'format': 'JPEG', 'quality': quality, 'optimize': True}
-            if img.mode in ('RGBA', 'LA', 'P'):
+            # 确保是RGB模式（JPEG不支持透明）
+            if img.mode in ('RGBA', 'LA'):
                 background = Image.new('RGB', img.size, (255, 255, 255))
-                if img.mode == 'P':
-                    img = img.convert('RGBA')
-                background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+                background.paste(img, mask=img.split()[-1])
                 img = background
+            elif img.mode == 'P':
+                img = img.convert('RGB')
+            elif img.mode != 'RGB':
+                img = img.convert('RGB')
         
         img.save(filepath, **save_kwargs)
         return os.path.getsize(filepath)
@@ -290,6 +324,7 @@ class ImageOptimizerGUI:
         try:
             filename = os.path.basename(filepath)
             original_size = os.path.getsize(filepath)
+            original_ext = os.path.splitext(filename)[1].lower()
             
             with Image.open(filepath) as img:
                 original_width, original_height = img.size
@@ -315,12 +350,18 @@ class ImageOptimizerGUI:
                 
                 # 确定新文件名
                 name_without_ext = os.path.splitext(filename)[0]
+                original_ext = os.path.splitext(filename)[1].lower()
+                
                 if params['output_format'] == 'WEBP':
                     new_filename = f"{name_without_ext}.webp"
                 elif params['output_format'] == 'JPEG':
                     new_filename = f"{name_without_ext}.jpg"
-                else:
-                    new_filename = filename
+                else:  # PNG
+                    # 如果原文件不是png，则改为png
+                    if original_ext != '.png':
+                        new_filename = f"{name_without_ext}.png"
+                    else:
+                        new_filename = filename
                 
                 new_filepath = os.path.join(params['target_dir'], new_filename)
                 
@@ -336,7 +377,14 @@ class ImageOptimizerGUI:
                 # 更新日志
                 self.log_message(f"✓ [{index}/{total}] {filename} -> {new_filename}")
                 self.log_message(f"   尺寸: {original_width}x{original_height} -> {optimized_img.size[0]}x{optimized_img.size[1]}")
-                self.log_message(f"   大小: {original_size/1024:.1f}KB -> {new_size/1024:.1f}KB (减少 {reduction:.1f}%)")
+                self.log_message(f"   大小: {original_size/1024:.1f}KB -> {new_size/1024:.1f}KB (变化 {reduction:+.1f}%)")
+                
+                # 特殊提示：JPG转PNG可能变大
+                if original_ext in ('.jpg', '.jpeg') and params['output_format'] == 'PNG':
+                    if new_size > original_size:
+                        increase = (new_size / original_size - 1) * 100
+                        self.log_message(f"   ⚠️ 注意: JPG转PNG为无损格式，文件大小增加 {increase:.1f}%")
+                        self.log_message(f"   💡 建议: 勾选'减少颜色深度'或选择WEBP格式以获得更小文件")
                 
                 # 如果格式改变，删除原文件
                 if new_filename != filename:
