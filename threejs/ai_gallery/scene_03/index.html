@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>场景3 - 任务要求文本</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Arial', sans-serif;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cccccc;
+            font-size: 24px;
+            text-shadow: 0 0 10px #cccccc;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div class="loading" id="loading">加载中...</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer;
+        let monitorMesh, taskTextMesh;
+        let clock = new THREE.Clock();
+        
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a1a);
+            
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 6, 8);
+            camera.lookAt(0, 0, 0);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 10, 7);
+            scene.add(directionalLight);
+            
+            createDeskAndMonitor();
+            createTaskText();
+            
+            document.getElementById('loading').style.display = 'none';
+            
+            animate();
+        }
+        
+        function createDeskAndMonitor() {
+            // 桌面
+            const deskGeometry = new THREE.BoxGeometry(12, 0.3, 8);
+            const deskMaterial = new THREE.MeshStandardMaterial({
+                color: 0x3d2817,
+                roughness: 0.7,
+                metalness: 0.1
+            });
+            const desk = new THREE.Mesh(deskGeometry, deskMaterial);
+            desk.position.set(0, -1, 0);
+            desk.receiveShadow = true;
+            scene.add(desk);
+            
+            // 显示器底座
+            const standGeometry = new THREE.CylinderGeometry(0.5, 0.7, 1.5, 32);
+            const standMaterial = new THREE.MeshStandardMaterial({
+                color: 0x2a2a2a,
+                roughness: 0.4,
+                metalness: 0.6
+            });
+            const stand = new THREE.Mesh(standGeometry, standMaterial);
+            stand.position.set(0, -0.1, -1);
+            scene.add(stand);
+            
+            // 显示器屏幕框架
+            const frameGeometry = new THREE.BoxGeometry(7, 4.5, 0.2);
+            const frameMaterial = new THREE.MeshStandardMaterial({
+                color: 0x1a1a1a,
+                roughness: 0.3,
+                metalness: 0.7
+            });
+            const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+            frame.position.set(0, 2, -1);
+            scene.add(frame);
+            
+            // 显示器屏幕
+            const screenGeometry = new THREE.PlaneGeometry(6.5, 4);
+            const screenCanvas = document.createElement('canvas');
+            screenCanvas.width = 1024;
+            screenCanvas.height = 768;
+            const ctx = screenCanvas.getContext('2d');
+            
+            // 绘制深色背景
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, 1024, 768);
+            
+            const screenTexture = new THREE.CanvasTexture(screenCanvas);
+            const screenMaterial = new THREE.MeshBasicMaterial({ map: screenTexture });
+            monitorMesh = new THREE.Mesh(screenGeometry, screenMaterial);
+            monitorMesh.position.set(0, 2, -0.89);
+            scene.add(monitorMesh);
+            
+            monitorMesh.userData = { canvas: screenCanvas, ctx: ctx, texture: screenTexture };
+        }
+        
+        function createTaskText() {
+            const textGroup = new THREE.Group();
+            
+            // 创建任务文本画布
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 768;
+            const ctx = canvas.getContext('2d');
+            
+            // 背景
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, 1024, 768);
+            
+            // 标题
+            ctx.font = 'bold 48px Arial';
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.fillText('任务要求', 512, 100);
+            
+            // 分隔线
+            ctx.strokeStyle = '#444444';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(100, 130);
+            ctx.lineTo(924, 130);
+            ctx.stroke();
+            
+            // 任务内容
+            ctx.font = '32px Arial';
+            ctx.fillStyle = '#cccccc';
+            ctx.textAlign = 'left';
+            
+            const lines = [
+                '编程语言: Python',
+                '',
+                '任务描述:',
+                '模拟人在屏幕中输入代码的效果',
+                '',
+                '具体要求:',
+                '• 逐字打印代码字符',
+                '• 模拟真实打字速度',
+                '• 正确处理缩进和换行',
+                '• 保持代码格式完整'
+            ];
+            
+            lines.forEach((line, index) => {
+                if (line.includes('Python') || line.includes('模拟人在屏幕中输入代码')) {
+                    // 高亮关键词 - 荧光黄色
+                    ctx.fillStyle = '#ffff00';
+                    ctx.font = 'bold 32px Arial';
+                } else {
+                    ctx.fillStyle = '#cccccc';
+                    ctx.font = '32px Arial';
+                }
+                ctx.fillText(line, 100, 200 + index * 50);
+            });
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0
+            });
+            
+            const geometry = new THREE.PlaneGeometry(6.5, 4);
+            taskTextMesh = new THREE.Mesh(geometry, material);
+            taskTextMesh.position.set(0, 2, -0.88);
+            scene.add(taskTextMesh);
+            
+            // 延迟显示文本
+            setTimeout(() => {
+                animateTextAppear(material);
+            }, 500);
+        }
+        
+        function animateTextAppear(material) {
+            const duration = 2000;
+            const startTime = Date.now();
+            
+            function update() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                
+                material.opacity = eased;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            update();
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            const elapsedTime = clock.getElapsedTime();
+            
+            // 俯拍视角轻微移动
+            camera.position.x = Math.sin(elapsedTime * 0.2) * 0.5;
+            camera.position.z = 8 + Math.cos(elapsedTime * 0.15) * 0.3;
+            camera.lookAt(0, 1, 0);
+            
+            // 屏幕微光效果
+            if (monitorMesh && monitorMesh.userData.ctx) {
+                const ctx = monitorMesh.userData.ctx;
+                const canvas = monitorMesh.userData.canvas;
+                
+                // 添加轻微的扫描线效果
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                const scanY = (elapsedTime * 100) % 768;
+                ctx.fillRect(0, scanY, 1024, 2);
+                
+                monitorMesh.userData.texture.needsUpdate = true;
+            }
+            
+            renderer.render(scene, camera);
+        }
+        
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        init();
+    </script>
+</body>
+</html>
