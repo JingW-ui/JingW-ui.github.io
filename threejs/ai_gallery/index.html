@@ -62,30 +62,7 @@
             border-color: #ccc;
             color: #fff;
         }
-        /* OUT标签样式 - 居中显示 */
-        .out-label {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 0, 0, 0.85);
-            color: white;
-            padding: 8px 16px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 4px;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), inset 0 0 10px rgba(255, 0, 0, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 10;
-            border: 2px solid rgba(255, 50, 50, 0.9);
-        }
-        .out-label.visible {
-            opacity: 1;
-        }
+
         /* OUT按钮样式 */
         .out-btn {
             background: rgba(0, 0, 0, 0.4);
@@ -147,6 +124,63 @@
             border-color: #bbb;
             color: #fff;
         }
+        /* 答题按钮 */
+        #quiz-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 140px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid #444;
+            color: #6a6;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 11px;
+            border-radius: 3px;
+            opacity: 0.15;
+            transition: opacity 0.3s ease, background 0.2s ease;
+            z-index: 101;
+            pointer-events: auto;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 0.5px;
+        }
+        #quiz-btn:hover {
+            opacity: 0.75;
+            background: rgba(30, 80, 30, 0.6);
+            border-color: #6a6;
+            color: #8f8;
+        }
+        #quiz-btn.active {
+            background: rgba(100, 100, 100, 0.8);
+            border-color: #bbb;
+            color: #fff;
+        }
+        #run-code-btn {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1px solid #444;
+            color: #6a6;
+            padding: 3px 8px;
+            cursor: pointer;
+            font-size: 10px;
+            border-radius: 3px;
+            opacity: 0.15;
+            transition: opacity 0.3s ease, background 0.2s ease;
+            z-index: 101;
+            pointer-events: auto;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+            display: none;
+        }
+        #run-code-btn:hover {
+            opacity: 0.75;
+            background: rgba(30, 80, 30, 0.6);
+            border-color: #6a6;
+            color: #8f8;
+        }
+        #run-code-btn.running {
+            color: #a86;
+            border-color: #864;
+        }
     </style>
 </head>
 <body>
@@ -154,8 +188,10 @@
     <div class="loading" id="loading">加载中...</div>
     <div id="hero-controls"></div>
     <div id="out-controls"></div>
-    <div id="out-labels-container"></div>
+
     <div id="blackboard-controls"></div>
+    <button id="quiz-btn" title="开始答题">📝 答题</button>
+    <button id="run-code-btn" title="运行代码">▶ Run</button>
 
     <!-- 引入 Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -174,6 +210,13 @@
         let outStates = {}; // 记录每个logo的OUT状态
         let blackboardMesh = null; // 黑板网格
         let isBlackboardMode = false; // 是否处于黑板视角模式
+        let monitorMeshes = []; // 显示器数组（每个logo一个）
+        let currentMonitorIndex = -1; // 当前激活的显示器索引
+        let isMonitorMode = false; // 是否处于显示器视角模式
+        let monitorScrollOffsets = []; // 每个显示器的滚动偏移量
+        let monitorScrollTimers = []; // 每个显示器的滚动定时器
+        let monitorsVisible = false; // 显示器是否可见
+        let monitorAnimations = []; // 显示器动画状态
         
         // 初始化场景
         function init() {
@@ -240,6 +283,9 @@
             
             // 创建黑板控制按钮
             createBlackboardControls();
+            
+            // 创建显示器（每个logo一个）
+            createMonitors();
             
             // 隐藏加载提示
             document.getElementById('loading').style.display = 'none';
@@ -382,6 +428,10 @@
                     glowBorder: glowBorder,
                     position: xPosition
                 });
+                
+                // 创建3D OUT标签并保存引用
+                const outLabel3D = createOutLabel3D(stand, standWidth, standHeight);
+                stands[i].outLabel3D = outLabel3D;
             }
         }
         
@@ -419,6 +469,8 @@
             if (index < 0 || index >= stands.length) return;
             
             isHeroMode = true;
+            isMonitorMode = false;
+            isBlackboardMode = false;
             autoRotateEnabled = false;
             
             const stand = stands[index];
@@ -482,12 +534,7 @@
                 
                 container.appendChild(btn);
                 
-                // 创建对应的OUT标签
-                const label = document.createElement('div');
-                label.className = 'out-label';
-                label.id = `out-label-${index}`;
-                label.textContent = 'OUT';
-                document.getElementById('out-labels-container').appendChild(label);
+
             });
         }
         
@@ -513,11 +560,9 @@
                     stand.glowBorder.material.color.setHex(0xff3333);
                     stand.glowBorder.material.opacity = 0.8;
                 }
-                // 显示OUT标签
-                const label = document.getElementById(`out-label-${index}`);
-                if (label) {
-                    label.classList.add('visible');
-                    updateLabelPosition(index);
+                // 显示3D OUT标签
+                if (stand.outLabel3D) {
+                    stand.outLabel3D.visible = true;
                 }
             } else {
                 // 恢复正常状态
@@ -534,10 +579,9 @@
                     stand.glowBorder.material.color.setHex(0x666666);
                     stand.glowBorder.material.opacity = 0.4;
                 }
-                // 隐藏OUT标签
-                const label = document.getElementById(`out-label-${index}`);
-                if (label) {
-                    label.classList.remove('visible');
+                // 隐藏3D OUT标签
+                if (stand.outLabel3D) {
+                    stand.outLabel3D.visible = false;
                 }
             }
             
@@ -552,23 +596,63 @@
             });
         }
         
-        // 更新标签位置
-        function updateLabelPosition(index) {
-            const stand = stands[index];
-            if (!stand) return;
+        // 创建3D OUT标签（固定在立牌上）
+        function createOutLabel3D(standMesh, standWidth, standHeight) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 128;
+            const ctx = canvas.getContext('2d');
             
-            const label = document.getElementById(`out-label-${index}`);
-            if (!label) return;
+            // 红色背景
+            ctx.fillStyle = 'rgba(220, 0, 0, 0.9)';
+            const rx = 10, ry = 10, rw = canvas.width - 20, rh = canvas.height - 20, radius = 12;
+            ctx.beginPath();
+            ctx.moveTo(rx + radius, ry);
+            ctx.lineTo(rx + rw - radius, ry);
+            ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + radius);
+            ctx.lineTo(rx + rw, ry + rh - radius);
+            ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - radius, ry + rh);
+            ctx.lineTo(rx + radius, ry + rh);
+            ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - radius);
+            ctx.lineTo(rx, ry + radius);
+            ctx.quadraticCurveTo(rx, ry, rx + radius, ry);
+            ctx.closePath();
+            ctx.fill();
             
-            // 将3D坐标转换为2D屏幕坐标（使用logo的中心位置）
-            const vector = new THREE.Vector3(stand.position, stand.mesh.position.y || 0, 0);
-            vector.project(camera);
+            // 红色边框
+            ctx.strokeStyle = 'rgba(255, 50, 50, 1)';
+            ctx.lineWidth = 4;
+            ctx.stroke();
             
-            const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
-            const y = (-(vector.y * 0.5) + 0.5) * window.innerHeight;
+            // 外发光
+            ctx.shadowColor = 'rgba(255, 0, 0, 0.8)';
+            ctx.shadowBlur = 20;
+            ctx.fill();
+            ctx.shadowBlur = 0;
             
-            label.style.left = `${x}px`;
-            label.style.top = `${y}px`;
+            // 文字
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 64px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('OUT', canvas.width / 2, canvas.height / 2);
+            
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.minFilter = THREE.LinearFilter;
+            
+            const spriteMaterial = new THREE.SpriteMaterial({
+                map: texture,
+                transparent: true,
+                depthTest: false
+            });
+            const sprite = new THREE.Sprite(spriteMaterial);
+            sprite.scale.set(standWidth * 0.6, standHeight * 0.2, 1);
+            sprite.position.set(0, standHeight * 0.55, 0.2);
+            sprite.visible = false;
+            
+            // 添加到立牌mesh上，使其随立牌固定在世界坐标
+            standMesh.add(sprite);
+            return sprite;
         }
         
         // 从 SVG 加载纹理
@@ -770,6 +854,628 @@
             blackboardMesh.add(textPlane);
         }
         
+        // 创建显示器（每个logo一个，放在logo后面）
+        function createMonitors() {
+            const mWidth = 4.5;
+            const mHeight = 3.0;
+            const mDepth = 0.12;
+            const spacing = 7; // 增大显示器间距
+            
+            logoList.forEach((logoName, index) => {
+                const xPosition = (index - logoList.length / 2 + 0.5) * spacing;
+                
+                // 读取对应代码文件内容
+                const codeContent = getCodeForMonitor(logoName);
+
+                // 显示器主体
+                const geometry = new THREE.BoxGeometry(mWidth, mHeight, mDepth);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0x0a0a0a,
+                    roughness: 0.3,
+                    metalness: 0.7,
+                    emissive: 0x050510,
+                    emissiveIntensity: 0.1
+                });
+                
+                const mesh = new THREE.Mesh(geometry, material);
+                mesh.position.set(xPosition, 1.5, -8);
+                mesh.castShadow = true;
+                mesh.receiveShadow = true;
+                scene.add(mesh);
+                
+                // 金属边框
+                const edgesGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(mWidth, mHeight, mDepth));
+                const edgeMat = new THREE.LineBasicMaterial({ color: 0x555555, transparent: true, opacity: 0.6 });
+                const edgeLine = new THREE.LineSegments(edgesGeo, edgeMat);
+                mesh.add(edgeLine);
+                
+                // 创建屏幕内容（带滚动）
+                const screenCanvas = createCodeScreen(mWidth, mHeight, codeContent, logoName);
+                const texture = new THREE.CanvasTexture(screenCanvas);
+                texture.minFilter = THREE.LinearFilter;
+                
+                const screenGeo = new THREE.PlaneGeometry(mWidth - 0.2, mHeight - 0.2);
+                const screenMat = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.95 });
+                const screenPlane = new THREE.Mesh(screenGeo, screenMat);
+                screenPlane.position.z = mDepth / 2 + 0.01;
+                mesh.add(screenPlane);
+                
+                // 底座支架
+                const standGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.2, 8);
+                const standMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8, roughness: 0.3 });
+                const standMesh = new THREE.Mesh(standGeo, standMat);
+                standMesh.position.set(0, -mHeight / 2 - 0.6, 0);
+                mesh.add(standMesh);
+                
+                // 底座
+                const baseGeo = new THREE.CylinderGeometry(0.5, 0.6, 0.06, 16);
+                const baseMesh = new THREE.Mesh(baseGeo, standMat);
+                baseMesh.position.set(0, -mHeight / 2 - 1.2, 0);
+                mesh.add(baseMesh);
+                
+                // 保存引用
+                monitorMeshes.push({
+                    mesh: mesh,
+                    screenPlane: screenPlane,
+                    canvas: screenCanvas,
+                    texture: texture,
+                    codeContent: codeContent,
+                    scrollOffset: 0,
+                    screenMat: screenMat
+                });
+                monitorScrollOffsets.push(0);
+                monitorAnimations.push({
+                    visible: false,
+                    opacity: 0,
+                    scale: 0,
+                    targetOpacity: 0,
+                    targetScale: 0,
+                    animating: false
+                });
+                
+                // 初始隐藏显示器
+                mesh.visible = false;
+                screenPlane.visible = false;
+            });
+        }
+        
+        // 获取每个logo对应的代码
+        function getCodeForMonitor(logoName) {
+            const codeMap = {
+                'doubao': `import pyautogui
+import time
+import random
+
+
+def type_python_code(file_path: str = "code.txt") -> None:
+    """
+    读取Python代码文件，等待5秒后，
+    模拟人工非匀速逐字符输入代码
+    """
+    with open(file_path, 'r', encoding='utf-8') as f:
+        code_content = f.read()
+
+    print("5秒后开始自动输入...")
+    time.sleep(5)
+    print("开始输入！")
+
+    for char in code_content:
+        delay = random.uniform(0.05, 0.15)
+        if char in ('\\n', '    ', '\\t'):
+            delay = random.uniform(0.1, 0.25)
+        time.sleep(delay)
+        pyautogui.typewrite(char)
+
+    print("代码输入完成！")
+
+
+if __name__ == "__main__":
+    type_python_code()`,
+                'deepseek': `import pyautogui
+import time
+import random
+import sys
+
+def simulate_code_input(file_path='code.txt'):
+    """
+    读取Python代码文件，等待5秒后，
+    逐字符模拟人工输入到当前光标位置。
+    模拟非匀速输入，具有随机延迟和
+    一定概率的输入错误及自动更正。
+    """
+    with open(file_path, 'r', encoding='utf-8') as f:
+        code = f.read()
+
+    print("等待5秒，请将光标定位...")
+    time.sleep(5)
+
+    printable = [chr(i) for i in range(32, 127)]
+
+    for ch in code:
+        delay = random.uniform(0.05, 0.35)
+        time.sleep(delay)
+
+        if ch == '\\n':
+            pyautogui.press('enter')
+            continue
+        if ch == '\\t':
+            pyautogui.press('tab')
+            continue
+        if ch == ' ':
+            pyautogui.press('space')
+            continue
+
+        if random.random() < 0.08:
+            wrong_char = random.choice(printable)
+            pyautogui.press(wrong_char)
+            time.sleep(random.uniform(0.1, 0.3))
+            pyautogui.press('backspace')
+            time.sleep(random.uniform(0.05, 0.15))
+            pyautogui.press(ch)
+        else:
+            pyautogui.press(ch)
+
+if __name__ == '__main__':
+    file_path = sys.argv[1] if len(sys.argv) > 1 else 'code.txt'
+    simulate_code_input(file_path)`,
+                'kimi': `import pyautogui
+import time
+import random
+
+
+def type_code_from_file(file_path="code.txt"):
+    """
+    读取Python代码文件，等待5秒后
+    模拟人为逐字符输入到光标位置。
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            code_text = f.read()
+    except FileNotFoundError:
+        print(f"错误：找不到文件 '{file_path}'")
+        return
+
+    print("5秒后开始输入...")
+    time.sleep(5)
+
+    lines = code_text.split('\\n')
+
+    for line_idx, line in enumerate(lines):
+        stripped = line.lstrip()
+        indent = line[:len(line) - len(stripped)]
+
+        for char in indent:
+            _type_char_human_like(char)
+
+        for char in stripped:
+            _type_char_human_like(char)
+
+        if line_idx < len(lines) - 1:
+            _type_char_human_like('\\n')
+
+
+def _type_char_human_like(char):
+    """模拟人类输入单个字符"""
+    delay = random.uniform(0.03, 0.25)
+    time.sleep(delay)
+
+    if random.random() < 0.003 and char.isalnum():
+        wrong_char = random.choice('abcdefghijklmnopqrstuvwxyz0123456789')
+        pyautogui.typewrite(wrong_char, interval=0.01)
+        time.sleep(random.uniform(0.1, 0.3))
+        pyautogui.press('backspace')
+        time.sleep(random.uniform(0.05, 0.15))
+
+    if char == '\\n':
+        pyautogui.press('return')
+    elif char == '\\t':
+        pyautogui.press('tab')
+    else:
+        pyautogui.typewrite(char, interval=0.01)
+
+
+if __name__ == "__main__":
+    type_code_from_file("code.txt")`,
+                'yuanbao': `import pyautogui
+import time
+import random
+
+DEFAULT_PATH = "code.txt"
+
+
+def type_python_code_from_file(path=DEFAULT_PATH):
+    """
+    从 txt 文件中读取 Python 代码，
+    等待 5 秒后逐字符模拟人工输入
+    """
+    with open(path, "r", encoding="utf-8") as f:
+        code = f.read()
+
+    time.sleep(5)
+
+    for ch in code:
+        pyautogui.write(ch)
+
+        base_delay = random.uniform(0.03, 0.12)
+
+        if ch in (":", "(", ")", "{", "}", "[", "]", "\\n"):
+            base_delay += random.uniform(0.05, 0.15)
+
+        if random.random() < 0.01:
+            wrong_char = random.choice("abcdefghijklmnopqrstuvwxyz")
+            pyautogui.write(wrong_char)
+            time.sleep(random.uniform(0.05, 0.1))
+            pyautogui.press("backspace")
+
+        time.sleep(base_delay)
+
+
+if __name__ == "__main__":
+    type_python_code_from_file()`,
+                'glm': `import pyautogui
+import time
+import random
+
+
+def auto_type_code(file_path='code.txt'):
+    """
+    读取Python代码文件并逐字符模拟人为输入。
+    自动处理编辑器缩进，预测自动缩进，
+    仅补充/退格差量空格，避免频繁使用Home键。
+    """
+    with open(file_path, 'r', encoding='utf-8') as f:
+        code = f.read()
+
+    code = code.replace('\\t', '    ')
+    lines = code.splitlines()
+    while lines and lines[-1].strip() == '':
+        lines.pop()
+
+    if not lines:
+        print("代码文件为空！")
+        return
+
+    indent_size = _detect_indent_size(lines)
+
+    print("5秒后开始自动输入...")
+    for t in range(5, 0, -1):
+        print(f"  {t}...")
+        time.sleep(1)
+
+    editor_indent = 0
+
+    for i, line in enumerate(lines):
+        stripped = line.lstrip(' ')
+        target_indent = len(line) - len(stripped)
+
+        if stripped == '':
+            target_indent = 0
+
+        if i == 0:
+            _type_spaces(target_indent)
+            if stripped:
+                _type_human_string(stripped)
+        else:
+            _rand_delay(0.05, 0.20)
+            pyautogui.press('enter')
+            _rand_delay(0.15, 0.40)
+
+            if target_indent > editor_indent:
+                _type_spaces(target_indent - editor_indent)
+            elif target_indent < editor_indent:
+                for _ in range(editor_indent - target_indent):
+                    _rand_delay(0.01, 0.04)
+                    pyautogui.press('backspace')
+
+            if stripped:
+                _type_human_string(stripped)
+
+        editor_indent = _predict_next_indent(line, target_indent, indent_size)
+
+    print("\\n输入完成！")
+
+
+def _detect_indent_size(lines):
+    indents = set()
+    for line in lines:
+        stripped = line.lstrip(' ')
+        indent = len(line) - len(stripped)
+        if indent > 0 and stripped:
+            indents.add(indent)
+    return min(indents) if indents else 4
+
+
+def _predict_next_indent(line, current_indent, indent_size):
+    content = line.rstrip()
+    stripped = content.strip()
+    if content.endswith(':'):
+        return current_indent + indent_size
+    dedent_words = ('pass', 'break', 'continue', 'return', 'raise')
+    if stripped in dedent_words or stripped.startswith(('return ', 'raise ')):
+        return max(0, current_indent - indent_size)
+    return current_indent
+
+
+def _type_spaces(count):
+    for _ in range(count):
+        _rand_delay(0.01, 0.06)
+        pyautogui.press('space')
+
+
+def _type_human_string(text):
+    for char in text:
+        if random.random() < 0.02 and char.isalpha():
+            _simulate_typo(char)
+        else:
+            _type_char(char)
+
+
+def _type_char(char):
+    if char == ' ':
+        delay = _human_speed(0.02, 0.10)
+    elif char in '.,;:!?':
+        delay = _human_speed(0.07, 0.18)
+    elif char in '([{\\'"':
+        delay = _human_speed(0.05, 0.15)
+    elif char in ')]}':
+        delay = _human_speed(0.04, 0.12)
+    else:
+        delay = _human_speed(0.03, 0.13)
+    time.sleep(delay)
+    try:
+        pyautogui.write(char)
+    except Exception:
+        pass
+
+
+def _simulate_typo(correct_char):
+    wrong_char = _nearby_key(correct_char)
+    if wrong_char:
+        try:
+            pyautogui.write(wrong_char)
+        except Exception:
+            pass
+        _rand_delay(0.10, 0.40)
+        pyautogui.press('backspace')
+        _rand_delay(0.05, 0.20)
+    _type_char(correct_char)
+
+
+def _nearby_key(char):
+    neighbors = {
+        'q': 'w', 'w': 'e', 'e': 'r', 'r': 't', 't': 'y',
+        'y': 'u', 'u': 'i', 'i': 'o', 'o': 'p',
+        'a': 's', 's': 'd', 'd': 'f', 'f': 'g', 'g': 'h',
+        'h': 'j', 'j': 'k', 'k': 'l',
+        'z': 'x', 'x': 'c', 'c': 'v', 'v': 'b', 'b': 'n', 'n': 'm',
+    }
+    c = char.lower()
+    if c in neighbors:
+        n = neighbors[c]
+        return n if char.islower() else n.upper()
+    return None
+
+
+def _human_speed(min_s, max_s):
+    return random.triangular(min_s, max_s, (min_s + max_s) / 2)
+
+
+def _rand_delay(min_s, max_s):
+    time.sleep(random.uniform(min_s, max_s))
+
+
+if __name__ == '__main__':
+    auto_type_code('code.txt')`,
+                'longcat': `import time
+import random
+import pyautogui
+
+
+def simulate_typing_code(file_path='code.txt'):
+    """
+    模拟人工输入Python代码到当前光标位置，
+    具有真实的人类输入特征
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+    except FileNotFoundError:
+        print(f"错误：文件 '{file_path}' 未找到。")
+        return
+
+    print("请立即将光标定位到需要输入的位置！")
+    print("将在5秒后开始输入...")
+    for i in range(5, 0, -1):
+        print(f"{i}...")
+        time.sleep(1)
+
+    for i, line in enumerate(lines):
+        line = line.rstrip('\\n')
+
+        if i > 0:
+            pyautogui.press('enter')
+            time.sleep(random.uniform(0.05, 0.15))
+
+        if not line:
+            continue
+
+        chunk_size = random.randint(8, 20)
+        for j in range(0, len(line), chunk_size):
+            chunk = line[j:j + chunk_size]
+            delay = random.uniform(0.01, 0.06)
+            if random.random() < 0.1 and j > 0:
+                delay += random.uniform(0.1, 0.3)
+            time.sleep(delay)
+            pyautogui.typewrite(chunk, interval=random.uniform(0.01, 0.07))
+
+            if random.random() < 0.01:
+                wrong_char = chr(random.randint(97, 122))
+                pyautogui.press(wrong_char)
+                time.sleep(0.15)
+                pyautogui.press('backspace')
+                time.sleep(0.05)
+
+        if len(line) > 30:
+            time.sleep(random.uniform(0.15, 0.3))
+
+        if line.strip().startswith(('def ', 'class ')):
+            time.sleep(random.uniform(0.3, 0.8))
+
+    if random.random() < 0.2:
+        time.sleep(1)
+        for _ in range(random.randint(2, 4)):
+            pyautogui.press('up')
+            time.sleep(0.2)
+
+    print("代码输入完成！")
+
+
+if __name__ == "__main__":
+    simulate_typing_code('code.txt')`,
+                'qianwen': `import pyautogui
+import time
+import random
+
+# 耗时10s以内
+def auto_type_code(file_path="code.txt"):
+    """
+    读取 Python 代码文件并模拟人为
+    逐字符输入到当前光标位置。
+    """
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+    except FileNotFoundError:
+        print(f"错误：找不到文件 {file_path}")
+        return
+
+    print("请在 5 秒内将光标定位...")
+    time.sleep(5)
+    print("开始模拟输入...")
+
+    for line in lines:
+        stripped_line = line.rstrip('\\n').lstrip(' \\t')
+
+        if stripped_line:
+            for char in stripped_line:
+                time.sleep(random.uniform(0.05, 0.2))
+
+                if random.random() < 0.02:
+                    pyautogui.typewrite(random.choice('abcdefghijklmnopqrstuvwxyz'))
+                    time.sleep(0.1)
+                    pyautogui.press('backspace')
+                    time.sleep(0.1)
+
+                pyautogui.typewrite(char)
+        else:
+            pass
+
+        pyautogui.press('enter')
+        time.sleep(random.uniform(0.1, 0.4))
+
+    print("代码输入完成！")
+
+
+if __name__ == "__main__":
+    auto_type_code("code.txt")`
+            };
+            return codeMap[logoName] || '# No code available';
+        }
+        
+        // 创建代码屏幕纹理（支持滚动）
+        function createCodeScreen(mWidth, mHeight, codeContent, title, scrollOffset = 0) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 680;
+            const ctx = canvas.getContext('2d');
+                    
+            // 深色背景
+            ctx.fillStyle = '#0d1117';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+            // 标题栏
+            ctx.fillStyle = '#161b22';
+            ctx.fillRect(0, 0, canvas.width, 36);
+            const dots = ['#ff5f56', '#ffbd2e', '#27c93f'];
+            dots.forEach((c, i) => {
+                ctx.fillStyle = c;
+                ctx.beginPath();
+                ctx.arc(18 + i * 22, 18, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.fillStyle = '#8b949e';
+            ctx.font = '14px monospace';
+            ctx.fillText(title + '.py - Python', 100, 23);
+                    
+            // 代码内容（可滚动）
+            ctx.font = '15px "Courier New", monospace';
+            const codeLines = codeContent.split('\n');
+            const lineHeight = 28;
+            const startY = 50;
+                    
+            // 计算可见范围
+            const startLine = Math.floor(scrollOffset / lineHeight);
+            const maxVisibleLines = Math.floor((canvas.height - startY - 10) / lineHeight);
+            const endLine = Math.min(startLine + maxVisibleLines + 2, codeLines.length);
+                    
+            // 绘制滚动条背景
+            if (codeLines.length > maxVisibleLines) {
+                const scrollbarX = canvas.width - 12;
+                const scrollbarWidth = 8;
+                ctx.fillStyle = '#21262d';
+                ctx.fillRect(scrollbarX, startY, scrollbarWidth, canvas.height - startY - 10);
+                        
+                // 滚动条滑块
+                const totalHeight = codeLines.length * lineHeight;
+                const visibleHeight = maxVisibleLines * lineHeight;
+                const sliderHeight = Math.max(30, (visibleHeight / totalHeight) * (canvas.height - startY - 10));
+                const sliderY = startY + (scrollOffset / totalHeight) * (canvas.height - startY - 10);
+                        
+                ctx.fillStyle = '#484f58';
+                ctx.fillRect(scrollbarX, sliderY, scrollbarWidth, sliderHeight);
+            }
+                    
+            // 绘制行号和代码
+            for (let i = startLine; i < endLine; i++) {
+                const y = startY + (i * lineHeight) - scrollOffset;
+                if (y < startY - lineHeight || y > canvas.height - 10) continue;
+                        
+                ctx.fillStyle = '#484f58';
+                ctx.fillText(String(i + 1).padStart(3), 10, y);
+                        
+                // 简单语法高亮
+                const line = codeLines[i];
+                if (line.trim().startsWith('#') || line.trim().startsWith('"""') || line.trim().startsWith("'''")) {
+                    ctx.fillStyle = '#8b949e';
+                } else if (line.includes('def ') || line.includes('class ') || line.includes('import ') || line.includes('from ')) {
+                    ctx.fillStyle = '#ff7b72';
+                } else if (line.includes('if ') || line.includes('else') || line.includes('for ') || line.includes('while ') || line.includes('return ') || line.includes('try:') || line.includes('except')) {
+                    ctx.fillStyle = '#ff7b72';
+                } else {
+                    ctx.fillStyle = '#c9d1d9';
+                }
+                        
+                ctx.fillText(line, 55, y);
+            }
+                    
+            return canvas;
+        }
+        
+        // 更新指定显示器的代码滚动
+        function updateMonitorScroll(monitorIndex, scrollOffset) {
+            if (!monitorMeshes[monitorIndex]) return;
+            const monitor = monitorMeshes[monitorIndex];
+            monitor.scrollOffset = scrollOffset;
+            
+            const newCanvas = createCodeScreen(4.5, 3.0, monitor.codeContent, logoList[monitorIndex], scrollOffset);
+            const newTexture = new THREE.CanvasTexture(newCanvas);
+            newTexture.minFilter = THREE.LinearFilter;
+            
+            monitor.screenPlane.material.map = newTexture;
+            monitor.screenPlane.material.needsUpdate = true;
+            monitor.texture = newTexture;
+        }
+        
         // 创建黑板控制按钮
         function createBlackboardControls() {
             const container = document.getElementById('blackboard-controls');
@@ -786,6 +1492,24 @@
             
             container.appendChild(viewBtn);
             
+            // 显示器按钮组（每个logo一个）
+            const monitorScrollContainer = document.createElement('div');
+            monitorScrollContainer.style.cssText = 'margin-top: 5px; display: flex; flex-direction: column; gap: 4px;';
+            monitorScrollContainer.id = 'monitor-scroll-controls';
+            
+            logoList.forEach((logoName, index) => {
+                const monitorBtn = document.createElement('button');
+                monitorBtn.className = 'bb-btn';
+                monitorBtn.textContent = `🖥 ${logoName}`;
+                monitorBtn.title = `查看 ${logoName} 的代码`;
+                monitorBtn.addEventListener('click', () => {
+                    if (monitorsVisible) {
+                        activateMonitorView(index);
+                    }
+                });
+                container.appendChild(monitorBtn);
+            });
+            
             // 返回按钮
             const backBtn = document.createElement('button');
             backBtn.className = 'bb-btn';
@@ -794,6 +1518,7 @@
             
             backBtn.addEventListener('click', () => {
                 deactivateBlackboardView();
+                deactivateMonitorView();
             });
             
             container.appendChild(backBtn);
@@ -804,6 +1529,7 @@
             if (!blackboardMesh) return;
             
             isBlackboardMode = true;
+            isMonitorMode = false;
             isHeroMode = false;
             autoRotateEnabled = false;
             
@@ -829,10 +1555,71 @@
             autoRotateEnabled = true;
             heroTarget = null;
             
-            // 清除所有按钮的active状态
             document.querySelectorAll('.bb-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
+        }
+        
+        // 激活显示器视角
+        function activateMonitorView(index) {
+            if (!monitorMeshes[index] || !monitorsVisible) return;
+            
+            currentMonitorIndex = index;
+            isMonitorMode = true;
+            isBlackboardMode = false;
+            isHeroMode = false;
+            autoRotateEnabled = false;
+            
+            const monitor = monitorMeshes[index];
+            
+            // 相机推进到显示器正前方（z方向靠近）
+            heroTarget = {
+                position: new THREE.Vector3(monitor.mesh.position.x, monitor.mesh.position.y, monitor.mesh.position.z + 3),
+                lookAt: monitor.mesh.position.clone()
+            };
+            
+            document.querySelectorAll('.bb-btn').forEach(btn => {
+                if (btn.textContent.includes(logoList[index])) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
+        
+        // 取消显示器视角
+        function deactivateMonitorView() {
+            isMonitorMode = false;
+            autoRotateEnabled = true;
+            heroTarget = null;
+            
+            document.querySelectorAll('.bb-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+        
+        // 更新运行按钮位置（跟随当前激活显示器右下角）
+        function updateRunButtonPosition() {
+            if (!monitorsVisible || currentMonitorIndex < 0 || !monitorMeshes[currentMonitorIndex]) {
+                document.getElementById('run-code-btn').style.display = 'none';
+                return;
+            }
+            
+            const monitor = monitorMeshes[currentMonitorIndex];
+            const runBtn = document.getElementById('run-code-btn');
+            
+            const mWidth = 4.5, mHeight = 3.0;
+            const localCorner = new THREE.Vector3(mWidth / 2, -mHeight / 2, 0.07);
+            const worldCorner = localCorner.applyMatrix4(monitor.mesh.matrixWorld);
+            
+            const vector = worldCorner.clone().project(camera);
+            const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (-(vector.y * 0.5) + 0.5) * window.innerHeight;
+            
+            if (vector.z < 1 && x > -100 && x < window.innerWidth + 100 && y > -100 && y < window.innerHeight + 100) {
+                runBtn.style.display = 'block';
+                runBtn.style.left = (x - 60) + 'px';
+                runBtn.style.top = (y + 4) + 'px';
+            } else {
+                runBtn.style.display = 'none';
+            }
         }
         
         // Logo 入场动画
@@ -864,8 +1651,8 @@
             const elapsedTime = clock.getElapsedTime();
             
             // 镜头控制逻辑
-            if (isBlackboardMode && heroTarget) {
-                // 黑板视角模式：平滑推进到黑板位置
+            if ((isBlackboardMode || isMonitorMode) && heroTarget) {
+                // 黑板/显示器视角模式：平滑推进
                 const lerpFactor = 0.05;
                 camera.position.lerp(heroTarget.position, lerpFactor);
                 
@@ -935,12 +1722,10 @@
                 stand.glowBorder.material.opacity = glowPulse;
             });
             
-            // 更新所有OUT标签的位置
-            logoList.forEach((logoName, index) => {
-                if (outStates[index]) {
-                    updateLabelPosition(index);
-                }
-            });
+
+            
+            // 更新运行按钮位置
+            updateRunButtonPosition();
             
             renderer.render(scene, camera);
         }
@@ -950,6 +1735,156 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+        
+        // 答题按钮点击事件
+        document.getElementById('quiz-btn').addEventListener('click', function() {
+            const btn = this;
+            if (monitorsVisible) {
+                // 隐藏显示器
+                hideMonitors();
+                btn.classList.remove('active');
+                btn.textContent = '📝 答题';
+            } else {
+                // 显示显示器（蒙太奇动画）
+                showMonitorsWithAnimation();
+                btn.classList.add('active');
+                btn.textContent = '📝 收起';
+            }
+        });
+        
+        // 显示显示器（蒙太奇动画）
+        function showMonitorsWithAnimation() {
+            monitorsVisible = true;
+            
+            monitorMeshes.forEach((monitor, index) => {
+                const anim = monitorAnimations[index];
+                anim.visible = true;
+                anim.animating = true;
+                anim.targetOpacity = 1;
+                anim.targetScale = 1;
+                
+                // 延迟启动每个显示器的动画
+                setTimeout(() => {
+                    monitor.mesh.visible = true;
+                    monitor.screenPlane.visible = true;
+                    animateMonitorIn(index);
+                }, index * 200);
+            });
+        }
+        
+        // 隐藏显示器
+        function hideMonitors() {
+            monitorsVisible = false;
+            
+            monitorMeshes.forEach((monitor, index) => {
+                const anim = monitorAnimations[index];
+                anim.visible = false;
+                anim.animating = true;
+                anim.targetOpacity = 0;
+                anim.targetScale = 0;
+                
+                // 延迟隐藏每个显示器
+                setTimeout(() => {
+                    animateMonitorOut(index);
+                }, index * 100);
+            });
+        }
+        
+        // 显示器进入动画（蒙太奇效果）
+        function animateMonitorIn(index) {
+            const monitor = monitorMeshes[index];
+            const anim = monitorAnimations[index];
+            const duration = 800;
+            const startTime = Date.now();
+            
+            function update() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // 缓动函数
+                const eased = 1 - Math.pow(1 - progress, 3);
+                
+                // 更新透明度和缩放
+                anim.opacity = eased * anim.targetOpacity;
+                anim.scale = eased * anim.targetScale;
+                
+                monitor.mesh.scale.set(anim.scale, anim.scale, anim.scale);
+                monitor.screenPlane.material.opacity = anim.opacity;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    anim.animating = false;
+                }
+            }
+            
+            update();
+        }
+        
+        // 显示器退出动画
+        function animateMonitorOut(index) {
+            const monitor = monitorMeshes[index];
+            const anim = monitorAnimations[index];
+            const duration = 600;
+            const startTime = Date.now();
+            
+            function update() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // 缓动函数
+                const eased = 1 - Math.pow(1 - progress, 3);
+                
+                // 更新透明度和缩放
+                anim.opacity = (1 - eased) * anim.targetOpacity;
+                anim.scale = (1 - eased) * anim.targetScale;
+                
+                monitor.mesh.scale.set(anim.scale, anim.scale, anim.scale);
+                monitor.screenPlane.material.opacity = anim.opacity;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    monitor.mesh.visible = false;
+                    monitor.screenPlane.visible = false;
+                    anim.animating = false;
+                }
+            }
+            
+            update();
+        }
+        // 运行按钮点击事件
+        document.getElementById('run-code-btn').addEventListener('click', function() {
+            const btn = this;
+            if (btn.classList.contains('running')) return;
+            btn.classList.add('running');
+            btn.textContent = '⏳ Running...';
+            setTimeout(() => {
+                btn.classList.remove('running');
+                btn.textContent = '▶ Run';
+            }, 3000);
+        });
+        
+        // 鼠标滚轮滚动代码
+        window.addEventListener('wheel', function(e) {
+            if (!monitorsVisible || !isMonitorMode || currentMonitorIndex < 0) return;
+            
+            const monitor = monitorMeshes[currentMonitorIndex];
+            if (!monitor) return;
+            
+            // 滚动步长
+            const scrollStep = 30;
+            monitor.scrollOffset += e.deltaY > 0 ? scrollStep : -scrollStep;
+            
+            // 限制滚动范围
+            const codeLines = monitor.codeContent.split('\n');
+            const lineHeight = 28;
+            const maxScroll = Math.max(0, codeLines.length * lineHeight - 580);
+            monitor.scrollOffset = Math.max(0, Math.min(monitor.scrollOffset, maxScroll));
+            
+            // 更新显示
+            updateMonitorScroll(currentMonitorIndex, monitor.scrollOffset);
         });
         
         // 启动场景
