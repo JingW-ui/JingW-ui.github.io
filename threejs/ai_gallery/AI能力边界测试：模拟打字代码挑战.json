@@ -1,0 +1,108 @@
+{
+  "title": "AI能力边界测试：模拟打字代码挑战",
+  "total_duration": "1分30秒",
+  "scenes_count": 10,
+  "scenes": [
+    {
+      "number": 1,
+      "time_range": "00:00-00:08",
+      "duration_sec": 8,
+      "shot_type": "特写",
+      "visual": "暗场中一块黑色屏幕亮起，键盘的RGB灯效反射在屏幕上，镜头缓慢拉出，屏幕中央浮现发光的代码字符",
+      "audio": "今天这期视频，我们要探索的是AI的能力边界。",
+      "sound_effect": "低沉的电子电流声，伴随机械键盘清脆的敲击音效",
+      "notes": "营造极客与科技感氛围，画面偏冷色调"
+    },
+    {
+      "number": 2,
+      "time_range": "00:08-00:18",
+      "duration_sec": 10,
+      "shot_type": "中景",
+      "visual": "画面左右分屏对比：左侧是炫酷的3D物理引擎粒子爆炸画面（被打上红叉），右侧是简洁的Python IDE界面（被打上绿勾），镜头推向右侧",
+      "audio": "当然，我们不会让AI做复杂的项目，比如那种带物理引擎的3D视频效果，这次只让它写一个简单的函数。",
+      "sound_effect": "左侧3D画面配有沉闷爆炸音效，切到右侧时变为轻快的提示音",
+      "notes": "强调任务的看似简单，形成视觉反差"
+    },
+    {
+      "number": 3,
+      "time_range": "00:18-00:28",
+      "duration_sec": 10,
+      "shot_type": "近景",
+      "visual": "俯拍桌面显示器，屏幕上展示任务要求的文本，高亮显示'Python'和'模拟人在屏幕中输入代码'等关键词",
+      "audio": "这是详细的任务要求，简单来说，就是用Python写一个，模拟人在屏幕中输入代码的效果。",
+      "sound_effect": "纸张翻动音效，背景加入轻微的悬疑感合成器铺底",
+      "notes": "关键词高亮使用荧光黄色，确保观众一眼看清核心任务"
+    },
+    {
+      "number": 4,
+      "time_range": "00:28-00:38",
+      "duration_sec": 10,
+      "shot_type": "全景",
+      "visual": "赛博朋克风格的大厅，六个发光的虚拟立牌依次亮起，分别显示：豆包、DeepSeek、Kimi、元宝、gLM、Longcat的Logo，镜头横移扫过",
+      "audio": "下面介绍这次登场的大模型。国产方面：豆包、DeepSeek、Kimi、元宝、gLM、Longcat。",
+      "sound_effect": "每个Logo亮起时伴随短促的科技“滴”声，BGM节奏加快",
+      "notes": "立牌采用红金配色，体现国产力量感"
+    },
+    {
+      "number": 5,
+      "time_range": "00:38-00:47",
+      "duration_sec": 9,
+      "shot_type": "特写",
+      "visual": "屏幕录制视角，AI瞬间输出了大段完整代码，光标闪烁，画面打上“想简单了”的红色印章特效",
+      "audio": "结果国产模型全部失败。要么是把任务想简单了，直接输出了结果……",
+      "sound_effect": "急促的键盘敲击声后接错误蜂鸣音",
+      "notes": "表现AI没有理解“逐字打印”的模拟过程"
+    },
+    {
+      "number": 6,
+      "time_range": "00:47-00:55",
+      "duration_sec": 8,
+      "shot_type": "大特写",
+      "visual": "镜头极度贴近屏幕像素点，展示Python代码中混乱的缩进层级，红色波浪线报错标满屏幕，印章特效打出“缩进处理不当”",
+      "audio": "要么就是缩进处理不当，逻辑一团糟……",
+      "sound_effect": "警报般的错误提示音，BGM变得紧张",
+      "notes": "突出缩进这个Python核心痛点"
+    },
+    {
+      "number": 7,
+      "time_range": "00:55-01:03",
+      "duration_sec": 8,
+      "shot_type": "特写",
+      "visual": "代码运行终端界面，字符在错误的位置换行，变成乱码般的阶梯状，印章特效打出“换行有问题”",
+      "audio": "要么就是换行有问题，模拟打字变成了乱码输出。",
+      "sound_effect": "卡带故障音效（Glitch sound）",
+      "notes": "画面可加入轻微的CRT显示器抖动特效"
+    },
+    {
+      "number": 8,
+      "time_range": "01:03-01:10",
+      "duration_sec": 7,
+      "shot_type": "中景",
+      "visual": "六个国产模型立牌同时变暗，红光闪烁，屏幕中心浮现一个巨大的“FAIL”字样，碎片化散开",
+      "audio": "国产模型全军覆没。",
+      "sound_effect": "沉重的轰鸣声，玻璃碎裂音效",
+      "notes": "情绪降至低谷，为后续反转做铺垫"
+    },
+    {
+      "number": 9,
+      "time_range": "01:10-01:20",
+      "duration_sec": 10,
+      "shot_type": "全景",
+      "visual": "镜头转向另一侧黑暗区域，三个冷蓝色幽光立牌在迷雾中若隐若现，显示：GPT5mini、ClaudeCade、Gemini",
+      "audio": "至于国外的模型，GPT5mini、ClaudeCade、Gemini……",
+      "sound_effect": "神秘空灵的合成器音效渐强，心跳声",
+      "notes": "雾气效果增加神秘感，不给立牌完全特写，留足悬念"
+    },
+    {
+      "number": 10,
+      "time_range": "01:20-01:30",
+      "duration_sec": 10,
+      "shot_type": "近景",
+      "visual": "画面切回主持人或主视角，手指悬停在回车键上方，屏幕倒影在眼中，画面突然黑屏，只留一行白字“下期揭晓”",
+      "audio": "它们还没有测试，究竟能否完成挑战？我们下期揭晓！",
+      "sound_effect": "重击回车键的巨响，随后瞬间静音，接着出片尾低音BGM",
+      "notes": "断点卡在最具悬念的时刻，引导观众关注下期"
+    }
+  ],
+  "exported_at": "2026-05-24T06:02:01.276Z"
+}
