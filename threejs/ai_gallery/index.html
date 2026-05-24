@@ -24,11 +24,50 @@
             font-size: 24px;
             text-shadow: 0 0 10px #cccccc;
         }
+        /* 英雄镜头控制面板 */
+        #hero-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            opacity: 0.3;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+        #hero-controls:hover {
+            opacity: 0.9;
+        }
+        .hero-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #666;
+            color: #aaa;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .hero-btn:hover {
+            background: rgba(100, 100, 100, 0.8);
+            border-color: #999;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(100, 100, 100, 0.5);
+        }
+        .hero-btn.active {
+            background: rgba(150, 150, 150, 0.9);
+            border-color: #ccc;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
     <div id="canvas-container"></div>
     <div class="loading" id="loading">加载中...</div>
+    <div id="hero-controls"></div>
 
     <!-- 引入 Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -41,6 +80,9 @@
         let stands = [];
         let particles;
         let clock = new THREE.Clock();
+        let isHeroMode = false; // 是否处于英雄镜头模式
+        let heroTarget = null; // 英雄镜头目标位置
+        let autoRotateEnabled = true; // 自动旋转是否启用
         
         // 初始化场景
         function init() {
@@ -95,6 +137,9 @@
             
             // 创建六个立牌
             createStands();
+            
+            // 创建英雄镜头控制按钮
+            createHeroControls();
             
             // 隐藏加载提示
             document.getElementById('loading').style.display = 'none';
@@ -240,6 +285,73 @@
             }
         }
         
+        // 创建英雄镜头控制按钮
+        function createHeroControls() {
+            const container = document.getElementById('hero-controls');
+            
+            // 为每个logo创建按钮
+            logoList.forEach((logoName, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'hero-btn';
+                btn.textContent = logoName;
+                btn.dataset.index = index;
+                
+                btn.addEventListener('click', () => {
+                    activateHeroLens(index);
+                });
+                
+                container.appendChild(btn);
+            });
+            
+            // 添加返回按钮
+            const backBtn = document.createElement('button');
+            backBtn.className = 'hero-btn';
+            backBtn.textContent = '⟲';
+            backBtn.title = '返回自动漫游';
+            backBtn.addEventListener('click', () => {
+                deactivateHeroLens();
+            });
+            container.appendChild(backBtn);
+        }
+        
+        // 激活英雄镜头
+        function activateHeroLens(index) {
+            if (index < 0 || index >= stands.length) return;
+            
+            isHeroMode = true;
+            autoRotateEnabled = false;
+            
+            const stand = stands[index];
+            const targetX = stand.position;
+            
+            // 设置目标位置：正对logo，距离适中
+            heroTarget = {
+                position: new THREE.Vector3(targetX, 1, 6),
+                lookAt: new THREE.Vector3(targetX, 0.5, 0)
+            };
+            
+            // 更新按钮状态
+            document.querySelectorAll('.hero-btn').forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+        
+        // 取消英雄镜头
+        function deactivateHeroLens() {
+            isHeroMode = false;
+            autoRotateEnabled = true;
+            heroTarget = null;
+            
+            // 清除所有按钮的active状态
+            document.querySelectorAll('.hero-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+        
         // 从 SVG 加载纹理
         function loadSVGAsTexture(svgPath, xPosition, standDepth, index, standWidth, standHeight) {
             const img = new Image();
@@ -311,11 +423,30 @@
             
             const elapsedTime = clock.getElapsedTime();
             
-            // 镜头横移动画 - 更流畅的扫过效果
-            camera.position.x = Math.sin(elapsedTime * 0.15) * 12;
-            camera.position.z = 15 + Math.cos(elapsedTime * 0.15) * 3;
-            camera.position.y = 2 + Math.sin(elapsedTime * 0.3) * 0.5;
-            camera.lookAt(0, 0.5, 0);
+            // 镜头控制逻辑
+            if (isHeroMode && heroTarget) {
+                // 英雄镜头模式：平滑推进到目标位置
+                const lerpFactor = 0.05; // 插值速度
+                
+                camera.position.lerp(heroTarget.position, lerpFactor);
+                
+                // 平滑调整视角
+                const currentLookAt = new THREE.Vector3();
+                camera.getWorldDirection(currentLookAt);
+                const targetDirection = new THREE.Vector3().subVectors(
+                    heroTarget.lookAt, 
+                    camera.position
+                ).normalize();
+                
+                // 使用lookAt直接设置视角
+                camera.lookAt(heroTarget.lookAt);
+            } else if (autoRotateEnabled) {
+                // 自动漫游模式：原有的横移动画
+                camera.position.x = Math.sin(elapsedTime * 0.15) * 12;
+                camera.position.z = 15 + Math.cos(elapsedTime * 0.15) * 3;
+                camera.position.y = 2 + Math.sin(elapsedTime * 0.3) * 0.5;
+                camera.lookAt(0, 0.5, 0);
+            }
             
             // 粒子动画
             if (particles) {
