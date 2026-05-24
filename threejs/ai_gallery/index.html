@@ -110,6 +110,43 @@
             border-color: #994444;
             color: #bbb;
         }
+        /* 黑板控制面板 */
+        #blackboard-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            opacity: 0.15;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+        #blackboard-controls:hover {
+            opacity: 0.7;
+        }
+        .bb-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #555;
+            color: #888;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 11px;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .bb-btn:hover {
+            background: rgba(80, 80, 80, 0.7);
+            border-color: #999;
+            color: #ccc;
+        }
+        .bb-btn.active {
+            background: rgba(100, 100, 100, 0.8);
+            border-color: #bbb;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -118,6 +155,7 @@
     <div id="hero-controls"></div>
     <div id="out-controls"></div>
     <div id="out-labels-container"></div>
+    <div id="blackboard-controls"></div>
 
     <!-- 引入 Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -134,6 +172,8 @@
         let heroTarget = null; // 英雄镜头目标位置
         let autoRotateEnabled = true; // 自动旋转是否启用
         let outStates = {}; // 记录每个logo的OUT状态
+        let blackboardMesh = null; // 黑板网格
+        let isBlackboardMode = false; // 是否处于黑板视角模式
         
         // 初始化场景
         function init() {
@@ -194,6 +234,12 @@
             
             // 创建OUT控制按钮
             createOutControls();
+            
+            // 创建黑板
+            createBlackboard();
+            
+            // 创建黑板控制按钮
+            createBlackboardControls();
             
             // 隐藏加载提示
             document.getElementById('loading').style.display = 'none';
@@ -574,6 +620,221 @@
             }, index * 300);
         }
         
+        // 创建黑板
+        function createBlackboard() {
+            // 黑板尺寸
+            const boardWidth = 8;
+            const boardHeight = 5;
+            const boardDepth = 0.15;
+            
+            // 创建黑板主体 - 使用深绿色模拟真实黑板
+            const geometry = new THREE.BoxGeometry(boardWidth, boardHeight, boardDepth);
+            const material = new THREE.MeshStandardMaterial({
+                color: 0x1a3d1a,
+                roughness: 0.85,
+                metalness: 0.05,
+                emissive: 0x0a1f0a,
+                emissiveIntensity: 0.1
+            });
+            
+            blackboardMesh = new THREE.Mesh(geometry, material);
+            // 放置在摄像头后面（z轴负方向），高度适中
+            blackboardMesh.position.set(0, 1.5, 24);
+            // 旋转180度，使黑板内容面向logo方向（正Z轴）
+            blackboardMesh.rotation.y = Math.PI;
+            blackboardMesh.castShadow = true;
+            blackboardMesh.receiveShadow = true;
+            scene.add(blackboardMesh);
+            
+            // 添加木质边框
+            const frameThickness = 0.2;
+            const frameDepth = 0.1;
+            
+            // 上边框
+            const topFrame = new THREE.Mesh(
+                new THREE.BoxGeometry(boardWidth + frameThickness * 2, frameThickness, frameDepth),
+                new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.7 })
+            );
+            topFrame.position.set(0, boardHeight / 2 + frameThickness / 2, 0);
+            blackboardMesh.add(topFrame);
+            
+            // 下边框
+            const bottomFrame = new THREE.Mesh(
+                new THREE.BoxGeometry(boardWidth + frameThickness * 2, frameThickness, frameDepth),
+                new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.7 })
+            );
+            bottomFrame.position.set(0, -boardHeight / 2 - frameThickness / 2, 0);
+            blackboardMesh.add(bottomFrame);
+            
+            // 左边框
+            const leftFrame = new THREE.Mesh(
+                new THREE.BoxGeometry(frameThickness, boardHeight, frameDepth),
+                new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.7 })
+            );
+            leftFrame.position.set(-boardWidth / 2 - frameThickness / 2, 0, 0);
+            blackboardMesh.add(leftFrame);
+            
+            // 右边框
+            const rightFrame = new THREE.Mesh(
+                new THREE.BoxGeometry(frameThickness, boardHeight, frameDepth),
+                new THREE.MeshStandardMaterial({ color: 0x5c3a1e, roughness: 0.7 })
+            );
+            rightFrame.position.set(boardWidth / 2 + frameThickness / 2, 0, 0);
+            blackboardMesh.add(rightFrame);
+            
+            // 创建黑板上的文字纹理
+            createBlackboardText(boardWidth, boardHeight, boardDepth);
+        }
+        
+        // 创建黑板文字
+        function createBlackboardText(boardWidth, boardHeight, boardDepth) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 2048;
+            canvas.height = 1280;
+            const ctx = canvas.getContext('2d');
+            
+            // 设置背景为黑板色
+            ctx.fillStyle = '#1a3d1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 添加轻微的纹理噪点，模拟真实黑板
+            for (let i = 0; i < 5000; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const alpha = Math.random() * 0.05;
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.fillRect(x, y, 2, 2);
+            }
+            
+            // 设置粉笔文字样式
+            ctx.fillStyle = '#e8e8e8';
+            ctx.font = 'bold 48px "Courier New", monospace';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            
+            // 任务内容
+            const lines = [
+                '输入：Python代码文本文件路径 （txt格式）默认 code.txt',
+                '',
+                '功能：',
+                '  读取文件中缩进规范的Python代码',
+                '  等待5秒，供用户定位光标',
+                '  使用 pyautogui逐字符模拟人为输入到光标位置',
+                '',
+                '要求：仅实现函数，环境已就绪，不处理依赖',
+                '',
+                '注意：',
+                '  处理.py 文件中常见软件会自动处理缩进的情况',
+                '  不要频繁使用home 模拟人真实的输入',
+                '  即非匀速输入 有几率输入错误字符',
+                '',
+                '写好函数的调用 代码可直接运行'
+            ];
+            
+            // 逐行绘制文字
+            const startX = 80;
+            const startY = 80;
+            const lineHeight = 65;
+            
+            lines.forEach((line, index) => {
+                const y = startY + index * lineHeight;
+                
+                // 添加轻微的随机偏移，模拟手写效果
+                const offsetX = Math.random() * 2 - 1;
+                const offsetY = Math.random() * 1.5 - 0.75;
+                
+                // 绘制文字阴影（模拟粉笔的厚度）
+                ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+                ctx.fillText(line, startX + offsetX + 1, y + offsetY + 1);
+                
+                // 绘制主要文字
+                ctx.fillStyle = '#e8e8e8';
+                ctx.fillText(line, startX + offsetX, y + offsetY);
+            });
+            
+            // 创建纹理并应用到黑板
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            
+            // 在黑板正面添加文字平面
+            const textGeometry = new THREE.PlaneGeometry(boardWidth - 0.3, boardHeight - 0.3);
+            const textMaterial = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.95
+            });
+            
+            const textPlane = new THREE.Mesh(textGeometry, textMaterial);
+            textPlane.position.z = boardDepth / 2 + 0.01;
+            blackboardMesh.add(textPlane);
+        }
+        
+        // 创建黑板控制按钮
+        function createBlackboardControls() {
+            const container = document.getElementById('blackboard-controls');
+            
+            // 查看黑板按钮
+            const viewBtn = document.createElement('button');
+            viewBtn.className = 'bb-btn';
+            viewBtn.textContent = '📋 黑板';
+            viewBtn.title = '查看黑板任务';
+            
+            viewBtn.addEventListener('click', () => {
+                activateBlackboardView();
+            });
+            
+            container.appendChild(viewBtn);
+            
+            // 返回按钮
+            const backBtn = document.createElement('button');
+            backBtn.className = 'bb-btn';
+            backBtn.textContent = '⟲';
+            backBtn.title = '返回自动漫游';
+            
+            backBtn.addEventListener('click', () => {
+                deactivateBlackboardView();
+            });
+            
+            container.appendChild(backBtn);
+        }
+        
+        // 激活黑板视角
+        function activateBlackboardView() {
+            if (!blackboardMesh) return;
+            
+            isBlackboardMode = true;
+            isHeroMode = false;
+            autoRotateEnabled = false;
+            
+            // 设置目标位置：扭转到摄像头后面查看黑板
+            heroTarget = {
+                position: new THREE.Vector3(0, 1.5, 20),
+                lookAt: new THREE.Vector3(0, 1.5, 24)
+            };
+            
+            // 更新按钮状态
+            document.querySelectorAll('.bb-btn').forEach(btn => {
+                if (btn.textContent.includes('黑板')) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+        
+        // 取消黑板视角
+        function deactivateBlackboardView() {
+            isBlackboardMode = false;
+            autoRotateEnabled = true;
+            heroTarget = null;
+            
+            // 清除所有按钮的active状态
+            document.querySelectorAll('.bb-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+        }
+        
         // Logo 入场动画
         function animateLogoIn(logo) {
             const targetScale = 1;
@@ -603,7 +864,32 @@
             const elapsedTime = clock.getElapsedTime();
             
             // 镜头控制逻辑
-            if (isHeroMode && heroTarget) {
+            if (isBlackboardMode && heroTarget) {
+                // 黑板视角模式：平滑推进到黑板位置
+                const lerpFactor = 0.05;
+                camera.position.lerp(heroTarget.position, lerpFactor);
+                
+                // 平滑调整视角方向
+                const currentLookAt = new THREE.Vector3();
+                camera.getWorldDirection(currentLookAt);
+                const targetDirection = new THREE.Vector3().subVectors(
+                    heroTarget.lookAt, 
+                    camera.position
+                ).normalize();
+                
+                // 使用球面插值平滑旋转视角
+                const currentQuaternion = new THREE.Quaternion();
+                camera.getWorldQuaternion(currentQuaternion);
+                
+                const targetQuaternion = new THREE.Quaternion();
+                const targetCamera = new THREE.Camera();
+                targetCamera.position.copy(camera.position);
+                targetCamera.lookAt(heroTarget.lookAt);
+                targetCamera.getWorldQuaternion(targetQuaternion);
+                
+                currentQuaternion.slerp(targetQuaternion, lerpFactor);
+                camera.quaternion.copy(currentQuaternion);
+            } else if (isHeroMode && heroTarget) {
                 // 英雄镜头模式：平滑推进到目标位置
                 const lerpFactor = 0.05; // 插值速度
                 
@@ -647,11 +933,6 @@
                 
                 const glowPulse = Math.sin(elapsedTime * 1.5 + index * 0.5) * 0.15 + 0.35;
                 stand.glowBorder.material.opacity = glowPulse;
-                
-                // 立牌轻微浮动效果
-                stand.mesh.position.y = Math.sin(elapsedTime * 1.5 + index) * 0.1;
-                stand.border.position.y = stand.mesh.position.y;
-                stand.glowBorder.position.y = stand.mesh.position.y;
             });
             
             // 更新所有OUT标签的位置
