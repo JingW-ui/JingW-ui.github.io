@@ -34,7 +34,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // Logo 列表
-        const logoList = ["doubao", "deepseek", "kimi", "yuanbao", "glm", "longcat"];
+        const logoList = ["doubao", "deepseek", "kimi", "yuanbao", "glm", "longcat", "qianwen"];
         
         // 场景初始化
         let scene, camera, renderer;
@@ -214,7 +214,7 @@
                 // 加载 Logo 纹理
                 const logoName = logoList[i];
                 
-                if (logoName === 'glm') {
+                if (logoName === 'glm' || logoName === 'qianwen') {
                     // SVG 文件需要使用 Canvas 渲染
                     loadSVGAsTexture(`assets/${logoName}.svg`, xPosition, standDepth, i, standWidth, standHeight);
                 } else {
