@@ -62,12 +62,62 @@
             border-color: #ccc;
             color: #fff;
         }
+        /* OUT标签样式 - 居中显示 */
+        .out-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.85);
+            color: white;
+            padding: 8px 16px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.8), inset 0 0 10px rgba(255, 0, 0, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+            border: 2px solid rgba(255, 50, 50, 0.9);
+        }
+        .out-label.visible {
+            opacity: 1;
+        }
+        /* OUT按钮样式 */
+        .out-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid #666;
+            color: #aaa;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .out-btn:hover {
+            background: rgba(150, 50, 50, 0.8);
+            border-color: #ff4444;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        .out-btn.active {
+            background: rgba(200, 50, 50, 0.9);
+            border-color: #ff6666;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
     <div id="canvas-container"></div>
     <div class="loading" id="loading">加载中...</div>
     <div id="hero-controls"></div>
+    <div id="out-controls"></div>
+    <div id="out-labels-container"></div>
 
     <!-- 引入 Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -83,6 +133,7 @@
         let isHeroMode = false; // 是否处于英雄镜头模式
         let heroTarget = null; // 英雄镜头目标位置
         let autoRotateEnabled = true; // 自动旋转是否启用
+        let outStates = {}; // 记录每个logo的OUT状态
         
         // 初始化场景
         function init() {
@@ -140,6 +191,9 @@
             
             // 创建英雄镜头控制按钮
             createHeroControls();
+            
+            // 创建OUT控制按钮
+            createOutControls();
             
             // 隐藏加载提示
             document.getElementById('loading').style.display = 'none';
@@ -352,6 +406,125 @@
             });
         }
         
+        // 创建OUT控制按钮
+        function createOutControls() {
+            const container = document.getElementById('out-controls');
+            container.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 150px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                opacity: 0.3;
+                transition: opacity 0.3s ease;
+                z-index: 100;
+            `;
+            container.onmouseover = () => container.style.opacity = '0.9';
+            container.onmouseout = () => container.style.opacity = '0.3';
+            
+            // 为每个logo创建OUT按钮和标签
+            logoList.forEach((logoName, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'out-btn';
+                btn.textContent = logoName;
+                btn.dataset.index = index;
+                
+                btn.addEventListener('click', () => {
+                    toggleOutState(index);
+                });
+                
+                container.appendChild(btn);
+                
+                // 创建对应的OUT标签
+                const label = document.createElement('div');
+                label.className = 'out-label';
+                label.id = `out-label-${index}`;
+                label.textContent = 'OUT';
+                document.getElementById('out-labels-container').appendChild(label);
+            });
+        }
+        
+        // 切换OUT状态
+        function toggleOutState(index) {
+            if (index < 0 || index >= stands.length) return;
+            
+            const stand = stands[index];
+            outStates[index] = !outStates[index];
+            
+            if (outStates[index]) {
+                // 设置为OUT状态：变灰
+                if (stand.logoMaterial) {
+                    stand.logoMaterial.color.setHex(0x666666); // 灰色
+                    stand.logoMaterial.needsUpdate = true;
+                }
+                // 添加红色边框效果
+                if (stand.border) {
+                    stand.border.material.color.setHex(0xff0000);
+                    stand.border.material.opacity = 1.0;
+                }
+                if (stand.glowBorder) {
+                    stand.glowBorder.material.color.setHex(0xff3333);
+                    stand.glowBorder.material.opacity = 0.8;
+                }
+                // 显示OUT标签
+                const label = document.getElementById(`out-label-${index}`);
+                if (label) {
+                    label.classList.add('visible');
+                    updateLabelPosition(index);
+                }
+            } else {
+                // 恢复正常状态
+                if (stand.logoMaterial) {
+                    stand.logoMaterial.color.setHex(0xffffff); // 白色
+                    stand.logoMaterial.needsUpdate = true;
+                }
+                // 恢复灰色边框
+                if (stand.border) {
+                    stand.border.material.color.setHex(0x888888);
+                    stand.border.material.opacity = 0.8;
+                }
+                if (stand.glowBorder) {
+                    stand.glowBorder.material.color.setHex(0x666666);
+                    stand.glowBorder.material.opacity = 0.4;
+                }
+                // 隐藏OUT标签
+                const label = document.getElementById(`out-label-${index}`);
+                if (label) {
+                    label.classList.remove('visible');
+                }
+            }
+            
+            // 更新按钮状态
+            const buttons = document.querySelectorAll('#out-controls .out-btn');
+            buttons.forEach((btn, i) => {
+                if (i === index && outStates[index]) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+        
+        // 更新标签位置
+        function updateLabelPosition(index) {
+            const stand = stands[index];
+            if (!stand) return;
+            
+            const label = document.getElementById(`out-label-${index}`);
+            if (!label) return;
+            
+            // 将3D坐标转换为2D屏幕坐标（使用logo的中心位置）
+            const vector = new THREE.Vector3(stand.position, stand.mesh.position.y || 0, 0);
+            vector.project(camera);
+            
+            const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (-(vector.y * 0.5) + 0.5) * window.innerHeight;
+            
+            label.style.left = `${x}px`;
+            label.style.top = `${y}px`;
+        }
+        
         // 从 SVG 加载纹理
         function loadSVGAsTexture(svgPath, xPosition, standDepth, index, standWidth, standHeight) {
             const img = new Image();
@@ -387,6 +560,12 @@
             const logo = new THREE.Mesh(logoGeometry, logoMaterial);
             logo.position.set(xPosition, 0, standDepth / 2 + 0.01);
             scene.add(logo);
+            
+            // 保存logo引用到stands数组
+            if (stands[index]) {
+                stands[index].logo = logo;
+                stands[index].logoMaterial = logoMaterial;
+            }
             
             // 添加入场动画
             logo.scale.set(0, 0, 0);
@@ -473,6 +652,13 @@
                 stand.mesh.position.y = Math.sin(elapsedTime * 1.5 + index) * 0.1;
                 stand.border.position.y = stand.mesh.position.y;
                 stand.glowBorder.position.y = stand.mesh.position.y;
+            });
+            
+            // 更新所有OUT标签的位置
+            logoList.forEach((logoName, index) => {
+                if (outStates[index]) {
+                    updateLabelPosition(index);
+                }
             });
             
             renderer.render(scene, camera);
