@@ -20,9 +20,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #0ff;
+            color: #cccccc;
             font-size: 24px;
-            text-shadow: 0 0 10px #0ff;
+            text-shadow: 0 0 10px #cccccc;
         }
     </style>
 </head>
@@ -46,7 +46,7 @@
         function init() {
             // 创建场景
             scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x000033, 0.02);
+            scene.fog = new THREE.FogExp2(0x000000, 0.02);
             
             // 创建相机
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -60,30 +60,30 @@
             document.getElementById('canvas-container').appendChild(renderer.domElement);
             
             // 添加环境光
-            const ambientLight = new THREE.AmbientLight(0x222244, 0.5);
+            const ambientLight = new THREE.AmbientLight(0x111111, 0.3);
             scene.add(ambientLight);
             
             // 添加方向光
-            const directionalLight = new THREE.DirectionalLight(0x00ffff, 0.8);
+            const directionalLight = new THREE.DirectionalLight(0xcccccc, 0.6);
             directionalLight.position.set(5, 10, 7);
             directionalLight.castShadow = true;
             scene.add(directionalLight);
             
-            // 添加点光源（霓虹效果）
-            const pointLight1 = new THREE.PointLight(0xff00ff, 2, 50);
+            // 添加点光源（灰色霓虹效果）
+            const pointLight1 = new THREE.PointLight(0xaaaaaa, 1.5, 50);
             pointLight1.position.set(-10, 5, 0);
             scene.add(pointLight1);
             
-            const pointLight2 = new THREE.PointLight(0x00ffff, 2, 50);
+            const pointLight2 = new THREE.PointLight(0x999999, 1.5, 50);
             pointLight2.position.set(10, 5, 0);
             scene.add(pointLight2);
             
-            // 添加更多霓虹灯效果
-            const pointLight3 = new THREE.PointLight(0xff0080, 1.5, 40);
+            // 添加更多灰色霓虹灯效果
+            const pointLight3 = new THREE.PointLight(0xbbbbbb, 1, 40);
             pointLight3.position.set(0, 8, -5);
             scene.add(pointLight3);
             
-            const pointLight4 = new THREE.PointLight(0x00ff80, 1.5, 40);
+            const pointLight4 = new THREE.PointLight(0x888888, 1, 40);
             pointLight4.position.set(0, 3, 10);
             scene.add(pointLight4);
             
@@ -107,11 +107,11 @@
         function createCyberFloor() {
             const geometry = new THREE.PlaneGeometry(100, 100, 20, 20);
             const material = new THREE.MeshStandardMaterial({
-                color: 0x0a0a2a,
-                roughness: 0.2,
-                metalness: 0.8,
-                emissive: 0x001133,
-                emissiveIntensity: 0.2
+                color: 0x0a0a0a,
+                roughness: 0.3,
+                metalness: 0.7,
+                emissive: 0x111111,
+                emissiveIntensity: 0.15
             });
             
             const floor = new THREE.Mesh(geometry, material);
@@ -121,7 +121,7 @@
             scene.add(floor);
             
             // 添加网格线效果
-            const gridHelper = new THREE.GridHelper(100, 50, 0x00ffff, 0x330066);
+            const gridHelper = new THREE.GridHelper(100, 50, 0x666666, 0x222222);
             gridHelper.position.y = -1.99;
             scene.add(gridHelper);
         }
@@ -138,21 +138,11 @@
                 positions[i + 1] = Math.random() * 30 - 10;
                 positions[i + 2] = (Math.random() - 0.5) * 100;
                 
-                // 随机颜色（青色、紫色、粉色）
-                const colorChoice = Math.random();
-                if (colorChoice < 0.33) {
-                    colors[i] = 0;     // R
-                    colors[i + 1] = 1; // G
-                    colors[i + 2] = 1; // B (青色)
-                } else if (colorChoice < 0.66) {
-                    colors[i] = 1;     // R
-                    colors[i + 1] = 0; // G
-                    colors[i + 2] = 1; // B (紫色)
-                } else {
-                    colors[i] = 1;     // R
-                    colors[i + 1] = 0; // G
-                    colors[i + 2] = 0.5; // B (粉色)
-                }
+                // 随机颜色（灰色系）
+                const grayValue = Math.random() * 0.4 + 0.6; // 0.6-1.0
+                colors[i] = grayValue;     // R
+                colors[i + 1] = grayValue; // G
+                colors[i + 2] = grayValue; // B
             }
             
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -183,11 +173,11 @@
                 // 立牌主体
                 const geometry = new THREE.BoxGeometry(standWidth, standHeight, standDepth);
                 const material = new THREE.MeshStandardMaterial({
-                    color: 0x0a0a1a,
-                    roughness: 0.3,
-                    metalness: 0.7,
-                    emissive: 0x000022,
-                    emissiveIntensity: 0.1
+                    color: 0x0a0a0a,
+                    roughness: 0.4,
+                    metalness: 0.6,
+                    emissive: 0x111111,
+                    emissiveIntensity: 0.08
                 });
                 
                 const stand = new THREE.Mesh(geometry, material);
@@ -199,7 +189,7 @@
                 // 添加发光边框 - 使用EdgesGeometry只显示边缘
                 const edgesGeometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(standWidth, standHeight, standDepth));
                 const borderMaterial = new THREE.LineBasicMaterial({
-                    color: 0x00ffff,
+                    color: 0x888888,
                     linewidth: 2,
                     transparent: true,
                     opacity: 0.8
@@ -213,7 +203,7 @@
                 const glowGeometry = new THREE.BoxGeometry(standWidth + 0.15, standHeight + 0.15, standDepth + 0.05);
                 const glowEdges = new THREE.EdgesGeometry(glowGeometry);
                 const glowMaterial = new THREE.LineBasicMaterial({
-                    color: 0x00ffff,
+                    color: 0x666666,
                     transparent: true,
                     opacity: 0.4
                 });
