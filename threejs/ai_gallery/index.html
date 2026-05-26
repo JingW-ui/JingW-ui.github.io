@@ -181,6 +181,34 @@
             color: #a86;
             border-color: #864;
         }
+        /* 黑板右下角隐蔽更新按钮 */
+        #update-prompt-btn {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid #333;
+            color: #555;
+            padding: 3px 8px;
+            cursor: pointer;
+            font-size: 11px;
+            border-radius: 3px;
+            opacity: 0.08;
+            transition: opacity 0.3s ease;
+            z-index: 102;
+            pointer-events: auto;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 1px;
+            display: none;
+        }
+        #update-prompt-btn:hover {
+            opacity: 0.6;
+            background: rgba(60, 60, 60, 0.5);
+            border-color: #777;
+            color: #aaa;
+        }
+        #update-prompt-btn.updated {
+            color: #6a6;
+            border-color: #4a4;
+        }
     </style>
 </head>
 <body>
@@ -192,6 +220,7 @@
     <div id="blackboard-controls"></div>
     <button id="quiz-btn" title="开始答题">📝 答题</button>
     <button id="run-code-btn" title="运行代码">▶ Run</button>
+    <button id="update-prompt-btn" title="更新提示词">更新</button>
 
     <!-- 引入 Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -217,6 +246,22 @@
         let monitorScrollTimers = []; // 每个显示器的滚动定时器
         let monitorsVisible = false; // 显示器是否可见
         let monitorAnimations = []; // 显示器动画状态
+        let blackboardPromptVersion = 0; // 0=原始提示词, 1=更新后提示词
+        let blackboardTextPlane = null; // 黑板文字平面引用
+        let blackboardCanvas = null; // 黑板画布引用
+        let blackboardDims = {}; // 黑板尺寸
+        let codes2Map = {}; // codes2目录的代码内容映射
+        let codes2Loaded = false; // codes2是否已加载完成
+        // Dolly Zoom (希区柯克变焦) 状态
+        let isDollyZooming = false;       // 是否正在执行 Dolly Zoom
+        let dollyZoomStartTime = 0;       // 动画开始时间
+        let dollyZoomDuration = 2000;     // 动画持续时间(ms)
+        let dollyZoomStartPos = null;     // 起始相机位置
+        let dollyZoomTargetPos = null;    // 目标相机位置
+        let dollyZoomStartFov = 75;       // 起始 FOV
+        let dollyZoomEndFov = 75;         // 结束 FOV
+        let dollyZoomLookAt = null;       // 注视目标点
+        let dollyZoomOutIndex = -1;       // Dolly Zoom 完成后需要应用 OUT 视觉效果的索引
         
         // 初始化场景
         function init() {
@@ -286,6 +331,9 @@
             
             // 创建显示器（每个logo一个）
             createMonitors();
+            
+            // 异步加载codes2代码
+            loadCodes2();
             
             // 隐藏加载提示
             document.getElementById('loading').style.display = 'none';
@@ -495,8 +543,12 @@
         // 取消英雄镜头
         function deactivateHeroLens() {
             isHeroMode = false;
+            isDollyZooming = false; // 同步取消未完成的 dolly zoom
             autoRotateEnabled = true;
             heroTarget = null;
+            // 恢复默认 FOV（Dolly Zoom 会修改 FOV，需重置）
+            camera.fov = 75;
+            camera.updateProjectionMatrix();
             
             // 清除所有按钮的active状态
             document.querySelectorAll('.hero-btn').forEach(btn => {
@@ -546,29 +598,25 @@
             outStates[index] = !outStates[index];
             
             if (outStates[index]) {
-                // 设置为OUT状态：变灰
-                if (stand.logoMaterial) {
-                    stand.logoMaterial.color.setHex(0x666666); // 灰色
-                    stand.logoMaterial.needsUpdate = true;
-                }
-                // 添加红色边框效果
-                if (stand.border) {
-                    stand.border.material.color.setHex(0xff0000);
-                    stand.border.material.opacity = 1.0;
-                }
-                if (stand.glowBorder) {
-                    stand.glowBorder.material.color.setHex(0xff3333);
-                    stand.glowBorder.material.opacity = 0.8;
-                }
-                // 显示3D OUT标签
-                if (stand.outLabel3D) {
-                    stand.outLabel3D.visible = true;
-                }
+                // 不立即应用视觉变化，等 Dolly Zoom 完成后再渐入显示
+                // 记录索引，Dolly Zoom 完成后会读取
+                dollyZoomOutIndex = index;
+                // 触发 Dolly Zoom 效果
+                startDollyZoom(index);
             } else {
                 // 恢复正常状态
+                // 裂开复原动画（同时恢复不透明度）
+                if (stand.logoLeft && stand.logoRight) {
+                    animateCrackReset(stand);
+                }
+                // logo 颜色立即恢复（不透明度由 animateCrackReset 处理）
                 if (stand.logoMaterial) {
-                    stand.logoMaterial.color.setHex(0xffffff); // 白色
+                    stand.logoMaterial.color.setHex(0xffffff);
                     stand.logoMaterial.needsUpdate = true;
+                }
+                if (stand.logoMaterialRight) {
+                    stand.logoMaterialRight.color.setHex(0xffffff);
+                    stand.logoMaterialRight.needsUpdate = true;
                 }
                 // 恢复灰色边框
                 if (stand.border) {
@@ -596,6 +644,226 @@
             });
         }
         
+        // 希区柯克变焦（Dolly Zoom / Vertigo Shot）
+        // 左右位置跳切（直接到位），仅前后移动镜头 + FOV 变化
+        function startDollyZoom(index) {
+            const stand = stands[index];
+            if (!stand) return;
+
+            // 禁用其他镜头模式
+            autoRotateEnabled = false;
+            isHeroMode = false;
+            isMonitorMode = false;
+            isBlackboardMode = false;
+
+            const standX = stand.position;
+            const lookAtPos = new THREE.Vector3(standX, 0, 0);
+
+            // Hero 镜头标准位置（用作 dolly zoom 的目标终点）
+            const heroPos = new THREE.Vector3(standX, 1, 6);
+
+            // 左右位置直接跳切：立即将相机 X/Y 对齐目标
+            camera.position.x = standX;
+            camera.position.y = heroPos.y;
+            camera.lookAt(lookAtPos);
+
+            // 确保足够的运动距离：起始距离至少为 18（远处长焦），制造强烈透视畸变效果
+            const minStartDist = 18;
+            const currentDist = camera.position.distanceTo(lookAtPos);
+            if (currentDist < minStartDist) {
+                // 相机太近，强制拉远到 minStartDist 的距离
+                // 计算需要的 Z 值：dist² = (y-0)² + (z-0)² => z = sqrt(dist² - y²)
+                const y = camera.position.y;
+                const neededZ = Math.sqrt(minStartDist * minStartDist - y * y);
+                camera.position.z = neededZ;
+                camera.lookAt(lookAtPos);
+            }
+
+            const startPos = camera.position.clone();
+            const startDist = startPos.distanceTo(lookAtPos);
+            const targetDist = heroPos.distanceTo(lookAtPos); // ≈ 6.08
+
+            // 使用默认 FOV 75° 作为起始值（远处标准视角）
+            const startFov = 75;
+            camera.fov = startFov;
+            camera.updateProjectionMatrix();
+
+            // 根据 Dolly Zoom 公式: tan(fov/2) ∝ 1/d
+            // 保持主体可视高度 h 不变: h = d × tan(fov/2) = 常数
+            const h = startDist * Math.tan((startFov / 2) * Math.PI / 180);
+
+            // 目标 FOV = 2 × atan(h / targetDist)
+            let endFov = 2 * Math.atan(h / targetDist) * 180 / Math.PI;
+            // 限制 FOV 在合理范围内（最大不超过 120°）
+            endFov = Math.min(Math.max(endFov, 40), 120);
+
+            // 设置动画参数
+            isDollyZooming = true;
+            dollyZoomStartTime = performance.now();
+            dollyZoomStartPos = startPos;
+            dollyZoomTargetPos = heroPos;
+            dollyZoomStartFov = startFov;
+            dollyZoomEndFov = endFov;
+            dollyZoomLookAt = lookAtPos;
+        }
+
+        // OUT 视觉效果渐入动画（Dolly Zoom 完成后触发）
+        function animateOutAppear(index) {
+            const stand = stands[index];
+            if (!stand) return;
+            const duration = 800;
+            const startTime = performance.now();
+
+            // 初始状态
+            if (stand.logoMaterial) {
+                stand.logoMaterial.color.setHex(0xffffff);
+            }
+            if (stand.logoMaterialRight) {
+                stand.logoMaterialRight.color.setHex(0xffffff);
+            }
+            if (stand.border) {
+                stand.border.material.opacity = 0;
+            }
+            if (stand.glowBorder) {
+                stand.glowBorder.material.opacity = 0;
+            }
+
+            // 记录两半原始位置（用于裂开动画）
+            const leftOrigX = stand.logoLeft ? stand.logoLeft.position.x : 0;
+            const rightOrigX = stand.logoRight ? stand.logoRight.position.x : 0;
+
+            if (stand.outLabel3D) {
+                stand.outLabel3D.visible = true;
+                stand.outLabel3D.material.opacity = 0;
+                const baseScale = stand.outLabel3D.scale.clone();
+                stand.outLabel3D.scale.set(baseScale.x * 0.3, baseScale.y * 0.3, 1);
+
+                function update() {
+                    if (!outStates[index]) return;
+                    const elapsed = performance.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    // easeOutBack 缓动
+                    const c1 = 1.70158;
+                    const c3 = c1 + 1;
+                    const eased = 1 + c3 * Math.pow(progress - 1, 3) + c1 * Math.pow(progress - 1, 2);
+
+                    // logo 渐变为灰色 + 降低不透明度
+                    if (stand.logoMaterial) {
+                        const gray = 0xffffff - (0xffffff - 0x555555) * eased;
+                        stand.logoMaterial.color.setHex(Math.round(gray));
+                        stand.logoMaterial.opacity = 0.95 - 0.7 * eased; // 最终 0.25
+                        stand.logoMaterial.needsUpdate = true;
+                    }
+                    if (stand.logoMaterialRight) {
+                        const gray = 0xffffff - (0xffffff - 0x555555) * eased;
+                        stand.logoMaterialRight.color.setHex(Math.round(gray));
+                        stand.logoMaterialRight.opacity = 0.95 - 0.7 * eased;
+                        stand.logoMaterialRight.needsUpdate = true;
+                    }
+
+                    // 裂开效果：左右两半向外滑开 + 旋转
+                    if (stand.logoLeft) {
+                        stand.logoLeft.position.x = leftOrigX - 0.5 * eased;
+                        stand.logoLeft.rotation.y = -0.5 * eased;  // 左半向外翻（像书页打开）
+                        stand.logoLeft.rotation.z = 0.08 * eased;  // 轻微倾斜
+                    }
+                    if (stand.logoRight) {
+                        stand.logoRight.position.x = rightOrigX + 0.5 * eased;
+                        stand.logoRight.rotation.y = 0.5 * eased;   // 右半向外翻
+                        stand.logoRight.rotation.z = -0.08 * eased;
+                    }
+
+                    // 边框渐变为红色
+                    if (stand.border) {
+                        stand.border.material.color.setHex(0xff0000);
+                        stand.border.material.opacity = eased;
+                    }
+                    if (stand.glowBorder) {
+                        stand.glowBorder.material.color.setHex(0xff3333);
+                        stand.glowBorder.material.opacity = eased * 0.8;
+                    }
+                    // OUT 标签缩放+渐入
+                    if (stand.outLabel3D) {
+                        stand.outLabel3D.material.opacity = eased;
+                        stand.outLabel3D.scale.set(baseScale.x * eased, baseScale.y * eased, 1);
+                    }
+
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    }
+                }
+                update();
+            } else {
+                // 没有 OUT 标签时直接应用
+                if (stand.logoMaterial) {
+                    stand.logoMaterial.color.setHex(0x555555);
+                    stand.logoMaterial.opacity = 0.25;
+                    stand.logoMaterial.needsUpdate = true;
+                }
+                if (stand.logoMaterialRight) {
+                    stand.logoMaterialRight.color.setHex(0x555555);
+                    stand.logoMaterialRight.opacity = 0.25;
+                    stand.logoMaterialRight.needsUpdate = true;
+                }
+                if (stand.border) {
+                    stand.border.material.color.setHex(0xff0000);
+                    stand.border.material.opacity = 1.0;
+                }
+                if (stand.glowBorder) {
+                    stand.glowBorder.material.color.setHex(0xff3333);
+                    stand.glowBorder.material.opacity = 0.8;
+                }
+            }
+        }
+
+        // 裂开复原动画（取消 OUT 时两半合拢）
+        function animateCrackReset(stand) {
+            const duration = 500;
+            const startTime = performance.now();
+            const leftStartX = stand.logoLeft.position.x;
+            const rightStartX = stand.logoRight.position.x;
+            const leftStartRY = stand.logoLeft.rotation.y;
+            const rightStartRY = stand.logoRight.rotation.y;
+            const leftStartRZ = stand.logoLeft.rotation.z;
+            const rightStartRZ = stand.logoRight.rotation.z;
+            const startOpacity = stand.logoMaterial ? stand.logoMaterial.opacity : 0.25;
+            const standWidth = 2;
+            const halfW = standWidth * 0.85 / 2;
+            const leftTargetX = -halfW / 2;
+            const rightTargetX = halfW / 2;
+
+            function update() {
+                const elapsed = performance.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+
+                if (stand.logoLeft) {
+                    stand.logoLeft.position.x = leftStartX + (leftTargetX - leftStartX) * eased;
+                    stand.logoLeft.rotation.y = leftStartRY * (1 - eased);
+                    stand.logoLeft.rotation.z = leftStartRZ * (1 - eased);
+                }
+                if (stand.logoRight) {
+                    stand.logoRight.position.x = rightStartX + (rightTargetX - rightStartX) * eased;
+                    stand.logoRight.rotation.y = rightStartRY * (1 - eased);
+                    stand.logoRight.rotation.z = rightStartRZ * (1 - eased);
+                }
+                // 不透明度恢复
+                if (stand.logoMaterial) {
+                    stand.logoMaterial.opacity = startOpacity + (0.95 - startOpacity) * eased;
+                    stand.logoMaterial.needsUpdate = true;
+                }
+                if (stand.logoMaterialRight) {
+                    stand.logoMaterialRight.opacity = startOpacity + (0.95 - startOpacity) * eased;
+                    stand.logoMaterialRight.needsUpdate = true;
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            update();
+        }
+
         // 创建3D OUT标签（固定在立牌上）
         function createOutLabel3D(standMesh, standWidth, standHeight) {
             const canvas = document.createElement('canvas');
@@ -677,30 +945,71 @@
             img.src = svgPath;
         }
         
-        // 创建 Logo 网格
-        function createLogoMesh(texture, xPosition, standDepth, index, standWidth, standHeight) {
-            const logoGeometry = new THREE.PlaneGeometry(standWidth * 0.85, standHeight * 0.85);
-            const logoMaterial = new THREE.MeshBasicMaterial({
-                map: texture,
-                transparent: true,
-                side: THREE.DoubleSide,
-                opacity: 0.95
-            });
-            
-            const logo = new THREE.Mesh(logoGeometry, logoMaterial);
-            logo.position.set(xPosition, 0, standDepth / 2 + 0.01);
-            scene.add(logo);
-            
-            // 保存logo引用到stands数组
-            if (stands[index]) {
-                stands[index].logo = logo;
-                stands[index].logoMaterial = logoMaterial;
+        // Logo 入场动画
+        function animateLogoIn(obj) {
+            const duration = 600;
+            const startTime = Date.now();
+            function update() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                obj.scale.set(eased, eased, eased);
+                if (progress < 1) requestAnimationFrame(update);
             }
-            
-            // 添加入场动画
-            logo.scale.set(0, 0, 0);
+            update();
+        }
+
+        // 创建 Logo 网格（左右两半，支持裂开效果）
+        function createLogoMesh(texture, xPosition, standDepth, index, standWidth, standHeight) {
+            const logoW = standWidth * 0.85;
+            const logoH = standHeight * 0.85;
+            const halfW = logoW / 2;
+
+            // 左半纹理（UV 取纹理左半）
+            const leftTex = texture.clone();
+            leftTex.offset.set(0, 0);
+            leftTex.repeat.set(0.5, 1);
+            leftTex.needsUpdate = true;
+
+            // 右半纹理（UV 取纹理右半）
+            const rightTex = texture.clone();
+            rightTex.offset.set(0.5, 0);
+            rightTex.repeat.set(0.5, 1);
+            rightTex.needsUpdate = true;
+
+            const leftMat = new THREE.MeshBasicMaterial({
+                map: leftTex, transparent: true, side: THREE.DoubleSide, opacity: 0.95
+            });
+            const rightMat = new THREE.MeshBasicMaterial({
+                map: rightTex, transparent: true, side: THREE.DoubleSide, opacity: 0.95
+            });
+
+            const leftMesh = new THREE.Mesh(new THREE.PlaneGeometry(halfW, logoH), leftMat);
+            leftMesh.position.x = -halfW / 2;
+
+            const rightMesh = new THREE.Mesh(new THREE.PlaneGeometry(halfW, logoH), rightMat);
+            rightMesh.position.x = halfW / 2;
+
+            // 用 Group 包裹两半，整体定位
+            const logoGroup = new THREE.Group();
+            logoGroup.add(leftMesh);
+            logoGroup.add(rightMesh);
+            logoGroup.position.set(xPosition, 0, standDepth / 2 + 0.01);
+            scene.add(logoGroup);
+
+            // 保存引用
+            if (stands[index]) {
+                stands[index].logo = logoGroup;
+                stands[index].logoLeft = leftMesh;
+                stands[index].logoRight = rightMesh;
+                stands[index].logoMaterial = leftMat;
+                stands[index].logoMaterialRight = rightMat;
+            }
+
+            // 入场动画
+            logoGroup.scale.set(0, 0, 0);
             setTimeout(() => {
-                animateLogoIn(logo);
+                animateLogoIn(logoGroup);
             }, index * 300);
         }
         
@@ -772,11 +1081,36 @@
         
         // 创建黑板文字
         function createBlackboardText(boardWidth, boardHeight, boardDepth) {
+            blackboardDims = { boardWidth, boardHeight, boardDepth };
             const canvas = document.createElement('canvas');
             canvas.width = 2048;
             canvas.height = 1280;
+            blackboardCanvas = canvas;
             const ctx = canvas.getContext('2d');
             
+            drawBlackboardContent(ctx, canvas);
+            
+            // 创建纹理并应用到黑板
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            
+            // 在黑板正面添加文字平面
+            const textGeometry = new THREE.PlaneGeometry(boardWidth - 0.3, boardHeight - 0.3);
+            const textMaterial = new THREE.MeshBasicMaterial({
+                map: texture,
+                transparent: true,
+                opacity: 0.95
+            });
+            
+            const textPlane = new THREE.Mesh(textGeometry, textMaterial);
+            textPlane.position.z = boardDepth / 2 + 0.01;
+            blackboardMesh.add(textPlane);
+            blackboardTextPlane = textPlane;
+        }
+        
+        // 绘制黑板内容（根据 promptVersion 切换原始/更新版本）
+        function drawBlackboardContent(ctx, canvas) {
             // 设置背景为黑板色
             ctx.fillStyle = '#1a3d1a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -796,62 +1130,131 @@
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             
-            // 任务内容
-            const lines = [
-                '输入：Python代码文本文件路径 （txt格式）默认 code.txt',
-                '',
-                '功能：',
-                '  读取文件中缩进规范的Python代码',
-                '  等待5秒，供用户定位光标',
-                '  使用 pyautogui逐字符模拟人为输入到光标位置',
-                '',
-                '要求：仅实现函数，环境已就绪，不处理依赖',
-                '',
-                '注意：',
-                '  处理.py 文件中常见软件会自动处理缩进的情况',
-                '  不要频繁使用home 模拟人真实的输入',
-                '  即非匀速输入 有几率输入错误字符',
-                '',
-                '写好函数的调用 代码可直接运行'
-            ];
-            
-            // 逐行绘制文字
             const startX = 80;
             const startY = 80;
             const lineHeight = 65;
             
-            lines.forEach((line, index) => {
-                const y = startY + index * lineHeight;
-                
-                // 添加轻微的随机偏移，模拟手写效果
-                const offsetX = Math.random() * 2 - 1;
-                const offsetY = Math.random() * 1.5 - 0.75;
-                
-                // 绘制文字阴影（模拟粉笔的厚度）
-                ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
-                ctx.fillText(line, startX + offsetX + 1, y + offsetY + 1);
-                
-                // 绘制主要文字
-                ctx.fillStyle = '#e8e8e8';
-                ctx.fillText(line, startX + offsetX, y + offsetY);
-            });
-            
-            // 创建纹理并应用到黑板
-            const texture = new THREE.CanvasTexture(canvas);
-            texture.minFilter = THREE.LinearFilter;
-            texture.magFilter = THREE.LinearFilter;
-            
-            // 在黑板正面添加文字平面
-            const textGeometry = new THREE.PlaneGeometry(boardWidth - 0.3, boardHeight - 0.3);
-            const textMaterial = new THREE.MeshBasicMaterial({
-                map: texture,
-                transparent: true,
-                opacity: 0.95
-            });
-            
-            const textPlane = new THREE.Mesh(textGeometry, textMaterial);
-            textPlane.position.z = boardDepth / 2 + 0.01;
-            blackboardMesh.add(textPlane);
+            if (blackboardPromptVersion === 0) {
+                // 原始提示词
+                const lines = [
+                    '输入：Python代码文本文件路径 （txt格式）默认 code.txt',
+                    '',
+                    '功能：',
+                    '  读取文件中缩进规范的Python代码',
+                    '  等待5秒，供用户定位光标',
+                    '  使用 pyautogui逐字符模拟人为输入到光标位置',
+                    '',
+                    '要求：仅实现函数，环境已就绪，不处理依赖',
+                    '',
+                    '注意：',
+                    '  处理.py 文件中常见软件会自动处理缩进的情况',
+                    '  不要频繁使用home 模拟人真实的输入',
+                    '  即非匀速输入 有几率输入错误字符',
+                    '',
+                    '写好函数的调用 代码可直接运行'
+                ];
+                lines.forEach((line, index) => {
+                    const y = startY + index * lineHeight;
+                    const offsetX = Math.random() * 2 - 1;
+                    const offsetY = Math.random() * 1.5 - 0.75;
+                    ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+                    ctx.fillText(line, startX + offsetX + 1, y + offsetY + 1);
+                    ctx.fillStyle = '#e8e8e8';
+                    ctx.fillText(line, startX + offsetX, y + offsetY);
+                });
+            } else {
+                // 更新后提示词 - segments: {t:text, h:highlighted}
+                const lines = [
+                    [{t:'输入：Python代码文本文件路径 （txt格式）默认 code.txt'}],
+                    [],
+                    [{t:'功能：'}],
+                    [{t:'  读取文件中缩进规范的Python代码'}],
+                    [{t:'  等待5秒，供用户定位光标'}],
+                    [{t:'  使用 pyautogui逐字符模拟人为输入到光标位置'}],
+                    [],
+                    [{t:'要求：仅实现函数，环境已就绪，不处理依赖'}],
+                    [],
+                    [{t:'注意：'}],
+                    [{t:'  注意处理.py 文件中'},{t:'常见软件会自动处理缩进的情况',h:1}],
+                    [{t:'  '},{t:'所以你不能输入额外的缩进',h:1}],
+                    [{t:'  '},{t:'下行相同或长的缩进 交给软件自动处理',h:1}],
+                    [{t:'  '},{t:'短的缩进通过home+键入本身缩进进行处理',h:1}],
+                    [{t:'  '},{t:'每一行输入结束后 应该多输入一个空格再换行',h:1}],
+                    [{t:'  不要频繁使用home 模拟人真实的输入'}],
+                    [{t:'  即非匀速输入 有几率输入错误字符'}],
+                    [{t:'写好函数的调用 代码可直接运行'}]
+                ];
+                // 绘制每行
+                lines.forEach((lineData, lineIndex) => {
+                    const y = startY + lineIndex * lineHeight;
+                    let curX = startX;
+                    if (!lineData || lineData.length === 0) return;
+                    lineData.forEach(seg => {
+                        const text = seg.t;
+                        const hl = seg.h;
+                        for (let i = 0; i < text.length; i++) {
+                            const char = text[i];
+                            const ox = Math.random() * 1.5 - 0.75;
+                            const oy = Math.random() * 1 - 0.5;
+                            // 阴影
+                            ctx.fillStyle = hl ? 'rgba(255, 255, 100, 0.25)' : 'rgba(200, 200, 200, 0.3)';
+                            ctx.fillText(char, curX + ox + 1, y + oy + 1);
+                            // 主文字
+                            ctx.fillStyle = hl ? '#ffff66' : '#e8e8e8';
+                            ctx.fillText(char, curX + ox, y + oy);
+                            curX += ctx.measureText(char).width;
+                        }
+                        // 重点内容画波浪下划线
+                        if (hl) {
+                            const segPixelWidth = ctx.measureText(text).width;
+                            const lineY = y + 52;
+                            ctx.strokeStyle = '#ffff66';
+                            ctx.lineWidth = 2.5;
+                            ctx.beginPath();
+                            for (let wx = curX - segPixelWidth; wx < curX; wx += 3) {
+                                const wy = lineY + Math.sin((wx - curX + segPixelWidth) * 0.12) * 2.5;
+                                if (wx === curX - segPixelWidth) ctx.moveTo(wx, wy);
+                                else ctx.lineTo(wx, wy);
+                            }
+                            ctx.stroke();
+                        }
+                    });
+                });
+            }
+        }
+        
+        // 重绘黑板内容（切换提示词后调用）
+        function redrawBlackboard() {
+            if (!blackboardCanvas || !blackboardTextPlane) return;
+            const ctx = blackboardCanvas.getContext('2d');
+            drawBlackboardContent(ctx, blackboardCanvas);
+            blackboardTextPlane.material.map.needsUpdate = true;
+        }
+        
+        // 更新黑板右下角隐蔽按钮位置
+        function updateBlackboardUpdateBtnPosition() {
+            if (!blackboardMesh || !blackboardDims.boardWidth) {
+                document.getElementById('update-prompt-btn').style.display = 'none';
+                return;
+            }
+            const btn = document.getElementById('update-prompt-btn');
+            // 黑板本地坐标系右下角（面向观众）
+            const localCorner = new THREE.Vector3(
+                blackboardDims.boardWidth / 2 - 0.3,
+                -blackboardDims.boardHeight / 2 + 0.2,
+                blackboardDims.boardDepth / 2 + 0.02
+            );
+            const worldCorner = localCorner.applyMatrix4(blackboardMesh.matrixWorld);
+            const vector = worldCorner.clone().project(camera);
+            const x = (vector.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (-(vector.y * 0.5) + 0.5) * window.innerHeight;
+            if (vector.z < 1 && x > -100 && x < window.innerWidth + 100 && y > -100 && y < window.innerHeight + 100) {
+                btn.style.display = 'block';
+                btn.style.left = (x - 20) + 'px';
+                btn.style.top = (y - 10) + 'px';
+            } else {
+                btn.style.display = 'none';
+            }
         }
         
         // 创建显示器（每个logo一个，放在logo后面）
@@ -1461,13 +1864,63 @@ if __name__ == "__main__":
             return canvas;
         }
         
+        // 异步加载codes2目录的代码文件
+        async function loadCodes2() {
+            const fileMap = { 'longcat': 'langcat' }; // logo名到文件名的映射
+            const promises = logoList.map(async (logoName) => {
+                const fileName = fileMap[logoName] || logoName;
+                try {
+                    const resp = await fetch(`codes2/${fileName}.py`);
+                    if (resp.ok) {
+                        codes2Map[logoName] = await resp.text();
+                    }
+                } catch(e) {
+                    // 加载失败时静默处理
+                }
+            });
+            await Promise.all(promises);
+            codes2Loaded = true;
+            
+            // 如果当前已是更新版本，刷新显示器
+            if (monitorMeshes.length > 0 && blackboardPromptVersion === 1) {
+                updateMonitorsCode();
+            }
+        }
+        
+        // 获取指定显示器当前版本的代码内容
+        function getCurrentMonitorCode(monitorIndex) {
+            const monitor = monitorMeshes[monitorIndex];
+            if (blackboardPromptVersion === 1 && codes2Map[logoList[monitorIndex]]) {
+                return codes2Map[logoList[monitorIndex]];
+            }
+            return monitor.codeContent;
+        }
+        
+        // 更新所有显示器的代码显示（根据 promptVersion 切换）
+        function updateMonitorsCode() {
+            monitorMeshes.forEach((monitor, index) => {
+                const code = getCurrentMonitorCode(index);
+                monitor.scrollOffset = 0;
+                monitorScrollOffsets[index] = 0;
+                
+                const newCanvas = createCodeScreen(4.5, 3.0, code, logoList[index], 0);
+                const newTexture = new THREE.CanvasTexture(newCanvas);
+                newTexture.minFilter = THREE.LinearFilter;
+                
+                monitor.screenPlane.material.map = newTexture;
+                monitor.screenPlane.material.needsUpdate = true;
+                monitor.texture = newTexture;
+            });
+        }
+        
         // 更新指定显示器的代码滚动
         function updateMonitorScroll(monitorIndex, scrollOffset) {
             if (!monitorMeshes[monitorIndex]) return;
             const monitor = monitorMeshes[monitorIndex];
             monitor.scrollOffset = scrollOffset;
             
-            const newCanvas = createCodeScreen(4.5, 3.0, monitor.codeContent, logoList[monitorIndex], scrollOffset);
+            const code = getCurrentMonitorCode(monitorIndex);
+            const newCanvas = createCodeScreen(4.5, 3.0, code, logoList[monitorIndex], scrollOffset);
             const newTexture = new THREE.CanvasTexture(newCanvas);
             newTexture.minFilter = THREE.LinearFilter;
             
@@ -1651,7 +2104,40 @@ if __name__ == "__main__":
             const elapsedTime = clock.getElapsedTime();
             
             // 镜头控制逻辑
-            if ((isBlackboardMode || isMonitorMode) && heroTarget) {
+            if (isDollyZooming) {
+                // === 希区柯克变焦（Dolly Zoom）===
+                const elapsed = performance.now() - dollyZoomStartTime;
+                const progress = Math.min(elapsed / dollyZoomDuration, 1);
+                // easeInOutCubic 缓动函数，开始和结束平滑
+                const eased = progress < 0.5
+                    ? 4 * progress * progress * progress
+                    : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+                // 平滑插值相机位置（相机向前推）
+                camera.position.lerpVectors(dollyZoomStartPos, dollyZoomTargetPos, eased);
+
+                // 平滑插值 FOV（FOV 同步增大，保持主体大小不变）
+                camera.fov = dollyZoomStartFov + (dollyZoomEndFov - dollyZoomStartFov) * eased;
+                camera.updateProjectionMatrix();
+
+                // 始终朝向目标主体
+                camera.lookAt(dollyZoomLookAt);
+
+                if (progress >= 1) {
+                    isDollyZooming = false;
+                    // 动画完成后进入英雄镜头模式，保持相机位置
+                    isHeroMode = true;
+                    heroTarget = {
+                        position: dollyZoomTargetPos.clone(),
+                        lookAt: dollyZoomLookAt.clone()
+                    };
+                    // Dolly Zoom 完成后，渐入显示 OUT 视觉效果
+                    if (dollyZoomOutIndex >= 0 && outStates[dollyZoomOutIndex]) {
+                        animateOutAppear(dollyZoomOutIndex);
+                        dollyZoomOutIndex = -1;
+                    }
+                }
+            } else if ((isBlackboardMode || isMonitorMode) && heroTarget) {
                 // 黑板/显示器视角模式：平滑推进
                 const lerpFactor = 0.05;
                 camera.position.lerp(heroTarget.position, lerpFactor);
@@ -1698,6 +2184,11 @@ if __name__ == "__main__":
                 camera.position.z = 15 + Math.cos(elapsedTime * 0.15) * 3;
                 camera.position.y = 2 + Math.sin(elapsedTime * 0.3) * 0.5;
                 camera.lookAt(0, 0.5, 0);
+                // 确保自动漫游时 FOV 为默认值
+                if (Math.abs(camera.fov - 75) > 0.5) {
+                    camera.fov = 75;
+                    camera.updateProjectionMatrix();
+                }
             }
             
             // 粒子动画
@@ -1726,6 +2217,8 @@ if __name__ == "__main__":
             
             // 更新运行按钮位置
             updateRunButtonPosition();
+            // 更新黑板更新按钮位置
+            updateBlackboardUpdateBtnPosition();
             
             renderer.render(scene, camera);
         }
@@ -1866,6 +2359,15 @@ if __name__ == "__main__":
             }, 3000);
         });
         
+        // 黑板更新提示词按钮点击事件
+        document.getElementById('update-prompt-btn').addEventListener('click', function() {
+            blackboardPromptVersion = blackboardPromptVersion === 0 ? 1 : 0;
+            this.classList.toggle('updated', blackboardPromptVersion === 1);
+            this.title = blackboardPromptVersion === 1 ? '切换回原始提示词' : '更新提示词';
+            redrawBlackboard();
+            updateMonitorsCode();
+        });
+        
         // 鼠标滚轮滚动代码
         window.addEventListener('wheel', function(e) {
             if (!monitorsVisible || !isMonitorMode || currentMonitorIndex < 0) return;
@@ -1878,7 +2380,7 @@ if __name__ == "__main__":
             monitor.scrollOffset += e.deltaY > 0 ? scrollStep : -scrollStep;
             
             // 限制滚动范围
-            const codeLines = monitor.codeContent.split('\n');
+            const codeLines = getCurrentMonitorCode(currentMonitorIndex).split('\n');
             const lineHeight = 28;
             const maxScroll = Math.max(0, codeLines.length * lineHeight - 580);
             monitor.scrollOffset = Math.max(0, Math.min(monitor.scrollOffset, maxScroll));
