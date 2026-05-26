@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js 项目展示</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #313e3e, #000000, #292e2e);
+            color: #fff;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        header {
+            text-align: center;
+            padding: 60px 0 40px;
+        }
+        h1 {
+            font-size: 3rem;
+            margin: 0 0 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .project-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .project-card h2 {
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        .project-card p {
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        .project-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .project-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 60px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Three.js 项目展示</h1>
+            <p class="subtitle">探索3D世界的无限可能</p>
+        </header>
+        
+        <div class="projects-grid">
+            <div class="project-card">
+                <h2>AI Gallery</h2>
+                <p>一个基于Three.js的3D画廊项目，展示AI生成的艺术作品，支持沉浸式浏览体验。</p>
+                <a href="/threejs/ai_gallery/" class="project-link">进入项目</a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>更多Three.js项目正在开发中...</p>
+        </footer>
+    </div>
+</body>
+</html>
