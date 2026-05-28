@@ -144,6 +144,14 @@
     .note-item { padding: 11px 14px; border-radius: var(--radius); cursor: pointer; border: 1px solid transparent; transition: var(--transition); }
     .note-item:hover { background: var(--bg-card-hover); border-color: var(--border-light); }
     .note-item.active { background: var(--accent-soft); border-color: var(--accent); }
+    .note-item .item-title { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .note-item .item-meta { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+    .note-item .item-rename-input { width: 100%; border: none; border-bottom: 1.5px solid var(--accent); background: var(--bg-input); font-size: 13px; font-weight: 600; outline: none; padding: 2px 4px; border-radius: 3px; font-family: var(--font-sans); }
+
+    .ctx-menu { position: fixed; z-index: 200; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 4px 0; min-width: 120px; }
+    .ctx-menu-item { padding: 8px 16px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+    .ctx-menu-item:hover { background: var(--bg-hover); }
+    .ctx-menu-item.danger { color: var(--red); }
 
     .main-panel { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-surface); }
 
@@ -390,10 +398,66 @@
     function renderNotesList() {
       const list = filterNotes();
       notesList.innerHTML = list.length ? list.map(n => `<div class="note-item${currentNoteId===n.id?' active':''}" data-id="${n.id}"><div class="item-title">${n.title}</div><div class="item-meta">${n.date} · ${n.tags.slice(0,2).join(' ')}</div></div>`).join('') : '<div class="empty-list">📭 无笔记</div>';
-      notesList.querySelectorAll('.note-item').forEach(el => el.onclick = () => {
-        openNote(parseInt(el.dataset.id));
-        closeSidebar(); // 点击笔记后关闭侧边栏
+      notesList.querySelectorAll('.note-item').forEach(el => {
+        el.onclick = () => { openNote(parseInt(el.dataset.id)); closeSidebar(); };
+        el.oncontextmenu = (e) => {
+          e.preventDefault();
+          showCtxMenu(e.clientX, e.clientY, parseInt(el.dataset.id));
+        };
       });
+    }
+
+    // ========== 右键菜单 ==========
+    let ctxMenuEl = null;
+    function showCtxMenu(x, y, noteId) {
+      removeCtxMenu();
+      ctxMenuEl = document.createElement('div');
+      ctxMenuEl.className = 'ctx-menu';
+      ctxMenuEl.innerHTML = `
+        <div class="ctx-menu-item" data-action="rename">✏️ 重命名</div>
+        <div class="ctx-menu-item danger" data-action="delete">🗑️ 删除</div>
+      `;
+      document.body.appendChild(ctxMenuEl);
+      const rect = ctxMenuEl.getBoundingClientRect();
+      if (x + rect.width > window.innerWidth) x = window.innerWidth - rect.width - 8;
+      if (y + rect.height > window.innerHeight) y = window.innerHeight - rect.height - 8;
+      ctxMenuEl.style.left = x + 'px';
+      ctxMenuEl.style.top = y + 'px';
+      ctxMenuEl.onclick = (e) => {
+        const item = e.target.closest('.ctx-menu-item');
+        if (!item) return;
+        const action = item.dataset.action;
+        if (action === 'rename') startRename(noteId);
+        else if (action === 'delete') { openNote(noteId); deleteCurrentNote(); }
+        removeCtxMenu();
+      };
+      setTimeout(() => document.addEventListener('click', removeCtxMenu, {once:true}), 0);
+    }
+    function removeCtxMenu() { if (ctxMenuEl) { ctxMenuEl.remove(); ctxMenuEl = null; } }
+
+    function startRename(noteId) {
+      const el = notesList.querySelector(`.note-item[data-id="${noteId}"]`);
+      if (!el) return;
+      const note = notes.find(n => n.id === noteId);
+      if (!note) return;
+      const titleEl = el.querySelector('.item-title');
+      const oldTitle = note.title;
+      titleEl.innerHTML = `<input class="item-rename-input" value="${oldTitle.replace(/"/g,'&quot;')}">`;
+      const input = titleEl.querySelector('input');
+      input.focus();
+      input.select();
+      function finishRename() {
+        const newTitle = input.value.trim() || oldTitle;
+        note.title = newTitle;
+        saveNotes();
+        if (currentNoteId === noteId) titleInput.value = newTitle;
+        renderNotesList();
+      }
+      input.onblur = finishRename;
+      input.onkeydown = (e) => {
+        if (e.key === 'Enter') { e.preventDefault(); input.blur(); }
+        if (e.key === 'Escape') { input.value = oldTitle; input.blur(); }
+      };
     }
 
     // ========== 侧边栏控制 ==========
