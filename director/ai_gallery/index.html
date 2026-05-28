@@ -416,7 +416,9 @@
                     roughness: 0.4,
                     metalness: 0.6,
                     emissive: 0x111111,
-                    emissiveIntensity: 0.08
+                    emissiveIntensity: 0.08,
+                    transparent: true,
+                    opacity: 1
                 });
                 
                 const stand = new THREE.Mesh(geometry, material);
@@ -605,20 +607,18 @@
                 startDollyZoom(index);
             } else {
                 // 恢复正常状态
-                // 裂开复原动画（同时恢复不透明度）
-                if (stand.logoLeft && stand.logoRight) {
-                    animateCrackReset(stand);
+                stand.isShattering = false;
+                stand.isProgressiveShattering = false;
+                // 隐藏裂纹线
+                if (stand.crackLines) stand.crackLines.forEach(cl => { cl.visible = false; });
+                // 碎片复原动画（飞回拼合 + 交叉淡入原始画框）
+                if (stand.fragments && stand.fragments.length > 0) {
+                    animateShatterReset(stand, index);
+                } else {
+                    // 没有碎片，直接恢复
+                    restoreLogoMaterials(stand);
                 }
-                // logo 颜色立即恢复（不透明度由 animateCrackReset 处理）
-                if (stand.logoMaterial) {
-                    stand.logoMaterial.color.setHex(0xffffff);
-                    stand.logoMaterial.needsUpdate = true;
-                }
-                if (stand.logoMaterialRight) {
-                    stand.logoMaterialRight.color.setHex(0xffffff);
-                    stand.logoMaterialRight.needsUpdate = true;
-                }
-                // 恢复灰色边框
+                // 边框渐变为灰色（延迟恢复）
                 if (stand.border) {
                     stand.border.material.color.setHex(0x888888);
                     stand.border.material.opacity = 0.8;
@@ -627,7 +627,7 @@
                     stand.glowBorder.material.color.setHex(0x666666);
                     stand.glowBorder.material.opacity = 0.4;
                 }
-                // 隐藏3D OUT标签
+                // 隐藏 OUT 标签
                 if (stand.outLabel3D) {
                     stand.outLabel3D.visible = false;
                 }
@@ -707,161 +707,564 @@
             dollyZoomLookAt = lookAtPos;
         }
 
-        // OUT 视觉效果渐入动画（Dolly Zoom 完成后触发）
+        // OUT 渐进式三阶段破碎动画
+        // 阶段1: 裂纹出现 (0~1200ms)
+        // 阶段2: 碎片分离 (1200~2400ms)
+        // 阶段3: 散落漂浮 (2400~4500ms)
         function animateOutAppear(index) {
             const stand = stands[index];
             if (!stand) return;
-            const duration = 800;
-            const startTime = performance.now();
 
-            // 初始状态
-            if (stand.logoMaterial) {
-                stand.logoMaterial.color.setHex(0xffffff);
-            }
-            if (stand.logoMaterialRight) {
-                stand.logoMaterialRight.color.setHex(0xffffff);
-            }
-            if (stand.border) {
-                stand.border.material.opacity = 0;
-            }
-            if (stand.glowBorder) {
-                stand.glowBorder.material.opacity = 0;
-            }
+            if (stand.logoMaterial) stand.logoMaterial.color.setHex(0xffffff);
+            if (stand.logoMaterialRight) stand.logoMaterialRight.color.setHex(0xffffff);
+            if (stand.border) stand.border.material.opacity = 0;
+            if (stand.glowBorder) stand.glowBorder.material.opacity = 0;
 
-            // 记录两半原始位置（用于裂开动画）
-            const leftOrigX = stand.logoLeft ? stand.logoLeft.position.x : 0;
-            const rightOrigX = stand.logoRight ? stand.logoRight.position.x : 0;
+            if (!stand.fragments || stand.fragments.length === 0) createShatterFragments(index);
+            if (stand.fragmentGroup) stand.fragmentGroup.visible = false;
+            if (stand.crackLines) stand.crackLines.forEach(cl => { cl.visible = false; cl.material.opacity = 0; });
+            if (stand.outLabel3D) { stand.outLabel3D.visible = false; stand.outLabel3D.material.opacity = 0; }
 
-            if (stand.outLabel3D) {
-                stand.outLabel3D.visible = true;
-                stand.outLabel3D.material.opacity = 0;
-                const baseScale = stand.outLabel3D.scale.clone();
-                stand.outLabel3D.scale.set(baseScale.x * 0.3, baseScale.y * 0.3, 1);
-
-                function update() {
-                    if (!outStates[index]) return;
-                    const elapsed = performance.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    // easeOutBack 缓动
-                    const c1 = 1.70158;
-                    const c3 = c1 + 1;
-                    const eased = 1 + c3 * Math.pow(progress - 1, 3) + c1 * Math.pow(progress - 1, 2);
-
-                    // logo 渐变为灰色 + 降低不透明度
-                    if (stand.logoMaterial) {
-                        const gray = 0xffffff - (0xffffff - 0x555555) * eased;
-                        stand.logoMaterial.color.setHex(Math.round(gray));
-                        stand.logoMaterial.opacity = 0.95 - 0.7 * eased; // 最终 0.25
-                        stand.logoMaterial.needsUpdate = true;
-                    }
-                    if (stand.logoMaterialRight) {
-                        const gray = 0xffffff - (0xffffff - 0x555555) * eased;
-                        stand.logoMaterialRight.color.setHex(Math.round(gray));
-                        stand.logoMaterialRight.opacity = 0.95 - 0.7 * eased;
-                        stand.logoMaterialRight.needsUpdate = true;
-                    }
-
-                    // 裂开效果：左右两半向外滑开 + 旋转
-                    if (stand.logoLeft) {
-                        stand.logoLeft.position.x = leftOrigX - 0.5 * eased;
-                        stand.logoLeft.rotation.y = -0.5 * eased;  // 左半向外翻（像书页打开）
-                        stand.logoLeft.rotation.z = 0.08 * eased;  // 轻微倾斜
-                    }
-                    if (stand.logoRight) {
-                        stand.logoRight.position.x = rightOrigX + 0.5 * eased;
-                        stand.logoRight.rotation.y = 0.5 * eased;   // 右半向外翻
-                        stand.logoRight.rotation.z = -0.08 * eased;
-                    }
-
-                    // 边框渐变为红色
-                    if (stand.border) {
-                        stand.border.material.color.setHex(0xff0000);
-                        stand.border.material.opacity = eased;
-                    }
-                    if (stand.glowBorder) {
-                        stand.glowBorder.material.color.setHex(0xff3333);
-                        stand.glowBorder.material.opacity = eased * 0.8;
-                    }
-                    // OUT 标签缩放+渐入
-                    if (stand.outLabel3D) {
-                        stand.outLabel3D.material.opacity = eased;
-                        stand.outLabel3D.scale.set(baseScale.x * eased, baseScale.y * eased, 1);
-                    }
-
-                    if (progress < 1) {
-                        requestAnimationFrame(update);
-                    }
-                }
-                update();
-            } else {
-                // 没有 OUT 标签时直接应用
-                if (stand.logoMaterial) {
-                    stand.logoMaterial.color.setHex(0x555555);
-                    stand.logoMaterial.opacity = 0.25;
-                    stand.logoMaterial.needsUpdate = true;
-                }
-                if (stand.logoMaterialRight) {
-                    stand.logoMaterialRight.color.setHex(0x555555);
-                    stand.logoMaterialRight.opacity = 0.25;
-                    stand.logoMaterialRight.needsUpdate = true;
-                }
-                if (stand.border) {
-                    stand.border.material.color.setHex(0xff0000);
-                    stand.border.material.opacity = 1.0;
-                }
-                if (stand.glowBorder) {
-                    stand.glowBorder.material.color.setHex(0xff3333);
-                    stand.glowBorder.material.opacity = 0.8;
-                }
-            }
+            stand.shatterStartTime = performance.now();
+            animateProgressiveShatter(index);
         }
 
-        // 裂开复原动画（取消 OUT 时两半合拢）
-        function animateCrackReset(stand) {
-            const duration = 500;
+        // 渐进式破碎动画控制器（3阶段）
+        function animateProgressiveShatter(index) {
+            const stand = stands[index];
+            if (!stand || !outStates[index]) return;
+            if (stand.isProgressiveShattering) return;
+            stand.isProgressiveShattering = true;
+
+            const PHASE1_END = 1200, PHASE2_END = 2400, PHASE3_END = 4500;
+            const baseStartTime = stand.shatterStartTime;
+            const outLabelBaseScale = stand.outLabel3D ? stand.outLabel3D.scale.clone() : null;
+            let lastTime = baseStartTime;
+
+            // 阶段1 初始化：隐藏原始对象，显示碎片
+            if (stand.logo) stand.logo.visible = false;
+            if (stand.mesh) stand.mesh.material.opacity = 0.03;
+            if (stand.fragmentGroup) {
+                stand.fragmentGroup.visible = true;
+                stand.fragments.forEach(frag => {
+                    frag.mesh.position.copy(frag.originalPosition);
+                    frag.mesh.rotation.set(0, 0, 0);
+                    frag.frontMat.opacity = 0.92;
+                    frag.sideMat.opacity = 0.92;
+                });
+            }
+
+            function tick() {
+                if (!outStates[index] || !stand.fragments) { stand.isProgressiveShattering = false; return; }
+                const now = performance.now();
+                const elapsed = now - baseStartTime;
+                const dt = Math.min((now - lastTime) / 1000, 0.05); // 真实 dt，上限 50ms 防跳帧
+                lastTime = now;
+
+                // ---- 阶段1: 裂纹出现 (0~1200ms) ----
+                if (elapsed < PHASE1_END) {
+                    const p = elapsed / PHASE1_END;
+                    // 裂纹线逐渐显现（每条有延迟，从中心向外依次出现）
+                    if (stand.crackLines) {
+                        stand.crackLines.forEach(cl => {
+                            cl.visible = true;
+                            const lineDelay = cl.userData.delay || 0;
+                            const lp = Math.max(0, (p - lineDelay) / (1 - lineDelay));
+                            cl.material.opacity = lp * 0.9;
+                        });
+                    }
+                    // 边框微红
+                    if (stand.border) { stand.border.material.color.setHex(0xcc3333); stand.border.material.opacity = p * 0.4; }
+                }
+                // ---- 阶段2: 碎片分离 (1200~2400ms) ----
+                else if (elapsed < PHASE2_END) {
+                    const p = (elapsed - PHASE1_END) / (PHASE2_END - PHASE1_END);
+                    const eased = 1 - (1 - p) * (1 - p); // easeOutQuad
+                    // 裂纹线渐隐
+                    if (stand.crackLines) stand.crackLines.forEach(cl => { cl.material.opacity = 0.9 * (1 - eased * 0.85); });
+                    // 边框变红
+                    if (stand.border) { stand.border.material.color.setHex(0xff0000); stand.border.material.opacity = 0.4 + eased * 0.6; }
+                    if (stand.glowBorder) { stand.glowBorder.material.color.setHex(0xff3333); stand.glowBorder.material.opacity = eased * 0.6; }
+                    // 碎片微微撑开（Z 前推 + XY 微分离 + 微旋转）
+                    if (stand.fragments) {
+                        stand.fragments.forEach(frag => {
+                            frag.mesh.position.z = frag.originalPosition.z + eased * 0.12;
+                            frag.mesh.position.x = frag.originalPosition.x + frag.velocity.x * eased * 0.04;
+                            frag.mesh.position.y = frag.originalPosition.y + frag.velocity.y * eased * 0.04;
+                            frag.mesh.rotation.x = eased * frag.angularVelocity.x * 0.02;
+                            frag.mesh.rotation.y = eased * frag.angularVelocity.y * 0.02;
+                        });
+                    }
+                }
+                // ---- 阶段3: 散落漂浮 (2400~4500ms) ----
+                else if (elapsed < PHASE3_END) {
+                    const p = (elapsed - PHASE2_END) / (PHASE3_END - PHASE2_END);
+                    if (stand.crackLines) stand.crackLines.forEach(cl => { cl.material.opacity = Math.max(0, 0.135 * (1 - p)); });
+                    // 碎片飞散物理（使用真实 dt）
+                    if (stand.fragments) {
+                        stand.fragments.forEach(frag => {
+                            frag.mesh.position.x += frag.velocity.x * dt;
+                            frag.mesh.position.y += frag.velocity.y * dt;
+                            frag.mesh.position.z += frag.velocity.z * dt;
+                            frag.velocity.y -= 0.04 * dt;
+                            frag.velocity.z *= Math.pow(0.5, dt * 0.6); // 帧率无关阻尼
+                            frag.mesh.rotation.x += frag.angularVelocity.x * dt;
+                            frag.mesh.rotation.y += frag.angularVelocity.y * dt;
+                            frag.mesh.rotation.z += frag.angularVelocity.z * dt;
+                            frag.angularVelocity.multiplyScalar(Math.pow(0.65, dt)); // 帧率无关角衰减
+                        });
+                    }
+                    // OUT 标签渐入
+                    if (stand.outLabel3D && outLabelBaseScale) {
+                        stand.outLabel3D.visible = true;
+                        const lp = Math.min(p * 2, 1);
+                        const c1 = 1.70158, c3 = c1 + 1;
+                        const le = 1 + c3 * Math.pow(lp - 1, 3) + c1 * Math.pow(lp - 1, 2);
+                        stand.outLabel3D.material.opacity = le;
+                        stand.outLabel3D.scale.set(outLabelBaseScale.x * le, outLabelBaseScale.y * le, 1);
+                    }
+                }
+                // ---- 完成后切换到漂浮模式 ----
+                else {
+                    stand.isProgressiveShattering = false;
+                    stand.shatterPhase = 4;
+                    if (stand.crackLines) stand.crackLines.forEach(cl => cl.visible = false);
+                    return;
+                }
+                requestAnimationFrame(tick);
+            }
+            requestAnimationFrame(tick);
+        }
+
+        // ===== 碎片化系统 =====
+
+        // Voronoi 不规则碎片：生成真实破碎效果
+        function createShatterFragments(index) {
+            const stand = stands[index];
+            if (!stand) return;
+
+            disposeShatterFragments(stand);
+
+            const group = new THREE.Group();
+            group.position.set(stand.position, 0, 0);
+            const fragments = [];
+
+            const standWidth = 2, standHeight = 3, standDepth = 0.2;
+            const halfW = standWidth / 2, halfH = standHeight / 2;
+
+            // ---- 渲染画框正面合成纹理 ----
+            const texCanvas = document.createElement('canvas');
+            texCanvas.width = 512;
+            texCanvas.height = Math.round(512 * (standHeight / standWidth)); // 768
+            const texCtx = texCanvas.getContext('2d');
+            texCtx.fillStyle = '#0a0a0a';
+            texCtx.fillRect(0, 0, texCanvas.width, texCanvas.height);
+            try {
+                if (stand.logoLeft && stand.logoLeft.material && stand.logoLeft.material.map) {
+                    const img = stand.logoLeft.material.map.image;
+                    if (img && img.width) {
+                        texCtx.globalAlpha = 0.95;
+                        // logoLeft UV: offset(0,0) repeat(0.5,1) → 只取图像左半
+                        texCtx.drawImage(img, 0, 0, img.width / 2, img.height, 0, 0, texCanvas.width / 2, texCanvas.height);
+                    }
+                }
+            } catch(e) {}
+            try {
+                if (stand.logoRight && stand.logoRight.material && stand.logoRight.material.map) {
+                    const img = stand.logoRight.material.map.image;
+                    if (img && img.width) {
+                        texCtx.globalAlpha = 0.95;
+                        // logoRight UV: offset(0.5,0) repeat(0.5,1) → 只取图像右半
+                        texCtx.drawImage(img, img.width / 2, 0, img.width / 2, img.height, texCanvas.width / 2, 0, texCanvas.width / 2, texCanvas.height);
+                    }
+                }
+            } catch(e) {}
+            const compositeTexture = new THREE.CanvasTexture(texCanvas);
+            compositeTexture.minFilter = THREE.LinearFilter;
+
+            // ---- 生成 Voronoi 种子点（链式裂纹分布）----
+            const seeds = [];
+            // 2~4 个冲击中心
+            const impacts = [];
+            for (let i = 0; i < 2 + Math.floor(Math.random() * 3); i++) {
+                impacts.push({ x: (Math.random() - 0.5) * standWidth * 0.7, y: (Math.random() - 0.5) * standHeight * 0.7 });
+            }
+            // 从每个冲击中心发射裂纹线，种子沿裂纹分布
+            for (const imp of impacts) {
+                const numCracks = 5 + Math.floor(Math.random() * 5); // 5~9 条裂纹
+                for (let c = 0; c < numCracks; c++) {
+                    const crackAngle = (c / numCracks) * Math.PI * 2 + (Math.random() - 0.5) * 0.6;
+                    const crackLen = 0.4 + Math.random() * 1.2;
+                    const numPts = 3 + Math.floor(Math.random() * 5); // 3~7 个种子点
+                    let cx = imp.x, cy = imp.y;
+                    for (let p = 0; p < numPts; p++) {
+                        const step = crackLen / numPts * (0.7 + Math.random() * 0.6);
+                        cx += Math.cos(crackAngle + (Math.random() - 0.5) * 0.4) * step;
+                        cy += Math.sin(crackAngle + (Math.random() - 0.5) * 0.4) * step;
+                        cx = Math.max(-halfW + 0.01, Math.min(halfW - 0.01, cx));
+                        cy = Math.max(-halfH + 0.01, Math.min(halfH - 0.01, cy));
+                        seeds.push({ x: cx, y: cy });
+                    }
+                    // 裂纹分支
+                    if (Math.random() > 0.4) {
+                        const branchAngle = crackAngle + (Math.random() > 0.5 ? 1 : -1) * (0.4 + Math.random() * 0.8);
+                        const bLen = crackLen * 0.4;
+                        let bx = imp.x + Math.cos(crackAngle) * crackLen * 0.5;
+                        let by = imp.y + Math.sin(crackAngle) * crackLen * 0.5;
+                        for (let p = 0; p < 2 + Math.floor(Math.random() * 3); p++) {
+                            bx += Math.cos(branchAngle + (Math.random() - 0.5) * 0.3) * (bLen / 3);
+                            by += Math.sin(branchAngle + (Math.random() - 0.5) * 0.3) * (bLen / 3);
+                            bx = Math.max(-halfW + 0.01, Math.min(halfW - 0.01, bx));
+                            by = Math.max(-halfH + 0.01, Math.min(halfH - 0.01, by));
+                            seeds.push({ x: bx, y: by });
+                        }
+                    }
+                }
+            }
+            // 补充随机散布的种子
+            for (let i = 0; i < 15; i++) {
+                seeds.push({ x: (Math.random() - 0.5) * standWidth * 0.95, y: (Math.random() - 0.5) * standHeight * 0.95 });
+            }
+            // 边缘补充
+            for (let i = 0; i < 10; i++) {
+                const e = Math.floor(Math.random() * 4);
+                let x, y;
+                if (e === 0) { x = -halfW + 0.02; y = (Math.random() - 0.5) * standHeight; }
+                else if (e === 1) { x = halfW - 0.02; y = (Math.random() - 0.5) * standHeight; }
+                else if (e === 2) { y = -halfH + 0.02; x = (Math.random() - 0.5) * standWidth; }
+                else { y = halfH - 0.02; x = (Math.random() - 0.5) * standWidth; }
+                seeds.push({ x, y });
+            }
+
+            // ---- 计算每个种子的 Voronoi 单元格 ----
+            const angleSteps = 10 + Math.floor(Math.random() * 8); // 10~17 个顶点 → 精细不规则碎片
+            const maxR = Math.max(standWidth, standHeight) * 0.6;
+
+            for (let si = 0; si < seeds.length; si++) {
+                const seed = seeds[si];
+                // 采样角度（随机扰动，非均匀），生成尖锐不规则多边形
+                const angles = [];
+                for (let ai = 0; ai < angleSteps; ai++) {
+                    const base = (ai / angleSteps) * Math.PI * 2;
+                    // 每个角度随机偏移，让形状更不规则
+                    angles.push(base + (Math.random() - 0.5) * (Math.PI * 2 / angleSteps) * 0.8);
+                }
+                angles.sort((a, b) => a - b);
+
+                const poly = [];
+                for (let ai = 0; ai < angleSteps; ai++) {
+                    const angle = angles[ai];
+                    const dx = Math.cos(angle), dy = Math.sin(angle);
+                    let minT = maxR;
+                    for (let sj = 0; sj < seeds.length; sj++) {
+                        if (sj === si) continue;
+                        const other = seeds[sj];
+                        const mx = (other.x - seed.x), my = (other.y - seed.y);
+                        const dist = Math.sqrt(mx * mx + my * my);
+                        if (dist < 0.001) continue;
+                        const nx = mx / dist, ny = my / dist;
+                        const dot = nx * dx + ny * dy;
+                        if (dot <= 0.01) continue;
+                        const t = (dist * 0.5) / dot;
+                        if (t > 0 && t < minT) minT = t;
+                    }
+                    // 边界裁剪
+                    if (Math.abs(dx) > 0.001) {
+                        const tx1 = (-halfW - seed.x) / dx;
+                        const tx2 = (halfW - seed.x) / dx;
+                        if (tx1 > 0 && tx1 < minT) minT = tx1;
+                        if (tx2 > 0 && tx2 < minT) minT = tx2;
+                    }
+                    if (Math.abs(dy) > 0.001) {
+                        const ty1 = (-halfH - seed.y) / dy;
+                        const ty2 = (halfH - seed.y) / dy;
+                        if (ty1 > 0 && ty1 < minT) minT = ty1;
+                        if (ty2 > 0 && ty2 < minT) minT = ty2;
+                    }
+                    // 大幅度锯齿扰动（模拟真实碎裂边缘）
+                    const jitter = 0.6 + Math.random() * 0.8; // 0.6~1.4 倍
+                    poly.push({ x: seed.x + dx * minT * jitter, y: seed.y + dy * minT * jitter });
+                }
+                if (poly.length < 3) continue;
+
+                // 碎片随机厚度
+                const depth = standDepth * (0.1 + Math.random() * 0.6); // 更大幅度厚度变化
+
+                // ---- 构建 ExtrudeGeometry（不规则多边形 + 厚度）----
+                const shape = new THREE.Shape();
+                shape.moveTo(poly[0].x, poly[0].y);
+                for (let p = 1; p < poly.length; p++) {
+                    shape.lineTo(poly[p].x, poly[p].y);
+                }
+                shape.closePath();
+
+                const extrudeSettings = {
+                    depth: depth,
+                    bevelEnabled: true,
+                    bevelThickness: 0.005,
+                    bevelSize: 0.005,
+                    bevelSegments: 1
+                };
+                const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+                // ---- UV 映射：正面采样合成纹理对应区域 ----
+                const posAttr = geo.attributes.position;
+                const uvAttr = geo.attributes.uv;
+                for (let vi = 0; vi < posAttr.count; vi++) {
+                    const vx = posAttr.getX(vi);
+                    const vy = posAttr.getY(vi);
+                    // 将世界坐标映射到纹理 UV (0~1)
+                    const u = (vx + halfW) / standWidth;
+                    const v = 1 - (vy + halfH) / standHeight;
+                    uvAttr.setXY(vi, u, v);
+                }
+                uvAttr.needsUpdate = true;
+
+                // 正面材质（采样画框纹理）
+                const frontMat = new THREE.MeshStandardMaterial({
+                    map: compositeTexture.clone(),
+                    transparent: true, opacity: 0.95,
+                    roughness: 0.45, metalness: 0.3,
+                    side: THREE.FrontSide
+                });
+                frontMat.map.needsUpdate = true;
+
+                // 侧面/断面材质（深色断面，模拟碎裂截面）
+                const sideColor = new THREE.Color(0x0d0d0d).lerp(new THREE.Color(0x2a1a1a), Math.random() * 0.5);
+                const sideMat = new THREE.MeshStandardMaterial({
+                    color: sideColor,
+                    transparent: true, opacity: 0.95,
+                    roughness: 0.85, metalness: 0.1,
+                    side: THREE.FrontSide
+                });
+
+                // ExtrudeGeometry groups: [0]=侧面, [1]=正面+背面
+                const mesh = new THREE.Mesh(geo, [sideMat, frontMat]);
+
+                // 定位碎片（Z 居中，正面朝外）
+                const origX = seed.x;
+                const origY = seed.y;
+                const origZ = standDepth / 2 - depth / 2;
+                mesh.position.set(origX, origY, origZ);
+                group.add(mesh);
+
+                // ---- 碎片飞散物理 ----
+                const distFromCenter = Math.sqrt(origX * origX + origY * origY);
+                const angle = Math.atan2(origY, origX) + (Math.random() - 0.5) * 1.0;
+                const spread = 0.12 + Math.random() * 0.3;
+
+                fragments.push({
+                    mesh: mesh,
+                    frontMat: frontMat,
+                    sideMat: sideMat,
+                    originalPosition: new THREE.Vector3(origX, origY, origZ),
+                    originalRotation: new THREE.Euler(0, 0, 0),
+                    velocity: new THREE.Vector3(
+                        Math.cos(angle) * spread + (Math.random() - 0.5) * 0.12,
+                        Math.sin(angle) * spread * 0.5 + (Math.random() - 0.5) * 0.12,
+                        0.25 + Math.random() * 0.7
+                    ),
+                    angularVelocity: new THREE.Vector3(
+                        (Math.random() - 0.5) * 2.5,
+                        (Math.random() - 0.5) * 2.5,
+                        (Math.random() - 0.5) * 1.8
+                    ),
+                    delay: (distFromCenter * 25) + Math.random() * 60,
+                    polyVerts: poly // 存储原始多边形顶点，用于裂纹线生成
+                });
+            }
+
+            // ---- 生成裂纹线（贴在画框表面）----
+            const crackLines = [];
+            const crackGroup = new THREE.Group();
+            crackGroup.position.set(stand.position, 0, 0);
+            // 收集所有碎片的多边形边作为裂纹线（去重共享边）
+            const edgeSet = new Set();
+            for (let fi = 0; fi < fragments.length; fi++) {
+                const frag = fragments[fi];
+                const poly = frag.polyVerts;
+                if (!poly || poly.length < 3) continue;
+                for (let vi = 0; vi < poly.length; vi++) {
+                    const p1 = poly[vi];
+                    const p2 = poly[(vi + 1) % poly.length];
+                    // 去重（按端点排序 hash）
+                    const key = `${Math.min(p1.x, p2.x).toFixed(2)},${Math.min(p1.y, p2.y).toFixed(2)}-${Math.max(p1.x, p2.x).toFixed(2)},${Math.max(p1.y, p2.y).toFixed(2)}`;
+                    if (edgeSet.has(key)) continue;
+                    edgeSet.add(key);
+                    // 跳过靠近画框边缘的边
+                    const mx = (p1.x + p2.x) / 2, my = (p1.y + p2.y) / 2;
+                    if (Math.abs(mx) > halfW - 0.05 || Math.abs(my) > halfH - 0.05) continue;
+                    // 创建裂纹线（贴在画框正面 Z = standDepth/2 + 0.005）
+                    const v1 = new THREE.Vector3(p1.x, p1.y, standDepth / 2 + 0.005);
+                    const v2 = new THREE.Vector3(p2.x, p2.y, standDepth / 2 + 0.005);
+                    const lineGeo = new THREE.BufferGeometry().setFromPoints([v1, v2]);
+                    const lineMat = new THREE.LineBasicMaterial({ color: 0x555555, transparent: true, opacity: 0, linewidth: 1 });
+                    const line = new THREE.Line(lineGeo, lineMat);
+                    // 延迟基于距中心的距离（中心的裂纹先出现）
+                    const dist = Math.sqrt(mx * mx + my * my);
+                    const maxDist = Math.sqrt(halfW * halfW + halfH * halfH);
+                    line.userData.delay = (dist / maxDist) * 0.6;
+                    crackLines.push(line);
+                    crackGroup.add(line);
+                }
+            }
+            scene.add(crackGroup);
+            stand.crackLines = crackLines;
+            stand.crackGroup = crackGroup;
+
+            stand.fragmentGroup = group;
+            stand.fragments = fragments;
+            scene.add(group);
+        }
+
+        // 碎片复原动画（取消 OUT 时碎片飞回拼合 + 原始画框交叉渐入）
+        function animateShatterReset(stand, index) {
+            if (!stand.fragments || stand.fragments.length === 0) return;
+
+            const FLYBACK_DUR = 600;   // 碎片飞回时长
+            const FADE_DUR = 400;      // 交叉淡入时长（与飞回尾部重叠）
+            const TOTAL_DUR = FLYBACK_DUR + FADE_DUR; // 总时长 1000ms
             const startTime = performance.now();
-            const leftStartX = stand.logoLeft.position.x;
-            const rightStartX = stand.logoRight.position.x;
-            const leftStartRY = stand.logoLeft.rotation.y;
-            const rightStartRY = stand.logoRight.rotation.y;
-            const leftStartRZ = stand.logoLeft.rotation.z;
-            const rightStartRZ = stand.logoRight.rotation.z;
-            const startOpacity = stand.logoMaterial ? stand.logoMaterial.opacity : 0.25;
-            const standWidth = 2;
-            const halfW = standWidth * 0.85 / 2;
-            const leftTargetX = -halfW / 2;
-            const rightTargetX = halfW / 2;
+
+            // 初始状态：原始画框完全透明，logo 隐藏
+            if (stand.mesh) stand.mesh.material.opacity = 0.03;
+            if (stand.logo) stand.logo.visible = false;
+            if (stand.logoMaterial) { stand.logoMaterial.opacity = 0; stand.logoMaterial.needsUpdate = true; }
+            if (stand.logoMaterialRight) { stand.logoMaterialRight.opacity = 0; stand.logoMaterialRight.needsUpdate = true; }
+
+            // 快照当前碎片状态
+            const snap = stand.fragments.map(f => ({
+                px: f.mesh.position.x, py: f.mesh.position.y, pz: f.mesh.position.z,
+                rx: f.mesh.rotation.x, ry: f.mesh.rotation.y, rz: f.mesh.rotation.z,
+                fOpacity: f.frontMat.opacity, sOpacity: f.sideMat.opacity
+            }));
 
             function update() {
                 const elapsed = performance.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const eased = 1 - Math.pow(1 - progress, 3);
 
-                if (stand.logoLeft) {
-                    stand.logoLeft.position.x = leftStartX + (leftTargetX - leftStartX) * eased;
-                    stand.logoLeft.rotation.y = leftStartRY * (1 - eased);
-                    stand.logoLeft.rotation.z = leftStartRZ * (1 - eased);
-                }
-                if (stand.logoRight) {
-                    stand.logoRight.position.x = rightStartX + (rightTargetX - rightStartX) * eased;
-                    stand.logoRight.rotation.y = rightStartRY * (1 - eased);
-                    stand.logoRight.rotation.z = rightStartRZ * (1 - eased);
-                }
-                // 不透明度恢复
-                if (stand.logoMaterial) {
-                    stand.logoMaterial.opacity = startOpacity + (0.95 - startOpacity) * eased;
-                    stand.logoMaterial.needsUpdate = true;
-                }
-                if (stand.logoMaterialRight) {
-                    stand.logoMaterialRight.opacity = startOpacity + (0.95 - startOpacity) * eased;
-                    stand.logoMaterialRight.needsUpdate = true;
-                }
+                // ---- 阶段 A: 碎片飞回 (0 ~ FLYBACK_DUR) ----
+                if (elapsed < FLYBACK_DUR) {
+                    const p = elapsed / FLYBACK_DUR;
+                    const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
 
-                if (progress < 1) {
-                    requestAnimationFrame(update);
+                    stand.fragments.forEach((frag, i) => {
+                        const s = snap[i];
+                        frag.mesh.position.x = s.px + (frag.originalPosition.x - s.px) * eased;
+                        frag.mesh.position.y = s.py + (frag.originalPosition.y - s.py) * eased;
+                        frag.mesh.position.z = s.pz + (frag.originalPosition.z - s.pz) * eased;
+                        frag.mesh.rotation.x = s.rx * (1 - eased);
+                        frag.mesh.rotation.y = s.ry * (1 - eased);
+                        frag.mesh.rotation.z = s.rz * (1 - eased);
+                    });
+
+                    // 飞回后半段开始淡入原始画框（重叠区域）
+                    if (p > 0.5) {
+                        const fadeP = (p - 0.5) / 0.5; // 0~1 in last half
+                        const fadeEased = fadeP * fadeP; // easeInQuad for smooth start
+                        if (stand.mesh) stand.mesh.material.opacity = 0.03 + fadeEased * 0.97;
+                        if (stand.logoMaterial) { stand.logoMaterial.opacity = fadeEased * 0.95; stand.logoMaterial.needsUpdate = true; }
+                        if (stand.logoMaterialRight) { stand.logoMaterialRight.opacity = fadeEased * 0.95; stand.logoMaterialRight.needsUpdate = true; }
+                        // 碎片渐隐
+                        stand.fragments.forEach((frag, i) => {
+                            const s = snap[i];
+                            frag.frontMat.opacity = s.fOpacity * (1 - fadeEased * 0.5);
+                            frag.sideMat.opacity = s.sOpacity * (1 - fadeEased * 0.5);
+                        });
+                    }
                 }
+                // ---- 阶段 B: 交叉淡入 (FLYBACK_DUR ~ TOTAL_DUR) ----
+                else if (elapsed < TOTAL_DUR) {
+                    const p = (elapsed - FLYBACK_DUR) / FADE_DUR;
+                    const eased = 1 - (1 - p) * (1 - p); // easeOutQuad
+
+                    // 原始画框完全显现
+                    if (stand.mesh) stand.mesh.material.opacity = 1;
+                    if (stand.logo) stand.logo.visible = true;
+                    if (stand.logoMaterial) { stand.logoMaterial.color.setHex(0xffffff); stand.logoMaterial.opacity = 0.95; stand.logoMaterial.needsUpdate = true; }
+                    if (stand.logoMaterialRight) { stand.logoMaterialRight.color.setHex(0xffffff); stand.logoMaterialRight.opacity = 0.95; stand.logoMaterialRight.needsUpdate = true; }
+
+                    // 碎片快速淡出
+                    stand.fragments.forEach(frag => {
+                        frag.frontMat.opacity = 0.45 * (1 - eased);
+                        frag.sideMat.opacity = 0.45 * (1 - eased);
+                    });
+                }
+                // ---- 完成 ----
+                else {
+                    disposeShatterFragments(stand);
+                    stand.isShattering = false;
+                    stand.isProgressiveShattering = false;
+                    return;
+                }
+                requestAnimationFrame(update);
             }
-            update();
+            requestAnimationFrame(update);
+        }
+
+        // 每帧更新碎片漂浮（animate 循环调用）
+        function updateShatterFragments() {
+            stands.forEach((stand, idx) => {
+                if (!outStates[idx] || !stand.fragments || stand.isShattering || stand.isProgressiveShattering) return;
+                const time = clock.getElapsedTime();
+                stand.fragments.forEach((frag, i) => {
+                    // 缓慢漂浮 + 微微旋转（在原位附近轻轻摇摆）
+                    frag.mesh.position.y += Math.sin(time * 0.8 + i * 0.7) * 0.0008;
+                    frag.mesh.position.x += Math.cos(time * 0.5 + i * 0.5) * 0.0004;
+                    frag.mesh.position.z += Math.sin(time * 0.6 + i * 0.3) * 0.0004;
+                    frag.mesh.rotation.x += 0.0008;
+                    frag.mesh.rotation.y += 0.0012;
+                });
+            });
+        }
+
+        // 清理碎片资源
+        function disposeShatterFragments(stand) {
+            if (stand.fragmentGroup) {
+                scene.remove(stand.fragmentGroup);
+                stand.fragmentGroup.traverse(child => {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) {
+                        if (Array.isArray(child.material)) {
+                            child.material.forEach(m => { if (m.map) m.map.dispose(); m.dispose(); });
+                        } else {
+                            if (child.material.map) child.material.map.dispose();
+                            child.material.dispose();
+                        }
+                    }
+                });
+                stand.fragmentGroup = null;
+            }
+            // 清理裂纹线
+            if (stand.crackGroup) {
+                scene.remove(stand.crackGroup);
+                stand.crackGroup.traverse(child => {
+                    if (child.geometry) child.geometry.dispose();
+                    if (child.material) child.material.dispose();
+                });
+                stand.crackGroup = null;
+            }
+            stand.crackLines = [];
+            stand.fragments = [];
+        }
+
+        // 恢复logo材质到正常状态
+        function restoreLogoMaterials(stand) {
+            if (stand.logoMaterial) {
+                stand.logoMaterial.color.setHex(0xffffff);
+                stand.logoMaterial.opacity = 0.95;
+                stand.logoMaterial.needsUpdate = true;
+            }
+            if (stand.logoMaterialRight) {
+                stand.logoMaterialRight.color.setHex(0xffffff);
+                stand.logoMaterialRight.opacity = 0.95;
+                stand.logoMaterialRight.needsUpdate = true;
+            }
+            if (stand.mesh) {
+                stand.mesh.material.opacity = 1;
+            }
+            if (stand.logo) {
+                stand.logo.visible = true;
+            }
         }
 
         // 创建3D OUT标签（固定在立牌上）
@@ -1109,33 +1512,111 @@
             blackboardTextPlane = textPlane;
         }
         
+        // 粉笔字绘制：模拟真实粉笔的粗糙、不均匀、有粉尘效果
+        function drawChalkChar(ctx, char, x, y, color, fontSize) {
+            const baseAlpha = 0.75 + Math.random() * 0.2;
+            const passes = 3;
+            for (let p = 0; p < passes; p++) {
+                const ox = (Math.random() - 0.5) * 1.8;
+                const oy = (Math.random() - 0.5) * 1.2;
+                const a = baseAlpha * (0.25 + Math.random() * 0.35);
+                ctx.save();
+                ctx.globalAlpha = a;
+                ctx.fillStyle = color;
+                ctx.translate(x + ox, y + oy);
+                ctx.rotate((Math.random() - 0.5) * 0.02);
+                ctx.fillText(char, 0, 0);
+                ctx.restore();
+            }
+            // 主笔触
+            ctx.save();
+            ctx.globalAlpha = baseAlpha;
+            ctx.fillStyle = color;
+            ctx.fillText(char, x, y);
+            ctx.restore();
+            // 粉笔粉尘颗粒
+            const dustCount = Math.floor(Math.random() * 4) + 1;
+            for (let d = 0; d < dustCount; d++) {
+                const dx = x + Math.random() * fontSize * 0.6 - fontSize * 0.1;
+                const dy = y + Math.random() * fontSize * 0.8 - fontSize * 0.3;
+                const ds = Math.random() * 1.8 + 0.3;
+                ctx.save();
+                ctx.globalAlpha = Math.random() * 0.15 + 0.03;
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(dx, dy, ds, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // 绘制粉笔文字行（返回结束X位置）
+        function drawChalkLine(ctx, text, startX, y, color, fontSize) {
+            let curX = startX;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                drawChalkChar(ctx, char, curX, y, color, fontSize);
+                curX += ctx.measureText(char).width + (Math.random() - 0.5) * 1.0;
+            }
+            return curX;
+        }
+
+        // 粉笔波浪下划线
+        function drawChalkUnderline(ctx, x1, x2, y, color) {
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2.0;
+            ctx.globalAlpha = 0.55;
+            ctx.beginPath();
+            for (let wx = x1; wx < x2; wx += 2) {
+                const wy = y + Math.sin((wx - x1) * 0.13) * 2.5 + (Math.random() - 0.5) * 1.2;
+                if (wx === x1) ctx.moveTo(wx, wy);
+                else ctx.lineTo(wx, wy);
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
+
         // 绘制黑板内容（根据 promptVersion 切换原始/更新版本）
         function drawBlackboardContent(ctx, canvas) {
             // 设置背景为黑板色
             ctx.fillStyle = '#1a3d1a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // 添加轻微的纹理噪点，模拟真实黑板
-            for (let i = 0; i < 5000; i++) {
+            // 黑板表面纹理：深浅不一的绿色斑块
+            for (let i = 0; i < 8000; i++) {
                 const x = Math.random() * canvas.width;
                 const y = Math.random() * canvas.height;
-                const alpha = Math.random() * 0.05;
-                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-                ctx.fillRect(x, y, 2, 2);
+                const alpha = Math.random() * 0.04;
+                const g = 50 + Math.random() * 30;
+                ctx.fillStyle = `rgba(${30 + Math.random()*20}, ${g}, ${20 + Math.random()*15}, ${alpha})`;
+                ctx.fillRect(x, y, Math.random() * 4 + 1, Math.random() * 4 + 1);
+            }
+            // 粉笔灰痕迹（浅色长条）
+            for (let i = 0; i < 60; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                ctx.save();
+                ctx.globalAlpha = Math.random() * 0.02 + 0.005;
+                ctx.fillStyle = '#ccc';
+                ctx.translate(x, y);
+                ctx.rotate(Math.random() * Math.PI);
+                ctx.fillRect(-15, -1, 30 + Math.random() * 20, 2 + Math.random() * 2);
+                ctx.restore();
             }
             
-            // 设置粉笔文字样式
-            ctx.fillStyle = '#e8e8e8';
-            ctx.font = 'bold 48px "Courier New", monospace';
+            const fontSize = 44;
+            ctx.font = `bold ${fontSize}px "KaiTi", "STKaiti", "楷体", "Courier New", serif`;
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             
             const startX = 80;
             const startY = 80;
             const lineHeight = 65;
+            const normalColor = '#e0ddd5';
+            const hlColor = '#ffee88';
             
             if (blackboardPromptVersion === 0) {
-                // 原始提示词
                 const lines = [
                     '输入：Python代码文本文件路径 （txt格式）默认 code.txt',
                     '',
@@ -1155,15 +1636,9 @@
                 ];
                 lines.forEach((line, index) => {
                     const y = startY + index * lineHeight;
-                    const offsetX = Math.random() * 2 - 1;
-                    const offsetY = Math.random() * 1.5 - 0.75;
-                    ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
-                    ctx.fillText(line, startX + offsetX + 1, y + offsetY + 1);
-                    ctx.fillStyle = '#e8e8e8';
-                    ctx.fillText(line, startX + offsetX, y + offsetY);
+                    drawChalkLine(ctx, line, startX, y, normalColor, fontSize);
                 });
             } else {
-                // 更新后提示词 - segments: {t:text, h:highlighted}
                 const lines = [
                     [{t:'输入：Python代码文本文件路径 （txt格式）默认 code.txt'}],
                     [],
@@ -1184,7 +1659,6 @@
                     [{t:'  即非匀速输入 有几率输入错误字符'}],
                     [{t:'写好函数的调用 代码可直接运行'}]
                 ];
-                // 绘制每行
                 lines.forEach((lineData, lineIndex) => {
                     const y = startY + lineIndex * lineHeight;
                     let curX = startX;
@@ -1192,31 +1666,15 @@
                     lineData.forEach(seg => {
                         const text = seg.t;
                         const hl = seg.h;
+                        const color = hl ? hlColor : normalColor;
+                        const segStartX = curX;
                         for (let i = 0; i < text.length; i++) {
                             const char = text[i];
-                            const ox = Math.random() * 1.5 - 0.75;
-                            const oy = Math.random() * 1 - 0.5;
-                            // 阴影
-                            ctx.fillStyle = hl ? 'rgba(255, 255, 100, 0.25)' : 'rgba(200, 200, 200, 0.3)';
-                            ctx.fillText(char, curX + ox + 1, y + oy + 1);
-                            // 主文字
-                            ctx.fillStyle = hl ? '#ffff66' : '#e8e8e8';
-                            ctx.fillText(char, curX + ox, y + oy);
-                            curX += ctx.measureText(char).width;
+                            drawChalkChar(ctx, char, curX, y, color, fontSize);
+                            curX += ctx.measureText(char).width + (Math.random() - 0.5) * 1.0;
                         }
-                        // 重点内容画波浪下划线
                         if (hl) {
-                            const segPixelWidth = ctx.measureText(text).width;
-                            const lineY = y + 52;
-                            ctx.strokeStyle = '#ffff66';
-                            ctx.lineWidth = 2.5;
-                            ctx.beginPath();
-                            for (let wx = curX - segPixelWidth; wx < curX; wx += 3) {
-                                const wy = lineY + Math.sin((wx - curX + segPixelWidth) * 0.12) * 2.5;
-                                if (wx === curX - segPixelWidth) ctx.moveTo(wx, wy);
-                                else ctx.lineTo(wx, wy);
-                            }
-                            ctx.stroke();
+                            drawChalkUnderline(ctx, segStartX, curX, y + 52, hlColor);
                         }
                     });
                 });
@@ -2204,8 +2662,12 @@ if __name__ == "__main__":
                 particles.geometry.attributes.position.needsUpdate = true;
             }
             
-            // 立牌发光效果动画
+            // 更新碎片漂浮
+            updateShatterFragments();
+
+            // 立牌发光效果动画（跳过OUT状态）
             stands.forEach((stand, index) => {
+                if (outStates[index]) return;
                 const pulse = Math.sin(elapsedTime * 2 + index * 0.5) * 0.2 + 0.8;
                 stand.border.material.opacity = pulse;
                 
