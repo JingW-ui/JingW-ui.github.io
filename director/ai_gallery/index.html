@@ -209,6 +209,34 @@
             color: #6a6;
             border-color: #4a4;
         }
+        /* 黑板右下角复制按钮 */
+        #copy-blackboard-btn {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid #333;
+            color: #555;
+            padding: 3px 8px;
+            cursor: pointer;
+            font-size: 11px;
+            border-radius: 3px;
+            opacity: 0.08;
+            transition: opacity 0.3s ease;
+            z-index: 102;
+            pointer-events: auto;
+            font-family: 'Arial', sans-serif;
+            letter-spacing: 1px;
+            display: none;
+        }
+        #copy-blackboard-btn:hover {
+            opacity: 0.6;
+            background: rgba(60, 60, 60, 0.5);
+            border-color: #777;
+            color: #aaa;
+        }
+        #copy-blackboard-btn.copied {
+            color: #6a6;
+            border-color: #4a4;
+        }
     </style>
 </head>
 <body>
@@ -221,6 +249,7 @@
     <button id="quiz-btn" title="开始答题">📝 答题</button>
     <button id="run-code-btn" title="运行代码">▶ Run</button>
     <button id="update-prompt-btn" title="更新提示词">更新</button>
+    <button id="copy-blackboard-btn" title="复制黑板内容">复制</button>
 
     <!-- 引入 Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -1693,9 +1722,11 @@
         function updateBlackboardUpdateBtnPosition() {
             if (!blackboardMesh || !blackboardDims.boardWidth) {
                 document.getElementById('update-prompt-btn').style.display = 'none';
+                document.getElementById('copy-blackboard-btn').style.display = 'none';
                 return;
             }
             const btn = document.getElementById('update-prompt-btn');
+            const copyBtn = document.getElementById('copy-blackboard-btn');
             // 黑板本地坐标系右下角（面向观众）
             const localCorner = new THREE.Vector3(
                 blackboardDims.boardWidth / 2 - 0.3,
@@ -1710,8 +1741,12 @@
                 btn.style.display = 'block';
                 btn.style.left = (x - 20) + 'px';
                 btn.style.top = (y - 10) + 'px';
+                copyBtn.style.display = 'block';
+                copyBtn.style.left = (x - 65) + 'px';
+                copyBtn.style.top = (y - 10) + 'px';
             } else {
                 btn.style.display = 'none';
+                copyBtn.style.display = 'none';
             }
         }
         
@@ -2828,6 +2863,70 @@ if __name__ == "__main__":
             this.title = blackboardPromptVersion === 1 ? '切换回原始提示词' : '更新提示词';
             redrawBlackboard();
             updateMonitorsCode();
+        });
+        
+        // 黑板复制按钮点击事件
+        document.getElementById('copy-blackboard-btn').addEventListener('click', function() {
+            const btn = this;
+            let textToCopy;
+            if (blackboardPromptVersion === 0) {
+                textToCopy = `输入：Python代码文本文件路径 （txt格式）默认 code.txt
+
+功能：
+  读取文件中缩进规范的Python代码
+  等待5秒，供用户定位光标
+  使用 pyautogui逐字符模拟人为输入到光标位置
+
+要求：仅实现函数，环境已就绪，不处理依赖
+
+注意：
+  处理.py 文件中常见软件会自动处理缩进的情况
+  不要频繁使用home 模拟人真实的输入
+  即非匀速输入 有几率输入错误字符
+
+写好函数的调用 代码可直接运行`;
+            } else {
+                textToCopy = `输入：Python代码文本文件路径 （txt格式）默认 code.txt
+
+功能：
+  读取文件中缩进规范的Python代码
+  等待5秒，供用户定位光标
+  使用 pyautogui逐字符模拟人为输入到光标位置
+
+要求：仅实现函数，环境已就绪，不处理依赖
+
+注意：
+  注意处理.py 文件中常见软件会自动处理缩进的情况
+  所以你不能输入额外的缩进
+  下行相同或长的缩进 交给软件自动处理
+  短的缩进通过home+键入本身缩进进行处理
+  每一行输入结束后 应该多输入一个空格再换行
+  不要频繁使用home 模拟人真实的输入
+  即非匀速输入 有几率输入错误字符
+写好函数的调用 代码可直接运行`;
+            }
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                btn.classList.add('copied');
+                btn.textContent = '已复制';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.textContent = '复制';
+                }, 1500);
+            }).catch(() => {
+                // fallback
+                const ta = document.createElement('textarea');
+                ta.value = textToCopy;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                btn.classList.add('copied');
+                btn.textContent = '已复制';
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.textContent = '复制';
+                }, 1500);
+            });
         });
         
         // 鼠标滚轮滚动代码
