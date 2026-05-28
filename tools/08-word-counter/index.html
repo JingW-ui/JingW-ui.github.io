@@ -149,6 +149,14 @@
         <div id="topWords" style="color:var(--text2);font-size:13px;">输入文本后显示</div>
       </div>
     </div>
+
+    <!-- 词云 -->
+    <div class="card">
+      <div class="card-header">词云可视化</div>
+      <div class="card-body" style="padding:8px;">
+        <canvas id="wordCloudCanvas" width="320" height="260" style="width:100%;border-radius:var(--radius);background:var(--bg2);"></canvas>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -209,16 +217,45 @@ function fmtTime(minutes) {
   return Math.floor(minutes/60) + ' 小时 ' + Math.round(minutes%60) + ' 分钟';
 }
 
+// ========== 停用词表 ==========
+const STOP_WORDS = new Set([
+  // 英文停用词
+  'the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','is','am','are','was','were',
+  'be','been','being','have','has','had','do','does','did','will','would','shall','should','may','might','must',
+  'can','could','this','that','these','those','it','its','i','me','my','we','our','you','your','he','him','his',
+  'she','her','they','them','their','what','which','who','whom','when','where','why','how','not','no','nor',
+  'as','if','so','than','too','very','just','about','above','after','again','all','also','any','because',
+  'before','between','both','each','few','more','most','other','over','own','same','some','such','then',
+  'there','through','under','until','up','while','during','into','out','off','down','only','still','already',
+  'even','though','although','however','yet','either','neither','every','many','much','here','now','today',
+  'get','got','go','went','gone','come','came','make','made','take','took','know','think','see','want','give',
+  'use','find','tell','ask','work','seem','feel','try','leave','call','need','become','keep','let','begin',
+  'say','said','like','thing','things','way','also','back','well','one','two','new','old','first','last',
+  'long','great','little','right','good','big','high','small','large','next','early','young','important',
+  'able','since','around','upon','within','without','along','across','among','behind','beyond',
+  // 中文停用词
+  '的','了','在','是','我','有','和','就','不','人','都','一','一个','上','也','很','到','说','要','去','你',
+  '会','着','没有','看','好','自己','这','他','她','它','们','那','里','吗','呢','吧','啊','哦','嗯',
+  '什么','怎么','为什么','哪','谁','多少','几','如何','怎样','可以','因为','所以','但是','而且','虽然',
+  '然而','如果','即使','只要','只有','无论','不管','因此','于是','然后','或者','还是','并且','而',
+  '对','与','从','向','把','被','给','让','用','以','为','于','及','等','中','时','后','前','间',
+  '年','月','日','个','些','种','各','每','之','该','此','其','或','又','再','已','曾','正在','将',
+  '可能','应该','必须','需要','能够','应当','这个','那个','这些','那些','这里','那里','哪里',
+  '不是','没','比','最','更','非常','十分','相当','比较','稍微','有点儿','一点','一下','一些',
+  '来','去','出','进','回','过','起','开','下','上来','下去','起来','出来','过来','通过','关于',
+  '进行','已经','之后','之前','以来','以后','以前','以上','以下','之间','之中','之外','之内'
+]);
+
 function updateTopWords(text) {
   const words = text.toLowerCase()
     .replace(/[^\u4e00-\u9fa5a-z0-9\s]/g, ' ')
     .split(/\s+/)
-    .filter(w => w.length > 1 && !/^\d+$/.test(w));
+    .filter(w => w.length > 1 && !/^\d+$/.test(w) && !STOP_WORDS.has(w));
   const freq = {};
   words.forEach(w => freq[w] = (freq[w]||0) + 1);
   const sorted = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0, 10);
   const el = document.getElementById('topWords');
-  if (sorted.length === 0) { el.textContent = '输入文本后显示'; return; }
+  if (sorted.length === 0) { el.textContent = '输入文本后显示'; drawWordCloud([]); return; }
   const max = sorted[0][1];
   el.innerHTML = sorted.map(([w, c]) => `
     <div class="word-bar">
@@ -227,9 +264,70 @@ function updateTopWords(text) {
       <span class="word-count">${c}</span>
     </div>
   `).join('');
+  drawWordCloud(sorted);
 }
 
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ========== 词云绘制 ==========
+const CLOUD_COLORS = ['#2da44e','#1a7f37','#4a90d9','#d97706','#dc2626','#7c3aed','#0891b2','#be185d','#65a30d','#ea580c'];
+
+function drawWordCloud(wordFreqs) {
+  const canvas = document.getElementById('wordCloudCanvas');
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.clientWidth, H = 260;
+  canvas.width = W * dpr; canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, W, H);
+
+  if (!wordFreqs.length) {
+    ctx.fillStyle = '#999'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('输入文本后显示', W/2, H/2);
+    return;
+  }
+
+  const max = wordFreqs[0][1];
+  const minSize = 12, maxSize = 42;
+  const placed = []; // {x,y,w,h} 碰撞检测
+
+  // 按频率打乱一点顺序让布局更自然
+  const items = wordFreqs.slice(0, 30).map(([word, count], i) => ({
+    word, count,
+    size: minSize + (count / max) * (maxSize - minSize),
+    color: CLOUD_COLORS[i % CLOUD_COLORS.length]
+  }));
+
+  // 螺旋放置
+  items.forEach((item) => {
+    ctx.font = `bold ${item.size}px -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif`;
+    const metrics = ctx.measureText(item.word);
+    const tw = metrics.width + 6, th = item.size + 4;
+    let bestX = null, bestY = null;
+    // 螺旋搜索
+    for (let r = 0; r < Math.max(W, H) * 0.6; r += 3) {
+      for (let angle = 0; angle < Math.PI * 2; angle += 0.3) {
+        const cx = W/2 + r * Math.cos(angle + r * 0.05);
+        const cy = H/2 + r * 0.7 * Math.sin(angle + r * 0.05);
+        const x = cx - tw/2, y = cy - th/2;
+        if (x < 2 || y < 2 || x + tw > W - 2 || y + th > H - 2) continue;
+        const box = {x, y, w: tw, h: th};
+        if (!placed.some(p => box.x < p.x+p.w && box.x+box.w > p.x && box.y < p.y+p.h && box.y+box.h > p.y)) {
+          bestX = cx; bestY = cy; placed.push(box); break;
+        }
+      }
+      if (bestX !== null) break;
+    }
+    if (bestX === null) return; // 放不下就跳过
+    ctx.font = `bold ${item.size}px -apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif`;
+    ctx.fillStyle = item.color;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 0.6 + 0.4 * (item.count / max);
+    ctx.fillText(item.word, bestX, bestY);
+  });
+  ctx.globalAlpha = 1;
+}
 
 function clearText() { document.getElementById('textInput').value = ''; updateStats(); }
 
