@@ -989,7 +989,7 @@
         <small style="color: #888; font-size: 11px; display: block; margin-top: 4px;">范围：10-200 条，修改后需重新加载页面生效</small>
 
         <div class="modal-buttons">
-            <button onclick="loadConfig()">读取配置</button>
+            <button onclick="saveConfig()">💾 保存配置</button>
             <button class="primary" onclick="saveAndConnect()">💾 保存并连接</button>
         </div>
         <div class="modal-buttons" style="justify-content:center; margin-top:10px;">
@@ -1018,13 +1018,20 @@
     let pendingImages = [];  // 待上传图片队列
     let isManualClose = false;  // 标记是否为手动关闭连接
 
-    // 页面加载时自动读配置和加载历史记录
+    // 页面加载时自动读配置、加载历史记录，并在有已保存配置时自动连接
     window.onload = function () {
         loadConfig();
         loadHistory();
 
         // 注册网络状态监听器
         setupNetworkListener();
+
+        // 如果有已保存的有效配置，自动连接
+        const savedIP = localStorage.getItem('pc_ip');
+        const savedPort = localStorage.getItem('pc_port');
+        if (savedIP && savedPort) {
+            connect();
+        }
     };
 
     // 页面卸载时清理资源
@@ -1132,7 +1139,22 @@
         }
         localStorage.setItem('pc_ip', ip);
         localStorage.setItem('pc_port', port);
+
+        // 保存历史记录限制
+        const historyLimit = document.getElementById('historyLimitInput').value.trim();
+        if (historyLimit) {
+            const limit = parseInt(historyLimit);
+            if (limit >= 10 && limit <= 200) {
+                localStorage.setItem('history_limit', limit);
+                maxHistoryItems = limit;
+            } else {
+                alert('历史记录条数必须在 10-200 之间');
+                return;
+            }
+        }
+
         alert('配置已保存，下次打开自动加载');
+        closeConfig();
     }
 
     // 保存配置并立即连接
@@ -1179,11 +1201,21 @@
             return;
         }
 
-        // 自动填充本地地址
+        // 临时设置本地地址进行连接（不覆盖已保存的 localStorage 配置）
+        const savedIP = document.getElementById('ipInput').value.trim();
+        const savedPort = document.getElementById('portInput').value.trim();
+
+        // 使用本地地址连接
         document.getElementById('ipInput').value = '127.0.0.1';
         document.getElementById('portInput').value = '8765';
-        // 直接连接
         connect();
+
+        // 连接后恢复之前保存的地址（保持输入框显示已保存的配置）
+        if (savedIP && savedPort) {
+            document.getElementById('ipInput').value = savedIP;
+            document.getElementById('portInput').value = savedPort;
+        }
+
         closeDrawerAfterAction();
     }
 
