@@ -11,7 +11,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
             line-height: 1.6;
@@ -19,15 +19,15 @@
             background: #f5f5f5;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 900px;
             margin: 0 auto;
             background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 40px;
         }
-        
+
         /* Header */
         .header {
             display: flex;
@@ -38,7 +38,7 @@
             margin-bottom: 30px;
             position: relative;
         }
-        
+
         .school-logo {
             position: absolute;
             top: -20px;
@@ -47,42 +47,42 @@
             height: 60px;
             object-fit: contain;
         }
-        
+
         .avatar {
             width: 120px;
             height: 120px;
             border-radius: 50%;
             object-fit: cover;
         }
-        
+
         .header-info {
             flex: 1;
         }
-        
+
         .name {
             font-size: 32px;
             font-weight: bold;
             color: #2c3e50;
             margin-bottom: 8px;
         }
-        
+
         .contact {
             font-size: 14px;
             color: #666;
             line-height: 1.8;
         }
-        
+
         .contact span {
             margin-right: 20px;
         }
-        
+
         .contact-links {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
             align-items: center;
         }
-        
+
         .contact-links a {
             color: #3498db;
             text-decoration: none;
@@ -92,23 +92,23 @@
             border-radius: 3px;
             transition: all 0.2s;
         }
-        
+
         .contact-links a:hover {
             background: #3498db;
             color: white;
             text-decoration: none;
         }
-        
+
         .contact-links span {
             font-size: 13px;
             color: #666;
         }
-        
+
         /* Section */
         .section {
             margin-bottom: 25px;
         }
-        
+
         .section-title {
             font-size: 18px;
             font-weight: bold;
@@ -117,41 +117,41 @@
             padding-left: 12px;
             margin-bottom: 15px;
         }
-        
+
         /* Education */
         .edu-item {
             margin-bottom: 15px;
         }
-        
+
         .edu-header {
             display: flex;
             justify-content: space-between;
             align-items: baseline;
             margin-bottom: 5px;
         }
-        
+
         .school {
             font-size: 15px;
             font-weight: 600;
             color: #2c3e50;
         }
-        
+
         .date {
             font-size: 13px;
             color: #999;
         }
-        
+
         .edu-detail {
             font-size: 14px;
             color: #666;
             margin-bottom: 3px;
         }
-        
+
         .highlight {
             color: #e74c3c;
             font-weight: 600;
         }
-        
+
         /* Projects Table */
         .project-category {
             font-size: 16px;
@@ -160,14 +160,14 @@
             margin: 20px 0 10px 0;
             padding-bottom: 5px;
         }
-        
+
         .project-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
             font-size: 13px;
         }
-        
+
         .project-table th {
             background: #f8f9fa;
             color: #2c3e50;
@@ -176,50 +176,50 @@
             text-align: left;
             border-bottom: 2px solid #dee2e6;
         }
-        
+
         .project-table td {
             padding: 8px 10px;
             border-bottom: 1px solid #eee;
             vertical-align: top;
         }
-        
+
         .project-table tr:hover {
             background: #f8f9fa;
         }
-        
+
         .project-name {
             font-weight: 600;
             color: #2c3e50;
         }
-        
+
         .project-tech {
             color: #3498db;
             font-size: 12px;
         }
-        
+
         .project-result {
             color: #555;
             font-size: 12px;
         }
-        
+
         .project-links a {
             color: #3498db;
             text-decoration: none;
             font-size: 12px;
             margin-right: 8px;
         }
-        
+
         .project-links a:hover {
             text-decoration: underline;
         }
-        
+
         /* Skills */
         .skills-grid {
             display: flex;
             flex-wrap: wrap;
             gap: 6px;
         }
-        
+
         .skill-tag {
             background: #ecf0f1;
             color: #2c3e50;
@@ -228,37 +228,37 @@
             font-size: 12px;
             font-weight: 500;
         }
-        
+
         /* Awards */
         .awards-list {
             font-size: 14px;
             color: #555;
             padding-left: 20px;
         }
-        
+
         .awards-list li {
             margin-bottom: 6px;
             line-height: 1.5;
         }
-        
+
         .award-level {
             color: #e74c3c;
             font-weight: 600;
             margin-right: 5px;
         }
-        
+
         /* Responsive */
         @media (max-width: 768px) {
             body {
                 padding: 10px;
                 background: #fff;
             }
-            
+
             .container {
                 padding: 15px;
                 box-shadow: none;
             }
-            
+
             /* Header - 左右紧凑布局 */
             .header {
                 flex-direction: row;
@@ -268,135 +268,135 @@
                 margin-bottom: 12px;
                 text-align: left;
             }
-            
+
             .avatar {
                 width: 55px;
                 height: 55px;
                 flex-shrink: 0;
                 margin-top: 0;
             }
-            
+
             .school-logo {
                 width: 75px;
                 height: 30px;
                 top: -8px;
             }
-            
+
             .header-info {
                 flex: 1;
                 min-width: 0;
                 padding-top: 0;
             }
-            
+
             .name {
                 font-size: 19px;
                 margin-bottom: 3px;
                 line-height: 1.2;
             }
-            
+
             .contact-links {
                 gap: 4px;
                 flex-wrap: wrap;
                 line-height: 1.3;
             }
-            
+
             .contact-links span,
             .contact-links a {
                 font-size: 10px;
                 padding: 2px 5px;
                 white-space: nowrap;
             }
-            
+
             /* Section titles */
             .section-title {
                 font-size: 15px;
                 padding-left: 8px;
                 margin-bottom: 10px;
             }
-            
+
             /* Education */
             .edu-item {
                 margin-bottom: 10px;
             }
-            
+
             .edu-header {
                 flex-direction: row;
                 justify-content: space-between;
                 gap: 8px;
                 margin-bottom: 3px;
             }
-            
+
             .school {
                 font-size: 13px;
             }
-            
+
             .date {
                 font-size: 11px;
                 white-space: nowrap;
             }
-            
+
             .edu-detail {
                 font-size: 12px;
                 line-height: 1.4;
             }
-            
+
             /* Projects */
             .project-category {
                 font-size: 14px;
                 margin: 15px 0 8px 0;
             }
-            
+
             .project-table {
                 font-size: 11px;
             }
-            
+
             .project-table th {
                 padding: 6px 5px;
                 font-size: 11px;
             }
-            
+
             .project-table td {
                 padding: 6px 5px;
             }
-            
+
             .project-tech,
             .project-result {
                 font-size: 10px;
             }
-            
+
             .project-links a {
                 font-size: 10px;
                 margin-right: 4px;
             }
-            
+
             /* Skills */
             .skills-grid {
                 gap: 4px;
             }
-            
+
             .skill-tag {
                 padding: 3px 6px;
                 font-size: 10px;
             }
-            
+
             /* Awards */
             .awards-list {
                 font-size: 12px;
             }
-            
+
             .awards-list li {
                 margin-bottom: 4px;
                 line-height: 1.4;
             }
-            
+
             .award-level {
                 font-size: 11px;
             }
-            
+
             .item {
                 margin-bottom: 8px;
             }
-            
+
             .item-title {
                 font-size: 13px;
             }
@@ -404,188 +404,214 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <img src="/imgs/life_and_others/myavtar.png" alt="Wang Jing" class="avatar">
-            <img src="/Games/ball/img/UESTC_ico.png" alt="University of Electronic Science and Technology of China" class="school-logo">
-            <div class="header-info">
-                <div class="name">王京</div>
-                <div class="contact-links">
-                    <span>17702376984</span>
-                    <span>2642144249@qq.com</span>
-                    <span>Weichat：Barbarianwj</span>
-                    <a href="https://github.com/JingW-ui" target="_blank">GitHub</a>
-                    <a href="https://space.bilibili.com/521967044" target="_blank">B站</a><a href="https://jingw-ui.github.io/">Home</a>
-                    <a href="/carousel/">Rewards</a>
-                    <a href="/Software_Downloads/">Downloads</a>
-                    <a href="/phone/">Receiver</a>
-                    <a href="/videos/">Projects</a>
-                    <a href="/Games/">Games</a>
-                    <a href="/skills/">Skills</a>
-                    <a href="/resume/">Details</a>
-                    <a href="/tools/">tools</a>
-                    <a href="https://jingw-ui.github.io/MediScreen-Brain/">MediScreen-Brain</a>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <img src="/imgs/life_and_others/myavtar.png" alt="Wang Jing" class="avatar">
+        <img src="/Games/ball/img/UESTC_ico.png" alt="University of Electronic Science and Technology of China"
+             class="school-logo">
+        <div class="header-info">
+            <div class="name">王京</div>
+            <div class="contact-links">
+                <span>17702376984</span>
+                <span>2642144249@qq.com</span>
+                <span>Weichat：Barbarianwj</span>
+                <a href="https://github.com/JingW-ui" target="_blank">GitHub</a>
+                <a href="https://space.bilibili.com/521967044" target="_blank">B站</a><a
+                    href="https://jingw-ui.github.io/">Home</a>
+                <a href="/carousel/">Rewards</a>
+                <a href="/Software_Downloads/">Downloads</a>
+                <a href="/phone/">Receiver</a>
+                <a href="/videos/">Projects</a>
+                <a href="/Games/">Games</a>
+                <a href="/skills/">Skills</a>
+                <a href="/resume/">Details</a>
+                <a href="/tools/">tools</a>
+                <a href="https://jingw-ui.github.io/MediScreen-Brain/">MediScreen-Brain</a>
 
-                </div>
             </div>
-        </div>
-
-        <!-- Education -->
-        <div class="section">
-            <div class="section-title">教育背景</div>
-            <div class="edu-item">
-                <div class="edu-header">
-                    <span class="school">电子科技大学（985）</span>
-                    <span class="date">2024.09 - 至今</span>
-                </div>
-                <div class="edu-detail">生物医学工程 · 硕士 | GPA: 3.83/4（前5%）| 导师：<a
-                    class="edu-detail" href="/chen_hua_fu/" target="_blank" rel="noopener">陈华富教授</a></div>
-            </div>
-            <div class="edu-item">
-                <div class="edu-header">
-                    <span class="school">西南科技大学</span>
-                    <span class="date">2020.09 - 2024.06</span>
-                </div>
-                <div class="edu-detail">生物医学工程 · 本科 | GPA: 4.15/5（前2%）| <span class="highlight">四川省优秀毕业生</span> | <span class="highlight">推免生</span></div>
-            </div>
-        </div>
-
-        <!-- Internship -->
-        <div class="section">
-            <div class="section-title">实习经历</div>
-            <div class="item">
-                <div class="item-header">
-                    <span class="item-title">国网**电力有限公司 - AI算法实习生</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Projects -->
-        <div class="section">
-            <div class="section-title">项目经历</div>
-            
-            <!-- 科研与医疗AI -->
-            <div class="project-category">🔬 科研与医疗AI</div>
-            <table class="project-table">
-                <thead>
-                    <tr>
-                        <th style="width: 30%">项目</th>
-                        <th style="width: 25%">技术栈</th>
-                        <th style="width: 25%">成果</th>
-                        <th style="width: 20%">链接</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="project-name">NEURA神经影像智能体系统</td>
-                        <td class="project-tech">Agent · LLM · RAG · 自动化工作流</td>
-                        <td class="project-result">bioRxiv预印本已发布</td>
-                        <td class="project-links"><a href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank">论文</a></td>
-                    </tr>
-                    <tr>
-                        <td class="project-name">MediScreen-Brain脑肿瘤检测平台</td>
-                        <td class="project-tech">YOLO · PyTorch · GUI · 多模态支持</td>
-                        <td class="project-result">SCI论文在审，系统已开源</td>
-                        <td class="project-links"><a href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank">GitHub</a><a href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank">主页</a></td>
-                    </tr>
-                    <tr>
-                        <td class="project-name">海马体自动分割诊断系统</td>
-                        <td class="project-tech">nnU-Net · 3D Slicer · MRI分析</td>
-                        <td class="project-result">Dice=0.9554，国赛一等奖</td>
-                        <td class="project-links"><a href="https://jingw-ui.github.io/videos/" target="_blank">视频</a><a href="https://jingw-ui.github.io/imgs/competitions/9.png" target="_blank">证书</a></td>
-                    </tr>
-                    <tr>
-                        <td class="project-name">结直肠息肉智能检测系统</td>
-                        <td class="project-tech">YOLOv8 · Django · MySQL · Web</td>
-                        <td class="project-result">全国二等奖/省一等奖</td>
-                        <td class="project-links"><a href="https://jingw-ui.github.io/videos/" target="_blank">视频</a><a href="https://jingw-ui.github.io/imgs/competitions/8.png" target="_blank">证书</a></td>
-                    </tr>
-                    <tr>
-                        <td class="project-name">摔倒行为识别与安全预警系统</td>
-                        <td class="project-tech">YOLO-Pose · OpenPose</td>
-                        <td class="project-result">四川省一等奖</td>
-                        <td class="project-links"><a href="https://jingw-ui.github.io/imgs/competitions/3.png" target="_blank">证书</a></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <!-- 应用开发 -->
-            <div class="project-category">💻 应用开发</div>
-            <table class="project-table">
-                <thead>
-                    <tr>
-                        <th style="width: 30%">项目</th>
-                        <th style="width: 25%">技术栈</th>
-                        <th style="width: 25%">Star/用户</th>
-                        <th style="width: 20%">链接</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="project-name">AutoTask智能自动化办公助手</td>
-                        <td class="project-tech">PySide6 · PyAutoGUI · RPA</td>
-                        <td class="project-result"><img src="https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-?style=social" alt="stars" style="vertical-align: middle;"> 150+用户</td>
-                        <td class="project-links"><a href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank">GitHub</a><a href="https://www.bilibili.com/video/BV1FzpLzHEWL" target="_blank">B站</a><a href="https://github.com/JingW-ui/AutoTask-UI-/releases" target="_blank">下载</a></td>
-                    </tr>
-                    <tr>
-                        <td class="project-name">通用目标检测系统平台</td>
-                        <td class="project-tech">YOLOv8-v26 · PyTorch · GUI</td>
-                        <td class="project-result"><img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP?style=social" alt="stars" style="vertical-align: middle;"> 50+用户</td>
-                        <td class="project-links"><a href="https://github.com/c/tree/main/project/universal_object_detection_plus" target="_blank">GitHub</a><a href="https://www.bilibili.com/video/BV1dQedz9EKn" target="_blank">B站</a><a href="https://github.com/JingW-ui/PI-MAPP/releases/tag/UniversalObjectDetection" target="_blank">下载</a></td>
-                    </tr>
-                    <tr>
-                        <td class="project-name">C语言在线考试系统</td>
-                        <td class="project-tech">Spring Boot · Vue · MySQL</td>
-                        <td class="project-result">校内上线，数百名学生使用</td>
-                        <td class="project-links"><a href="https://jingw-ui.github.io/resume/" target="_blank">详情</a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-
-
-        <!-- Skills -->
-        <div class="section">
-            <div class="section-title">技能专长</div>
-            <div class="skills-grid">
-                <span class="skill-tag">Python</span>
-                <span class="skill-tag">深度学习</span>
-                <span class="skill-tag">YOLO系列</span>
-                <span class="skill-tag">PyTorch</span>
-                <span class="skill-tag">PySide6/Qt</span>
-                <span class="skill-tag">LLM Agent开发</span>
-                <span class="skill-tag">全栈开发</span>
-                <span class="skill-tag">Java/Spring Boot</span>
-                <span class="skill-tag">MySQL</span>
-                <span class="skill-tag">英语六级</span>
-            </div>
-        </div>
-
-        <!-- Awards -->
-        <div class="section">
-            <div class="section-title">获奖荣誉</div>
-            <ul class="awards-list">
-                <li><span class="award-level">国家级</span>第九届全国大学生生物医学工程创新设计竞赛一等奖（2024）</li>
-                <li><span class="award-level">国家级</span>第八届全国大学生生物医学工程创新设计竞赛二等奖（2023）</li>
-                <li><span class="award-level">奖学金</span>国家励志奖学金 <span class="highlight">×2</span>、电子科技大学优秀研究生、学业奖学金一等奖</li>
-                <li><span class="">省级 </span>第五/四/三届四川省生物医学工程创新设计大赛一等奖 <span class="highlight">×4</span>（2023-2025）</li>
-                <li><span class="">省级 </span>湖北省"华为云杯"昇腾云血液图像处理大赛二等奖（2025）</li>
-                <li><span class="">其他 </span>四川省优秀毕业生、绵阳市三好学生</li>
-            </ul>
-        </div>
-
-        <!-- Publications -->
-        <div class="section">
-            <div class="section-title">科研成果</div>
-            <ul class="awards-list">
-                <li>SCI论文：MediScreen-Brain: A Portable, YOLO-powered GUI for Multi-Modal Brain Tumor Detection</li>
-                <li>SCI论文：NEURA: An agentic system for autonomous neuroimaging workflows (bioRxiv)</li>
-                <li>专利：基于深度学习的MRI海马体3D智能分析诊断平台</li>
-                <li>软著：结直肠息肉智能检测系统、脑部肿瘤检测系统、批量图像处理工具等 <span class="highlight">×5</span></li>
-            </ul>
         </div>
     </div>
+
+    <!-- Education -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="edu-item">
+            <div class="edu-header">
+                <span class="school">电子科技大学（985）</span>
+                <span class="date">2024.09 - 至今</span>
+            </div>
+            <div class="edu-detail">生物医学工程 · 硕士 | GPA: 3.83/4（前5%）| 导师：<a
+                    class="edu-detail" href="/chen_hua_fu/" target="_blank" rel="noopener">陈华富教授</a></div>
+        </div>
+        <div class="edu-item">
+            <div class="edu-header">
+                <span class="school">西南科技大学</span>
+                <span class="date">2020.09 - 2024.06</span>
+            </div>
+            <div class="edu-detail">生物医学工程 · 本科 | GPA: 4.15/5（前2%）| <span
+                    class="highlight">四川省优秀毕业生</span> | <span class="highlight">推免生</span></div>
+        </div>
+    </div>
+
+    <!-- Internship -->
+    <div class="section">
+        <div class="section-title">实习经历</div>
+        <div class="item">
+            <div class="item-header">
+                <span class="item-title">国网**电力有限公司 - AI算法实习生</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="section">
+        <div class="section-title">项目经历</div>
+
+        <!-- 科研与医疗AI -->
+        <div class="project-category">🔬 科研与医疗AI</div>
+        <table class="project-table">
+            <thead>
+            <tr>
+                <th style="width: 30%">项目</th>
+                <th style="width: 25%">技术栈</th>
+                <th style="width: 25%">成果</th>
+                <th style="width: 20%">链接</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="project-name">NEURA神经影像智能体系统</td>
+                <td class="project-tech">Agent · LLM · RAG · 自动化工作流</td>
+                <td class="project-result">bioRxiv预印本已发布</td>
+                <td class="project-links"><a
+                        href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf"
+                        target="_blank">论文</a></td>
+            </tr>
+            <tr>
+                <td class="project-name">MediScreen-Brain脑肿瘤检测平台</td>
+                <td class="project-tech">YOLO · PyTorch · GUI · 多模态支持</td>
+                <td class="project-result">SCI论文在审，系统已开源</td>
+                <td class="project-links"><a href="https://github.com/JingW-ui/MediScreen-Brain"
+                                             target="_blank">GitHub</a><a
+                        href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank">主页</a></td>
+            </tr>
+            <tr>
+                <td class="project-name">海马体自动分割诊断系统</td>
+                <td class="project-tech">nnU-Net · 3D Slicer · MRI分析</td>
+                <td class="project-result">Dice=0.9554，国赛一等奖</td>
+                <td class="project-links"><a href="https://jingw-ui.github.io/videos/" target="_blank">视频</a><a
+                        href="https://jingw-ui.github.io/imgs/competitions/9.png" target="_blank">证书</a></td>
+            </tr>
+            <tr>
+                <td class="project-name">结直肠息肉智能检测系统</td>
+                <td class="project-tech">YOLOv8 · Django · MySQL · Web</td>
+                <td class="project-result">全国二等奖/省一等奖</td>
+                <td class="project-links"><a href="https://jingw-ui.github.io/videos/" target="_blank">视频</a><a
+                        href="https://jingw-ui.github.io/imgs/competitions/8.png" target="_blank">证书</a></td>
+            </tr>
+            <tr>
+                <td class="project-name">摔倒行为识别与安全预警系统</td>
+                <td class="project-tech">YOLO-Pose · OpenPose</td>
+                <td class="project-result">四川省一等奖</td>
+                <td class="project-links"><a href="https://jingw-ui.github.io/imgs/competitions/3.png" target="_blank">证书</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 应用开发 -->
+        <div class="project-category">💻 应用开发</div>
+        <table class="project-table">
+            <thead>
+            <tr>
+                <th style="width: 30%">项目</th>
+                <th style="width: 25%">技术栈</th>
+                <th style="width: 25%">Star/用户</th>
+                <th style="width: 20%">链接</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="project-name">AutoTask智能自动化办公助手</td>
+                <td class="project-tech">PySide6 · PyAutoGUI · RPA</td>
+                <td class="project-result"><img
+                        src="https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-?style=social" alt="stars"
+                        style="vertical-align: middle;"> 150+用户
+                </td>
+                <td class="project-links"><a href="https://github.com/JingW-ui/AutoTask-UI-"
+                                             target="_blank">GitHub</a><a
+                        href="https://www.bilibili.com/video/BV1FzpLzHEWL" target="_blank">B站</a><a
+                        href="https://github.com/JingW-ui/AutoTask-UI-/releases" target="_blank">下载</a></td>
+            </tr>
+            <tr>
+                <td class="project-name">通用目标检测系统平台</td>
+                <td class="project-tech">YOLOv8-v26 · PyTorch · GUI</td>
+                <td class="project-result">
+                    <img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP?label=Stars&logo=github&style=social"
+                         alt="stars" style="vertical-align: middle;">
+                    50+用户
+                </td>
+                <td class="project-links"><a
+                        href="https://github.com/JingW-ui/PI-MAPP/tree/main/project/universal_object_detection_plus"
+                        target="_blank">GitHub</a><a href="https://www.bilibili.com/video/BV1dQedz9EKn" target="_blank">B站</a><a
+                        href="https://github.com/JingW-ui/PI-MAPP/releases/tag/UniversalObjectDetection"
+                        target="_blank">下载</a></td>
+            </tr>
+            <tr>
+                <td class="project-name">C语言在线考试系统</td>
+                <td class="project-tech">Spring Boot · Vue · MySQL</td>
+                <td class="project-result">校内上线，数百名学生使用</td>
+                <td class="project-links"><a href="https://jingw-ui.github.io/resume/" target="_blank">详情</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- Skills -->
+    <div class="section">
+        <div class="section-title">技能专长</div>
+        <div class="skills-grid">
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">深度学习</span>
+            <span class="skill-tag">YOLO系列</span>
+            <span class="skill-tag">PyTorch</span>
+            <span class="skill-tag">PySide6/Qt</span>
+            <span class="skill-tag">LLM Agent开发</span>
+            <span class="skill-tag">全栈开发</span>
+            <span class="skill-tag">Java/Spring Boot</span>
+            <span class="skill-tag">MySQL</span>
+            <span class="skill-tag">英语六级</span>
+        </div>
+    </div>
+
+    <!-- Awards -->
+    <div class="section">
+        <div class="section-title">获奖荣誉</div>
+        <ul class="awards-list">
+            <li><span class="award-level">国家级</span>第九届全国大学生生物医学工程创新设计竞赛一等奖（2024）</li>
+            <li><span class="award-level">国家级</span>第八届全国大学生生物医学工程创新设计竞赛二等奖（2023）</li>
+            <li><span class="award-level">奖学金</span>国家励志奖学金 <span class="highlight">×2</span>、电子科技大学优秀研究生、学业奖学金一等奖
+            </li>
+            <li><span class="">省级 </span>第五/四/三届四川省生物医学工程创新设计大赛一等奖 <span
+                    class="highlight">×4</span>（2023-2025）
+            </li>
+            <li><span class="">省级 </span>湖北省"华为云杯"昇腾云血液图像处理大赛二等奖（2025）</li>
+            <li><span class="">其他 </span>四川省优秀毕业生、绵阳市三好学生</li>
+        </ul>
+    </div>
+
+    <!-- Publications -->
+    <div class="section">
+        <div class="section-title">科研成果</div>
+        <ul class="awards-list">
+            <li>SCI论文：MediScreen-Brain: A Portable, YOLO-powered GUI for Multi-Modal Brain Tumor Detection</li>
+            <li>SCI论文：NEURA: An agentic system for autonomous neuroimaging workflows (bioRxiv)</li>
+            <li>专利：基于深度学习的MRI海马体3D智能分析诊断平台</li>
+            <li>软著：结直肠息肉智能检测系统、脑部肿瘤检测系统、批量图像处理工具等 <span class="highlight">×5</span></li>
+        </ul>
+    </div>
+</div>
 </body>
 </html>
