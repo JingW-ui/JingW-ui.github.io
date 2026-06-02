@@ -10,148 +10,65 @@
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <noscript><link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet"></noscript>
     <style>
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             font-family: 'ZCOOL KuaiLe', cursive, sans-serif;
             background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: flex; flex-direction: column; align-items: center;
             padding: 40px 20px;
-            position: relative;
             overflow-x: hidden;
         }
 
-
-
-        .page-title {
-            color: #ffffff;
-            font-size: 3em;
-            font-weight: 900;
-            text-align: center;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .page-subtitle {
-            color: #b0b0b0;
-            font-size: 1.2em;
-            text-align: center;
-            margin-bottom: 50px;
-            letter-spacing: 2px;
-            position: relative;
-            z-index: 1;
-        }
+        .page-title { color: #fff; font-size: 3em; text-align: center; margin-bottom: 10px; }
+        .page-subtitle { color: #b0b0b0; font-size: 1.2em; text-align: center; margin-bottom: 50px; letter-spacing: 2px; }
 
         .games-container {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            max-width: 1400px;
-            width: 100%;
-            position: relative;
-            z-index: 1;
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 20px; max-width: 1400px; width: 100%;
         }
 
+        /* 卡片 */
         .game-card {
-            background: #2a2a2a;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            transition: all 0.3s ease;
+            background: #2a2a2a; border-radius: 15px; overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             cursor: pointer;
-            position: relative;
         }
-        
+
         .game-card:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.6);
         }
 
+        /* 图片微放大 */
         .game-image {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            object-fit: cover;
-            display: block;
+            width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block;
+            transition: transform 0.35s ease;
         }
 
-
-
-        @media (max-width: 1200px) {
-            .games-container {
-                grid-template-columns: repeat(3, 1fr);
-            }
+        .game-card:hover .game-image {
+            transform: scale(1.08);
         }
 
-        /* 响应式设计 - 手机端优化 */
+        @media (max-width: 1200px) { .games-container { grid-template-columns: repeat(3, 1fr); } }
+
         @media (max-width: 768px) {
-            body {
-                padding: 30px 20px;
-            }
-
-            .page-title {
-                font-size: 2em;
-                margin-bottom: 15px;
-            }
-
-            .page-subtitle {
-                font-size: 1em;
-                margin-bottom: 30px;
-                letter-spacing: 1.5px;
-            }
-
-            .games-container {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 15px;
-            }
-
-            .game-card {
-                border-radius: 12px;
-            }
-            
-            .game-card:hover {
-                transform: translateY(-2px) scale(1.01);
-            }
+            body { padding: 30px 20px; }
+            .page-title { font-size: 2em; margin-bottom: 15px; }
+            .page-subtitle { font-size: 1em; margin-bottom: 30px; letter-spacing: 1.5px; }
+            .games-container { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .game-card { border-radius: 12px; }
         }
 
-        /* 超小屏幕进一步优化 */
         @media (max-width: 480px) {
-            body {
-                padding: 20px 15px;
-            }
-            
-            .page-title {
-                font-size: 1.8em;
-                margin-bottom: 10px;
-            }
-
-            .page-subtitle {
-                font-size: 0.9em;
-                margin-bottom: 25px;
-                letter-spacing: 1px;
-            }
-
-            .games-container {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 10px;
-            }
-            
-            .game-card {
-                border-radius: 10px;
-            }
-            
-            .game-image {
-                aspect-ratio: 5 / 3;
-            }
+            body { padding: 20px 15px; }
+            .page-title { font-size: 1.8em; margin-bottom: 10px; }
+            .page-subtitle { font-size: 0.9em; margin-bottom: 25px; letter-spacing: 1px; }
+            .games-container { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+            .game-card { border-radius: 10px; }
+            .game-image { aspect-ratio: 5 / 3; }
         }
     </style>
 </head>
@@ -160,87 +77,64 @@
     <p class="page-subtitle">选择你喜欢的游戏，开始畅玩吧！</p>
 
     <div class="games-container">
-        <!-- 像素物语：4048小町 -->
-        <div class="game-card" onclick="window.location.href='/Games/2024/'">
+        <div class="game-card" data-href="/Games/2024/">
             <img src="assets/img/2024.webp" alt="像素物语：4048小町" class="game-image">
         </div>
-
-        <!-- Three.js 无限轨道弹跳球 -->
-        <div class="game-card" onclick="window.location.href='/Games/ball'">
+        <div class="game-card" data-href="/Games/ball">
             <img src="assets/img/ball.webp" alt="Three.js 无限轨道弹跳球" class="game-image">
         </div>
-
-        <!-- 霓虹贪吃蛇 -->
-        <div class="game-card" onclick="window.location.href='/Games/snake'">
+        <div class="game-card" data-href="/Games/snake">
             <img src="assets/img/snake.webp" alt="霓虹贪吃蛇" class="game-image">
         </div>
-
-        <!-- 3D炫光骰子 -->
-        <div class="game-card" onclick="window.location.href='/Games/dice_3D/'">
+        <div class="game-card" data-href="/Games/dice_3D/">
             <img src="assets/img/dice_3D.webp" alt="3D炫光骰子" class="game-image">
         </div>
-
-        <!-- 3D极速赛车 -->
-        <div class="game-card" onclick="window.location.href='racing/'">
+        <div class="game-card" data-href="racing/">
             <img src="assets/img/racing.webp" alt="3D极速赛车" class="game-image">
         </div>
-
-        <!-- 赛博木鱼 -->
-        <div class="game-card" onclick="window.location.href='/Games/muyu/'">
+        <div class="game-card" data-href="/Games/muyu/">
             <img src="assets/img/muyu.webp" alt="赛博木鱼" class="game-image">
         </div>
-
-        <!-- 3D地球模型 -->
-        <div class="game-card" onclick="window.location.href='/Games/earth_3D/'">
+        <div class="game-card" data-href="/Games/earth_3D/">
             <img src="assets/img/earth.webp" alt="3D地球模型" class="game-image">
         </div>
-
-        <!-- 星空漂流 -->
-        <div class="game-card" onclick="window.location.href='/Games/star_drift/'">
+        <div class="game-card" data-href="/Games/star_drift/">
             <img src="assets/img/star_drift.webp" alt="星空漂流" class="game-image">
         </div>
-
-        <!-- 数独挑战 -->
-        <div class="game-card" onclick="window.location.href='/Games/suduku/'">
+        <div class="game-card" data-href="/Games/suduku/">
             <img src="assets/img/suduku.webp" alt="数独挑战" class="game-image">
         </div>
-
-        <!-- 扑克牌游戏 -->
-        <div class="game-card" onclick="window.location.href='/Games/puke/'">
+        <div class="game-card" data-href="/Games/puke/">
             <img src="assets/img/puke.webp" alt="扑克牌游戏" class="game-image">
         </div>
-
-        <!-- Jackrabbit 跳跃兔子 -->
-        <div class="game-card" onclick="window.location.href='/Games/jackrabbit/'">
+        <div class="game-card" data-href="/Games/jackrabbit/">
             <img src="assets/img/jackrabbit.webp" alt="Jackrabbit 跳跃兔子" class="game-image">
+        </div>
+        <div class="game-card" data-href="/Games/warp_drift/">
+            <img src="assets/img/warp_drift.webp" alt="Warp Drift" class="game-image">
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const cards = document.querySelectorAll('.game-card');
-            
-            // 卡片进入动画
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                
-                setTimeout(() => {
-                    card.style.transition = 'all 0.4s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 60);
-            });
+        const cards = document.querySelectorAll('.game-card');
+
+        // 入场动画
+        cards.forEach((card, i) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.4s ease, transform 0.3s ease, box-shadow 0.3s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, i * 60);
         });
-        
+
         // 点击跳转
-        document.querySelectorAll('.game-card').forEach(card => {
+        cards.forEach(card => {
             card.addEventListener('click', () => {
                 if (card.dataset.loading) return;
                 card.dataset.loading = 'true';
-                
-                const href = card.getAttribute('onclick').match(/'([^']+)'/)[1];
-                window.location.href = href;
+                window.location.href = card.dataset.href;
             });
         });
     </script>
