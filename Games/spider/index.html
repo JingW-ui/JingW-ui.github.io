@@ -1,0 +1,785 @@
+
+html_content = '''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spider</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0a0e17;
+            overflow: hidden;
+            cursor: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        canvas {
+            display: block;
+        }
+
+        /* 极简光标 */
+        .cursor {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: #fbbf24;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 99;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 8px #fbbf24;
+            transition: transform 0.1s, width 0.15s, height 0.15s;
+        }
+
+        .cursor.click {
+            width: 14px;
+            height: 14px;
+            box-shadow: 0 0 20px #fbbf24, 0 0 40px rgba(251, 191, 36, 0.4);
+        }
+
+        /* 隐蔽控制面板 - 默认收起状态 */
+        .panel-trigger {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            width: 36px;
+            height: 36px;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 101;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 16px;
+        }
+
+        .panel-trigger:hover {
+            background: rgba(251, 191, 36, 0.15);
+            border-color: rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+
+        .panel-trigger.active {
+            background: rgba(251, 191, 36, 0.2);
+            border-color: rgba(251, 191, 36, 0.4);
+            color: #fbbf24;
+            transform: rotate(45deg);
+        }
+
+        /* 控制面板 */
+        .controls {
+            position: fixed;
+            top: 60px;
+            right: 16px;
+            width: 240px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 16px;
+            color: #e2e8f0;
+            z-index: 100;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            opacity: 0;
+            transform: translateY(-10px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        .controls.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: all;
+        }
+
+        .controls::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .controls::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+        }
+
+        .controls h3 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fbbf24;
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .control-row {
+            margin-bottom: 12px;
+        }
+
+        .control-row label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            margin-bottom: 5px;
+            color: #64748b;
+        }
+
+        .control-row label span.val {
+            color: #fbbf24;
+            font-family: 'SF Mono', monospace;
+            font-size: 10px;
+            background: rgba(251, 191, 36, 0.1);
+            padding: 1px 6px;
+            border-radius: 4px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: #1e293b;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #fbbf24;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+            transition: transform 0.15s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+        }
+
+        input[type="color"] {
+            width: 100%;
+            height: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .toggle-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .toggle-chip {
+            flex: 1;
+            padding: 6px 0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            background: transparent;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .toggle-chip:hover {
+            border-color: rgba(251, 191, 36, 0.3);
+            color: #94a3b8;
+        }
+
+        .toggle-chip.on {
+            background: rgba(251, 191, 36, 0.12);
+            border-color: rgba(251, 191, 36, 0.3);
+            color: #fbbf24;
+        }
+
+        .presets {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .preset-dot {
+            height: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preset-dot:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .preset-dot::after {
+            content: attr(data-name);
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            letter-spacing: 0.3px;
+        }
+
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+            margin: 12px 0;
+        }
+
+        .hint {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 50;
+            letter-spacing: 0.5px;
+            transition: opacity 1s;
+        }
+
+        .hint.fade {
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cursor" id="cursor"></div>
+
+    <div class="panel-trigger" id="panelTrigger" title="设置">⚙</div>
+
+    <div class="controls" id="controls">
+        <h3>蜘蛛设置</h3>
+
+        <div class="control-row">
+            <label>大小 <span class="val" id="v-size">35</span></label>
+            <input type="range" id="size" min="12" max="80" value="35">
+        </div>
+
+        <div class="control-row">
+            <label>响应速度 <span class="val" id="v-speed">0.22</span></label>
+            <input type="range" id="speed" min="0.05" max="0.5" step="0.01" value="0.22">
+        </div>
+
+        <div class="control-row">
+            <label>腿数 <span class="val" id="v-legs">8</span></label>
+            <input type="range" id="legs" min="4" max="16" step="2" value="8">
+        </div>
+
+        <div class="control-row">
+            <label>腿长 <span class="val" id="v-legLen">55</span></label>
+            <input type="range" id="legLen" min="25" max="100" value="55">
+        </div>
+
+        <div class="control-row">
+            <label>发光 <span class="val" id="v-glow">18</span></label>
+            <input type="range" id="glow" min="0" max="40" value="18">
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="control-row">
+            <label>身体颜色</label>
+            <input type="color" id="bodyColor" value="#8B4513">
+        </div>
+
+        <div class="control-row">
+            <label>腿部颜色</label>
+            <input type="color" id="legColor" value="#D2691E">
+        </div>
+
+        <div class="control-row">
+            <label>眼睛颜色</label>
+            <input type="color" id="eyeColor" value="#FF3333">
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="toggle-row">
+            <div class="toggle-chip on" id="t-trail">拖尾</div>
+            <div class="toggle-chip" id="t-web">蛛丝</div>
+            <div class="toggle-chip on" id="t-glow">发光</div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="control-row">
+            <label>预设</label>
+            <div class="presets">
+                <div class="preset-dot" data-name="经典" style="background: linear-gradient(135deg, #8B4513, #D2691E);" onclick="setPreset('classic')"></div>
+                <div class="preset-dot" data-name="黑寡妇" style="background: linear-gradient(135deg, #1a1a1a, #333);" onclick="setPreset('black')"></div>
+                <div class="preset-dot" data-name="霓虹" style="background: linear-gradient(135deg, #00ffff, #0099ff);" onclick="setPreset('neon')"></div>
+                <div class="preset-dot" data-name="毒液" style="background: linear-gradient(135deg, #2d5a27, #4a8c3f);" onclick="setPreset('green')"></div>
+                <div class="preset-dot" data-name="黄金" style="background: linear-gradient(135deg, #b8860b, #daa520);" onclick="setPreset('gold')"></div>
+                <div class="preset-dot" data-name="幽灵" style="background: linear-gradient(135deg, #e0e0e0, #999);" onclick="setPreset('ghost')"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hint" id="hint">移动鼠标引导蜘蛛 · 点击惊吓 · 右上角齿轮调节样式</div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const cursor = document.getElementById('cursor');
+        const panelTrigger = document.getElementById('panelTrigger');
+        const controls = document.getElementById('controls');
+        const hint = document.getElementById('hint');
+
+        let W, H;
+        let mouse = { x: W / 2 || window.innerWidth / 2, y: H / 2 || window.innerHeight / 2 };
+        let clicking = false;
+
+        // 蜘蛛状态
+        const spider = {
+            x: window.innerWidth / 2,
+            y: window.innerHeight / 2,
+            angle: 0,
+            vx: 0,
+            vy: 0,
+            legs: [],
+            trail: [],
+            webPts: [],
+            legPhase: 0
+        };
+
+        let cfg = {
+            size: 35,
+            speed: 0.22,
+            legCount: 8,
+            legLen: 55,
+            bodyColor: '#8B4513',
+            legColor: '#D2691E',
+            eyeColor: '#FF3333',
+            glow: 18,
+            trail: true,
+            web: false,
+            glowOn: true
+        };
+
+        // 初始化
+        function resize() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // 鼠标
+        window.addEventListener('mousemove', e => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        window.addEventListener('mousedown', () => {
+            clicking = true;
+            cursor.classList.add('click');
+            spider.vx += (Math.random() - 0.5) * 20;
+            spider.vy += (Math.random() - 0.5) * 20;
+        });
+
+        window.addEventListener('mouseup', () => {
+            clicking = false;
+            cursor.classList.remove('click');
+        });
+
+        window.addEventListener('touchmove', e => {
+            e.preventDefault();
+            mouse.x = e.touches[0].clientX;
+            mouse.y = e.touches[0].clientY;
+        }, { passive: false });
+
+        // 面板开关
+        panelTrigger.addEventListener('click', () => {
+            controls.classList.toggle('open');
+            panelTrigger.classList.toggle('active');
+        });
+
+        // 初始化腿
+        function initLegs() {
+            spider.legs = [];
+            for (let i = 0; i < cfg.legCount; i++) {
+                const baseAngle = (Math.PI * 2 / cfg.legCount) * i;
+                spider.legs.push({
+                    baseAngle: baseAngle,
+                    segments: [],
+                    tipX: 0, tipY: 0
+                });
+            }
+        }
+        initLegs();
+
+        // 颜色解析
+        function parseHex(hex) {
+            const m = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex);
+            return m ? {
+                r: parseInt(m[1], 16),
+                g: parseInt(m[2], 16),
+                b: parseInt(m[3], 16)
+            } : { r: 255, g: 255, b: 255 };
+        }
+
+        // 缓动函数
+        function lerp(a, b, t) { return a + (b - a) * t; }
+
+        function angleLerp(a, b, t) {
+            let d = b - a;
+            while (d > Math.PI) d -= Math.PI * 2;
+            while (d < -Math.PI) d += Math.PI * 2;
+            return a + d * t;
+        }
+
+        // 更新蜘蛛
+        function updateSpider() {
+            const dx = mouse.x - spider.x;
+            const dy = mouse.y - spider.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const targetAngle = Math.atan2(dy, dx);
+
+            // 快速转向
+            spider.angle = angleLerp(spider.angle, targetAngle, 0.15);
+
+            // 快速移动 - 距离越远速度越快
+            if (dist > 3) {
+                const accel = cfg.speed * (1 + dist * 0.003);
+                spider.vx += Math.cos(spider.angle) * accel;
+                spider.vy += Math.sin(spider.angle) * accel;
+            }
+
+            // 阻尼
+            spider.vx *= 0.88;
+            spider.vy *= 0.88;
+
+            spider.x += spider.vx;
+            spider.y += spider.vy;
+
+            // 边界
+            const margin = cfg.size;
+            spider.x = Math.max(margin, Math.min(W - margin, spider.x));
+            spider.y = Math.max(margin, Math.min(H - margin, spider.y));
+
+            // 腿部相位
+            spider.legPhase += 0.15 + Math.min(dist * 0.002, 0.3);
+
+            // 拖尾
+            if (cfg.trail && (Math.abs(spider.vx) > 1 || Math.abs(spider.vy) > 1)) {
+                spider.trail.push({ x: spider.x, y: spider.y, t: Date.now() });
+            }
+            spider.trail = spider.trail.filter(p => Date.now() - p.t < 600);
+
+            // 蛛丝点
+            if (cfg.web) {
+                if (spider.webPts.length === 0 ||
+                    Math.hypot(spider.x - spider.webPts[spider.webPts.length - 1].x,
+                               spider.y - spider.webPts[spider.webPts.length - 1].y) > 40) {
+                    spider.webPts.push({ x: spider.x, y: spider.y });
+                }
+                if (spider.webPts.length > 25) spider.webPts.shift();
+            }
+        }
+
+        // 绘制
+        function draw() {
+            // 清屏 - 轻微拖影
+            ctx.fillStyle = 'rgba(10, 14, 23, 0.35)';
+            ctx.fillRect(0, 0, W, H);
+
+            const bc = parseHex(cfg.bodyColor);
+            const lc = parseHex(cfg.legColor);
+            const ec = parseHex(cfg.eyeColor);
+
+            ctx.save();
+
+            // 蛛丝
+            if (cfg.web && spider.webPts.length > 1) {
+                ctx.beginPath();
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 0.8;
+                spider.webPts.forEach((p, i) => {
+                    if (i === 0) ctx.moveTo(p.x, p.y);
+                    else ctx.lineTo(p.x, p.y);
+                });
+                ctx.stroke();
+            }
+
+            // 拖尾
+            if (cfg.trail) {
+                spider.trail.forEach((p, i) => {
+                    const age = (Date.now() - p.t) / 600;
+                    const alpha = (1 - age) * 0.25;
+                    const s = (1 - age) * cfg.size * 0.4;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, s, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${bc.r}, ${bc.g}, ${bc.b}, ${alpha})`;
+                    ctx.fill();
+                });
+            }
+
+            // 发光
+            if (cfg.glowOn) {
+                ctx.shadowBlur = cfg.glow;
+                ctx.shadowColor = cfg.bodyColor;
+            }
+
+            // 腿
+            spider.legs.forEach((leg, i) => {
+                const side = i < cfg.legCount / 2 ? 1 : -1;
+                const legIndex = i % (cfg.legCount / 2);
+                const legSpread = (legIndex / (cfg.legCount / 2 - 1)) * 0.8 + 0.2;
+
+                const baseAngle = leg.baseAngle + spider.angle;
+                const startX = spider.x + Math.cos(baseAngle) * cfg.size * 0.25;
+                const startY = spider.y + Math.sin(baseAngle) * cfg.size * 0.25;
+
+                // 行走摆动
+                const walkCycle = Math.sin(spider.legPhase + i * 0.8) * 0.4;
+                const reach = cfg.legLen * (0.6 + walkCycle * 0.15);
+
+                const midAngle = baseAngle + side * 0.5 + walkCycle * 0.3;
+                const endAngle = baseAngle + side * 1.2 * legSpread + walkCycle * 0.5;
+
+                const midX = startX + Math.cos(midAngle) * reach * 0.5;
+                const midY = startY + Math.sin(midAngle) * reach * 0.5;
+                const endX = startX + Math.cos(endAngle) * reach;
+                const endY = startY + Math.sin(endAngle) * reach;
+
+                // 腿线
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.quadraticCurveTo(midX, midY, endX, endY);
+                ctx.strokeStyle = cfg.legColor;
+                ctx.lineWidth = Math.max(1.5, cfg.size / 18);
+                ctx.lineCap = 'round';
+                ctx.stroke();
+
+                // 关节
+                ctx.beginPath();
+                ctx.arc(midX, midY, Math.max(1.5, cfg.size / 22), 0, Math.PI * 2);
+                ctx.fillStyle = cfg.legColor;
+                ctx.fill();
+
+                // 脚尖微光
+                ctx.beginPath();
+                ctx.arc(endX, endY, Math.max(1, cfg.size / 28), 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${lc.r + 40}, ${lc.g + 40}, ${lc.b + 40}, 0.7)`;
+                ctx.fill();
+            });
+
+            // 腹部
+            const abdomenX = spider.x - Math.cos(spider.angle) * cfg.size * 0.18;
+            const abdomenY = spider.y - Math.sin(spider.angle) * cfg.size * 0.18;
+
+            ctx.beginPath();
+            ctx.ellipse(abdomenX, abdomenY, cfg.size * 0.55, cfg.size * 0.45, spider.angle, 0, Math.PI * 2);
+            ctx.fillStyle = cfg.bodyColor;
+            ctx.fill();
+
+            // 腹部高光
+            ctx.beginPath();
+            ctx.ellipse(
+                abdomenX - Math.cos(spider.angle) * cfg.size * 0.1,
+                abdomenY - Math.sin(spider.angle) * cfg.size * 0.1,
+                cfg.size * 0.25, cfg.size * 0.2, spider.angle, 0, Math.PI * 2
+            );
+            ctx.fillStyle = `rgba(${Math.min(255, bc.r + 50)}, ${Math.min(255, bc.g + 50)}, ${Math.min(255, bc.b + 50)}, 0.3)`;
+            ctx.fill();
+
+            // 头胸部
+            const headX = spider.x + Math.cos(spider.angle) * cfg.size * 0.28;
+            const headY = spider.y + Math.sin(spider.angle) * cfg.size * 0.28;
+
+            ctx.beginPath();
+            ctx.ellipse(headX, headY, cfg.size * 0.32, cfg.size * 0.26, spider.angle, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${Math.min(255, bc.r + 30)}, ${Math.min(255, bc.g + 30)}, ${Math.min(255, bc.b + 30)}, 1)`;
+            ctx.fill();
+
+            // 眼睛
+            const eyeOff = cfg.size * 0.12;
+            const eyeSz = Math.max(2.5, cfg.size / 14);
+            const eyeGlow = cfg.glowOn ? cfg.glow * 1.5 : 0;
+
+            const eyePos = [
+                { dx: eyeOff, dy: -eyeOff * 0.4 },
+                { dx: eyeOff, dy: eyeOff * 0.4 },
+                { dx: eyeOff * 0.5, dy: -eyeOff * 0.75 },
+                { dx: eyeOff * 0.5, dy: eyeOff * 0.75 },
+                { dx: eyeOff * 1.2, dy: -eyeOff * 0.25 },
+                { dx: eyeOff * 1.2, dy: eyeOff * 0.25 },
+                { dx: eyeOff * 1.0, dy: -eyeOff * 0.65 },
+                { dx: eyeOff * 1.0, dy: eyeOff * 0.65 }
+            ];
+
+            eyePos.forEach(eye => {
+                const ex = headX + Math.cos(spider.angle) * eye.dx - Math.sin(spider.angle) * eye.dy;
+                const ey = headY + Math.sin(spider.angle) * eye.dx + Math.cos(spider.angle) * eye.dy;
+
+                // 眼眶
+                ctx.beginPath();
+                ctx.arc(ex, ey, eyeSz, 0, Math.PI * 2);
+                ctx.fillStyle = '#000';
+                ctx.fill();
+
+                // 眼球发光
+                ctx.save();
+                ctx.shadowBlur = eyeGlow;
+                ctx.shadowColor = cfg.eyeColor;
+                ctx.beginPath();
+                ctx.arc(ex, ey, eyeSz * 0.75, 0, Math.PI * 2);
+                ctx.fillStyle = cfg.eyeColor;
+                ctx.fill();
+                ctx.restore();
+
+                // 高光
+                ctx.beginPath();
+                ctx.arc(ex - eyeSz * 0.25, ey - eyeSz * 0.25, eyeSz * 0.3, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.fill();
+            });
+
+            // 螯牙
+            const fangX = headX + Math.cos(spider.angle) * cfg.size * 0.55;
+            const fangY = headY + Math.sin(spider.angle) * cfg.size * 0.55;
+            ctx.beginPath();
+            ctx.moveTo(fangX - 2, fangY);
+            ctx.lineTo(fangX - 1, fangY + cfg.size * 0.12);
+            ctx.lineTo(fangX + 1, fangY + cfg.size * 0.12);
+            ctx.lineTo(fangX + 2, fangY);
+            ctx.fillStyle = '#222';
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // 背景粒子
+        const particles = Array.from({ length: 40 }, () => ({
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+            vx: (Math.random() - 0.5) * 0.3,
+            vy: (Math.random() - 0.5) * 0.3,
+            s: Math.random() * 1.5 + 0.5,
+            a: Math.random() * 0.4 + 0.1
+        }));
+
+        function drawParticles() {
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if (p.x < 0) p.x = W;
+                if (p.x > W) p.x = 0;
+                if (p.y < 0) p.y = H;
+                if (p.y > H) p.y = 0;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(251, 191, 36, ${p.a})`;
+                ctx.fill();
+            });
+        }
+
+        // 循环
+        function loop() {
+            drawParticles();
+            updateSpider();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        // 绑定控件
+        function bind(id, key, type = 'float') {
+            const el = document.getElementById(id);
+            const val = document.getElementById('v-' + id);
+            el.addEventListener('input', e => {
+                const v = type === 'float' ? parseFloat(e.target.value) : e.target.value;
+                cfg[key] = v;
+                if (val) val.textContent = v;
+                if (key === 'legCount') initLegs();
+            });
+        }
+
+        bind('size', 'size');
+        bind('speed', 'speed');
+        bind('legs', 'legCount');
+        bind('legLen', 'legLen');
+        bind('glow', 'glow');
+        bind('bodyColor', 'bodyColor', 'string');
+        bind('legColor', 'legColor', 'string');
+        bind('eyeColor', 'eyeColor', 'string');
+
+        function toggle(id, key) {
+            const el = document.getElementById(id);
+            el.addEventListener('click', () => {
+                cfg[key] = !cfg[key];
+                el.classList.toggle('on');
+            });
+        }
+
+        toggle('t-trail', 'trail');
+        toggle('t-web', 'web');
+        toggle('t-glow', 'glowOn');
+
+        // 预设
+        const presets = {
+            classic: { bodyColor: '#8B4513', legColor: '#D2691E', eyeColor: '#FF3333', glow: 18 },
+            black: { bodyColor: '#1a1a1a', legColor: '#333333', eyeColor: '#ff0044', glow: 28 },
+            neon: { bodyColor: '#00ced1', legColor: '#0099cc', eyeColor: '#ffffff', glow: 35 },
+            green: { bodyColor: '#2d5a27', legColor: '#4a8c3f', eyeColor: '#ff6600', glow: 22 },
+            gold: { bodyColor: '#b8860b', legColor: '#daa520', eyeColor: '#ff0000', glow: 30 },
+            ghost: { bodyColor: '#d0d0d0', legColor: '#e8e8e8', eyeColor: '#000000', glow: 12 }
+        };
+
+        window.setPreset = function(name) {
+            const p = presets[name];
+            if (!p) return;
+            Object.assign(cfg, p);
+            document.getElementById('bodyColor').value = p.bodyColor;
+            document.getElementById('legColor').value = p.legColor;
+            document.getElementById('eyeColor').value = p.eyeColor;
+            document.getElementById('glow').value = p.glow;
+            document.getElementById('v-glow').textContent = p.glow;
+        };
+
+        // 3秒后淡出提示
+        setTimeout(() => hint.classList.add('fade'), 4000);
+
+        loop();
+    </script>
+</body>
+</html>'''
+
+with open('/mnt/agents/output/spider.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print("文件已保存")

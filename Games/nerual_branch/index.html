@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural Branch — 粒子分支可视化引擎</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Noto+Sans+SC:wght@300;500;700&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --panel-bg: rgba(12, 12, 20, 0.92);
+    --panel-border: rgba(255, 255, 255, 0.06);
+    --fg: #e0e0e8;
+    --muted: #6a6a80;
+    --accent: #00ffaa;
+    --accent-dim: rgba(0, 255, 170, 0.15);
+    --card: rgba(18, 18, 30, 0.85);
+    --slider-track: rgba(255, 255, 255, 0.08);
+    --font-mono: 'Space Mono', monospace;
+    --font-ui: 'Noto Sans SC', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-ui);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  canvas#mainCanvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 1;
+  }
+
+  /* 控制面板 */
+  .panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    z-index: 100;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+  }
+
+  .panel.collapsed {
+    transform: translateX(calc(100% + 30px));
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .panel::-webkit-scrollbar { width: 4px; }
+  .panel::-webkit-scrollbar-track { background: transparent; }
+  .panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 12px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+
+  .panel-title {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .panel-close {
+    width: 28px; height: 28px;
+    border: none; background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+    color: var(--muted);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+  }
+  .panel-close:hover { background: rgba(255,255,255,0.1); color: var(--fg); }
+
+  .section {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  /* 颜色控制行 */
+  .color-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .color-row:last-child { margin-bottom: 0; }
+
+  .color-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg);
+    width: 68px;
+    flex-shrink: 0;
+  }
+
+  .color-preview {
+    width: 20px; height: 20px;
+    border-radius: 6px;
+    border: 2px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: transform 0.15s, border-color 0.2s;
+  }
+  .color-preview:hover { transform: scale(1.15); border-color: rgba(255,255,255,0.3); }
+
+  .color-sliders {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .slider-channel {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    width: 12px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .slider-channel.r { color: #ff6666; }
+  .slider-channel.g { color: #66ff66; }
+  .slider-channel.b { color: #6688ff; }
+
+  .color-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--slider-track);
+    outline: none;
+    cursor: pointer;
+  }
+  .color-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--fg);
+    border: 2px solid rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: transform 0.1s;
+  }
+  .color-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
+  .color-slider::-moz-range-thumb {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--fg);
+    border: 2px solid rgba(0,0,0,0.3);
+    cursor: pointer;
+  }
+
+  .slider-val {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    width: 30px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* 通用滑块 */
+  .param-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .param-row:last-child { margin-bottom: 0; }
+
+  .param-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg);
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  .param-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--slider-track);
+    outline: none;
+    cursor: pointer;
+  }
+  .param-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid rgba(0,0,0,0.3);
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(0,255,170,0.3);
+  }
+  .param-slider::-moz-range-thumb {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid rgba(0,0,0,0.3);
+    cursor: pointer;
+  }
+
+  .param-val {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    width: 34px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* 模式按钮 */
+  .mode-group {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .mode-btn {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 6px 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .mode-btn:hover { background: rgba(255,255,255,0.06); color: var(--fg); }
+  .mode-btn.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 12px rgba(0,255,170,0.15);
+  }
+
+  /* 操作按钮 */
+  .action-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .action-btn {
+    flex: 1;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    color: var(--fg);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .action-btn:hover { background: rgba(255,255,255,0.08); }
+  .action-btn.primary {
+    background: var(--accent-dim);
+    border-color: rgba(0,255,170,0.3);
+    color: var(--accent);
+  }
+  .action-btn.primary:hover {
+    background: rgba(0,255,170,0.2);
+    box-shadow: 0 0 16px rgba(0,255,170,0.15);
+  }
+
+  /* 齿轮切换按钮 */
+  .toggle-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 200;
+    width: 48px; height: 48px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    background: var(--panel-bg);
+    backdrop-filter: blur(16px);
+    color: var(--muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+  .toggle-btn:hover {
+    color: var(--accent);
+    border-color: rgba(0,255,170,0.3);
+    box-shadow: 0 0 20px rgba(0,255,170,0.15);
+  }
+  .toggle-btn i {
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .toggle-btn:hover i { transform: rotate(90deg); }
+
+  /* 统计信息 */
+  .stats-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 100;
+    display: flex;
+    gap: 16px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .stat-item span { color: var(--accent); }
+
+  /* 提示 */
+  .hint {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 100;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+    opacity: 0.7;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+
+  /* Toast 通知 */
+  .toast-container {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 10px 20px;
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    backdrop-filter: blur(16px);
+    color: var(--accent);
+    animation: toastIn 0.3s ease, toastOut 0.3s ease 1.7s forwards;
+  }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-10px); } }
+
+  /* 隐藏的颜色选择器 */
+  .hidden-picker {
+    position: absolute;
+    width: 0; height: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  @media (max-width: 640px) {
+    .panel { width: calc(100vw - 40px); right: 20px; top: 20px; }
+    .hint { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="mainCanvas"></canvas>
+
+<div class="hint" id="hint">移动鼠标与粒子互动 / 点击产生脉冲</div>
+
+<!-- 控制面板 -->
+<div class="panel" id="panel">
+  <div class="panel-header">
+    <div class="panel-title">Neural Branch</div>
+    <button class="panel-close" id="panelClose" aria-label="关闭面板"><i class="fas fa-times"></i></button>
+  </div>
+
+  <!-- 颜色设置 -->
+  <div class="section">
+    <div class="section-label">Color Palette</div>
+
+    <div class="color-row" data-color="dotCol">
+      <span class="color-label">dotCol</span>
+      <div class="color-preview" id="prev-dotCol" style="background:rgb(255,0,0)" tabindex="0" role="button" aria-label="选择粒子颜色"></div>
+      <div class="color-sliders">
+        <div class="slider-row"><span class="slider-channel r">r</span><input type="range" class="color-slider" min="0" max="100" value="100" data-channel="0"><span class="slider-val">1.00</span></div>
+        <div class="slider-row"><span class="slider-channel g">g</span><input type="range" class="color-slider" min="0" max="100" value="0" data-channel="1"><span class="slider-val">0.00</span></div>
+        <div class="slider-row"><span class="slider-channel b">b</span><input type="range" class="color-slider" min="0" max="100" value="0" data-channel="2"><span class="slider-val">0.00</span></div>
+      </div>
+    </div>
+
+    <div class="color-row" data-color="headCol">
+      <span class="color-label">headCol</span>
+      <div class="color-preview" id="prev-headCol" style="background:rgb(0,255,0)" tabindex="0" role="button" aria-label="选择头部颜色"></div>
+      <div class="color-sliders">
+        <div class="slider-row"><span class="slider-channel r">r</span><input type="range" class="color-slider" min="0" max="100" value="0" data-channel="0"><span class="slider-val">0.00</span></div>
+        <div class="slider-row"><span class="slider-channel g">g</span><input type="range" class="color-slider" min="0" max="100" value="100" data-channel="1"><span class="slider-val">1.00</span></div>
+        <div class="slider-row"><span class="slider-channel b">b</span><input type="range" class="color-slider" min="0" max="100" value="0" data-channel="2"><span class="slider-val">0.00</span></div>
+      </div>
+    </div>
+
+    <div class="color-row" data-color="tailCol">
+      <span class="color-label">tailCol</span>
+      <div class="color-preview" id="prev-tailCol" style="background:rgb(255,0,0)" tabindex="0" role="button" aria-label="选择尾部颜色"></div>
+      <div class="color-sliders">
+        <div class="slider-row"><span class="slider-channel r">r</span><input type="range" class="color-slider" min="0" max="100" value="100" data-channel="0"><span class="slider-val">1.00</span></div>
+        <div class="slider-row"><span class="slider-channel g">g</span><input type="range" class="color-slider" min="0" max="100" value="0" data-channel="1"><span class="slider-val">0.00</span></div>
+        <div class="slider-row"><span class="slider-channel b">b</span><input type="range" class="color-slider" min="0" max="100" value="0" data-channel="2"><span class="slider-val">0.00</span></div>
+      </div>
+    </div>
+
+    <div class="color-row" data-color="glowCol">
+      <span class="color-label">glowCol</span>
+      <div class="color-preview" id="prev-glowCol" style="background:rgb(0,255,255)" tabindex="0" role="button" aria-label="选择辉光颜色"></div>
+      <div class="color-sliders">
+        <div class="slider-row"><span class="slider-channel r">r</span><input type="range" class="color-slider" min="0" max="100" value="0" data-channel="0"><span class="slider-val">0.00</span></div>
+        <div class="slider-row"><span class="slider-channel g">g</span><input type="range" class="color-slider" min="0" max="100" value="100" data-channel="1"><span class="slider-val">1.00</span></div>
+        <div class="slider-row"><span class="slider-channel b">b</span><input type="range" class="color-slider" min="0" max="100" value="100" data-channel="2"><span class="slider-val">1.00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 分支参数 -->
+  <div class="section">
+    <div class="section-label">Branch Parameters</div>
+    <div class="param-row">
+      <span class="param-label">Branches</span>
+      <input type="range" class="param-slider" min="3" max="24" value="8" id="param-branches">
+      <span class="param-val" id="val-branches">8</span>
+    </div>
+    <div class="param-row">
+      <span class="param-label">Depth</span>
+      <input type="range" class="param-slider" min="2" max="7" value="4" id="param-depth">
+      <span class="param-val" id="val-depth">4</span>
+    </div>
+    <div class="param-row">
+      <span class="param-label">Length</span>
+      <input type="range" class="param-slider" min="20" max="200" value="90" id="param-length">
+      <span class="param-val" id="val-length">90</span>
+    </div>
+    <div class="param-row">
+      <span class="param-label">Angle</span>
+      <input type="range" class="param-slider" min="10" max="90" value="35" id="param-angle">
+      <span class="param-val" id="val-angle">35</span>
+    </div>
+    <div class="param-row">
+      <span class="param-label">Decay</span>
+      <input type="range" class="param-slider" min="40" max="85" value="65" id="param-decay">
+      <span class="param-val" id="val-decay">0.65</span>
+    </div>
+  </div>
+
+  <!-- 动画参数 -->
+  <div class="section">
+    <div class="section-label">Animation</div>
+    <div class="param-row">
+      <span class="param-label">Speed</span>
+      <input type="range" class="param-slider" min="5" max="100" value="30" id="param-speed">
+      <span class="param-val" id="val-speed">0.30</span>
+    </div>
+    <div class="param-row">
+      <span class="param-label">Glow Size</span>
+      <input type="range" class="param-slider" min="2" max="30" value="10" id="param-glow">
+      <span class="param-val" id="val-glow">10</span>
+    </div>
+    <div class="param-row">
+      <span class="param-label">Mouse Pull</span>
+      <input type="range" class="param-slider" min="0" max="100" value="40" id="param-pull">
+      <span class="param-val" id="val-pull">0.40</span>
+    </div>
+  </div>
+
+  <!-- 模式选择 -->
+  <div class="section">
+    <div class="section-label">Branch Mode</div>
+    <div class="mode-group">
+      <button class="mode-btn active" data-mode="radial">Radial</button>
+      <button class="mode-btn" data-mode="spiral">Spiral</button>
+      <button class="mode-btn" data-mode="tree">Tree</button>
+      <button class="mode-btn" data-mode="neural">Neural</button>
+    </div>
+  </div>
+
+  <!-- 操作 -->
+  <div class="section">
+    <div class="action-row">
+      <button class="action-btn primary" id="btn-regen"><i class="fas fa-sync-alt"></i> Regenerate</button>
+      <button class="action-btn" id="btn-pulse"><i class="fas fa-bolt"></i> Pulse</button>
+    </div>
+  </div>
+</div>
+
+<!-- 齿轮切换按钮 -->
+<button class="toggle-btn" id="togglePanel" aria-label="切换控制面板">
+  <i class="fas fa-cog"></i>
+</button>
+
+<!-- 统计栏 -->
+<div class="stats-bar">
+  <div class="stat-item">NODES <span id="stat-nodes">0</span></div>
+  <div class="stat-item">FPS <span id="stat-fps">60</span></div>
+  <div class="stat-item">BRANCHES <span id="stat-branches">0</span></div>
+</div>
+
+<!-- Toast 容器 -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+/**
+ * Neural Branch — 粒子分支可视化引擎
+ * 核心逻辑：递归生成分支结构，每帧动画化粒子沿分支流动
+ */
+
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+
+// ========== 全局配置 ==========
+const config = {
+  colors: {
+    dotCol:  [1.0, 0.0, 0.0],
+    headCol: [0.0, 1.0, 0.0],
+    tailCol: [1.0, 0.0, 0.0],
+    glowCol: [0.0, 1.0, 1.0]
+  },
+  branches: 8,
+  depth: 4,
+  length: 90,
+  angle: 35,
+  decay: 0.65,
+  speed: 0.30,
+  glowSize: 10,
+  mousePull: 0.40,
+  mode: 'radial'
+};
+
+// 鼠标状态
+let mouseX = 0, mouseY = 0;
+let mouseActive = false;
+
+// 分支数据
+let branches = [];
+let particles = [];
+let pulseWaves = [];
+
+// FPS 计算
+let lastTime = performance.now();
+let frameCount = 0;
+let currentFPS = 60;
+
+// ========== Canvas 尺寸 ==========
+function resizeCanvas() {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+resizeCanvas();
+window.addEventListener('resize', () => { resizeCanvas(); generateBranches(); });
+
+// ========== 工具函数 ==========
+function rgbStr(c, a) {
+  a = a !== undefined ? a : 1;
+  return `rgba(${Math.round(c[0]*255)},${Math.round(c[1]*255)},${Math.round(c[2]*255)},${a})`;
+}
+
+function lerpColor(a, b, t) {
+  return [
+    a[0] + (b[0] - a[0]) * t,
+    a[1] + (b[1] - a[1]) * t,
+    a[2] + (b[2] - a[2]) * t
+  ];
+}
+
+function showToast(msg) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+// ========== 分支生成 ==========
+function generateBranches() {
+  branches = [];
+  particles = [];
+
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const numBranches = config.branches;
+  const maxDepth = config.depth;
+  const baseLen = config.length;
+  const branchAngle = config.angle * Math.PI / 180;
+  const decayRate = config.decay;
+
+  // 根据模式生成不同的分支结构
+  if (config.mode === 'radial') {
+    // 放射状：从中心向外均匀辐射
+    for (let i = 0; i < numBranches; i++) {
+      const baseAngle = (i / numBranches) * Math.PI * 2;
+      buildBranch(cx, cy, baseAngle, baseLen, maxDepth, 0, decayRate, branchAngle);
+    }
+  } else if (config.mode === 'spiral') {
+    // 螺旋状：带角度偏移的放射
+    for (let i = 0; i < numBranches; i++) {
+      const baseAngle = (i / numBranches) * Math.PI * 2 + (i * 0.15);
+      buildBranch(cx, cy, baseAngle, baseLen, maxDepth, 0, decayRate, branchAngle * 1.2);
+    }
+  } else if (config.mode === 'tree') {
+    // 树状：从底部向上生长
+    buildBranch(cx, cy + window.innerHeight * 0.3, -Math.PI / 2, baseLen * 1.5, maxDepth, 0, decayRate, branchAngle);
+    // 额外的侧枝
+    buildBranch(cx, cy + window.innerHeight * 0.3, -Math.PI / 2 + 0.3, baseLen * 1.2, Math.max(2, maxDepth - 1), 0, decayRate, branchAngle);
+    buildBranch(cx, cy + window.innerHeight * 0.3, -Math.PI / 2 - 0.3, baseLen * 1.2, Math.max(2, maxDepth - 1), 0, decayRate, branchAngle);
+  } else if (config.mode === 'neural') {
+    // 神经元：带随机弯曲的分支
+    for (let i = 0; i < numBranches; i++) {
+      const baseAngle = (i / numBranches) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+      buildBranch(cx, cy, baseAngle, baseLen * (0.8 + Math.random() * 0.4), maxDepth, 0, decayRate * (0.9 + Math.random() * 0.2), branchAngle * (0.8 + Math.random() * 0.4), true);
+    }
+  }
+
+  // 为每个分支端点创建粒子
+  createParticles();
+  updateStats();
+}
+
+function buildBranch(x, y, angle, len, maxDepth, currentDepth, decay, branchAngle, addWobble) {
+  if (currentDepth >= maxDepth || len < 5) return;
+
+  const wobble = addWobble ? (Math.random() - 0.5) * 0.3 : 0;
+  const endX = x + Math.cos(angle + wobble) * len;
+  const endY = y + Math.sin(angle + wobble) * len;
+
+  const branch = {
+    x1: x, y1: y,
+    x2: endX, y2: endY,
+    depth: currentDepth,
+    maxDepth: maxDepth,
+    len: len,
+    angle: angle + wobble
+  };
+  branches.push(branch);
+
+  const newLen = len * decay;
+
+  // 左右子分支
+  buildBranch(endX, endY, angle + branchAngle + wobble, newLen, maxDepth, currentDepth + 1, decay, branchAngle, addWobble);
+  buildBranch(endX, endY, angle - branchAngle + wobble, newLen, maxDepth, currentDepth + 1, decay, branchAngle, addWobble);
+
+  // 偶尔产生额外的中间分支（增加丰富度）
+  if (currentDepth > 0 && currentDepth < maxDepth - 1 && Math.random() < 0.3) {
+    buildBranch(endX, endY, angle + (Math.random() - 0.5) * branchAngle * 0.5, newLen * 0.7, maxDepth, currentDepth + 1, decay, branchAngle, addWobble);
+  }
+}
+
+function createParticles() {
+  particles = [];
+  // 在每个分支上创建流动粒子
+  branches.forEach((b, idx) => {
+    const numP = Math.max(1, Math.ceil(3 - b.depth * 0.5));
+    for (let i = 0; i < numP; i++) {
+      particles.push({
+        branchIdx: idx,
+        t: Math.random(), // 沿分支的进度 0~1
+        speed: (0.2 + Math.random() * 0.8) * config.speed,
+        size: Math.max(1.5, 4 - b.depth * 0.6),
+        direction: Math.random() > 0.3 ? 1 : -1 // 大部分向外，少量向内
+      });
+    }
+  });
+}
+
+// ========== 脉冲效果 ==========
+function triggerPulse() {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  pulseWaves.push({
+    x: cx, y: cy,
+    radius: 0,
+    maxRadius: Math.max(window.innerWidth, window.innerHeight) * 0.6,
+    speed: 4,
+    alpha: 1
+  });
+  showToast('PULSE');
+}
+
+// ========== 渲染循环 ==========
+function render(time) {
+  requestAnimationFrame(render);
+
+  // FPS 计算
+  frameCount++;
+  if (time - lastTime >= 1000) {
+    currentFPS = frameCount;
+    frameCount = 0;
+    lastTime = time;
+    document.getElementById('stat-fps').textContent = currentFPS;
+  }
+
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+
+  // 清除 + 渐变背景
+  ctx.clearRect(0, 0, w, h);
+  const bgGrad = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, Math.max(w, h) * 0.7);
+  bgGrad.addColorStop(0, '#12121e');
+  bgGrad.addColorStop(0.5, '#0a0a12');
+  bgGrad.addColorStop(1, '#050508');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, w, h);
+
+  // 中心辉光
+  const centerGlow = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, 200);
+  centerGlow.addColorStop(0, rgbStr(config.colors.glowCol, 0.06));
+  centerGlow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = centerGlow;
+  ctx.fillRect(0, 0, w, h);
+
+  // 绘制脉冲波
+  for (let i = pulseWaves.length - 1; i >= 0; i--) {
+    const pw = pulseWaves[i];
+    pw.radius += pw.speed;
+    pw.alpha = 1 - (pw.radius / pw.maxRadius);
+    if (pw.alpha <= 0) { pulseWaves.splice(i, 1); continue; }
+    ctx.beginPath();
+    ctx.arc(pw.x, pw.y, pw.radius, 0, Math.PI * 2);
+    ctx.strokeStyle = rgbStr(config.colors.glowCol, pw.alpha * 0.4);
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // 绘制分支线条
+  branches.forEach(b => {
+    const depthRatio = b.depth / Math.max(1, b.maxDepth - 1);
+    const lineColor = lerpColor(config.colors.headCol, config.colors.tailCol, depthRatio);
+    const lineAlpha = Math.max(0.08, 0.5 - depthRatio * 0.35);
+    const lineWidth = Math.max(0.5, 2.5 - depthRatio * 2);
+
+    // 鼠标引力偏移
+    let ox1 = 0, oy1 = 0, ox2 = 0, oy2 = 0;
+    if (mouseActive && config.mousePull > 0) {
+      const pull = config.mousePull;
+      const d1 = Math.hypot(b.x1 - mouseX, b.y1 - mouseY);
+      const d2 = Math.hypot(b.x2 - mouseX, b.y2 - mouseY);
+      const maxD = 300;
+      if (d1 < maxD) {
+        const f = (1 - d1 / maxD) * pull * 30;
+        ox1 = (mouseX - b.x1) / Math.max(1, d1) * f;
+        oy1 = (mouseY - b.y1) / Math.max(1, d1) * f;
+      }
+      if (d2 < maxD) {
+        const f = (1 - d2 / maxD) * pull * 30;
+        ox2 = (mouseX - b.x2) / Math.max(1, d2) * f;
+        oy2 = (mouseY - b.y2) / Math.max(1, d2) * f;
+      }
+    }
+
+    ctx.beginPath();
+    ctx.moveTo(b.x1 + ox1, b.y1 + oy1);
+    ctx.lineTo(b.x2 + ox2, b.y2 + oy2);
+    ctx.strokeStyle = rgbStr(lineColor, lineAlpha);
+    ctx.lineWidth = lineWidth;
+    ctx.stroke();
+  });
+
+  // 绘制端点（红色小点）
+  // 收集所有端点（深度最大的分支末端）
+  const endPoints = new Set();
+  branches.forEach(b => {
+    if (b.depth >= config.depth - 1) {
+      endPoints.add(`${Math.round(b.x2)},${Math.round(b.y2)}`);
+    }
+  });
+
+  // 绘制所有节点
+  branches.forEach(b => {
+    const depthRatio = b.depth / Math.max(1, b.maxDepth - 1);
+    const dotSize = Math.max(1, 3 - depthRatio * 1.5);
+
+    // 鼠标偏移
+    let ox = 0, oy = 0;
+    if (mouseActive && config.mousePull > 0) {
+      const d = Math.hypot(b.x2 - mouseX, b.y2 - mouseY);
+      const maxD = 300;
+      if (d < maxD) {
+        const f = (1 - d / maxD) * config.mousePull * 30;
+        ox = (mouseX - b.x2) / Math.max(1, d) * f;
+        oy = (mouseY - b.y2) / Math.max(1, d) * f;
+      }
+    }
+
+    ctx.beginPath();
+    ctx.arc(b.x2 + ox, b.y2 + oy, dotSize, 0, Math.PI * 2);
+    ctx.fillStyle = rgbStr(config.colors.dotCol, 0.6 + depthRatio * 0.4);
+    ctx.fill();
+  });
+
+  // 中心点
+  ctx.beginPath();
+  ctx.arc(w / 2, h / 2, 5, 0, Math.PI * 2);
+  ctx.fillStyle = rgbStr(config.colors.glowCol, 0.8);
+  ctx.fill();
+  // 中心辉光
+  const cGlow = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, 30);
+  cGlow.addColorStop(0, rgbStr(config.colors.glowCol, 0.4));
+  cGlow.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = cGlow;
+  ctx.beginPath();
+  ctx.arc(w / 2, h / 2, 30, 0, Math.PI * 2);
+  ctx.fill();
+
+  // 绘制流动粒子
+  particles.forEach(p => {
+    const b = branches[p.branchIdx];
+    if (!b) return;
+
+    // 更新进度
+    p.t += p.speed * p.direction * 0.01;
+    if (p.t > 1) { p.t = 1; p.direction = -1; }
+    if (p.t < 0) { p.t = 0; p.direction = 1; }
+
+    const depthRatio = b.depth / Math.max(1, b.maxDepth - 1);
+    const px = b.x1 + (b.x2 - b.x1) * p.t;
+    const py = b.y1 + (b.y2 - b.y1) * p.t;
+
+    // 鼠标偏移
+    let ox = 0, oy = 0;
+    if (mouseActive && config.mousePull > 0) {
+      const d = Math.hypot(px - mouseX, py - mouseY);
+      const maxD = 300;
+      if (d < maxD) {
+        const f = (1 - d / maxD) * config.mousePull * 25;
+        ox = (mouseX - px) / Math.max(1, d) * f;
+        oy = (mouseY - py) / Math.max(1, d) * f;
+      }
+    }
+
+    const particleColor = lerpColor(config.colors.headCol, config.colors.tailCol, p.t);
+
+    // 粒子辉光
+    const glowR = config.glowSize * (0.5 + (1 - depthRatio) * 0.5);
+    if (glowR > 2) {
+      const pGlow = ctx.createRadialGradient(px + ox, py + oy, 0, px + ox, py + oy, Math.max(1, glowR));
+      pGlow.addColorStop(0, rgbStr(config.colors.glowCol, 0.3));
+      pGlow.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = pGlow;
+      ctx.beginPath();
+      ctx.arc(px + ox, py + oy, Math.max(1, glowR), 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // 粒子本体
+    ctx.beginPath();
+    ctx.arc(px + ox, py + oy, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = rgbStr(particleColor, 0.9);
+    ctx.fill();
+  });
+
+  // 端点辉光（红色）
+  branches.forEach(b => {
+    if (b.depth < config.depth - 1) return;
+    let ox = 0, oy = 0;
+    if (mouseActive && config.mousePull > 0) {
+      const d = Math.hypot(b.x2 - mouseX, b.y2 - mouseY);
+      const maxD = 300;
+      if (d < maxD) {
+        const f = (1 - d / maxD) * config.mousePull * 30;
+        ox = (mouseX - b.x2) / Math.max(1, d) * f;
+        oy = (mouseY - b.y2) / Math.max(1, d) * f;
+      }
+    }
+    const gr = config.glowSize * 0.8;
+    const eGlow = ctx.createRadialGradient(b.x2 + ox, b.y2 + oy, 0, b.x2 + ox, b.y2 + oy, Math.max(1, gr));
+    eGlow.addColorStop(0, rgbStr(config.colors.dotCol, 0.5));
+    eGlow.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = eGlow;
+    ctx.beginPath();
+    ctx.arc(b.x2 + ox, b.y2 + oy, Math.max(1, gr), 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+// ========== 鼠标交互 ==========
+canvas.addEventListener('mousemove', e => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  mouseActive = true;
+});
+canvas.addEventListener('mouseleave', () => { mouseActive = false; });
+canvas.addEventListener('click', e => {
+  // 点击产生脉冲
+  pulseWaves.push({
+    x: e.clientX,
+    y: e.clientY,
+    radius: 0,
+    maxRadius: 300,
+    speed: 3,
+    alpha: 1
+  });
+});
+
+// 触摸支持
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  const touch = e.touches[0];
+  mouseX = touch.clientX;
+  mouseY = touch.clientY;
+  mouseActive = true;
+}, { passive: false });
+canvas.addEventListener('touchend', () => { mouseActive = false; });
+
+// ========== 面板交互 ==========
+
+// 面板折叠/展开
+const panel = document.getElementById('panel');
+const toggleBtn = document.getElementById('togglePanel');
+const panelClose = document.getElementById('panelClose');
+
+toggleBtn.addEventListener('click', () => {
+  panel.classList.toggle('collapsed');
+});
+panelClose.addEventListener('click', () => {
+  panel.classList.add('collapsed');
+});
+
+// 颜色滑块交互
+document.querySelectorAll('.color-row').forEach(row => {
+  const colorKey = row.dataset.color;
+  const sliders = row.querySelectorAll('.color-slider');
+  const valSpans = row.querySelectorAll('.slider-val');
+  const preview = row.querySelector('.color-preview');
+
+  sliders.forEach((slider, chIdx) => {
+    slider.addEventListener('input', () => {
+      const val = slider.value / 100;
+      config.colors[colorKey][chIdx] = val;
+      valSpans[chIdx].textContent = val.toFixed(2);
+      updateColorPreview(colorKey, preview);
+    });
+  });
+});
+
+function updateColorPreview(key, preview) {
+  const c = config.colors[key];
+  preview.style.background = `rgb(${Math.round(c[0]*255)},${Math.round(c[1]*255)},${Math.round(c[2]*255)})`;
+}
+
+// 参数滑块交互
+function setupParam(id, configKey, transform) {
+  const slider = document.getElementById(`param-${id}`);
+  const valSpan = document.getElementById(`val-${id}`);
+  slider.addEventListener('input', () => {
+    const raw = parseFloat(slider.value);
+    const val = transform ? transform(raw) : raw;
+    config[configKey] = val;
+    valSpan.textContent = typeof val === 'number' && val < 10 ? val.toFixed(2) : Math.round(val);
+  });
+  // 松开时重新生成
+  slider.addEventListener('change', () => {
+    generateBranches();
+  });
+}
+
+setupParam('branches', 'branches');
+setupParam('depth', 'depth');
+setupParam('length', 'length');
+setupParam('angle', 'angle');
+setupParam('decay', 'decay', v => v / 100);
+setupParam('speed', 'speed', v => v / 100);
+setupParam('glow', 'glowSize');
+setupParam('pull', 'mousePull', v => v / 100);
+
+// 模式切换
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    config.mode = btn.dataset.mode;
+    generateBranches();
+    showToast(`MODE: ${config.mode.toUpperCase()}`);
+  });
+});
+
+// 操作按钮
+document.getElementById('btn-regen').addEventListener('click', () => {
+  generateBranches();
+  showToast('REGENERATED');
+});
+document.getElementById('btn-pulse').addEventListener('click', triggerPulse);
+
+// ========== 统计更新 ==========
+function updateStats() {
+  document.getElementById('stat-nodes').textContent = branches.length;
+  document.getElementById('stat-branches').textContent = config.branches;
+}
+
+// ========== 初始化 ==========
+generateBranches();
+requestAnimationFrame(render);
+
+// 隐藏提示
+setTimeout(() => {
+  document.getElementById('hint').style.opacity = '0';
+}, 5000);
+
+// 键盘快捷键
+document.addEventListener('keydown', e => {
+  if (e.key === 'p' || e.key === 'P') {
+    triggerPulse();
+  }
+  if (e.key === 'r' || e.key === 'R') {
+    generateBranches();
+    showToast('REGENERATED');
+  }
+  if (e.key === 'h' || e.key === 'H') {
+    panel.classList.toggle('collapsed');
+  }
+});
+</script>
+</body>
+</html>
