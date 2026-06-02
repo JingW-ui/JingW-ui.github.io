@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CYBER CORRIDOR // 赛博回廊</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{overflow:hidden;background:#000;font-family:'Share Tech Mono',monospace;cursor:none}
+  canvas{display:block;position:fixed;inset:0}
+
+  #cursor{position:fixed;width:24px;height:24px;border:1.5px solid #00fff0;border-radius:50%;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .15s,height .15s,border-color .15s}
+  #cursor.active{width:50px;height:50px;border-color:#ff00ff}
+
+  #start-screen{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;transition:opacity 1.2s ease-out,visibility 1.2s}
+  #start-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+  #start-screen::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,255,240,0.02) 2px,rgba(0,255,240,0.02) 4px);animation:scanScroll 8s linear infinite;pointer-events:none}
+  @keyframes scanScroll{to{background-position:0 100px}}
+  .title-wrap{text-align:center;position:relative}
+  .title-wrap h1{font-family:'Orbitron',sans-serif;font-size:clamp(2.2rem,6vw,5rem);font-weight:900;color:#00fff0;letter-spacing:.25em;text-shadow:0 0 40px #00fff0,0 0 80px #00fff060;animation:neonPulse 3s ease-in-out infinite alternate,glitchTitle 6s infinite}
+  .title-wrap .sub{font-size:clamp(.7rem,1.8vw,1rem);color:#ff00ff;text-shadow:0 0 20px #ff00ff80;letter-spacing:.5em;margin-top:.5rem;animation:subFlicker 4s infinite}
+  @keyframes neonPulse{from{text-shadow:0 0 30px #00fff0,0 0 60px #00fff060}to{text-shadow:0 0 50px #00fff0,0 0 100px #00fff060,0 0 140px #00fff030}}
+  @keyframes glitchTitle{0%,92%,100%{transform:translate(0)}93%{transform:translate(-6px,2px) skewX(2deg)}95%{transform:translate(4px,-1px) skewX(-1deg)}97%{transform:translate(-3px,3px)}}
+  @keyframes subFlicker{0%,88%,100%{opacity:1}90%{opacity:.1}92%{opacity:.9}94%{opacity:.2}}
+  #start-btn{font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:700;letter-spacing:.4em;padding:1rem 3.5rem;background:transparent;color:#00fff0;border:2px solid #00fff0;cursor:pointer;position:relative;overflow:hidden;margin-top:3rem;transition:all .3s}
+  #start-btn:hover{background:#00fff0;color:#000;box-shadow:0 0 60px #00fff080}
+  #start-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,#00fff030,transparent);animation:btnSweep 2.5s infinite}
+  @keyframes btnSweep{to{left:100%}}
+  .hint{color:#ffffff40;font-size:.65rem;letter-spacing:.2em;margin-top:2rem;animation:hintPulse 2s ease-in-out infinite alternate}
+  @keyframes hintPulse{from{opacity:.3}to{opacity:.7}}
+
+  #hud{position:fixed;inset:0;pointer-events:none;z-index:100}
+  .corner{position:absolute;width:50px;height:50px;border-color:#00fff030;border-style:solid;border-width:0}
+  .corner.tl{top:15px;left:15px;border-top-width:1px;border-left-width:1px}
+  .corner.tr{top:15px;right:15px;border-top-width:1px;border-right-width:1px}
+  .corner.bl{bottom:15px;left:15px;border-bottom-width:1px;border-left-width:1px}
+  .corner.br{bottom:15px;right:15px;border-bottom-width:1px;border-right-width:1px}
+
+  .cyber-text{position:absolute;font-family:'Share Tech Mono',monospace;font-size:.75rem;opacity:0;text-shadow:0 0 8px currentColor;white-space:nowrap;animation:textGlitch var(--dur,4s) var(--del,0s) infinite;pointer-events:none}
+  @keyframes textGlitch{0%,85%,100%{opacity:0}87%,96%{opacity:.65;transform:translate(0)}89%{opacity:.1;transform:translate(-3px,1px)}93%{opacity:.5;transform:translate(2px,-1px)}}
+
+  #scanlines{position:fixed;inset:0;pointer-events:none;z-index:150;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px)}
+
+  #glitch-overlay{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
+  .g-bar{position:absolute;left:0;width:100%;opacity:0}
+
+  #spectrum{position:fixed;bottom:0;left:0;width:100%;height:3px;z-index:300;display:flex;gap:1px}
+  .sp-bar{flex:1;background:#00fff0;transform:scaleY(1);transform-origin:bottom;transition:transform 60ms}
+
+  #speed-panel{position:fixed;bottom:20px;left:20px;z-index:300;pointer-events:none}
+  #speed-panel .label{font-size:.55rem;color:#00fff060;letter-spacing:.15em}
+  #speed-panel .val{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:#00fff0;text-shadow:0 0 15px #00fff060;line-height:1}
+  #speed-panel .unit{font-size:.55rem;color:#00fff060;letter-spacing:.1em}
+
+  #controls{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .cb{font-family:'Share Tech Mono',monospace;font-size:.6rem;padding:5px 12px;background:rgba(0,0,0,.5);color:#00fff0;border:1px solid #00fff030;cursor:pointer;transition:all .25s;backdrop-filter:blur(4px);letter-spacing:.1em}
+  .cb:hover{border-color:#00fff0;box-shadow:0 0 12px #00fff030}
+  .cb.on{background:#00fff015;border-color:#00fff0;color:#00fff0}
+
+  #info-panel{position:fixed;top:20px;right:20px;z-index:300;text-align:right;pointer-events:none}
+  #info-panel .line{font-size:.55rem;color:#00fff050;letter-spacing:.08em;line-height:1.6}
+  #info-panel .line b{color:#00fff090}
+
+  #top-label{position:fixed;top:20px;left:20px;z-index:300;pointer-events:none}
+  #top-label .sys{font-family:'Orbitron',sans-serif;font-size:.6rem;color:#00fff060;letter-spacing:.3em}
+  #top-label .ver{font-size:.5rem;color:#ff00ff40;letter-spacing:.15em;margin-top:2px}
+
+  @media(max-width:640px){
+    #controls{bottom:10px;right:10px;gap:4px}
+    .cb{font-size:.5rem;padding:4px 8px}
+    #speed-panel{bottom:10px;left:10px}
+    #info-panel{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+
+<div id="start-screen">
+  <div class="title-wrap">
+    <h1>CYBER CORRIDOR</h1>
+    <div class="sub">INFINITE NEON DESCENT</div>
+  </div>
+  <button id="start-btn">JACK IN</button>
+  <div class="hint">CLICK TO INITIALIZE NEURAL LINK</div>
+</div>
+
+<div id="hud">
+  <div class="corner tl"></div><div class="corner tr"></div>
+  <div class="corner bl"></div><div class="corner br"></div>
+</div>
+
+<div id="scanlines"></div>
+<div id="glitch-overlay"></div>
+<div id="spectrum"></div>
+
+<div id="top-label">
+  <div class="sys">CYBER CORRIDOR v9.7</div>
+  <div class="ver">BUILD 0x7F3A // NEURAL ENGINE</div>
+</div>
+
+<div id="speed-panel">
+  <div class="label">VELOCITY</div>
+  <div class="val" id="spd-val">0.00</div>
+  <div class="unit">M/S</div>
+</div>
+
+<div id="info-panel">
+  <div class="line">DEPTH <b id="depth-val">0</b> m</div>
+  <div class="line">SECTOR <b id="sector-val">A-0</b></div>
+  <div class="line">SIGNAL <b id="signal-val">NOMINAL</b></div>
+</div>
+
+<div id="controls">
+  <button class="cb" data-speed="slow">SLOW</button>
+  <button class="cb on" data-speed="cruise">CRUISE</button>
+  <button class="cb" data-speed="hyper">HYPER</button>
+  <button class="cb" data-speed="overdrive">OVERDRIVE</button>
+  <button class="cb on" id="btn-audio">AUDIO</button>
+  <button class="cb on" id="btn-glitch">GLITCH</button>
+</div>
+
+<script type="importmap">
+{
+  "imports":{
+    "three":"https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
+import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
+import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
+import {AfterimagePass} from 'three/addons/postprocessing/AfterimagePass.js';
+import {GlitchPass} from 'three/addons/postprocessing/GlitchPass.js';
+import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
+
+/* ========== 全局状态 ========== */
+let scene, camera, renderer, composer;
+let pathCurve, tunnel1, tunnel2, tunnel3;
+let ringMeshes = [], particles;
+let progress = 0;
+let baseSpeed = 0.00025;
+let targetSpeed = 0.00025;
+let currentSpeed = 0.00025;
+let mouseX = 0, mouseY = 0;
+let audioCtx, analyser, freqData, bassLevel = 0;
+let audioOn = false, glitchOn = true, started = false;
+const clock = new THREE.Clock();
+let afterimagePass, bloomPass, glitchPass, chromaPass;
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ========== 赛博朋克文字数据 ========== */
+const TEXTS = [
+  'SYS.BREACH::0x7F3A','GHOST_PROTOCOL.ACTIVE','NEURAL.LINK::OK',
+  'DATA_STREAM[█▓▒░]','ACCESS.GRANTED//LVL9','FIREWALL.BREACHED',
+  'CYBORG_ENHANCE.ON','ΣΥS.0VERR1D3::OK','VOID::NULL_PTR',
+  'QUANTUM.DECOHERE','MEM.LEAK::0xDEAD','ROOT::GRANTED',
+  'AES256.CRACKED','NODE.SYNC::FAIL','REBOOT..3..2..1',
+  'ENCRYPT.XOR.RUN','SHELL.ACCESS.OPEN','PORT:7331 LISTEN',
+  'DNA.SPLICING.DONE','CORTEX.IMPLANT.OK','REZ.IN.3..2..1',
+  'ICE.BREAKER.START','DECRYPT.RSA.2048','TRACE.ROUTE.DEEP'
+];
+
+/* ========== 初始化 ========== */
+function init() {
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ReinhardToneMapping;
+  /* [修复] 大幅降低曝光，防止高光溢出变白 */
+  renderer.toneMappingExposure = 0.85;
+  document.body.prepend(renderer.domElement);
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x020208);
+  scene.fog = new THREE.FogExp2(0x020208, 0.02);
+
+  camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 500);
+
+  buildPath();
+  buildTunnels();
+  buildRings();
+  buildParticles();
+  buildPostProcessing();
+  buildSpectrum();
+  bindEvents();
+  animate();
+}
+
+/* ========== 生成蜿蜒3D路径 ========== */
+function buildPath() {
+  const pts = [];
+  const N = 80;
+  for (let i = 0; i < N; i++) {
+    const t = i / N;
+    const a = t * Math.PI * 2;
+    const r = 55 + Math.sin(t * Math.PI * 7) * 22 + Math.cos(t * Math.PI * 4) * 15;
+    pts.push(new THREE.Vector3(
+      Math.cos(a) * r + Math.sin(a * 3) * 8 + (Math.random() - 0.5) * 6,
+      Math.sin(a * 2) * 22 + Math.cos(a * 5) * 8 + (Math.random() - 0.5) * 4,
+      Math.sin(a) * r + Math.cos(a * 4) * 10 + (Math.random() - 0.5) * 6
+    ));
+  }
+  pathCurve = new THREE.CatmullRomCurve3(pts, true, 'catmullrom', 0.5);
+}
+
+/* ========== 三层线框隧道 ========== */
+function buildTunnels() {
+  /* [修复] 降低每层隧道材质的不透明度，减少线框密度让光更透气 */
+  const g1 = new THREE.TubeGeometry(pathCurve, 1200, 5, 12, true);
+  const m1 = new THREE.MeshBasicMaterial({ color: 0x00ddb8, wireframe: true, transparent: true, opacity: 0.3 });
+  tunnel1 = new THREE.Mesh(g1, m1);
+  scene.add(tunnel1);
+
+  const g2 = new THREE.TubeGeometry(pathCurve, 700, 7, 8, true);
+  const m2 = new THREE.MeshBasicMaterial({ color: 0xcc00cc, wireframe: true, transparent: true, opacity: 0.1 });
+  tunnel2 = new THREE.Mesh(g2, m2);
+  scene.add(tunnel2);
+
+  const g3 = new THREE.TubeGeometry(pathCurve, 400, 10, 5, true);
+  const m3 = new THREE.MeshBasicMaterial({ color: 0xcc5500, wireframe: true, transparent: true, opacity: 0.04 });
+  tunnel3 = new THREE.Mesh(g3, m3);
+  scene.add(tunnel3);
+}
+
+/* ========== 霓虹装饰环 ========== */
+function buildRings() {
+  const ringColors = [0x00ddb8, 0xcc00cc, 0xcc5500, 0x6600cc];
+  const COUNT = 60;
+  for (let i = 0; i < COUNT; i++) {
+    const t = i / COUNT;
+    const pos = pathCurve.getPointAt(t);
+    const tan = pathCurve.getTangentAt(t);
+
+    const innerR = 3.8 + Math.random() * 1.2;
+    const outerR = innerR + 0.3 + Math.random() * 0.5;
+    const geo = new THREE.RingGeometry(Math.max(0.1, innerR), Math.max(innerR + 0.1, outerR), 24);
+    const c = ringColors[i % ringColors.length];
+    const mat = new THREE.MeshBasicMaterial({ color: c, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.copy(pos);
+    mesh.lookAt(pos.clone().add(tan));
+    mesh.userData = { t, baseOp: 0.4, phase: Math.random() * Math.PI * 2 };
+    ringMeshes.push(mesh);
+    scene.add(mesh);
+  }
+}
+
+/* ========== 发光粒子系统 ========== */
+function buildParticles() {
+  const COUNT = 3500;
+  const positions = new Float32Array(COUNT * 3);
+  const colors = new Float32Array(COUNT * 3);
+  /* [修复] 粒子颜色更暗，避免白点 */
+  const palette = [
+    new THREE.Color(0x00aa90),
+    new THREE.Color(0xaa00aa),
+    new THREE.Color(0xaa4400),
+    new THREE.Color(0x5500aa)
+  ];
+
+  for (let i = 0; i < COUNT; i++) {
+    const t = Math.random();
+    const p = pathCurve.getPointAt(t);
+    const spread = 18;
+    positions[i * 3]     = p.x + (Math.random() - 0.5) * spread;
+    positions[i * 3 + 1] = p.y + (Math.random() - 0.5) * spread;
+    positions[i * 3 + 2] = p.z + (Math.random() - 0.5) * spread;
+    const c = palette[Math.floor(Math.random() * palette.length)];
+    colors[i * 3] = c.r; colors[i * 3 + 1] = c.g; colors[i * 3 + 2] = c.b;
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+  grad.addColorStop(0, 'rgba(255,255,255,0.6)');
+  grad.addColorStop(0.3, 'rgba(255,255,255,0.15)');
+  grad.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 64, 64);
+
+  const mat = new THREE.PointsMaterial({
+    size: 0.25,
+    map: new THREE.CanvasTexture(canvas),
+    vertexColors: true,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    sizeAttenuation: true
+  });
+  particles = new THREE.Points(geo, mat);
+  scene.add(particles);
+}
+
+/* ========== 后处理管线 ========== */
+function buildPostProcessing() {
+  composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+
+  /* [修复] 残影大幅降低，减少亮度累积 */
+  afterimagePass = new AfterimagePass(0.55);
+  composer.addPass(afterimagePass);
+
+  /* [修复] Bloom：降低强度、提高阈值，只有最亮的部分才发光 */
+  bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    0.7,    // strength：原来1.6 → 0.7
+    0.35,   // radius：收敛辉光范围
+    0.45    // threshold：原来0.2 → 0.45，更暗的区域不参与辉光
+  );
+  composer.addPass(bloomPass);
+
+  glitchPass = new GlitchPass();
+  glitchPass.goWild = false;
+  composer.addPass(glitchPass);
+
+  /* [修复] 色差减弱，扫描线暗角稍强压住边缘 */
+  const chromaShiftShader = {
+    uniforms: {
+      tDiffuse: { value: null },
+      uTime: { value: 0 },
+      uChroma: { value: 0.0015 },
+      uScan: { value: 0.05 },
+      uVignette: { value: 1.3 }
+    },
+    vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+    fragmentShader: `
+      uniform sampler2D tDiffuse;
+      uniform float uTime, uChroma, uScan, uVignette;
+      varying vec2 vUv;
+      void main(){
+        vec2 off = uChroma * vec2(sin(uTime*2.3), cos(uTime*1.7));
+        float r = texture2D(tDiffuse, vUv + off).r;
+        float g = texture2D(tDiffuse, vUv).g;
+        float b = texture2D(tDiffuse, vUv - off).b;
+        vec3 col = vec3(r,g,b);
+        col -= sin(vUv.y*900.)*uScan;
+        float vig = 1.-smoothstep(.3,1.1,length((vUv-.5)*uVignette));
+        col *= vig;
+        gl_FragColor = vec4(col,1.);
+      }
+    `
+  };
+  chromaPass = new ShaderPass(chromaShiftShader);
+  composer.addPass(chromaPass);
+}
+
+/* ========== 频谱条 ========== */
+function buildSpectrum() {
+  const el = document.getElementById('spectrum');
+  for (let i = 0; i < 64; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'sp-bar';
+    el.appendChild(bar);
+  }
+}
+
+/* ========== 音频引擎 ========== */
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  freqData = new Uint8Array(analyser.frequencyBinCount);
+
+  const master = audioCtx.createGain();
+  master.gain.value = 0.25;
+
+  const bassOsc = audioCtx.createOscillator();
+  const bassGain = audioCtx.createGain();
+  const bassFilter = audioCtx.createBiquadFilter();
+  bassOsc.type = 'sawtooth'; bassOsc.frequency.value = 55;
+  bassFilter.type = 'lowpass'; bassFilter.frequency.value = 180;
+  bassGain.gain.value = 0.5;
+  const bassLfo = audioCtx.createOscillator();
+  const bassLfoG = audioCtx.createGain();
+  bassLfo.type = 'square'; bassLfo.frequency.value = 2;
+  bassLfoG.gain.value = 0.45;
+  bassLfo.connect(bassLfoG); bassLfoG.connect(bassGain.gain);
+  bassOsc.connect(bassFilter); bassFilter.connect(bassGain); bassGain.connect(master);
+  bassOsc.start(); bassLfo.start();
+
+  const arpNotes = [220, 261.63, 329.63, 392, 440, 392, 329.63, 261.63];
+  let arpIdx = 0;
+  const arpOsc = audioCtx.createOscillator();
+  const arpGain = audioCtx.createGain();
+  const arpFilter = audioCtx.createBiquadFilter();
+  arpOsc.type = 'square'; arpOsc.frequency.value = arpNotes[0];
+  arpFilter.type = 'lowpass'; arpFilter.frequency.value = 1200; arpFilter.Q.value = 4;
+  arpGain.gain.value = 0.07;
+  arpOsc.connect(arpFilter); arpFilter.connect(arpGain); arpGain.connect(master);
+  arpOsc.start();
+  setInterval(() => { arpIdx = (arpIdx + 1) % arpNotes.length; arpOsc.frequency.setTargetAtTime(arpNotes[arpIdx], audioCtx.currentTime, 0.01); }, 187);
+
+  const hhBuf = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.04, audioCtx.sampleRate);
+  const hhD = hhBuf.getChannelData(0);
+  for (let i = 0; i < hhD.length; i++) hhD[i] = (Math.random() * 2 - 1) * Math.exp(-i / (hhD.length * 0.08));
+  const hhGain = audioCtx.createGain(); hhGain.gain.value = 0.04;
+  const hhFilter = audioCtx.createBiquadFilter(); hhFilter.type = 'highpass'; hhFilter.frequency.value = 9000;
+  setInterval(() => {
+    const src = audioCtx.createBufferSource(); src.buffer = hhBuf;
+    src.connect(hhFilter); hhFilter.connect(hhGain); hhGain.connect(master); src.start();
+  }, 375);
+
+  const pad1 = audioCtx.createOscillator(); const pad2 = audioCtx.createOscillator();
+  const padGain = audioCtx.createGain(); const padFilter = audioCtx.createBiquadFilter();
+  pad1.type = 'sine'; pad1.frequency.value = 110;
+  pad2.type = 'sine'; pad2.frequency.value = 164.81;
+  padFilter.type = 'lowpass'; padFilter.frequency.value = 350;
+  padGain.gain.value = 0.1;
+  const padLfo = audioCtx.createOscillator(); const padLfoG = audioCtx.createGain();
+  padLfo.frequency.value = 0.25; padLfoG.gain.value = 180;
+  padLfo.connect(padLfoG); padLfoG.connect(padFilter.frequency);
+  pad1.connect(padFilter); pad2.connect(padFilter);
+  padFilter.connect(padGain); padGain.connect(master);
+  pad1.start(); pad2.start(); padLfo.start();
+
+  master.connect(analyser);
+  analyser.connect(audioCtx.destination);
+  audioOn = true;
+}
+
+function readBass() {
+  if (!analyser) return 0;
+  analyser.getByteFrequencyData(freqData);
+  let sum = 0;
+  for (let i = 0; i < 8; i++) sum += freqData[i];
+  return sum / (8 * 255);
+}
+
+/* ========== CSS Glitch ========== */
+function cssGlitch() {
+  if (!glitchOn || !started) return;
+  const ov = document.getElementById('glitch-overlay');
+  ov.innerHTML = '';
+  const n = 2 + Math.floor(Math.random() * 4);
+  for (let i = 0; i < n; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'g-bar';
+    bar.style.cssText = `top:${Math.random()*100}%;height:${1+Math.random()*4}%;background:${Math.random()>.5?'rgba(0,221,184,0.1)':'rgba(204,0,204,0.1)'};transform:translateX(${(Math.random()-.5)*30}px);opacity:1`;
+    ov.appendChild(bar);
+  }
+  const c = renderer.domElement;
+  c.style.transform = `translate(${(Math.random()-.5)*12}px,${(Math.random()-.5)*6}px)`;
+  if (Math.random() > 0.5 && glitchPass) { glitchPass.goWild = true; setTimeout(() => glitchPass.goWild = false, 150 + Math.random() * 250); }
+  setTimeout(() => { ov.innerHTML = ''; c.style.transform = ''; }, 80 + Math.random() * 120);
+}
+function scheduleGlitch() { setTimeout(() => { cssGlitch(); scheduleGlitch(); }, 1500 + Math.random() * 4500); }
+scheduleGlitch();
+
+/* ========== 动态赛博文字 ========== */
+function spawnText() {
+  if (!started) return;
+  const hud = document.getElementById('hud');
+  const el = document.createElement('div');
+  el.className = 'cyber-text';
+  el.textContent = TEXTS[Math.floor(Math.random() * TEXTS.length)];
+  const colors = ['#00ddb8','#cc00cc','#cc5500','#6600cc'];
+  el.style.cssText = `top:${8+Math.random()*82}%;${Math.random()>.5?'left':'right'}:${3+Math.random()*15}%;color:${colors[Math.floor(Math.random()*4)]};--dur:${2.5+Math.random()*3}s;--del:${Math.random()*0.5}s;font-size:${0.55+Math.random()*0.5}rem`;
+  hud.appendChild(el);
+  setTimeout(() => el.remove(), 5000 + Math.random() * 3000);
+}
+setInterval(spawnText, 700);
+
+/* ========== 事件绑定 ========== */
+function bindEvents() {
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    composer.setSize(window.innerWidth, window.innerHeight);
+  });
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+    const cur = document.getElementById('cursor');
+    cur.style.left = e.clientX + 'px'; cur.style.top = e.clientY + 'px';
+  });
+  document.addEventListener('mousedown', () => document.getElementById('cursor').classList.add('active'));
+  document.addEventListener('mouseup', () => document.getElementById('cursor').classList.remove('active'));
+
+  document.getElementById('start-btn').addEventListener('click', () => {
+    document.getElementById('start-screen').classList.add('hidden');
+    initAudio();
+    started = true;
+  });
+
+  const speedMap = { slow: 0.0001, cruise: 0.00025, hyper: 0.0007, overdrive: 0.0016 };
+  document.querySelectorAll('[data-speed]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      targetSpeed = speedMap[btn.dataset.speed];
+      document.querySelectorAll('[data-speed]').forEach(b => b.classList.remove('on'));
+      btn.classList.add('on');
+    });
+  });
+
+  document.getElementById('btn-audio').addEventListener('click', function() {
+    if (!audioCtx) { initAudio(); this.classList.add('on'); return; }
+    if (audioCtx.state === 'running') { audioCtx.suspend(); this.classList.remove('on'); }
+    else { audioCtx.resume(); this.classList.add('on'); }
+  });
+
+  document.getElementById('btn-glitch').addEventListener('click', function() {
+    glitchOn = !glitchOn;
+    this.classList.toggle('on', glitchOn);
+    if (glitchPass) glitchPass.enabled = glitchOn;
+  });
+}
+
+/* ========== 动画主循环 ========== */
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = clock.getDelta();
+  const t = clock.getElapsedTime();
+
+  if (audioOn && analyser) bassLevel = readBass();
+
+  currentSpeed += (targetSpeed - currentSpeed) * 0.03;
+  const effectiveSpeed = currentSpeed * (1 + bassLevel * 2.5);
+
+  progress = (progress + effectiveSpeed) % 1;
+
+  const camPos = pathCurve.getPointAt(progress);
+  const lookT = (progress + 0.006) % 1;
+  const lookPos = pathCurve.getPointAt(lookT);
+  const tangent = pathCurve.getTangentAt(progress);
+
+  camera.position.copy(camPos);
+
+  const up = new THREE.Vector3(0, 1, 0);
+  const norm = new THREE.Vector3().crossVectors(tangent, up).normalize();
+  const binorm = new THREE.Vector3().crossVectors(tangent, norm).normalize();
+  const offsetLook = lookPos.clone()
+    .add(norm.clone().multiplyScalar(mouseX * 2.5))
+    .add(binorm.clone().multiplyScalar(-mouseY * 2));
+  camera.lookAt(offsetLook);
+
+  /* [修复] 呼吸效果幅度减小 */
+  const breathe = 1 + bassLevel * 0.25 + Math.sin(t * 2) * 0.015;
+  if (tunnel1) tunnel1.scale.setScalar(breathe);
+  if (tunnel2) { tunnel2.scale.setScalar(1 + bassLevel * 0.15 + Math.sin(t * 1.5 + 1) * 0.01); tunnel2.rotation.z += dt * 0.12; }
+  if (tunnel3) { tunnel3.scale.setScalar(1 + bassLevel * 0.1 + Math.sin(t + 2) * 0.008); tunnel3.rotation.z -= dt * 0.06; }
+
+  ringMeshes.forEach(ring => {
+    const dist = Math.abs(ring.userData.t - progress);
+    const wrap = Math.min(dist, 1 - dist);
+    if (wrap < 0.08) {
+      const prox = 1 - wrap / 0.08;
+      ring.material.opacity = ring.userData.baseOp * prox * (1.2 + bassLevel * 1.5);
+      ring.scale.setScalar(1 + bassLevel * 0.4 + Math.sin(t * 4 + ring.userData.phase) * 0.04 * prox);
+    } else {
+      ring.material.opacity = ring.userData.baseOp * 0.15;
+      ring.scale.setScalar(1);
+    }
+  });
+
+  if (particles) {
+    const pos = particles.geometry.attributes.position.array;
+    for (let i = 0; i < pos.length; i += 3) {
+      pos[i + 1] += Math.sin(t * 0.5 + i) * 0.002;
+    }
+    particles.geometry.attributes.position.needsUpdate = true;
+  }
+
+  /* [修复] 所有后处理参数降级 */
+  bloomPass.strength = 0.7 + bassLevel * 0.35;
+  afterimagePass.uniforms['damp'].value = Math.min(0.7, 0.55 + bassLevel * 0.08);
+  chromaPass.uniforms['uTime'].value = t;
+  chromaPass.uniforms['uChroma'].value = 0.0015 + bassLevel * 0.004;
+
+  if (freqData) {
+    const bars = document.querySelectorAll('.sp-bar');
+    const step = Math.max(1, Math.floor(freqData.length / bars.length));
+    bars.forEach((b, i) => {
+      const v = (freqData[i * step] || 0) / 255;
+      b.style.transform = `scaleY(${1 + v * 10})`;
+      b.style.background = v > 0.7 ? '#cc00cc' : v > 0.35 ? '#00ddb8' : '#00ddb830';
+    });
+  }
+
+  document.getElementById('spd-val').textContent = (effectiveSpeed * 10000).toFixed(2);
+  document.getElementById('depth-val').textContent = Math.floor(progress * 10000);
+  const sectors = ['A','B','C','D','E','F','G','H'];
+  document.getElementById('sector-val').textContent = sectors[Math.floor(progress * 8)] + '-' + Math.floor(progress * 100) % 99;
+  const signals = ['NOMINAL','UNSTABLE','CRITICAL','SYNCING','LOST'];
+  document.getElementById('signal-val').textContent = bassLevel > 0.6 ? 'CRITICAL' : signals[Math.floor(t / 3) % signals.length];
+
+  composer.render();
+}
+
+init();
+</script>
+</body>
+</html>
