@@ -568,7 +568,9 @@ class Game {
         }
 
         if (this.starfield) {
-            // 星空背景只需要渲染，不需要视差移动
+            // 更新3D星空（传入相机位置和玩家速度）
+            const playerSpeed = this.player ? this.player.velocity.magnitude() : 0;
+            this.starfield.update(this.deltaTime, this.camera.x, this.camera.y, playerSpeed);
             this.starfield.render();
         }
         

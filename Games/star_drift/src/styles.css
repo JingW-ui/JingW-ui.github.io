@@ -73,7 +73,7 @@ html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    background: var(--bg-deep);
+    background: #000000;
     font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
     color: var(--text-primary);
     /* 禁止移动端默认触摸行为 */
@@ -217,12 +217,12 @@ canvas {
     left: 0;
     width: 100%;
     height: 100%;
-    /* 科幻风格黑色背景 + 动态渐变 */
+    /* 半透明黑色背景，让星空透过来 */
     background:
-        radial-gradient(ellipse at 20% 50%, rgba(79, 70, 229, 0.2) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
-        linear-gradient(180deg, #000000 0%, #0a0a1a 50%, #000000 100%);
+        radial-gradient(ellipse at 20% 50%, rgba(79, 70, 229, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 80%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
+        rgba(0, 0, 0, 0.55);
     z-index: -1;
     animation: bgPulse 8s ease-in-out infinite;
 }
