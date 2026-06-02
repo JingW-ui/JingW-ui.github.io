@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星际穿梭 - 3D 星空漫游</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', 'PingFang SC', sans-serif;
+            cursor: crosshair;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        #ui .speed-bar {
+            width: 300px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+            margin: 0 auto 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #ui .speed-fill {
+            height: 100%;
+            width: 20%;
+            background: linear-gradient(90deg, #4fc3f7, #29b6f6, #039be5);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+        }
+
+        #ui .info {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        #ui .info span {
+            color: #4fc3f7;
+            font-weight: 600;
+        }
+
+        #title {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            text-align: center;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        #title h1 {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 28px;
+            font-weight: 300;
+            letter-spacing: 8px;
+            text-shadow: 0 0 30px rgba(79, 195, 247, 0.4);
+        }
+
+        #title p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 12px;
+            margin-top: 8px;
+            letter-spacing: 3px;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div id="title">
+        <h1>星际穿梭</h1>
+        <p>滚动滚轮加速 · 移动鼠标转向</p>
+    </div>
+    <canvas id="starfield"></canvas>
+    <div id="ui">
+        <div class="speed-bar">
+            <div class="speed-fill" id="speedFill"></div>
+        </div>
+        <div class="info">
+            速度: <span id="speedValue">1.0</span>x · 星星数: <span id="starCount">4000</span>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        const speedFill = document.getElementById('speedFill');
+        const speedValue = document.getElementById('speedValue');
+        const starCountEl = document.getElementById('starCount');
+
+        let width, height, centerX, centerY;
+        let mouseX = 0, mouseY = 0;
+        let targetMouseX = 0, targetMouseY = 0;
+        let speed = 2;
+        let baseSpeed = 2;
+        let targetSpeed = 2;
+        const STAR_COUNT = 4000;
+        const FOV = 300;
+        const STAR_COLORS = [
+            '#ffffff', '#e8f4f8', '#d4eeff', '#fff4e6',
+            '#ffe8d6', '#ffd4a3', '#b8e6ff', '#c4d4ff',
+            '#e0c8ff', '#ffc8e0'
+        ];
+
+        // 调整画布尺寸
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            centerX = width / 2;
+            centerY = height / 2;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        // 星星类
+        class Star {
+            constructor() {
+                this.reset(true);
+            }
+
+            reset(randomZ = false) {
+                // 在3D空间中随机分布
+                this.x = (Math.random() - 0.5) * 4000;
+                this.y = (Math.random() - 0.5) * 4000;
+                this.z = randomZ ? Math.random() * 4000 : 4000;
+
+                this.color = STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)];
+                this.size = Math.random() * 1.5 + 0.5;
+                this.brightness = Math.random() * 0.5 + 0.5;
+                this.twinklePhase = Math.random() * Math.PI * 2;
+                this.twinkleSpeed = Math.random() * 0.02 + 0.01;
+            }
+
+            update(dt) {
+                // 向观察者移动（z轴减小）
+                this.z -= speed * dt * 60;
+
+                // 如果星星穿过观察者，重置到远处
+                if (this.z <= 1) {
+                    this.reset();
+                }
+
+                // 闪烁效果
+                this.twinklePhase += this.twinkleSpeed * dt * 60;
+            }
+
+            draw(ctx, offsetX, offsetY) {
+                // 3D透视投影公式
+                // screenX = (worldX / worldZ) * FOV + centerX
+                const scale = FOV / this.z;
+                const sx = this.x * scale + centerX + offsetX * scale * 0.5;
+                const sy = this.y * scale + centerY + offsetY * scale * 0.5;
+
+                // 视锥剔除：只绘制在屏幕范围内的星星
+                if (sx < -50 || sx > width + 50 || sy < -50 || sy > height + 50) return;
+
+                // 根据距离计算透明度（越远越淡）
+                const distanceFade = Math.min(1, (4000 - this.z) / 2000);
+                const twinkle = 0.7 + 0.3 * Math.sin(this.twinklePhase);
+                const alpha = this.brightness * distanceFade * twinkle;
+
+                // 根据速度计算拖尾长度
+                const trailLength = Math.min(100, speed * 3 * scale);
+
+                ctx.globalAlpha = alpha;
+
+                if (speed > 8 && trailLength > 5) {
+                    // 高速拖尾效果
+                    const trailScale = FOV / (this.z + trailLength);
+                    const tx = this.x * trailScale + centerX + offsetX * trailScale * 0.5;
+                    const ty = this.y * trailScale + centerY + offsetY * trailScale * 0.5;
+
+                    const gradient = ctx.createLinearGradient(sx, sy, tx, ty);
+                    gradient.addColorStop(0, this.color);
+                    gradient.addColorStop(1, 'transparent');
+
+                    ctx.strokeStyle = gradient;
+                    ctx.lineWidth = this.size * scale * 0.5;
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(sx, sy);
+                    ctx.lineTo(tx, ty);
+                    ctx.stroke();
+                }
+
+                // 绘制星星本体
+                const drawSize = this.size * scale;
+                if (drawSize > 0.3) {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, drawSize, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // 大星星添加光晕
+                    if (drawSize > 2) {
+                        ctx.globalAlpha = alpha * 0.3;
+                        ctx.beginPath();
+                        ctx.arc(sx, sy, drawSize * 2.5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        // 初始化星星
+        const stars = [];
+        for (let i = 0; i < STAR_COUNT; i++) {
+            stars.push(new Star());
+        }
+
+        // 鼠标移动
+        document.addEventListener('mousemove', (e) => {
+            targetMouseX = (e.clientX - centerX) * 0.5;
+            targetMouseY = (e.clientY - centerY) * 0.5;
+        });
+
+        // 滚轮控制速度
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            targetSpeed += e.deltaY * -0.01;
+            targetSpeed = Math.max(0.5, Math.min(50, targetSpeed));
+        }, { passive: false });
+
+        // 触摸支持
+        let touchStartY = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        });
+        document.addEventListener('touchmove', (e) => {
+            const dy = touchStartY - e.touches[0].clientY;
+            targetSpeed += dy * 0.05;
+            targetSpeed = Math.max(0.5, Math.min(50, targetSpeed));
+            touchStartY = e.touches[0].clientY;
+
+            targetMouseX = (e.touches[0].clientX - centerX) * 0.5;
+            targetMouseY = (e.touches[0].clientY - centerY) * 0.5;
+        });
+
+        // 动画循环
+        let lastTime = performance.now();
+        let frameCount = 0;
+        let lastFpsTime = 0;
+
+        function animate(currentTime) {
+            const dt = Math.min((currentTime - lastTime) / 1000, 0.1);
+            lastTime = currentTime;
+
+            // 平滑插值速度
+            speed += (targetSpeed - speed) * 0.05;
+            baseSpeed = speed;
+
+            // 平滑插值鼠标位置
+            mouseX += (targetMouseX - mouseX) * 0.05;
+            mouseY += (targetMouseY - mouseY) * 0.05;
+
+            // 更新UI
+            const speedPercent = Math.min(100, (speed / 50) * 100);
+            speedFill.style.width = speedPercent + '%';
+            speedValue.textContent = speed.toFixed(1);
+
+            // 根据速度调整背景亮度
+            const bgBrightness = Math.min(0.08, speed * 0.002);
+
+            // 清除画布（带轻微拖影效果增强速度感）
+            if (speed > 15) {
+                ctx.fillStyle = `rgba(0, 0, 0, ${0.1 + speed * 0.005})`;
+                ctx.fillRect(0, 0, width, height);
+            } else {
+                ctx.fillStyle = `rgb(0, 0, ${Math.floor(bgBrightness * 255)})`;
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            // 绘制星星
+            // 按z坐标排序，远的先画
+            stars.sort((a, b) => b.z - a.z);
+
+            for (const star of stars) {
+                star.update(dt);
+                star.draw(ctx, mouseX, mouseY);
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+    </script>
+</body>
+</html>
