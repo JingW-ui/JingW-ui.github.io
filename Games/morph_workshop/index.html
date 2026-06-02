@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>形态工坊 | 粒子·光线调节</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        /* --- 极简右侧面板：无炫光，纯平玻璃质感 --- */
+        .control-panel {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 260px;
+            background: rgba(18, 22, 35, 0.75);
+            backdrop-filter: blur(16px);
+            border-radius: 16px 0 0 16px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-right: none;
+            padding: 18px 16px 20px 18px;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+            z-index: 30;
+            transition: transform 0.3s ease;
+            font-size: 12px;
+            color: #eef2ff;
+            letter-spacing: 0.2px;
+        }
+
+        .control-panel.collapsed {
+            transform: translateY(-50%) translateX(calc(100% - 42px));
+        }
+
+        /* 收起拉手 — 简约线条 */
+        .panel-toggle {
+            position: absolute;
+            left: -34px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 64px;
+            background: rgba(25, 30, 45, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: 20px 0 0 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 16px;
+            color: #ccddee;
+            font-weight: 300;
+        }
+
+        .panel-toggle:hover {
+            background: rgba(60, 70, 100, 0.8);
+            color: white;
+            width: 38px;
+        }
+
+        .panel-header {
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .panel-header h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: #dddfff;
+        }
+
+        .control-group {
+            margin-bottom: 18px;
+        }
+
+        .control-group label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 400;
+            color: #cbd5f0;
+            letter-spacing: 0.3px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            background: #2a2f3e;
+            height: 2px;
+            border-radius: 2px;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]:focus {
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #9bb8ff;
+            border: none;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .param-value {
+            color: #bbd9ff;
+            font-family: 'SF Mono', monospace;
+            font-size: 10px;
+        }
+
+        .divider-light {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 14px 0;
+        }
+
+        .badge-note {
+            font-size: 9px;
+            text-align: center;
+            opacity: 0.45;
+            margin-top: 14px;
+        }
+
+        /* 底部中央切换按钮 (保留，低调) */
+        .switch-btn-container {
+            position: fixed;
+            bottom: 22px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            pointer-events: none;
+            z-index: 25;
+        }
+
+        .switch-btn {
+            pointer-events: auto;
+            background: rgba(20, 24, 38, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(160, 190, 255, 0.3);
+            border-radius: 48px;
+            padding: 6px 26px;
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            color: #e0ecff;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        .switch-btn:hover {
+            background: rgba(50, 70, 110, 0.7);
+            border-color: rgba(160, 200, 255, 0.6);
+            transform: translateY(-1px);
+        }
+
+        /* 左下角物体标签 */
+        .object-label {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(5px);
+            padding: 4px 14px;
+            border-radius: 28px;
+            font-size: 11px;
+            color: #ccddff;
+            font-family: monospace;
+            pointer-events: none;
+            z-index: 20;
+            border-left: 2px solid #7aaaff;
+        }
+
+        @media (max-width: 600px) {
+            .control-panel { width: 230px; padding: 14px 12px; }
+            .switch-btn { padding: 4px 18px; font-size: 10px; }
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="object-label" id="currentObjectLabel">💎 晶核棱镜</div>
+    <div class="switch-btn-container">
+        <button class="switch-btn" id="toggleObjectBtn">⇄ 切换形态</button>
+    </div>
+
+    <!-- 右侧简洁控制面板 -->
+    <div class="control-panel" id="controlPanel">
+        <div class="panel-toggle" id="panelToggleBtn">◀</div>
+        <div class="panel-header">
+            <h3>⚙ 控制器</h3>
+        </div>
+
+        <div class="control-group">
+            <label>粒子数量 <span id="particleCountVal" class="param-value">1800</span></label>
+            <input type="range" id="particleCountSlider" min="500" max="4000" step="100" value="1800">
+        </div>
+
+        <div class="control-group">
+            <label>粒子大小 <span id="particleSizeVal" class="param-value">0.038</span></label>
+            <input type="range" id="particleSizeSlider" min="0.015" max="0.12" step="0.002" value="0.038">
+        </div>
+
+        <div class="control-group">
+            <label>粒子色调 <span id="particleHueVal" class="param-value">0.55</span></label>
+            <input type="range" id="particleHueSlider" min="0" max="1" step="0.01" value="0.55">
+        </div>
+
+        <div class="divider-light"></div>
+
+        <div class="control-group">
+            <label>形态转速 <span id="rotateSpeedVal" class="param-value">0.70</span></label>
+            <input type="range" id="rotateSpeedSlider" min="0" max="1.6" step="0.02" value="0.70">
+        </div>
+
+        <div class="control-group">
+            <label>脉冲强度 <span id="pulseStrengthVal" class="param-value">0.045</span></label>
+            <input type="range" id="pulseStrengthSlider" min="0" max="0.12" step="0.002" value="0.045">
+        </div>
+
+        <div class="control-group">
+            <label>自发光 <span id="emissiveVal" class="param-value">0.48</span></label>
+            <input type="range" id="emissiveSlider" min="0.1" max="1.2" step="0.01" value="0.48">
+        </div>
+
+        <!-- 新增：光线调节（主光源强度 + 环境光强度整合为一个简洁参数） -->
+        <div class="control-group">
+            <label>光线强度 <span id="lightIntensityVal" class="param-value">1.00</span></label>
+            <input type="range" id="lightIntensitySlider" min="0.3" max="1.8" step="0.02" value="1.00">
+        </div>
+
+        <div class="badge-note">可收起 | 实时调节</div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        // --- 初始化 ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x020218);
+        scene.fog = new THREE.FogExp2(0x020218, 0.01);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(3.8, 2.2, 5.4);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.toneMapping = THREE.ReinhardToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        document.body.appendChild(renderer.domElement);
+
+        // 后期 (简洁泛光)
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.1, 0.3, 0.7);
+        bloomPass.threshold = 0.1;
+        bloomPass.strength = 0.65;
+        const effectComposer = new EffectComposer(renderer);
+        effectComposer.addPass(renderScene);
+        effectComposer.addPass(bloomPass);
+
+        // 轨道控制
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.06;
+        controls.autoRotate = false;
+        controls.enableZoom = true;
+        controls.zoomSpeed = 1.0;
+        controls.target.set(0, 0, 0);
+
+        // ========= 1. 光源系统 (可调节整体光线强度) =========
+        const ambientLight = new THREE.AmbientLight(0x22223b, 0.65);
+        scene.add(ambientLight);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        mainLight.position.set(2.5, 3.2, 3);
+        scene.add(mainLight);
+        const backLight = new THREE.PointLight(0x6688cc, 0.45);
+        backLight.position.set(-2, 1.2, -3);
+        scene.add(backLight);
+        const fillLight = new THREE.PointLight(0xffaa77, 0.4);
+        fillLight.position.set(1.8, 1.5, 2.2);
+        scene.add(fillLight);
+        const dynamicColorLight = new THREE.PointLight(0xff77aa, 0.55);
+        dynamicColorLight.position.set(2, 1, 1.8);
+        scene.add(dynamicColorLight);
+
+        // 统一光线强度调节函数
+        let currentLightIntensity = 1.0;
+        function updateLightIntensity(val) {
+            currentLightIntensity = val;
+            mainLight.intensity = 0.9 * val;
+            ambientLight.intensity = 0.55 * val;
+            backLight.intensity = 0.4 * val;
+            fillLight.intensity = 0.35 * val;
+            dynamicColorLight.intensity = 0.5 * val;
+            // 让主光源稍强一点保持立体感
+            mainLight.intensity = Math.min(1.4, 0.9 * val);
+        }
+
+        // 辅助视觉元素 (简单装饰)
+        const orbitRingGeo = new THREE.TorusGeometry(2.5, 0.018, 64, 300);
+        const orbitMat = new THREE.MeshStandardMaterial({ color: 0x88aaff, emissive: 0x224466, transparent: true, opacity: 0.25 });
+        const baseRing = new THREE.Mesh(orbitRingGeo, orbitMat);
+        baseRing.rotation.x = Math.PI / 2;
+        baseRing.position.y = -1.2;
+        scene.add(baseRing);
+        const secondRing = new THREE.Mesh(orbitRingGeo, orbitMat);
+        secondRing.scale.setScalar(0.78);
+        secondRing.rotation.z = Math.PI / 3;
+        secondRing.rotation.x = Math.PI / 2.4;
+        secondRing.position.y = -0.8;
+        scene.add(secondRing);
+        const gridHelper = new THREE.GridHelper(9, 18, 0x88aaff, 0x335588);
+        gridHelper.position.y = -1.7;
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.1;
+        scene.add(gridHelper);
+
+        // ========= 2. 粒子系统 (可调节) =========
+        let starField = null;
+        let dustRing = null;
+        let currentParticleCount = 1800;
+        let currentParticleSize = 0.038;
+        let currentParticleHue = 0.55;
+
+        function regenerateParticles() {
+            if (starField) scene.remove(starField);
+            if (dustRing) scene.remove(dustRing);
+
+            const starCount = currentParticleCount;
+            const starGeo = new THREE.BufferGeometry();
+            const starPositions = new Float32Array(starCount * 3);
+            for (let i = 0; i < starCount; i++) {
+                const radius = 5 + Math.random() * 15;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+                starPositions[i*3] = radius * Math.sin(phi) * Math.cos(theta);
+                starPositions[i*3+1] = radius * Math.sin(phi) * Math.sin(theta) * 0.7;
+                starPositions[i*3+2] = radius * Math.cos(phi);
+            }
+            starGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+            const starMat = new THREE.PointsMaterial({
+                color: new THREE.Color().setHSL(currentParticleHue, 0.7, 0.65),
+                size: currentParticleSize,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                opacity: 0.55
+            });
+            starField = new THREE.Points(starGeo, starMat);
+            scene.add(starField);
+
+            const dustCount = Math.floor(currentParticleCount * 0.65);
+            const dustGeo = new THREE.BufferGeometry();
+            const dustPositions = new Float32Array(dustCount * 3);
+            for (let i = 0; i < dustCount; i++) {
+                const r = 1.9 + Math.random() * 1.7;
+                const angle = Math.random() * Math.PI * 2;
+                const y = (Math.random() - 0.5) * 1.9;
+                dustPositions[i*3] = Math.cos(angle) * r;
+                dustPositions[i*3+1] = y;
+                dustPositions[i*3+2] = Math.sin(angle) * r;
+            }
+            dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+            const dustMat = new THREE.PointsMaterial({
+                color: new THREE.Color().setHSL(currentParticleHue + 0.12, 0.8, 0.6),
+                size: currentParticleSize * 0.7,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                opacity: 0.5
+            });
+            dustRing = new THREE.Points(dustGeo, dustMat);
+            scene.add(dustRing);
+        }
+
+        function updateParticleColors() {
+            if (starField && starField.material) {
+                starField.material.color.setHSL(currentParticleHue, 0.7, 0.65);
+                starField.material.size = currentParticleSize;
+            }
+            if (dustRing && dustRing.material) {
+                dustRing.material.color.setHSL(currentParticleHue + 0.12, 0.8, 0.6);
+                dustRing.material.size = currentParticleSize * 0.7;
+            }
+        }
+
+        regenerateParticles();
+
+        // ========= 3. 核心物体 (多种形态，支持参数调节) =========
+        let currentObject = null;
+        let currentAnimCallback = null;
+        let currentType = 'crystal';
+
+        // 用户调节参数
+        let rotateSpeedFactor = 0.70;
+        let pulseStrength = 0.045;
+        let emissiveIntensity = 0.48;
+
+        const objectsLibrary = {
+            crystal: {
+                name: '💎 晶核棱镜',
+                create: () => {
+                    const geom = new THREE.IcosahedronGeometry(1.1, 0);
+                    const mat = new THREE.MeshStandardMaterial({ color: 0x3a86ff, emissive: 0x331a88, roughness: 0.28, metalness: 0.72, transparent: true, opacity: 0.92 });
+                    const mesh = new THREE.Mesh(geom, mat);
+                    const wireMat = new THREE.MeshBasicMaterial({ color: 0x88aaff, wireframe: true, transparent: true, opacity: 0.25 });
+                    const wireframe = new THREE.Mesh(geom, wireMat);
+                    wireframe.scale.setScalar(1.05);
+                    mesh.add(wireframe);
+                    return mesh;
+                },
+                animate: (obj, t) => {
+                    const scale = 1 + Math.sin(t * 2.2) * pulseStrength;
+                    obj.scale.set(scale, scale, scale);
+                    if (obj.material) obj.material.emissiveIntensity = emissiveIntensity + Math.sin(t * 1.8) * 0.12;
+                    obj.rotation.y += 0.008 * rotateSpeedFactor;
+                    obj.rotation.x += 0.003 * rotateSpeedFactor;
+                }
+            },
+            torus: {
+                name: '🌀 霓虹环结',
+                create: () => {
+                    const geom = new THREE.TorusKnotGeometry(1.0, 0.21, 200, 26, 3, 4);
+                    const mat = new THREE.MeshStandardMaterial({ color: 0xff66aa, emissive: 0x551133, roughness: 0.32, metalness: 0.8 });
+                    const knot = new THREE.Mesh(geom, mat);
+                    // 少量内粒子晕
+                    const innerParticles = new THREE.BufferGeometry();
+                    const posArray = [];
+                    for (let i = 0; i < 350; i++) {
+                        const rad = 1.2;
+                        const theta = Math.random() * Math.PI * 2;
+                        const phi = Math.acos(2 * Math.random() - 1);
+                        posArray.push(rad * Math.sin(phi) * Math.cos(theta), rad * Math.sin(phi) * Math.sin(theta) * 0.7, rad * Math.cos(phi));
+                    }
+                    innerParticles.setAttribute('position', new THREE.BufferAttribute(new Float32Array(posArray), 3));
+                    const pMat = new THREE.PointsMaterial({ color: 0xff99cc, size: 0.022, blending: THREE.AdditiveBlending });
+                    knot.add(new THREE.Points(innerParticles, pMat));
+                    return knot;
+                },
+                animate: (obj, t) => {
+                    obj.rotation.x = t * 0.5 * rotateSpeedFactor;
+                    obj.rotation.y = t * 0.7 * rotateSpeedFactor;
+                    obj.rotation.z = t * 0.3 * rotateSpeedFactor;
+                    if (obj.material) {
+                        const r = 0.6 + Math.sin(t) * 0.3;
+                        const g = 0.3 + Math.sin(t * 1.3) * 0.4;
+                        const b = 0.8 + Math.cos(t * 0.9) * 0.2;
+                        obj.material.color.setRGB(r, g, b);
+                        obj.material.emissiveIntensity = emissiveIntensity + Math.sin(t * 1.2) * 0.18;
+                    }
+                }
+            },
+            helix: {
+                name: '🌊 螺旋星轨',
+                create: () => {
+                    const group = new THREE.Group();
+                    const points = [];
+                    const turns = 2.3;
+                    const radius = 0.92;
+                    for (let i = 0; i <= 130; i++) {
+                        const tRatio = i / 130;
+                        const y = -0.9 + tRatio * 1.8;
+                        const ang = tRatio * Math.PI * 2 * turns;
+                        points.push(new THREE.Vector3(Math.cos(ang) * radius, y, Math.sin(ang) * radius));
+                    }
+                    const tubeGeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 220, 0.085, 8, false);
+                    const material = new THREE.MeshStandardMaterial({ color: 0x66ccff, emissive: 0x2266aa, metalness: 0.65 });
+                    const tube = new THREE.Mesh(tubeGeo, material);
+                    group.add(tube);
+                    return group;
+                },
+                animate: (obj, t) => {
+                    obj.rotation.y = t * 0.42 * rotateSpeedFactor;
+                    obj.rotation.x = Math.sin(t * 0.5) * 0.18;
+                    if (obj.children[0] && obj.children[0].material) obj.children[0].material.emissiveIntensity = emissiveIntensity + Math.sin(t) * 0.15;
+                }
+            },
+            sphereIco: {
+                name: '🌟 流光球体',
+                create: () => {
+                    const geom = new THREE.SphereGeometry(0.98, 32, 32);
+                    const mat = new THREE.MeshStandardMaterial({ color: 0x77aaff, emissive: 0x2266aa, roughness: 0.22, metalness: 0.85 });
+                    const sphere = new THREE.Mesh(geom, mat);
+                    const edges = new THREE.EdgesGeometry(geom);
+                    const wire = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({ color: 0xaaccff }));
+                    sphere.add(wire);
+                    return sphere;
+                },
+                animate: (obj, t) => {
+                    const pulse = 1 + Math.sin(t * 2.4) * pulseStrength;
+                    obj.scale.set(pulse, pulse, pulse);
+                    if (obj.material) {
+                        const hue = (t * 0.2) % 1;
+                        obj.material.color.setHSL(hue, 0.75, 0.6);
+                        obj.material.emissiveIntensity = emissiveIntensity + Math.sin(t) * 0.16;
+                    }
+                    obj.rotation.y += 0.007 * rotateSpeedFactor;
+                }
+            }
+        };
+
+        const objectKeys = ['crystal', 'torus', 'helix', 'sphereIco'];
+        let currentIdx = 0;
+
+        function switchToObject(id) {
+            if (currentObject) scene.remove(currentObject);
+            const def = objectsLibrary[id];
+            if (!def) return;
+            const newObj = def.create();
+            currentObject = newObj;
+            currentType = id;
+            currentAnimCallback = def.animate;
+            scene.add(currentObject);
+            document.getElementById('currentObjectLabel').innerText = def.name;
+            // 切换时短促光源反馈
+            dynamicColorLight.intensity = 0.9 * currentLightIntensity;
+            setTimeout(() => { dynamicColorLight.intensity = 0.5 * currentLightIntensity; }, 200);
+        }
+
+        switchToObject('crystal');
+
+        document.getElementById('toggleObjectBtn').addEventListener('click', () => {
+            currentIdx = (currentIdx + 1) % objectKeys.length;
+            switchToObject(objectKeys[currentIdx]);
+        });
+
+        // ========= 4. UI 绑定与实时更新 =========
+        // 粒子控件
+        const particleCountSlider = document.getElementById('particleCountSlider');
+        const particleCountVal = document.getElementById('particleCountVal');
+        const particleSizeSlider = document.getElementById('particleSizeSlider');
+        const particleSizeVal = document.getElementById('particleSizeVal');
+        const particleHueSlider = document.getElementById('particleHueSlider');
+        const particleHueVal = document.getElementById('particleHueVal');
+        // 形态控件
+        const rotateSpeedSlider = document.getElementById('rotateSpeedSlider');
+        const rotateSpeedVal = document.getElementById('rotateSpeedVal');
+        const pulseStrengthSlider = document.getElementById('pulseStrengthSlider');
+        const pulseStrengthVal = document.getElementById('pulseStrengthVal');
+        const emissiveSlider = document.getElementById('emissiveSlider');
+        const emissiveVal = document.getElementById('emissiveVal');
+        // 光线控件
+        const lightIntensitySlider = document.getElementById('lightIntensitySlider');
+        const lightIntensityVal = document.getElementById('lightIntensityVal');
+
+        particleCountSlider.addEventListener('input', (e) => {
+            currentParticleCount = parseInt(e.target.value);
+            particleCountVal.innerText = currentParticleCount;
+            regenerateParticles();
+            updateParticleColors();
+        });
+        particleSizeSlider.addEventListener('input', (e) => {
+            currentParticleSize = parseFloat(e.target.value);
+            particleSizeVal.innerText = currentParticleSize.toFixed(3);
+            updateParticleColors();
+        });
+        particleHueSlider.addEventListener('input', (e) => {
+            currentParticleHue = parseFloat(e.target.value);
+            particleHueVal.innerText = currentParticleHue.toFixed(2);
+            updateParticleColors();
+        });
+        rotateSpeedSlider.addEventListener('input', (e) => {
+            rotateSpeedFactor = parseFloat(e.target.value);
+            rotateSpeedVal.innerText = rotateSpeedFactor.toFixed(2);
+        });
+        pulseStrengthSlider.addEventListener('input', (e) => {
+            pulseStrength = parseFloat(e.target.value);
+            pulseStrengthVal.innerText = pulseStrength.toFixed(3);
+        });
+        emissiveSlider.addEventListener('input', (e) => {
+            emissiveIntensity = parseFloat(e.target.value);
+            emissiveVal.innerText = emissiveIntensity.toFixed(2);
+        });
+        lightIntensitySlider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            lightIntensityVal.innerText = val.toFixed(2);
+            updateLightIntensity(val);
+        });
+
+        // 面板收起/展开
+        const panel = document.getElementById('controlPanel');
+        const toggleBtn = document.getElementById('panelToggleBtn');
+        let isCollapsed = false;
+        toggleBtn.addEventListener('click', () => {
+            isCollapsed = !isCollapsed;
+            if (isCollapsed) {
+                panel.classList.add('collapsed');
+                toggleBtn.innerHTML = '▶';
+            } else {
+                panel.classList.remove('collapsed');
+                toggleBtn.innerHTML = '◀';
+            }
+        });
+
+        // 初始光线强度设置默认1.0
+        updateLightIntensity(1.0);
+
+        // 动画循环 & 全局动态光效
+        let clock = new THREE.Clock();
+        function animateGlobal(t) {
+            dynamicColorLight.position.x = 2.0 * Math.sin(t * 0.7);
+            dynamicColorLight.position.z = 1.9 * Math.cos(t * 0.8);
+            if (starField) starField.rotation.y += 0.0004;
+            if (dustRing) dustRing.rotation.y += 0.002;
+            baseRing.rotation.z += 0.0015;
+            secondRing.rotation.x += 0.001;
+            bloomPass.strength = 0.62 + Math.sin(t * 0.4) * 0.05;
+        }
+
+        function renderLoop() {
+            const elapsed = performance.now() / 1000;
+            if (currentObject && currentAnimCallback) {
+                currentAnimCallback(currentObject, elapsed);
+            }
+            animateGlobal(elapsed);
+            controls.update();
+            effectComposer.render();
+            requestAnimationFrame(renderLoop);
+        }
+        renderLoop();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            effectComposer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        console.log('简洁面板已启动 | 包含光线强度调节');
+    </script>
+</body>
+</html>
