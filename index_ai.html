@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wang Jing - Personal Homepage</title>
+    <meta name="description" content="王京的个人主页 - 电子科技大学生物医学工程硕士">
+    <link rel="icon" href="imgs/life_and_others/myavtar.png" type="image/png">
+    <link rel="apple-touch-icon" href="imgs/life_and_others/myavtar.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg-primary: #050505;
+            --bg-secondary: #0a0a0a;
+            --bg-card: rgba(26, 26, 26, 0.6);
+            --bg-card-hover: rgba(40, 40, 40, 0.6);
+            --text-primary: #e5e5e5;
+            --text-secondary: #a3a3a3;
+            --text-muted: #737373;
+            --accent: #3b82f6;
+            --accent-deep: #2563eb;
+            --border: rgba(255,255,255,0.05);
+            --border-hover: rgba(255,255,255,0.1);
+            --indigo: #4f46e5;
+            --pink: #ec4899;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== Navbar ===== */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(5,5,5,0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+        .navbar-inner {
+            max-width: 1280px; margin: 0 auto;
+            padding: 0.6rem 1.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .navbar-brand {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.15rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            color: var(--text-primary); text-decoration: none;
+            flex-shrink: 0;
+        }
+        .navbar-brand span { color: var(--accent); }
+
+        .nav-center {
+            display: flex; gap: 0.15rem; align-items: center;
+        }
+        .nav-center a {
+            color: var(--text-secondary); text-decoration: none;
+            font-size: 0.7rem; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            padding: 0.35rem 0.6rem; border-radius: 6px;
+            transition: color 0.15s, background 0.15s;
+            white-space: nowrap;
+        }
+        .nav-center a:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-center a.active { color: #fff; }
+
+        /* Dropdown */
+        .nav-dropdown {
+            position: relative;
+        }
+        .nav-dropdown-btn {
+            color: var(--text-secondary); background: none; border: none; cursor: pointer;
+            font-size: 0.7rem; font-weight: 500; font-family: 'Inter', sans-serif;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            padding: 0.35rem 0.6rem; border-radius: 6px;
+            display: flex; align-items: center; gap: 0.3rem;
+            transition: color 0.15s, background 0.15s;
+        }
+        .nav-dropdown-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-dropdown-btn i { font-size: 0.55rem; transition: transform 0.2s; }
+        .nav-dropdown.open .nav-dropdown-btn i { transform: rotate(180deg); }
+
+        .nav-dropdown-menu {
+            display: none; position: absolute; top: calc(100% + 8px); right: 0;
+            background: #141414; border: 1px solid var(--border-hover);
+            border-radius: 12px; padding: 0.5rem;
+            min-width: 220px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            animation: dropdown-in 0.2s ease-out;
+            z-index: 200;
+        }
+        .nav-dropdown.open .nav-dropdown-menu { display: block; }
+        @keyframes dropdown-in {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-group-label {
+            font-size: 0.6rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.1em; color: var(--text-muted);
+            padding: 0.5rem 0.75rem 0.25rem;
+        }
+        .dropdown-divider {
+            height: 1px; background: var(--border); margin: 0.35rem 0.5rem;
+        }
+        .nav-dropdown-menu a {
+            display: flex; align-items: center; gap: 0.6rem;
+            color: var(--text-secondary); text-decoration: none;
+            font-size: 0.8rem; padding: 0.5rem 0.75rem;
+            border-radius: 8px; transition: color 0.15s, background 0.15s;
+            text-transform: none; letter-spacing: 0;
+        }
+        .nav-dropdown-menu a:hover { color: #fff; background: rgba(255,255,255,0.06); }
+        .nav-dropdown-menu a i { width: 16px; text-align: center; font-size: 0.75rem; color: var(--text-muted); }
+        .nav-dropdown-menu a:hover i { color: var(--accent); }
+
+        .mobile-toggle { display: none; background: none; border: none; color: var(--text-primary); font-size: 1.15rem; cursor: pointer; padding: 0.4rem; }
+        .mobile-menu { display: none; }
+
+        @media (max-width: 768px) {
+            .nav-center { display: none; }
+            .mobile-toggle { display: block; }
+            .mobile-menu.open {
+                display: flex; flex-direction: column;
+                padding: 0.5rem 1.5rem 1rem; gap: 0;
+                border-top: 1px solid var(--border);
+                max-height: 70vh; overflow-y: auto;
+            }
+            .mobile-menu a {
+                color: var(--text-secondary); text-decoration: none;
+                font-size: 0.85rem; padding: 0.55rem 0;
+                border-bottom: 1px solid var(--border);
+            }
+            .mobile-menu a:hover { color: #fff; }
+            .mobile-group-label {
+                font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+                letter-spacing: 0.08em; color: var(--text-muted);
+                padding: 0.8rem 0 0.2rem; border: none;
+            }
+        }
+
+        /* ===== Hero ===== */
+        .hero {
+            min-height: 100vh; display: flex; align-items: center;
+            position: relative; overflow: hidden;
+            padding-top: 60px;
+        }
+        .hero-bg {
+            position: absolute; inset: 0; z-index: 0;
+            background: radial-gradient(ellipse at 20% 50%, rgba(79,70,229,0.12) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 80%, rgba(236,72,153,0.06) 0%, transparent 50%);
+        }
+        .hero-grid {
+            position: absolute; inset: 0; z-index: 0;
+            background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .hero-inner {
+            max-width: 1280px; margin: 0 auto; padding: 0 1.5rem;
+            position: relative; z-index: 1;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+        }
+        .hero-text h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 500; line-height: 0.95;
+            text-transform: uppercase; letter-spacing: -0.02em;
+            margin-bottom: 1.5rem;
+        }
+        .hero-text h1 .gradient-text {
+            background: linear-gradient(to right, var(--indigo), var(--pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-text .tagline {
+            font-size: 1.05rem; color: var(--text-secondary);
+            line-height: 1.7; margin-bottom: 2rem; max-width: 480px;
+        }
+        .hero-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.7rem 1.5rem; border-radius: 9999px;
+            background: #fff; color: #000;
+            font-size: 0.8rem; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            text-decoration: none; border: none; cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255,255,255,0.15); }
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.7rem 1.5rem; border-radius: 9999px;
+            background: transparent; color: var(--text-primary);
+            font-size: 0.8rem; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            text-decoration: none; border: 1px solid var(--border-hover); cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
+
+        .hero-visual {
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
+        }
+        .avatar-wrapper {
+            position: relative; width: 320px; height: 400px;
+        }
+        .avatar-wrapper img {
+            width: 100%; height: 100%; object-fit: cover;
+            border-radius: 1.25rem;
+            border: 2px solid var(--border-hover);
+            box-shadow: 0 0 30px rgba(59,130,246,0.1);
+        }
+        .avatar-glow {
+            position: absolute; inset: -30%; z-index: -1;
+            background: radial-gradient(circle, rgba(79,70,229,0.2) 0%, transparent 60%);
+            filter: blur(40px);
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .stats-row {
+            display: flex; gap: 2rem; margin-top: 2.5rem;
+        }
+        .stat-item { text-align: left; }
+        .stat-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.75rem; font-weight: 500;
+            color: var(--accent);
+        }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        @media (max-width: 768px) {
+            .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 2rem; padding-top: 2rem; }
+            .hero-text .tagline { margin-left: auto; margin-right: auto; }
+            .hero-actions { justify-content: center; }
+            .stats-row { justify-content: center; }
+            .avatar-wrapper { width: 140px; height: 140px; }
+        }
+
+        /* ===== Sections ===== */
+        .section {
+            padding: 5rem 1.5rem;
+            max-width: 1280px; margin: 0 auto;
+        }
+        .section-label {
+            font-size: 0.7rem; font-weight: 500;
+            text-transform: uppercase; letter-spacing: 0.15em;
+            color: var(--accent); margin-bottom: 0.6rem;
+        }
+        .section-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
+            font-weight: 500; text-transform: uppercase;
+            margin-bottom: 2.5rem;
+        }
+
+        /* ===== About ===== */
+        .about-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;
+        }
+        .about-text p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 1.25rem; font-size: 0.95rem; }
+        .about-text p strong { color: var(--text-primary); }
+
+        .info-cards { display: flex; flex-direction: column; gap: 0.85rem; }
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem; padding: 1.1rem 1.25rem;
+            display: flex; align-items: center; gap: 0.85rem;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .info-card:hover { border-color: var(--border-hover); background: var(--bg-card-hover); }
+        .info-card-icon {
+            width: 36px; height: 36px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem; flex-shrink: 0;
+        }
+        .info-card-icon.blue { background: rgba(59,130,246,0.15); color: var(--accent); }
+        .info-card-icon.indigo { background: rgba(79,70,229,0.15); color: var(--indigo); }
+        .info-card-icon.pink { background: rgba(236,72,153,0.15); color: var(--pink); }
+        .info-card-icon.green { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .info-card-text h4 { font-size: 0.85rem; font-weight: 600; margin-bottom: 0.1rem; }
+        .info-card-text p { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+
+        @media (max-width: 768px) {
+            .about-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ===== Skills ===== */
+        .skills-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem;
+        }
+        .skill-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem; padding: 1.25rem;
+            transition: border-color 0.15s, transform 0.2s;
+        }
+        .skill-card:hover { border-color: var(--border-hover); transform: translateY(-2px); }
+        .skill-card-header { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.85rem; }
+        .skill-icon {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
+        }
+        .skill-card-header h3 { font-size: 0.9rem; font-weight: 600; }
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+        .skill-tag {
+            font-size: 0.65rem; padding: 0.25rem 0.6rem;
+            border-radius: 9999px; font-weight: 500;
+            background: rgba(255,255,255,0.05); color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        /* ===== Timeline ===== */
+        .timeline { position: relative; padding-left: 2rem; }
+        .timeline::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 2px; background: linear-gradient(to bottom, var(--accent), var(--indigo), transparent);
+        }
+        .timeline-item { position: relative; margin-bottom: 2.25rem; }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -2rem; top: 6px;
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent); border: 2px solid var(--bg-primary);
+            transform: translateX(-4px);
+        }
+        .timeline-year {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.75rem; color: var(--accent);
+            letter-spacing: 0.05em; margin-bottom: 0.25rem;
+        }
+        .timeline-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem; }
+        .timeline-desc { font-size: 0.8rem; color: var(--text-muted); line-height: 1.6; }
+
+        /* ===== Connect ===== */
+        .connect-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.85rem;
+        }
+        .connect-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 1rem; padding: 1.25rem;
+            display: flex; align-items: center; gap: 0.85rem;
+            text-decoration: none; color: var(--text-primary);
+            transition: border-color 0.15s, background 0.15s, transform 0.2s;
+        }
+        .connect-card:hover { border-color: var(--border-hover); background: var(--bg-card-hover); transform: translateY(-2px); }
+        .connect-card i { font-size: 1.15rem; width: 24px; text-align: center; }
+        .connect-card-text { font-size: 0.85rem; font-weight: 500; }
+        .connect-card-sub { font-size: 0.65rem; color: var(--text-muted); }
+
+        /* ===== Footer ===== */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 1.5rem 1.5rem;
+            text-align: center;
+        }
+        .footer-inner { max-width: 1280px; margin: 0 auto; }
+        .footer p { font-size: 0.75rem; color: var(--text-muted); }
+        .footer a { color: var(--text-secondary); text-decoration: none; transition: color 0.15s; }
+        .footer a:hover { color: #fff; }
+        .alt-page-link { opacity: 0.15; transition: opacity 0.3s; font-size: 0.6rem; color: var(--text-muted); text-decoration: none; position: fixed; bottom: 8px; right: 12px; z-index: 50; }
+        .alt-page-link:hover { opacity: 0.6; }
+
+        /* ===== Modal ===== */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            justify-content: center; align-items: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #1a1a1a; border-radius: 1rem;
+            padding: 1.75rem; text-align: center;
+            border: 1px solid var(--border-hover);
+            max-width: 320px; width: 90%;
+            animation: modal-in 0.25s ease-out;
+        }
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-box img { max-width: 100%; border-radius: 0.75rem; margin-bottom: 0.75rem; }
+        .modal-box p { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.75rem; }
+        .modal-close {
+            padding: 0.45rem 1rem; border-radius: 9999px;
+            background: rgba(255,255,255,0.1); color: var(--text-primary);
+            border: 1px solid var(--border-hover);
+            font-size: 0.75rem; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .modal-close:hover { background: rgba(255,255,255,0.15); }
+
+        /* ===== Scroll Animations ===== */
+        .reveal {
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-inner">
+        <a href="https://JingW-ui.github.io/" class="navbar-brand">Wang<span>Jing</span></a>
+
+        <div class="nav-center">
+            <!-- Page anchors -->
+            <a href="#hero" class="active">Home</a>
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#education">Education</a>
+            <a href="#connect">Connect</a>
+
+            <!-- Dropdown: Pages -->
+            <div class="nav-dropdown" id="dropdownPages">
+                <button class="nav-dropdown-btn" onclick="toggleDropdown('dropdownPages')">
+                    Pages <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="nav-dropdown-menu">
+                    <div class="dropdown-group-label">Career</div>
+                    <a href="/resume/"><i class="fas fa-file-alt"></i> Resume</a>
+                    <a href="/cv/"><i class="fas fa-graduation-cap"></i> CV</a>
+                    <a href="/carousel/"><i class="fas fa-trophy"></i> Rewards</a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-group-label">Projects</div>
+                    <a href="/videos/"><i class="fas fa-project-diagram"></i> Projects</a>
+                    <a href="/web_demos/"><i class="fas fa-globe"></i> Web Demos</a>
+                    <a href="/Games/"><i class="fas fa-gamepad"></i> Games</a>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-group-label">Resources</div>
+                    <a href="/Software_Downloads/"><i class="fas fa-download"></i> Downloads</a>
+                    <a href="/tools/"><i class="fas fa-wrench"></i> Tools</a>
+                    <a href="/skills/"><i class="fas fa-chart-bar"></i> Skills</a>
+                    <a href="/director/"><i class="fas fa-folder-open"></i> Director</a>
+                    <a href="/phone/"><i class="fas fa-mobile-alt"></i> Receiver</a>
+                </div>
+            </div>
+        </div>
+
+        <button class="mobile-toggle" onclick="toggleMobile()" aria-label="Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-group-label">Navigation</div>
+        <a href="#hero" onclick="closeMobile()">Home</a>
+        <a href="#about" onclick="closeMobile()">About</a>
+        <a href="#skills" onclick="closeMobile()">Skills</a>
+        <a href="#education" onclick="closeMobile()">Education</a>
+        <a href="#connect" onclick="closeMobile()">Connect</a>
+        <div class="mobile-group-label">Career</div>
+        <a href="/resume/" onclick="closeMobile()">Resume</a>
+        <a href="/cv/" onclick="closeMobile()">CV</a>
+        <a href="/carousel/" onclick="closeMobile()">Rewards</a>
+        <div class="mobile-group-label">Projects</div>
+        <a href="/videos/" onclick="closeMobile()">Projects</a>
+        <a href="/web_demos/" onclick="closeMobile()">Web Demos</a>
+        <a href="/Games/" onclick="closeMobile()">Games</a>
+        <div class="mobile-group-label">Resources</div>
+        <a href="/Software_Downloads/" onclick="closeMobile()">Downloads</a>
+        <a href="/tools/" onclick="closeMobile()">Tools</a>
+        <a href="/skills/" onclick="closeMobile()">Skills</a>
+        <a href="/director/" onclick="closeMobile()">Director</a>
+        <a href="/phone/" onclick="closeMobile()">Receiver</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+        <div class="hero-text">
+            <h1>
+                Wang<br><span class="gradient-text">Jing</span>
+            </h1>
+            <p class="tagline">
+                Master's student in Biomedical Engineering at UESTC. Bridging AI innovation and medical application through high-performance computer vision and intelligent systems.
+            </p>
+            <div class="hero-actions">
+                <a href="#about" class="btn-primary">
+                    About Me <i class="fas fa-arrow-down" style="font-size:0.7rem;"></i>
+                </a>
+                <a href="#connect" class="btn-secondary">
+                    Get In Touch <i class="fas fa-paper-plane" style="font-size:0.7rem;"></i>
+                </a>
+            </div>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value">4.15</div>
+                    <div class="stat-label">BSc GPA (Top 2%)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">2+</div>
+                    <div class="stat-label">SCI Publications</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">5+</div>
+                    <div class="stat-label">National Awards</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="avatar-wrapper">
+                <img src="imgs/life_and_others/io_pic.png" alt="Wang Jing">
+                <div class="avatar-glow"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About -->
+<section class="section reveal" id="about">
+    <div class="section-label">About Me</div>
+    <h2 class="section-title">Short Bio</h2>
+    <div class="about-grid">
+        <div class="about-text">
+            <p>
+                I am a Master's student in Biomedical Engineering at the <strong>University of Electronic Science and Technology of China (UESTC)</strong>. I focus on the research and development of intelligent medical systems, integrating deep learning, computer vision, and software engineering to create innovative solutions for clinical diagnostics and safety monitoring.
+            </p>
+            <p>
+                In 2024, I graduated with a Bachelor's degree from <strong>Southwest University of Science and Technology</strong> (top 2% GPA: 4.15/5, Outstanding Graduate of Sichuan Province). Now pursuing my Master's at UESTC (top 5% GPA: 3.83/4), specializing in medical imaging and brain-computer interface.
+            </p>
+            <p>
+                Beyond academics, I'm an influential fitness vlogger (5k+ Douyin followers) and professional photographer (100+ clients). My goal is to excel as a senior algorithm engineer in intelligent medical systems, driving impactful innovations in healthcare.
+            </p>
+        </div>
+        <div class="info-cards">
+            <div class="info-card">
+                <div class="info-card-icon blue"><i class="fas fa-brain"></i></div>
+                <div class="info-card-text">
+                    <h4>Research Focus</h4>
+                    <p>High-Performance CV & Medical Image Processing</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon indigo"><i class="fas fa-robot"></i></div>
+                <div class="info-card-text">
+                    <h4>AI-Native Engineering</h4>
+                    <p>Software Engineering & Intelligent Agents</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon pink"><i class="fas fa-award"></i></div>
+                <div class="info-card-text">
+                    <h4>Achievements</h4>
+                    <p>1 Patent · 4 Software Copyrights · National Prizes</p>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="info-card-icon green"><i class="fas fa-camera"></i></div>
+                <div class="info-card-text">
+                    <h4>Beyond Code</h4>
+                    <p>Fitness Vlogger · Professional Photographer</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Skills -->
+<section class="section reveal" id="skills">
+    <div class="section-label">Technical</div>
+    <h2 class="section-title">Skills & Tools</h2>
+    <div class="skills-grid">
+        <div class="skill-card">
+            <div class="skill-card-header">
+                <div class="skill-icon" style="background:rgba(59,130,246,0.15);color:var(--accent);"><i class="fas fa-code"></i></div>
+                <h3>Languages</h3>
+            </div>
+            <div class="skill-tags">
+                <span class="skill-tag">Python</span>
+                <span class="skill-tag">Java</span>
+                <span class="skill-tag">C/C++</span>
+                <span class="skill-tag">JavaScript</span>
+                <span class="skill-tag">MATLAB</span>
+            </div>
+        </div>
+        <div class="skill-card">
+            <div class="skill-card-header">
+                <div class="skill-icon" style="background:rgba(79,70,229,0.15);color:var(--indigo);"><i class="fas fa-network-wired"></i></div>
+                <h3>Deep Learning</h3>
+            </div>
+            <div class="skill-tags">
+                <span class="skill-tag">YOLO</span>
+                <span class="skill-tag">nnU-Net</span>
+                <span class="skill-tag">Transformer</span>
+                <span class="skill-tag">PyTorch</span>
+            </div>
+        </div>
+        <div class="skill-card">
+            <div class="skill-card-header">
+                <div class="skill-icon" style="background:rgba(236,72,153,0.15);color:var(--pink);"><i class="fas fa-eye"></i></div>
+                <h3>Computer Vision</h3>
+            </div>
+            <div class="skill-tags">
+                <span class="skill-tag">Object Detection</span>
+                <span class="skill-tag">Segmentation</span>
+                <span class="skill-tag">Medical Imaging</span>
+                <span class="skill-tag">OpenCV</span>
+            </div>
+        </div>
+        <div class="skill-card">
+            <div class="skill-card-header">
+                <div class="skill-icon" style="background:rgba(34,197,94,0.15);color:#22c55e;"><i class="fas fa-server"></i></div>
+                <h3>Engineering</h3>
+            </div>
+            <div class="skill-tags">
+                <span class="skill-tag">Git</span>
+                <span class="skill-tag">Docker</span>
+                <span class="skill-tag">Claude code</span>
+                <span class="skill-tag">Agent</span>
+                <span class="skill-tag">Qoder</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Education Timeline -->
+<section class="section reveal" id="education">
+    <div class="section-label">Background</div>
+    <h2 class="section-title">Education & Highlights</h2>
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-year">2024 – Present</div>
+            <div class="timeline-title">M.Eng. in Biomedical Engineering — UESTC</div>
+            <div class="timeline-desc">GPA 3.83/4 (Top 5%). Research in medical imaging, brain-computer interface, and colorectal cancer detection systems.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-year">2020 – 2024</div>
+            <div class="timeline-title">B.Eng. in Biomedical Engineering — SWUST</div>
+            <div class="timeline-desc">GPA 4.15/5 (Top 2%). Outstanding Graduate of Sichuan Province. Led award-winning projects in brain MRI segmentation.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-year">Highlights</div>
+            <div class="timeline-title">National First & Second Prizes · 1 Patent · 4 Software Copyrights</div>
+            <div class="timeline-desc">Colorectal cancer detection system, brain MRI segmentation (Dice 0.9554), and multiple innovation competition awards.</div>
+        </div>
+    </div>
+</section>
+
+<!-- Connect -->
+<section class="section reveal" id="connect">
+    <div class="section-label">Contact</div>
+    <h2 class="section-title">Get In Touch</h2>
+    <div class="connect-grid">
+        <a href="mailto:2642144249@qq.com" class="connect-card">
+            <i class="fas fa-envelope" style="color:#DB4437;"></i>
+            <div>
+                <div class="connect-card-text">Email</div>
+                <div class="connect-card-sub">2642144249@qq.com</div>
+            </div>
+        </a>
+        <a href="https://github.com/JingW-ui" target="_blank" class="connect-card">
+            <i class="fab fa-github" style="color:#e5e5e5;"></i>
+            <div>
+                <div class="connect-card-text">GitHub</div>
+                <div class="connect-card-sub">JingW-ui</div>
+            </div>
+        </a>
+        <a href="https://www.douyin.com/user/MS4wLjABAAAAgTtnMEWyl9SeEZpMYAJgzY1zEu7sZ5Z2AkwLiN8tags" target="_blank" class="connect-card">
+            <i class="fab fa-tiktok" style="color:#ee1d52;"></i>
+            <div>
+                <div class="connect-card-text">Douyin</div>
+                <div class="connect-card-sub">5k+ Followers</div>
+            </div>
+        </a>
+        <a href="https://space.bilibili.com/521967044" target="_blank" class="connect-card">
+            <i class="fab fa-bilibili" style="color:#00a1d6;"></i>
+            <div>
+                <div class="connect-card-text">Bilibili</div>
+                <div class="connect-card-sub">Videos & Tutorials</div>
+            </div>
+        </a>
+        <a href="#" class="connect-card" onclick="openWeChat(); return false;">
+            <i class="fab fa-weixin" style="color:#07c160;"></i>
+            <div>
+                <div class="connect-card-text">WeChat</div>
+                <div class="connect-card-sub">Scan QR Code</div>
+            </div>
+        </a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-inner">
+        <p>© 2026 Wang Jing · Built with ❤️</p>
+    </div>
+</footer>
+<a href="index.html" class="alt-page-link" title="Classic">◆</a>
+
+<!-- WeChat Modal -->
+<div class="modal-overlay" id="wechatModal">
+    <div class="modal-box">
+        <img src="imgs/life_and_others/weichat.png" alt="WeChat QR Code">
+        <p>Scan to add me on WeChat</p>
+        <button class="modal-close" onclick="closeWeChat()">Close</button>
+    </div>
+</div>
+
+<script>
+    // Mobile menu
+    function toggleMobile() {
+        document.getElementById('mobileMenu').classList.toggle('open');
+    }
+    function closeMobile() {
+        document.getElementById('mobileMenu').classList.remove('open');
+    }
+
+    // Dropdown
+    function toggleDropdown(id) {
+        const el = document.getElementById(id);
+        const isOpen = el.classList.contains('open');
+        // Close all dropdowns first
+        document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+        if (!isOpen) el.classList.add('open');
+    }
+    // Close dropdown on outside click
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.nav-dropdown')) {
+            document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+        }
+    });
+
+    // WeChat modal
+    function openWeChat() {
+        document.getElementById('wechatModal').classList.add('open');
+    }
+    function closeWeChat() {
+        document.getElementById('wechatModal').classList.remove('open');
+    }
+    document.getElementById('wechatModal').addEventListener('click', function(e) {
+        if (e.target === this) closeWeChat();
+    });
+
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+
+    // Active nav link on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-center a[href^="#"]');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop - 100;
+            if (window.scrollY >= sectionTop) {
+                current = section.getAttribute('id');
+            }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
