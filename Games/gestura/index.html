@@ -364,11 +364,40 @@
         function countFingers(lm) {
             let cnt = 0;
             const wrist = lm[0];
-            [{t:8,b:5},{t:12,b:9},{t:16,b:13},{t:20,b:17}].forEach(f => {
-                const d1 = Math.hypot(lm[f.t].x-wrist.x, lm[f.t].y-wrist.y);
-                const d2 = Math.hypot(lm[f.b].x-wrist.x, lm[f.b].y-wrist.y);
-                if (d1 > d2 * 1.18) cnt++;
-            });
+            
+            // 拇指检测：使用X轴距离（考虑左右手）
+            // 判断手的朝向：中指根部相对于手腕的位置
+            const middleMCP = lm[9];
+            const isRightHand = middleMCP.x < wrist.x; // 右手：中指根部在手腕左侧
+            
+            const thumbTip = lm[4];
+            const thumbIP = lm[3];
+            const thumbMCP = lm[2];
+            
+            if (isRightHand) {
+                // 右手：拇指指尖X坐标 > 拇指关节X坐标 = 伸展
+                if (thumbTip.x > thumbIP.x) cnt++;
+            } else {
+                // 左手：拇指指尖X坐标 < 拇指关节X坐标 = 伸展
+                if (thumbTip.x < thumbIP.x) cnt++;
+            }
+            
+            // 四指检测：使用Y轴坐标比较（更稳定）
+            // 指尖Y坐标 < 指根Y坐标 = 手指伸展（屏幕坐标系Y向下为正）
+            const fingers = [
+                { tip: 8, pip: 6 },   // 食指
+                { tip: 12, pip: 10 }, // 中指
+                { tip: 16, pip: 14 }, // 无名指
+                { tip: 20, pip: 18 }  // 小指
+            ];
+            
+            for (const f of fingers) {
+                // 指尖高于指根关节 = 伸展
+                if (lm[f.tip].y < lm[f.pip].y) {
+                    cnt++;
+                }
+            }
+            
             return cnt;
         }
 
@@ -385,12 +414,14 @@
             let gesture = 0;
 
             if (detectedHands > 0) {
-                let maxF = 0;
+                let totalFingers = 0;
                 for (const h of r.multiHandLandmarks) {
-                    const f = countFingers(h);
-                    if (f > maxF) maxF = f;
+                    totalFingers += countFingers(h);
                 }
-                if (maxF >= 1 && maxF <= 9) gesture = maxF;
+                // 双手手指总数：1-9 有效
+                if (totalFingers >= 1 && totalFingers <= 9) {
+                    gesture = totalFingers;
+                }
 
                 if (detectedHands >= 2) {
                     const a = r.multiHandLandmarks[0][9];
