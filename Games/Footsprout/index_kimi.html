@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js 枯木逢春跑酷 Demo</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #1a1a2e; }
+        canvas { display: block; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        #info {
+            position: absolute; top: 10px; left: 10px; color: #fff;
+            font-family: 'Microsoft YaHei', sans-serif; font-size: 14px;
+            background: rgba(0,0,0,0.6); padding: 15px; border-radius: 8px;
+            pointer-events: none; line-height: 1.6; z-index: 10;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        #info span { color: #7ee787; font-weight: bold; }
+        #combo { color: #FFD700; }
+        #error {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            color: #ff6b6b; font-family: sans-serif; font-size: 16px;
+            background: rgba(0,0,0,0.8); padding: 20px; border-radius: 8px;
+            display: none; z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <span>🌸 枯木逢春跑酷</span><br>
+        <span id="score">分数: 0</span> | <span id="combo">连击: 0</span><br>
+        <span style="font-size:12px; color:#aaa;">WASD/方向键 移动 | 空格跳跃 | 收集光球</span>
+    </div>
+    <div id="startScreen" style="position:absolute; top:0; left:0; width:100%; height:100%; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); display:flex; align-items:center; justify-content:center; z-index:300;">
+        <div style="text-align:center; color:#fff; font-family:'Microsoft YaHei',sans-serif;">
+            <div style="font-size:48px; margin-bottom:20px; animation:pulse 2s infinite;">🌸</div>
+            <h1 style="font-size:36px; margin:0 0 20px 0;">枯木逢春跑酷</h1>
+            <p style="font-size:18px; margin:10px 0;">踩过的地面会开出花草</p>
+            <p style="font-size:16px; margin:10px 0; color:#FFD700;">收集光球获得高分 | 保持连击获得加成</p>
+            <div style="margin-top:30px;">
+                <button id="startBtn" style="padding:15px 50px; font-size:20px; background:#7ee787; border:none; border-radius:8px; cursor:pointer; transition:transform 0.2s;">开始游戏</button>
+            </div>
+            <div style="margin-top:20px; font-size:14px; color:#ddd;">
+                <p>WASD / 方向键 - 移动</p>
+                <p>空格 - 跳跃</p>
+            </div>
+        </div>
+    </div>
+    <div id="gameOver" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#fff; font-family:'Microsoft YaHei',sans-serif; font-size:24px; background:rgba(0,0,0,0.8); padding:30px; border-radius:12px; text-align:center; z-index:200;">
+        <div style="font-size:32px; margin-bottom:20px;">🎮 游戏结束</div>
+        <div>最终分数: <span id="finalScore" style="color:#7ee787;">0</span></div>
+        <div style="margin-top:10px; font-size:16px; color:#aaa;">最高连击: <span id="maxCombo">0</span></div>
+        <button id="restartBtn" style="margin-top:20px; padding:10px 30px; font-size:18px; background:#7ee787; border:none; border-radius:6px; cursor:pointer; pointer-events:auto;">重新开始</button>
+    </div>
+    
+    <!-- 移动端触控控制 -->
+    <div id="mobileControls" style="display:none; position:fixed; bottom:20px; left:0; width:100%; z-index:50; pointer-events:none;">
+        <div style="display:flex; justify-content:space-between; padding:0 20px;">
+            <div id="dpad" style="position:relative; width:150px; height:150px; pointer-events:auto;">
+                <div id="btn-up" style="position:absolute; top:0; left:50%; transform:translateX(-50%); width:50px; height:50px; background:rgba(255,255,255,0.3); border:2px solid rgba(255,255,255,0.5); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff;">↑</div>
+                <div id="btn-down" style="position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:50px; height:50px; background:rgba(255,255,255,0.3); border:2px solid rgba(255,255,255,0.5); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff;">↓</div>
+                <div id="btn-left" style="position:absolute; left:0; top:50%; transform:translateY(-50%); width:50px; height:50px; background:rgba(255,255,255,0.3); border:2px solid rgba(255,255,255,0.5); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff;">←</div>
+                <div id="btn-right" style="position:absolute; right:0; top:50%; transform:translateY(-50%); width:50px; height:50px; background:rgba(255,255,255,0.3); border:2px solid rgba(255,255,255,0.5); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:24px; color:#fff;">→</div>
+            </div>
+            <div id="btn-jump" style="width:80px; height:80px; background:rgba(255,255,255,0.3); border:2px solid rgba(255,255,255,0.5); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; color:#fff; pointer-events:auto; align-self:flex-end;">跳跃</div>
+        </div>
+    </div>
+    <div id="error"></div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        try {
+
+            // ==================== 游戏状态 ====================
+            const gameState = {
+                score: 0,
+                combo: 0,
+                maxCombo: 0,
+                isPlaying: false,
+                gameTime: 0
+            };
+
+            // ==================== 音效系统 ====================
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            const audioCtx = new AudioContext();
+
+            function playSound(type) {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                switch(type) {
+                    case 'collect':
+                        oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                        oscillator.start(audioCtx.currentTime);
+                        oscillator.stop(audioCtx.currentTime + 0.1);
+                        break;
+                    case 'jump':
+                        oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15);
+                        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                        oscillator.start(audioCtx.currentTime);
+                        oscillator.stop(audioCtx.currentTime + 0.15);
+                        break;
+                    case 'hit':
+                        oscillator.type = 'sawtooth';
+                        oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+                        oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.2);
+                        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                        oscillator.start(audioCtx.currentTime);
+                        oscillator.stop(audioCtx.currentTime + 0.2);
+                        break;
+                }
+            }
+
+            // ==================== 场景初始化 ====================
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87CEEB);
+            scene.fog = new THREE.FogExp2(0x87CEEB, 0.015);
+
+            const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+            camera.position.set(0, 15, 20);
+            camera.lookAt(0, 0, 0);
+
+            const renderer = new THREE.WebGLRenderer({ 
+                antialias: true,
+                powerPreference: "high-performance"
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+            document.body.appendChild(renderer.domElement);
+
+            // ==================== 灯光 ====================
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            dirLight.position.set(50, 80, 30);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 2048;
+            dirLight.shadow.mapSize.height = 2048;
+            dirLight.shadow.camera.near = 0.5;
+            dirLight.shadow.camera.far = 200;
+            dirLight.shadow.camera.left = -50;
+            dirLight.shadow.camera.right = 50;
+            dirLight.shadow.camera.top = 50;
+            dirLight.shadow.camera.bottom = -50;
+            dirLight.shadow.bias = -0.0001;
+            scene.add(dirLight);
+
+            // 添加半球光增强自然光照
+            const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x3a5f3a, 0.4);
+            scene.add(hemiLight);
+
+            // 添加点光源营造氛围
+            const pointLight1 = new THREE.PointLight(0xFFB6C1, 0.5, 30);
+            pointLight1.position.set(10, 5, 10);
+            scene.add(pointLight1);
+
+            const pointLight2 = new THREE.PointLight(0x98FB98, 0.5, 30);
+            pointLight2.position.set(-10, 5, -10);
+            scene.add(pointLight2);
+
+            // ==================== 地面系统 ====================
+            const GROUND_SIZE = 80;
+            const GRID_RES = 64;
+            const CELL_SIZE = GROUND_SIZE / GRID_RES;
+
+            // 生长数据纹理
+            const growthData = new Float32Array(GRID_RES * GRID_RES * 4);
+            const growthTexture = new THREE.DataTexture(
+                growthData, GRID_RES, GRID_RES, THREE.RGBAFormat, THREE.FloatType
+            );
+            growthTexture.minFilter = THREE.LinearFilter;
+            growthTexture.magFilter = THREE.LinearFilter;
+            growthTexture.needsUpdate = true;
+
+            // 地面几何体
+            const groundGeometry = new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE, GRID_RES, GRID_RES);
+            groundGeometry.rotateX(-Math.PI / 2);
+
+            // 地面 Shader
+            const groundVertexShader = `
+                varying vec2 vUv;
+                varying vec3 vWorldPos;
+                varying vec3 vNormal;
+                void main() {
+                    vUv = uv;
+                    vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+                    vNormal = normalize(mat3(modelMatrix) * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `;
+
+            const groundFragmentShader = `
+                uniform sampler2D uGrowthMap;
+                uniform float uTime;
+                varying vec2 vUv;
+                varying vec3 vWorldPos;
+                varying vec3 vNormal;
+
+                float hash(vec2 p) {
+                    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+                }
+
+                float noise(vec2 p) {
+                    vec2 i = floor(p);
+                    vec2 f = fract(p);
+                    f = f * f * (3.0 - 2.0 * f);
+                    float a = hash(i);
+                    float b = hash(i + vec2(1.0, 0.0));
+                    float c = hash(i + vec2(0.0, 1.0));
+                    float d = hash(i + vec2(1.0, 1.0));
+                    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+                }
+
+                void main() {
+                    vec4 growthData = texture2D(uGrowthMap, vUv);
+                    float growth = growthData.r;
+
+                    vec3 deadColor = vec3(0.4, 0.3, 0.2);
+                    vec3 grassColor = vec3(0.2, 0.6, 0.2);
+                    vec3 flowerColor = vec3(0.9, 0.3, 0.5);
+
+                    float n = noise(vWorldPos.xz * 0.5);
+                    float detail = noise(vWorldPos.xz * 2.0) * 0.3;
+
+                    vec3 color = mix(deadColor, grassColor, smoothstep(0.0, 0.6, growth));
+                    color = mix(color, flowerColor, smoothstep(0.7, 1.0, growth) * n);
+                    
+                    // 添加细节纹理
+                    color += detail * 0.1 * (1.0 - growth);
+
+                    // 添加微妙的纹理图案
+                    float pattern = sin(vWorldPos.x * 10.0) * sin(vWorldPos.z * 10.0) * 0.05;
+                    color += pattern * (1.0 - growth * 0.5);
+                    
+                    // 简易光照计算
+                    vec3 lightDir = normalize(vec3(0.5, 1.0, 0.3));
+                    float diff = max(dot(vNormal, lightDir), 0.3);
+                    color *= diff;
+                    
+                    // 生长区域发光效果
+                    color += vec3(0.1, 0.2, 0.1) * growth * (0.5 + 0.5 * sin(uTime));
+
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `;
+
+            const groundMaterial = new THREE.ShaderMaterial({
+                vertexShader: groundVertexShader,
+                fragmentShader: groundFragmentShader,
+                uniforms: {
+                    uGrowthMap: { value: growthTexture },
+                    uTime: { value: 0 }
+                }
+            });
+
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // ==================== 花草实例化系统 ====================
+            const INSTANCE_COUNT = 4000;
+            const FLOWER_TYPES = 3;
+
+            function createFlowerGeometry() {
+                const geometry = new THREE.PlaneGeometry(0.3, 1.2, 1, 4);
+                geometry.translate(0, 0.6, 0);
+
+                const pos = geometry.attributes.position;
+                for (let i = 0; i < pos.count; i++) {
+                    const y = pos.getY(i);
+                    const bend = Math.pow(y / 1.2, 2) * 0.3;
+                    pos.setX(i, pos.getX(i) + bend);
+                }
+                geometry.computeVertexNormals();
+                return geometry;
+            }
+
+            const flowerGeometry = createFlowerGeometry();
+
+            const flowerVertexShader = `
+                attribute float aGrowth;
+                attribute vec3 aOffset;
+                attribute float aScale;
+                attribute float aType;
+                attribute vec3 aColor;
+
+                uniform float uTime;
+
+                varying float vGrowth;
+                varying vec3 vColor;
+                varying float vType;
+
+                mat3 rotateY(float theta) {
+                    float c = cos(theta);
+                    float s = sin(theta);
+                    return mat3(c, 0, s, 0, 1, 0, -s, 0, c);
+                }
+
+                void main() {
+                    vGrowth = aGrowth;
+                    vColor = aColor;
+                    vType = aType;
+
+                    vec3 pos = position;
+
+                    float growthScale = smoothstep(0.0, 0.3, aGrowth);
+                    float popUp = smoothstep(0.0, 0.5, aGrowth) * 1.2;
+
+                    pos.y *= growthScale * aScale;
+                    pos.y += -0.5 + popUp;
+
+                    float wind = sin(uTime * 2.0 + aOffset.x * 3.0 + aOffset.z * 2.0) * 0.15;
+                    wind += sin(uTime * 1.5 + aOffset.x) * 0.05;
+                    pos.x += wind * pos.y;
+
+                    float angle = aOffset.x * 10.0 + aOffset.z * 7.0;
+                    pos = rotateY(angle) * pos;
+
+                    vec3 worldPos = pos + aOffset;
+
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(worldPos, 1.0);
+                }
+            `;
+
+            const flowerFragmentShader = `
+                varying float vGrowth;
+                varying vec3 vColor;
+                varying float vType;
+
+                void main() {
+                    vec3 color = vColor;
+
+                    if (vGrowth < 0.01) discard;
+
+                    if (vType > 1.5 && vGrowth > 0.8) {
+                        color = mix(color, vec3(1.0, 0.8, 0.9), 0.6);
+                    }
+
+                    vec3 lightDir = normalize(vec3(1.0, 1.0, 0.5));
+                    float diff = max(dot(normalize(vec3(0.0, 1.0, 0.2)), lightDir), 0.3);
+                    color *= diff;
+
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `;
+
+            const flowerMaterial = new THREE.ShaderMaterial({
+                vertexShader: flowerVertexShader,
+                fragmentShader: flowerFragmentShader,
+                uniforms: {
+                    uTime: { value: 0 }
+                },
+                side: THREE.DoubleSide
+            });
+
+            const flowerMesh = new THREE.InstancedMesh(flowerGeometry, flowerMaterial, INSTANCE_COUNT);
+            flowerMesh.castShadow = true;
+            flowerMesh.receiveShadow = true;
+            scene.add(flowerMesh);
+
+            // ==================== 初始化花草实例数据 ====================
+            const offsets = new Float32Array(INSTANCE_COUNT * 3);
+            const scales = new Float32Array(INSTANCE_COUNT);
+            const types = new Float32Array(INSTANCE_COUNT);
+            const colors = new Float32Array(INSTANCE_COUNT * 3);
+            const growths = new Float32Array(INSTANCE_COUNT);
+            const activeFlowers = []; // 记录活跃的花草索引
+
+            let idx = 0;
+            for (let i = 0; i < INSTANCE_COUNT; i++) {
+                // 使用网格化分布，确保花草均匀覆盖整个地面
+                const gridX = i % GRID_RES;
+                const gridZ = Math.floor(i / GRID_RES);
+                
+                if (gridZ >= GRID_RES) {
+                    // 超出网格范围的花草随机分布
+                    const x = (Math.random() - 0.5) * GROUND_SIZE;
+                    const z = (Math.random() - 0.5) * GROUND_SIZE;
+                    offsets[idx * 3] = x;
+                    offsets[idx * 3 + 1] = 0;
+                    offsets[idx * 3 + 2] = z;
+                } else {
+                    // 网格内的花草，添加随机偏移使分布更自然
+                    const cellSize = GROUND_SIZE / GRID_RES;
+                    const x = (gridX - GRID_RES / 2) * cellSize + (Math.random() - 0.5) * cellSize * 0.8;
+                    const z = (gridZ - GRID_RES / 2) * cellSize + (Math.random() - 0.5) * cellSize * 0.8;
+                    offsets[idx * 3] = x;
+                    offsets[idx * 3 + 1] = 0;
+                    offsets[idx * 3 + 2] = z;
+                    activeFlowers.push(idx);
+                }
+
+                scales[idx] = 0.5 + Math.random() * 0.8;
+                types[idx] = Math.floor(Math.random() * FLOWER_TYPES);
+
+                // 根据类型设置不同的颜色
+                const type = types[idx];
+                if (type === 0) { // 绿色草
+                    colors[idx * 3] = 0.1 + Math.random() * 0.2;
+                    colors[idx * 3 + 1] = 0.5 + Math.random() * 0.4;
+                    colors[idx * 3 + 2] = 0.1 + Math.random() * 0.2;
+                } else if (type === 1) { // 粉色花
+                    colors[idx * 3] = 0.8 + Math.random() * 0.2;
+                    colors[idx * 3 + 1] = 0.3 + Math.random() * 0.3;
+                    colors[idx * 3 + 2] = 0.4 + Math.random() * 0.3;
+                } else { // 紫色花
+                    colors[idx * 3] = 0.6 + Math.random() * 0.2;
+                    colors[idx * 3 + 1] = 0.2 + Math.random() * 0.2;
+                    colors[idx * 3 + 2] = 0.7 + Math.random() * 0.3;
+                }
+
+                growths[idx] = 0;
+
+                idx++;
+            }
+
+            flowerGeometry.setAttribute('aOffset', new THREE.InstancedBufferAttribute(offsets, 3));
+            flowerGeometry.setAttribute('aScale', new THREE.InstancedBufferAttribute(scales, 1));
+            flowerGeometry.setAttribute('aType', new THREE.InstancedBufferAttribute(types, 1));
+            flowerGeometry.setAttribute('aColor', new THREE.InstancedBufferAttribute(colors, 3));
+            flowerGeometry.setAttribute('aGrowth', new THREE.InstancedBufferAttribute(growths, 1));
+
+            // ==================== 角色系统 ====================
+            const playerGeometry = new THREE.CapsuleGeometry(0.5, 1.5, 4, 8);
+            const playerMaterial = new THREE.MeshStandardMaterial({
+                color: 0xff6b6b,
+                roughness: 0.3,
+                metalness: 0.1,
+                emissive: 0xff6b6b,
+                emissiveIntensity: 0.2
+            });
+            const player = new THREE.Mesh(playerGeometry, playerMaterial);
+            player.position.y = 1.25;
+            player.castShadow = true;
+            scene.add(player);
+
+            const shadowGeo = new THREE.CircleGeometry(0.6, 32);
+            const shadowMat = new THREE.MeshBasicMaterial({
+                color: 0x000000,
+                transparent: true,
+                opacity: 0.3
+            });
+            const playerShadow = new THREE.Mesh(shadowGeo, shadowMat);
+            playerShadow.rotation.x = -Math.PI / 2;
+            playerShadow.position.y = 0.02;
+            scene.add(playerShadow);
+
+            // ==================== 障碍物系统 ====================
+            const obstacles = [];
+            const obstacleGeometry = new THREE.BoxGeometry(2, 1.5, 2);
+            const obstacleMaterial = new THREE.MeshStandardMaterial({
+                color: 0x8B4513,
+                roughness: 0.8,
+                metalness: 0.2
+            });
+
+            function createObstacle() {
+                const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial.clone());
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 10 + Math.random() * 25;
+                obstacle.position.set(
+                    Math.cos(angle) * distance,
+                    0.75,
+                    Math.sin(angle) * distance
+                );
+                obstacle.castShadow = true;
+                obstacle.receiveShadow = true;
+                obstacle.userData = { type: 'obstacle', active: true };
+                scene.add(obstacle);
+                obstacles.push(obstacle);
+                return obstacle;
+            }
+
+            // 初始创建一些障碍物
+            for (let i = 0; i < 15; i++) {
+                createObstacle();
+            }
+
+            // ==================== 收集品系统 ====================
+            const collectibles = [];
+            const collectibleGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+            const collectibleMaterial = new THREE.MeshStandardMaterial({
+                color: 0xFFD700,
+                emissive: 0xFFD700,
+                emissiveIntensity: 0.8,
+                roughness: 0.2,
+                metalness: 0.8
+            });
+
+            function createCollectible() {
+                const collectible = new THREE.Mesh(collectibleGeometry, collectibleMaterial.clone());
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 8 + Math.random() * 28;
+                collectible.position.set(
+                    Math.cos(angle) * distance,
+                    1 + Math.random() * 3,
+                    Math.sin(angle) * distance
+                );
+                collectible.userData = { type: 'collectible', active: true, value: 10 + Math.floor(Math.random() * 20) };
+                scene.add(collectible);
+                collectibles.push(collectible);
+                return collectible;
+            }
+
+            // 初始创建收集品
+            for (let i = 0; i < 20; i++) {
+                createCollectible();
+            }
+
+            // ==================== 粒子系统 ====================
+            const particleCount = 200;
+            const particleGeometry = new THREE.BufferGeometry();
+            const particlePositions = new Float32Array(particleCount * 3);
+            const particleSizes = new Float32Array(particleCount);
+            const particleOpacities = new Float32Array(particleCount);
+
+            for (let i = 0; i < particleCount; i++) {
+                particlePositions[i * 3] = (Math.random() - 0.5) * GROUND_SIZE;
+                particlePositions[i * 3 + 1] = Math.random() * 10;
+                particlePositions[i * 3 + 2] = (Math.random() - 0.5) * GROUND_SIZE;
+                particleSizes[i] = Math.random() * 3 + 1;
+                particleOpacities[i] = Math.random();
+            }
+
+            particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+            particleGeometry.setAttribute('size', new THREE.BufferAttribute(particleSizes, 1));
+            particleGeometry.setAttribute('opacity', new THREE.BufferAttribute(particleOpacities, 1));
+
+            const particleMaterial = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uColor: { value: new THREE.Color(0xFFB6C1) }
+                },
+                vertexShader: `
+                    attribute float size;
+                    attribute float opacity;
+                    varying float vOpacity;
+                    uniform float uTime;
+                    void main() {
+                        vOpacity = opacity;
+                        vec3 pos = position;
+                        pos.y += sin(uTime * 0.5 + position.x * 0.1) * 0.5;
+                        vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                        gl_PointSize = size * (200.0 / -mvPosition.z);
+                        gl_Position = projectionMatrix * mvPosition;
+                    }
+                `,
+                fragmentShader: `
+                    varying float vOpacity;
+                    uniform vec3 uColor;
+                    void main() {
+                        float dist = length(gl_PointCoord - vec2(0.5));
+                        if (dist > 0.5) discard;
+                        float alpha = smoothstep(0.5, 0.0, dist) * vOpacity * 0.6;
+                        gl_FragColor = vec4(uColor, alpha);
+                    }
+                `,
+                transparent: true,
+                depthWrite: false,
+                blending: THREE.AdditiveBlending
+            });
+
+            const particles = new THREE.Points(particleGeometry, particleMaterial);
+            scene.add(particles);
+
+            // ==================== 碰撞检测 ====================
+            function checkCollisions() {
+                const playerPos = player.position;
+                const playerRadius = 0.5;
+
+                // 检测障碍物碰撞
+                for (const obstacle of obstacles) {
+                    if (!obstacle.userData.active) continue;
+                    const dx = playerPos.x - obstacle.position.x;
+                    const dz = playerPos.z - obstacle.position.z;
+                    const distance = Math.sqrt(dx * dx + dz * dz);
+                    
+                    if (distance < playerRadius + 1.0 && playerPos.y < 2.0) {
+                        // 碰撞障碍物，重置连击
+                        if (gameState.combo > 0) {
+                            playSound('hit');
+                        }
+                        gameState.combo = 0;
+                        updateUI();
+                    }
+                }
+
+                // 检测收集品碰撞
+                for (let i = collectibles.length - 1; i >= 0; i--) {
+                    const collectible = collectibles[i];
+                    if (!collectible.userData.active) continue;
+                    
+                    const dx = playerPos.x - collectible.position.x;
+                    const dy = playerPos.y - collectible.position.y;
+                    const dz = playerPos.z - collectible.position.z;
+                    const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                    
+                    if (distance < playerRadius + 0.3) {
+                        // 收集成功
+                        collectible.userData.active = false;
+                        scene.remove(collectible);
+                        collectibles.splice(i, 1);
+                        
+                        // 增加分数和连击
+                        gameState.combo++;
+                        if (gameState.combo > gameState.maxCombo) {
+                            gameState.maxCombo = gameState.combo;
+                        }
+                        const bonus = Math.floor(collectible.userData.value * (1 + gameState.combo * 0.1));
+                        gameState.score += bonus;
+                        
+                        updateUI();
+                        playSound('collect');
+                        
+                        // 创建新的收集品
+                        setTimeout(() => createCollectible(), 1000 + Math.random() * 2000);
+                    }
+                }
+            }
+
+            function updateUI() {
+                document.getElementById('score').textContent = `分数: ${gameState.score}`;
+                document.getElementById('combo').textContent = `连击: ${gameState.combo}`;
+            }
+
+            // ==================== 输入控制 ====================
+            const keys = {};
+            window.addEventListener('keydown', (e) => { keys[e.code] = true; });
+            window.addEventListener('keyup', (e) => { keys[e.code] = false; });
+
+            const playerVelocity = new THREE.Vector3();
+            const playerSpeed = 8;
+            const jumpForce = 12;
+            let isGrounded = true;
+
+            // ==================== 生长触发逻辑 ====================
+            function worldToUV(x, z) {
+                return new THREE.Vector2(
+                    (x / GROUND_SIZE) + 0.5,
+                    (z / GROUND_SIZE) + 0.5
+                );
+            }
+
+            function updateGrowth(playerPos, deltaTime) {
+                const uv = worldToUV(playerPos.x, playerPos.z);
+                const gx = Math.floor(uv.x * GRID_RES);
+                const gz = Math.floor(uv.y * GRID_RES);
+
+                const radius = 4;
+                const growthSpeed = 2.0 * deltaTime;
+
+                for (let dy = -radius; dy <= radius; dy++) {
+                    for (let dx = -radius; dx <= radius; dx++) {
+                        const nx = gx + dx;
+                        const nz = gz + dy;
+
+                        if (nx < 0 || nx >= GRID_RES || nz < 0 || nz >= GRID_RES) continue;
+
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist > radius) continue;
+
+                        const idx = (nz * GRID_RES + nx) * 4;
+                        const falloff = 1.0 - (dist / radius);
+                        const targetGrowth = Math.min(growthData[idx] + growthSpeed * falloff, 1.0);
+                        growthData[idx] = targetGrowth;
+                    }
+                }
+
+                growthTexture.needsUpdate = true;
+            }
+
+            function updateFlowerGrowth() {
+                const growthAttr = flowerGeometry.attributes.aGrowth;
+                const playerPos = player.position;
+                const updateRadius = 15; // 只更新玩家附近的花草
+
+                // 只更新活跃的花草
+                for (let i = 0; i < activeFlowers.length; i++) {
+                    const flowerIdx = activeFlowers[i];
+                    const x = offsets[flowerIdx * 3];
+                    const z = offsets[flowerIdx * 3 + 2];
+                    
+                    // 距离检查：只更新玩家附近的花草
+                    const dx = x - playerPos.x;
+                    const dz = z - playerPos.z;
+                    const distSq = dx * dx + dz * dz;
+                    
+                    if (distSq > updateRadius * updateRadius) {
+                        continue; // 跳过远处的花草
+                    }
+                    
+                    const uv = worldToUV(x, z);
+                    const gx = Math.floor(uv.x * GRID_RES);
+                    const gz = Math.floor(uv.y * GRID_RES);
+
+                    if (gx >= 0 && gx < GRID_RES && gz >= 0 && gz < GRID_RES) {
+                        const dataIdx = (gz * GRID_RES + gx) * 4;
+                        const targetGrowth = growthData[dataIdx];
+
+                        const current = growthAttr.getX(flowerIdx);
+                        // 如果目标生长值很小且当前值也很小，跳过更新
+                        if (targetGrowth < 0.01 && current < 0.01) continue;
+                        
+                        const newGrowth = THREE.MathUtils.lerp(current, targetGrowth, 0.05);
+                        growthAttr.setX(flowerIdx, newGrowth);
+                    }
+                }
+
+                growthAttr.needsUpdate = true;
+            }
+
+            // ==================== 相机跟随 ====================
+            function updateCamera() {
+                const targetPos = player.position.clone();
+                targetPos.y += 5 + gameState.combo * 0.1; // 连击越高相机越高
+                targetPos.z += 12 + gameState.combo * 0.1;
+                camera.position.lerp(targetPos, 0.05);
+                camera.lookAt(player.position);
+            }
+
+            // ==================== 动态难度调整 ====================
+            function adjustDifficulty() {
+                const gameTime = gameState.gameTime;
+                
+                // 随时间增加障碍物
+                if (obstacles.length < 15 + Math.floor(gameTime / 30) && Math.random() < 0.01) {
+                    createObstacle();
+                }
+                
+                // 随时间增加收集品价值
+                collectibles.forEach(c => {
+                    if (c.userData.active) {
+                        c.userData.value = 10 + Math.floor(Math.random() * 20) + Math.floor(gameTime / 60) * 5;
+                    }
+                });
+            }
+
+            // ==================== 主循环 ====================
+            const clock = new THREE.Clock();
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                if (!gameState.isPlaying) return;
+
+                const delta = Math.min(clock.getDelta(), 0.05);
+                const time = clock.getElapsedTime();
+                gameState.gameTime += delta;
+
+                // 角色移动
+                const moveDir = new THREE.Vector3();
+                if (keys['KeyW'] || keys['ArrowUp']) moveDir.z -= 1;
+                if (keys['KeyS'] || keys['ArrowDown']) moveDir.z += 1;
+                if (keys['KeyA'] || keys['ArrowLeft']) moveDir.x -= 1;
+                if (keys['KeyD'] || keys['ArrowRight']) moveDir.x += 1;
+
+                if (moveDir.length() > 0) {
+                    moveDir.normalize();
+                    playerVelocity.x = moveDir.x * playerSpeed;
+                    playerVelocity.z = moveDir.z * playerSpeed;
+
+                    const angle = Math.atan2(moveDir.x, moveDir.z);
+                    player.rotation.y = angle;
+                } else {
+                    playerVelocity.x *= 0.8;
+                    playerVelocity.z *= 0.8;
+                }
+
+                if (keys['Space'] && isGrounded) {
+                    playerVelocity.y = jumpForce;
+                    isGrounded = false;
+                    playSound('jump');
+                    // 跳跃时轻微重置连击
+                    if (gameState.combo > 0) {
+                        gameState.combo = Math.max(0, gameState.combo - 1);
+                        updateUI();
+                    }
+                }
+
+                playerVelocity.y -= 30 * delta;
+
+                player.position.x += playerVelocity.x * delta;
+                player.position.z += playerVelocity.z * delta;
+                player.position.y += playerVelocity.y * delta;
+
+                if (player.position.y <= 1.25) {
+                    player.position.y = 1.25;
+                    playerVelocity.y = 0;
+                    isGrounded = true;
+                }
+
+                player.position.x = THREE.MathUtils.clamp(player.position.x, -GROUND_SIZE/2 + 1, GROUND_SIZE/2 - 1);
+                player.position.z = THREE.MathUtils.clamp(player.position.z, -GROUND_SIZE/2 + 1, GROUND_SIZE/2 - 1);
+
+                playerShadow.position.x = player.position.x;
+                playerShadow.position.z = player.position.z;
+
+                // 更新玩家发光效果
+                player.material.emissiveIntensity = 0.2 + Math.sin(time * 2) * 0.1;
+
+                // 碰撞检测
+                checkCollisions();
+
+                // 更新收集品动画
+                collectibles.forEach(c => {
+                    if (c.userData.active) {
+                        c.rotation.y += delta * 2;
+                        c.position.y += Math.sin(time * 2 + c.position.x) * 0.005;
+                    }
+                });
+
+                if (isGrounded) {
+                    updateGrowth(player.position, delta);
+                }
+                updateFlowerGrowth();
+
+                // 动态难度调整
+                adjustDifficulty();
+
+                // 更新 UI 显示时间
+                const minutes = Math.floor(gameState.gameTime / 60);
+                const seconds = Math.floor(gameState.gameTime % 60);
+                document.getElementById('score').textContent = `分数: ${gameState.score} | 时间: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+                groundMaterial.uniforms.uTime.value = time;
+                flowerMaterial.uniforms.uTime.value = time;
+                particleMaterial.uniforms.uTime.value = time;
+
+                updateCamera();
+                renderer.render(scene, camera);
+            }
+
+            // 开始游戏
+            document.getElementById('startBtn').addEventListener('click', () => {
+                document.getElementById('startScreen').style.display = 'none';
+                gameState.isPlaying = true;
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+            });
+
+            // 重新开始游戏
+            document.getElementById('restartBtn').addEventListener('click', () => {
+                gameState.score = 0;
+                gameState.combo = 0;
+                gameState.maxCombo = 0;
+                gameState.isPlaying = true;
+                gameState.gameTime = 0;
+                player.position.set(0, 1.25, 0);
+                playerVelocity.set(0, 0, 0);
+                updateUI();
+                document.getElementById('gameOver').style.display = 'none';
+            });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            // ==================== 移动端触控支持 ====================
+            function isMobile() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+            }
+
+            if (isMobile()) {
+                document.getElementById('mobileControls').style.display = 'block';
+                
+                // 触控按钮事件
+                const setupButton = (id, keyCode) => {
+                    const btn = document.getElementById(id);
+                    btn.addEventListener('touchstart', (e) => {
+                        e.preventDefault();
+                        keys[keyCode] = true;
+                    });
+                    btn.addEventListener('touchend', (e) => {
+                        e.preventDefault();
+                        keys[keyCode] = false;
+                    });
+                    btn.addEventListener('touchcancel', (e) => {
+                        e.preventDefault();
+                        keys[keyCode] = false;
+                    });
+                };
+
+                setupButton('btn-up', 'KeyW');
+                setupButton('btn-down', 'KeyS');
+                setupButton('btn-left', 'KeyA');
+                setupButton('btn-right', 'KeyD');
+                
+                const jumpBtn = document.getElementById('btn-jump');
+                jumpBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    keys['Space'] = true;
+                });
+                jumpBtn.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    keys['Space'] = false;
+                });
+                jumpBtn.addEventListener('touchcancel', (e) => {
+                    e.preventDefault();
+                    keys['Space'] = false;
+                });
+            }
+
+            animate();
+
+        } catch (err) {
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = '加载失败: ' + err.message;
+            console.error(err);
+        }
+    </script>
+</body>
+</html>
