@@ -65,7 +65,7 @@
     position: fixed;
     top: 0; left: 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    background: rgba(16, 33, 45, 0.25);
     z-index: 9999;
     transition: width 0.15s;
   }
@@ -166,6 +166,17 @@
     50% { transform: scale(1.05); opacity: 0.7; }
   }
   .slide-cover .content { position: relative; z-index: 2; }
+  .huawei-logo-top {
+    position: absolute;
+    top: 40px;
+    left: 80px;
+    z-index: 3;
+  }
+  .huawei-logo-top img {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+  }
   .slide-cover .eyebrow {
     text-transform: uppercase;
     letter-spacing: 0.14em;
@@ -259,8 +270,8 @@
     width: 100%;
   }
   .about-avatar {
-    width: 220px;
-    height: 220px;
+    width: 280px;
+    height: 280px;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
     display: flex;
@@ -270,6 +281,7 @@
     margin: 0 auto;
     box-shadow: 0 0 50px rgba(47,106,149,0.15);
     position: relative;
+    overflow: hidden;
   }
   .about-avatar::after {
     content: '';
@@ -393,6 +405,20 @@
     font-size: 18px;
     font-weight: 700;
     color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .school-logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+  }
+  .school-logo-light {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) saturate(100%) invert(15%) sepia(78%) saturate(2848%) hue-rotate(203deg) brightness(96%) contrast(101%);
   }
   .edu-meta {
     font-size: 12px;
@@ -581,7 +607,7 @@
   .skill-level .fill {
     height: 100%;
     border-radius: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    background: #2F6A95;
     transition: width 1s ease;
     width: 0;
   }
@@ -763,15 +789,18 @@
 
 <!-- ==================== SLIDE 1: COVER ==================== -->
 <section class="slide slide-cover" id="slide1">
+  <div class="huawei-logo-top fade-up">
+    <img src="./assets/huawei_logo.png" alt="华为">
+  </div>
   <div class="content">
     <div class="eyebrow fade-up">求职面试 · 华为</div>
     <h1 class="fade-up" style="transition-delay: 0.2s">王 京</h1>
     <p class="subtitle fade-up" style="transition-delay: 0.4s">生物医学工程硕士 · 电子科技大学（985）</p>
     <div class="tags fade-up" style="transition-delay: 0.6s">
-      <span>🧠 脑机接口技术</span>
-      <span>🏥 医学图像处理</span>
-      <span>🤖 AI Agent</span>
-      <span>💻 全栈开发</span>
+      <span>脑机接口技术</span>
+      <span>医学图像处理</span>
+      <span>AI Agent</span>
+      <span>全栈开发</span>
     </div>
   </div>
   <div class="scroll-hint">
@@ -787,39 +816,31 @@
   <div class="section-line fade-up" style="transition-delay:0.1s"></div>
   <div class="about-grid">
     <div class="fade-up">
-      <div class="about-avatar">👨‍💻</div>
+      <div class="about-avatar"><img src="../imgs/life_and_others/io_pic.png" alt="王京" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
     </div>
     <div class="about-info fade-up" style="transition-delay:0.15s">
       <h2>王京</h2>
       <p class="role">硕士研究生 · 电子科技大学 · 神经信息教育部重点实验室</p>
       <p class="bio">
         专注于生物医学工程领域，研究方向涵盖脑机接口技术、医学图像处理与机器学习。
-        具备扎实的深度学习与全栈开发能力，在多项国家级竞赛中获奖，发表多篇SCI论文。
+        具备扎实的深度学习与全栈开发能力，在多项国家级竞赛中获奖，撰写多篇SCI论文（在审/预印本）。
         热爱技术，追求卓越，致力于将AI技术应用于医疗健康领域。
       </p>
       <div class="info-grid">
         <div class="info-item">
-          <div class="icon">📍</div>
-          <span>成都 · 重庆</span>
-        </div>
-        <div class="info-item">
-          <div class="icon">📱</div>
-          <span>177-0237-6984</span>
-        </div>
-        <div class="info-item">
-          <div class="icon">📮</div>
+          <div class="">📮</div>
           <span>2642144249@qq.com</span>
         </div>
         <div class="info-item">
-          <div class="icon">🎓</div>
+          <div class="">🎓</div>
           <span>英语六级 · 可流畅阅读前沿论文</span>
         </div>
         <div class="info-item">
-          <div class="icon">💪</div>
+          <div class="">💪</div>
           <span>健身博主 · 抖音 5k+ 粉丝 · 获赞 10w+</span>
         </div>
         <div class="info-item">
-          <div class="icon">📸</div>
+          <div class="">📸</div>
           <span>佳能摄影师 · 100+ 组客片</span>
         </div>
       </div>
@@ -835,26 +856,33 @@
   <div class="edu-container">
     <div class="edu-card fade-up">
       <div class="edu-header">
-        <h3>🎓 电子科技大学（985）</h3>
+        <h3><img src="/Games/ball/img/UESTC_ico.png" alt="UESTC" class="school-logo"></h3>
         <div class="edu-meta">
-          <span>📅 2024.09 - 至今</span>
-          <span>📊 GPA 3.83/4 (前5%)</span>
+          <span>2024.09 - 至今</span>
+          <span>GPA 3.83/4 (前5%)</span>
         </div>
       </div>
       <p class="edu-highlight">🏅 导师：陈华富教授 · 神经信息教育部重点实验室</p>
       <div class="edu-tags">
         <span class="tag">生物医学工程 硕士</span>
-        <span class="tag">优秀研究生</span>
-        <span class="tag">学业奖学金一等奖</span>
+        <span class="tag">优秀研究生 ×2</span>
+        <span class="tag">学业奖学金一等奖 ×2</span>
         <span class="tag">学术青苗奖</span>
+      </div>
+      <div style="margin-top:12px;font-size:12px;">
+        <a href="https://jingw-ui.github.io/cv/" target="_blank" style="color:var(--accent);text-decoration:none;">📄 简历</a>
+        &nbsp;·&nbsp;
+        <a href="https://jingw-ui.github.io/resume/" target="_blank" style="color:var(--accent);text-decoration:none;">📋 详细简历</a>
+                <a href="https://jingw-ui.github.io/carousel/" target="_blank" style="color:var(--accent);text-decoration:none;">🏆 荣誉墙</a>
+
       </div>
     </div>
     <div class="edu-card fade-up" style="transition-delay:0.15s">
       <div class="edu-header">
-        <h3>🎓 西南科技大学</h3>
+        <h3><img src="./assets/logo_swust.svg" alt="SWUST" class="school-logo-light"> </h3>
         <div class="edu-meta">
-          <span>📅 2020.09 - 2024.06</span>
-          <span>📊 GPA 4.15/5 (前2%)</span>
+          <span>2020.09 - 2024.06</span>
+          <span>GPA 4.15/5 (前2%)</span>
         </div>
       </div>
       <p class="edu-highlight">🏅 导师：周颖玥 · ACM项目组 & BMELab</p>
@@ -863,6 +891,9 @@
         <span class="tag">四川省优秀毕业生</span>
         <span class="tag">推免生</span>
         <span class="tag">国家励志奖学金 ×2</span>
+      </div>
+      <div style="margin-top:12px;font-size:12px;">
+        <a href="https://jingw-ui.github.io/carousel/" target="_blank" style="color:var(--accent);text-decoration:none;">🏆 荣誉墙</a>
       </div>
     </div>
   </div>
@@ -878,21 +909,27 @@
       <!-- Card 1 -->
       <div class="research-card fade-up">
         <div class="achievement-badge">📄 SCI在审</div>
-        <div class="card-icon">🧠</div>
+        <div class="card-icon"></div>
         <h3>NEURA 神经影像智能体系统</h3>
         <p>受认知科学启发的大语言模型驱动自主智能体，双知识图谱架构（DiseaseKG/ToolKG）动态桥接医学知识与异构工具，实现端到端多模态神经影像分析工作流自动化。</p>
         <div class="tech-tags">
           <span>Agent</span><span>LLM</span><span>RAG</span><span>CoT</span><span>Python</span>
         </div>
+        <div style="margin-top:12px;font-size:12px;">
+          <a href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" style="color:var(--accent);text-decoration:none;">📄 阅读论文</a>
+        </div>
       </div>
       <!-- Card 2 -->
       <div class="research-card fade-up" style="transition-delay:0.1s">
         <div class="achievement-badge">📄 SCI在审</div>
-        <div class="card-icon">🔬</div>
+        <div class="card-icon"></div>
         <h3>MediScreen-Brain 脑肿瘤检测平台</h3>
         <p>基于YOLO的CPU优化GUI平台，支持NIfTI 3D MRI解析，自动生成三视图，精准定位肿瘤并测量体积。零配置，双击即用。</p>
         <div class="tech-tags">
           <span>YOLO</span><span>PyTorch</span><span>PySide6</span><span>NiBabel</span>
+        </div>
+        <div style="margin-top:12px;font-size:12px;">
+          <a href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" style="color:var(--accent);text-decoration:none;">🔗 访问平台</a>
         </div>
       </div>
       <!-- Card 3 -->
@@ -908,11 +945,14 @@
       <!-- Card 4 -->
       <div class="research-card fade-up" style="transition-delay:0.3s">
         <div class="achievement-badge">🏆 全国二等奖</div>
-        <div class="card-icon">🔍</div>
+        <div class="card-icon"></div>
         <h3>结直肠癌智能检测与诊断系统</h3>
         <p>基于YOLOv8的目标检测模型，结合Django + Vue + MySQL，实现结直肠癌早期筛查辅助诊断系统。</p>
         <div class="tech-tags">
           <span>YOLOv8</span><span>Django</span><span>Vue</span><span>MySQL</span>
+        </div>
+        <div style="margin-top:12px;font-size:12px;">
+          <a href="https://jingw-ui.github.io/videos/" target="_blank" style="color:var(--accent);text-decoration:none;">🎥 查看演示视频</a>
         </div>
       </div>
       <!-- Card 5 -->
@@ -981,49 +1021,41 @@
   <div class="skills-container">
     <div class="skills-grid">
       <div class="skill-card fade-up">
-        <div class="skill-icon">🐍</div>
         <h4>Python</h4>
         <p>深度学习/数据分析/自动化</p>
         <div class="skill-level"><div class="fill" data-width="95%"></div></div>
       </div>
       <div class="skill-card fade-up" style="transition-delay:0.05s">
-        <div class="skill-icon">🧠</div>
         <h4>深度学习</h4>
         <p>YOLO系列/PyTorch/nnU-Net</p>
         <div class="skill-level"><div class="fill" data-width="90%"></div></div>
       </div>
       <div class="skill-card fade-up" style="transition-delay:0.1s">
-        <div class="skill-icon">🤖</div>
         <h4>AI Agent 开发</h4>
         <p>LLM/RAG/CoT/Toolset</p>
         <div class="skill-level"><div class="fill" data-width="85%"></div></div>
       </div>
       <div class="skill-card fade-up" style="transition-delay:0.15s">
-        <div class="skill-icon">🖥️</div>
         <h4>PySide6 / Qt</h4>
         <p>GUI开发/桌面应用</p>
         <div class="skill-level"><div class="fill" data-width="88%"></div></div>
       </div>
       <div class="skill-card fade-up" style="transition-delay:0.2s">
-        <div class="skill-icon">💻</div>
         <h4>全栈开发</h4>
         <p>Spring Boot/Vue/Django</p>
         <div class="skill-level"><div class="fill" data-width="80%"></div></div>
       </div>
       <div class="skill-card fade-up" style="transition-delay:0.25s">
-        <div class="skill-icon">☕</div>
         <h4>Java / MySQL</h4>
         <p>后端开发/数据库设计</p>
         <div class="skill-level"><div class="fill" data-width="75%"></div></div>
       </div>
       <div class="skill-card fade-up" style="transition-delay:0.3s">
-        <div class="skill-icon">🔬</div>
         <h4>医学影像处理</h4>
         <p>MRI/NIfTI/3D Slicer</p>
         <div class="skill-level"><div class="fill" data-width="88%"></div></div>
       </div>
       <div class="skill-card fade-up" style="transition-delay:0.35s">
-        <div class="skill-icon">📝</div>
         <h4>英语六级</h4>
         <p>论文阅读/技术文档</p>
         <div class="skill-level"><div class="fill" data-width="82%"></div></div>
@@ -1068,6 +1100,9 @@
         <div class="medal">🏅</div>
         <h4>CSIG图像图形技术挑战赛 第八名</h4>
         <p>2025 "Camera学术之星" 影像算法竞赛</p>
+        <div style="margin-top:10px;font-size:12px;">
+          <a href="https://developer.huaweicloud.com/competition/information/1300000173/html2" target="_blank" style="color:var(--accent);text-decoration:none;">查看比赛详情</a>
+        </div>
       </div>
     </div>
   </div>
@@ -1084,16 +1119,22 @@
         <h4>🔧 AutoTask 自动化办公</h4>
         <p>基于 PySide6 + PyAutoGUI 的零代码桌面自动化工具，支持可视化任务编排与定时调度。</p>
         <div class="stats">
-          <span>⭐ 70+ Stars</span>
+          <span><img src="https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-?style=social" alt="stars" style="height:18px;vertical-align:middle;"></span>
           <span>👥 150+ 用户</span>
+        </div>
+        <div style="margin-top:10px;font-size:12px;">
+          <a href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank" style="color:var(--accent);text-decoration:none;">查看GitHub</a>
         </div>
       </div>
       <div class="oss-card fade-up" style="transition-delay:0.1s">
         <h4>🎯 通用目标检测系统</h4>
         <p>基于 YOLOv8-v26 的通用目标检测平台，支持图片/视频/摄像头/文件夹批量检测。</p>
         <div class="stats">
-          <span>⭐ 100+ Stars</span>
+          <span><img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP?style=social" alt="stars" style="height:18px;vertical-align:middle;"></span>
           <span>👥 50+ 用户</span>
+        </div>
+        <div style="margin-top:10px;font-size:12px;">
+          <a href="https://github.com/JingW-ui/PI-MAPP" target="_blank" style="color:var(--accent);text-decoration:none;">查看GitHub</a>
         </div>
       </div>
       <div class="oss-card fade-up" style="transition-delay:0.2s">
@@ -1103,6 +1144,9 @@
           <span>📦 开源</span>
           <span>🔬 SCI论文</span>
         </div>
+        <div style="margin-top:10px;font-size:12px;">
+          <a href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" style="color:var(--accent);text-decoration:none;">访问项目</a>
+        </div>
       </div>
       <div class="oss-card fade-up" style="transition-delay:0.3s">
         <h4>📚 Nature Academic Skills</h4>
@@ -1110,6 +1154,9 @@
         <div class="stats">
           <span>📦 开源</span>
           <span>🤖 Agent Skills</span>
+        </div>
+        <div style="margin-top:10px;font-size:12px;">
+          <a href="https://jingw-ui.github.io/skills/" target="_blank" style="color:var(--accent);text-decoration:none;">查看Skills</a>
         </div>
       </div>
       <div class="oss-card fade-up" style="transition-delay:0.4s">
@@ -1119,6 +1166,13 @@
           <span>📦 开源</span>
           <span>🌐 Web</span>
         </div>
+        <div style="margin-top:10px;font-size:12px;">
+          <a href="https://jingw-ui.github.io/tools/" target="_blank" style="color:var(--accent);text-decoration:none;">访问工具箱</a>
+          &nbsp;·&nbsp;
+          <a href="https://jingw-ui.github.io/Games/" target="_blank" style="color:var(--accent);text-decoration:none;">游戏中心</a>
+            &nbsp;·&nbsp;
+          <a href="https://jingw-ui.github.io/director/" target="_blank" style="color:var(--accent);text-decoration:none;">3D探索</a>
+        </div>
       </div>
       <div class="oss-card fade-up" style="transition-delay:0.5s">
         <h4>📖 微机原理期末复习</h4>
@@ -1126,6 +1180,9 @@
         <div class="stats">
           <span>▶️ 20w+ 播放</span>
           <span>⭐ 4000+ 收藏</span>
+        </div>
+        <div style="margin-top:10px;font-size:12px;">
+          <a href="https://space.bilibili.com/521967044" target="_blank" style="color:var(--accent);text-decoration:none;">前往B站观看</a>
         </div>
       </div>
     </div>
@@ -1176,10 +1233,10 @@
         <span>📮</span> 2642144249@qq.com
       </div>
       <div class="contact-item">
-        <span>🐙</span> github.com/JingW-ui
+        <a href="https://github.com/JingW-ui" target="_blank" style="color:inherit;text-decoration:none;">🐙 github.com/JingW-ui</a>
       </div>
       <div class="contact-item">
-        <span>📹</span> B站 @京W
+        <a href="https://space.bilibili.com/521967044" target="_blank" style="color:inherit;text-decoration:none;">📹 B站 @京W</a>
       </div>
     </div>
     <p class="thank-you">期待与华为一起，用技术改变世界 🚀</p>
