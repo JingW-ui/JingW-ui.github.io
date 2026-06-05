@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排序算法动画可视化 - Sort Algorithm Animation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* 左侧算法选择面板 - 默认隐藏 */
+        #algorithm-panel {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 300px;
+            height: 100%;
+            background: #000;
+            border-right: 1px solid #333;
+            padding: 20px;
+            z-index: 100;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+
+        #algorithm-panel.show {
+            left: 0;
+        }
+
+        #algorithm-panel h2 {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #fff;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .algorithm-option {
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .algorithm-option:hover {
+            background: #1a1a1a;
+        }
+
+        .algorithm-option input[type="radio"] {
+            margin-right: 8px;
+            cursor: pointer;
+            accent-color: #fff;
+        }
+
+        .algorithm-option label {
+            cursor: pointer;
+            font-size: 13px;
+            color: #fff;
+        }
+
+        /* 面板切换按钮 */
+        .panel-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 101;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .panel-toggle:hover {
+            background: #1a1a1a;
+            border-color: #555;
+        }
+
+        /* 运行按钮 - 中下方 */
+        #btn-run {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 40px;
+            background: #fff;
+            border: none;
+            border-radius: 4px;
+            color: #000;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 100;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        #btn-run:hover {
+            background: #e0e0e0;
+        }
+
+        #btn-run:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        #btn-run:disabled:hover {
+            background: #fff;
+        }
+
+        /* 右侧信息面板 - 右下方 */
+        #info-panel {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px 20px;
+            z-index: 100;
+            min-width: 220px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 12px;
+        }
+
+        .info-label {
+            color: #888;
+            margin-right: 15px;
+        }
+
+        .info-value {
+            color: #fff;
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 参数设置 */
+        .params-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 10px 15px;
+            z-index: 100;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .param-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .param-item label {
+            font-size: 12px;
+            color: #888;
+            white-space: nowrap;
+        }
+
+        .param-item input[type="range"] {
+            width: 100px;
+            cursor: pointer;
+            accent-color: #fff;
+        }
+
+        .param-value {
+            font-size: 12px;
+            color: #fff;
+            min-width: 30px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* 伪代码面板 - 左下角 */
+        #pseudocode-panel {
+            position: fixed;
+            bottom: 30px;
+            left: -400px;
+            width: 380px;
+            max-height: 70vh;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 15px 20px;
+            z-index: 100;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+        }
+
+        #pseudocode-panel.show {
+            left: 30px;
+        }
+
+        #pseudocode-panel h3 {
+            font-size: 13px;
+            margin-bottom: 12px;
+            color: #fff;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .pseudocode-line {
+            padding: 4px 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #666;
+            transition: all 0.3s;
+            white-space: pre;
+            border-left: 2px solid transparent;
+            margin-bottom: 2px;
+        }
+
+        .pseudocode-line.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: #fff;
+        }
+
+        /* 伪代码切换按钮 */
+        .pseudocode-toggle {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 40px;
+            height: 40px;
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 101;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .pseudocode-toggle:hover {
+            background: #1a1a1a;
+            border-color: #555;
+        }
+
+        /* 加载提示 */
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #fff;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #333;
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="spinner"></div>
+        <div>Loading...</div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <!-- 面板切换按钮 -->
+    <button class="panel-toggle" id="panel-toggle">☰</button>
+
+    <!-- 左侧算法选择面板 -->
+    <div id="algorithm-panel">
+        <h2>Algorithms</h2>
+        <div class="algorithm-option">
+            <input type="radio" name="algorithm" id="bubble" value="bubble" checked>
+            <label for="bubble">Bubble Sort</label>
+        </div>
+        <div class="algorithm-option">
+            <input type="radio" name="algorithm" id="selection" value="selection">
+            <label for="selection">Selection Sort</label>
+        </div>
+        <div class="algorithm-option">
+            <input type="radio" name="algorithm" id="insertion" value="insertion">
+            <label for="insertion">Insertion Sort</label>
+        </div>
+        <div class="algorithm-option">
+            <input type="radio" name="algorithm" id="shell" value="shell">
+            <label for="shell">Shell Sort</label>
+        </div>
+        <div class="algorithm-option">
+            <input type="radio" name="algorithm" id="merge" value="merge">
+            <label for="merge">Merge Sort</label>
+        </div>
+        <div class="algorithm-option">
+            <input type="radio" name="algorithm" id="quick" value="quick">
+            <label for="quick">Quick Sort</label>
+        </div>
+    </div>
+
+    <!-- 参数设置 -->
+    <div class="params-bar">
+        <div class="param-item">
+            <label>Size: <span class="param-value" id="array-size-value">20</span></label>
+            <input type="range" id="array-size" min="5" max="50" value="20">
+        </div>
+        <div class="param-item">
+            <label>Speed: <span class="param-value" id="speed-value">3</span></label>
+            <input type="range" id="speed" min="1" max="5" value="3">
+        </div>
+    </div>
+
+    <!-- 运行按钮 -->
+    <button id="btn-run">RUN</button>
+
+    <!-- 伪代码切换按钮 -->
+    <button class="pseudocode-toggle" id="pseudocode-toggle">&lt;/&gt;</button>
+
+    <!-- 伪代码面板 -->
+    <div id="pseudocode-panel">
+        <h3>Pseudocode</h3>
+        <div id="pseudocode-content"></div>
+    </div>
+
+    <!-- 右侧信息面板 -->
+    <div id="info-panel">
+        <div class="info-row">
+            <span class="info-label">Time</span>
+            <span class="info-value" id="elapsed-time">0.0s</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Time Complexity</span>
+            <span class="info-value" id="time-complexity">O(n²)</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Space</span>
+            <span class="info-value" id="space-complexity">O(1)</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Stability</span>
+            <span class="info-value" id="stability">Yes</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Comparisons</span>
+            <span class="info-value" id="comparisons">0</span>
+        </div>
+    </div>
+
+    <!-- 算法模块 -->
+    <script src="algorithms/registry.js"></script>
+    <script src="algorithms/bubble-sort.js"></script>
+    <script src="algorithms/selection-sort.js"></script>
+    <script src="algorithms/insertion-sort.js"></script>
+    <script src="algorithms/shell-sort.js"></script>
+    <script src="algorithms/merge-sort.js"></script>
+    <script src="algorithms/quick-sort.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+        // 全局变量
+        let scene, camera, renderer, controls;
+        let bars = [];
+        let arrayData = [];
+        let isRunning = false;
+        let isPaused = false;
+        let animationSpeed = 3;
+        let comparisons = 0;
+        let swaps = 0;
+        let startTime = 0;
+        let timerInterval;
+        let currentAlgorithm = 'bubble';
+        let animationSteps = [];
+        let currentStep = 0;
+        
+        // 算法信息
+        const algorithmInfo = {
+            bubble: { space: 'O(1)', time: 'O(n²)', stable: 'Yes' },
+            selection: { space: 'O(1)', time: 'O(n²)', stable: 'No' },
+            insertion: { space: 'O(1)', time: 'O(n²)', stable: 'Yes' },
+            shell: { space: 'O(1)', time: 'O(n log n)', stable: 'No' },
+            merge: { space: 'O(n)', time: 'O(n log n)', stable: 'Yes' },
+            quick: { space: 'O(log n)', time: 'O(n log n)', stable: 'No' }
+        };
+        
+        // 初始化算法注册表
+        function initAlgorithms() {
+            window.algorithmRegistry.register('bubble', new BubbleSortAnimator());
+            window.algorithmRegistry.register('selection', new SelectionSortAnimator());
+            window.algorithmRegistry.register('insertion', new InsertionSortAnimator());
+            window.algorithmRegistry.register('shell', new ShellSortAnimator());
+            window.algorithmRegistry.register('merge', new MergeSortAnimator());
+            window.algorithmRegistry.register('quick', new QuickSortAnimator());
+        }
+
+        // 切换算法面板
+        function toggleAlgorithmPanel() {
+            const panel = document.getElementById('algorithm-panel');
+            panel.classList.toggle('show');
+        }
+
+        // 初始化Three.js场景
+        function initScene() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0a);
+            scene.fog = new THREE.Fog(0x0a0a0a, 50, 150);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 15, 40);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2.2;
+
+            // 灯光系统 - 优化亮度
+            // 环境光 - 提高基础亮度
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+
+            // 主光源 - 增强亮度
+            const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            mainLight.position.set(15, 25, 15);
+            mainLight.castShadow = true;
+            mainLight.shadow.camera.left = -30;
+            mainLight.shadow.camera.right = 30;
+            mainLight.shadow.camera.top = 30;
+            mainLight.shadow.camera.bottom = -30;
+            mainLight.shadow.mapSize.width = 2048;
+            mainLight.shadow.mapSize.height = 2048;
+            scene.add(mainLight);
+
+            // 补光灯 - 右侧
+            const fillLight = new THREE.DirectionalLight(0xffffff, 0.6);
+            fillLight.position.set(-10, 15, 5);
+            scene.add(fillLight);
+
+            // 顶部聚光灯 - 增强舞台效果
+            const spotLight = new THREE.SpotLight(0xffffff, 1.0);
+            spotLight.position.set(0, 35, 0);
+            spotLight.angle = 0.4;
+            spotLight.penumbra = 0.6;
+            spotLight.decay = 2;
+            spotLight.distance = 100;
+            scene.add(spotLight);
+
+            // 底部补光 - 减少阴影
+            const bottomLight = new THREE.DirectionalLight(0xffffff, 0.3);
+            bottomLight.position.set(0, -10, 10);
+            scene.add(bottomLight);
+
+            // 地面
+            const groundGeometry = new THREE.PlaneGeometry(100, 100);
+            const groundMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x111111,
+                roughness: 0.8,
+                metalness: 0.2
+            });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -5;
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // 网格辅助线
+            const gridHelper = new THREE.GridHelper(100, 50, 0x222222, 0x111111);
+            gridHelper.position.y = -4.9;
+            scene.add(gridHelper);
+
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // 创建柱状体
+        function createBars(data) {
+            // 清除旧柱子
+            bars.forEach(bar => scene.remove(bar));
+            bars = [];
+            arrayData = [...data];
+
+            const maxVal = Math.max(...data);
+            const barWidth = 0.8;
+            const spacing = 1.2;
+            const totalWidth = data.length * spacing;
+            const startX = -totalWidth / 2 + spacing / 2;
+
+            data.forEach((value, index) => {
+                const height = (value / maxVal) * 20;
+                const geometry = new THREE.BoxGeometry(barWidth, height, barWidth);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0x6b7bff,
+                    roughness: 0.4,
+                    metalness: 0.6,
+                    emissive: 0x000000
+                });
+                const bar = new THREE.Mesh(geometry, material);
+                bar.position.set(
+                    startX + index * spacing,
+                    height / 2 - 5,
+                    0
+                );
+                bar.castShadow = true;
+                bar.receiveShadow = true;
+                bar.userData = {
+                    index: index,
+                    value: value,
+                    originalColor: 0x6b7bff
+                };
+
+                scene.add(bar);
+                bars.push(bar);
+            });
+        }
+
+        // 设置柱子颜色
+        function setBarColor(index, color, emissive = 0x000000) {
+            if (bars[index]) {
+                bars[index].material.color.setHex(color);
+                bars[index].material.emissive.setHex(emissive);
+            }
+        }
+
+        // 更新柱子高度
+        function updateBarHeight(index, newValue, maxVal) {
+            const height = (newValue / maxVal) * 20;
+            const oldY = bars[index].position.y;
+            
+            bars[index].geometry.dispose();
+            bars[index].geometry = new THREE.BoxGeometry(0.8, height, 0.8);
+            bars[index].position.y = height / 2 - 5;
+        }
+
+        // 生成随机数组
+        function generateRandomArray(size) {
+            const arr = [];
+            for (let i = 0; i < size; i++) {
+                arr.push(Math.floor(Math.random() * 95) + 5);
+            }
+            return arr;
+        }
+
+        // 更新UI
+        function updateUI() {
+            document.getElementById('comparisons').textContent = comparisons;
+        }
+
+        // 更新伪代码高亮 (UI面板形式)
+        function updatePseudocode(lineIndex) {
+            const content = document.getElementById('pseudocode-content');
+            const algorithm = window.algorithmRegistry.get(currentAlgorithm);
+            if (!algorithm) return;
+            
+            const lines = algorithm.pseudocode;
+            content.innerHTML = '';
+            
+            lines.forEach((line, idx) => {
+                const div = document.createElement('div');
+                div.className = 'pseudocode-line' + (idx === lineIndex ? ' active' : '');
+                // 添加行号
+                const lineNum = String(idx + 1).padStart(2, ' ');
+                div.textContent = lineNum + ' | ' + (line || '');
+                content.appendChild(div);
+            });
+        }
+
+        // 切换伪代码面板
+        function togglePseudocodePanel() {
+            const panel = document.getElementById('pseudocode-panel');
+            panel.classList.toggle('show');
+        }
+
+        // 执行动画步骤
+        async function executeSteps() {
+            isRunning = true;
+            isPaused = false;
+            startTime = Date.now();
+
+            // 重置统计数据
+            comparisons = 0;
+            swaps = 0;
+
+            timerInterval = setInterval(() => {
+                if (!isPaused) {
+                    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+                    document.getElementById('elapsed-time').textContent = elapsed + 's';
+                }
+            }, 100);
+
+            const maxVal = Math.max(...arrayData);
+
+            for (let i = 0; i < animationSteps.length; i++) {
+                while (isPaused) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+
+                currentStep = i;
+                const step = animationSteps[i];
+
+                if (step.pseudocodeLine >= 0) {
+                    updatePseudocode(step.pseudocodeLine);
+                }
+
+                switch (step.type) {
+                    case 'compare':
+                        setBarColor(step.indices[0], 0xffdd00, 0x333300);
+                        setBarColor(step.indices[1], 0xffdd00, 0x333300);
+                        comparisons++;
+                        await sleep(300 / animationSpeed);
+                        // 恢复颜色
+                        setBarColor(step.indices[0], 0x6b7bff, 0x000000);
+                        setBarColor(step.indices[1], 0x6b7bff, 0x000000);
+                        break;
+
+                    case 'swap':
+                        // 更新arrayData
+                        const tempVal = arrayData[step.indices[0]];
+                        arrayData[step.indices[0]] = arrayData[step.indices[1]];
+                        arrayData[step.indices[1]] = tempVal;
+
+                        // 动画交换 - 交换bars数组中的引用
+                        const idx1 = step.indices[0];
+                        const idx2 = step.indices[1];
+                        const bar1 = bars[idx1];
+                        const bar2 = bars[idx2];
+                        const x1 = bar1.position.x;
+                        const x2 = bar2.position.x;
+
+                        await Promise.all([
+                            animateBarPosition(bar1, x2),
+                            animateBarPosition(bar2, x1)
+                        ]);
+
+                        // 交换bars数组中的引用（关键！）
+                        bars[idx1] = bar2;
+                        bars[idx2] = bar1;
+
+                        // 更新userData.index
+                        bars[idx1].userData.index = idx1;
+                        bars[idx2].userData.index = idx2;
+
+                        // 更新高度（使用arrayData的值）
+                        updateBarHeight(idx1, arrayData[idx1], maxVal);
+                        updateBarHeight(idx2, arrayData[idx2], maxVal);
+
+                        setBarColor(idx1, 0xff4444, 0x330000);
+                        setBarColor(idx2, 0xff4444, 0x330000);
+                        swaps++;
+                        await sleep(400 / animationSpeed);
+                        
+                        // 恢复颜色
+                        setBarColor(idx1, 0x6b7bff, 0x000000);
+                        setBarColor(idx2, 0x6b7bff, 0x000000);
+                        break;
+
+                    case 'sorted':
+                        step.indices.forEach(idx => {
+                            setBarColor(idx, 0x4eff91, 0x003300);
+                        });
+                        await sleep(200 / animationSpeed);
+                        break;
+
+                    case 'highlight':
+                        step.indices.forEach(idx => {
+                            setBarColor(idx, step.color, 0x222222);
+                        });
+                        await sleep(300 / animationSpeed);
+                        // 恢复颜色
+                        step.indices.forEach(idx => {
+                            setBarColor(idx, 0x6b7bff, 0x000000);
+                        });
+                        break;
+
+                    case 'unhighlight':
+                        step.indices.forEach(idx => {
+                            setBarColor(idx, bars[idx].userData.originalColor, 0x000000);
+                        });
+                        break;
+
+                    case 'shift':
+                        // 更新arrayData - 将from位置的值复制到to位置
+                        arrayData[step.to] = arrayData[step.from];
+                        
+                        // 高亮源位置
+                        setBarColor(step.from, 0xffaa00, 0x333300);
+                        await sleep(150 / animationSpeed);
+                        
+                        // 更新目标位置的高度
+                        updateBarHeight(step.to, arrayData[step.to], maxVal);
+                        setBarColor(step.to, 0xffaa00, 0x333300);
+                        await sleep(150 / animationSpeed);
+                        
+                        // 恢复颜色
+                        setBarColor(step.from, 0x6b7bff, 0x000000);
+                        setBarColor(step.to, 0x6b7bff, 0x000000);
+                        break;
+
+                    case 'insert':
+                        // 更新arrayData
+                        arrayData[step.index] = step.value;
+                        
+                        // 更新柱子高度
+                        updateBarHeight(step.index, step.value, maxVal);
+                        
+                        // 高亮插入位置
+                        setBarColor(step.index, 0x4eff91, 0x003300);
+                        
+                        // 跳跃动画表示插入完成
+                        const insertBar = bars[step.index];
+                        await new Promise(resolve => {
+                            gsap.to(insertBar.position, {
+                                y: insertBar.position.y + 1.5,
+                                duration: 0.15,
+                                yoyo: true,
+                                repeat: 1,
+                                ease: "power2.out",
+                                onComplete: resolve
+                            });
+                        });
+                        
+                        await sleep(200 / animationSpeed);
+                        break;
+
+                    case 'split':
+                        for (let i = step.range[0]; i <= step.range[1]; i++) {
+                            setBarColor(i, 0x6b7bff, 0x111133);
+                        }
+                        await sleep(300 / animationSpeed);
+                        break;
+
+                    case 'merge-start':
+                        for (let i = step.range[0]; i <= step.range[1]; i++) {
+                            setBarColor(i, 0xff88ff, 0x330033);
+                        }
+                        await sleep(300 / animationSpeed);
+                        break;
+
+                    case 'place':
+                        arrayData[step.index] = step.value;
+                        updateBarHeight(step.index, step.value, maxVal);
+                        setBarColor(step.index, 0x4eff91, 0x003300);
+                        await sleep(200 / animationSpeed);
+                        break;
+
+                    case 'pivot':
+                        setBarColor(step.index, 0xff00ff, 0x330033);
+                        await sleep(400 / animationSpeed);
+                        // 恢复颜色
+                        setBarColor(step.index, 0x6b7bff, 0x000000);
+                        break;
+
+                    case 'info':
+                        await sleep(500 / animationSpeed);
+                        break;
+                }
+
+                updateUI();
+            }
+
+            // 完成动画
+            completeAnimation();
+        }
+
+        function animateBarPosition(bar, targetX) {
+            return new Promise(resolve => {
+                gsap.to(bar.position, {
+                    x: targetX,
+                    duration: 0.3 / animationSpeed,
+                    ease: "power2.inOut",
+                    onComplete: resolve
+                });
+            });
+        }
+
+        function completeAnimation() {
+            isRunning = false;
+            clearInterval(timerInterval);
+
+            // 所有柱子变绿色
+            bars.forEach((bar, index) => {
+                setTimeout(() => {
+                    setBarColor(index, 0x4eff91, 0x004400);
+                    // 跳跃庆祝动画
+                    gsap.to(bar.position, {
+                        y: bar.position.y + 2,
+                        duration: 0.2,
+                        yoyo: true,
+                        repeat: 1,
+                        ease: "power2.out"
+                    });
+                }, index * 50);
+            });
+
+            document.getElementById('btn-run').textContent = 'RUN';
+            document.getElementById('btn-run').disabled = false;
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // 事件监听
+        function setupEventListeners() {
+            // 面板切换
+            document.getElementById('panel-toggle').addEventListener('click', toggleAlgorithmPanel);
+
+            // 伪代码面板切换
+            document.getElementById('pseudocode-toggle').addEventListener('click', togglePseudocodePanel);
+
+            // 算法选择
+            document.querySelectorAll('input[name="algorithm"]').forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    currentAlgorithm = e.target.value;
+                    const info = algorithmInfo[currentAlgorithm];
+                    if (info) {
+                        document.getElementById('time-complexity').textContent = info.time;
+                        document.getElementById('space-complexity').textContent = info.space;
+                        document.getElementById('stability').textContent = info.stable;
+                    }
+                    updatePseudocode(-1);
+                });
+            });
+
+            // 数组大小
+            document.getElementById('array-size').addEventListener('input', (e) => {
+                document.getElementById('array-size-value').textContent = e.target.value;
+            });
+
+            // 速度
+            document.getElementById('speed').addEventListener('input', (e) => {
+                animationSpeed = parseInt(e.target.value);
+                document.getElementById('speed-value').textContent = animationSpeed;
+            });
+
+            // 运行/暂停按钮
+            document.getElementById('btn-run').addEventListener('click', () => {
+                if (isRunning) {
+                    // 暂停/继续
+                    isPaused = !isPaused;
+                    document.getElementById('btn-run').textContent = isPaused ? 'RESUME' : 'PAUSE';
+                } else {
+                    // 开始运行
+                    resetAnimation();
+                    generateAndRun();
+                }
+            });
+        }
+
+        function resetAnimation() {
+            isRunning = false;
+            isPaused = false;
+            currentStep = 0;
+            comparisons = 0;
+            swaps = 0;
+            clearInterval(timerInterval);
+
+            document.getElementById('comparisons').textContent = '0';
+            document.getElementById('elapsed-time').textContent = '0.0s';
+            document.getElementById('btn-run').textContent = 'RUN';
+            document.getElementById('btn-run').disabled = false;
+
+            updatePseudocode(-1);
+
+            const size = parseInt(document.getElementById('array-size').value);
+            const newData = generateRandomArray(size);
+            createBars(newData);
+        }
+
+        function generateAndRun() {
+            isRunning = true;
+            isPaused = false;
+            document.getElementById('btn-run').textContent = 'PAUSE';
+
+            // 使用注册的算法生成步骤
+            const algorithm = window.algorithmRegistry.get(currentAlgorithm);
+            if (!algorithm) {
+                console.error('Algorithm not found:', currentAlgorithm);
+                return;
+            }
+
+            const result = algorithm.generateSteps(arrayData);
+            animationSteps = result.steps;
+            comparisons = result.comparisons;
+            swaps = result.swaps;
+
+            executeSteps();
+        }
+
+        // 动画循环
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        // 初始化
+        window.addEventListener('load', () => {
+            initAlgorithms();
+            initScene();
+            setupEventListeners();
+
+            const initialData = generateRandomArray(20);
+            createBars(initialData);
+            updatePseudocode(-1);
+
+            // 初始化算法信息
+            const info = algorithmInfo[currentAlgorithm];
+            document.getElementById('time-complexity').textContent = info.time;
+            document.getElementById('space-complexity').textContent = info.space;
+            document.getElementById('stability').textContent = info.stable;
+
+            document.getElementById('loading').style.display = 'none';
+
+            animate();
+        });
+    </script>
+</body>
+</html>
