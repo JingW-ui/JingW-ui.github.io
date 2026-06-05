@@ -208,6 +208,140 @@
             font-family: 'Courier New', monospace;
         }
 
+        /* 随机按钮 */
+        #btn-randomize {
+            padding: 6px 16px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        #btn-randomize:hover {
+            background: #444;
+            border-color: #777;
+        }
+
+        /* 自定义数据按钮 */
+        #btn-custom-data {
+            padding: 6px 16px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        #btn-custom-data:hover {
+            background: #444;
+            border-color: #777;
+        }
+
+        /* 自定义数据弹窗 */
+        .custom-data-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-data-modal.show {
+            display: flex;
+        }
+
+        .custom-data-content {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .custom-data-content h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .custom-data-content textarea {
+            width: 100%;
+            height: 120px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 4px;
+            color: #fff;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        .custom-data-content textarea:focus {
+            outline: none;
+            border-color: #555;
+        }
+
+        .custom-data-hint {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .custom-data-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .custom-data-buttons button {
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-confirm {
+            background: #fff;
+            border: none;
+            color: #000;
+        }
+
+        .btn-confirm:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-cancel {
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+        }
+
+        .btn-cancel:hover {
+            background: #444;
+            border-color: #777;
+        }
+
         /* 伪代码面板 - 左下角 */
         #pseudocode-panel {
             position: fixed;
@@ -353,7 +487,13 @@
         </div>
         <div class="param-item">
             <label>Speed: <span class="param-value" id="speed-value">3</span></label>
-            <input type="range" id="speed" min="1" max="5" value="3">
+            <input type="range" id="speed" min="0.1" max="5" value="3" step="0.1">
+        </div>
+        <div class="param-item">
+            <button id="btn-randomize">🎲 随机数据</button>
+        </div>
+        <div class="param-item">
+            <button id="btn-custom-data">✏️ 自定义数据</button>
         </div>
     </div>
 
@@ -362,6 +502,23 @@
 
     <!-- 伪代码切换按钮 -->
     <button class="pseudocode-toggle" id="pseudocode-toggle">&lt;/&gt;</button>
+
+    <!-- 自定义数据弹窗 -->
+    <div class="custom-data-modal" id="custom-data-modal">
+        <div class="custom-data-content">
+            <h3>自定义数组数据</h3>
+            <textarea id="custom-data-input" placeholder="例如: 5, 3, 8, 1, 9, 2, 7, 4, 6"></textarea>
+            <div class="custom-data-hint">
+                请输入用逗号分隔的数字数组<br>
+                支持格式：5,3,8,1,9 或 5 3 8 1 9<br>
+                数字范围：1-100，最多50个数字
+            </div>
+            <div class="custom-data-buttons">
+                <button class="btn-cancel" id="btn-cancel-custom">取消</button>
+                <button class="btn-confirm" id="btn-confirm-custom">确认</button>
+            </div>
+        </div>
+    </div>
 
     <!-- 伪代码面板 -->
     <div id="pseudocode-panel">
@@ -513,13 +670,13 @@
             });
             const ground = new THREE.Mesh(groundGeometry, groundMaterial);
             ground.rotation.x = -Math.PI / 2;
-            ground.position.y = -5;
+            ground.position.y = -5.01; // 略微低于柱子底部，避免Z-fighting
             ground.receiveShadow = true;
             scene.add(ground);
 
             // 网格辅助线
             const gridHelper = new THREE.GridHelper(100, 50, 0x222222, 0x111111);
-            gridHelper.position.y = -4.9;
+            gridHelper.position.y = -4.99; // 略微高于地面，避免与地面重叠
             scene.add(gridHelper);
 
             window.addEventListener('resize', onWindowResize, false);
@@ -677,9 +834,14 @@
                         arrayData[step.indices[0]] = arrayData[step.indices[1]];
                         arrayData[step.indices[1]] = tempVal;
 
-                        // 动画交换 - 交换bars数组中的引用
+                        // 先变红高亮要交换的元素
                         const idx1 = step.indices[0];
                         const idx2 = step.indices[1];
+                        setBarColor(idx1, 0xff4444, 0x330000);
+                        setBarColor(idx2, 0xff4444, 0x330000);
+                        await sleep(200 / animationSpeed);
+
+                        // 动画交换 - 交换bars数组中的引用
                         const bar1 = bars[idx1];
                         const bar2 = bars[idx2];
                         const x1 = bar1.position.x;
@@ -702,8 +864,6 @@
                         updateBarHeight(idx1, arrayData[idx1], maxVal);
                         updateBarHeight(idx2, arrayData[idx2], maxVal);
 
-                        setBarColor(idx1, 0xff4444, 0x330000);
-                        setBarColor(idx2, 0xff4444, 0x330000);
                         swaps++;
                         await sleep(400 / animationSpeed);
                         
@@ -778,6 +938,9 @@
                         });
                         
                         await sleep(200 / animationSpeed);
+                        
+                        // 恢复颜色
+                        setBarColor(step.index, 0x6b7bff, 0x000000);
                         break;
 
                     case 'split':
@@ -887,8 +1050,8 @@
 
             // 速度
             document.getElementById('speed').addEventListener('input', (e) => {
-                animationSpeed = parseInt(e.target.value);
-                document.getElementById('speed-value').textContent = animationSpeed;
+                animationSpeed = parseFloat(e.target.value);
+                document.getElementById('speed-value').textContent = animationSpeed.toFixed(1);
             });
 
             // 运行/暂停按钮
@@ -899,8 +1062,38 @@
                     document.getElementById('btn-run').textContent = isPaused ? 'RESUME' : 'PAUSE';
                 } else {
                     // 开始运行
-                    resetAnimation();
                     generateAndRun();
+                }
+            });
+
+            // 随机数据按钮
+            document.getElementById('btn-randomize').addEventListener('click', () => {
+                if (!isRunning) {
+                    randomizeData();
+                }
+            });
+
+            // 自定义数据按钮
+            document.getElementById('btn-custom-data').addEventListener('click', () => {
+                if (!isRunning) {
+                    showCustomDataModal();
+                }
+            });
+
+            // 取消自定义数据
+            document.getElementById('btn-cancel-custom').addEventListener('click', () => {
+                hideCustomDataModal();
+            });
+
+            // 确认自定义数据
+            document.getElementById('btn-confirm-custom').addEventListener('click', () => {
+                applyCustomData();
+            });
+
+            // 点击遮罩层关闭
+            document.getElementById('custom-data-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'custom-data-modal') {
+                    hideCustomDataModal();
                 }
             });
         }
@@ -920,9 +1113,85 @@
 
             updatePseudocode(-1);
 
+            // 不自动生成新数据，保持当前数据
+            // 用户可以通过随机按钮手动生成新数据
+        }
+
+        function randomizeData() {
             const size = parseInt(document.getElementById('array-size').value);
             const newData = generateRandomArray(size);
-            createBars(newData);
+            
+            // 添加动画效果：先缩小再放大
+            bars.forEach((bar, index) => {
+                gsap.to(bar.scale, {
+                    y: 0.1,
+                    duration: 0.15,
+                    ease: "power2.in",
+                    delay: index * 0.02,
+                    onComplete: () => {
+                        // 更新数据
+                        const maxVal = Math.max(...newData);
+                        const height = (newData[index] / maxVal) * 20;
+                        
+                        bar.geometry.dispose();
+                        bar.geometry = new THREE.BoxGeometry(0.8, height, 0.8);
+                        bar.position.y = height / 2 - 5;
+                        bar.userData.value = newData[index];
+                        
+                        // 恢复缩放
+                        gsap.to(bar.scale, {
+                            y: 1,
+                            duration: 0.3,
+                            ease: "back.out(1.7)"
+                        });
+                    }
+                });
+            });
+            
+            // 更新数组数据
+            arrayData = [...newData];
+        }
+
+        function showCustomDataModal() {
+            document.getElementById('custom-data-modal').classList.add('show');
+            document.getElementById('custom-data-input').value = '';
+            document.getElementById('custom-data-input').focus();
+        }
+
+        function hideCustomDataModal() {
+            document.getElementById('custom-data-modal').classList.remove('show');
+        }
+
+        function applyCustomData() {
+            const input = document.getElementById('custom-data-input').value.trim();
+            
+            if (!input) {
+                alert('请输入数据！');
+                return;
+            }
+
+            // 解析输入的数据（支持逗号或空格分隔）
+            const parsedData = input.split(/[,\s]+/)
+                .map(val => parseInt(val.trim()))
+                .filter(val => !isNaN(val) && val > 0 && val <= 100);
+
+            if (parsedData.length === 0) {
+                alert('数据格式错误！请输入有效的数字（1-100）');
+                return;
+            }
+
+            if (parsedData.length > 50) {
+                alert('数据过多！最多支持50个数字');
+                return;
+            }
+
+            // 更新数组大小滑块
+            document.getElementById('array-size').value = parsedData.length;
+            document.getElementById('array-size-value').textContent = parsedData.length;
+
+            // 创建柱状体
+            createBars(parsedData);
+            hideCustomDataModal();
         }
 
         function generateAndRun() {
