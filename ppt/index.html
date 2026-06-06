@@ -13,7 +13,7 @@
     --ink: #10212d;
     --muted: #5f6f7c;
     --accent: #2F6A95;
-    --accent-2: #cc6d2f;
+    --accent-2: #4187b8;
     --panel: #ffffff;
     --line: #f4efef;
     --shadow: 0 12px 40px rgba(47, 106, 149, 0.08);
@@ -461,102 +461,258 @@
   .research-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 14px;
   }
   .research-card {
     background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 26px;
+    border-radius: 12px;
+    padding: 16px 18px;
     transition: transform 0.3s, box-shadow 0.3s;
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow);
   }
   .research-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(47,106,149,0.12);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(47,106,149,0.12);
   }
   .research-card .card-icon {
-    font-size: 28px;
-    margin-bottom: 12px;
+    font-size: 22px;
+    margin-bottom: 8px;
   }
   .research-card h3 {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     line-height: 1.3;
   }
   .research-card p {
-    font-size: 13px;
+    font-size: 11.5px;
     color: var(--muted);
-    line-height: 1.7;
+    line-height: 1.55;
   }
   .tech-tags {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     flex-wrap: wrap;
-    margin-top: 12px;
+    margin-top: 8px;
   }
   .tech-tags span {
-    padding: 2px 10px;
+    padding: 2px 8px;
     background: rgba(47,106,149,0.06);
     color: var(--accent);
-    border-radius: 10px;
-    font-size: 11px;
+    border-radius: 8px;
+    font-size: 10px;
     border: 1px solid rgba(47,106,149,0.1);
   }
   .achievement-badge {
     position: absolute;
-    top: 14px;
-    right: 14px;
-    padding: 3px 10px;
-    background: rgba(204,109,47,0.08);
+    top: 10px;
+    right: 10px;
+    padding: 2px 8px;
     color: var(--accent-2);
-    border-radius: 10px;
-    font-size: 11px;
+    border-radius: 8px;
+    font-size: 10px;
     font-weight: 600;
     border: 1px solid rgba(204,109,47,0.15);
   }
 
   /* ====== SLIDE 5: PUBLICATIONS ====== */
   .pub-container {
-    max-width: 900px;
+    max-width: 1300px;
     width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .pub-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
   .pub-card {
     background: var(--panel);
     border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 26px 30px;
-    margin-bottom: 16px;
+    border-radius: 12px;
+    padding: 14px 18px;
     transition: transform 0.3s;
     box-shadow: var(--shadow);
   }
-  .pub-card:hover { transform: translateY(-2px); }
+  .pub-card:hover { transform: translateX(3px); }
   .pub-type {
     display: inline-block;
-    padding: 2px 10px;
-    border-radius: 8px;
-    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 10px;
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   .pub-type.sci { background: rgba(47,106,149,0.08); color: var(--accent); }
   .pub-type.patent { background: rgba(204,109,47,0.08); color: var(--accent-2); }
   .pub-type.soft { background: rgba(95,111,124,0.08); color: var(--muted); border: 1px solid rgba(95,111,124,0.15); }
   .pub-card h3 {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--ink);
-    margin-bottom: 6px;
-    line-height: 1.5;
+    margin-bottom: 4px;
+    line-height: 1.4;
   }
   .pub-card p {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
-    line-height: 1.6;
+    line-height: 1.5;
+  }
+  
+  /* 证书轮播区 */
+  .cert-carousel {
+    background: transparent;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .cert-carousel h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  .cert-viewer {
+    flex: 1;
+    position: relative;
+    background: transparent;
+    border-radius: 8px;
+    overflow: hidden;
+    min-height: 280px;
+    cursor: pointer;
+    perspective: 1000px;
+  }
+  .cert-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80%;
+    height: 85%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cert-item.active {
+    opacity: 1;
+    z-index: 10;
+    transform: translate(-50%, -50%) translateX(0) rotateY(0) scale(1.1);
+  }
+  .cert-item.prev {
+    opacity: 0.7;
+    z-index: 9;
+    transform: translate(-50%, -50%) translateX(-40%) rotateY(-12deg) scale(0.95);
+  }
+  .cert-item.next {
+    opacity: 0.7;
+    z-index: 8;
+    transform: translate(-50%, -50%) translateX(40%) rotateY(12deg) scale(0.95);
+  }
+  .cert-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    background: white;
+    transition: none;
+  }
+  .cert-item.active img {
+    background: white;
+  }
+  .cert-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    gap: 8px;
+  }
+  .cert-btn {
+    flex: 1;
+    padding: 4px 8px;
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid rgba(95,111,124,0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 500;
+    transition: all 0.2s;
+    opacity: 0.5;
+  }
+  .cert-btn:hover {
+    background: rgba(47,106,149,0.05);
+    color: var(--accent);
+    border-color: rgba(47,106,149,0.3);
+    opacity: 1;
+    transform: none;
+  }
+  .cert-indicator {
+    font-size: 10px;
+    color: var(--muted);
+    font-weight: 500;
+    min-width: 45px;
+    text-align: center;
+    opacity: 0.6;
+  }
+  .cert-dots {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .cert-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(95,111,124,0.2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .cert-dot:hover {
+    background: rgba(95,111,124,0.4);
+  }
+  .cert-dot.active {
+    background: var(--accent);
+    opacity: 0.8;
+  }
+  
+  /* 证书放大预览覆盖层 */
+  .cert-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.85);
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    cursor: zoom-out;
+  }
+  .cert-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .cert-overlay img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    cursor: default;
   }
 
   /* ====== SLIDE 6: SKILLS ====== */
@@ -763,6 +919,8 @@
     .slide { padding: 40px 24px; }
     .about-grid { grid-template-columns: 1fr; text-align: center; }
     .research-grid { grid-template-columns: 1fr; }
+    .pub-container { grid-template-columns: 1fr; }
+    .cert-viewer { min-height: 200px; }
     .skills-grid { grid-template-columns: repeat(2, 1fr); }
     .achieve-grid { grid-template-columns: 1fr 1fr; }
     .oss-grid { grid-template-columns: 1fr; }
@@ -862,7 +1020,7 @@
           <span>GPA 3.83/4 (前5%)</span>
         </div>
       </div>
-      <p class="edu-highlight">🏅 导师：陈华富教授 · 神经信息教育部重点实验室</p>
+      <p class="edu-highlight">导师：陈华富教授 · 神经信息教育部重点实验室</p>
       <div class="edu-tags">
         <span class="tag">生物医学工程 硕士</span>
         <span class="tag">优秀研究生 ×2</span>
@@ -885,7 +1043,7 @@
           <span>GPA 4.15/5 (前2%)</span>
         </div>
       </div>
-      <p class="edu-highlight">🏅 导师：周颖玥 · ACM项目组 & BMELab</p>
+      <p class="edu-highlight">导师：周颖玥 · ACM项目组 & BMELab</p>
       <div class="edu-tags">
         <span class="tag">生物医学工程 本科</span>
         <span class="tag">四川省优秀毕业生</span>
@@ -912,11 +1070,13 @@
         <div class="card-icon"></div>
         <h3>NEURA 神经影像智能体系统</h3>
         <p>受认知科学启发的大语言模型驱动自主智能体，双知识图谱架构（DiseaseKG/ToolKG）动态桥接医学知识与异构工具，实现端到端多模态神经影像分析工作流自动化。</p>
-        <div class="tech-tags">
-          <span>Agent</span><span>LLM</span><span>RAG</span><span>CoT</span><span>Python</span>
-        </div>
-        <div style="margin-top:12px;font-size:12px;">
-          <a href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" style="color:var(--accent);text-decoration:none;">📄 阅读论文</a>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;">
+          <div class="tech-tags" style="margin-top:0;">
+            <span>Agent</span><span>LLM</span><span>RAG</span><span>CoT</span><span>Python</span>
+          </div>
+          <div style="font-size:12px;white-space:nowrap;">
+            <a href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" style="color:var(--accent);text-decoration:none;">📄 阅读论文</a>
+          </div>
         </div>
       </div>
       <!-- Card 2 -->
@@ -925,17 +1085,21 @@
         <div class="card-icon"></div>
         <h3>MediScreen-Brain 脑肿瘤检测平台</h3>
         <p>基于YOLO的CPU优化GUI平台，支持NIfTI 3D MRI解析，自动生成三视图，精准定位肿瘤并测量体积。零配置，双击即用。</p>
-        <div class="tech-tags">
-          <span>YOLO</span><span>PyTorch</span><span>PySide6</span><span>NiBabel</span>
-        </div>
-        <div style="margin-top:12px;font-size:12px;">
-          <a href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" style="color:var(--accent);text-decoration:none;">🔗 访问平台</a>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;">
+          <div class="tech-tags" style="margin-top:0;">
+            <span>YOLO</span><span>PyTorch</span><span>PySide6</span><span>NiBabel</span>
+          </div>
+          <div style="font-size:12px;white-space:nowrap;">
+            <a href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" style="color:var(--accent);text-decoration:none;">🔗 访问平台</a>
+          </div>
         </div>
       </div>
       <!-- Card 3 -->
       <div class="research-card fade-up" style="transition-delay:0.2s">
-        <div class="achievement-badge">🏆 国赛一等奖</div>
-        <div class="card-icon">🧬</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <img src="./assets/logo_lianying.png" alt="海马体分割" style="height:25px;width:auto;">
+          <div class="achievement-badge" style="position:static;">🏆 国赛一等奖</div>
+        </div>
         <h3>海马体自动分割诊断系统</h3>
         <p>基于nnU-Net 3D分割模型，Dice系数达0.9554，HD95仅1.0mm，支持3D/2D可视化及历史记录查询。</p>
         <div class="tech-tags">
@@ -948,11 +1112,13 @@
         <div class="card-icon"></div>
         <h3>结直肠癌智能检测与诊断系统</h3>
         <p>基于YOLOv8的目标检测模型，结合Django + Vue + MySQL，实现结直肠癌早期筛查辅助诊断系统。</p>
-        <div class="tech-tags">
-          <span>YOLOv8</span><span>Django</span><span>Vue</span><span>MySQL</span>
-        </div>
-        <div style="margin-top:12px;font-size:12px;">
-          <a href="https://jingw-ui.github.io/videos/" target="_blank" style="color:var(--accent);text-decoration:none;">🎥 查看演示视频</a>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div class="tech-tags" style="margin-top:0;">
+            <span>YOLOv8</span><span>Django</span><span>Vue</span><span>MySQL</span>
+          </div>
+          <div style="font-size:12px;white-space:nowrap;">
+            <a href="https://jingw-ui.github.io/videos/" target="_blank" style="color:var(--accent);text-decoration:none;">🎥 查看演示视频</a>
+          </div>
         </div>
       </div>
       <!-- Card 5 -->
@@ -967,8 +1133,10 @@
       </div>
       <!-- Card 6 -->
       <div class="research-card fade-up" style="transition-delay:0.5s">
-        <div class="achievement-badge">💼 实习</div>
-        <div class="card-icon">⚡</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <img src="./assets/logo_dianwang.png" alt="国网宁夏电力" style="height:50px;width:auto;">
+          <div class="achievement-badge" style="position:static;">💼 实习</div>
+        </div>
         <h3>国网宁夏电力 · AI算法实习</h3>
         <p>采集2k+带电作业图像，基于YOLOv8+OpenPose实现头盔佩戴与危险姿态识别，mAP@0.5提升7.3%。</p>
         <div class="tech-tags">
@@ -985,30 +1153,47 @@
   <div class="section-title fade-up" style="transition-delay:0.05s">论文 · 专利 · 软著</div>
   <div class="section-line fade-up" style="transition-delay:0.1s"></div>
   <div class="pub-container">
-    <div class="pub-card fade-up">
-      <div class="pub-type sci">SCI 论文</div>
-      <h3>MediScreen-Brain: A Portable, YOLO-powered GUI for Multi-Modal Brain Tumor Detection and 3D Localization</h3>
-      <p>提出基于YOLO的便携化脑肿瘤检测GUI系统，支持多模态MRI数据的3D定位与可视化分析。</p>
+    <!-- 左侧：论文与专利列表 -->
+    <div class="pub-list">
+      <div class="pub-card fade-up">
+        <div class="pub-type sci">SCI 论文</div>
+        <h3>MediScreen-Brain: A Portable, YOLO-powered GUI for Multi-Modal Brain Tumor Detection and 3D Localization</h3>
+        <p>提出基于YOLO的便携化脑肿瘤检测GUI系统，支持多模态MRI数据的3D定位与可视化分析。</p>
+      </div>
+      <div class="pub-card fade-up" style="transition-delay:0.05s">
+        <div class="pub-type sci">SCI 论文（bioRxiv）</div>
+        <h3>NEURA: An Agentic System for Autonomous Neuroimaging Workflows</h3>
+        <p>大语言模型驱动的自主神经影像分析智能体，双知识图谱架构实现复杂工作流端到端自动化。</p>
+      </div>
+      <div class="pub-card fade-up" style="transition-delay:0.1s">
+        <div class="pub-type sci">SCI 论文（在审）</div>
+        <h3>Spatiotemporal Patterns of Brainstem Tract Atrophy Predict Disease Progression in SCA3</h3>
+        <p>脑干束萎缩的时空模式预测脊髓小脑性共济失调3型的疾病进展。</p>
+      </div>
+      <div class="pub-card fade-up" style="transition-delay:0.15s">
+        <div class="pub-type patent">专利</div>
+        <h3>基于深度学习的MRI海马体3D智能分析诊断平台</h3>
+        <p>发明专利：利用深度学习技术实现MRI海马体区域的自动化3D分割与病理分析。</p>
+      </div>
+      <div class="pub-card fade-up" style="transition-delay:0.2s">
+        <div class="pub-type soft">软著 ×5</div>
+        <h3>结直肠息肉检测 · 摔倒行为识别 · 批量图像处理 · 脑肿瘤检测 · 海马体分析</h3>
+        <p>多项软件著作权覆盖医学影像分析、目标检测、行为识别等多个方向。</p>
+      </div>
     </div>
-    <div class="pub-card fade-up" style="transition-delay:0.1s">
-      <div class="pub-type sci">SCI 论文（bioRxiv）</div>
-      <h3>NEURA: An Agentic System for Autonomous Neuroimaging Workflows</h3>
-      <p>大语言模型驱动的自主神经影像分析智能体，双知识图谱架构实现复杂工作流端到端自动化。</p>
-    </div>
-    <div class="pub-card fade-up" style="transition-delay:0.2s">
-      <div class="pub-type sci">SCI 论文（在审）</div>
-      <h3>Spatiotemporal Patterns of Brainstem Tract Atrophy Predict Disease Progression in SCA3</h3>
-      <p>脑干束萎缩的时空模式预测脊髓小脑性共济失调3型的疾病进展。</p>
-    </div>
-    <div class="pub-card fade-up" style="transition-delay:0.3s">
-      <div class="pub-type patent">专利</div>
-      <h3>基于深度学习的MRI海马体3D智能分析诊断平台</h3>
-      <p>发明专利：利用深度学习技术实现MRI海马体区域的自动化3D分割与病理分析。</p>
-    </div>
-    <div class="pub-card fade-up" style="transition-delay:0.4s">
-      <div class="pub-type soft">软著 ×5</div>
-      <h3>结直肠息肉检测 · 摔倒行为识别 · 批量图像处理 · 脑肿瘤检测 · 海马体分析</h3>
-      <p>多项软件著作权覆盖医学影像分析、目标检测、行为识别等多个方向。</p>
+    
+    <!-- 右侧：证书轮播 -->
+    <div class="cert-carousel fade-up" style="transition-delay:0.25s">
+      <h4>📜 专利与软著证书</h4>
+      <div class="cert-viewer" id="certViewer">
+        <!-- 证书图片将通过JS动态生成 -->
+      </div>
+      <div class="cert-nav">
+        <button class="cert-btn" onclick="prevCert()">◀ 上一张</button>
+        <span class="cert-indicator" id="certIndicator">1 / 11</span>
+        <button class="cert-btn" onclick="nextCert()">下一张 ▶</button>
+      </div>
+      <div class="cert-dots" id="certDots"></div>
     </div>
   </div>
 </section>
@@ -1092,12 +1277,12 @@
         <p>第十届（2025）· 国家级企业赛道</p>
       </div>
       <div class="achieve-card fade-up" style="transition-delay:0.4s">
-        <div class="medal">🥈</div>
+        <img src="./assets/huawei_logo.png" alt="华为" style="height:32px;width:auto;margin-bottom:8px;">
         <h4>华为云杯昇腾云 二等奖</h4>
         <p>血液图像处理大赛（2025）· 省级</p>
       </div>
       <div class="achieve-card fade-up" style="transition-delay:0.5s">
-        <div class="medal">🏅</div>
+        <img src="./assets/huawei_logo.png" alt="华为" style="height:32px;width:auto;margin-bottom:8px;">
         <h4>CSIG图像图形技术挑战赛 第八名</h4>
         <p>2025 "Camera学术之星" 影像算法竞赛</p>
         <div style="margin-top:10px;font-size:12px;">
@@ -1322,6 +1507,213 @@
     requestAnimationFrame(updateUI);
   }
   requestAnimationFrame(updateUI);
+
+  // 证书3D轮播功能
+  const certImages = [
+    '/imgs/patents_and_software/1.png',
+    '/imgs/patents_and_software/2.png',
+    '/imgs/patents_and_software/3.png',
+    '/imgs/patents_and_software/4.png',
+    '/imgs/patents_and_software/5.png',
+    '/imgs/patents_and_software/6.png',
+    '/imgs/patents_and_software/7.png',
+    '/imgs/patents_and_software/8.png',
+    '/imgs/patents_and_software/9.png',
+    '/imgs/patents_and_software/10.png',
+    '/imgs/patents_and_software/11.png'
+  ];
+  let currentCertIndex = 0;
+  let certAutoPlay = null;
+  
+  // 初始化证书轮播
+  function initCertCarousel() {
+    const viewer = document.getElementById('certViewer');
+    if (!viewer) return;
+    
+    viewer.innerHTML = '';
+    
+    // 创建所有证书项
+    certImages.forEach((src, index) => {
+      const item = document.createElement('div');
+      item.className = 'cert-item';
+      item.innerHTML = `<img src="${src}" alt="证书 ${index + 1}">`;
+      
+      // 点击放大预览
+      item.querySelector('img').addEventListener('click', (e) => {
+        e.stopPropagation();
+        openCertPreview(src);
+      });
+      
+      viewer.appendChild(item);
+    });
+    
+    // 创建指示点
+    updateCertDots();
+    
+    // 更新初始状态
+    updateCertCarousel();
+    
+    // 开始自动播放
+    startCertAutoplay();
+    
+    // 点击切换功能（仅在非图片区域）
+    viewer.addEventListener('click', (e) => {
+      if (e.target.tagName === 'IMG') return; // 点击图片不切换
+      
+      const rect = viewer.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const threshold = rect.width * 0.3;
+      
+      if (clickX < threshold) {
+        prevCert();
+      } else if (clickX > rect.width - threshold) {
+        nextCert();
+      }
+    });
+    
+    // 鼠标悬停暂停
+    viewer.addEventListener('mouseenter', () => {
+      clearInterval(certAutoPlay);
+    });
+    viewer.addEventListener('mouseleave', () => {
+      startCertAutoplay();
+    });
+    
+    // 创建预览覆盖层
+    createCertOverlay();
+  }
+  
+  // 更新轮播状态
+  function updateCertCarousel() {
+    const items = document.querySelectorAll('.cert-item');
+    const total = items.length;
+    
+    if (total === 0) return;
+    
+    // 清除所有状态
+    items.forEach(item => {
+      item.classList.remove('active', 'prev', 'next');
+    });
+    
+    // 计算索引
+    const activeIdx = currentCertIndex;
+    const prevIdx = (currentCertIndex - 1 + total) % total;
+    const nextIdx = (currentCertIndex + 1) % total;
+    
+    // 设置状态
+    if (items[activeIdx]) items[activeIdx].classList.add('active');
+    if (items[prevIdx]) items[prevIdx].classList.add('prev');
+    if (items[nextIdx]) items[nextIdx].classList.add('next');
+    
+    // 更新指示器
+    updateCertIndicator();
+    updateCertDots();
+  }
+  
+  // 下一张
+  window.nextCert = function() {
+    currentCertIndex = (currentCertIndex + 1) % certImages.length;
+    updateCertCarousel();
+  };
+  
+  // 上一张
+  window.prevCert = function() {
+    currentCertIndex = (currentCertIndex - 1 + certImages.length) % certImages.length;
+    updateCertCarousel();
+  };
+  
+  // 更新指示器
+  function updateCertIndicator() {
+    const indicator = document.getElementById('certIndicator');
+    if (indicator) {
+      indicator.textContent = `${currentCertIndex + 1} / ${certImages.length}`;
+    }
+  }
+  
+  // 更新指示点
+  function updateCertDots() {
+    const dotsContainer = document.getElementById('certDots');
+    if (!dotsContainer) return;
+    
+    dotsContainer.innerHTML = '';
+    certImages.forEach((_, index) => {
+      const dot = document.createElement('span');
+      dot.className = `cert-dot ${index === currentCertIndex ? 'active' : ''}`;
+      dot.onclick = () => {
+        currentCertIndex = index;
+        updateCertCarousel();
+        resetCertAutoplay();
+      };
+      dotsContainer.appendChild(dot);
+    });
+  }
+  
+  // 自动播放
+  function startCertAutoplay() {
+    clearInterval(certAutoPlay);
+    certAutoPlay = setInterval(() => {
+      nextCert();
+    }, 5000);
+  }
+  
+  // 重置自动播放
+  function resetCertAutoplay() {
+    clearInterval(certAutoPlay);
+    startCertAutoplay();
+  }
+  
+  // 初始化轮播
+  setTimeout(initCertCarousel, 100);
+  
+  // 创建预览覆盖层
+  function createCertOverlay() {
+    const overlay = document.createElement('div');
+    overlay.className = 'cert-overlay';
+    overlay.id = 'certOverlay';
+    overlay.innerHTML = '<img src="" alt="证书预览">';
+    document.body.appendChild(overlay);
+    
+    // 点击背景关闭
+    overlay.addEventListener('click', () => {
+      closeCertPreview();
+    });
+    
+    // 点击图片不关闭
+    overlay.querySelector('img').addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+    
+    // ESC键关闭
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeCertPreview();
+      }
+    });
+  }
+  
+  // 打开预览
+  function openCertPreview(src) {
+    const overlay = document.getElementById('certOverlay');
+    if (!overlay) return;
+    
+    const img = overlay.querySelector('img');
+    img.src = src;
+    overlay.classList.add('show');
+    
+    // 暂停自动播放
+    clearInterval(certAutoPlay);
+  }
+  
+  // 关闭预览
+  function closeCertPreview() {
+    const overlay = document.getElementById('certOverlay');
+    if (!overlay) return;
+    
+    overlay.classList.remove('show');
+    
+    // 恢复自动播放
+    startCertAutoplay();
+  }
 
   // Keyboard nav
   document.addEventListener('keydown', (e) => {
