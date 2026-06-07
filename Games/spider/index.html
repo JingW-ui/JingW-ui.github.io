@@ -1,785 +1,1502 @@
-
-html_content = '''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spider</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #0a0e17;
-            overflow: hidden;
-            cursor: none;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-
-        canvas {
-            display: block;
-        }
-
-        /* 极简光标 */
-        .cursor {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            background: #fbbf24;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 99;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 8px #fbbf24;
-            transition: transform 0.1s, width 0.15s, height 0.15s;
-        }
-
-        .cursor.click {
-            width: 14px;
-            height: 14px;
-            box-shadow: 0 0 20px #fbbf24, 0 0 40px rgba(251, 191, 36, 0.4);
-        }
-
-        /* 隐蔽控制面板 - 默认收起状态 */
-        .panel-trigger {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            width: 36px;
-            height: 36px;
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 101;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 16px;
-        }
-
-        .panel-trigger:hover {
-            background: rgba(251, 191, 36, 0.15);
-            border-color: rgba(251, 191, 36, 0.3);
-            color: #fbbf24;
-            transform: scale(1.1);
-        }
-
-        .panel-trigger.active {
-            background: rgba(251, 191, 36, 0.2);
-            border-color: rgba(251, 191, 36, 0.4);
-            color: #fbbf24;
-            transform: rotate(45deg);
-        }
-
-        /* 控制面板 */
-        .controls {
-            position: fixed;
-            top: 60px;
-            right: 16px;
-            width: 240px;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 14px;
-            padding: 16px;
-            color: #e2e8f0;
-            z-index: 100;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-            opacity: 0;
-            transform: translateY(-10px) scale(0.95);
-            pointer-events: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            max-height: calc(100vh - 80px);
-            overflow-y: auto;
-        }
-
-        .controls.open {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            pointer-events: all;
-        }
-
-        .controls::-webkit-scrollbar {
-            width: 3px;
-        }
-
-        .controls::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 2px;
-        }
-
-        .controls h3 {
-            font-size: 13px;
-            font-weight: 600;
-            color: #fbbf24;
-            margin-bottom: 14px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-
-        .control-row {
-            margin-bottom: 12px;
-        }
-
-        .control-row label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            margin-bottom: 5px;
-            color: #64748b;
-        }
-
-        .control-row label span.val {
-            color: #fbbf24;
-            font-family: 'SF Mono', monospace;
-            font-size: 10px;
-            background: rgba(251, 191, 36, 0.1);
-            padding: 1px 6px;
-            border-radius: 4px;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            height: 4px;
-            border-radius: 2px;
-            background: #1e293b;
-            outline: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #fbbf24;
-            cursor: pointer;
-            box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
-            transition: transform 0.15s;
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            transform: scale(1.3);
-        }
-
-        input[type="color"] {
-            width: 100%;
-            height: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
-            cursor: pointer;
-            background: transparent;
-        }
-
-        .toggle-row {
-            display: flex;
-            gap: 6px;
-            margin-top: 8px;
-        }
-
-        .toggle-chip {
-            flex: 1;
-            padding: 6px 0;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 6px;
-            background: transparent;
-            color: #64748b;
-            cursor: pointer;
-            font-size: 11px;
-            transition: all 0.2s;
-            text-align: center;
-        }
-
-        .toggle-chip:hover {
-            border-color: rgba(251, 191, 36, 0.3);
-            color: #94a3b8;
-        }
-
-        .toggle-chip.on {
-            background: rgba(251, 191, 36, 0.12);
-            border-color: rgba(251, 191, 36, 0.3);
-            color: #fbbf24;
-        }
-
-        .presets {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            margin-top: 8px;
-        }
-
-        .preset-dot {
-            height: 28px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .preset-dot:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .preset-dot::after {
-            content: attr(data-name);
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 500;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-            letter-spacing: 0.3px;
-        }
-
-        .divider {
-            height: 1px;
-            background: rgba(255, 255, 255, 0.06);
-            margin: 12px 0;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #080b12; overflow: hidden; cursor: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        canvas { display: block; }
         .hint {
-            position: fixed;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255, 255, 255, 0.25);
-            font-size: 12px;
-            pointer-events: none;
-            z-index: 50;
-            letter-spacing: 0.5px;
-            transition: opacity 1s;
+            position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+            color: rgba(255,255,255,0.2); font-size: 11px;
+            pointer-events: none; z-index: 50; letter-spacing: 0.5px; transition: opacity 1.5s;
         }
-
-        .hint.fade {
-            opacity: 0;
+        .hint.fade { opacity: 0; }
+        .panel-btn {
+            position: fixed; top: 16px; right: 16px; width: 32px; height: 32px;
+            background: rgba(20,20,20,0.7); border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 6px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 101; transition: all 0.2s; color: rgba(255,255,255,0.4); font-size: 14px;
         }
+        .panel-btn:hover { border-color: rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); }
+        .panel-btn.active { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.8); }
+        .controls {
+            position: fixed; top: 56px; right: 16px; width: 200px;
+            background: rgba(10,10,10,0.94); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px; padding: 16px 14px; color: #999; z-index: 100;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6); opacity: 0; transform: translateY(-8px) scale(0.97);
+            pointer-events: none; transition: all 0.3s cubic-bezier(0.16,1,0.3,1); max-height: calc(100vh - 72px); overflow-y: auto;
+        }
+        .controls.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+        .controls::-webkit-scrollbar { width: 2px; }
+        .controls::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 1px; }
+        .ctrl-row { margin-bottom: 8px; }
+        .ctrl-row label { display: flex; justify-content: space-between; align-items: center; font-size: 10px; margin-bottom: 3px; color: #555; }
+        .ctrl-row label span.v { color: #777; font-family: 'SF Mono', Menlo, monospace; font-size: 9px; }
+        input[type="range"] { width: 100%; height: 2px; border-radius: 1px; background: #1a1a1a; outline: none; -webkit-appearance: none; cursor: pointer; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 8px; height: 8px; border-radius: 50%; background: #555; cursor: pointer; border: none; transition: background 0.15s; }
+        input[type="range"]::-webkit-slider-thumb:hover { background: #999; }
+        input[type="color"] { width: 100%; height: 18px; border: 1px solid rgba(255,255,255,0.06); border-radius: 3px; cursor: pointer; background: transparent; padding: 0; }
+        .sep { height: 1px; background: rgba(255,255,255,0.04); margin: 8px 0; }
+        .chip-row { display: flex; gap: 3px; }
+        .chip { flex: 1; padding: 4px 0; border: 1px solid rgba(255,255,255,0.06); border-radius: 3px; background: transparent; color: #444; cursor: pointer; font-size: 9px; transition: all 0.15s; text-align: center; letter-spacing: 0.3px; }
+        .chip:hover { border-color: rgba(255,255,255,0.12); color: #666; }
+        .chip.on { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.12); color: #999; }
+        .presets { display: grid; grid-template-columns: repeat(3,1fr); gap: 3px; }
+        .preset { height: 22px; border: 1px solid rgba(255,255,255,0.06); border-radius: 3px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #666; font-weight: 400; letter-spacing: 0.3px; }
+        .preset:hover { border-color: rgba(255,255,255,0.15); color: #bbb; background: rgba(255,255,255,0.03); }
+        .preset.active { border-color: rgba(255,255,255,0.2); color: #ddd; background: rgba(255,255,255,0.05); }
+        .act-row { display: flex; gap: 3px; }
+        .act-btn { flex: 1; padding: 5px 0; border: 1px solid rgba(255,255,255,0.08); border-radius: 3px; background: transparent; color: #666; cursor: pointer; font-size: 9px; transition: all 0.15s; text-align: center; letter-spacing: 0.3px; }
+        .act-btn:hover { background: rgba(255,255,255,0.03); color: #bbb; border-color: rgba(255,255,255,0.12); }
+        .color-row { display: flex; gap: 4px; align-items: center; }
+        .color-row label { font-size: 9px; color: #555; width: 28px; flex-shrink: 0; }
+        .color-row input[type="color"] { flex: 1; }
     </style>
 </head>
 <body>
-
-    <div class="cursor" id="cursor"></div>
-
-    <div class="panel-trigger" id="panelTrigger" title="设置">⚙</div>
-
-    <div class="controls" id="controls">
-        <h3>蜘蛛设置</h3>
-
-        <div class="control-row">
-            <label>大小 <span class="val" id="v-size">35</span></label>
-            <input type="range" id="size" min="12" max="80" value="35">
-        </div>
-
-        <div class="control-row">
-            <label>响应速度 <span class="val" id="v-speed">0.22</span></label>
-            <input type="range" id="speed" min="0.05" max="0.5" step="0.01" value="0.22">
-        </div>
-
-        <div class="control-row">
-            <label>腿数 <span class="val" id="v-legs">8</span></label>
-            <input type="range" id="legs" min="4" max="16" step="2" value="8">
-        </div>
-
-        <div class="control-row">
-            <label>腿长 <span class="val" id="v-legLen">55</span></label>
-            <input type="range" id="legLen" min="25" max="100" value="55">
-        </div>
-
-        <div class="control-row">
-            <label>发光 <span class="val" id="v-glow">18</span></label>
-            <input type="range" id="glow" min="0" max="40" value="18">
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="control-row">
-            <label>身体颜色</label>
-            <input type="color" id="bodyColor" value="#8B4513">
-        </div>
-
-        <div class="control-row">
-            <label>腿部颜色</label>
-            <input type="color" id="legColor" value="#D2691E">
-        </div>
-
-        <div class="control-row">
-            <label>眼睛颜色</label>
-            <input type="color" id="eyeColor" value="#FF3333">
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="toggle-row">
-            <div class="toggle-chip on" id="t-trail">拖尾</div>
-            <div class="toggle-chip" id="t-web">蛛丝</div>
-            <div class="toggle-chip on" id="t-glow">发光</div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="control-row">
-            <label>预设</label>
-            <div class="presets">
-                <div class="preset-dot" data-name="经典" style="background: linear-gradient(135deg, #8B4513, #D2691E);" onclick="setPreset('classic')"></div>
-                <div class="preset-dot" data-name="黑寡妇" style="background: linear-gradient(135deg, #1a1a1a, #333);" onclick="setPreset('black')"></div>
-                <div class="preset-dot" data-name="霓虹" style="background: linear-gradient(135deg, #00ffff, #0099ff);" onclick="setPreset('neon')"></div>
-                <div class="preset-dot" data-name="毒液" style="background: linear-gradient(135deg, #2d5a27, #4a8c3f);" onclick="setPreset('green')"></div>
-                <div class="preset-dot" data-name="黄金" style="background: linear-gradient(135deg, #b8860b, #daa520);" onclick="setPreset('gold')"></div>
-                <div class="preset-dot" data-name="幽灵" style="background: linear-gradient(135deg, #e0e0e0, #999);" onclick="setPreset('ghost')"></div>
-            </div>
-        </div>
+<div class="panel-btn" id="panelBtn" title="设置">⚙</div>
+<div class="controls" id="controls">
+    <div class="ctrl-row"><label>大小 <span class="v" id="v-size">35</span></label><input type="range" id="size" min="12" max="80" value="35"></div>
+    <div class="ctrl-row"><label>速度 <span class="v" id="v-speed">0.22</span></label><input type="range" id="speed" min="0.05" max="0.5" step="0.01" value="0.22"></div>
+    <div class="ctrl-row"><label>腿长 <span class="v" id="v-legLen">55</span></label><input type="range" id="legLen" min="25" max="120" value="55"></div>
+    <div class="ctrl-row"><label>同伴 <span class="v" id="v-companions">2</span></label><input type="range" id="companions" min="0" max="8" step="1" value="2"></div>
+    <div class="sep"></div>
+    <div class="color-row"><label>身体</label><input type="color" id="bodyColor" value="#1a1a1a"></div>
+    <div class="color-row"><label>腿部</label><input type="color" id="legColor" value="#2a2a2a"></div>
+    <div class="color-row"><label>眼睛</label><input type="color" id="eyeColor" value="#ff0044"></div>
+    <div class="sep"></div>
+    <div class="chip-row"><div class="chip on" id="t-trail">拖尾</div><div class="chip on" id="t-web">蛛网</div><div class="chip on" id="t-glow">发光</div></div>
+    <div class="sep"></div>
+    <div class="act-row"><div class="act-btn" id="btn-descend">垂丝</div><div class="act-btn" id="btn-buildweb">结网</div><div class="act-btn" id="btn-jump">跳跃</div></div>
+    <div class="sep"></div>
+    <div class="presets">
+        <div class="preset active" data-key="black" onclick="setPreset('black')">黑寡妇</div>
+        <div class="preset" data-key="classic" onclick="setPreset('classic')">经典</div>
+        <div class="preset" data-key="ghost" onclick="setPreset('ghost')">幽灵</div>
+        <div class="preset" data-key="neon" onclick="setPreset('neon')">霓虹</div>
+        <div class="preset" data-key="green" onclick="setPreset('green')">毒液</div>
+        <div class="preset" data-key="gold" onclick="setPreset('gold')">黄金</div>
     </div>
+</div>
+<div class="hint" id="hint">移动鼠标引导蜘蛛 · 点击惊吓 · 右上角齿轮调节</div>
+<canvas id="canvas"></canvas>
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+let mouse = { x: 0, y: 0, inWindow: true };
+let globalTime = 0;
 
-    <div class="hint" id="hint">移动鼠标引导蜘蛛 · 点击惊吓 · 右上角齿轮调节样式</div>
+// 默认黑寡妇皮肤
+let cfg = {
+    size: 35, speed: 0.22, legLen: 55,
+    bodyColor: '#1a1a1a', legColor: '#2a2a2a', eyeColor: '#ff0044',
+    glow: 28, trail: true, web: true, glowOn: true, companions: 2
+};
 
-    <canvas id="canvas"></canvas>
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; mouse.x = W/2; mouse.y = H/2; }
+resize(); window.addEventListener('resize', resize);
 
-    <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const cursor = document.getElementById('cursor');
-        const panelTrigger = document.getElementById('panelTrigger');
-        const controls = document.getElementById('controls');
-        const hint = document.getElementById('hint');
+// ==================== 工具 ====================
+function lerp(a,b,t){return a+(b-a)*t;}
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+function angleLerp(a,b,t){let d=b-a;while(d>Math.PI)d-=Math.PI*2;while(d<-Math.PI)d+=Math.PI*2;return a+d*t;}
+function dist(x1,y1,x2,y2){return Math.hypot(x2-x1,y2-y1);}
+function rng(lo,hi){return lo+Math.random()*(hi-lo);}
+function parseHex(hex){const m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);return m?{r:parseInt(m[1],16),g:parseInt(m[2],16),b:parseInt(m[3],16)}:{r:128,g:128,b:128};}
+function lighten(hex,amt){const c=parseHex(hex);return`rgb(${Math.min(255,c.r+amt)},${Math.min(255,c.g+amt)},${Math.min(255,c.b+amt)})`;}
+function darken(hex,amt){const c=parseHex(hex);return`rgb(${Math.max(0,c.r-amt)},${Math.max(0,c.g-amt)},${Math.max(0,c.b-amt)})`;}
 
-        let W, H;
-        let mouse = { x: W / 2 || window.innerWidth / 2, y: H / 2 || window.innerHeight / 2 };
-        let clicking = false;
+function solveIK(bx,by,tx,ty,l1,l2,bend){
+    let d=Math.hypot(tx-bx,ty-by);
+    d=clamp(d,Math.abs(l1-l2)+0.5,l1+l2-0.5);
+    const a=Math.atan2(ty-by,tx-bx);
+    const cos=clamp((l1*l1+d*d-l2*l2)/(2*l1*d),-1,1);
+    const ka=a+bend*Math.acos(cos);
+    return{kx:bx+Math.cos(ka)*l1,ky:by+Math.sin(ka)*l1};
+}
 
-        // 蜘蛛状态
-        const spider = {
-            x: window.innerWidth / 2,
-            y: window.innerHeight / 2,
-            angle: 0,
-            vx: 0,
-            vy: 0,
-            legs: [],
-            trail: [],
-            webPts: [],
-            legPhase: 0
-        };
+// ==================== 场景系统（日/夜） ====================
+class SceneSystem {
+    constructor() {
+        this.dayImage = new Image();
+        this.nightImage = new Image();
+        this.dayImageLoaded = false;
+        this.nightImageLoaded = false;
+        this.dayImage.crossOrigin = 'anonymous';
+        this.nightImage.crossOrigin = 'anonymous';
+        this.dayImage.onload = () => { this.dayImageLoaded = true; };
+        this.nightImage.onload = () => { this.nightImageLoaded = true; };
+        this.dayImage.onerror = () => { this.dayImageLoaded = false; };
+        this.nightImage.onerror = () => { this.nightImageLoaded = false; };
+        this.dayImage.src = 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=1920&q=80';
+        this.nightImage.src = 'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1920&q=80';
 
-        let cfg = {
-            size: 35,
-            speed: 0.22,
-            legCount: 8,
-            legLen: 55,
-            bodyColor: '#8B4513',
-            legColor: '#D2691E',
-            eyeColor: '#FF3333',
-            glow: 18,
-            trail: true,
-            web: false,
-            glowOn: true
-        };
+        this.isDay = true;
+        this.blend = 1.0; // 1=day, 0=night — smoothly interpolated
+        this._checkTime();
+        this.ambientParticles = [];
+        this._initAmbientParticles();
+    }
 
-        // 初始化
-        function resize() {
-            W = canvas.width = window.innerWidth;
-            H = canvas.height = window.innerHeight;
-        }
-        resize();
-        window.addEventListener('resize', resize);
+    _checkTime() {
+        const h = new Date().getHours();
+        this.isDay = (h >= 6 && h < 18);
+        this.blend = this.isDay ? 1.0 : 0.0;
+    }
 
-        // 鼠标
-        window.addEventListener('mousemove', e => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
-
-        window.addEventListener('mousedown', () => {
-            clicking = true;
-            cursor.classList.add('click');
-            spider.vx += (Math.random() - 0.5) * 20;
-            spider.vy += (Math.random() - 0.5) * 20;
-        });
-
-        window.addEventListener('mouseup', () => {
-            clicking = false;
-            cursor.classList.remove('click');
-        });
-
-        window.addEventListener('touchmove', e => {
-            e.preventDefault();
-            mouse.x = e.touches[0].clientX;
-            mouse.y = e.touches[0].clientY;
-        }, { passive: false });
-
-        // 面板开关
-        panelTrigger.addEventListener('click', () => {
-            controls.classList.toggle('open');
-            panelTrigger.classList.toggle('active');
-        });
-
-        // 初始化腿
-        function initLegs() {
-            spider.legs = [];
-            for (let i = 0; i < cfg.legCount; i++) {
-                const baseAngle = (Math.PI * 2 / cfg.legCount) * i;
-                spider.legs.push({
-                    baseAngle: baseAngle,
-                    segments: [],
-                    tipX: 0, tipY: 0
-                });
-            }
-        }
-        initLegs();
-
-        // 颜色解析
-        function parseHex(hex) {
-            const m = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex);
-            return m ? {
-                r: parseInt(m[1], 16),
-                g: parseInt(m[2], 16),
-                b: parseInt(m[3], 16)
-            } : { r: 255, g: 255, b: 255 };
-        }
-
-        // 缓动函数
-        function lerp(a, b, t) { return a + (b - a) * t; }
-
-        function angleLerp(a, b, t) {
-            let d = b - a;
-            while (d > Math.PI) d -= Math.PI * 2;
-            while (d < -Math.PI) d += Math.PI * 2;
-            return a + d * t;
-        }
-
-        // 更新蜘蛛
-        function updateSpider() {
-            const dx = mouse.x - spider.x;
-            const dy = mouse.y - spider.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            const targetAngle = Math.atan2(dy, dx);
-
-            // 快速转向
-            spider.angle = angleLerp(spider.angle, targetAngle, 0.15);
-
-            // 快速移动 - 距离越远速度越快
-            if (dist > 3) {
-                const accel = cfg.speed * (1 + dist * 0.003);
-                spider.vx += Math.cos(spider.angle) * accel;
-                spider.vy += Math.sin(spider.angle) * accel;
-            }
-
-            // 阻尼
-            spider.vx *= 0.88;
-            spider.vy *= 0.88;
-
-            spider.x += spider.vx;
-            spider.y += spider.vy;
-
-            // 边界
-            const margin = cfg.size;
-            spider.x = Math.max(margin, Math.min(W - margin, spider.x));
-            spider.y = Math.max(margin, Math.min(H - margin, spider.y));
-
-            // 腿部相位
-            spider.legPhase += 0.15 + Math.min(dist * 0.002, 0.3);
-
-            // 拖尾
-            if (cfg.trail && (Math.abs(spider.vx) > 1 || Math.abs(spider.vy) > 1)) {
-                spider.trail.push({ x: spider.x, y: spider.y, t: Date.now() });
-            }
-            spider.trail = spider.trail.filter(p => Date.now() - p.t < 600);
-
-            // 蛛丝点
-            if (cfg.web) {
-                if (spider.webPts.length === 0 ||
-                    Math.hypot(spider.x - spider.webPts[spider.webPts.length - 1].x,
-                               spider.y - spider.webPts[spider.webPts.length - 1].y) > 40) {
-                    spider.webPts.push({ x: spider.x, y: spider.y });
-                }
-                if (spider.webPts.length > 25) spider.webPts.shift();
-            }
-        }
-
-        // 绘制
-        function draw() {
-            // 清屏 - 轻微拖影
-            ctx.fillStyle = 'rgba(10, 14, 23, 0.35)';
-            ctx.fillRect(0, 0, W, H);
-
-            const bc = parseHex(cfg.bodyColor);
-            const lc = parseHex(cfg.legColor);
-            const ec = parseHex(cfg.eyeColor);
-
-            ctx.save();
-
-            // 蛛丝
-            if (cfg.web && spider.webPts.length > 1) {
-                ctx.beginPath();
-                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-                ctx.lineWidth = 0.8;
-                spider.webPts.forEach((p, i) => {
-                    if (i === 0) ctx.moveTo(p.x, p.y);
-                    else ctx.lineTo(p.x, p.y);
-                });
-                ctx.stroke();
-            }
-
-            // 拖尾
-            if (cfg.trail) {
-                spider.trail.forEach((p, i) => {
-                    const age = (Date.now() - p.t) / 600;
-                    const alpha = (1 - age) * 0.25;
-                    const s = (1 - age) * cfg.size * 0.4;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, s, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(${bc.r}, ${bc.g}, ${bc.b}, ${alpha})`;
-                    ctx.fill();
-                });
-            }
-
-            // 发光
-            if (cfg.glowOn) {
-                ctx.shadowBlur = cfg.glow;
-                ctx.shadowColor = cfg.bodyColor;
-            }
-
-            // 腿
-            spider.legs.forEach((leg, i) => {
-                const side = i < cfg.legCount / 2 ? 1 : -1;
-                const legIndex = i % (cfg.legCount / 2);
-                const legSpread = (legIndex / (cfg.legCount / 2 - 1)) * 0.8 + 0.2;
-
-                const baseAngle = leg.baseAngle + spider.angle;
-                const startX = spider.x + Math.cos(baseAngle) * cfg.size * 0.25;
-                const startY = spider.y + Math.sin(baseAngle) * cfg.size * 0.25;
-
-                // 行走摆动
-                const walkCycle = Math.sin(spider.legPhase + i * 0.8) * 0.4;
-                const reach = cfg.legLen * (0.6 + walkCycle * 0.15);
-
-                const midAngle = baseAngle + side * 0.5 + walkCycle * 0.3;
-                const endAngle = baseAngle + side * 1.2 * legSpread + walkCycle * 0.5;
-
-                const midX = startX + Math.cos(midAngle) * reach * 0.5;
-                const midY = startY + Math.sin(midAngle) * reach * 0.5;
-                const endX = startX + Math.cos(endAngle) * reach;
-                const endY = startY + Math.sin(endAngle) * reach;
-
-                // 腿线
-                ctx.beginPath();
-                ctx.moveTo(startX, startY);
-                ctx.quadraticCurveTo(midX, midY, endX, endY);
-                ctx.strokeStyle = cfg.legColor;
-                ctx.lineWidth = Math.max(1.5, cfg.size / 18);
-                ctx.lineCap = 'round';
-                ctx.stroke();
-
-                // 关节
-                ctx.beginPath();
-                ctx.arc(midX, midY, Math.max(1.5, cfg.size / 22), 0, Math.PI * 2);
-                ctx.fillStyle = cfg.legColor;
-                ctx.fill();
-
-                // 脚尖微光
-                ctx.beginPath();
-                ctx.arc(endX, endY, Math.max(1, cfg.size / 28), 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${lc.r + 40}, ${lc.g + 40}, ${lc.b + 40}, 0.7)`;
-                ctx.fill();
+    _initAmbientParticles() {
+        const count = 50;
+        for (let i = 0; i < count; i++) {
+            this.ambientParticles.push({
+                x: Math.random() * (W || 1920),
+                y: Math.random() * (H || 1080),
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3 - 0.1,
+                size: Math.random() * 1.5 + 0.3,
+                alpha: Math.random() * 0.3 + 0.05,
+                phase: Math.random() * Math.PI * 2,
+                flicker: Math.random() * 0.5 + 0.5
             });
+        }
+    }
 
-            // 腹部
-            const abdomenX = spider.x - Math.cos(spider.angle) * cfg.size * 0.18;
-            const abdomenY = spider.y - Math.sin(spider.angle) * cfg.size * 0.18;
+    update(dt) {
+        const h = new Date().getHours();
+        const targetDay = (h >= 6 && h < 18);
+        if (targetDay !== this.isDay) this.isDay = targetDay;
+        const targetBlend = this.isDay ? 1.0 : 0.0;
+        this.blend += (targetBlend - this.blend) * dt * 0.5;
 
-            ctx.beginPath();
-            ctx.ellipse(abdomenX, abdomenY, cfg.size * 0.55, cfg.size * 0.45, spider.angle, 0, Math.PI * 2);
-            ctx.fillStyle = cfg.bodyColor;
-            ctx.fill();
+        // Update ambient particles
+        for (const p of this.ambientParticles) {
+            p.x += p.vx + Math.sin(globalTime * 0.5 + p.phase) * 0.15;
+            p.y += p.vy + Math.cos(globalTime * 0.3 + p.phase) * 0.1;
+            p.phase += dt * 1.5;
+            if (p.x < 0) p.x = W;
+            if (p.x > W) p.x = 0;
+            if (p.y < 0) p.y = H;
+            if (p.y > H) p.y = 0;
+        }
+    }
 
-            // 腹部高光
-            ctx.beginPath();
-            ctx.ellipse(
-                abdomenX - Math.cos(spider.angle) * cfg.size * 0.1,
-                abdomenY - Math.sin(spider.angle) * cfg.size * 0.1,
-                cfg.size * 0.25, cfg.size * 0.2, spider.angle, 0, Math.PI * 2
-            );
-            ctx.fillStyle = `rgba(${Math.min(255, bc.r + 50)}, ${Math.min(255, bc.g + 50)}, ${Math.min(255, bc.b + 50)}, 0.3)`;
-            ctx.fill();
+    getWebAlphaMultiplier() {
+        // Daytime: slightly more visible; Nighttime: slightly dimmer
+        return 0.8 + this.blend * 0.4;
+    }
 
-            // 头胸部
-            const headX = spider.x + Math.cos(spider.angle) * cfg.size * 0.28;
-            const headY = spider.y + Math.sin(spider.angle) * cfg.size * 0.28;
+    getEyeGlowMultiplier() {
+        // Night: more glow; Day: less glow
+        return 0.6 + (1 - this.blend) * 0.8;
+    }
 
-            ctx.beginPath();
-            ctx.ellipse(headX, headY, cfg.size * 0.32, cfg.size * 0.26, spider.angle, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${Math.min(255, bc.r + 30)}, ${Math.min(255, bc.g + 30)}, ${Math.min(255, bc.b + 30)}, 1)`;
-            ctx.fill();
+    getOverlayColor() {
+        // Day: warm; Night: cool
+        const r = Math.round(lerp(20, 255, this.blend));
+        const g = Math.round(lerp(30, 220, this.blend));
+        const b = Math.round(lerp(60, 180, this.blend));
+        const a = lerp(0.3, 0.05, this.blend);
+        return `rgba(${r},${g},${b},${a})`;
+    }
 
-            // 眼睛
-            const eyeOff = cfg.size * 0.12;
-            const eyeSz = Math.max(2.5, cfg.size / 14);
-            const eyeGlow = cfg.glowOn ? cfg.glow * 1.5 : 0;
+    drawBackground(ctx) {
+        // Draw background image or fallback gradient
+        if (this.blend > 0.01 && this.dayImageLoaded) {
+            ctx.globalAlpha = this.blend * 0.35;
+            this._drawCoverImage(ctx, this.dayImage);
+            ctx.globalAlpha = 1;
+        }
+        if (this.blend < 0.99 && this.nightImageLoaded) {
+            ctx.globalAlpha = (1 - this.blend) * 0.4;
+            this._drawCoverImage(ctx, this.nightImage);
+            ctx.globalAlpha = 1;
+        }
 
-            const eyePos = [
-                { dx: eyeOff, dy: -eyeOff * 0.4 },
-                { dx: eyeOff, dy: eyeOff * 0.4 },
-                { dx: eyeOff * 0.5, dy: -eyeOff * 0.75 },
-                { dx: eyeOff * 0.5, dy: eyeOff * 0.75 },
-                { dx: eyeOff * 1.2, dy: -eyeOff * 0.25 },
-                { dx: eyeOff * 1.2, dy: eyeOff * 0.25 },
-                { dx: eyeOff * 1.0, dy: -eyeOff * 0.65 },
-                { dx: eyeOff * 1.0, dy: eyeOff * 0.65 }
-            ];
+        // Fallback gradient if images not loaded
+        if (!this.dayImageLoaded && !this.nightImageLoaded) {
+            const r = Math.round(lerp(8, 30, this.blend));
+            const g = Math.round(lerp(11, 35, this.blend));
+            const b = Math.round(lerp(18, 25, this.blend));
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fillRect(0, 0, W, H);
+        }
 
-            eyePos.forEach(eye => {
-                const ex = headX + Math.cos(spider.angle) * eye.dx - Math.sin(spider.angle) * eye.dy;
-                const ey = headY + Math.sin(spider.angle) * eye.dx + Math.cos(spider.angle) * eye.dy;
+        // Overlay tint
+        ctx.fillStyle = this.getOverlayColor();
+        ctx.fillRect(0, 0, W, H);
+    }
 
-                // 眼眶
-                ctx.beginPath();
-                ctx.arc(ex, ey, eyeSz, 0, Math.PI * 2);
-                ctx.fillStyle = '#000';
-                ctx.fill();
+    _drawCoverImage(ctx, img) {
+        const iAspect = (img.naturalWidth || 16) / (img.naturalHeight || 9);
+        const cAspect = W / H;
+        let dw, dh, dx, dy;
+        if (cAspect > iAspect) {
+            dw = W; dh = W / iAspect; dx = 0; dy = (H - dh) / 2;
+        } else {
+            dh = H; dw = H * iAspect; dx = (W - dw) / 2; dy = 0;
+        }
+        ctx.drawImage(img, dx, dy, dw, dh);
+    }
 
-                // 眼球发光
+    drawAmbientParticles(ctx) {
+        for (const p of this.ambientParticles) {
+            const dayA = p.alpha * 0.7;
+            const nightA = p.alpha * p.flicker * (0.5 + 0.5 * Math.sin(p.phase * 3));
+            const a = lerp(nightA, dayA, this.blend);
+            if (a < 0.01) continue;
+
+            if (this.blend < 0.5) {
+                // Night: firefly-like green/yellow glow
+                const gr = Math.round(lerp(200, 100, Math.sin(p.phase) * 0.5 + 0.5));
+                const gg = Math.round(lerp(230, 200, Math.sin(p.phase) * 0.5 + 0.5));
+                const gb = Math.round(lerp(100, 50, Math.sin(p.phase) * 0.5 + 0.5));
                 ctx.save();
-                ctx.shadowBlur = eyeGlow;
-                ctx.shadowColor = cfg.eyeColor;
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = `rgba(${gr},${gg},${gb},${a})`;
                 ctx.beginPath();
-                ctx.arc(ex, ey, eyeSz * 0.75, 0, Math.PI * 2);
-                ctx.fillStyle = cfg.eyeColor;
+                ctx.arc(p.x, p.y, p.size * 1.2, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${gr},${gg},${gb},${a})`;
                 ctx.fill();
                 ctx.restore();
-
-                // 高光
+            } else {
+                // Day: dust motes, bright small particles
                 ctx.beginPath();
-                ctx.arc(ex - eyeSz * 0.25, ey - eyeSz * 0.25, eyeSz * 0.3, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.arc(p.x, p.y, p.size * 0.8, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255,240,200,${a})`;
                 ctx.fill();
-            });
+            }
+        }
+    }
 
-            // 螯牙
-            const fangX = headX + Math.cos(spider.angle) * cfg.size * 0.55;
-            const fangY = headY + Math.sin(spider.angle) * cfg.size * 0.55;
+    drawVignette(ctx) {
+        const grad = ctx.createRadialGradient(W/2, H/2, Math.min(W, H) * 0.25, W/2, H/2, Math.max(W, H) * 0.75);
+        const strength = lerp(0.4, 0.2, this.blend);
+        grad.addColorStop(0, 'rgba(0,0,0,0)');
+        grad.addColorStop(1, `rgba(0,0,0,${strength})`);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+    }
+
+    getUIBackgroundAlpha() {
+        return lerp(0.92, 0.85, this.blend);
+    }
+}
+
+// ==================== 视差层 ====================
+class ParallaxLayer {
+    constructor(sceneSystem) {
+        this.scene = sceneSystem;
+        this.dustParticles = [];
+        this._initDust();
+    }
+
+    _initDust() {
+        const count = 25;
+        for (let i = 0; i < count; i++) {
+            this.dustParticles.push({
+                x: Math.random() * (W || 1920),
+                y: Math.random() * (H || 1080),
+                vx: (Math.random() - 0.5) * 0.15,
+                vy: (Math.random() - 0.5) * 0.15,
+                size: Math.random() * 2 + 0.5,
+                alpha: Math.random() * 0.12 + 0.03,
+                phase: Math.random() * Math.PI * 2
+            });
+        }
+    }
+
+    update(dt) {
+        for (const p of this.dustParticles) {
+            p.x += p.vx + Math.sin(globalTime * 0.2 + p.phase) * 0.08;
+            p.y += p.vy + Math.cos(globalTime * 0.15 + p.phase) * 0.06;
+            if (p.x < -20) p.x = W + 20;
+            if (p.x > W + 20) p.x = -20;
+            if (p.y < -20) p.y = H + 20;
+            if (p.y > H + 20) p.y = -20;
+        }
+    }
+
+    drawBackgroundLayer(ctx) {
+        // Background image parallax at 0.02x mouse offset
+        const ox = (mouse.x - W/2) * 0.02;
+        const oy = (mouse.y - H/2) * 0.02;
+        ctx.save();
+        ctx.translate(ox, oy);
+        this.scene.drawBackground(ctx);
+        ctx.restore();
+    }
+
+    drawMiddleLayer(ctx) {
+        // Floating dust at 0.05x mouse offset
+        const ox = (mouse.x - W/2) * 0.05;
+        const oy = (mouse.y - H/2) * 0.05;
+        ctx.save();
+        ctx.translate(ox, oy);
+        for (const p of this.dustParticles) {
             ctx.beginPath();
-            ctx.moveTo(fangX - 2, fangY);
-            ctx.lineTo(fangX - 1, fangY + cfg.size * 0.12);
-            ctx.lineTo(fangX + 1, fangY + cfg.size * 0.12);
-            ctx.lineTo(fangX + 2, fangY);
-            ctx.fillStyle = '#222';
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            const dayCol = `rgba(200,190,170,${p.alpha})`;
+            const nightCol = `rgba(120,130,160,${p.alpha})`;
+            ctx.fillStyle = lerp(0, 1, this.scene.blend) > 0.5 ? dayCol : nightCol;
             ctx.fill();
+        }
+        ctx.restore();
+    }
 
-            ctx.restore();
+    drawForegroundLayer(ctx) {
+        // Vignette and ambient particles (no parallax, 1x speed)
+        this.scene.drawVignette(ctx);
+        this.scene.drawAmbientParticles(ctx);
+    }
+}
+
+// ==================== 光标 ====================
+function drawCursor(){
+    if(!mouse.inWindow)return;
+    const mx=mouse.x,my=mouse.y,s=8;
+    ctx.save();
+    ctx.strokeStyle='rgba(200,210,230,0.35)';ctx.lineWidth=0.8;
+    ctx.beginPath();
+    ctx.moveTo(mx-s,my);ctx.lineTo(mx-3,my);ctx.moveTo(mx+3,my);ctx.lineTo(mx+s,my);
+    ctx.moveTo(mx,my-s);ctx.lineTo(mx,my-3);ctx.moveTo(mx,my+3);ctx.lineTo(mx,my+s);
+    ctx.stroke();
+    ctx.strokeStyle='rgba(200,210,230,0.2)';ctx.lineWidth=0.5;
+    for(let i=0;i<6;i++){const a=(Math.PI*2/6)*i+globalTime*0.3;ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(mx+Math.cos(a)*12,my+Math.sin(a)*12);ctx.stroke();}
+    ctx.beginPath();ctx.arc(mx,my,1.5,0,Math.PI*2);ctx.fillStyle='rgba(200,210,230,0.4)';ctx.fill();
+    ctx.restore();
+}
+
+// ==================== 蜘蛛腿 ====================
+class Leg{
+    constructor(side,idx,total){this.side=side;this.idx=idx;this.total=total;this.footX=0;this.footY=0;this.stepping=false;this.stepT=0;this.stepFromX=0;this.stepFromY=0;this.stepToX=0;this.stepToY=0;this.stepH=0;}
+    restPos(bx,by,ba,sz,ll){
+        const perpA=ba+this.side*Math.PI/2;
+        const t=this.total>1?this.idx/(this.total-1):0.5;
+        const fwdOff=(t-0.35)*ll*0.9;
+        const sideOff=ll*(0.75+t*0.2);
+        return{x:bx+Math.cos(perpA)*sideOff+Math.cos(ba)*fwdOff,y:by+Math.sin(perpA)*sideOff+Math.sin(ba)*fwdOff};
+    }
+    init(bx,by,ba,sz,ll){const r=this.restPos(bx,by,ba,sz,ll);this.footX=r.x;this.footY=r.y;}
+    update(bx,by,ba,sz,ll,dt,spd){
+        const r=this.restPos(bx,by,ba,sz,ll);
+        const d=dist(this.footX,this.footY,r.x,r.y);
+        const thresh=ll*0.3+sz*0.25;
+        if(!this.stepping&&d>thresh){this.stepping=true;this.stepT=0;this.stepFromX=this.footX;this.stepFromY=this.footY;this.stepToX=r.x+(r.x-this.footX)*0.1;this.stepToY=r.y+(r.y-this.footY)*0.1;}
+        if(this.stepping){this.stepT+=dt*(5+spd*1.5);if(this.stepT>=1){this.stepT=1;this.stepping=false;this.footX=this.stepToX;this.footY=this.stepToY;this.stepH=0;}else{const e=this.stepT<0.5?2*this.stepT*this.stepT:1-Math.pow(-2*this.stepT+2,2)/2;this.footX=lerp(this.stepFromX,this.stepToX,e);this.footY=lerp(this.stepFromY,this.stepToY,e);this.stepH=Math.sin(this.stepT*Math.PI)*sz*0.45;}}else{this.stepH*=0.85;}
+    }
+}
+
+// ==================== 蛛网（真实圆网风格） ====================
+class CornerWeb {
+    constructor(cx, cy) {
+        this.cx = cx; this.cy = cy;
+        this.progress = 0;
+        this.built = false;
+        this.phase = rng(0, Math.PI * 2);
+
+        // 真实蛛网参数
+        this.numRadials = 20 + Math.floor(Math.random() * 8);   // 20-28条辐射线
+        this.numSpirals = 18 + Math.floor(Math.random() * 8);   // 18-25圈螺旋
+        this.hubRadius = rng(0.04, 0.07);  // 中心hub占比
+        this.freeZoneRatio = rng(0.10, 0.16); // 自由区（hub外无螺旋区）
+
+        // 构建蛛网结构
+        this.frameAnchors = this._findFrameAnchors();
+        this.radialAnchors = this._computeRadialAnchors();
+        this._sortRadialsByAngle();
+        this.radialLengths = this.radialAnchors.map(a => dist(this.cx, this.cy, a.x, a.y));
+        this.minRadialLen = Math.min(...this.radialLengths);
+
+        // 框架线连接（非顺序，更自然）
+        this.frameConnections = this._computeFrameConnections();
+        // 框架线每条的中点下垂偏移（预计算，避免每帧随机）
+        this.frameSags = this.frameConnections.map(() => rng(1, 4));
+
+        // 预计算螺旋路径点（连续螺旋，非同心圆）
+        this._precomputeSpiralPoints();
+
+        // 每条辐射线的重力下垂偏移
+        this.radialSag = this.radialAnchors.map(() => rng(2, 8));
+    }
+
+    _findFrameAnchors() {
+        const pts = [];
+        const m = 5;
+        // 四角锚点
+        pts.push({ x: m + rng(-3, 3), y: m + rng(-3, 3) });
+        pts.push({ x: W - m + rng(-3, 3), y: m + rng(-3, 3) });
+        pts.push({ x: W - m + rng(-3, 3), y: H - m + rng(-3, 3) });
+        pts.push({ x: m + rng(-3, 3), y: H - m + rng(-3, 3) });
+        // 边中点锚点
+        pts.push({ x: W / 2 + rng(-20, 20), y: m + rng(-3, 3) });
+        pts.push({ x: W - m + rng(-3, 3), y: H / 2 + rng(-20, 20) });
+        pts.push({ x: W / 2 + rng(-20, 20), y: H - m + rng(-3, 3) });
+        pts.push({ x: m + rng(-3, 3), y: H / 2 + rng(-20, 20) });
+        return pts;
+    }
+
+    _computeRadialAnchors() {
+        const pts = [];
+        for (let i = 0; i < this.numRadials; i++) {
+            const angle = (Math.PI * 2 / this.numRadials) * i + rng(-0.03, 0.03);
+            const edge = this._castToEdge(this.cx, this.cy, angle);
+            pts.push({ x: edge.x + rng(-3, 3), y: edge.y + rng(-3, 3) });
+        }
+        return pts;
+    }
+
+    _sortRadialsByAngle() {
+        const cx = this.cx, cy = this.cy;
+        this.radialAnchors.sort((a, b) =>
+            Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx)
+        );
+    }
+
+    _castToEdge(cx, cy, angle) {
+        const dx = Math.cos(angle), dy = Math.sin(angle);
+        let t = Infinity;
+        if (dx > 0) t = Math.min(t, (W - cx) / dx);
+        if (dx < 0) t = Math.min(t, -cx / dx);
+        if (dy > 0) t = Math.min(t, (H - cy) / dy);
+        if (dy < 0) t = Math.min(t, -cy / dy);
+        t = Math.max(0, t);
+        return { x: cx + dx * t, y: cy + dy * t };
+    }
+
+    _computeFrameConnections() {
+        // 计算框架线：将锚点连接成外围框架（最近邻连接）
+        const conns = [];
+        const anchors = this.frameAnchors;
+        // 按角度排序后顺序连接
+        const sorted = anchors.map((a, i) => ({
+            ...a, idx: i, angle: Math.atan2(a.y - this.cy, a.x - this.cx)
+        })).sort((a, b) => a.angle - b.angle);
+        for (let i = 0; i < sorted.length; i++) {
+            conns.push([sorted[i], sorted[(i + 1) % sorted.length]]);
+        }
+        return conns;
+    }
+
+    _precomputeSpiralPoints() {
+        // 真实蛛网螺旋：从内到外连续一条线
+        // 在每两条辐射线之间，螺旋丝向内凹（受重力/张力影响）
+        const n = this.numRadials;
+        const totalTurns = this.numSpirals;
+        const freeStart = this.freeZoneRatio;
+        const outerEnd = 0.90; // 不到达最外缘，留出框架区
+
+        this.spiralPoints = [];
+
+        // 每圈绕n段（每段从一个辐射线到下一个）
+        for (let turn = 0; turn < totalTurns; turn++) {
+            for (let i = 0; i < n; i++) {
+                const rIdx = i % n;
+                const nextRIdx = (i + 1) % n;
+
+                // 当前圈起止比例（沿辐射线从中心到边缘）
+                const ratioStart = freeStart + (outerEnd - freeStart) * (turn / totalTurns);
+                const ratioEnd = freeStart + (outerEnd - freeStart) * ((turn + 1) / totalTurns);
+                // 沿此段螺旋的线性插值比例
+                const segT = i / n;
+                const ratio = ratioStart + (ratioEnd - ratioStart) * segT;
+
+                // 当前辐射线上的位置
+                const ra = this.radialAnchors[rIdx];
+                const px = lerp(this.cx, ra.x, ratio);
+                const py = lerp(this.cy, ra.y, ratio);
+
+                // 自然微摆（每个点固定，预计算时不随帧变化）
+                const wobAmp = 0.8 + ratio * 1.5; // 外圈摆动略大
+                const wobX = Math.sin(i * 2.3 + turn * 1.7) * wobAmp;
+                const wobY = Math.cos(i * 1.9 + turn * 2.1) * wobAmp;
+
+                this.spiralPoints.push({
+                    x: px + wobX,
+                    y: py + wobY,
+                    turn, segInTurn: i, ratio,
+                    // 辐射线交汇点，用于控制曲线弯曲方向
+                    radIdx: rIdx,
+                    nextRadIdx: nextRIdx
+                });
+            }
+        }
+    }
+
+    _getRadialPoint(idx, ratio) {
+        const ra = this.radialAnchors[idx % this.radialAnchors.length];
+        return { x: lerp(this.cx, ra.x, ratio), y: lerp(this.cy, ra.y, ratio) };
+    }
+
+    update(dt) {
+        if (this.progress < 1) {
+            this.progress += dt * 0.02;
+            if (this.progress >= 1) { this.progress = 1; this.built = true; }
+        }
+        this.phase += dt * 0.3;
+    }
+
+    draw(ctx) {
+        const sceneAlphaMul = sceneSystem ? sceneSystem.getWebAlphaMultiplier() : 1.0;
+        const baseA = (0.12 + Math.sin(this.phase) * 0.015) * sceneAlphaMul;
+        ctx.save();
+
+        // === Phase 1: 框架线 (progress 0~0.20) ===
+        const frameProg = clamp(this.progress / 0.20, 0, 1);
+        if (frameProg > 0) {
+            ctx.strokeStyle = `rgba(170,175,185,${baseA * 0.8})`;
+            ctx.lineWidth = 0.7;
+            const conns = this.frameConnections;
+            const sags = this.frameSags;
+            const total = conns.length;
+            const drawn = Math.floor(frameProg * total);
+            for (let i = 0; i < drawn; i++) {
+                const [a, b] = conns[i];
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                // 框架线微弱下垂（重力感）
+                const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2 + sags[i];
+                ctx.quadraticCurveTo(midX, midY, b.x, b.y);
+                ctx.stroke();
+            }
+            if (drawn < total) {
+                const partial = (frameProg * total) - drawn;
+                const [a, b] = conns[drawn];
+                const midX = (a.x + b.x) / 2, midY = (a.y + b.y) / 2 + sags[drawn];
+                // 近似部分绘制
+                const t = partial;
+                const px = (1-t)*(1-t)*a.x + 2*(1-t)*t*midX + t*t*b.x;
+                const py = (1-t)*(1-t)*a.y + 2*(1-t)*t*midY + t*t*b.y;
+                ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(px, py); ctx.stroke();
+            }
         }
 
-        // 背景粒子
-        const particles = Array.from({ length: 40 }, () => ({
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-            vx: (Math.random() - 0.5) * 0.3,
-            vy: (Math.random() - 0.5) * 0.3,
-            s: Math.random() * 1.5 + 0.5,
-            a: Math.random() * 0.4 + 0.1
-        }));
+        // === Phase 2: 辐射线 (progress 0.15~0.45) ===
+        const radProg = clamp((this.progress - 0.15) / 0.30, 0, 1);
+        if (radProg > 0) {
+            ctx.lineWidth = 0.4;
+            for (let i = 0; i < this.radialAnchors.length; i++) {
+                const segProg = clamp(radProg * this.radialAnchors.length - i, 0, 1);
+                if (segProg <= 0) break;
+                const ra = this.radialAnchors[i];
+                const sag = this.radialSag[i];
+                // 辐射线从中心到锚点，带微弱重力下垂
+                const endX = lerp(this.cx, ra.x, segProg);
+                const endY = lerp(this.cy, ra.y, segProg);
+                // 下垂控制点在中间偏下
+                const midX = (this.cx + endX) / 2;
+                const midY = (this.cy + endY) / 2 + sag * segProg;
+                const alpha = baseA * (0.6 + 0.3 * (1 - i / this.radialAnchors.length));
+                ctx.strokeStyle = `rgba(185,190,200,${alpha})`;
+                ctx.beginPath();
+                ctx.moveTo(this.cx, this.cy);
+                ctx.quadraticCurveTo(midX, midY, endX, endY);
+                ctx.stroke();
+            }
+        }
 
-        function drawParticles() {
-            particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                if (p.x < 0) p.x = W;
-                if (p.x > W) p.x = 0;
-                if (p.y < 0) p.y = H;
-                if (p.y > H) p.y = 0;
+        // === Phase 3: 中心Hub + 自由区丝线 (progress 0.40~0.50) ===
+        const hubProg = clamp((this.progress - 0.40) / 0.10, 0, 1);
+        if (hubProg > 0) {
+            const hubR = this.minRadialLen * this.hubRadius;
+            const freeR = this.minRadialLen * this.freeZoneRatio;
+            // Hub区域：密集丝线
+            ctx.strokeStyle = `rgba(200,205,215,${baseA * 1.2 * hubProg})`;
+            ctx.lineWidth = 0.5;
+            // 中心十字丝
+            const hubSegs = 6;
+            for (let i = 0; i < hubSegs; i++) {
+                const a = (Math.PI * 2 / hubSegs) * i + this.phase * 0.1;
+                ctx.beginPath();
+                ctx.moveTo(this.cx + Math.cos(a) * hubR * 0.3, this.cy + Math.sin(a) * hubR * 0.3);
+                ctx.lineTo(this.cx + Math.cos(a) * hubR, this.cy + Math.sin(a) * hubR);
+                ctx.stroke();
+            }
+            // Hub环
+            ctx.beginPath();
+            ctx.arc(this.cx, this.cy, hubR * hubProg, 0, Math.PI * 2);
+            ctx.stroke();
+            // 自由区边界环
+            if (hubProg > 0.5) {
+                ctx.strokeStyle = `rgba(195,200,210,${baseA * 0.5 * (hubProg - 0.5) * 2})`;
+                ctx.lineWidth = 0.3;
+                ctx.beginPath();
+                ctx.arc(this.cx, this.cy, freeR, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        // === Phase 4: 连续螺旋线 (progress 0.45~1.0) ===
+        const spProg = clamp((this.progress - 0.45) / 0.55, 0, 1);
+        if (spProg > 0 && this.spiralPoints.length > 1) {
+            const totalPts = this.spiralPoints.length;
+            const drawCount = Math.floor(spProg * totalPts);
+            if (drawCount > 1) {
+                // 螺旋丝：最细的丝线，带粘性光泽
+                ctx.lineWidth = 0.22;
+                ctx.strokeStyle = `rgba(210,215,225,${baseA * 0.9})`;
 
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.s, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(251, 191, 36, ${p.a})`;
-                ctx.fill();
-            });
+                ctx.moveTo(this.spiralPoints[0].x, this.spiralPoints[0].y);
+
+                for (let i = 1; i < drawCount; i++) {
+                    const prev = this.spiralPoints[i - 1];
+                    const curr = this.spiralPoints[i];
+
+                    // 真实蛛网特征：螺旋丝在两条辐射线之间向中心凹陷
+                    // 控制点朝中心偏移，偏移量与距中心距离成正比
+                    const midBaseX = (prev.x + curr.x) / 2;
+                    const midBaseY = (prev.y + curr.y) / 2;
+                    // 向中心凹陷的程度（内圈小外圈大）
+                    const inwardBias = 0.04 + curr.ratio * 0.06;
+                    const cpX = midBaseX + (this.cx - midBaseX) * inwardBias;
+                    const cpY = midBaseY + (this.cy - midBaseY) * inwardBias;
+
+                    ctx.quadraticCurveTo(cpX, cpY, curr.x, curr.y);
+                }
+                ctx.stroke();
+
+                // 粘液珠点（螺旋丝上的粘性小球，真实蛛网特征）
+                if (spProg > 0.3) {
+                    const beadAlpha = baseA * 0.5 * clamp((spProg - 0.3) / 0.3, 0, 1);
+                    ctx.fillStyle = `rgba(225,230,240,${beadAlpha})`;
+                    // 每隔几段画一个粘液珠
+                    const step = Math.max(2, Math.floor(this.numRadials / 4));
+                    for (let i = 0; i < drawCount; i += step) {
+                        const p = this.spiralPoints[i];
+                        // 珠点大小随距离变化
+                        const beadSize = 0.4 + p.ratio * 0.4;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, beadSize, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
         }
 
-        // 循环
-        function loop() {
-            drawParticles();
-            updateSpider();
-            draw();
-            requestAnimationFrame(loop);
+        // === 中心亮点 ===
+        if (this.progress > 0.15) {
+            const hubR = this.minRadialLen * this.hubRadius;
+            ctx.beginPath(); ctx.arc(this.cx, this.cy, 2, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(230,235,240,${baseA * 1.5})`; ctx.fill();
+            // 微弱光晕
+            const glow = ctx.createRadialGradient(this.cx, this.cy, 0, this.cx, this.cy, hubR * 0.8);
+            glow.addColorStop(0, `rgba(220,225,235,${baseA * 0.4})`);
+            glow.addColorStop(1, 'rgba(220,225,235,0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath(); ctx.arc(this.cx, this.cy, hubR * 0.8, 0, Math.PI * 2); ctx.fill();
+        }
+        ctx.restore();
+    }
+}
+
+// ==================== 猎物基类 ====================
+class Prey {
+    constructor(x, y, web) {
+        this.x = x; this.y = y;
+        this.web = web;
+        this.angle = rng(0, Math.PI * 2);
+        this.alive = true;
+        this.health = 1;
+        this.strugglePhase = rng(0, Math.PI * 2);
+        this.struggleIntensity = 1;
+        this.wrapProgress = 0;
+        this.beingEaten = false;
+        this.eatenBy = null;
+        this.size = 4;
+    }
+    update(dt, spider) {
+        if (!this.alive) return;
+        this.strugglePhase += dt * (4 + this.struggleIntensity * 6);
+        if (this.wrapProgress < 1) {
+            this.wrapProgress += dt * 0.06;
+            this.struggleIntensity = Math.max(0, 1 - this.wrapProgress * 0.8);
+            this.x += Math.sin(this.strugglePhase) * this.struggleIntensity * 0.6;
+            this.y += Math.cos(this.strugglePhase * 1.3) * this.struggleIntensity * 0.4;
+        }
+        if (spider && dist(spider.x, spider.y, this.x, this.y) < spider.size * 1.5 && !this.beingEaten) {
+            this.beingEaten = true; this.eatenBy = spider;
+        }
+        if (this.beingEaten) {
+            this.health -= dt * 0.12;
+            this.struggleIntensity = Math.max(0, this.health * 0.5);
+            if (this.health <= 0) this.alive = false;
+        }
+    }
+    _drawWrap(ctx) {
+        if (this.wrapProgress < 0.1) return;
+        ctx.strokeStyle = `rgba(200,210,230,${0.12 + this.wrapProgress * 0.18})`;
+        ctx.lineWidth = 0.4;
+        const wc = Math.floor(this.wrapProgress * 6);
+        for (let i = 0; i < wc; i++) {
+            const yy = (i - wc / 2) * this.size * 0.25;
+            ctx.beginPath();
+            ctx.ellipse(0, yy, this.size * 0.5, this.size * 0.18, rng(-0.15, 0.15), 0, Math.PI * 2);
+            ctx.stroke();
+        }
+    }
+}
+
+// ==================== 飞蛾（改进版） ====================
+class Moth extends Prey {
+    constructor(web) {
+        const ra = web.radialAnchors[Math.floor(Math.random() * web.radialAnchors.length)];
+        const t = rng(0.3, 0.7);
+        super(lerp(web.cx, ra.x, t), lerp(web.cy, ra.y, t), web);
+        this.size = rng(7, 13);
+        this.wingPhase = rng(0, Math.PI * 2);
+        const br = 140 + Math.floor(rng(0, 60));
+        const bg = 130 + Math.floor(rng(0, 50));
+        const bb = 100 + Math.floor(rng(0, 40));
+        this.color = `rgb(${br},${bg},${bb})`;
+        this.darkColor = `rgb(${Math.max(0,br-40)},${Math.max(0,bg-35)},${Math.max(0,bb-30)})`;
+        this.veinColor = `rgba(${Math.max(0,br-60)},${Math.max(0,bg-55)},${Math.max(0,bb-50)},0.3)`;
+        this.spotColor = `rgba(${Math.min(255,br+30)},${Math.max(0,bg-20)},${Math.max(0,bb-40)},0.4)`;
+    }
+    update(dt, spider) {
+        super.update(dt, spider);
+        this.wingPhase += dt * (12 * this.struggleIntensity + 2);
+    }
+    draw(ctx) {
+        if (!this.alive) return;
+        ctx.save();
+        ctx.translate(this.x, this.y); ctx.rotate(this.angle);
+        const s = this.size;
+        const wf = Math.sin(this.wingPhase) * 0.3 * this.struggleIntensity;
+        const ws = 1 - this.wrapProgress * 0.6;
+        ctx.globalAlpha = 0.3 + this.health * 0.5;
+
+        // ---- Left upper wing ----
+        ctx.save(); ctx.scale(1, ws); ctx.rotate(wf);
+        ctx.beginPath(); ctx.ellipse(-s * 0.05, -s * 0.42, s * 0.42, s * 0.38, -0.25, 0, Math.PI * 2);
+        ctx.fillStyle = this.color; ctx.fill();
+        // Wing veins
+        this._drawWingVeins(ctx, -s * 0.05, -s * 0.42, s * 0.42, s * 0.38, -0.25, -1);
+        // Eyespot
+        ctx.beginPath(); ctx.arc(-s * 0.08, -s * 0.48, s * 0.08, 0, Math.PI * 2);
+        ctx.fillStyle = this.spotColor; ctx.fill();
+        ctx.beginPath(); ctx.arc(-s * 0.08, -s * 0.48, s * 0.04, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(20,15,10,0.35)'; ctx.fill();
+        ctx.restore();
+
+        // ---- Left lower wing ----
+        ctx.save(); ctx.scale(1, ws); ctx.rotate(wf * 0.7);
+        ctx.beginPath(); ctx.ellipse(-s * 0.12, -s * 0.72, s * 0.28, s * 0.25, -0.15, 0, Math.PI * 2);
+        ctx.fillStyle = this.darkColor; ctx.fill();
+        this._drawWingVeins(ctx, -s * 0.12, -s * 0.72, s * 0.28, s * 0.25, -0.15, -1);
+        ctx.restore();
+
+        // ---- Right upper wing ----
+        ctx.save(); ctx.scale(1, ws); ctx.rotate(-wf);
+        ctx.beginPath(); ctx.ellipse(-s * 0.05, s * 0.42, s * 0.42, s * 0.38, 0.25, 0, Math.PI * 2);
+        ctx.fillStyle = this.color; ctx.fill();
+        this._drawWingVeins(ctx, -s * 0.05, s * 0.42, s * 0.42, s * 0.38, 0.25, 1);
+        ctx.beginPath(); ctx.arc(-s * 0.08, s * 0.48, s * 0.08, 0, Math.PI * 2);
+        ctx.fillStyle = this.spotColor; ctx.fill();
+        ctx.beginPath(); ctx.arc(-s * 0.08, s * 0.48, s * 0.04, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(20,15,10,0.35)'; ctx.fill();
+        ctx.restore();
+
+        // ---- Right lower wing ----
+        ctx.save(); ctx.scale(1, ws); ctx.rotate(-wf * 0.7);
+        ctx.beginPath(); ctx.ellipse(-s * 0.12, s * 0.72, s * 0.28, s * 0.25, 0.15, 0, Math.PI * 2);
+        ctx.fillStyle = this.darkColor; ctx.fill();
+        this._drawWingVeins(ctx, -s * 0.12, s * 0.72, s * 0.28, s * 0.25, 0.15, 1);
+        ctx.restore();
+
+        // ---- Fuzzy body ----
+        ctx.beginPath(); ctx.ellipse(0, 0, s * 0.3, s * 0.12, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#3a2a1a'; ctx.fill();
+        // Body fuzz/hair lines
+        ctx.strokeStyle = 'rgba(80,60,40,0.3)';
+        ctx.lineWidth = 0.4;
+        for (let i = -2; i <= 2; i++) {
+            const bx = i * s * 0.08;
+            ctx.beginPath();
+            ctx.moveTo(bx, -s * 0.05);
+            ctx.lineTo(bx + rng(-1, 1), -s * 0.14);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(bx, s * 0.05);
+            ctx.lineTo(bx + rng(-1, 1), s * 0.14);
+            ctx.stroke();
+        }
+        // Thorax (slightly wider segment)
+        ctx.beginPath(); ctx.ellipse(s * 0.12, 0, s * 0.1, s * 0.09, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#4a3a2a'; ctx.fill();
+
+        // ---- Feathered antennae ----
+        this._drawAntenna(ctx, s, -1);
+        this._drawAntenna(ctx, s, 1);
+
+        this._drawWrap(ctx);
+        ctx.globalAlpha = 1; ctx.restore();
+    }
+
+    _drawWingVeins(ctx, cx, cy, rx, ry, rot, side) {
+        ctx.save();
+        ctx.strokeStyle = this.veinColor;
+        ctx.lineWidth = 0.3;
+        const numVeins = 4;
+        for (let i = 0; i < numVeins; i++) {
+            const a = (i / numVeins) * Math.PI * 0.6 - Math.PI * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            const endX = cx + Math.cos(a + rot) * rx * 0.85;
+            const endY = cy + Math.sin(a + rot) * ry * 1.2 * side;
+            const cpX = cx + Math.cos(a + rot) * rx * 0.4;
+            const cpY = cy + Math.sin(a + rot) * ry * 0.5 * side;
+            ctx.quadraticCurveTo(cpX, cpY, endX, endY);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    _drawAntenna(ctx, s, side) {
+        ctx.save();
+        ctx.strokeStyle = '#4a3a2a';
+        ctx.lineWidth = 0.5;
+        const baseX = s * 0.2;
+        const baseY = side * s * 0.06;
+        const tipX = s * 0.55;
+        const tipY = side * s * 0.35;
+        // Main stalk
+        ctx.beginPath();
+        ctx.moveTo(baseX, baseY);
+        ctx.quadraticCurveTo(s * 0.4, side * s * 0.15, tipX, tipY);
+        ctx.stroke();
+        // Feathered branches (comb-like)
+        ctx.lineWidth = 0.3;
+        ctx.strokeStyle = 'rgba(74,58,42,0.5)';
+        const numBranches = 5;
+        for (let i = 1; i <= numBranches; i++) {
+            const t = i / (numBranches + 1);
+            const px = lerp(baseX, tipX, t);
+            const py = lerp(baseY, tipY, t);
+            const branchLen = s * 0.06 * (1 - t * 0.5);
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(px + branchLen * 0.3, py + side * branchLen);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(px - branchLen * 0.2, py + side * branchLen * 0.7);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+}
+
+// ==================== 蚊子 ====================
+class Mosquito extends Prey {
+    constructor(web) {
+        const ra = web.radialAnchors[Math.floor(Math.random() * web.radialAnchors.length)];
+        const t = rng(0.3, 0.7);
+        super(lerp(web.cx, ra.x, t), lerp(web.cy, ra.y, t), web);
+        this.size = rng(3, 6);
+        this.wingPhase = rng(0, Math.PI * 2);
+        this.legPhase = rng(0, Math.PI * 2);
+        this.buzzPhase = rng(0, Math.PI * 2);
+    }
+    update(dt, spider) {
+        super.update(dt, spider);
+        this.wingPhase += dt * 40 * this.struggleIntensity;
+        this.legPhase += dt * 8 * this.struggleIntensity;
+        this.buzzPhase += dt * 20;
+    }
+    draw(ctx) {
+        if (!this.alive) return;
+        ctx.save();
+        ctx.translate(this.x, this.y); ctx.rotate(this.angle);
+        const s = this.size;
+        ctx.globalAlpha = 0.3 + this.health * 0.6;
+
+        const wf = Math.sin(this.wingPhase) * 0.4 * this.struggleIntensity;
+        const ws = 1 - this.wrapProgress * 0.5;
+        ctx.save(); ctx.scale(1, ws); ctx.rotate(wf);
+        ctx.beginPath(); ctx.ellipse(-s * 0.05, -s * 0.5, s * 0.15, s * 0.45, -0.1, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(180,200,220,0.3)'; ctx.fill(); ctx.restore();
+        ctx.save(); ctx.scale(1, ws); ctx.rotate(-wf);
+        ctx.beginPath(); ctx.ellipse(-s * 0.05, s * 0.5, s * 0.15, s * 0.45, 0.1, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(180,200,220,0.3)'; ctx.fill(); ctx.restore();
+
+        ctx.beginPath(); ctx.ellipse(0, 0, s * 0.4, s * 0.06, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#2a1a0a'; ctx.fill();
+
+        ctx.beginPath(); ctx.ellipse(-s * 0.2, 0, s * 0.18, s * 0.05, 0, 0, Math.PI * 2);
+        ctx.fillStyle = this.beingEaten ? 'rgba(120,20,20,0.6)' : '#3a1010'; ctx.fill();
+
+        ctx.strokeStyle = 'rgba(60,40,20,0.5)';
+        ctx.lineWidth = 0.3;
+        for (let i = 0; i < 3; i++) {
+            const la = (i - 1) * 0.4 + Math.sin(this.legPhase + i) * 0.15 * this.struggleIntensity;
+            for (const side of [1, -1]) {
+                ctx.beginPath();
+                ctx.moveTo(s * 0.1 * (i - 1), 0);
+                ctx.lineTo(s * 0.1 * (i - 1) + Math.cos(la) * s * 0.3, side * s * 0.4);
+                ctx.stroke();
+            }
         }
 
-        // 绑定控件
-        function bind(id, key, type = 'float') {
-            const el = document.getElementById(id);
-            const val = document.getElementById('v-' + id);
-            el.addEventListener('input', e => {
-                const v = type === 'float' ? parseFloat(e.target.value) : e.target.value;
-                cfg[key] = v;
-                if (val) val.textContent = v;
-                if (key === 'legCount') initLegs();
-            });
+        ctx.beginPath();
+        ctx.moveTo(s * 0.4, 0);
+        ctx.lineTo(s * 0.7, 0);
+        ctx.strokeStyle = '#1a0a00'; ctx.lineWidth = 0.5; ctx.stroke();
+
+        this._drawWrap(ctx);
+        ctx.globalAlpha = 1; ctx.restore();
+    }
+}
+
+// ==================== 游离蚊子（飞在空中还没被捕获） ====================
+class FreeMosquito {
+    constructor() {
+        this.x = rng(50, W - 50);
+        this.y = rng(50, H - 50);
+        this.vx = rng(-30, 30);
+        this.vy = rng(-30, 30);
+        this.alive = true;
+        this.size = rng(3, 5);
+        this.wingPhase = rng(0, Math.PI * 2);
+        this.angle = Math.atan2(this.vy, this.vx);
+        this.changeTimer = rng(0.5, 2);
+        this.caught = false;
+        this.catchWeb = null;
+    }
+
+    update(dt) {
+        if (!this.alive) return;
+        this.wingPhase += dt * 50;
+
+        if (this.caught) return;
+
+        this.changeTimer -= dt;
+        if (this.changeTimer <= 0) {
+            this.vx += rng(-40, 40);
+            this.vy += rng(-40, 40);
+            this.changeTimer = rng(0.3, 1.5);
         }
 
-        bind('size', 'size');
-        bind('speed', 'speed');
-        bind('legs', 'legCount');
-        bind('legLen', 'legLen');
-        bind('glow', 'glow');
-        bind('bodyColor', 'bodyColor', 'string');
-        bind('legColor', 'legColor', 'string');
-        bind('eyeColor', 'eyeColor', 'string');
+        const spd = Math.hypot(this.vx, this.vy);
+        if (spd > 60) { this.vx *= 60 / spd; this.vy *= 60 / spd; }
 
-        function toggle(id, key) {
-            const el = document.getElementById(id);
-            el.addEventListener('click', () => {
-                cfg[key] = !cfg[key];
-                el.classList.toggle('on');
-            });
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.angle = Math.atan2(this.vy, this.vx);
+
+        if (this.x < 10) { this.x = 10; this.vx = Math.abs(this.vx); }
+        if (this.x > W - 10) { this.x = W - 10; this.vx = -Math.abs(this.vx); }
+        if (this.y < 10) { this.y = 10; this.vy = Math.abs(this.vy); }
+        if (this.y > H - 10) { this.y = H - 10; this.vy = -Math.abs(this.vy); }
+    }
+
+    checkWebCollision(webs) {
+        if (this.caught) return null;
+        for (const web of webs) {
+            if (!web || !web.built) continue;
+            const d = dist(this.x, this.y, web.cx, web.cy);
+            const maxR = web.minRadialLen || dist(web.cx, web.cy, web.radialAnchors[0].x, web.radialAnchors[0].y);
+            if (d < maxR * 0.85) {
+                this.caught = true;
+                this.catchWeb = web;
+                return web;
+            }
+        }
+        return null;
+    }
+
+    draw(ctx) {
+        if (!this.alive) return;
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+        const s = this.size;
+
+        const wf = Math.sin(this.wingPhase) * 0.5;
+        ctx.save(); ctx.rotate(wf);
+        ctx.beginPath(); ctx.ellipse(-s * 0.05, -s * 0.45, s * 0.12, s * 0.4, -0.1, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(180,200,220,0.2)'; ctx.fill(); ctx.restore();
+        ctx.save(); ctx.rotate(-wf);
+        ctx.beginPath(); ctx.ellipse(-s * 0.05, s * 0.45, s * 0.12, s * 0.4, 0.1, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(180,200,220,0.2)'; ctx.fill(); ctx.restore();
+
+        ctx.beginPath(); ctx.ellipse(0, 0, s * 0.35, s * 0.05, 0, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(40,25,10,0.6)'; ctx.fill();
+
+        ctx.beginPath(); ctx.moveTo(s * 0.35, 0); ctx.lineTo(s * 0.6, 0);
+        ctx.strokeStyle = 'rgba(30,15,0,0.5)'; ctx.lineWidth = 0.4; ctx.stroke();
+
+        ctx.restore();
+    }
+}
+
+// ==================== 蜘蛛行为 ====================
+const B = { FOLLOW:0, WANDER:1, FLEE:2, BUILD_WEB:3, DESCEND:4, HANG:5, CLIMB:6, IDLE:7, JUMP:8, EAT:9, GRAVITY:10 };
+
+class Spider {
+    constructor(x, y, opts = {}) {
+        this.x = x; this.y = y; this.angle = rng(0, Math.PI * 2); this.vx = 0; this.vy = 0;
+        this.size = opts.size || cfg.size; this.speed = opts.speed || cfg.speed; this.legLen = opts.legLen || cfg.legLen;
+        this.bodyColor = opts.bodyColor || cfg.bodyColor; this.legColor = opts.legColor || cfg.legColor;
+        this.eyeColor = opts.eyeColor || cfg.eyeColor; this.glowAmt = opts.glow || cfg.glow;
+        this.isPlayer = opts.isPlayer || false;
+        this.patternType = opts.patternType !== undefined ? opts.patternType : 3;
+        this.hairy = this.size > 25;
+        this.behavior = this.isPlayer ? B.FOLLOW : B.WANDER;
+        this.bTimer = 0; this.idleTimer = 0;
+        this.wanderTX = x; this.wanderTY = y; this.wanderWait = 0;
+        this.silkX = 0; this.silkY = 0; this.descendY = 0;
+        this.hangSwing = 0; this.hangSwSpd = rng(1.0, 1.8); this.hangSwAmp = rng(0.03, 0.06);
+        this.jumpStartX = 0; this.jumpStartY = 0; this.jumpTargetX = 0; this.jumpTargetY = 0;
+        this.jumpT = 0; this.jumpDuration = 0;
+        this.currentWeb = null; this.webBuildPhase = 0;
+        this.webWaypointIdx = 0;
+        this.fleeTimer = 0; this.fleeAngle = 0;
+        this.eatTarget = null;
+        this.trail = [];
+        this.pedPhase = rng(0, Math.PI * 2);
+        this.legs = []; this.initLegs();
+    }
+
+    initLegs() {
+        this.legs = [];
+        const ps = 4;
+        for (let i = 0; i < ps; i++) this.legs.push(new Leg(1, i, ps));
+        for (let i = 0; i < ps; i++) this.legs.push(new Leg(-1, i, ps));
+        for (const leg of this.legs) leg.init(this.x, this.y, this.angle, this.size, this.legLen);
+    }
+
+    setBehavior(b) {
+        this.behavior = b; this.bTimer = 0;
+        if (b === B.DESCEND) { this.silkX = this.x; this.silkY = -5; this.descendY = rng(H * 0.25, H * 0.55); }
+        if (b === B.BUILD_WEB) { this.currentWeb = new CornerWeb(this.x, this.y); this.webBuildPhase = 0; this.webWaypointIdx = 0; }
+        if (b === B.JUMP) {
+            this.jumpStartX = this.x; this.jumpStartY = this.y;
+            const tx = mouse.inWindow ? mouse.x : this.x + rng(-200, 200);
+            const ty = mouse.inWindow ? mouse.y : this.y + rng(-200, 200);
+            this.jumpTargetX = clamp(tx, this.size, W - this.size);
+            this.jumpTargetY = clamp(ty, this.size, H - this.size);
+            const d = dist(this.x, this.y, this.jumpTargetX, this.jumpTargetY);
+            this.jumpDuration = clamp(d / 500, 0.3, 1.0); this.jumpT = 0;
+        }
+    }
+
+    scare(fx, fy) {
+        this.fleeAngle = Math.atan2(this.y - fy, this.x - fx) + rng(-0.4, 0.4);
+        this.fleeTimer = rng(1, 2); this.behavior = B.FLEE; this.bTimer = 0;
+    }
+
+    update(dt) {
+        this.bTimer += dt; this.pedPhase += dt * 3;
+        switch (this.behavior) {
+            case B.FOLLOW: this._follow(dt); break;
+            case B.WANDER: this._wander(dt); break;
+            case B.FLEE: this._flee(dt); break;
+            case B.DESCEND: this._descend(dt); break;
+            case B.HANG: this._hang(dt); break;
+            case B.CLIMB: this._climb(dt); break;
+            case B.BUILD_WEB: this._buildWeb(dt); break;
+            case B.IDLE: this._idle(dt); break;
+            case B.JUMP: this._jump(dt); break;
+            case B.EAT: this._eat(dt); break;
+            case B.GRAVITY: this._gravity(dt); break;
+        }
+        const inAir = this.behavior === B.DESCEND || this.behavior === B.HANG || this.behavior === B.CLIMB || this.behavior === B.JUMP || this.behavior === B.GRAVITY;
+        if (!inAir) {
+            this.vx *= 0.87; this.vy *= 0.87;
+            this.x += this.vx; this.y += this.vy;
+            const m = this.size * 0.5;
+            if (this.x < m) this.vx += (m - this.x) * 0.1;
+            if (this.x > W - m) this.vx -= (this.x - (W - m)) * 0.1;
+            if (this.y < m) this.vy += (m - this.y) * 0.1;
+            if (this.y > H - m) this.vy -= (this.y - (H - m)) * 0.1;
+        }
+        const spd = Math.hypot(this.vx, this.vy);
+        for (const leg of this.legs) leg.update(this.x, this.y, this.angle, this.size, this.legLen, dt, spd);
+        if (cfg.trail && (Math.abs(this.vx) > 1.5 || Math.abs(this.vy) > 1.5)) this.trail.push({ x: this.x, y: this.y, t: Date.now() });
+        this.trail = this.trail.filter(p => Date.now() - p.t < 500);
+        if (this.currentWeb) this.currentWeb.update(dt);
+    }
+
+    _follow(dt) {
+        if (!mouse.inWindow) { this.behavior = B.WANDER; this.wanderTX = this.x + rng(-200, 200); this.wanderTY = this.y + rng(-200, 200); this.wanderWait = rng(2, 5); return; }
+        const dx = mouse.x - this.x, dy = mouse.y - this.y, d = Math.hypot(dx, dy);
+        this.angle = angleLerp(this.angle, Math.atan2(dy, dx), 0.12);
+        if (d > this.size * 0.8) { const acc = this.speed * (1 + d * 0.003); this.vx += Math.cos(this.angle) * acc; this.vy += Math.sin(this.angle) * acc; }
+        if (d < this.size * 1.5) {
+            this.idleTimer += dt;
+            if (this.idleTimer > 1.5) {
+                if (cfg.web && !this.currentWeb && Math.random() < 0.4) this.setBehavior(B.BUILD_WEB);
+                else if (Math.random() < 0.3) this.behavior = B.IDLE;
+                else { this.behavior = B.WANDER; this.wanderTX = mouse.x + rng(-100, 100); this.wanderTY = mouse.y + rng(-100, 100); this.wanderWait = rng(2, 5); }
+                this.idleTimer = 0;
+            }
+        } else { this.idleTimer = 0; }
+        if (d > 400 && Math.random() < 0.005) this.setBehavior(B.JUMP);
+    }
+
+    _wander(dt) {
+        this.wanderWait -= dt;
+        if (this.isPlayer && mouse.inWindow && dist(this.x, this.y, mouse.x, mouse.y) > 100) { this.behavior = B.FOLLOW; return; }
+        if (this.wanderWait <= 0) { this.wanderTX = rng(this.size * 3, W - this.size * 3); this.wanderTY = rng(this.size * 3, H - this.size * 3); this.wanderWait = rng(3, 7); }
+        const dx = this.wanderTX - this.x, dy = this.wanderTY - this.y, d = Math.hypot(dx, dy);
+        this.angle = angleLerp(this.angle, Math.atan2(dy, dx), 0.05);
+        if (d > 25) { this.vx += Math.cos(this.angle) * this.speed * 0.4; this.vy += Math.sin(this.angle) * this.speed * 0.4; }
+        else { this.wanderWait = rng(1, 4); if (!this.currentWeb && cfg.web && Math.random() < 0.02) this.setBehavior(B.BUILD_WEB); if (Math.random() < 0.008) this.setBehavior(B.DESCEND); }
+    }
+
+    _flee(dt) { this.fleeTimer -= dt; this.vx += Math.cos(this.fleeAngle) * this.speed * 3; this.vy += Math.sin(this.fleeAngle) * this.speed * 3; this.angle = angleLerp(this.angle, this.fleeAngle, 0.25); if (this.fleeTimer <= 0) this.behavior = this.isPlayer ? (mouse.inWindow ? B.FOLLOW : B.WANDER) : B.WANDER; }
+
+    _descend(dt) {
+        const startY = Math.max(-this.size, this.silkY);
+        const progress = clamp(this.bTimer / (2.5 + this.descendY * 0.002), 0, 1);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        this.x = this.silkX + Math.sin(this.bTimer * this.hangSwSpd) * this.hangSwAmp * 80 * Math.min(1, progress);
+        this.y = lerp(startY, this.descendY, ease);
+        this.angle = Math.PI / 2 + Math.sin(this.bTimer * this.hangSwSpd) * this.hangSwAmp * Math.min(1, progress);
+        if (progress >= 1) { this.behavior = B.HANG; this.bTimer = 0; }
+    }
+
+    _hang(dt) {
+        this.hangSwing += dt; const sw = Math.sin(this.hangSwing * this.hangSwSpd);
+        this.x = this.silkX + sw * 25; this.angle = Math.PI / 2 + sw * this.hangSwAmp;
+        if (this.bTimer > rng(3, 7)) { if (Math.random() < 0.4) this.setBehavior(B.CLIMB); else this.setBehavior(B.JUMP); }
+    }
+
+    _climb(dt) {
+        this.y -= dt * 70; this.x = this.silkX + Math.sin(this.bTimer * 2) * 4; this.angle = -Math.PI / 2;
+        if (this.y < -this.size * 2) { this.x = rng(this.size, W - this.size); this.y = rng(this.size, H * 0.3); this.behavior = this.isPlayer ? (mouse.inWindow ? B.FOLLOW : B.WANDER) : B.WANDER; }
+    }
+
+    _buildWeb(dt) {
+        this.webBuildPhase += dt;
+        const web = this.currentWeb;
+        const anchors = web.frameAnchors;
+        if (anchors.length === 0) return;
+
+        const targetIdx = Math.min(this.webWaypointIdx, anchors.length - 1);
+        const target = anchors[targetIdx];
+        const dx = target.x - this.x, dy = target.y - this.y;
+        const d = Math.hypot(dx, dy);
+        const ta = Math.atan2(dy, dx);
+
+        this.angle = angleLerp(this.angle, ta, 0.04);
+        if (d > 15) {
+            const acc = this.speed * 0.25;
+            this.vx += Math.cos(this.angle) * acc;
+            this.vy += Math.sin(this.angle) * acc;
+        } else {
+            if (this.webWaypointIdx < anchors.length - 1) {
+                this.webWaypointIdx++;
+            } else {
+                const dcx = web.cx - this.x, dcy = web.cy - this.y;
+                const dc = Math.hypot(dcx, dcy);
+                if (dc > 20) {
+                    this.angle = angleLerp(this.angle, Math.atan2(dcy, dcx), 0.04);
+                    this.vx += Math.cos(this.angle) * this.speed * 0.2;
+                    this.vy += Math.sin(this.angle) * this.speed * 0.2;
+                }
+            }
         }
 
-        toggle('t-trail', 'trail');
-        toggle('t-web', 'web');
-        toggle('t-glow', 'glowOn');
+        if (web.built && this.bTimer > 6) {
+            this.behavior = this.isPlayer ? (mouse.inWindow ? B.FOLLOW : B.WANDER) : B.WANDER;
+        }
+    }
 
-        // 预设
-        const presets = {
-            classic: { bodyColor: '#8B4513', legColor: '#D2691E', eyeColor: '#FF3333', glow: 18 },
-            black: { bodyColor: '#1a1a1a', legColor: '#333333', eyeColor: '#ff0044', glow: 28 },
-            neon: { bodyColor: '#00ced1', legColor: '#0099cc', eyeColor: '#ffffff', glow: 35 },
-            green: { bodyColor: '#2d5a27', legColor: '#4a8c3f', eyeColor: '#ff6600', glow: 22 },
-            gold: { bodyColor: '#b8860b', legColor: '#daa520', eyeColor: '#ff0000', glow: 30 },
-            ghost: { bodyColor: '#d0d0d0', legColor: '#e8e8e8', eyeColor: '#000000', glow: 12 }
-        };
+    _idle(dt) { this.angle += Math.sin(globalTime * 1.5) * 0.002; this.idleTimer += dt; if (this.idleTimer > rng(2, 5)) { this.behavior = this.isPlayer ? (mouse.inWindow ? B.FOLLOW : B.WANDER) : B.WANDER; this.idleTimer = 0; } }
 
-        window.setPreset = function(name) {
-            const p = presets[name];
-            if (!p) return;
-            Object.assign(cfg, p);
-            document.getElementById('bodyColor').value = p.bodyColor;
-            document.getElementById('legColor').value = p.legColor;
-            document.getElementById('eyeColor').value = p.eyeColor;
-            document.getElementById('glow').value = p.glow;
-            document.getElementById('v-glow').textContent = p.glow;
-        };
+    _jump(dt) {
+        this.jumpT += dt; const t = clamp(this.jumpT / this.jumpDuration, 0, 1);
+        const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        this.x = lerp(this.jumpStartX, this.jumpTargetX, ease);
+        const arc = -4 * t * (1 - t) * Math.min(150, dist(this.jumpStartX, this.jumpStartY, this.jumpTargetX, this.jumpTargetY) * 0.3);
+        this.y = lerp(this.jumpStartY, this.jumpTargetY, ease) + arc;
+        this.angle = Math.atan2(this.jumpTargetY - this.jumpStartY, this.jumpTargetX - this.jumpStartX);
+        if (t >= 1) { this.x = this.jumpTargetX; this.y = this.jumpTargetY; this.vx = 0; this.vy = 0; this.behavior = this.isPlayer ? (mouse.inWindow ? B.FOLLOW : B.WANDER) : B.WANDER; }
+    }
 
-        // 3秒后淡出提示
-        setTimeout(() => hint.classList.add('fade'), 4000);
+    _eat(dt) {
+        if (!this.eatTarget || !this.eatTarget.alive) { this.eatTarget = null; this.behavior = this.isPlayer ? (mouse.inWindow ? B.FOLLOW : B.WANDER) : B.WANDER; return; }
+        const dx = this.eatTarget.x - this.x, dy = this.eatTarget.y - this.y, d = Math.hypot(dx, dy);
+        this.angle = angleLerp(this.angle, Math.atan2(dy, dx), 0.15);
+        if (d > this.size) { this.vx += Math.cos(this.angle) * this.speed * 0.5; this.vy += Math.sin(this.angle) * this.speed * 0.5; }
+        this.eatTarget.update(dt, this);
+    }
 
-        loop();
-    </script>
+    _gravity(dt) { this.vy += dt * 400; this.x += this.vx * dt; this.y += this.vy * dt; this.angle = Math.atan2(this.vy, this.vx) * 0.5 + this.angle * 0.5; if (this.y >= H * 0.5) { this.y = H * 0.5; this.vy = 0; this.vx *= 0.5; this.behavior = this.isPlayer ? (mouse.inWindow ? B.FOLLOW : B.WANDER) : B.WANDER; } }
+
+    // ==================== 绘制 ====================
+    draw(ctx) {
+        const bc = parseHex(this.bodyColor); ctx.save();
+        if (this.currentWeb) this.currentWeb.draw(ctx);
+        if (this.behavior === B.DESCEND || this.behavior === B.HANG || this.behavior === B.CLIMB) {
+            ctx.beginPath(); ctx.moveTo(this.silkX, Math.max(0, this.silkY)); ctx.lineTo(this.x, this.y - this.size * 0.3);
+            ctx.strokeStyle = 'rgba(190,200,220,0.18)'; ctx.lineWidth = 0.8; ctx.stroke();
+        }
+        if (cfg.trail) { for (const p of this.trail) { const age = (Date.now() - p.t) / 500; const a = (1 - age) * 0.1; const s = (1 - age) * this.size * 0.25; ctx.beginPath(); ctx.arc(p.x, p.y, s, 0, Math.PI * 2); ctx.fillStyle = `rgba(${bc.r},${bc.g},${bc.b},${a})`; ctx.fill(); } }
+        if (cfg.glowOn) { ctx.shadowBlur = this.glowAmt; ctx.shadowColor = this.bodyColor; }
+        this._drawLegs(ctx);
+        ctx.shadowBlur = cfg.glowOn ? this.glowAmt : 0;
+        this._drawBody(ctx);
+        this._drawPedipalps(ctx);
+        ctx.restore();
+    }
+
+    _drawLegs(ctx) {
+        const ps = 4;
+        for (let i = 0; i < this.legs.length; i++) {
+            const leg = this.legs[i];
+            const perpA = this.angle + leg.side * Math.PI / 2;
+            const fr = leg.idx / (ps - 1 || 1);
+            const fwdOff = (fr - 0.35) * this.size * 0.6;
+            const ax = this.x + Math.cos(perpA) * this.size * 0.28 + Math.cos(this.angle) * fwdOff;
+            const ay = this.y + Math.sin(perpA) * this.size * 0.28 + Math.sin(this.angle) * fwdOff;
+            const fx = leg.footX, fy = leg.footY - leg.stepH;
+            const tl = this.legLen, l1 = tl * 0.45, l2 = tl * 0.38, l3 = tl * 0.17, effL2 = l2 + l3;
+            const ik = solveIK(ax, ay, fx, fy, l1, effL2, leg.side);
+            const ankA = Math.atan2(fy - ik.ky, fx - ik.kx);
+            const ankX = ik.kx + Math.cos(ankA) * l2, ankY = ik.ky + Math.sin(ankA) * l2;
+            ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(ik.kx, ik.ky);
+            ctx.strokeStyle = this.legColor; ctx.lineWidth = Math.max(2, this.size / 10); ctx.lineCap = 'round'; ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ik.kx, ik.ky); ctx.lineTo(ankX, ankY);
+            ctx.strokeStyle = lighten(this.legColor, 12); ctx.lineWidth = Math.max(1.5, this.size / 14); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(ankX, ankY); ctx.lineTo(fx, fy);
+            ctx.strokeStyle = lighten(this.legColor, 22); ctx.lineWidth = Math.max(1, this.size / 20); ctx.stroke();
+            ctx.beginPath(); ctx.arc(ik.kx, ik.ky, Math.max(2, this.size / 13), 0, Math.PI * 2); ctx.fillStyle = darken(this.legColor, 25); ctx.fill();
+            ctx.beginPath(); ctx.arc(ankX, ankY, Math.max(1.2, this.size / 17), 0, Math.PI * 2); ctx.fillStyle = this.legColor; ctx.fill();
+            if (this.hairy) { this._drawHairs(ctx, ax, ay, ik.kx, ik.ky, 3, this.size * 0.05, 0.25); this._drawHairs(ctx, ik.kx, ik.ky, ankX, ankY, 2, this.size * 0.04, 0.2); }
+            ctx.beginPath(); ctx.arc(fx, fy, Math.max(0.8, this.size / 26), 0, Math.PI * 2); ctx.fillStyle = 'rgba(220,220,220,0.25)'; ctx.fill();
+        }
+    }
+
+    _drawHairs(ctx, x1, y1, x2, y2, n, len, alpha) {
+        const dx = x2 - x1, dy = y2 - y1, sl = Math.hypot(dx, dy); if (sl < 1) return;
+        const nx = -dy / sl, ny = dx / sl;
+        ctx.strokeStyle = `rgba(180,180,180,${alpha})`; ctx.lineWidth = 0.4;
+        for (let i = 0; i < n; i++) { const t = (i + 1) / (n + 1); const px = x1 + dx * t, py = y1 + dy * t; for (const s of [1, -1]) { const a = Math.atan2(ny, nx) + s * 0.3; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + Math.cos(a) * len * s, py + Math.sin(a) * len * s); ctx.stroke(); } }
+    }
+
+    _drawBody(ctx) {
+        const bc = parseHex(this.bodyColor);
+        const abX = this.x - Math.cos(this.angle) * this.size * 0.2, abY = this.y - Math.sin(this.angle) * this.size * 0.2;
+        ctx.beginPath(); ctx.ellipse(abX, abY, this.size * 0.52, this.size * 0.38, this.angle, 0, Math.PI * 2); ctx.fillStyle = this.bodyColor; ctx.fill();
+        this._drawPattern(ctx, abX, abY);
+        ctx.beginPath(); ctx.ellipse(abX - Math.cos(this.angle) * this.size * 0.06, abY - Math.sin(this.angle) * this.size * 0.06, this.size * 0.18, this.size * 0.13, this.angle, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${Math.min(255, bc.r + 50)},${Math.min(255, bc.g + 50)},${Math.min(255, bc.b + 50)},0.18)`; ctx.fill();
+        const hdX = this.x + Math.cos(this.angle) * this.size * 0.28, hdY = this.y + Math.sin(this.angle) * this.size * 0.28;
+        ctx.beginPath(); ctx.ellipse(hdX, hdY, this.size * 0.28, this.size * 0.22, this.angle, 0, Math.PI * 2); ctx.fillStyle = lighten(this.bodyColor, 22); ctx.fill();
+        this._drawEyes(ctx, hdX, hdY); this._drawFangs(ctx, hdX, hdY);
+    }
+
+    _drawPattern(ctx, ax, ay) {
+        ctx.save(); ctx.translate(ax, ay); ctx.rotate(this.angle); const s = this.size;
+        switch (this.patternType) {
+            case 1: for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.moveTo(i * s * 0.1, -s * 0.3); ctx.lineTo(i * s * 0.1, s * 0.3); ctx.strokeStyle = 'rgba(0,0,0,0.18)'; ctx.lineWidth = s * 0.025; ctx.stroke(); } break;
+            case 2: for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.arc((i - 1.5) * s * 0.13, (i % 2 === 0 ? -1 : 1) * s * 0.1, s * 0.035, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fill(); } break;
+            case 3:
+                ctx.beginPath(); ctx.moveTo(0, -s * 0.12); ctx.lineTo(-s * 0.07, 0); ctx.lineTo(0, s * 0.12); ctx.lineTo(s * 0.07, 0); ctx.closePath();
+                ctx.fillStyle = 'rgba(200,0,0,0.35)'; ctx.fill(); break;
+        }
+        ctx.restore();
+    }
+
+    _drawEyes(ctx, hx, hy) {
+        const eyeGlowMul = sceneSystem ? sceneSystem.getEyeGlowMultiplier() : 1.0;
+        const eo = this.size * 0.1, es = Math.max(1.8, this.size / 14), eg = cfg.glowOn ? this.glowAmt * 1.1 * eyeGlowMul : 0;
+        const eyes = [{ dx: eo * 1.3, dy: -eo * 0.4, s: es * 1.1 }, { dx: eo * 1.3, dy: eo * 0.4, s: es * 1.1 }, { dx: eo * 0.85, dy: -eo * 0.7, s: es * 0.8 }, { dx: eo * 0.85, dy: eo * 0.7, s: es * 0.8 }, { dx: eo * 0.5, dy: -eo * 0.9, s: es * 0.65 }, { dx: eo * 0.5, dy: eo * 0.9, s: es * 0.65 }, { dx: eo * 1.45, dy: -eo * 0.2, s: es * 0.55 }, { dx: eo * 1.45, dy: eo * 0.2, s: es * 0.55 }];
+        for (const e of eyes) {
+            const ex = hx + Math.cos(this.angle) * e.dx - Math.sin(this.angle) * e.dy, ey = hy + Math.sin(this.angle) * e.dx + Math.cos(this.angle) * e.dy;
+            ctx.beginPath(); ctx.arc(ex, ey, e.s, 0, Math.PI * 2); ctx.fillStyle = '#000'; ctx.fill();
+            ctx.save(); ctx.shadowBlur = eg; ctx.shadowColor = this.eyeColor;
+            ctx.beginPath(); ctx.arc(ex, ey, e.s * 0.72, 0, Math.PI * 2); ctx.fillStyle = this.eyeColor; ctx.fill(); ctx.restore();
+            ctx.beginPath(); ctx.arc(ex - e.s * 0.2, ey - e.s * 0.22, e.s * 0.25, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,255,255,0.8)'; ctx.fill();
+        }
+    }
+
+    _drawFangs(ctx, hx, hy) {
+        const fb = this.size * 0.5, fl = this.size * 0.12;
+        for (const side of [-1, 1]) {
+            const bx = hx + Math.cos(this.angle) * fb - Math.sin(this.angle) * side * this.size * 0.05, by = hy + Math.sin(this.angle) * fb + Math.cos(this.angle) * side * this.size * 0.05;
+            const tx = bx + Math.cos(this.angle + side * 0.3) * fl, ty = by + Math.sin(this.angle + side * 0.3) * fl;
+            ctx.beginPath(); ctx.moveTo(bx - Math.sin(this.angle) * side * 1.5, by + Math.cos(this.angle) * side * 1.5); ctx.lineTo(tx, ty); ctx.lineTo(bx + Math.sin(this.angle) * side * 1.5, by - Math.cos(this.angle) * side * 1.5);
+            ctx.fillStyle = '#1a1a1a'; ctx.fill();
+        }
+    }
+
+    _drawPedipalps(ctx) {
+        const hx = this.x + Math.cos(this.angle) * this.size * 0.28, hy = this.y + Math.sin(this.angle) * this.size * 0.28;
+        for (const side of [-1, 1]) {
+            const bo = this.size * 0.06, bx = hx + Math.cos(this.angle) * this.size * 0.26 - Math.sin(this.angle) * side * bo, by = hy + Math.sin(this.angle) * this.size * 0.26 + Math.cos(this.angle) * side * bo;
+            const w = Math.sin(this.pedPhase + side * 0.5) * 0.12, tx = bx + Math.cos(this.angle + side * 0.25 + w) * this.size * 0.12, ty = by + Math.sin(this.angle + side * 0.25 + w) * this.size * 0.12;
+            ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(tx, ty); ctx.strokeStyle = this.legColor; ctx.lineWidth = Math.max(1, this.size / 22); ctx.lineCap = 'round'; ctx.stroke();
+            ctx.beginPath(); ctx.arc(tx, ty, Math.max(0.8, this.size / 28), 0, Math.PI * 2); ctx.fillStyle = this.legColor; ctx.fill();
+        }
+    }
+}
+
+// ==================== 全局管理 ====================
+let mainSpider = null;
+let companions = [];
+let preyList = [];
+let freeMosquitoes = [];
+let allWebs = [];
+
+// Scene system and parallax layer
+let sceneSystem = null;
+let parallaxLayer = null;
+
+function createMainSpider() { mainSpider = new Spider(W / 2, H / 2, { isPlayer: true, patternType: 3 }); }
+
+function syncConfig() {
+    if (!mainSpider) return;
+    mainSpider.size = cfg.size; mainSpider.speed = cfg.speed; mainSpider.legLen = cfg.legLen;
+    mainSpider.bodyColor = cfg.bodyColor; mainSpider.legColor = cfg.legColor; mainSpider.eyeColor = cfg.eyeColor; mainSpider.glowAmt = cfg.glow;
+}
+
+function updateCompanions() {
+    const t = cfg.companions;
+    while (companions.length > t) { const r = companions.pop(); if (r.currentWeb) allWebs.push(r.currentWeb); }
+    while (companions.length < t) {
+        const sv = rng(0.4, 1.2), spv = rng(0.5, 1.5);
+        let sx, sy; const edge = Math.floor(Math.random() * 4);
+        switch (edge) { case 0: sx = rng(0, W); sy = -30; break; case 1: sx = rng(0, W); sy = H + 30; break; case 2: sx = -30; sy = rng(0, H); break; case 3: sx = W + 30; sy = rng(0, H); break; }
+        const bc = parseHex(cfg.bodyColor), v = 35;
+        companions.push(new Spider(sx, sy, {
+            size: cfg.size * sv, speed: cfg.speed * spv, legLen: cfg.legLen * (0.6 + sv * 0.4),
+            bodyColor: `rgb(${clamp(bc.r + rng(-v, v), 0, 255)},${clamp(bc.g + rng(-v, v), 0, 255)},${clamp(bc.b + rng(-v, v), 0, 255)})`,
+            legColor: cfg.legColor, eyeColor: cfg.eyeColor, glow: cfg.glow * 0.5, isPlayer: false, patternType: Math.floor(Math.random() * 4)
+        }));
+    }
+}
+
+function getAllWebs() {
+    const webs = [...allWebs];
+    if (mainSpider && mainSpider.currentWeb) webs.push(mainSpider.currentWeb);
+    for (const c of companions) if (c.currentWeb) webs.push(c.currentWeb);
+    return webs.filter(w => w.built);
+}
+
+function trySpawnPrey(web) {
+    if (!web || !web.built) return;
+    if (preyList.length >= 8) return;
+    if (Math.random() > 0.015) return;
+    if (Math.random() < 0.7) preyList.push(new Mosquito(web));
+    else preyList.push(new Moth(web));
+}
+
+function trySpawnFreeMosquito() {
+    if (freeMosquitoes.length >= 3) return;
+    if (Math.random() > 0.003) return;
+    freeMosquitoes.push(new FreeMosquito());
+}
+
+// ==================== 主循环 ====================
+let lastTime = performance.now();
+function loop(now) {
+    const dt = Math.min((now - lastTime) / 1000, 0.05); lastTime = now; globalTime += dt;
+
+    // Update scene and parallax
+    if (sceneSystem) sceneSystem.update(dt);
+    if (parallaxLayer) parallaxLayer.update(dt);
+
+    // Clear with base color
+    ctx.fillStyle = 'rgba(8,11,18,0.4)';
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw parallax background layer
+    if (parallaxLayer) parallaxLayer.drawBackgroundLayer(ctx);
+
+    // Draw parallax middle dust layer
+    if (parallaxLayer) parallaxLayer.drawMiddleLayer(ctx);
+
+    // Legacy particles (now handled by scene system, drawn in foreground layer)
+    // Draw foreground parallax (vignette + ambient particles)
+    if (parallaxLayer) parallaxLayer.drawForegroundLayer(ctx);
+
+    // 遗留蛛网
+    for (const w of allWebs) { w.update(dt); w.draw(ctx); }
+
+    // 游离蚊子
+    trySpawnFreeMosquito();
+    const builtWebs = getAllWebs();
+    for (let i = freeMosquitoes.length - 1; i >= 0; i--) {
+        const fm = freeMosquitoes[i];
+        fm.update(dt);
+        const hitWeb = fm.checkWebCollision(builtWebs);
+        if (hitWeb) {
+            const caught = new Mosquito(hitWeb);
+            caught.x = fm.x; caught.y = fm.y; caught.angle = fm.angle;
+            preyList.push(caught);
+            freeMosquitoes.splice(i, 1);
+            continue;
+        }
+        fm.draw(ctx);
+    }
+
+    // 被捕获的猎物
+    const allSpiders = [mainSpider, ...companions].filter(Boolean);
+    for (let i = preyList.length - 1; i >= 0; i--) {
+        const p = preyList[i];
+        for (const s of allSpiders) {
+            if (dist(s.x, s.y, p.x, p.y) < s.size * 2 && !p.beingEaten) {
+                p.beingEaten = true; p.eatenBy = s; s.eatTarget = p; s.behavior = B.EAT; s.bTimer = 0; break;
+            }
+        }
+        p.update(dt, p.eatenBy);
+        p.draw(ctx);
+        if (!p.alive) preyList.splice(i, 1);
+    }
+
+    // 蜘蛛
+    for (const s of companions) { s.update(dt); s.draw(ctx); trySpawnPrey(s.currentWeb); }
+    if (mainSpider) { mainSpider.update(dt); mainSpider.draw(ctx); trySpawnPrey(mainSpider.currentWeb); }
+
+    drawCursor();
+    requestAnimationFrame(loop);
+}
+
+// ==================== 事件 ====================
+window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.inWindow = true; });
+window.addEventListener('mouseleave', () => { mouse.inWindow = false; });
+window.addEventListener('mouseenter', () => { mouse.inWindow = true; });
+window.addEventListener('mousedown', e => { if (mainSpider) mainSpider.scare(e.clientX, e.clientY); for (const s of companions) s.scare(e.clientX, e.clientY); });
+window.addEventListener('touchmove', e => { e.preventDefault(); mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; mouse.inWindow = true; }, { passive: false });
+window.addEventListener('touchend', () => { mouse.inWindow = false; });
+
+// ==================== 面板 ====================
+document.getElementById('panelBtn').addEventListener('click', () => { document.getElementById('controls').classList.toggle('open'); document.getElementById('panelBtn').classList.toggle('active'); });
+function bind(id, key, type = 'float') {
+    const el = document.getElementById(id), val = document.getElementById('v-' + id);
+    el.addEventListener('input', e => { const v = type === 'float' ? parseFloat(e.target.value) : (type === 'int' ? parseInt(e.target.value) : e.target.value); cfg[key] = v; if (val) val.textContent = v; syncConfig(); if (key === 'companions') updateCompanions(); });
+}
+bind('size', 'size'); bind('speed', 'speed'); bind('legLen', 'legLen'); bind('companions', 'companions', 'int');
+bind('bodyColor', 'bodyColor', 'string'); bind('legColor', 'legColor', 'string'); bind('eyeColor', 'eyeColor', 'string');
+['bodyColor','legColor','eyeColor'].forEach(cid => document.getElementById(cid).addEventListener('input', () => document.querySelectorAll('.preset').forEach(el => el.classList.remove('active'))));
+function toggle(id, key) { const el = document.getElementById(id); el.addEventListener('click', () => { cfg[key] = !cfg[key]; el.classList.toggle('on'); }); }
+toggle('t-trail', 'trail'); toggle('t-web', 'web'); toggle('t-glow', 'glowOn');
+document.getElementById('btn-descend').addEventListener('click', () => { if (mainSpider) mainSpider.setBehavior(B.DESCEND); });
+document.getElementById('btn-buildweb').addEventListener('click', () => { if (mainSpider) mainSpider.setBehavior(B.BUILD_WEB); });
+document.getElementById('btn-jump').addEventListener('click', () => { if (mainSpider) mainSpider.setBehavior(B.JUMP); });
+
+const presets = {
+    classic: { bodyColor: '#8B4513', legColor: '#D2691E', eyeColor: '#FF3333', glow: 18 },
+    black: { bodyColor: '#1a1a1a', legColor: '#2a2a2a', eyeColor: '#ff0044', glow: 28 },
+    neon: { bodyColor: '#00cccc', legColor: '#0066aa', eyeColor: '#ffffff', glow: 35 },
+    green: { bodyColor: '#2d5a27', legColor: '#4a8c3f', eyeColor: '#ff6600', glow: 22 },
+    gold: { bodyColor: '#b8860b', legColor: '#daa520', eyeColor: '#ff0000', glow: 30 },
+    ghost: { bodyColor: '#d0d0d0', legColor: '#e8e8e8', eyeColor: '#000000', glow: 12 }
+};
+window.setPreset = function(n) { const p = presets[n]; if (!p) return; Object.assign(cfg, p); document.getElementById('bodyColor').value = p.bodyColor; document.getElementById('legColor').value = p.legColor; document.getElementById('eyeColor').value = p.eyeColor; syncConfig(); if (n === 'black' && mainSpider) mainSpider.patternType = 3; document.querySelectorAll('.preset').forEach(el => el.classList.toggle('active', el.dataset.key === n)); };
+setTimeout(() => document.getElementById('hint').classList.add('fade'), 4000);
+
+// Initialize scene system and parallax
+sceneSystem = new SceneSystem();
+parallaxLayer = new ParallaxLayer(sceneSystem);
+
+createMainSpider(); updateCompanions(); requestAnimationFrame(loop);
+</script>
 </body>
-</html>'''
-
-with open('/mnt/agents/output/spider.html', 'w', encoding='utf-8') as f:
-    f.write(html_content)
-
-print("文件已保存")
+</html>
