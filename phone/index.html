@@ -1018,6 +1018,11 @@
     let pendingImages = [];  // 待上传图片队列
     let isManualClose = false;  // 标记是否为手动关闭连接
 
+    // 语音识别面板状态与计时器
+    let speechState = 'idle'; // 'idle' | 'recording' | 'processing'
+    let speechStartTime = null;
+    let speechTimerInterval = null;
+
     // 页面加载时自动读配置、加载历史记录，并在有已保存配置时自动连接
     window.onload = function () {
         loadConfig();
@@ -1290,6 +1295,31 @@
                         handleImageSwitch(jsonData);
                         return;
                     }
+
+                    // 处理 Shift+S 返回的音频识别问答（以 Markdown 在主区域显示：仅问题与答案）
+                    if (jsonData.type === 'audio_answer') {
+                        isJsonMessage = true;
+                        try {
+                            const question = jsonData.question || '';
+                            const answer = jsonData.answer || '';
+
+                            // 构建 Markdown 内容：仅包含问题和答案
+                            const md = `### 问题\n\n${question}\n\n---\n\n### 答案\n\n${answer}`;
+
+                            // 在大面板也展示纯文本的问答（便于手机快速查看），并停止语音计时器
+                            try {
+                                showSpeechPanel(`问题:\n${question}\n\n答案:\n${answer}`, {autoFocus:true, stopTimer:true});
+                            } catch (e) { /* ignore */ }
+
+                            // 将 Markdown 渲染到主消息区（并标记为来自 WebSocket 以保存历史）
+                            isFromWebSocket = true;
+                            displayMessage(md);
+                            isFromWebSocket = false;
+                        } catch (e) {
+                            console.error('处理 audio_answer 消息失败:', e);
+                        }
+                        return;
+                    }
                 } catch (e) {
                     // 不是JSON格式，继续按文本处理
                 }
@@ -1297,9 +1327,31 @@
                 // 解析消息，提取状态信息
                 const messageData = parseWorkflowMessage(event.data);
 
+                // 先对可能出现的编码/转义问题进行容错处理（特别是移动端语音识别结果）
+                if (messageData.content) {
+                    messageData.content = normalizeTextEncoding(messageData.content);
+                }
+
                 // 更新PC状态（始终更新，包含耗时信息）
                 if (messageData.status) {
                     updatePCStatus(messageData.status, messageData.elapsed);
+                }
+
+                // 语音识别专用：当收到识别过程中或识别结果时，弹出大面板以便手机端查看（仅显示状态，移除复制）
+                if (messageData.status && /录音|语音|ASR/.test(messageData.status)) {
+                    // 识别进行中：显示提示并启动语音计时器（若还未启动）
+                    if (/识别中|处理中/.test(messageData.status)) {
+                        speechState = 'recording';
+                        if (!speechTimerInterval) {
+                            speechStartTime = Date.now();
+                            startSpeechTimer();
+                        }
+                        showSpeechPanel(messageData.content || '识别中...', {autoFocus: false, transient: true, startTimer:false});
+                    } else {
+                        // 识别结果或已完成：停止计时并在大面板与主区域显示结果（主区域使用 Markdown 渲染）
+                        speechState = 'idle';
+                        showSpeechPanel(messageData.content || '', {autoFocus: true, transient: false, stopTimer: true});
+                    }
                 }
 
                 // 仅当有实际内容时才显示消息（纯状态标记不显示在主消息区）
@@ -1369,6 +1421,16 @@
                 bg: 'rgba(33, 150, 243, 0.1)',
                 color: '#2196f3'
             },
+            '录音识别中': {
+                icon: '🎤',
+                bg: 'rgba(255, 87, 34, 0.08)',
+                color: '#ff7043'
+            },
+            '录音识别结果': {
+                icon: '🎤',
+                bg: 'rgba(255, 87, 34, 0.04)',
+                color: '#ff7043'
+            },
             'LLM分析中': {
                 icon: '🤖',
                 bg: 'rgba(156, 39, 176, 0.1)',
@@ -1415,7 +1477,8 @@
 
         // 如果需要计时的状态，启动计时器
         if (status === 'OCR分析中' || status === 'LLM分析中' ||
-            status === '整体代码中' || status === '整理代码中' || status === '自动写入中') {
+            status === '整体代码中' || status === '整理代码中' || status === '自动写入中' ||
+            status === '录音识别中') {
             // 记录当前长任务状态和图标
             currentLongStatus = status;
             currentLongIcon = config.icon;
@@ -1635,6 +1698,173 @@
                 overlay.style.display = 'none';
             }
         }
+    }
+
+    // ========== 语音识别大面板（用于手机端避免乱码/仅显示状态，移除复制功能） ==========
+    function ensureSpeechPanel() {
+        let panel = document.getElementById('globalSpeechPanel');
+        if (!panel) {
+            panel = document.createElement('div');
+            panel.id = 'globalSpeechPanel';
+            panel.style.cssText = `
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.6);
+                z-index: 99998;
+                align-items: center;
+                justify-content: center;
+                padding: 16px;
+            `;
+
+            const box = document.createElement('div');
+            box.id = 'globalSpeechBox';
+            box.style.cssText = `
+                width: 100%;
+                max-width: 800px;
+                background: rgba(22,33,62,0.98);
+                color: #fff;
+                padding: 18px 20px;
+                border-radius: 12px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+                text-align: left;
+                pointer-events: auto;
+            `;
+
+            const header = document.createElement('div');
+            header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;';
+            const title = document.createElement('div');
+            title.id = 'globalSpeechTitle';
+            title.style.cssText = 'font-size:18px; font-weight:700; color:#ffd166;';
+            title.textContent = '🎤 语音识别';
+            header.appendChild(title);
+
+            // 计时显示（与全局覆盖层样式一致）
+            const rightGroup = document.createElement('div');
+            rightGroup.style.cssText = 'display:flex; gap:8px; align-items:center;';
+
+            const timer = document.createElement('div');
+            timer.id = 'globalSpeechTimer';
+            timer.style.cssText = 'font-size:14px; color:#e0e0e0; opacity:0.95;';
+            timer.textContent = '';
+
+            const closeBtn = document.createElement('button');
+            closeBtn.textContent = '✕';
+            closeBtn.style.cssText = 'background:rgba(15,52,96,0.9); color:white; padding:6px 10px; border-radius:6px;';
+            closeBtn.onclick = hideSpeechPanel;
+
+            rightGroup.appendChild(timer);
+            rightGroup.appendChild(closeBtn);
+            header.appendChild(rightGroup);
+
+            const content = document.createElement('div');
+            content.id = 'globalSpeechContent';
+            content.style.cssText = 'font-size:18px; color:#e0e0e0; white-space:pre-wrap; word-break:break-word; line-height:1.6; max-height:60vh; overflow:auto; padding-top:6px;';
+
+            box.appendChild(header);
+            box.appendChild(content);
+            panel.appendChild(box);
+
+            // 点击背景关闭（仅当点击在 overlay 上）
+            panel.addEventListener('click', function(e){ if (e.target === panel) hideSpeechPanel(); });
+
+            document.body.appendChild(panel);
+        }
+        return panel;
+    }
+
+    function showSpeechPanel(text, opts = {autoFocus:true, transient:false, startTimer:false, stopTimer:false}) {
+        const panel = ensureSpeechPanel();
+        const content = document.getElementById('globalSpeechContent');
+        const title = document.getElementById('globalSpeechTitle');
+        const timer = document.getElementById('globalSpeechTimer');
+        if (content) content.textContent = text || '';
+        if (title) title.textContent = '🎤 语音识别';
+        if (timer && opts.stopTimer) timer.textContent = '';
+        panel.style.display = 'flex';
+
+        // 小动画
+        const box = document.getElementById('globalSpeechBox');
+        if (box) { box.style.transform = 'scale(0.98)'; box.style.transition = 'transform 160ms ease-out'; setTimeout(()=>box.style.transform='scale(1)',20); }
+
+        if (opts.startTimer) {
+            speechStartTime = Date.now();
+            startSpeechTimer();
+        }
+
+        if (opts.stopTimer) {
+            stopSpeechTimer();
+        }
+    }
+
+    function hideSpeechPanel() {
+        const panel = document.getElementById('globalSpeechPanel');
+        if (panel) panel.style.display = 'none';
+    }
+
+    // 语音计时器相关
+    function startSpeechTimer() {
+        if (speechTimerInterval) return; // 已在计时
+        const timerEl = document.getElementById('globalSpeechTimer');
+        if (!speechStartTime) speechStartTime = Date.now();
+        if (timerEl) timerEl.textContent = '0s';
+        speechTimerInterval = setInterval(updateSpeechTimerDisplay, 1000);
+    }
+
+    function updateSpeechTimerDisplay() {
+        const timerEl = document.getElementById('globalSpeechTimer');
+        if (!timerEl || !speechStartTime) return;
+        const elapsed = Math.floor((Date.now() - speechStartTime) / 1000);
+        timerEl.textContent = `${elapsed}s`;
+    }
+
+    function stopSpeechTimer() {
+        if (speechTimerInterval) {
+            clearInterval(speechTimerInterval);
+            speechTimerInterval = null;
+        }
+        speechStartTime = null;
+        const timerEl = document.getElementById('globalSpeechTimer');
+        if (timerEl) timerEl.textContent = '';
+    }
+
+    // 尝试修正常见的编码/转义问题，优先处理 \uXXXX 等 Unicode 转义，以及 latin1->utf8 的常见混淆
+    function normalizeTextEncoding(text) {
+        if (!text || typeof text !== 'string') return text;
+
+        let t = text;
+
+        // 如果包含 JSON 风格的 Unicode 转义（例如：\u4e2d\u56fd），解码为实际字符
+        try {
+            if (/\\u[0-9a-fA-F]{4}/.test(t)) {
+                t = t.replace(/\\u([0-9a-fA-F]{4})/g, function(_, g){ return String.fromCharCode(parseInt(g,16)); });
+            }
+            // 处理 \xHH 转义
+            if (/\\x[0-9a-fA-F]{2}/.test(t)) {
+                t = t.replace(/\\x([0-9a-fA-F]{2})/g, function(_, g){ return String.fromCharCode(parseInt(g,16)); });
+            }
+        } catch (e) {
+            // 忽略错误，继续尝试其他策略
+        }
+
+        // 修复 windows-1252/latin1 被当作 utf-8 导致的乱码：尝试 decodeURIComponent(escape(...)) 方案
+        try {
+            const maybe = decodeURIComponent(escape(t));
+            // 如果转换后看起来像中文或可读字符且长度合适，则使用
+            if (/[\u4e00-\u9fff]/.test(maybe) || maybe.length > t.length) {
+                t = maybe;
+            }
+        } catch (e) {
+            // ignore
+        }
+
+        // 去除不可见控制字符（除换行、制表符）
+        t = t.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/g, '');
+
+        return t;
     }
 
     // 解析工作流消息，提取状态和内容
@@ -3374,6 +3604,40 @@
             } else if (configModal && configModal.classList.contains('show')) {
                 closeConfig();
             }
+        }
+
+        // Shift+S 用于控制录音：第一次按下开始录音并显示开始状态，第二次按下停止录音并进入处理状态
+        if ((e.key === 'S' || e.key === 's') && e.shiftKey) {
+            e.preventDefault();
+            if (!isConnected()) {
+                showMessage('❌ 未连接到PC端，无法控制录音', 'error');
+                return;
+            }
+
+            try {
+                if (speechState === 'idle') {
+                    // 开始录音
+                    speechState = 'recording';
+                    speechStartTime = Date.now();
+                    startSpeechTimer();
+                    showSpeechPanel('开始录音', {autoFocus: false, startTimer:false});
+                    // 向PC端发送开始录音指令（服务端需配合处理）
+                    ws.send(JSON.stringify({ type: 'speech_control', action: 'start' }));
+                } else if (speechState === 'recording') {
+                    // 停止录音并通知服务端处理
+                    speechState = 'processing';
+                    showSpeechPanel('处理录音中', {autoFocus: false});
+                    ws.send(JSON.stringify({ type: 'speech_control', action: 'stop_and_process' }));
+                } else {
+                    // 正在处理时提示用户等待
+                    showMessage('语音正在处理，请稍候...', 'info');
+                }
+            } catch (err) {
+                console.error('发送录音控制消息失败', err);
+                showMessage('❌ 发送录音控制失败，请检查连接', 'error');
+            }
+
+            return;
         }
 
         // 方向键切换图片（仅在图片预览时）
