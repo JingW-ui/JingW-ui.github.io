@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub Trending</title>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --green:#238636;
+    --green-light:#2dba4e;
+    --green-bg:rgba(35,134,54,0.08);
+    --green-border:rgba(35,134,54,0.2);
+    --bg:#ffffff;
+    --text:#111111;
+    --text-secondary:#57606a;
+    --text-tertiary:#8b949e;
+    --border:#d0d7de;
+    --card-hover:rgba(35,134,54,0.04);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md:0 3px 12px rgba(0,0,0,0.06);
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);
+    line-height:1.5;min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  /* ---- Header ---- */
+  .header{
+    text-align:center;
+    padding:72px 24px 0;
+    opacity:0;transform:translateY(-30px);
+    animation:headerIn 0.8s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
+  }
+  @keyframes headerIn{to{opacity:1;transform:translateY(0)}}
+
+  .header h1{
+    font-size:clamp(2.2rem,5vw,3.6rem);
+    font-weight:800;letter-spacing:-0.03em;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  .header h1 span{color:var(--green)}
+  .header .subtitle{
+    font-size:1.05rem;color:var(--text-secondary);font-weight:400;
+    opacity:0;animation:fadeUp 0.6s ease 0.4s forwards;
+  }
+
+  /* ---- Controls ---- */
+  .controls{
+    max-width:960px;margin:40px auto 0;padding:0 24px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:16px;
+    opacity:0;animation:fadeUp 0.6s ease 0.55s forwards;
+  }
+  .control-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .control-label{
+    font-size:0.82rem;font-weight:600;color:var(--text-tertiary);
+    text-transform:uppercase;letter-spacing:0.06em;
+    margin-right:4px;white-space:nowrap;
+  }
+
+  .pill{
+    padding:6px 16px;border-radius:100px;
+    font-size:0.85rem;font-weight:500;
+    cursor:pointer;transition:all 0.25s ease;
+    border:1.5px solid var(--border);background:var(--bg);color:var(--text-secondary);
+    user-select:none;
+  }
+  .pill:hover{border-color:var(--green);color:var(--green)}
+  .pill.active{
+    background:var(--green);color:#fff;border-color:var(--green);
+    box-shadow:0 2px 8px rgba(35,134,54,0.25);
+  }
+  .pill.lang-pill.active{background:var(--green);color:#fff;border-color:var(--green)}
+
+  .divider{
+    width:1px;height:24px;background:var(--border);margin:0 4px;
+  }
+
+  /* ---- Loading ---- */
+  .loading-container{
+    display:flex;justify-content:center;align-items:center;
+    padding:80px 24px;
+  }
+  .loading-spinner{
+    width:32px;height:32px;border-radius:50%;
+    border:3px solid var(--border);border-top-color:var(--green);
+    animation:spin 0.7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---- Cards ---- */
+  .container{
+    max-width:960px;margin:32px auto 80px;padding:0 24px;
+  }
+  .repo-list{display:flex;flex-direction:column;gap:2px}
+
+  .repo-card{
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:20px 24px;
+    transition:all 0.25s ease;
+    cursor:pointer;
+    opacity:0;transform:translateY(24px);
+    position:relative;
+  }
+  .repo-card.visible{
+    animation:cardIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+  }
+  .repo-card:hover{
+    border-color:var(--green-border);
+    background:var(--card-hover);
+    box-shadow:var(--shadow-md);
+  }
+  @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+
+  /* exit animation */
+  .repo-card.exiting{
+    animation:cardOut 0.3s ease forwards;
+  }
+  @keyframes cardOut{to{opacity:0;transform:translateY(-12px) scale(0.98)}}
+
+  .repo-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:8px}
+  .repo-rank{
+    font-size:1.5rem;font-weight:800;color:var(--green);
+    min-width:36px;text-align:right;line-height:1.2;
+    font-variant-numeric:tabular-nums;
+  }
+  .repo-info{flex:1;min-width:0}
+  .repo-name{
+    font-size:1.08rem;font-weight:700;color:var(--text);
+    text-decoration:none;
+    transition:color 0.2s;
+    word-break:break-all;
+  }
+  .repo-name:hover{color:var(--green)}
+  .repo-name span.owner{color:var(--text-secondary);font-weight:400}
+  .repo-name span.slash{color:var(--text-tertiary);font-weight:300;margin:0 1px}
+
+  .repo-desc{
+    font-size:0.9rem;color:var(--text-secondary);
+    margin-top:6px;line-height:1.55;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+
+  .repo-meta{
+    display:flex;align-items:center;gap:16px;
+    margin-top:10px;flex-wrap:wrap;
+  }
+  .meta-item{
+    font-size:0.82rem;color:var(--text-tertiary);
+    display:flex;align-items:center;gap:4px;
+    font-variant-numeric:tabular-nums;
+  }
+  .meta-item.lang-dot{
+    color:var(--text-secondary);font-weight:500;
+  }
+  .lang-color{
+    width:10px;height:10px;border-radius:50%;
+    display:inline-block;
+  }
+  .meta-item .stars-today{
+    color:var(--green);font-weight:600;
+  }
+
+  /* ---- Empty ---- */
+  .empty-state{
+    text-align:center;padding:80px 24px;
+    color:var(--text-tertiary);
+  }
+  .empty-state p{font-size:1.1rem;margin-top:8px}
+
+  /* ---- Footer stats ---- */
+  .stats-bar{
+    max-width:960px;margin:0 auto 40px;padding:0 24px;
+    display:flex;justify-content:center;gap:32px;
+    opacity:0;animation:fadeUp 0.5s ease 0.7s forwards;
+  }
+  .stat-item{text-align:center}
+  .stat-value{font-size:1.5rem;font-weight:800;color:var(--green)}
+  .stat-label{font-size:0.78rem;color:var(--text-tertiary);margin-top:2px}
+
+  /* ---- Utility ---- */
+  @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+  /* ---- Responsive ---- */
+  @media(max-width:640px){
+    .header{padding-top:48px}
+    .controls{gap:10px}
+    .divider{display:none}
+    .repo-card{padding:16px 18px}
+    .repo-rank{font-size:1.2rem;min-width:28px}
+    .repo-name{font-size:0.98rem}
+    .stats-bar{gap:20px}
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--text-tertiary)}
+
+  /* Language color map */
+  .lang-python{background:#3572A5}
+  .lang-rust{background:#dea584}
+  .lang-html{background:#e34c26}
+  .lang-javascript{background:#f1e05a}
+  .lang-typescript{background:#3178c6}
+  .lang-go{background:#00ADD8}
+  .lang-java{background:#b07219}
+  .lang-c{background:#555555}
+  .lang-cplusplus{background:#f34b7d}
+  .lang-csharp{background:#178600}
+  .lang-ruby{background:#701516}
+  .lang-php{background:#4F5D95}
+  .lang-swift{background:#F05138}
+  .lang-kotlin{background:#A97BFF}
+  .lang-dart{background:#00B4AB}
+  .lang-scala{background:#c22d40}
+  .lang-shell{background:#89e051}
+  .lang-lua{background:#000080}
+  .lang-r{background:#198CE7}
+  .lang-julia{background:#A270BA}
+  .lang-zig{background:#ec915c}
+  .lang-default{background:var(--text-tertiary)}
+
+  /* transition for control changes */
+  .repo-list.transitioning{
+    opacity:0.3;transform:translateY(8px);
+    transition:all 0.2s ease;
+  }
+
+  /* link style reset */
+  a{text-decoration:none;color:inherit}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>GitHub <span>Trending</span></h1>
+  <p class="subtitle">Discover what the community is building</p>
+</header>
+
+<div class="stats-bar" id="statsBar">
+  <div class="stat-item">
+    <div class="stat-value" id="statTotal">--</div>
+    <div class="stat-label">repositories</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="statStars">--</div>
+    <div class="stat-label">total stars gained</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-value" id="statLangs">--</div>
+    <div class="stat-label">languages</div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="control-group">
+    <span class="control-label">Period</span>
+    <button class="pill since-pill active" data-since="daily">Daily</button>
+    <button class="pill since-pill" data-since="weekly">Weekly</button>
+    <button class="pill since-pill" data-since="monthly">Monthly</button>
+  </div>
+  <div class="divider"></div>
+  <div class="control-group">
+    <span class="control-label">Language</span>
+    <button class="pill lang-pill active" data-lang="">All</button>
+    <button class="pill lang-pill" data-lang="python">Python</button>
+    <button class="pill lang-pill" data-lang="rust">Rust</button>
+    <button class="pill lang-pill" data-lang="javascript">JavaScript</button>
+    <button class="pill lang-pill" data-lang="html">HTML</button>
+    <button class="pill lang-pill" data-lang="typescript">TypeScript</button>
+    <button class="pill lang-pill" data-lang="go">Go</button>
+  </div>
+</div>
+
+<div class="container">
+  <div id="repoList" class="repo-list"></div>
+</div>
+
+<script>
+(function(){
+  const API_BASE = 'https://cloudflare-mcp1.zx1993.top/api/trending';
+  let currentSince = 'daily';
+  let currentLang = '';
+  let cachedData = {};
+  let loading = false;
+
+  const repoListEl = document.getElementById('repoList');
+  const statTotal = document.getElementById('statTotal');
+  const statStars = document.getElementById('statStars');
+  const statLangs = document.getElementById('statLangs');
+
+  // ---- Language color helper ----
+  function langClass(lang) {
+    if (!lang) return 'lang-default';
+    const l = lang.toLowerCase().replace('++','plus').replace('#','sharp').replace(' ','');
+    return 'lang-' + l;
+  }
+
+  // ---- Format numbers ----
+  function fmtNum(n) {
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    return n.toString();
+  }
+
+  // ---- Cache key ----
+  function cacheKey(since, lang) {
+    return since + ':' + (lang || 'all');
+  }
+
+  // ---- Fetch data ----
+  async function fetchData(since, lang) {
+    const key = cacheKey(since, lang);
+    if (cachedData[key]) return cachedData[key];
+
+    let url = API_BASE + '?since=' + since;
+    if (lang) url += '&language=' + lang;
+
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('API error');
+    const json = await res.json();
+    cachedData[key] = json.data || [];
+    return cachedData[key];
+  }
+
+  // ---- Render cards ----
+  function renderCards(repos) {
+    repoListEl.innerHTML = '';
+
+    if (!repos.length) {
+      repoListEl.innerHTML = '<div class="empty-state"><p>No trending repositories found for this filter.</p></div>';
+      updateStats([]);
+      return;
+    }
+
+    updateStats(repos);
+
+    const frag = document.createDocumentFragment();
+    repos.forEach((repo, i) => {
+      const card = document.createElement('div');
+      card.className = 'repo-card';
+      card.style.animationDelay = (i * 50) + 'ms';
+
+      const langColorHtml = repo.language
+        ? `<span class="lang-color ${langClass(repo.language)}"></span>`
+        : '';
+
+      const langHtml = repo.language
+        ? `<span class="meta-item lang-dot">${langColorHtml} ${repo.language}</span>`
+        : '';
+
+      const starsTodayLabel = {
+        daily: 'stars today',
+        weekly: 'stars this week',
+        monthly: 'stars this month'
+      }[currentSince] || 'stars today';
+
+      card.innerHTML = `
+        <div class="repo-top">
+          <div class="repo-rank">${repo.rank}</div>
+          <div class="repo-info">
+            <a class="repo-name" href="${repo.url}" target="_blank" rel="noopener">
+              <span class="owner">${repo.username}</span><span class="slash">/</span>${repo.reponame}
+            </a>
+            ${repo.description ? `<p class="repo-desc">${escHtml(repo.description)}</p>` : ''}
+          </div>
+        </div>
+        <div class="repo-meta">
+          ${langHtml}
+          <span class="meta-item">${fmtNum(repo.stars)} stars</span>
+          <span class="meta-item">${fmtNum(repo.forks)} forks</span>
+          <span class="meta-item"><span class="stars-today">+${fmtNum(repo.starsToday)}</span> ${starsTodayLabel}</span>
+        </div>
+      `;
+
+      frag.appendChild(card);
+    });
+
+    repoListEl.appendChild(frag);
+
+    // Trigger entrance with stagger
+    requestAnimationFrame(() => {
+      const cards = repoListEl.querySelectorAll('.repo-card');
+      cards.forEach((card, i) => {
+        setTimeout(() => {
+          card.classList.add('visible');
+        }, i * 45);
+      });
+    });
+  }
+
+  function escHtml(str) {
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function updateStats(repos) {
+    if (!repos.length) {
+      statTotal.textContent = '0';
+      statStars.textContent = '0';
+      statLangs.textContent = '0';
+      return;
+    }
+    statTotal.textContent = repos.length;
+    const totalGained = repos.reduce((s, r) => s + (r.starsToday || 0), 0);
+    statStars.textContent = fmtNum(totalGained);
+    const langs = new Set(repos.map(r => r.language).filter(Boolean));
+    statLangs.textContent = langs.size;
+  }
+
+  // ---- Load and render ----
+  async function loadAndRender(animate = true) {
+    if (loading) return;
+    loading = true;
+
+    // Show loading
+    repoListEl.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div></div>';
+
+    try {
+      const repos = await fetchData(currentSince, currentLang);
+
+      // Animate transition
+      if (animate) {
+        repoListEl.classList.add('transitioning');
+        await sleep(200);
+        repoListEl.classList.remove('transitioning');
+      }
+
+      renderCards(repos);
+    } catch (err) {
+      repoListEl.innerHTML = '<div class="empty-state"><p>Failed to load trending data. Please try again.</p></div>';
+    }
+
+    loading = false;
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  // ---- Event: since pills ----
+  document.querySelectorAll('.since-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const since = btn.dataset.since;
+      if (since === currentSince) return;
+      document.querySelectorAll('.since-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSince = since;
+      loadAndRender();
+    });
+  });
+
+  // ---- Event: language pills ----
+  document.querySelectorAll('.lang-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang;
+      if (lang === currentLang) return;
+      document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLang = lang;
+      loadAndRender();
+    });
+  });
+
+  // ---- Initial load ----
+  loadAndRender(false);
+})();
+</script>
+</body>
+</html>
