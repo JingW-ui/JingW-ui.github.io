@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>岗位定制简历 · 王京</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0b;
+            --bg-soft: #111114;
+            --card: rgba(255, 255, 255, 0.025);
+            --card-hover: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.22);
+            --text: #ededed;
+            --text-soft: #a8a8b3;
+            --text-dim: #6b6b78;
+            --accent: #6ea8fe;
+            --accent-2: #9d7cff;
+            --accent-green: #5dd6a6;
+            --accent-amber: #e8c47a;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            /* 顶部氛围光晕 */
+            background-image:
+                radial-gradient(900px 480px at 80% -8%, rgba(110, 168, 254, 0.12), transparent 60%),
+                radial-gradient(760px 420px at 12% 4%, rgba(157, 124, 255, 0.10), transparent 60%);
+            background-attachment: fixed;
+        }
+
+        .wrap {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+
+        /* ---------- Header ---------- */
+        .header {
+            padding: 88px 0 56px;
+            border-bottom: 1px solid var(--border);
+            position: relative;
+            opacity: 0;
+            transform: translateY(18px);
+            animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.05s forwards;
+        }
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+        .eyebrow .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 12px var(--accent);
+        }
+        .name {
+            font-size: clamp(40px, 7vw, 72px);
+            font-weight: 700;
+            letter-spacing: -1px;
+            line-height: 1.05;
+            margin-bottom: 18px;
+            background: linear-gradient(120deg, #ffffff 30%, #9aa0b4 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .tagline {
+            font-size: 16px;
+            color: var(--text-soft);
+            max-width: 620px;
+            line-height: 1.7;
+        }
+        .tagline strong {
+            color: var(--text);
+            font-weight: 600;
+        }
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 26px;
+            margin-top: 30px;
+        }
+        .nav a {
+            font-size: 13px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.25s ease;
+        }
+        .nav a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -5px;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+        .nav a:hover {
+            color: var(--text);
+        }
+        .nav a:hover::after {
+            width: 100%;
+        }
+
+        /* ---------- Section head ---------- */
+        .section-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            margin: 72px 0 28px;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: rise 0.6s ease 0.15s forwards;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: var(--text);
+        }
+        .section-title .num {
+            color: var(--text-dim);
+            font-weight: 500;
+            margin-left: 6px;
+        }
+        .section-note {
+            font-size: 12px;
+            color: var(--text-dim);
+        }
+
+        /* ---------- Card grid ---------- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 18px;
+            padding-bottom: 72px;
+        }
+        .card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            min-height: 218px;
+            padding: 26px 26px 22px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            text-decoration: none;
+            color: var(--text);
+            overflow: hidden;
+            backdrop-filter: blur(6px);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                        border-color 0.4s ease,
+                        background 0.4s ease,
+                        box-shadow 0.4s ease;
+            opacity: 0;
+            transform: translateY(22px);
+            animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        /* hover 光泽扫过 */
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.06) 48%, transparent 66%);
+            transform: translateX(-120%);
+            transition: transform 0.7s ease;
+            pointer-events: none;
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+            box-shadow: 0 18px 50px -16px rgba(110, 168, 254, 0.25),
+                        0 2px 10px rgba(0, 0, 0, 0.4);
+        }
+        .card:hover::before {
+            transform: translateX(120%);
+        }
+
+        .card-index {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+        .card-company {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+        .card-role {
+            font-size: 19px;
+            font-weight: 650;
+            letter-spacing: -0.2px;
+            line-height: 1.3;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+        .card-direction {
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 500;
+            margin-bottom: 18px;
+        }
+        .card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 18px;
+            flex: 1;
+        }
+        .tag {
+            font-size: 11px;
+            color: var(--text-soft);
+            padding: 4px 9px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            font-weight: 500;
+        }
+        .card-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+            margin-top: auto;
+        }
+        .card-date {
+            font-size: 11px;
+            color: var(--text-dim);
+            letter-spacing: 0.3px;
+        }
+        .card-open {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            transition: gap 0.3s ease, color 0.3s ease;
+        }
+        .card-open .arrow {
+            transition: transform 0.3s ease;
+        }
+        .card:hover .card-open {
+            color: var(--accent);
+            gap: 9px;
+        }
+        .card:hover .card-open .arrow {
+            transform: translateX(2px);
+        }
+
+        /* 匹配度徽章 */
+        .match {
+            position: absolute;
+            top: 22px;
+            right: 22px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            background: rgba(93, 214, 166, 0.12);
+            color: var(--accent-green);
+            border: 1px solid rgba(93, 214, 166, 0.3);
+        }
+
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 0 64px;
+            font-size: 12px;
+            color: var(--text-dim);
+            line-height: 1.8;
+            opacity: 0;
+            animation: rise 0.6s ease 0.4s forwards;
+        }
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* 加载态 */
+        .grid-state {
+            padding: 40px 0;
+            font-size: 13px;
+            color: var(--text-dim);
+            text-align: center;
+        }
+
+        @keyframes rise {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .header {
+                padding: 56px 0 40px;
+            }
+            .nav {
+                gap: 18px;
+            }
+        }
+
+        /* 尊重减少动效偏好 */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+            .card, .header, .section-head, .footer {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <!-- Header -->
+    <header class="header">
+        <div class="eyebrow"><span class="dot"></span>Tailored Resumes</div>
+        <h1 class="name">岗位定制简历</h1>
+        <p class="tagline">
+            每份简历都<strong>针对具体岗位 JD 重新编排</strong>——按职责要求重排板块、用岗位关键词改写措辞、取舍无关经历、强化对口项目。
+            点击卡片查看对应 A4 单页简历（浏览器 Ctrl+P 可另存为 PDF）。
+        </p>
+        <nav class="nav">
+            <a href="/resume/">通用简历</a>
+            <a href="https://jingw-ui.github.io/cv/">精简版</a>
+            <a href="https://github.com/JingW-ui" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://jingw-ui.github.io/">主页</a>
+        </nav>
+    </header>
+
+    <!-- Section head -->
+    <div class="section-head">
+        <div class="section-title">投递档案 <span class="num">/ 06</span></div>
+        <div class="section-note">按目标岗位定向裁剪 · 突出适配性</div>
+    </div>
+
+    <!-- Cards（由 tailored.json 动态渲染） -->
+    <div class="grid" id="grid">
+        <div class="grid-state" id="gridState">加载中…</div>
+    </div>
+
+    <footer class="footer">
+        所有定制简历均基于同一份真实背景，仅按岗位侧重重新编排 ·
+        通用简历见 <a href="/resume/">Details</a> / <a href="https://jingw-ui.github.io/cv/">精简版</a>
+    </footer>
+
+</div>
+
+<script>
+(function () {
+    var grid = document.getElementById('grid');
+    var state = document.getElementById('gridState');
+
+    function esc(s) {
+        return String(s == null ? '' : s)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function renderCard(item, i) {
+        var delay = (0.18 + i * 0.08).toFixed(2) + 's';
+        var match = item.match === 'high'
+            ? '<span class="match">高匹配</span>' : '';
+        var tags = (item.tags || []).map(function (t) {
+            return '<span class="tag">' + esc(t) + '</span>';
+        }).join('');
+        return '' +
+            '<a class="card" href="' + esc(item.url) + '" target="_blank" rel="noopener" style="animation-delay:' + delay + '">' +
+                match +
+                '<div class="card-index">' + esc(item.index) + '</div>' +
+                '<div class="card-company">' + esc(item.company) + '</div>' +
+                '<div class="card-role">' + esc(item.role) + '</div>' +
+                '<div class="card-direction">' + esc(item.direction) + '</div>' +
+                '<div class="card-tags">' + tags + '</div>' +
+                '<div class="card-foot">' +
+                    '<span class="card-date">' + esc(item.date) + '</span>' +
+                    '<span class="card-open">打开 <span class="arrow">→</span></span>' +
+                '</div>' +
+            '</a>';
+    }
+
+    function render(list) {
+        grid.innerHTML = list.map(renderCard).join('');
+    }
+
+    fetch('/resume/tailored.json?_=' + Date.now())
+        .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+        })
+        .then(function (data) {
+            if (!Array.isArray(data) || !data.length) {
+                grid.innerHTML = '<div class="grid-state">暂无定制简历</div>';
+                return;
+            }
+            render(data);
+        })
+        .catch(function () {
+            state.textContent = '简历列表加载失败，请直接访问 /resume/ 下的定制简历文件';
+        });
+})();
+</script>
+
+</body>
+</html>

@@ -296,6 +296,21 @@
             margin-bottom: 10px;
             color: #222;
         }
+
+        /* 隐藏入口：点名字进入岗位定制简历墙，外观与普通文字完全一致 */
+        .name-portal {
+            display: inline-block;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #222;
+            text-decoration: none;
+            cursor: default;
+        }
+        .name-portal:hover {
+            color: #222;
+            text-decoration: none;
+        }
         
         .contact-info {
             font-size: 13px;
@@ -420,7 +435,7 @@
         <img src="/imgs/life_and_others/myavtar.png" alt="王京的头像" class="avatar">
         <div class="profile-info">
             <div class="profile-top">
-                <div class="name">王京</div>
+                <a class="name-portal" href="/resume/tailored.html" aria-label="王京" title="王京">王京</a>
                 <div class="header-cta">
                     <nav aria-label="page navigation">
                         <a class="nav-cta" href="https://jingw-ui.github.io/cv/">精简版本</a>

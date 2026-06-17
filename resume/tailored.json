@@ -1,0 +1,62 @@
+[
+  {
+    "index": "01",
+    "company": "作业帮 · 27暑期实习",
+    "role": "AI 应用算法工程师",
+    "direction": "AI Agent / RAG / 算法",
+    "tags": ["LLM Agent", "RAG", "Prompt 工程", "PyTorch"],
+    "date": "2026.06",
+    "url": "/resume/resume_zuoyebang_ai.html",
+    "match": "high"
+  },
+  {
+    "index": "02",
+    "company": "深圳 · 校招 J19901",
+    "role": "AI 全栈工程师",
+    "direction": "全栈 / AI 编程",
+    "tags": ["前后端全栈", "Claude Code", "Spring Boot", "Vue"],
+    "date": "2026.06",
+    "url": "/resume/resume_ai_fullstack_shenzhen.html",
+    "match": "high"
+  },
+  {
+    "index": "03",
+    "company": "哔哩哔哩 · 上海",
+    "role": "大会员前端开发实习生",
+    "direction": "前端 / React / H5",
+    "tags": ["HTML/CSS/JS", "Vue", "React（了解）", "AI 辅助研发"],
+    "date": "2026.06",
+    "url": "/resume/resume_bilibili_fe.html",
+    "match": ""
+  },
+  {
+    "index": "04",
+    "company": "TP-LINK",
+    "role": "跨平台应用开发工程师",
+    "direction": "跨平台 / Vue / AI 提效",
+    "tags": ["HTML5/CSS3/JS", "Vue", "AI 提效工具", "大模型落地"],
+    "date": "2026.06",
+    "url": "/resume/resume_tplink.html",
+    "match": ""
+  },
+  {
+    "index": "05",
+    "company": "27届秋储 · 国际化·金融",
+    "role": "客户端研发实习生",
+    "direction": "Android / iOS",
+    "tags": ["Java", "面向对象", "Kotlin（学习中）", "英语六级"],
+    "date": "2026.06",
+    "url": "/resume/resume_client_android.html",
+    "match": ""
+  },
+  {
+    "index": "06",
+    "company": "移动端方向",
+    "role": "Android / iOS 开发实习生",
+    "direction": "移动端 / GUI 客户端",
+    "tags": ["Java", "PySide6/Qt", "AI 辅助开发", "2027届"],
+    "date": "2026.06",
+    "url": "/resume/resume_android_ios.html",
+    "match": ""
+  }
+]
