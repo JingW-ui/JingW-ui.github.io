@@ -113,166 +113,146 @@
     <style id="fit-vids-style">
         .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
     </style>
-        <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    <style>
+        /* ============================================
+           Base Reset
+           ============================================ */
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
-
             min-height: 100vh;
-            padding: 0px 0px;
+            padding: 0;
             color: #333;
+            background: #f8f9fa;
         }
 
-        .container { width: 100%; max-width: 900px; margin: 0 auto; }
-
-        .title { text-align: center; color: #222; font-size: 28px; font-weight: 300; letter-spacing: 0.5px; margin-bottom: 24px; }
-
-        .tab-buttons { display: flex; gap: 8px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap; }
-        .tab-btn { background: white; border: 1px solid #d0d0d0; color: #666; padding: 8px 16px; border-radius: 3px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s ease; }
-        .tab-btn:hover { border-color: #999; color: #333; }
-        .tab-btn.active { background: #333; color: white; border-color: #333; }
-
-        .carousel-wrapper { background: white; border: 1px solid #e0e0e0; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .carousel-content { position: relative; width: 100%; padding-bottom: 60%; background: #fafafa; cursor: pointer; }
-        .carousel-inner { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: visible; perspective: 1000px; }
-        .carousel-item { position: absolute; width: 70%; height: 90%; opacity: 0; transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55); display: flex; align-items: center; justify-content: center; transform-origin: center; }
-        .carousel-item.active { opacity: 1; z-index: 10; transform: translateX(0) rotateY(0) scale(1.1); }
-        .carousel-item.prev { opacity: 0.8; z-index: 9; transform: translateX(-30%) rotateY(-15deg) scale(1); }
-        .carousel-item.next { opacity: 0.8; z-index: 8; transform: translateX(30%) rotateY(15deg) scale(1); }
-        .carousel-item img { max-width: 95%; max-height: 95%; object-fit: contain; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.12)) drop-shadow(0 2px 4px rgba(0,0,0,0.08)); transition: filter 0.3s ease; width: 100%; height: 100%; object-fit: contain; }
-        .carousel-item.active img { filter: drop-shadow(0 12px 24px rgba(0,0,0,0.15)) drop-shadow(0 4px 8px rgba(0,0,0,0.1)); }
-
-        .carousel-controls { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fafafa; border-top: 1px solid #e0e0e0; gap: 12px; }
-        .carousel-button { background: white; color: #333; border: 1px solid #d0d0d0; padding: 6px 12px; cursor: pointer; font-size: 12px; transition: all 0.2s ease; flex-shrink: 0; }
-        .carousel-button:hover { border-color: #999; background: #f9f9f9; }
-        .carousel-button:active { background: #f0f0f0; }
-
-        .carousel-info { text-align: center; color: #999; font-size: 12px; flex: 1; }
-        .carousel-dots { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
-        .dot { width: 6px; height: 6px; border-radius: 50%; background: #ddd; cursor: pointer; transition: background 0.2s ease; }
-        .dot:hover { background: #bbb; }
-        .dot.active { background: #333; }
-
-        .nav-buttons { display: flex; justify-content: center; gap: 12px; margin-top: 32px; }
-        .nav-btn { background: white; border: 1px solid #d0d0d0; color: #333; padding: 10px 20px; border-radius: 3px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s ease; text-decoration: none; display: inline-block; }
-        .nav-btn:hover { border-color: #999; background: #f9f9f9; }
-        .nav-btn:active { background: #f0f0f0; }
-        .nav-btn.primary { background: #333; color: white; border-color: #333; }
-        .nav-btn.primary:hover { background: #555; border-color: #555; }
-
-        /* overlay for image enlarge */
-        .overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.8); z-index: 9999; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
-        .overlay.show { opacity: 1; pointer-events: auto; }
-        .overlay img { max-width: 90vw; max-height: 88vh; object-fit: contain; border-radius: 6px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
-
-        /* mobile adjustments: larger carousel area */
-        @media (max-width: 768px) {
-            .carousel-content { padding-bottom: 90%; }
-            .carousel-item { width: 80%; height: 90%; }
-            .carousel-item.active { transform: translateX(0) rotateY(0) scale(1.05); }
-            .carousel-item.prev { transform: translateX(-30%) rotateY(-10deg) scale(1); }
-            .carousel-item.next { transform: translateX(30%) rotateY(10deg) scale(1); }
-        }
-
-        /* 针对更小屏幕的优化 */
-        @media (max-width: 480px) {
-            .carousel-content { padding-bottom: 100%; }
-            .carousel-item { width: 85%; height: 90%; }
-            .carousel-item.active { transform: translateX(0) rotateY(0) scale(1.05); }
-            .carousel-item.prev { transform: translateX(-25%) rotateY(-10deg) scale(0.95); }
-            .carousel-item.next { transform: translateX(25%) rotateY(10deg) scale(0.95); }
-        }
-
-        /* 优化页脚样式，使其在初始状态下隐藏 */
-        .page__footer {
-            position: fixed;
-            bottom: -100px; /* 初始位置在页面下方，不可见 */
-            left: 0;
-            right: 0;
-            background: white;
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
-            transition: bottom 0.3s ease;
-            z-index: 999;
-        }
-
-        .page__footer.show {
-            bottom: 0;
-        }
-
-        /* 主要内容区域样式调整 */
+        /* ============================================
+           Layout — work with the AcademicPages sidebar
+           ============================================ */
         #main {
-            margin-left: 240px; /* 为侧边栏留出空间 */
-            padding-bottom: 100px; /* 为固定页脚留出空间 */
+            padding-bottom: 40px;
         }
 
-        .page__inner-wrap {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0px;
+        /* Desktop: sidebar is ~240px, offset main content */
+        @media (min-width: 1025px) {
+            #main {
+                margin-left: 240px;
+            }
         }
 
-        .carousel-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        /* 优化轮播图容器以适应侧边栏布局 */
-        .carousel-wrapper {
-            margin: 0 auto;
-            max-width: 800px;
-        }
-
-        /* 针对不同屏幕尺寸的优化 */
+        /* Tablet & below: no sidebar offset */
         @media (max-width: 1024px) {
             #main {
                 margin-left: 0;
-                padding: 0 10px 100px 10px; /* 为固定页脚留出空间 */
+                padding: 0 12px 40px;
             }
+        }
 
-            .carousel-wrapper {
-                max-width: 100%;
-            }
+        .page__inner-wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* ============================================
+           Page Title
+           ============================================ */
+        .page-title {
+            text-align: center;
+            color: #222;
+            font-size: 26px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            margin: 24px 0 20px;
         }
 
         @media (max-width: 768px) {
-            .page__inner-wrap {
-                padding: 5px;
-            }
-
-            .carousel-container {
-                padding: 15px;
-            }
-
-            .carousel-content {
-                padding-bottom: 70%;
+            .page-title {
+                font-size: 20px;
+                margin: 16px 0 12px;
             }
         }
 
+        /* ============================================
+           Tab Buttons
+           ============================================ */
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: white;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            border-color: #999;
+            color: #333;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+
+        .tab-btn.active {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        /* Mobile: horizontal scroll for tabs */
         @media (max-width: 480px) {
-            .carousel-content {
-                padding-bottom: 85%;
+            .tab-buttons {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                justify-content: flex-start;
+                padding: 0 4px 8px;
+                gap: 6px;
+                scrollbar-width: none;
             }
-
-            .carousel-item { width: 85%; height: 90%; }
-            .carousel-item.active { transform: translateX(0) rotateY(0) scale(1.05); }
-            .carousel-item.prev { transform: translateX(-25%) rotateY(-10deg) scale(0.95); }
-            .carousel-item.next { transform: translateX(25%) rotateY(10deg) scale(0.95); }
+            .tab-buttons::-webkit-scrollbar {
+                display: none;
+            }
+            .tab-btn {
+                padding: 7px 14px;
+                font-size: 12px;
+                flex-shrink: 0;
+            }
         }
 
-        /* 悬停切换功能样式 */
+        /* ============================================
+           Carousel Container
+           ============================================ */
+        .carousel-wrapper {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin: 0 auto;
+            max-width: 860px;
+        }
+
+        /* Aspect ratio container — portrait-friendly for certificates */
         .carousel-content {
             position: relative;
             width: 100%;
-            padding-bottom: 60%;
+            padding-bottom: 78%;
             background: #fafafa;
             cursor: pointer;
             overflow: hidden;
         }
 
-        /* 左右悬停区域指示器（可选显示） */
+        /* Subtle edge indicators for hover zones */
         .carousel-content::before,
         .carousel-content::after {
             content: '';
@@ -284,31 +264,387 @@
             pointer-events: none;
         }
 
-        .carousel-content::before {
-            left: 0;
-            /* 可选：添加微妙的半透明覆盖层显示切换区域 */
-        }
+        .carousel-content::before { left: 0; }
+        .carousel-content::after { right: 0; }
 
-        .carousel-content::after {
-            right: 0;
-            /* 可选：添加微妙的半透明覆盖层显示切换区域 */
-        }
-
-        /* 页脚样式 - 初始隐藏，滚动后显示 */
-        .page__footer {
-            position: fixed;
-            bottom: 0;
+        /* ============================================
+           Carousel Items
+           ============================================ */
+        .carousel-inner {
+            position: absolute;
+            top: 0;
             left: 0;
             width: 100%;
-            background: white;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            z-index: 1000;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            perspective: 1000px;
         }
 
+        .carousel-item {
+            position: absolute;
+            width: 68%;
+            height: 88%;
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center;
+        }
+
+        .carousel-item.active {
+            opacity: 1;
+            z-index: 10;
+            transform: translateX(0) rotateY(0) scale(1.08);
+        }
+
+        .carousel-item.prev {
+            opacity: 0.7;
+            z-index: 9;
+            transform: translateX(-32%) rotateY(-12deg) scale(0.95);
+        }
+
+        .carousel-item.next {
+            opacity: 0.7;
+            z-index: 8;
+            transform: translateX(32%) rotateY(12deg) scale(0.95);
+        }
+
+        .carousel-item img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 6px 14px rgba(0,0,0,0.10)) drop-shadow(0 2px 4px rgba(0,0,0,0.06));
+            transition: filter 0.3s ease;
+        }
+
+        .carousel-item.active img {
+            filter: drop-shadow(0 10px 22px rgba(0,0,0,0.14)) drop-shadow(0 3px 6px rgba(0,0,0,0.08));
+        }
+
+        /* ============================================
+           Carousel Controls
+           ============================================ */
+        .carousel-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #fafafa;
+            border-top: 1px solid #e0e0e0;
+            gap: 12px;
+        }
+
+        .carousel-button {
+            background: white;
+            color: #333;
+            border: 1px solid #d0d0d0;
+            padding: 7px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .carousel-button:hover {
+            border-color: #999;
+            background: #f0f0f0;
+        }
+
+        .carousel-button:active {
+            background: #e8e8e8;
+        }
+
+        .carousel-info {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        #imageInfo {
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dot:hover {
+            background: #bbb;
+        }
+
+        .dot.active {
+            background: #333;
+            transform: scale(1.3);
+        }
+
+        /* ============================================
+           Overlay (image enlarge)
+           ============================================ */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+            cursor: zoom-out;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .overlay img {
+            max-width: 92vw;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            cursor: default;
+        }
+
+        /* ============================================
+           Navigation Buttons (below carousel)
+           ============================================ */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 1px solid #d0d0d0;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-btn:hover {
+            border-color: #999;
+            background: #f9f9f9;
+        }
+
+        .nav-btn:active {
+            background: #f0f0f0;
+        }
+
+        .nav-btn.primary {
+            background: #333;
+            color: white;
+            border-color: #333;
+        }
+
+        .nav-btn.primary:hover {
+            background: #555;
+            border-color: #555;
+        }
+
+        /* ============================================
+           Footer — normal flow, NOT fixed
+           ============================================ */
+        .page__footer {
+            position: relative;
+            left: 0;
+            right: 0;
+            bottom: auto;
+            width: 100%;
+            background: #f5f5f5;
+            border-top: 1px solid #e0e0e0;
+            z-index: 10;
+            transform: none !important;
+            transition: none !important;
+            margin-top: 40px;
+        }
+
+        /* Override the template's fixed footer JS behavior */
         .page__footer.show {
-            transform: translateY(0);
+            transform: none !important;
+        }
+
+        /* On desktop, offset footer for sidebar */
+        @media (min-width: 1025px) {
+            .page__footer {
+                margin-left: 0;
+            }
+        }
+
+        /* ============================================
+           Tablet Breakpoint (≤ 1024px)
+           ============================================ */
+        @media (max-width: 1024px) {
+            .carousel-content {
+                padding-bottom: 82%;
+            }
+
+            .carousel-item {
+                width: 72%;
+                height: 88%;
+            }
+
+            .carousel-item.active {
+                transform: translateX(0) rotateY(0) scale(1.05);
+            }
+
+            .carousel-item.prev {
+                transform: translateX(-30%) rotateY(-10deg) scale(0.95);
+            }
+
+            .carousel-item.next {
+                transform: translateX(30%) rotateY(10deg) scale(0.95);
+            }
+        }
+
+        /* ============================================
+           Mobile Breakpoint (≤ 768px)
+           ============================================ */
+        @media (max-width: 768px) {
+            body {
+                background: #fff;
+            }
+
+            .carousel-wrapper {
+                border-radius: 6px;
+                border-color: #e8e8e8;
+            }
+
+            .carousel-content {
+                padding-bottom: 90%;
+            }
+
+            .carousel-item {
+                width: 82%;
+                height: 90%;
+            }
+
+            .carousel-item.active {
+                transform: translateX(0) rotateY(0) scale(1.02);
+            }
+
+            .carousel-item.prev {
+                transform: translateX(-28%) rotateY(-8deg) scale(0.92);
+                opacity: 0.5;
+            }
+
+            .carousel-item.next {
+                transform: translateX(28%) rotateY(8deg) scale(0.92);
+                opacity: 0.5;
+            }
+
+            .carousel-controls {
+                padding: 10px 12px;
+                gap: 8px;
+            }
+
+            .carousel-button {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+
+            .nav-buttons {
+                margin-top: 16px;
+                gap: 8px;
+            }
+
+            .nav-btn {
+                padding: 9px 16px;
+                font-size: 12px;
+            }
+        }
+
+        /* ============================================
+           Small Mobile (≤ 480px)
+           ============================================ */
+        @media (max-width: 480px) {
+            .carousel-content {
+                padding-bottom: 100%;
+            }
+
+            .carousel-item {
+                width: 88%;
+                height: 90%;
+            }
+
+            .carousel-item.active {
+                transform: translateX(0) scale(1);
+            }
+
+            .carousel-item.prev {
+                transform: translateX(-22%) scale(0.88);
+                opacity: 0.4;
+            }
+
+            .carousel-item.next {
+                transform: translateX(22%) scale(0.88);
+                opacity: 0.4;
+            }
+
+            .carousel-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .carousel-info {
+                order: -1;
+                width: 100%;
+                flex-basis: 100%;
+                margin-bottom: 4px;
+            }
+
+            .carousel-button {
+                padding: 10px 16px;
+                font-size: 13px;
+                flex: 1;
+                min-width: 0;
+            }
+
+            .dot {
+                width: 8px;
+                height: 8px;
+            }
+
+            .overlay img {
+                max-width: 96vw;
+                max-height: 92vh;
+            }
         }
     </style>
 </head>
@@ -329,15 +665,16 @@
                     <li class="masthead__menu-item masthead__menu-item--lg"><a href="https://JingW-ui.github.io/">WangJing</a>
                     </li>
                     <li class="masthead__menu-item"><a href="/resume/">Resume</a></li>
-                    <li class="masthead__menu-item"><a href="/carousel/">Online Images</a></li>
-                    <li class="masthead__menu-item"><a href="/Software_Downloads/">Software Downloads
-                        </a></li>
-                    <li class="masthead__menu-item"><a href="/phone/">Phone Receiver</a></li>
+                    <li class="masthead__menu-item"><a href="/cv/">CV</a></li>
+                    <li class="masthead__menu-item"><a href="/carousel/" style="font-weight:700; color:#1a1a1a;">Rewards</a></li>
+                    <li class="masthead__menu-item"><a href="/Software_Downloads/">Downloads</a></li>
+                    <li class="masthead__menu-item"><a href="/phone/">Receiver</a></li>
                     <li class="masthead__menu-item"><a href="/videos/">Projects</a></li>
                     <li class="masthead__menu-item"><a href="/Games/">Games</a></li>
+                    <li class="masthead__menu-item"><a href="/tools/">Tools</a></li>
                     <li class="masthead__menu-item"><a href="/skills/">Skills</a></li>
-
-                    <!--                    <li class="masthead__menu-item"><a href="https://JingW-ui.github.io/AUDIT/">AUDIT library</a></li>-->
+                    <li class="masthead__menu-item"><a href="/director/">Director</a></li>
+                    <li class="masthead__menu-item"><a href="/ppt/">ppt</a></li>
                 </ul>
                 <ul class="hidden-links hidden"></ul>
             </nav>
@@ -380,22 +717,23 @@
         <meta itemprop="headline" content="About me">
         <meta itemprop="description" content="About me">
         <div class="page__inner-wrap">
-        <div class="tab-buttons" id="tabButtons"></div>
+            <h1 class="page-title">Rewards & Certificates</h1>
+            <div class="tab-buttons" id="tabButtons"></div>
 
-        <div class="carousel-wrapper">
-            <div class="carousel-header" id="carouselHeader"></div>
-            <div class="carousel-content" id="carouselContent">
-                <div class="carousel-inner" id="carouselInner"></div>
-            </div>
-            <div class="carousel-controls">
-                <button class="carousel-button" id="prevBtn" onclick="previousImage()">Previous</button>
-                <div class="carousel-info">
-                    <div id="imageInfo">Loading...</div>
-                    <div class="carousel-dots" id="dotsContainer"></div>
+            <div class="carousel-wrapper">
+                <div class="carousel-header" id="carouselHeader"></div>
+                <div class="carousel-content" id="carouselContent">
+                    <div class="carousel-inner" id="carouselInner"></div>
                 </div>
-                <button class="carousel-button" id="nextBtn" onclick="nextImage()">Next</button>
+                <div class="carousel-controls">
+                    <button class="carousel-button" id="prevBtn" onclick="previousImage()">← Prev</button>
+                    <div class="carousel-info">
+                        <div id="imageInfo">Loading...</div>
+                        <div class="carousel-dots" id="dotsContainer"></div>
+                    </div>
+                    <button class="carousel-button" id="nextBtn" onclick="nextImage()">Next →</button>
+                </div>
             </div>
-        </div>
         </div>
     </article>
 </div>
@@ -575,18 +913,18 @@
 
         // 点击切换图片（根据悬停位置）
         carouselContentEl.addEventListener('click', (e) => {
+            // 如果点击的是图片，由 carouselInner 的 click 处理放大
+            if (e.target.tagName === 'IMG') return;
+
             const rect = carouselContentEl.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
             const threshold = rect.width * 0.3; // 30% 阈值
 
             if (clickX < threshold) {
-                // 点击左侧30%区域，切换到上一张
                 previousImage();
             } else if (clickX > rect.width - threshold) {
-                // 点击右侧30%区域，切换到下一张
                 nextImage();
             }
-            // 中间40%区域不执行切换操作，允许用户与控制元素交互
         });
 
         // 移动端：滑动和点击处理（避免与滑动切换冲突）
@@ -667,13 +1005,10 @@
                     const threshold = rect.width * 0.3; // 30% 阈值
 
                     if (clickX < threshold) {
-                        // 点击左侧30%区域，切换到上一张
                         previousImage();
                     } else if (clickX > rect.width - threshold) {
-                        // 点击右侧30%区域，切换到下一张
                         nextImage();
                     }
-                    // 中间40%区域不执行切换操作
                 }
             }
             touchStartPos = null;
@@ -779,21 +1114,21 @@
             items[activeIndex].classList.add('active');
             items[activeIndex].style.zIndex = '10';
             items[activeIndex].style.opacity = '1';
-            items[activeIndex].style.transform = 'translateX(0) rotateY(0) scale(1.1)';
+            items[activeIndex].style.transform = 'translateX(0) rotateY(0) scale(1.08)';
         }
 
         if (items[prevIndex] && total > 1) {
             items[prevIndex].classList.add('prev');
             items[prevIndex].style.zIndex = '9';
-            items[prevIndex].style.opacity = '0.8';
-            items[prevIndex].style.transform = 'translateX(-30%) rotateY(-15deg) scale(1)';
+            items[prevIndex].style.opacity = '0.7';
+            items[prevIndex].style.transform = 'translateX(-32%) rotateY(-12deg) scale(0.95)';
         }
 
         if (items[nextIndex] && total > 1) {
             items[nextIndex].classList.add('next');
             items[nextIndex].style.zIndex = '8';
-            items[nextIndex].style.opacity = '0.8';
-            items[nextIndex].style.transform = 'translateX(30%) rotateY(15deg) scale(1)';
+            items[nextIndex].style.opacity = '0.7';
+            items[nextIndex].style.transform = 'translateX(32%) rotateY(12deg) scale(0.95)';
         }
 
         updateDots();
@@ -889,5 +1224,22 @@
     window.addEventListener('beforeunload', () => {
         clearInterval(autoplayTimer);
     });
+
+    // 阻止外部模板的 footer 固定行为
+    (function() {
+        // Override any scroll listener that adds .show to footer
+        const footer = document.querySelector('.page__footer');
+        if (!footer) return;
+
+        // Disconnect any MutationObserver that might add .show class
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(m) {
+                if (m.attributeName === 'class' && footer.classList.contains('show')) {
+                    footer.classList.remove('show');
+                }
+            });
+        });
+        observer.observe(footer, { attributes: true });
+    })();
 </script>
 </html>
