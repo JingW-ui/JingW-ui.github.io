@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 大会员前端开发实习生 / 哔哩哔哩</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            line-height: 1.2;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            padding: 14mm 16mm;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 22px;
+            padding: 0 0 16px;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 100px;
+            height: 110px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .profile-info {
+            text-align: left;
+        }
+        .name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .target {
+            font-size: 13px;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .contact-info a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            border-left: 4px solid #333;
+            padding-left: 10px;
+        }
+        .summary {
+            font-size: 12.5px;
+            color: #444;
+            line-height: 1.7;
+        }
+        .summary strong {
+            color: #1a1a1a;
+        }
+        .subsection {
+            margin-bottom: 10px;
+            padding-bottom: 9px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 3px;
+        }
+        .date {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .tech-line {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .tech-line em {
+            font-style: normal;
+            color: #2d74bb;
+            font-weight: 500;
+        }
+        ul {
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.55;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .skill {
+            background: linear-gradient(135deg, #f5f5f5 0%, #f0f0f0 100%);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            border: 1px solid #e0e0e0;
+            color: #555;
+            font-weight: 500;
+        }
+        .skill.primary {
+            color: #1a1a1a;
+            font-weight: 700;
+            border-color: #bbb;
+        }
+        .skill-group {
+            margin-bottom: 8px;
+        }
+        .skill-group:last-child {
+            margin-bottom: 0;
+        }
+        .label-link {
+            display: inline-block;
+            background-color: #f5f5f5;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .label-link:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .github-label-link {
+            display: inline-block;
+            background-color: #1F883D;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .github-label-link:hover {
+            background-color: #176d31;
+        }
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+            .page {
+                box-shadow: none;
+                width: auto;
+                min-height: auto;
+                padding: 0;
+            }
+        }
+        @media (max-width: 820px) {
+            body {
+                padding: 10px;
+            }
+            .page {
+                width: 100%;
+                min-height: auto;
+                padding: 18px 16px;
+            }
+            .profile-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-info {
+                text-align: center;
+            }
+            .name {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：大会员前端开发实习生（哔哩哔哩 · 上海）｜ 每周可实习 5 天 / 3 个月以上</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士在读<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            电子科技大学（985）硕士，具备<strong>前端开发</strong>与全栈交付能力，熟悉 <strong>HTML / CSS / JavaScript</strong> 基础与 <strong>Vue</strong> 组件化开发，了解 <strong>TypeScript / React</strong>，具备组件化与工程化意识。有多个已上线 / 已开源的 Web 项目经验，能独立完成页面开发、交互实现与体验优化。长期深度使用 <strong>AI 辅助研发</strong>（Claude Code / Cursor / Vibe Coding）与 <strong>AI Agent / Prompt 工程</strong>，对应岗位加分项；GitHub 累计 <strong>200+ Star</strong>，沉淀真实用户社群。学习能力强、有责任心，关注用户体验与长期可维护性。
+        </div>
+    </div>
+
+    <!-- 教育背景 -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 生物医学工程 · 硕士</div>
+            <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授</div>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ 四川省优秀毕业生 · 推免生</div>
+        </div>
+    </div>
+
+    <!-- 专业技能 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-group">
+            <div class="tech-line"><em>前端基础 / 框架：</em></div>
+            <div class="skills">
+                <span class="skill primary">HTML</span>
+                <span class="skill primary">CSS</span>
+                <span class="skill primary">JavaScript</span>
+                <span class="skill primary">Vue</span>
+                <span class="skill">TypeScript（了解）</span>
+                <span class="skill">React（了解）</span>
+                <span class="skill">组件化开发</span>
+                <span class="skill">响应式 / 移动端 H5 适配</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>前端工程化：</em></div>
+            <div class="skills">
+                <span class="skill">Vite</span>
+                <span class="skill">pnpm / npm</span>
+                <span class="skill">ESLint</span>
+                <span class="skill">Git</span>
+                <span class="skill">前后端联调</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>AI 辅助研发（加分项）：</em></div>
+            <div class="skills">
+                <span class="skill primary">Claude Code / Cursor</span>
+                <span class="skill primary">AI 辅助研发</span>
+                <span class="skill">AI Agent</span>
+                <span class="skill">Prompt 工程</span>
+                <span class="skill">Vibe Coding</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>后端 / 其他：</em></div>
+            <div class="skills">
+                <span class="skill">Python</span>
+                <span class="skill">Java / Spring Boot</span>
+                <span class="skill">MySQL</span>
+                <span class="skill">英语六级</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 前端 / Web 项目经验 -->
+    <div class="section">
+        <div class="section-title">前端 / Web 项目经验</div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                MediScreen-Brain 脑肿瘤检测平台（Web 应用 · 已开源）
+                <a class="github-label-link" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" rel="noopener">主页</a>
+            </div>
+            <div class="tech-line"><em>技术栈：</em>HTML · CSS · JavaScript · 响应式布局 · 多模态交互</div>
+            <ul>
+                <li>面向多模态检测与 3D 定位的 Web 化应用平台，负责前端页面设计与实现，关注<strong>交互体验</strong>与多端一致性。</li>
+                <li>实践组件化开发与页面适配，处理影像上传、结果可视化与交互逻辑，相关成果形成 SCI 论文并已开源。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                结直肠癌智能检测与诊断系统（全栈 Web · 独立交付）
+            </div>
+            <div class="date">2023.04 - 2023.07</div>
+            <div class="tech-line"><em>技术栈：</em>HTML · CSS · JavaScript · Django · MySQL</div>
+            <ul>
+                <li>独立完成前端页面设计与美化、交互实现及前后端联调，关注页面适配与用户体验，获全国二等奖、四川省一等奖。</li>
+                <li>体现从需求到上线的前端开发与体验优化完整能力。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                个人主页与作品集网站（前端工程化实践）
+                <a class="github-label-link" href="https://github.com/JingW-ui" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://jingw-ui.github.io/" target="_blank" rel="noopener">在线预览</a>
+            </div>
+            <div class="tech-line"><em>技术栈：</em>HTML · CSS · JavaScript · 响应式适配 · 模块化组件</div>
+            <ul>
+                <li>独立设计开发的个人主页与作品集站点，含多个工具/游戏/可视化子页面，实践<strong>响应式适配</strong>、模块化组件与<strong>移动端 H5 体验</strong>优化，长期迭代维护。</li>
+                <li>体现产品意识与从用户体验、长期维护角度思考问题的习惯。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- AI 辅助研发 / Agent 实践 -->
+    <div class="section">
+        <div class="section-title">AI 辅助研发 / Agent 实践（加分项）</div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                AutoTask 自动化办公助手（AI 辅助研发全流程）
+                <a class="github-label-link" href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank" rel="noopener">GitHub 70+ Star</a>
+                <a class="label-link" href="https://qm.qq.com/q/8Bm7ntOXte" target="_blank" rel="noopener">用户 150+</a>
+            </div>
+            <div class="date">2025.10 - 2026.01</div>
+            <div class="tech-line"><em>技术栈：</em>Claude Code / Cursor · Vibe Coding · Prompt 工程 · PySide6</div>
+            <ul>
+                <li>使用 Claude Code / Cursor 等 AI 工具完成代码生成、重构、调试与体验优化，全流程搭建并交付应用，开源获 70+ Star、150+ 用户。</li>
+                <li>沉淀可复用的 AI 辅助前端/客户端研发范式，持续引入 AI 工具提升代码质量与开发效率。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                NEURA 神经影像分析智能体（AI Agent / LLM 工具链）
+                <a class="github-label-link" href="https://github.com/NeuroScienceLab/NEURA" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" rel="noopener">论文</a>
+            </div>
+            <div class="date">2025.07 - 2026.02</div>
+            <div class="tech-line"><em>技术栈：</em>LLM · Agent · Prompt 工程 · RAG · Python</div>
+            <ul>
+                <li>主导基于大语言模型的智能体系统设计与开发，实践 Prompt 工程、记忆管理与工具链编排，对 <strong>AI Agent / LLM 工具链</strong>方向有深入认知与落地经验。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 实习经历 -->
+    <div class="section">
+        <div class="section-title">实习经历</div>
+        <div class="subsection">
+            <div class="subsection-title">国网宁夏电力有限公司 · AI 算法实习生</div>
+            <div class="date">2023.10 - 2023.12</div>
+            <div class="tech-line"><em>技术栈：</em>Python · 数据采集与处理</div>
+            <ul>
+                <li>参与企业项目，负责算法调研、实现与数据处理，具备团队协作与按需求交付的工程经验，沟通能力与责任心良好。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 开源 / 作品 -->
+    <div class="section">
+        <div class="section-title">开源与个人作品</div>
+        <ul>
+            <li>GitHub 累计 200+ Star，多个开源项目有真实用户社群（150+ / 50+ 用户），体现从 0 到 1 的产品交付与长期维护能力。</li>
+            <li>个人主页站点持续迭代，含工具箱、可视化、小游戏等多类前端子项目，注重交互体验与工程化。</li>
+            <li>软件著作权 ×5，SCI 论文 2 篇，发明专利 1 项。</li>
+        </ul>
+    </div>
+
+    <!-- 获奖荣誉 -->
+    <div class="section">
+        <div class="section-title">获奖荣誉</div>
+        <ul>
+            <li>国家级：第九届/第八届全国大学生生物医学工程创新设计竞赛 一等奖 / 二等奖（2024 / 2023）</li>
+            <li>省级：第三/四/五届四川省生物医学工程创新设计大赛一等奖 ×4（2023-2025）</li>
+            <li>奖学金：国家励志奖学金 ×2、电子科大优秀研究生、学业奖学金一等奖、研究生"学术青苗"奖</li>
+            <li>其他：四川省优秀毕业生、绵阳市三好学生、英语六级</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
