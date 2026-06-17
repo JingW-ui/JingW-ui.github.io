@@ -1,13 +1,13 @@
 const CACHE_NAME = "60s-web-static-v0.1.1";
 const APP_SHELL = [
 	"/",
-	"/index.html",
-	"/favicon.png",
-	"/apple-touch-icon.png",
-	"/pwa-icon-192.png",
-	"/pwa-icon-512.png",
-	"/pwa-icon-maskable.png",
-	"/manifest.webmanifest",
+	"/tools/60s/index.html",
+	"/tools/60s/favicon.png",
+	"/tools/60s/apple-touch-icon.png",
+	"/tools/60s/pwa-icon-192.png",
+	"/tools/60s/pwa-icon-512.png",
+	"/tools/60s/pwa-icon-maskable.png",
+	"/tools/60s/manifest.webmanifest",
 ];
 
 self.addEventListener("install", (event) => {
