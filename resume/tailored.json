@@ -68,5 +68,45 @@
     "date": "2026.06",
     "url": "/resume/resume_ai_native_fullstack.html",
     "match": "high"
+  },
+  {
+    "index": "08",
+    "company": "寒武纪 · 2027届实习",
+    "role": "软件栈质量保证实习生",
+    "direction": "深度学习平台 QA / C++·Python",
+    "tags": ["C/C++/Python", "PyTorch", "视觉计算", "软件质量保证"],
+    "date": "2026.06",
+    "url": "/resume/resume_cambrian_qa.html",
+    "match": "high"
+  },
+  {
+    "index": "09",
+    "company": "OPPO · 东莞 · 寻梦实习",
+    "role": "生物医学工程师实习生",
+    "direction": "运动生物力学 / 动作分析",
+    "tags": ["运动生物力学", "人体姿态检测", "AI 工程化", "健康体适能"],
+    "date": "2026.06",
+    "url": "/resume/resume_oppo_bme.html",
+    "match": "high"
+  },
+  {
+    "index": "10",
+    "company": "通用 · 游戏研发团队",
+    "role": "游戏测试开发工程师",
+    "direction": "自动化测试框架 / 游戏研发工具",
+    "tags": ["自动化测试", "Python/C++", "Three.js 游戏开发", "开源贡献"],
+    "date": "2026.06",
+    "url": "/resume/resume_game_test_dev.html",
+    "match": "high"
+  },
+  {
+    "index": "11",
+    "company": "携程 · 2027届校招",
+    "role": "前端开发工程师",
+    "direction": "前端 / Vue·React / 性能优化",
+    "tags": ["JavaScript/TS", "Vue", "前端工程化", "性能优化"],
+    "date": "2026.06",
+    "url": "/resume/resume_ctrip_fe.html",
+    "match": ""
   }
 ]

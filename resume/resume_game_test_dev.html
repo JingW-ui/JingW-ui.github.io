@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 游戏测试开发工程师</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            line-height: 1.2;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            padding: 14mm 16mm;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 18px;
+            padding: 0 0 14px;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 96px;
+            height: 106px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .profile-info {
+            text-align: left;
+        }
+        .name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+        .target {
+            font-size: 13px;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 7px;
+            letter-spacing: 0.5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .contact-info a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 14px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            border-left: 4px solid #333;
+            padding-left: 10px;
+        }
+        .summary {
+            font-size: 12px;
+            color: #444;
+            line-height: 1.65;
+        }
+        .summary strong {
+            color: #1a1a1a;
+        }
+        .subsection {
+            margin-bottom: 9px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 2px;
+        }
+        .date {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+        .tech-line {
+            font-size: 11.5px;
+            color: #555;
+            margin-bottom: 4px;
+        }
+        .tech-line em {
+            font-style: normal;
+            color: #2d74bb;
+            font-weight: 500;
+        }
+        ul {
+            padding-left: 16px;
+        }
+        li {
+            margin-bottom: 3px;
+            font-size: 11.5px;
+            color: #555;
+            line-height: 1.5;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .skill {
+            background: linear-gradient(135deg, #f5f5f5 0%, #f0f0f0 100%);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            border: 1px solid #e0e0e0;
+            color: #555;
+            font-weight: 500;
+        }
+        .skill.primary {
+            color: #1a1a1a;
+            font-weight: 700;
+            border-color: #bbb;
+        }
+        .skill-group {
+            margin-bottom: 7px;
+        }
+        .skill-group:last-child {
+            margin-bottom: 0;
+        }
+        .label-link {
+            display: inline-block;
+            background-color: #f5f5f5;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .label-link:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .github-label-link {
+            display: inline-block;
+            background-color: #1F883D;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .github-label-link:hover {
+            background-color: #176d31;
+        }
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+            .page {
+                box-shadow: none;
+                width: auto;
+                min-height: auto;
+                padding: 0;
+            }
+        }
+        @media (max-width: 820px) {
+            body {
+                padding: 10px;
+            }
+            .page {
+                width: 100%;
+                min-height: auto;
+                padding: 18px 16px;
+            }
+            .profile-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-info {
+                text-align: center;
+            }
+            .name {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：游戏测试开发工程师（自动化测试框架 / 研发测试工具）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士（2027届）<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 游戏：<a href="https://jingw-ui.github.io/Games/" target="_blank" rel="noopener">jingw-ui.github.io/Games</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            热爱游戏并 <strong>独立开发 18 款网页游戏</strong>（自建 Games Hub），覆盖 <strong>3D 竞速、贪吃蛇、赛车、数独、扑克、木鱼、WebGL 粒子</strong> 等多品类，乐于钻研游戏设定、勇于提出体验改进建议。扎实的计算机基础，<strong>精通 Python/C++，深入理解数据结构、算法、操作系统与网络</strong>，多次算法/程序设计竞赛获奖。具备 <strong>丰富的软件开发经验与开源贡献</strong>：个人 GitHub 多个项目共 <strong>190+ Stars、200+ 真实用户</strong>，在 AutoTask、通用检测等项目中长期担任 <strong>架构、评审与测试</strong> 角色，主导自动化能力建设、Bug 排查与回归验证，习惯 <strong>通过编写代码持续保障并提升质量与效率</strong>。能快速学习新知识，执行力强，推动问题闭环。
+        </div>
+    </div>
+
+    <!-- 教育背景 -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 生物医学工程（电子信息大类） · 硕士 · 2027届</div>
+            <div class="date">2024.09 - 2027.06 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授 · 神经信息教育部重点实验室</div>
+            <ul>
+                <li>计算机相关基础扎实：矩阵理论、统计推断、信号与系统，结合大量编程项目实践。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ 四川省优秀毕业生 · 推免生</div>
+            <ul>
+                <li>主修：计算机编程、计算机原理及应用、程序设计基础（C 语言）、电路分析、信号与系统——扎实的 <strong>计算机基础与编程功底</strong>。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 专业技能 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-group">
+            <div class="tech-line"><em>编程语言：</em></div>
+            <div class="skills">
+                <span class="skill primary">Python</span>
+                <span class="skill primary">C / C++</span>
+                <span class="skill">Java</span>
+                <span class="skill">JavaScript / TypeScript</span>
+                <span class="skill">HTML5 / CSS3</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>计算机基础（数据结构 / 算法 / OS / 网络）：</em></div>
+            <div class="skills">
+                <span class="skill primary">数据结构与算法</span>
+                <span class="skill">操作系统</span>
+                <span class="skill">计算机网络</span>
+                <span class="skill">Linux</span>
+                <span class="skill">MySQL</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>测试开发与自动化：</em></div>
+            <div class="skills">
+                <span class="skill primary">自动化测试 / 回归验证</span>
+                <span class="skill primary">测试工具开发</span>
+                <span class="skill">Bug 排查与定位</span>
+                <span class="skill">接口测试</span>
+                <span class="skill">Git</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>游戏与图形：</em></div>
+            <div class="skills">
+                <span class="skill primary">Three.js / WebGL</span>
+                <span class="skill">游戏循环 / 物理与碰撞</span>
+                <span class="skill">PySide6 / Qt GUI</span>
+                <span class="skill">PyAutoGUI（键鼠自动化）</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 项目经验 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                游戏开发 · Games Hub 个人游戏网站（18 款网页游戏）
+                <a class="github-label-link" href="https://jingw-ui.github.io/Games/" target="_blank" rel="noopener">在线试玩</a>
+            </div>
+            <div class="date">2023 - 至今</div>
+            <div class="tech-line"><em>技术栈：</em>Three.js · WebGL · JavaScript · HTML5 Canvas · CSS3</div>
+            <ul>
+                <li><strong>热爱游戏、钻研设定：</strong>独立设计并开发 18 款网页游戏，覆盖 <strong>3D 极速赛车、星空漂流、赛博回廊、霓虹贪吃蛇、数独、扑克、像素物语、赛博木鱼、3D 骰子/地球、交互式蜘蛛、形态工坊</strong> 等多品类，主动尝试体验不同类型游戏并持续迭代玩法与体验。</li>
+                <li><strong>游戏研发流程实践：</strong>从游戏循环、物理与碰撞、3D 渲染、交互输入到性能优化全链路自研，深入理解游戏研发各环节，可为测试工具设计提供研发侧视角。</li>
+                <li><strong>自测与质量保障：</strong>对每款游戏进行跨浏览器兼容性测试、帧率与内存调优、边界 Bug 排查，自主完成质量保障流程。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                自动化与测试工具开发 · AutoTask 智能自动化办公助手
+                <a class="github-label-link" href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank" rel="noopener">GitHub 70+ Stars</a>
+                <a class="label-link" href="https://github.com/JingW-ui/AutoTask-UI-/releases" target="_blank" rel="noopener">下载</a>
+            </div>
+            <div class="date">2025.10 - 2026.01</div>
+            <div class="tech-line"><em>技术栈：</em>Python · PySide6 · PyAutoGUI · RPA · 定时调度</div>
+            <ul>
+                <li><strong>自动化框架与平台研发：</strong>主导可视化任务编排、桌面键鼠自动化（PyAutoGUI 模拟）、定时调度与批量任务管理，<strong>构建可复用的自动化能力</strong>，思路可直接迁移至游戏自动化测试框架。</li>
+                <li><strong>测试与质量保障：</strong>担任架构师与评审员，主导 <strong>测试、Bug 排查与版本迭代</strong>，保障多版本稳定发布；开源获 70+ Stars、150+ 真实用户，直接运行于生产环境。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                测试工具开发 · 通用目标检测与分割系统（自动化测试视角）
+                <a class="github-label-link" href="https://github.com/JingW-ui/PI-MAPP/tree/main/project/universal_object_detection_plus" target="_blank" rel="noopener">GitHub 100+ Stars</a>
+                <a class="label-link" href="https://qm.qq.com/q/wZRWYGb78I" target="_blank" rel="noopener">用户群 50+</a>
+            </div>
+            <div class="date">2025.08 - 2025.10</div>
+            <div class="tech-line"><em>技术栈：</em>Python · YOLOv8~YOLO26 · PySide6 · 自动化推理</div>
+            <ul>
+                <li><strong>研发团队所需测试工具：</strong>支持图/视频/摄像头/实时流多输入、内置 40+ 权重自动切换、毫秒级输出对比——<strong>通过编写代码实现自动化质量验证工具</strong>，提升测试效率。</li>
+                <li>担任评审员负责测试与迭代，开源 100+ Stars、50+ 真实用户，持续保障质量与稳定性。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                算法与程序设计 · 竞赛与算法实战
+            </div>
+            <div class="date">2021 - 2025</div>
+            <div class="tech-line"><em>方向：</em>数据结构与算法 · 数学建模 · 程序设计</div>
+            <ul>
+                <li><strong>算法深入钻研：</strong>数学建模亚太地区三等奖（1/3）、企业竞赛模拟一等奖、电子科技大学研究生数学建模三等奖；并在摔倒识别项目中设计并对比阈值法/机器学习/深度学习/Transformer 多种算法方案。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                全栈开发 · C 语言能力在线考试系统
+                <a class="label-link" href="https://jingw-ui.github.io/resume/" target="_blank" rel="noopener">详情</a>
+            </div>
+            <div class="date">2022.06 - 2022.11</div>
+            <div class="tech-line"><em>技术栈：</em>Spring Boot · Vue · MySQL · Java</div>
+            <ul>
+                <li><strong>丰富软件开发经验：</strong>独立完成 MySQL 设计与后端接口开发测试，系统已上线校内服务数百名学生——体现推动问题闭环与工程交付能力。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 实习经历 -->
+    <div class="section">
+        <div class="section-title">实习经历</div>
+        <div class="subsection">
+            <div class="subsection-title">国网宁夏电力有限公司 · AI 算法实习生</div>
+            <div class="date">2023.10 - 2023.12</div>
+            <div class="tech-line"><em>技术栈：</em>Python · YOLO · OpenPose · Linux</div>
+            <ul>
+                <li>在 Linux 下调研并实现检测算法，<strong>通过编写代码解决真实业务问题</strong>，开发危险姿势识别与安全预警，具备快速学习新知识并推动落地的能力。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 开源与获奖 -->
+    <div class="section">
+        <div class="section-title">开源贡献与获奖</div>
+        <ul>
+            <li><strong>开源贡献：</strong>GitHub 多个项目共 190+ Stars、200+ 真实用户，为 AutoTask、PI-MAPP、MediScreen-Brain、NEURA 等多个开源项目贡献代码。</li>
+            <li>算法获奖 · 数学建模亚太地区三等奖（1/3）、企业竞赛模拟一等奖（2/3）、电子科技大学研究生数学建模三等奖（1/1）。</li>
+            <li>国家级 · 第九届全国大学生生物医学工程创新设计竞赛 <strong>一等奖</strong>（2024）。</li>
+            <li>省级 · 四川省生物医学工程创新设计大赛 <strong>一等奖 ×4</strong>（2023-2025）。</li>
+            <li>其他 · 国家励志奖学金 ×2、四川省优秀毕业生、英语六级。</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
