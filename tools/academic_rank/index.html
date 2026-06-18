@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+<title>第四轮学科评估 · 数据可视化面板</title>
+<script src="data.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#070b10; --bg-grad-1:#0b1620; --bg-grad-2:#0a1018;
+  --surface:rgba(255,255,255,0.035); --surface-2:rgba(255,255,255,0.055);
+  --surface-hover:rgba(255,255,255,0.08);
+  --border:rgba(255,255,255,0.08); --border-strong:rgba(255,255,255,0.16);
+  --text:#eaf0f6; --text-soft:#9fb0c0; --text-dim:#62748a;
+  --accent:#2dd4bf; --accent-2:#818cf8; --accent-3:#f59e0b;
+  --a-plus:#ef4444; --a:#f97316; --a-minus:#f59e0b;
+  --b-plus:#eab308; --b:#84cc16; --b-minus:#22c55e;
+  --c-plus:#14b8a6; --c:#06b6d4; --c-minus:#3b82f6;
+  --shadow:0 10px 40px rgba(0,0,0,0.35);
+  --radius:16px; --radius-sm:10px;
+  --t:cubic-bezier(.22,1,.36,1);
+}
+[data-theme="light"]{
+  color-scheme:light;
+  --bg:#f4f6fa; --bg-grad-1:#eef2f7; --bg-grad-2:#e6ecf3;
+  --surface:rgba(255,255,255,0.85); --surface-2:#ffffff; --surface-hover:#ffffff;
+  --border:rgba(15,30,50,0.10); --border-strong:rgba(15,30,50,0.18);
+  --text:#0f1c2e; --text-soft:#4b5d72; --text-dim:#8190a3;
+  --shadow:0 10px 30px rgba(20,40,80,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
+  color:var(--text); min-height:100vh; line-height:1.5;
+  background:
+    radial-gradient(1200px 600px at 12% -8%, rgba(45,212,191,.10), transparent 60%),
+    radial-gradient(1000px 500px at 100% 0%, rgba(129,140,248,.10), transparent 55%),
+    linear-gradient(180deg,var(--bg-grad-1),var(--bg-grad-2));
+  background-attachment:fixed;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1480px;margin:0 auto;padding:0 24px 80px}
+
+/* Header */
+header{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(18px) saturate(140%); -webkit-backdrop-filter:blur(18px) saturate(140%);
+  background:color-mix(in srgb, var(--bg) 72%, transparent);
+  border-bottom:1px solid var(--border);
+}
+.head-inner{max-width:1480px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:18px}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.logo{
+  width:42px;height:42px;border-radius:12px;flex:none;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:grid;place-items:center;font-weight:800;color:#06231f;font-size:18px;
+  box-shadow:0 6px 18px rgba(45,212,191,.35);
+}
+.brand h1{font-size:17px;font-weight:700;letter-spacing:.2px;white-space:nowrap}
+.brand p{font-size:12px;color:var(--text-dim);white-space:nowrap}
+.head-spacer{flex:1}
+.head-search{
+  position:relative;flex:0 1 320px;
+}
+.head-search input{
+  width:100%;padding:9px 14px 9px 36px;border-radius:999px;
+  border:1px solid var(--border);background:var(--surface);color:var(--text);
+  font-size:13px;outline:none;transition:border-color .2s var(--t),background .2s var(--t);
+}
+.head-search input:focus{border-color:var(--accent);background:var(--surface-2)}
+.head-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.5}
+.icon-btn{
+  width:38px;height:38px;border-radius:10px;border:1px solid var(--border);
+  background:var(--surface);color:var(--text-soft);cursor:pointer;
+  display:grid;place-items:center;transition:all .2s var(--t);flex:none;
+}
+.icon-btn:hover{color:var(--accent);border-color:var(--border-strong);background:var(--surface-hover)}
+
+/* Hero / intro */
+.hero{padding:30px 0 18px}
+.hero h2{font-size:26px;font-weight:800;letter-spacing:.3px}
+.hero h2 .grad{background:linear-gradient(120deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--text-soft);font-size:13.5px;margin-top:6px;max-width:760px}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin:22px 0 26px}
+.kpi{
+  position:relative;overflow:hidden;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 18px 16px;backdrop-filter:blur(8px);
+  transition:transform .25s var(--t),border-color .25s var(--t);
+}
+.kpi:hover{transform:translateY(-3px);border-color:var(--border-strong)}
+.kpi .lbl{font-size:11.5px;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase}
+.kpi .val{font-size:30px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:11.5px;color:var(--text-soft);margin-top:2px}
+.kpi .ico{position:absolute;right:14px;top:14px;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;opacity:.85}
+.kpi:nth-child(1) .ico{background:rgba(45,212,191,.16);color:var(--accent)}
+.kpi:nth-child(2) .ico{background:rgba(129,140,248,.16);color:var(--accent-2)}
+.kpi:nth-child(3) .ico{background:rgba(239,68,68,.16);color:var(--a-plus)}
+.kpi:nth-child(4) .ico{background:rgba(245,158,11,.16);color:var(--accent-3)}
+.kpi:nth-child(5) .ico{background:rgba(34,197,94,.16);color:var(--b-minus)}
+.kpi:nth-child(6) .ico{background:rgba(6,182,212,.16);color:var(--c)}
+
+/* Toolbar */
+.toolbar{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:12px 14px;margin-bottom:20px;backdrop-filter:blur(8px);
+}
+.toolbar .grp{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.toolbar label{font-size:11.5px;color:var(--text-dim);font-weight:600;letter-spacing:.3px}
+.sel{
+  appearance:none;-webkit-appearance:none;
+  padding:8px 30px 8px 12px;border-radius:9px;border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text);font-size:13px;cursor:pointer;outline:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239fb0c0' stroke-width='2.5'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:right 9px center;
+  transition:border-color .2s var(--t);
+}
+.sel:focus,.sel:hover{border-color:var(--border-strong)}
+.sel option{background:var(--bg-grad-1);color:var(--text)}
+.grade-chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{
+  padding:6px 11px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--text-soft);
+  transition:all .18s var(--t);user-select:none;
+}
+.chip:hover{border-color:var(--border-strong);color:var(--text)}
+.chip.active{color:#06121f;border-color:transparent}
+.toolbar .spacer{flex:1}
+.btn{
+  padding:8px 14px;border-radius:9px;border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text-soft);font-size:12.5px;cursor:pointer;font-weight:600;
+  transition:all .18s var(--t);
+}
+.btn:hover{border-color:var(--border-strong);color:var(--text)}
+.btn.primary{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#06121f;border:none}
+
+/* Layout grid */
+.grid{display:grid;gap:16px;margin-bottom:16px}
+.g-2-1{grid-template-columns:1.4fr 1fr}
+.g-3{grid-template-columns:repeat(3,1fr)}
+.g-2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1080px){.kpis{grid-template-columns:repeat(3,1fr)}.g-2-1,.g-3,.g-2{grid-template-columns:1fr}}
+
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  backdrop-filter:blur(8px);box-shadow:var(--shadow);overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.card-head{display:flex;align-items:center;gap:10px;padding:16px 18px 6px}
+.card-head .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.card-head h3{font-size:14.5px;font-weight:700}
+.card-head .desc{font-size:11.5px;color:var(--text-dim);margin-left:auto}
+.chart{width:100%;height:340px}
+.chart.tall{height:420px}
+.card-foot{padding:4px 18px 16px;font-size:11.5px;color:var(--text-dim)}
+
+/* Table */
+.tbl-wrap{padding:6px 10px 12px}
+.tbl-controls{display:flex;align-items:center;gap:10px;padding:10px 8px;flex-wrap:wrap}
+.tbl-controls .info{font-size:12px;color:var(--text-soft)}
+.tbl-controls .spacer{flex:1}
+.tbl-scroll{overflow:auto;max-height:520px;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  position:sticky;top:0;background:var(--surface-2);z-index:2;
+  text-align:left;padding:11px 14px;font-size:11.5px;font-weight:700;color:var(--text-dim);
+  letter-spacing:.4px;text-transform:uppercase;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;
+  user-select:none;
+}
+thead th:hover{color:var(--accent)}
+thead th .arr{opacity:.4;font-size:10px;margin-left:3px}
+thead th.sorted .arr{opacity:1;color:var(--accent)}
+tbody td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text-soft);white-space:nowrap}
+tbody tr{cursor:pointer;transition:background .15s var(--t)}
+tbody tr:hover{background:var(--surface-hover)}
+tbody tr:last-child td{border-bottom:none}
+td .nm{color:var(--text);font-weight:600}
+.grade-badge{
+  display:inline-block;padding:3px 9px;border-radius:7px;font-size:11.5px;font-weight:800;
+  font-variant-numeric:tabular-nums;min-width:30px;text-align:center;
+}
+.g-A\+{background:rgba(239,68,68,.18);color:#fca5a5}
+.g-A{background:rgba(249,115,22,.18);color:#fdba74}
+.g-A\-{background:rgba(245,158,11,.18);color:#fcd34d}
+.g-B\+{background:rgba(234,179,8,.18);color:#fde047}
+.g-B{background:rgba(132,204,22,.18);color:#bef264}
+.g-B\-{background:rgba(34,197,94,.18);color:#86efac}
+.g-C\+{background:rgba(20,184,166,.18);color:#5eead4}
+.g-C{background:rgba(6,182,212,.18);color:#67e8f9}
+.g-C\-{background:rgba(59,130,246,.18);color:#93c5fd}
+.pager{display:flex;align-items:center;gap:6px;padding:12px 8px 4px;justify-content:flex-end;flex-wrap:wrap}
+.pager .pginfo{font-size:12px;color:var(--text-soft);margin-right:auto}
+.pgbtn{
+  min-width:32px;height:32px;padding:0 8px;border-radius:8px;border:1px solid var(--border);
+  background:var(--surface-2);color:var(--text-soft);cursor:pointer;font-size:12.5px;font-weight:600;
+  transition:all .15s var(--t);
+}
+.pgbtn:hover:not(:disabled){border-color:var(--border-strong);color:var(--text)}
+.pgbtn.active{background:var(--accent);color:#06121f;border-color:transparent}
+.pgbtn:disabled{opacity:.4;cursor:not-allowed}
+
+/* Modal / drawer */
+.modal-mask{
+  position:fixed;inset:0;z-index:100;background:rgba(2,8,14,.6);backdrop-filter:blur(6px);
+  display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto;
+}
+.modal-mask.show{display:flex;animation:fade .25s var(--t)}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{
+  width:min(820px,100%);background:var(--bg-grad-1);border:1px solid var(--border-strong);
+  border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.5);overflow:hidden;
+  animation:pop .3s var(--t);
+}
+@keyframes pop{from{transform:translateY(16px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+.modal-head{
+  padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;
+  background:linear-gradient(120deg,rgba(45,212,191,.08),rgba(129,140,248,.08));
+}
+.modal-head .ttl{font-size:18px;font-weight:800}
+.modal-head .sub{font-size:12.5px;color:var(--text-soft)}
+.modal-head .x{margin-left:auto}
+.modal-body{padding:18px 24px 24px;max-height:65vh;overflow:auto}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.stat-mini{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.stat-mini .n{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.stat-mini .l{font-size:11px;color:var(--text-dim);margin-top:2px}
+.mini-list{display:flex;flex-direction:column;gap:7px}
+.mini-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:10px;background:var(--surface);border:1px solid var(--border)}
+.mini-row .g{flex:none;width:34px;text-align:center}
+.mini-row .nm{flex:1;font-weight:600;font-size:13px}
+.mini-row .meta{font-size:11.5px;color:var(--text-dim)}
+.empty{padding:40px;text-align:center;color:var(--text-dim);font-size:13px}
+.loading{display:grid;place-items:center;height:200px;color:var(--text-dim)}
+
+footer{margin-top:30px;text-align:center;color:var(--text-dim);font-size:12px}
+footer a{color:var(--accent);text-decoration:none}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:99px;border:2px solid transparent;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background:var(--text-dim);background-clip:content-box}
+</style>
+</head>
+<body>
+<header>
+  <div class="head-inner">
+    <div class="brand">
+      <div class="logo">学</div>
+      <div>
+        <h1>第四轮学科评估数据面板</h1>
+        <p>教育部学位中心 · 460 所高校 · 94 个学科 · 5082 条评估记录</p>
+      </div>
+    </div>
+    <div class="head-spacer"></div>
+    <div class="head-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="globalSearch" type="text" placeholder="搜索高校 / 学科 / 城市…" autocomplete="off">
+    </div>
+    <button class="icon-btn" id="themeToggle" title="切换主题">
+      <svg id="iconMoon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <h2>第四轮<span class="grad">学科评估</span>全景洞察</h2>
+    <p>基于教育部第四轮学科评估公开数据，从等级分布、学科门类、高校实力、地区格局四个维度，提供可交互、可下钻的可视化分析。</p>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="toolbar" id="toolbar">
+    <div class="grp">
+      <label>学科门类</label>
+      <select class="sel" id="fCategory"><option value="">全部</option></select>
+    </div>
+    <div class="grp">
+      <label>省份</label>
+      <select class="sel" id="fProvince"><option value="">全部</option></select>
+    </div>
+    <div class="grp">
+      <label>等级</label>
+      <div class="grade-chips" id="gradeChips"></div>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="resetBtn">重置筛选</button>
+  </div>
+
+  <div class="grid g-2-1">
+    <div class="card">
+      <div class="card-head"><span class="dot"></span><h3>高校 A 类学科数量 TOP 20</h3><span class="desc">点击柱条下钻高校详情</span></div>
+      <div class="chart tall" id="chartTopSchools"></div>
+      <div class="card-foot">统计口径：该校获得 A+ / A / A- 等级的学科总数</div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot"></span><h3>评估等级分布</h3><span class="desc">共 9 档</span></div>
+      <div class="chart" id="chartGrade"></div>
+      <div class="card-foot">A+ 为最高档，C- 为参评档最低档</div>
+    </div>
+  </div>
+
+  <div class="grid g-3">
+    <div class="card">
+      <div class="card-head"><span class="dot"></span><h3>学科门类分布</h3></div>
+      <div class="chart" id="chartCategory"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot"></span><h3>各省评估记录数</h3><span class="desc">点击下钻省份</span></div>
+      <div class="chart" id="chartProvince"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="dot"></span><h3>等级 × 门类 热力</h3></div>
+      <div class="chart" id="chartHeat"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><span class="dot"></span><h3>评估明细</h3><span class="desc">点击行下钻高校 / 学科</span></div>
+    <div class="tbl-wrap">
+      <div class="tbl-controls">
+        <span class="info" id="tblInfo"></span>
+        <div class="spacer"></div>
+        <button class="btn" id="exportBtn">导出 CSV</button>
+      </div>
+      <div class="tbl-scroll">
+        <table id="tbl">
+          <thead><tr id="thead"></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="pager" id="pager"></div>
+    </div>
+  </div>
+
+  <footer>
+    数据来源：教育部学位与研究生教育发展中心 第四轮学科评估（2017）· 纯前端可视化，无后端依赖
+  </footer>
+</div>
+
+<div class="modal-mask" id="modalMask">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="ttl" id="modalTitle">详情</div>
+        <div class="sub" id="modalSub"></div>
+      </div>
+      <button class="icon-btn x" id="modalClose">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
