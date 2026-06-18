@@ -243,6 +243,14 @@
                 font-size: 22px;
             }
         }
+        /* print-color-fix */
+        html, body, .header, .skill, .skill.primary, .label-link, .github-label-link, .target, .contact-info a {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        @media print {
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+        }
     </style>
 </head>
 <body>

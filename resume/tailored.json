@@ -108,5 +108,45 @@
     "date": "2026.06",
     "url": "/resume/resume_ctrip_fe.html",
     "match": ""
+  },
+  {
+    "index": "12",
+    "company": "通用 · 2027届校招",
+    "role": "前端开发工程师",
+    "direction": "前端 / Vue·React / 性能优化",
+    "tags": ["JavaScript/TS", "Vue", "前端工程化", "性能优化"],
+    "date": "2026.06",
+    "url": "/resume/resume_frontend_general.html",
+    "match": ""
+  },
+  {
+    "index": "13",
+    "company": "通用 · 智能驾驶",
+    "role": "视觉感知算法实习生",
+    "direction": "CV / 目标检测 / 数据闭环",
+    "tags": ["YOLO 目标检测", "PyTorch", "Python/C++", "数据闭环"],
+    "date": "2026.06",
+    "url": "/resume/resume_autodriving_cv.html",
+    "match": ""
+  },
+  {
+    "index": "14",
+    "company": "SHEIN · 实习",
+    "role": "GPT 应用开发实习生",
+    "direction": "LLM 应用 / Agent / 自动化",
+    "tags": ["LLM/GPT 应用", "Agent 开发", "Prompt 工程", "自动化测试"],
+    "date": "2026.06",
+    "url": "/resume/resume_shein_gpt.html",
+    "match": "high"
+  },
+  {
+    "index": "15",
+    "company": "通用 · 游戏研发",
+    "role": "AI Coding Agent 工程师",
+    "direction": "LLM Agent / 代码生成 / 游戏研发",
+    "tags": ["Multi-Agent", "Claude Code", "游戏研发", "代码生成与评测"],
+    "date": "2026.06",
+    "url": "/resume/resume_ai_coding_agent_game.html",
+    "match": "high"
   }
 ]
