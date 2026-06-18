@@ -58,5 +58,15 @@
     "date": "2026.06",
     "url": "/resume/resume_android_ios.html",
     "match": ""
+  },
+  {
+    "index": "07",
+    "company": "通用 · 27届 AI Native 岗",
+    "role": "AI Native 全栈工程师",
+    "direction": "AI 编程提效 / 端到端全栈",
+    "tags": ["AI Coding", "端到端全栈", "Vibe Coding", "先复核再采用"],
+    "date": "2026.06",
+    "url": "/resume/resume_ai_native_fullstack.html",
+    "match": "high"
   }
 ]
