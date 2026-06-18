@@ -7,48 +7,59 @@
     <title>工具箱 - Tools Collection</title>
     <style>
         :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --bg-card: #fafafa;
-            --bg-hover: #f0f0f0;
-            --accent-primary: #333333;
-            --accent-secondary: #666666;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --text-muted: #999999;
-            --border-color: #e0e0e0;
-            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
-            --transition: all 0.2s ease;
+            --bg: #0a0a0b;
+            --bg-soft: #111114;
+            --card: rgba(255, 255, 255, 0.025);
+            --card-hover: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.22);
+            --text: #ededed;
+            --text-soft: #a8a8b3;
+            --text-dim: #6b6b78;
+            --accent: #6ea8fe;
+            --accent-2: #9d7cff;
+            --accent-green: #5dd6a6;
+            --accent-amber: #e8c47a;
+            --transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        /* 暗黑主题 */
-        [data-theme="dark"] {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --bg-card: #252525;
-            --bg-hover: #333333;
-            --accent-primary: #e0e0e0;
-            --accent-secondary: #b0b0b0;
-            --text-primary: #f0f0f0;
-            --text-secondary: #b0b0b0;
-            --text-muted: #808080;
-            --border-color: #404040;
-            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
+        /* 浅色主题（兼容旧的主题切换） */
+        [data-theme="light"] {
+            --bg: #ffffff;
+            --bg-soft: #f5f5f5;
+            --card: rgba(0, 0, 0, 0.02);
+            --card-hover: rgba(0, 0, 0, 0.04);
+            --border: rgba(0, 0, 0, 0.08);
+            --border-hover: rgba(0, 0, 0, 0.15);
+            --text: #1a1a1a;
+            --text-soft: #555555;
+            --text-dim: #888888;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
             min-height: 100vh;
             padding: 30px 20px 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            /* 顶部氛围光晕 */
+            background-image:
+                radial-gradient(900px 480px at 80% -8%, rgba(110, 168, 254, 0.12), transparent 60%),
+                radial-gradient(760px 420px at 12% 4%, rgba(157, 124, 255, 0.10), transparent 60%);
+            background-attachment: fixed;
         }
 
         .container {
@@ -60,36 +71,43 @@
         .title-section {
             text-align: center;
             margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(18px);
+            animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.02s forwards;
         }
 
         h1 {
             font-size: 1.5rem;
             margin-bottom: 0.3rem;
             line-height: 1.2;
-            color: var(--text-primary);
+            color: var(--text);
         }
 
         .highlight {
-            color: var(--accent-primary);
+            background: linear-gradient(120deg, #ffffff 30%, #9aa0b4 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
             display: block;
             font-size: 1.7rem;
+            font-weight: 700;
         }
 
         .subtitle {
             font-size: 0.85rem;
-            color: var(--text-secondary);
+            color: var(--text-soft);
             margin-bottom: 0.5rem;
         }
 
         .stats-banner {
-            background-color: var(--bg-secondary);
-            color: var(--text-secondary);
-            padding: 0.25rem 0.8rem;
-            border-radius: 4px;
+            background-color: var(--card);
+            color: var(--text-dim);
+            padding: 0.35rem 1rem;
+            border-radius: 16px;
             font-size: 0.75rem;
             display: inline-flex;
             align-items: center;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             margin-top: 0.3rem;
         }
 
@@ -98,28 +116,28 @@
             margin-bottom: 1rem;
             display: flex;
             justify-content: center;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: rise 0.45s ease 0.08s forwards;
         }
 
         .search-box {
             width: 100%;
             max-width: 500px;
-            padding: 8px 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            background: var(--bg-card);
-            color: var(--text-primary);
+            padding: 10px 18px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--card);
+            color: var(--text);
             font-size: 0.85rem;
             transition: var(--transition);
+            backdrop-filter: blur(6px);
         }
 
         .search-box:focus {
             outline: none;
-            border-color: var(--accent-primary);
-            box-shadow: 0 0 0 2px rgba(51, 51, 51, 0.1);
-        }
-
-        [data-theme="dark"] .search-box:focus {
-            box-shadow: 0 0 0 2px rgba(224, 224, 224, 0.1);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(110, 168, 254, 0.15);
         }
 
         /* 分类标签 */
@@ -129,44 +147,49 @@
             margin-bottom: 1rem;
             flex-wrap: wrap;
             justify-content: center;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: rise 0.45s ease 0.14s forwards;
         }
 
         .category-tab {
-            padding: 6px 14px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+            padding: 8px 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
             cursor: pointer;
             font-size: 0.75rem;
-            color: var(--text-secondary);
+            color: var(--text-dim);
             transition: var(--transition);
             user-select: none;
+            backdrop-filter: blur(6px);
         }
 
         .category-tab:hover {
-            background: var(--bg-hover);
-            border-color: var(--accent-secondary);
+            background: var(--card-hover);
+            border-color: var(--border-hover);
+            color: var(--text);
         }
 
         .category-tab.active {
-            background: var(--accent-primary);
-            color: var(--bg-primary);
-            border-color: var(--accent-primary);
+            background: rgba(110, 168, 254, 0.15);
+            color: var(--accent);
+            border-color: rgba(110, 168, 254, 0.3);
         }
 
         /* 工具网格 */
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 8px;
+            gap: 12px;
             padding: 0;
         }
 
         .tool-card {
-            background: var(--bg-card);
-            border-radius: 4px;
+            background: var(--card);
+            border-radius: 16px;
             padding: 0;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             transition: var(--transition);
             position: relative;
             overflow: hidden;
@@ -175,48 +198,71 @@
             min-height: 85px;
             cursor: pointer;
             text-decoration: none;
+            backdrop-filter: blur(6px);
+            opacity: 0;
+            transform: translateY(16px);
+            animation: rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* hover 光泽扫过 */
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.06) 48%, transparent 66%);
+            transform: translateX(-120%);
+            transition: transform 0.7s ease;
+            pointer-events: none;
+            z-index: 2;
         }
 
         .tool-card:hover {
-            border-color: #cccccc;
-            box-shadow: var(--shadow-card);
-            transform: translateY(-2px);
+            transform: translateY(-6px);
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+            box-shadow: 0 18px 50px -16px rgba(110, 168, 254, 0.25),
+                        0 2px 10px rgba(0, 0, 0, 0.4);
+        }
+
+        .tool-card:hover::before {
+            transform: translateX(120%);
         }
 
         .tool-label {
             position: absolute;
-            top: 4px;
-            right: 4px;
-            padding: 1px 4px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 2px;
-            font-size: 0.55rem;
-            color: var(--text-muted);
-            z-index: 1;
+            top: 8px;
+            right: 8px;
+            padding: 3px 8px;
+            background: rgba(110, 168, 254, 0.12);
+            border: 1px solid rgba(110, 168, 254, 0.2);
+            border-radius: 12px;
+            font-size: 0.6rem;
+            color: var(--accent);
+            z-index: 3;
             line-height: 1.2;
+            font-weight: 600;
         }
 
         .tool-card-header {
             display: flex;
             align-items: flex-start;
-            gap: 8px;
-            padding: 8px 8px 0 8px;
+            gap: 10px;
+            padding: 12px 12px 0 12px;
             margin-bottom: 0;
-            padding-right: 50px;
+            padding-right: 60px;
         }
 
         .tool-icon {
-            width: 34px;
-            height: 34px;
-            min-width: 28px;
-            background: var(--bg-secondary);
-            border-radius: 4px;
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 16px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border);
             overflow: hidden;
         }
 
@@ -232,19 +278,20 @@
         }
 
         .tool-name {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 2px;
+            font-size: 0.85rem;
+            font-weight: 650;
+            color: var(--text);
+            margin-bottom: 3px;
             line-height: 1.3;
+            letter-spacing: -0.2px;
         }
 
         .tool-description {
-            color: var(--text-secondary);
-            font-size: 0.65rem;
-            line-height: 1.35;
+            color: var(--text-soft);
+            font-size: 0.68rem;
+            line-height: 1.4;
             margin-bottom: 0;
-            padding-bottom: 4px;
+            padding-bottom: 10px;
         }
 
 
@@ -254,36 +301,51 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 32px;
-            height: 32px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            background: var(--card);
+            border: 1px solid var(--border);
             border-radius: 50%;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            opacity: 0.6;
+            font-size: 18px;
+            opacity: 0.8;
             transition: var(--transition);
             z-index: 1000;
-            box-shadow: var(--shadow-card);
+            backdrop-filter: blur(6px);
         }
 
         .theme-toggle:hover {
             opacity: 1;
-            transform: scale(1.15);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: scale(1.1);
+            border-color: var(--border-hover);
+            background: var(--card-hover);
         }
 
         /* 页脚样式 */
         .footer {
             text-align: center;
-            padding: 20px 0 10px;
-            margin-top: 30px;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-muted);
+            padding: 30px 0 20px;
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
             font-size: 0.75rem;
+            opacity: 0;
+            animation: rise 0.45s ease 0.3s forwards;
+        }
+
+        .footer a {
+            color: var(--accent);
+        }
+
+        /* 动画关键帧 */
+        @keyframes rise {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* 蒙太奇动画画布 */
@@ -298,7 +360,6 @@
         }
 
         .footer a {
-            color: var(--accent-primary);
             text-decoration: none;
             transition: var(--transition);
             display: inline-flex;
@@ -307,7 +368,8 @@
         }
 
         .footer a:hover {
-            opacity: 0.7;
+            opacity: 0.8;
+            text-decoration: underline;
         }
 
         .github-icon {
@@ -321,32 +383,33 @@
             position: fixed;
             bottom: 20px;
             left: 20px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 6px 10px;
-            font-size: 0.65rem;
-            color: var(--text-muted);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 0.68rem;
+            color: var(--text-dim);
             z-index: 999;
-            box-shadow: var(--shadow-card);
-            opacity: 0.5;
+            opacity: 0.7;
             transition: var(--transition);
-            line-height: 1.5;
+            line-height: 1.6;
+            backdrop-filter: blur(6px);
         }
 
         .visit-stats:hover {
-            opacity: 0.9;
+            opacity: 1;
+            border-color: var(--border-hover);
         }
 
         .visit-stats-item {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .visit-count {
-            color: var(--accent-secondary);
-            font-weight: 500;
+            color: var(--accent);
+            font-weight: 600;
         }
 
         /* 响应式设计 */
@@ -365,55 +428,67 @@
 
             /* 分类标签紧凑布局 */
             .category-tabs {
-                gap: 4px;
+                gap: 6px;
                 margin-bottom: 0.8rem;
             }
 
             .category-tab {
-                padding: 4px 10px;
+                padding: 6px 12px;
                 font-size: 0.7rem;
             }
 
             /* 工具网格 - 每行两个卡片 */
             .tools-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 6px;
+                gap: 8px;
             }
 
-            /* 工具卡片紧凑化 */
+            /* 工具卡片紧凑化 - 保持原有大小 */
             .tool-card {
-                min-height: 75px;
+                min-height: 85px;
             }
 
             .tool-label {
-                top: 3px;
-                right: 3px;
-                padding: 1px 3px;
-                font-size: 0.5rem;
+                top: 6px;
+                right: 6px;
+                padding: 2px 6px;
+                font-size: 0.55rem;
             }
 
             .tool-card-header {
-                padding: 6px 6px 0 6px;
-                padding-right: 45px;
-                gap: 6px;
+                padding: 10px 10px 0 10px;
+                padding-right: 55px;
+                gap: 8px;
             }
 
             .tool-icon {
-                width: 28px;
-                height: 28px;
-                min-width: 28px;
-                font-size: 14px;
+                width: 34px;
+                height: 34px;
+                min-width: 34px;
+                font-size: 15px;
             }
 
             .tool-name {
-                font-size: 0.72rem;
-                margin-bottom: 1px;
+                font-size: 0.78rem;
+                margin-bottom: 2px;
             }
 
             .tool-description {
-                font-size: 0.58rem;
-                line-height: 1.3;
-                padding-bottom: 3px;
+                font-size: 0.62rem;
+                line-height: 1.35;
+                padding-bottom: 8px;
+            }
+        }
+
+        /* 尊重减少动效偏好 */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+            .tool-card, .title-section, .search-container, .category-tabs, .footer {
+                opacity: 1 !important;
+                transform: none !important;
             }
         }
     </style>
@@ -617,450 +692,450 @@
 
             <!-- 09 拼音转换 -->
             <a href="/tools/09-pinyin-converter/" class="tool-card" data-category="text" data-name="拼音转换" data-desc="中文转拼音，支持多种拼音格式">
+                <span class="tool-label">字符类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (8).webp" alt="拼音转换"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">拼音转换</h3>
                         <p class="tool-description">中文转拼音，支持多种拼音格式</p>
-                        <span class="tool-label">字符类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 10 代码格式化 -->
             <a href="/tools/10-code-formatter/" class="tool-card" data-category="text" data-name="代码格式化" data-desc="格式化 HTML、CSS、JavaScript 等代码">
+                <span class="tool-label">字符类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (9).webp" alt="代码格式化"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">代码格式化</h3>
                         <p class="tool-description">格式化 HTML、CSS、JavaScript 等代码</p>
-                        <span class="tool-label">字符类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 11 加密解密工具 -->
             <a href="/tools/11-crypto-tool/" class="tool-card" data-category="text" data-name="加密解密工具" data-desc="MD5、SHA、AES 等常用加密算法">
+                <span class="tool-label">字符类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (10).webp" alt="加密解密工具"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">加密解密工具</h3>
                         <p class="tool-description">MD5、SHA、AES 等常用加密算法</p>
-                        <span class="tool-label">字符类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 12 文本清理 -->
             <a href="/tools/12-text-cleaner/" class="tool-card" data-category="text" data-name="文本清理" data-desc="清理文本中的多余空格、换行和特殊字符">
+                <span class="tool-label">字符类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (11).webp" alt="文本清理"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">文本清理</h3>
                         <p class="tool-description">清理文本中的多余空格、换行和特殊字符</p>
-                        <span class="tool-label">字符类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 13 词频统计 -->
             <a href="/tools/13-word-frequency/" class="tool-card" data-category="text" data-name="词频统计" data-desc="统计文本中各词汇出现的频率">
+                <span class="tool-label">字符类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (12).webp" alt="词频统计"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">词频统计</h3>
                         <p class="tool-description">统计文本中各词汇出现的频率</p>
-                        <span class="tool-label">字符类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 14 编码转换 -->
             <a href="/tools/14-encoding-converter/" class="tool-card" data-category="text" data-name="编码转换" data-desc="UTF-8、GBK、ASCII 等字符编码转换">
+                <span class="tool-label">字符类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (13).webp" alt="编码转换"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">编码转换</h3>
                         <p class="tool-description">UTF-8、GBK、ASCII 等字符编码转换</p>
-                        <span class="tool-label">字符类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 15 时间戳转换 -->
             <a href="/tools/15-timestamp-converter/" class="tool-card" data-category="time" data-name="时间戳转换" data-desc="Unix 时间戳与日期时间互相转换">
+                <span class="tool-label">时间类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (14).webp" alt="时间戳转换"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">时间戳转换</h3>
                         <p class="tool-description">Unix 时间戳与日期时间互相转换</p>
-                        <span class="tool-label">时间类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 16 农历日历 -->
             <a href="/tools/16-lunar-calendar/" class="tool-card" data-category="time" data-name="农历日历" data-desc="公历农历互转，查询节气和节日">
+                <span class="tool-label">时间类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (15).webp" alt="农历日历"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">农历日历</h3>
                         <p class="tool-description">公历农历互转，查询节气和节日</p>
-                        <span class="tool-label">时间类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 17 倒计时器 -->
             <a href="/tools/17-countdown-timer/" class="tool-card" data-category="time" data-name="倒计时器" data-desc="设置目标时间，实时显示倒计时">
+                <span class="tool-label">时间类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (16).webp" alt="倒计时器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">倒计时器</h3>
                         <p class="tool-description">设置目标时间，实时显示倒计时</p>
-                        <span class="tool-label">时间类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 18 日期差计算器 -->
             <a href="/tools/18-date-diff-calculator/" class="tool-card" data-category="time" data-name="日期差计算器" data-desc="计算两个日期之间的天数差">
+                <span class="tool-label">时间类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (17).webp" alt="日期差计算器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">日期差计算器</h3>
                         <p class="tool-description">计算两个日期之间的天数差</p>
-                        <span class="tool-label">时间类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 19 图片压缩 -->
             <a href="/tools/19-image-compressor/" class="tool-card" data-category="image" data-name="图片压缩" data-desc="压缩图片文件大小，保持画质">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (18).webp" alt="图片压缩"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">图片压缩</h3>
                         <p class="tool-description">压缩图片文件大小，保持画质</p>
-                        <span class="tool-label">图片类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 20 图片裁剪 -->
             <a href="/tools/20-image-cropper/" class="tool-card" data-category="image" data-name="图片裁剪" data-desc="在线裁剪图片，支持自定义尺寸">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (19).webp" alt="图片裁剪"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">图片裁剪</h3>
                         <p class="tool-description">在线裁剪图片，支持自定义尺寸</p>
-                        <span class="tool-label">图片类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 21 图片转 Base64 -->
             <a href="/tools/21-image-to-base64/" class="tool-card" data-category="image" data-name="图片转 Base64" data-desc="将图片转换为 Base64 编码字符串">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (20).webp" alt="图片转 Base64"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">图片转 Base64</h3>
                         <p class="tool-description">将图片转换为 Base64 编码字符串</p>
-                        <span class="tool-label">图片类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 22 颜色选择器 -->
             <a href="/tools/22-color-picker/" class="tool-card" data-category="image" data-name="颜色选择器" data-desc="选取颜色，获取 HEX、RGB、HSL 值">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (21).webp" alt="颜色选择器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">颜色选择器</h3>
                         <p class="tool-description">选取颜色，获取 HEX、RGB、HSL 值</p>
-                        <span class="tool-label">图片类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 23 图片拼接 -->
             <a href="/tools/23-image-stitcher/" class="tool-card" data-category="image" data-name="图片拼接" data-desc="将多张图片拼接成一张长图">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (22).webp" alt="图片拼接"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">图片拼接</h3>
                         <p class="tool-description">将多张图片拼接成一张长图</p>
-                        <span class="tool-label">图片类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 24 背景移除 -->
             <a href="/tools/24-bg-remover/" class="tool-card" data-category="image" data-name="背景移除" data-desc="智能移除图片背景，生成透明背景">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (23).webp" alt="背景移除"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">背景移除</h3>
                         <p class="tool-description">智能移除图片背景，生成透明背景</p>
-                        <span class="tool-label">图片类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 25 图片滤镜 -->
             <a href="/tools/25-image-filter/" class="tool-card" data-category="image" data-name="图片滤镜" data-desc="为图片添加各种滤镜效果">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (24).webp" alt="图片滤镜"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">图片滤镜</h3>
                         <p class="tool-description">为图片添加各种滤镜效果</p>
-                        <span class="tool-label">图片类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 26 二维码工具 -->
             <a href="/tools/26-qrcode-tool/" class="tool-card" data-category="image" data-name="二维码工具" data-desc="生成和识别二维码，支持自定义样式">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (25).webp" alt="二维码工具"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">二维码工具</h3>
                         <p class="tool-description">生成和识别二维码，支持自定义样式</p>
-                        <span class="tool-label">图片类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 27 进制转换 -->
             <a href="/tools/27-base-converter/" class="tool-card" data-category="calc" data-name="进制转换" data-desc="二进制、八进制、十进制、十六进制互转">
+                <span class="tool-label">计算进制类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (26).webp" alt="进制转换"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">进制转换</h3>
                         <p class="tool-description">二进制、八进制、十进制、十六进制互转</p>
-                        <span class="tool-label">计算进制类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 28 科学计算器 -->
             <a href="/tools/28-scientific-calculator/" class="tool-card" data-category="calc" data-name="科学计算器" data-desc="支持三角函数、对数等科学计算">
+                <span class="tool-label">计算进制类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (27).webp" alt="科学计算器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">科学计算器</h3>
                         <p class="tool-description">支持三角函数、对数等科学计算</p>
-                        <span class="tool-label">计算进制类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 29 单位换算 -->
             <a href="/tools/29-unit-converter/" class="tool-card" data-category="calc" data-name="单位换算" data-desc="长度、重量、温度等常用单位换算">
+                <span class="tool-label">计算进制类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (28).webp" alt="单位换算"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">单位换算</h3>
                         <p class="tool-description">长度、重量、温度等常用单位换算</p>
-                        <span class="tool-label">计算进制类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 30 BMI 计算器 -->
             <a href="/tools/30-bmi-calculator/" class="tool-card" data-category="calc" data-name="BMI 计算器" data-desc="根据身高体重计算 BMI 指数">
+                <span class="tool-label">计算进制类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (29).webp" alt="BMI 计算器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">BMI 计算器</h3>
                         <p class="tool-description">根据身高体重计算 BMI 指数</p>
-                        <span class="tool-label">计算进制类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 31 贷款计算器 -->
             <a href="/tools/31-loan-calculator/" class="tool-card" data-category="calc" data-name="贷款计算器" data-desc="计算等额本息和等额本金还款方式">
+                <span class="tool-label">计算进制类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (30).webp" alt="贷款计算器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">贷款计算器</h3>
                         <p class="tool-description">计算等额本息和等额本金还款方式</p>
-                        <span class="tool-label">计算进制类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 32 随机数生成器 -->
             <a href="/tools/32-random-generator/" class="tool-card" data-category="other" data-name="随机数生成器" data-desc="生成指定范围的随机数或随机字符串">
+                <span class="tool-label">其他实用工具</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (31).webp" alt="随机数生成器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">随机数生成器</h3>
                         <p class="tool-description">生成指定范围的随机数或随机字符串</p>
-                        <span class="tool-label">其他实用工具</span>
                     </div>
                 </div>
             </a>
 
             <!-- 33 密码生成器 -->
             <a href="/tools/33-password-generator/" class="tool-card" data-category="other" data-name="密码生成器" data-desc="生成高强度随机密码，可自定义规则">
+                <span class="tool-label">其他实用工具</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (32).webp" alt="密码生成器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">密码生成器</h3>
                         <p class="tool-description">生成高强度随机密码，可自定义规则</p>
-                        <span class="tool-label">其他实用工具</span>
                     </div>
                 </div>
             </a>
 
             <!-- 34 文件预览器 -->
             <a href="/tools/34-file-previewer/" class="tool-card" data-category="other" data-name="文件预览器" data-desc="在线预览图片、PDF、文本等文件">
+                <span class="tool-label">其他实用工具</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (33).webp" alt="文件预览器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">文件预览器</h3>
                         <p class="tool-description">在线预览图片、PDF、文本等文件</p>
-                        <span class="tool-label">其他实用工具</span>
                     </div>
                 </div>
             </a>
 
             <!-- 35 待办清单 -->
             <a href="/tools/35-todo-list/" class="tool-card" data-category="other" data-name="待办清单" data-desc="简洁的待办事项管理工具">
+                <span class="tool-label">其他实用工具</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (34).webp" alt="待办清单"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">待办清单</h3>
                         <p class="tool-description">简洁的待办事项管理工具</p>
-                        <span class="tool-label">其他实用工具</span>
                     </div>
                 </div>
             </a>
 
             <!-- 36 屏幕尺子 -->
             <a href="/tools/36-screen-ruler/" class="tool-card" data-category="other" data-name="屏幕尺子" data-desc="在屏幕上测量像素距离">
+                <span class="tool-label">其他实用工具</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (35).webp" alt="屏幕尺子"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">屏幕尺子</h3>
                         <p class="tool-description">在屏幕上测量像素距离</p>
-                        <span class="tool-label">其他实用工具</span>
                     </div>
                 </div>
             </a>
 
             <!-- 37 文件哈希校验 -->
             <a href="/tools/37-file-hash-checker/" class="tool-card" data-category="other" data-name="文件哈希校验" data-desc="计算文件的 MD5、SHA1、SHA256 哈希值">
+                <span class="tool-label">其他实用工具</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (36).webp" alt="文件哈希校验"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">文件哈希校验</h3>
                         <p class="tool-description">计算文件的 MD5、SHA1、SHA256 哈希值</p>
-                        <span class="tool-label">其他实用工具</span>
                     </div>
                 </div>
             </a>
 
             <!-- 38 画板 -->
             <a href="/tools/38-drawing-board/" class="tool-card" data-category="image" data-name="画板" data-desc="在线绘图工具，支持多种画笔和颜色">
+                <span class="tool-label">图片类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (37).webp" alt="画板"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">画板</h3>
                         <p class="tool-description">在线绘图工具，支持多种画笔和颜色</p>
-                        <span class="tool-label">图片类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 39 Unicode 工具 -->
             <a href="/tools/39-unicode-tool/" class="tool-card" data-category="text" data-name="Unicode 工具" data-desc="字符与 Unicode 编码互相转换">
+                <span class="tool-label">字符类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (38).webp" alt="Unicode 工具"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">Unicode 工具</h3>
                         <p class="tool-description">字符与 Unicode 编码互相转换</p>
-                        <span class="tool-label">字符类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 40 Lorem 生成器 -->
             <a href="/tools/40-lorem-generator/" class="tool-card" data-category="text" data-name="Lorem 生成器" data-desc="生成占位文本，支持段落和单词数量自定义">
+                <span class="tool-label">字符类</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (39).webp" alt="Lorem 生成器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">Lorem 生成器</h3>
                         <p class="tool-description">生成占位文本，支持段落和单词数量自定义</p>
-                        <span class="tool-label">字符类</span>
                     </div>
                 </div>
             </a>
 
             <!-- 41 上课抽签器 -->
             <a href="/tools/lucky_draw/" class="tool-card" data-category="other" data-name="上课抽签器" data-desc="像素风课堂点名工具，支持Excel导入和隐蔽数据管理">
+                <span class="tool-label">其他</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/logo/lucky_draw.webp" alt="上课抽签器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">上课抽签器</h3>
                         <p class="tool-description">像素风课堂点名工具，支持Excel导入和隐蔽数据管理</p>
-                        <span class="tool-label">其他</span>
                     </div>
                 </div>
             </a>
 
             <!-- 42 脚本工坊 -->
             <a href="/tools/script_forge/" class="tool-card" data-category="other" data-name="脚本工坊" data-desc="在线脚本编辑和管理工具">
+                <span class="tool-label">其他</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/logo/script_forge.webp" alt="脚本工坊"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">脚本工坊</h3>
                         <p class="tool-description">在线脚本编辑和管理工具</p>
-                        <span class="tool-label">其他</span>
                     </div>
                 </div>
             </a>
             <a href="/tools/thrending/" class="tool-card" data-category="info" data-name="github热门榜单" data-desc="github热门榜单">
+                <span class="tool-label">信息</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e36d6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='23 6 13.5 15.5 8.5 10.5 1 18'%3E%3C/polyline%3E%3Cpolyline points='17 6 23 6 23 12'%3E%3C/polyline%3E%3C/svg%3E" alt="GitHub热门榜单"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">GitHub热门榜单</h3>
                         <p class="tool-description">快速访问GitHub热门榜单，支持日榜、周榜、月榜，可根据不同语言筛选</p>
-                        <span class="tool-label">信息</span>
                     </div>
                 </div>
             </a>
             <a href="/tools/hot-dashboard/" class="tool-card" data-category="info" data-name="60s信息流" data-desc="60s聚合信息流看板">
+                <span class="tool-label">信息</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7' rx='1'%3E%3C/rect%3E%3Crect x='14' y='3' width='7' height='7' rx='1'%3E%3C/rect%3E%3Crect x='3' y='14' width='7' height='7' rx='1'%3E%3C/rect%3E%3Crect x='14' y='14' width='7' height='7' rx='1'%3E%3C/rect%3E%3C/svg%3E" alt="60s信息流"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">60s 信息流</h3>
                         <p class="tool-description">聚合微博、B站、抖音、知乎等多平台热搜榜单，一站式获取热点信息</p>
-                        <span class="tool-label">信息</span>
                     </div>
                 </div>
             </a>
 
             <!-- 每天60秒 -->
             <a href="/tools/60s/" class="tool-card" data-category="info" data-name="每天60秒" data-desc="每天60秒看世界，聚合热榜、天气、实用数据">
+                <span class="tool-label">信息</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/60s/favicon.png" alt="每天60秒"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">每天60秒</h3>
                         <p class="tool-description">每天60秒看世界，聚合热榜、天气和实用数据</p>
-                        <span class="tool-label">信息</span>
                     </div>
                 </div>
             </a>
             <a href="/tools/glb_viewer_meshy/" class="tool-card" data-category="other" data-name="3D模型查看器" data-desc="3D模型查看器">
+                <span class="tool-label">其他</span>
                 <div class="tool-card-header">
                     <div class="tool-icon"><img src="/tools/assets/logo/glb_viewer_meshy.webp" alt="3D模型查看器"></div>
                     <div class="tool-content">
                         <h3 class="tool-name">3D模型查看器</h3>
                         <p class="tool-description">一个简单的3D模型查看器，支持GLB格式的模型加载和展示</p>
-                        <span class="tool-label">其他</span>
                     </div>
                 </div>
             </a>
@@ -1106,31 +1181,47 @@
     </div>
 
     <script>
-        // 主题切换功能
+        // 主题切换功能 - 默认深色主题
         const themeToggle = document.getElementById('themeToggle');
         const html = document.documentElement;
-        
+
         // 检查本地存储的主题偏好
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             html.setAttribute('data-theme', savedTheme);
             updateThemeIcon(savedTheme);
+        } else {
+            // 默认不设置 data-theme（使用深色）
+            updateThemeIcon('dark');
         }
-        
+
         // 切换主题
         themeToggle.addEventListener('click', () => {
             const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
+            const newTheme = currentTheme === 'light' ? null : 'light';
+
+            if (newTheme) {
+                html.setAttribute('data-theme', newTheme);
+            } else {
+                html.removeAttribute('data-theme');
+            }
+            localStorage.setItem('theme', newTheme || 'dark');
+            updateThemeIcon(newTheme || 'dark');
         });
-        
+
         // 更新图标
         function updateThemeIcon(theme) {
-            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌓';
+            themeToggle.textContent = theme === 'light' ? '🌙' : '☀️';
         }
+
+        // 给卡片添加交错动画延迟
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.tool-card');
+            cards.forEach((card, index) => {
+                const delay = (0.18 + index * 0.015).toFixed(3) + 's';
+                card.style.animationDelay = delay;
+            });
+        });
 
         function initVisitStats() {
             const s = document.createElement('script');
@@ -1731,7 +1822,7 @@
                     this.ctx.clip();
                     
                     // 绘制白色背景（防止透明图标显示问题）
-                    this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--bg-card');
+                    this.ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--card');
                     this.ctx.fillRect(-halfSize, -halfSize, icon.size, icon.size);
                     
                     // 绘制阴影（在裁剪之前）
