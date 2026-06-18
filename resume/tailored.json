@@ -148,5 +148,15 @@
     "date": "2026.06",
     "url": "/resume/resume_ai_coding_agent_game.html",
     "match": "high"
+  },
+  {
+    "index": "16",
+    "company": "通用 · 大型商业游戏",
+    "role": "游戏客户端开发工程师",
+    "direction": "客户端 / 核心模块 / 性能优化",
+    "tags": ["游戏客户端", "3D 渲染优化", "TypeScript", "AI Agent"],
+    "date": "2026.06",
+    "url": "/resume/resume_game_client_dev.html",
+    "match": ""
   }
 ]
