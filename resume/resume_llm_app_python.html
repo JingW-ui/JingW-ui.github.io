@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 大模型应用开发工程师（Python）</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            line-height: 1.2; color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px; display: flex; justify-content: center;
+        }
+        .page { width: 210mm; min-height: 297mm; background: #ffffff; padding: 14mm 16mm; box-shadow: 0 4px 24px rgba(0,0,0,0.12); position: relative; }
+        .header { text-align: center; margin-bottom: 18px; padding: 0 0 14px; border-bottom: 2px solid #333; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .profile-container { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .avatar { width: 96px; height: 106px; object-fit: cover; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .profile-info { text-align: left; }
+        .name { font-size: 26px; font-weight: bold; color: #1a1a1a; margin-bottom: 5px; }
+        .target { font-size: 13px; color: #4a90e2; font-weight: 600; margin-bottom: 7px; letter-spacing: 0.5px; }
+        .contact-info { font-size: 12px; color: #666; line-height: 1.6; }
+        .contact-info a { color: #4a90e2; text-decoration: none; font-weight: 500; }
+        .contact-info a:hover { text-decoration: underline; }
+        .section { margin-bottom: 14px; }
+        .section-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 10px; border-left: 4px solid #333; padding-left: 10px; }
+        .summary { font-size: 12px; color: #444; line-height: 1.65; }
+        .summary strong { color: #1a1a1a; }
+        .subsection { margin-bottom: 9px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
+        .subsection:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .subsection-title { font-size: 12.5px; font-weight: 600; color: #222; margin-bottom: 2px; }
+        .date { font-size: 11px; color: #999; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .tech-line { font-size: 11.5px; color: #555; margin-bottom: 4px; }
+        .tech-line em { font-style: normal; color: #2d74bb; font-weight: 500; }
+        ul { padding-left: 16px; }
+        li { margin-bottom: 3px; font-size: 11.5px; color: #555; line-height: 1.5; }
+        .skills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+        .skill { background: linear-gradient(135deg, #f5f5f5 0%, #f0f0f0 100%); padding: 4px 10px; border-radius: 4px; font-size: 11px; border: 1px solid #e0e0e0; color: #555; font-weight: 500; }
+        .skill.primary { color: #1a1a1a; font-weight: 700; border-color: #bbb; }
+        .skill-group { margin-bottom: 7px; }
+        .skill-group:last-child { margin-bottom: 0; }
+        .label-link { display: inline-block; background-color: #f5f5f5; padding: 1px 6px; border-radius: 4px; font-size: 10px; border: 1px solid #d0d0d0; color: #666; text-decoration: none; margin-left: 4px; font-weight: 500; }
+        .label-link:hover { background-color: #e0e0e0; color: #333; }
+        .github-label-link { display: inline-block; background-color: #1F883D; padding: 1px 6px; border-radius: 4px; font-size: 10px; color: #ffffff; text-decoration: none; margin-left: 4px; font-weight: 500; }
+        .github-label-link:hover { background-color: #176d31; }
+        @media print { body { background: #fff; padding: 0; } .page { box-shadow: none; width: auto; min-height: auto; padding: 0; } }
+        @media (max-width: 820px) { body { padding: 10px; } .page { width: 100%; min-height: auto; padding: 18px 16px; } .profile-container { flex-direction: column; text-align: center; } .profile-info { text-align: center; } .name { font-size: 22px; } }
+        /* print-color-fix */
+        html, body, .header, .skill, .skill.primary, .label-link, .github-label-link, .target, .contact-info a {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        @media print {
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：大模型应用开发工程师（Python 方向 · LLM 应用 / Agent / Demo 开发）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士（2027届）<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            对大模型（LLM）有浓厚兴趣并具备 <strong>完整 LLM 应用开发实战经验</strong>——主导设计开发 NEURA 智能体系统，独立完成从 <strong>Prompt 设计、API 调用到后端服务与 Agent 工程落地</strong> 的全链路。<strong>熟悉 Python 编程与基础软件开发</strong>，掌握 Prompt、Token、Inference 等大模型核心概念，深入实践 RAG、Function Calling、Structured Output、工具调用等技术。使用过 <strong>Hugging Face / OpenAI 类大模型平台与 API</strong> 进行应用开发，有后端服务开发能力（Django / Spring Boot / MySQL）。具备 <strong>AI Agent、智能对话、内容生成、知识问答</strong> 方向的 Demo 与内部工具开发经验，成果发表 <strong>SCI 论文</strong> 并开源。学习能力强，能在导师指导下快速将产品方案与交互设计图转化为可用应用。
+        </div>
+    </div>
+
+    <!-- 教育背景 -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 生物医学工程（电子信息大类） · 硕士 · 2027届</div>
+            <div class="date">2024.09 - 2027.06 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授 · 神经信息教育部重点实验室</div>
+            <ul>
+                <li>研究方向：基于大语言模型的智能体系统设计与开发——LLM 应用、Agent 工程化。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ 四川省优秀毕业生 · 推免生</div>
+            <ul>
+                <li>相关课程：计算机编程、计算机原理及应用、程序设计基础（C 语言）——扎实的软件开发基础。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 专业技能 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-group">
+            <div class="tech-line"><em>编程与后端：</em></div>
+            <div class="skills">
+                <span class="skill primary">Python</span>
+                <span class="skill primary">后端服务开发</span>
+                <span class="skill">Django</span>
+                <span class="skill">Spring Boot / Java</span>
+                <span class="skill">MySQL · 接口开发</span>
+                <span class="skill">Git / Linux</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>大模型基础概念：</em></div>
+            <div class="skills">
+                <span class="skill primary">LLM 基本概念</span>
+                <span class="skill primary">Prompt 设计</span>
+                <span class="skill">Token / Inference 原理</span>
+                <span class="skill">Temperature / Top-p 调参</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>LLM 平台与 API：</em></div>
+            <div class="skills">
+                <span class="skill primary">大模型 API 调用</span>
+                <span class="skill">Hugging Face</span>
+                <span class="skill">OpenAI 类 API</span>
+                <span class="skill">Function Calling</span>
+                <span class="skill">Structured Output</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>Agent / 应用方向：</em></div>
+            <div class="skills">
+                <span class="skill primary">AI Agent 开发</span>
+                <span class="skill">智能对话</span>
+                <span class="skill">内容生成</span>
+                <span class="skill">知识问答（RAG）</span>
+                <span class="skill">Multi-Agent 架构</span>
+                <span class="skill">Chain-of-Thought</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>综合：</em></div>
+            <div class="skills">
+                <span class="skill">Demo / 内部工具开发</span>
+                <span class="skill">PySide6 / Qt GUI</span>
+                <span class="skill">技术文档撰写</span>
+                <span class="skill">英语六级</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 项目经验 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                LLM 应用开发 · NEURA 智能对话与自动化 Agent 系统
+                <a class="github-label-link" href="https://github.com/NeuroScienceLab/NEURA" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" rel="noopener">论文</a>
+            </div>
+            <div class="date">2025.07 - 2026.02</div>
+            <div class="tech-line"><em>技术栈：</em>Python · LLM API · Prompt 工程 · RAG · Function Calling · 工具调用</div>
+            <ul>
+                <li><strong>智能对话 + AI Agent：</strong>主导设计开发基于大语言模型的智能体系统，实现 <strong>智能对话交互</strong> 与自主任务编排，覆盖 JD 所列"智能对话、内容生成、知识问答、AI Agent"方向。</li>
+                <li><strong>Prompt 设计与 API 调用：</strong>独立完成 <strong>Prompt 设计、大模型 API 调用、后端服务</strong> 开发，构建双知识图谱（RAG）实现知识问答，通过 Function Calling / 工具调用打通异构工具链。</li>
+                <li><strong>Demo 与工程落地：</strong>从产品需求到可用系统全链路独立交付，成果形成 <strong>SCI 论文</strong> 并开源，体现新应用孵化能力。</li>
+                <li><strong>项目职责：</strong>主导系统设计与开发，负责 Prompt 设计、API 调用、后端服务与 Agent 架构，独立完成原型到工程落地全流程并撰写论文。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                AI 应用 / 内部工具 · AutoTask 自动化办公助手
+                <a class="github-label-link" href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank" rel="noopener">GitHub 70+ Stars</a>
+            </div>
+            <div class="date">2025.10 - 2026.01</div>
+            <div class="tech-line"><em>技术栈：</em>Python · PySide6 · PyAutoGUI · 定时调度</div>
+            <ul>
+                <li><strong>Demo / 内部工具开发：</strong>开发可视化任务编排、自动化执行与批量任务管理工具，落地"内容生成 + 自动化"应用场景，开源获 70+ Stars、150+ 真实用户。</li>
+                <li><strong>后端与工程：</strong>承担架构设计、后端逻辑、测试与迭代，体现基础软件开发与产品化能力。</li>
+                <li><strong>项目职责：</strong>架构师与主迭代，负责架构设计、后端开发、UI 优化、测试与版本迭代。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 开源与获奖 -->
+    <div class="section">
+        <div class="section-title">开源贡献与获奖</div>
+        <ul>
+            <li><strong>开源项目：</strong>GitHub 多个项目共 190+ Stars、200+ 真实用户，为 NEURA、AutoTask 等开源项目贡献代码。</li>
+            <li><strong>论文：</strong>SCI ×3（含 LLM Agent 系统论文）——大模型应用研究与文档撰写能力。</li>
+            <li>算法 · 数学建模亚太地区三等奖（1/3）、企业竞赛模拟一等奖。</li>
+            <li>国家级 · 第九届全国大学生生物医学工程创新设计竞赛 <strong>一等奖</strong>（2024）。</li>
+            <li>省级 · 四川省生物医学工程创新设计大赛 <strong>一等奖 ×4</strong>（2023-2025）。</li>
+            <li>其他 · 国家励志奖学金 ×2、四川省优秀毕业生、英语六级。</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>

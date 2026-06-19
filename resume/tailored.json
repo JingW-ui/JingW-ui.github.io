@@ -178,5 +178,45 @@
     "date": "2026.06",
     "url": "/resume/resume_smart_mfg_mgmt.html",
     "match": ""
+  },
+  {
+    "index": "19",
+    "company": "通用 · 软件产品",
+    "role": "大模型应用开发工程师（Python）",
+    "direction": "LLM 应用 / Agent / Demo 开发",
+    "tags": ["Python", "LLM API", "Prompt 工程", "AI Agent"],
+    "date": "2026.06",
+    "url": "/resume/resume_llm_app_python.html",
+    "match": "high"
+  },
+  {
+    "index": "20",
+    "company": "通用 · IC 设计",
+    "role": "AI DFT 工程师",
+    "direction": "DFT + AI Agent / Skill 自动化",
+    "tags": ["Agent / Skill 开发", "Python/C++", "PyTorch", "工程经验转自动化"],
+    "date": "2026.06",
+    "url": "/resume/resume_ai_dft.html",
+    "match": ""
+  },
+  {
+    "index": "21",
+    "company": "通用 · 自动驾驶",
+    "role": "自动驾驶感知算法工程师",
+    "direction": "ADAS / NOA · 目标检测 · 数据闭环",
+    "tags": ["YOLO 目标检测", "PyTorch", "Python/C++", "数据闭环 + 评测"],
+    "date": "2026.06",
+    "url": "/resume/resume_adas_perception.html",
+    "match": ""
+  },
+  {
+    "index": "22",
+    "company": "通用 · 2027届",
+    "role": "软件开发工程师",
+    "direction": "后端 / 全栈 / 软件工程",
+    "tags": ["Python/Java/C++", "Spring Boot", "全栈开发", "数据结构与算法"],
+    "date": "2026.06",
+    "url": "/resume/resume_sde_general.html",
+    "match": ""
   }
 ]

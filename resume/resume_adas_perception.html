@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 自动驾驶感知算法工程师</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            line-height: 1.2; color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px; display: flex; justify-content: center;
+        }
+        .page { width: 210mm; min-height: 297mm; background: #ffffff; padding: 14mm 16mm; box-shadow: 0 4px 24px rgba(0,0,0,0.12); position: relative; }
+        .header { text-align: center; margin-bottom: 18px; padding: 0 0 14px; border-bottom: 2px solid #333; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .profile-container { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .avatar { width: 96px; height: 106px; object-fit: cover; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .profile-info { text-align: left; }
+        .name { font-size: 26px; font-weight: bold; color: #1a1a1a; margin-bottom: 5px; }
+        .target { font-size: 13px; color: #4a90e2; font-weight: 600; margin-bottom: 7px; letter-spacing: 0.5px; }
+        .contact-info { font-size: 12px; color: #666; line-height: 1.6; }
+        .contact-info a { color: #4a90e2; text-decoration: none; font-weight: 500; }
+        .contact-info a:hover { text-decoration: underline; }
+        .section { margin-bottom: 14px; }
+        .section-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 10px; border-left: 4px solid #333; padding-left: 10px; }
+        .summary { font-size: 12px; color: #444; line-height: 1.65; }
+        .summary strong { color: #1a1a1a; }
+        .subsection { margin-bottom: 9px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
+        .subsection:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .subsection-title { font-size: 12.5px; font-weight: 600; color: #222; margin-bottom: 2px; }
+        .date { font-size: 11px; color: #999; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .tech-line { font-size: 11.5px; color: #555; margin-bottom: 4px; }
+        .tech-line em { font-style: normal; color: #2d74bb; font-weight: 500; }
+        ul { padding-left: 16px; }
+        li { margin-bottom: 3px; font-size: 11.5px; color: #555; line-height: 1.5; }
+        .skills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+        .skill { background: linear-gradient(135deg, #f5f5f5 0%, #f0f0f0 100%); padding: 4px 10px; border-radius: 4px; font-size: 11px; border: 1px solid #e0e0e0; color: #555; font-weight: 500; }
+        .skill.primary { color: #1a1a1a; font-weight: 700; border-color: #bbb; }
+        .skill-group { margin-bottom: 7px; }
+        .skill-group:last-child { margin-bottom: 0; }
+        .label-link { display: inline-block; background-color: #f5f5f5; padding: 1px 6px; border-radius: 4px; font-size: 10px; border: 1px solid #d0d0d0; color: #666; text-decoration: none; margin-left: 4px; font-weight: 500; }
+        .label-link:hover { background-color: #e0e0e0; color: #333; }
+        .github-label-link { display: inline-block; background-color: #1F883D; padding: 1px 6px; border-radius: 4px; font-size: 10px; color: #ffffff; text-decoration: none; margin-left: 4px; font-weight: 500; }
+        .github-label-link:hover { background-color: #176d31; }
+        @media print { body { background: #fff; padding: 0; } .page { box-shadow: none; width: auto; min-height: auto; padding: 0; } }
+        @media (max-width: 820px) { body { padding: 10px; } .page { width: 100%; min-height: auto; padding: 18px 16px; } .profile-container { flex-direction: column; text-align: center; } .profile-info { text-align: center; } .name { font-size: 22px; } }
+        /* print-color-fix */
+        html, body, .header, .skill, .skill.primary, .label-link, .github-label-link, .target, .contact-info a {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        @media print {
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：自动驾驶感知算法工程师（ADAS / NOA · 目标检测 · 数据闭环）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士在读（2027届）<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            计算机视觉方向硕士在读，深耕 <strong>YOLO 系列目标检测</strong>——在 4 个独立项目中完成检测/分割模型的<strong>原创设计、训练、工程化落地与迭代</strong>，目标检测范式可平滑迁移至交通灯、标识牌等空中要素检测。具备完整的 <strong>数据闭环实战</strong>：多次自建数据集，主导数据挖掘、标注规范、训练、部署与 <strong>badcase 回归</strong> 全链路，深度认同"数据决定算法上限"。熟悉 <strong>PyTorch 深度学习框架</strong>，深入理解数据结构、算法与代码优化，<strong>精通 Python / C++</strong>。有 <strong>评测体系化构建与 case 迭代</strong> 经验：在开源项目中建立"权重管理—推理—结果对比—Bad Case 收集—回归"的量化迭代闭环。两个 GitHub 开源项目共 <strong>190+ Stars、200+ 真实用户</strong>，模型上线后持续保障稳定性与迭代。<strong>每周可实习至少 3 天、持续 3 个月以上</strong>，能快速学习 3D 感知、模型部署优化等新栈。
+        </div>
+    </div>
+
+    <!-- 教育背景 -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 生物医学工程（电子信息大类） · 硕士在读 · 2027届</div>
+            <div class="date">2024.09 - 2027.06 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授 · 神经信息教育部重点实验室</div>
+            <ul>
+                <li>研究方向：医学影像智能分析——目标检测 / 分割模型原创设计与工程化，与自动驾驶视觉感知同源。</li>
+                <li>相关课程：矩阵理论、统计推断——数据结构与算法、数学基础扎实。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ 四川省优秀毕业生 · 推免生</div>
+            <ul>
+                <li>相关课程：计算机编程、计算机原理及应用、程序设计基础（C 语言）、信号与系统。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 专业技能 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-group">
+            <div class="tech-line"><em>编程与基础：</em></div>
+            <div class="skills">
+                <span class="skill primary">Python</span>
+                <span class="skill primary">C / C++</span>
+                <span class="skill primary">数据结构与算法</span>
+                <span class="skill">代码优化</span>
+                <span class="skill">大规模数据处理</span>
+                <span class="skill">Linux / Git</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>深度学习框架与感知算法：</em></div>
+            <div class="skills">
+                <span class="skill primary">PyTorch</span>
+                <span class="skill primary">YOLO 系列（v8~v26）</span>
+                <span class="skill primary">目标检测（2D）</span>
+                <span class="skill">nnU-Net（分割）</span>
+                <span class="skill">Transformer</span>
+                <span class="skill">姿态估计</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>数据闭环与评测：</em></div>
+            <div class="skills">
+                <span class="skill primary">数据挖掘 / 标注规范</span>
+                <span class="skill primary">评测体系化构建</span>
+                <span class="skill">badcase 回归</span>
+                <span class="skill">case 迭代 / 量化优化</span>
+                <span class="skill">数据增强</span>
+            </div>
+        </div>
+        <div class="skill-group">
+            <div class="tech-line"><em>工程化与部署：</em></div>
+            <div class="skills">
+                <span class="skill primary">模型工程化落地</span>
+                <span class="skill">模型优化 / 迭代</span>
+                <span class="skill">多输入推理部署</span>
+                <span class="skill">MySQL · 接口开发</span>
+                <span class="skill">英语六级（论文阅读）</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 项目经验 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                感知算法研发 · 通用目标检测与分割系统（原创设计 + 工程化 + 评测闭环）
+                <a class="github-label-link" href="https://github.com/JingW-ui/PI-MAPP/tree/main/project/universal_object_detection_plus" target="_blank" rel="noopener">GitHub 110+ Stars</a>
+                <a class="label-link" href="https://qm.qq.com/q/wZRWYGb78I" target="_blank" rel="noopener">用户群 50+</a>
+            </div>
+            <div class="date">2025.08 - 2025.10</div>
+            <div class="tech-line"><em>技术栈：</em>PyTorch · YOLOv8~YOLO26 · Python · 多输入推理</div>
+            <ul>
+                <li><strong>感知算法研发：</strong>基于 YOLO 系列完成 <strong>2D 目标检测与分割</strong> 模型原创设计与训练，支持图/视频/摄像头/实时流多输入，毫秒级推理——检测范式可直接迁移至交通灯、标识牌等空中要素检测。</li>
+                <li><strong>工程化落地 + 评测体系：</strong>内置 40+ 权重并支持下载切换，构建 <strong>"权重管理—推理—结果对比"评测体系</strong>，量化模型表现并持续迭代。</li>
+                <li><strong>数据闭环 + badcase 回归：</strong>面向真实用户持续收集 <strong>Bad Case</strong> 并回归优化，开源 110+ Stars、50+ 真实用户，保障线上稳定性。</li>
+                <li><strong>项目职责：</strong>独立负责人，承担模型原创设计、训练、工程化落地、评测体系构建与 badcase 回归全流程。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                感知算法研发 · MediScreen-Brain 多模态脑肿瘤检测（YOLO 检测 + 3D 定位）
+                <a class="github-label-link" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" rel="noopener">主页</a>
+            </div>
+            <div class="date">2024 - 2025</div>
+            <div class="tech-line"><em>技术栈：</em>PyTorch · YOLO · 多模态</div>
+            <ul>
+                <li><strong>目标检测原创设计：</strong>基于 YOLO 完成多模态目标检测与 3D 定位，处理多模态输入并优化检测精度；成果发表 <strong>SCI 论文</strong> 并开源，体现算法原创设计与论文复现能力。</li>
+                <li><strong>项目职责：</strong>主要负责人，负责检测模型设计、训练、精度优化与工程化，独立完成并撰写论文。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                数据闭环 · 结直肠癌智能检测系统（YOLOv8 + 数据标注闭环）
+                <a class="label-link" href="/imgs/competitions/8.png" target="_blank" rel="noopener">证书</a>
+            </div>
+            <div class="date">2023.04 - 2023.07 ｜ 全国二等奖 · 四川省一等奖</div>
+            <div class="tech-line"><em>技术栈：</em>PyTorch · YOLOv8 · Python</div>
+            <ul>
+                <li><strong>数据闭环链路：</strong>独立完成 <strong>数据挖掘、标注规范制定、数据增强、训练、部署</strong> 全闭环，针对指定数据集把控数据质量支撑模型迭代。</li>
+                <li><strong>项目职责：</strong>主要负责人，独立完成数据采集标注、模型训练测试、接口开发全流程。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                算法攻坚 · 脑部 MRI 海马体分割系统（精度迭代 / case 优化）
+                <a class="label-link" href="/imgs/competitions/9.png" target="_blank" rel="noopener">国一证书</a>
+            </div>
+            <div class="date">2024.04 - 2024.07 ｜ 全国一等奖</div>
+            <div class="tech-line"><em>技术栈：</em>nnU-Net · PyTorch · Python</div>
+            <ul>
+                <li><strong>模型优化与 case 迭代：</strong>基于 nnU-Net 训练 3D 分割模型，通过数据策略与训练优化持续迭代，将 Dice 提升至 <strong>0.9554</strong>、HD95=1.0mm，体现模型优化与量化攻坚能力。</li>
+                <li><strong>项目职责：</strong>主要负责人，独立完成数据预处理、模型训练测试、精度优化与接口开发。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 实习经历 -->
+    <div class="section">
+        <div class="section-title">实习经历</div>
+        <div class="subsection">
+            <div class="subsection-title">国网宁夏电力有限公司 · AI 算法实习生</div>
+            <div class="date">2023.10 - 2023.12</div>
+            <div class="tech-line"><em>技术栈：</em>Python · YOLO · OpenPose · Linux · 数据采集</div>
+            <ul>
+                <li>面向真实业务场景完成 <strong>数据挖掘与采集</strong>，调研并实现头盔检测、人体姿势估计等感知算法，开发危险姿势识别与安全预警——直接对应"数据闭环 + 目标检测 + case 迭代"工程实战。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 开源与获奖 -->
+    <div class="section">
+        <div class="section-title">开源贡献与获奖</div>
+        <ul>
+            <li><strong>开源项目：</strong>GitHub 多个项目共 190+ Stars、200+ 真实用户，为通用检测、MediScreen-Brain 等开源项目贡献代码。</li>
+            <li><strong>论文：</strong>SCI ×3、专利 1 项、软著 ×5——算法原创设计与英文论文阅读能力。</li>
+            <li>算法 · 数学建模亚太地区三等奖（1/3）、企业竞赛模拟一等奖——数据结构与算法基础。</li>
+            <li>国家级 · 第九届全国大学生生物医学工程创新设计竞赛 <strong>一等奖</strong>（2024）。</li>
+            <li>省级 · 四川省生物医学工程创新设计大赛 <strong>一等奖 ×4</strong>（2023-2025）；湖北"华为云杯"昇腾云血液图像处理大赛二等奖（2025）。</li>
+            <li>其他 · 国家励志奖学金 ×2、四川省优秀毕业生、英语六级。</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
