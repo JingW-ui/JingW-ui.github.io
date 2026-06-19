@@ -1,264 +1,538 @@
-<html lang="en" class=" js ">
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-    <style type="text/css">
-        .anticon {
-          display: inline-block;
-          color: inherit;
-          font-style: normal;
-          line-height: 0;
-          text-align: center;
-          text-transform: none;
-          vertical-align: -0.125em;
-          text-rendering: optimizeLegibility;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-        .anticon > * {
-          line-height: 1;
-        }
-
-        .anticon svg {
-          display: inline-block;
-        }
-
-        .anticon::before {
-          display: none;
-        }
-
-        .anticon .anticon-icon {
-          display: block;
-        }
-
-        .anticon[tabindex] {
-          cursor: pointer;
-        }
-
-        .anticon-spin::before,
-        .anticon-spin {
-          display: inline-block;
-          -webkit-animation: loadingCircle 1s infinite linear;
-          animation: loadingCircle 1s infinite linear;
-        }
-
-        @-webkit-keyframes loadingCircle {
-          100% {
-            -webkit-transform: rotate(360deg);
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes loadingCircle {
-          100% {
-            -webkit-transform: rotate(360deg);
-            transform: rotate(360deg);
-          }
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
-    <meta charset="utf-8"> <!-- begin SEO --><title>Jing</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王京 - 个人主页</title>
+    <meta name="description" content="王京 · 电子科技大学生物医学工程硕士 · 高性能计算机视觉 / AI 原生软件工程 / 医学图像处理">
     <meta property="og:locale" content="zh-CN">
     <meta property="og:site_name" content="WangJing">
-    <meta property="og:title" content="About me - WangJing">
-    <link rel="canonical" href="https://JingW-ui.github.io/">
-    <meta property="og:url" content="https://JingW-ui.github.io/">
+    <meta property="og:title" content="王京 - 个人主页">
     <meta property="og:description" content="王京的个人简介">
-    <script async="" src="//www.google-analytics.com/analytics.js"></script>
+    <meta property="og:url" content="https://JingW-ui.github.io/">
+    <link rel="canonical" href="https://JingW-ui.github.io/">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="imgs/life_and_others/myavtar.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script type="application/ld+json"> {
         "@context": "http://schema.org",
         "@type": "Person",
         "name": "WangJing",
         "url": "https://JingW-ui.github.io",
         "sameAs": null
-    } </script> <!-- end SEO -->
-    <link href="https://JingW-ui.github.io/feed.xml" type="application/atom+xml" rel="alternate" title="王京 Feed">
-    <!-- http://t.co/dKP3o1e -->
-    <meta name="HandheldFriendly" content="True">
-    <meta name="MobileOptimized" content="320">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>
-        document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
-    </script> <!-- For all browsers -->
-    <link rel="stylesheet" href="https://caumente.github.io/assets/css/main.css">
-    <meta http-equiv="cleartype" content="on"> <!-- start custom head snippets -->
-    <link rel="apple-touch-icon" sizes="57x57" href="imgs/life_and_others/myavtar.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="imgs/life_and_others/myavtar.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="imgs/life_and_others/myavtar.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="imgs/life_and_others/myavtar.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="imgs/life_and_others/myavtar.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="imgs/life_and_others/myavtar.png">
-    <link rel="apple-touch-icon" sizes="144x144"
-          href="https://caumente.github.io/images/apple-touch-icon-144x144.png?v=M44lzPylqQ">
-    <link rel="apple-touch-icon" sizes="152x152"
-          href="https://caumente.github.io/images/apple-touch-icon-152x152.png?v=M44lzPylqQ">
-    <link rel="apple-touch-icon" sizes="180x180"
-          href="https://caumente.github.io/images/apple-touch-icon-180x180.png?v=M44lzPylqQ">
-    <link rel="icon" type="image/png" href="https://caumente.github.io/images/favicon-32x32.png?v=M44lzPylqQ"
-          sizes="32x32">
-    <link rel="icon" type="image/png" href="https://caumente.github.io/images/android-chrome-192x192.png?v=M44lzPylqQ"
-          sizes="192x192">
-    <link rel="icon" type="image/png" href="https://caumente.github.io/images/favicon-96x96.png?v=M44lzPylqQ"
-          sizes="96x96">
-    <link rel="icon" type="image/png" href="https://caumente.github.io/images/favicon-16x16.png?v=M44lzPylqQ"
-          sizes="16x16">
-    <link rel="manifest" href="https://caumente.github.io/images/manifest.json?v=M44lzPylqQ">
-    <link rel="mask-icon" href="https://caumente.github.io/images/safari-pinned-tab.svg?v=M44lzPylqQ" color="#000000">
-    <link rel="shortcut icon" href="/images/favicon.ico?v=M44lzPylqQ">
-    <meta name="msapplication-TileColor" content="#000000">
-    <meta name="msapplication-TileImage" content="https://caumente.github.io/images/mstile-144x144.png?v=M44lzPylqQ">
-    <meta name="msapplication-config" content="https://caumente.github.io/images/browserconfig.xml?v=M44lzPylqQ">
-    <meta name="theme-color" content="#ffffff">
-    <link rel="stylesheet" href="https://caumente.github.io/assets/css/academicons.css">
-    <style id="fit-vids-style">
-        .fluid-width-video-wrapper{width:100%;position:relative;padding:0;}.fluid-width-video-wrapper iframe,.fluid-width-video-wrapper object,.fluid-width-video-wrapper embed {position:absolute;top:0;left:0;width:100%;height:100%;}
+    } </script>
+
+    <style>
+        :root {
+            --bg-gradient-1: #e7f1f0;
+            --bg-gradient-2: #dfe9ec;
+            --bg-gradient-3: #e6edf2;
+            --card-bg: rgba(255, 255, 255, 0.50);
+            --card-bg-strong: rgba(255, 255, 255, 0.68);
+            --card-border: rgba(255, 255, 255, 0.55);
+            --text-primary: #2c3e50;
+            --text-secondary: #5a6c7d;
+            --text-muted: #8e9aaf;
+            --accent-teal: #2dd4bf;
+            --accent-blue: #3b82f6;
+            --accent-pink: #f472b6;
+            --shadow-sm: 0 2px 8px rgba(20,40,50,0.05);
+            --shadow-md: 0 6px 24px rgba(20,40,50,0.08);
+            --shadow-lg: 0 12px 40px rgba(20,40,50,0.12);
+            --radius-sm: 14px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .bg-decoration { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.45; pointer-events: none; z-index: 0; }
+        .bg-decoration-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(94,234,212,0.30) 0%, transparent 70%); top: -180px; left: -120px; animation: float 22s ease-in-out infinite; }
+        .bg-decoration-2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(125,211,252,0.28) 0%, transparent 70%); bottom: -140px; right: -120px; animation: float 26s ease-in-out infinite reverse; }
+        .bg-decoration-3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%); top: 48%; left: 52%; transform: translate(-50%, -50%); animation: pulse 16s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 33% { transform: translate(30px, -30px) rotate(120deg); } 66% { transform: translate(-20px, 20px) rotate(240deg); } }
+        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.45; } }
+
+        .main-container { max-width: 1380px; margin: 0 auto; padding: 56px 20px 12px; display: grid; grid-template-columns: 248px 1fr 312px; gap: 20px; position: relative; z-index: 1; }
+
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border: 1px solid var(--card-border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); transition: var(--transition); overflow: hidden; }
+        .glass-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px) scale(1.012); }
+
+        /* 左侧导航 */
+        .sidebar-left { position: sticky; top: 24px; height: fit-content; display: flex; flex-direction: column; gap: 16px; }
+        .nav-section { padding: 16px; }
+        .nav-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 0 12px; margin-bottom: 6px; }
+        .nav-label:not(:first-child) { margin-top: 14px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 9px 14px; border-radius: var(--radius-sm); color: var(--text-secondary); text-decoration: none; font-size: 13.5px; font-weight: 500; transition: var(--transition); margin-bottom: 1px; }
+        .nav-item:hover { background: rgba(255,255,255,0.6); color: var(--text-primary); transform: scale(1.02); }
+        .nav-item i { width: 18px; text-align: center; opacity: 0.7; font-size: 14px; }
+        .nav-item:hover i { opacity: 1; color: var(--accent-teal); }
+
+        /* 中间内容（非对称：欢迎卡独占宽，下方两列） */
+        .content-area { display: flex; flex-direction: column; gap: 18px; }
+
+        .welcome-card { padding: 26px 30px; position: relative; display: flex; align-items: flex-start; gap: 24px; }
+        .welcome-card-top { display: flex; align-items: center; gap: 22px; flex: 1; min-width: 0; }
+        .welcome-avatar { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 8px 22px rgba(20,40,50,0.16); }
+        .welcome-text { flex: 1; min-width: 0; }
+        .welcome-title { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; min-height: 30px; }
+        .welcome-title .highlight { color: var(--accent-teal); }
+        .welcome-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
+        .hero-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+        .hero-tag { font-size: 12.5px; padding: 6px 13px; border-radius: 18px; background: rgba(255,255,255,0.82); color: var(--text-primary); border: 1px solid rgba(45,212,191,0.32); font-weight: 600; box-shadow: 0 1px 3px rgba(20,40,50,0.05); }
+        /* 欢迎卡右上角紧凑数据 */
+        .welcome-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; flex-shrink: 0; }
+        .welcome-stat { text-align: center; padding: 5px 10px; border-radius: 10px; background: rgba(255,255,255,0.5); transition: var(--transition); min-width: 78px; }
+        .welcome-stat:hover { transform: scale(1.04); background: rgba(255,255,255,0.72); }
+        .welcome-stat .stat-value { font-family: 'Courier New', monospace; font-size: 17px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
+        .welcome-stat .stat-label { font-size: 9.5px; color: var(--text-muted); margin-top: 1px; }
+
+        .content-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+        .section-card { padding: 22px 24px; }
+        #mainContent > .section-card { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        #mainContent > .section-card .content-grid { width: 100%; }
+        .section-label { font-size: 11.5px; font-weight: 600; color: var(--accent-teal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .section-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
+        .about-text p { color: var(--text-secondary); line-height: 1.8; margin-bottom: 10px; font-size: 13.5px; }
+        .about-text p:last-child { margin-bottom: 0; }
+        .about-text strong { color: var(--text-primary); }
+
+        .timeline { position: relative; padding-left: 22px; }
+        .timeline::before { content: ''; position: absolute; left: 5px; top: 4px; bottom: 4px; width: 2px; background: linear-gradient(to bottom, var(--accent-teal), #7dd3fc, transparent); }
+        .timeline-item { position: relative; margin-bottom: 16px; }
+        .timeline-item:last-child { margin-bottom: 0; }
+        .timeline-item::before { content: ''; position: absolute; left: -22px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-teal); border: 2px solid #fff; box-shadow: 0 0 0 2px rgba(45,212,191,0.3); }
+        .timeline-item:not(:first-child)::before { background: #c4d0dd; box-shadow: 0 0 0 2px rgba(148,163,184,0.25); }
+        .timeline-item:not(:first-child) .timeline-year { color: var(--text-muted); }
+        .timeline-year { font-size: 11.5px; color: var(--accent-teal); font-weight: 600; margin-bottom: 3px; }
+        .timeline-title { font-size: 13.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+        .timeline-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+
+        /* 随机推荐 */
+        .recommend-card { padding: 20px 24px; }
+        .recommend-header { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 13px; display: flex; align-items: center; justify-content: space-between; }
+        .recommend-header .title { display: flex; align-items: center; gap: 8px; }
+        .reroll-btn { font-size: 11.5px; color: var(--accent-teal); background: rgba(45,212,191,0.12); border: none; padding: 5px 12px; border-radius: 16px; cursor: pointer; transition: var(--transition); font-weight: 500; }
+        .reroll-btn:hover { background: rgba(45,212,191,0.22); transform: scale(1.06); }
+        .recommend-item { display: flex; gap: 14px; padding: 13px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.5); text-decoration: none; transition: var(--transition); align-items: flex-start; }
+        .recommend-item:hover { background: rgba(255,255,255,0.78); transform: scale(1.02); }
+        .recommend-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #d9efef, #c4e3e8); display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
+        .recommend-thumb { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: linear-gradient(135deg, #d9efef, #c4e3e8); }
+        .recommend-content { flex: 1; min-width: 0; }
+        .recommend-content h4 { font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
+        .recommend-content p { font-size: 11.5px; color: var(--text-muted); line-height: 1.5; }
+        .recommend-tag { display: inline-block; font-size: 11px; color: var(--accent-teal); background: rgba(45,212,191,0.12); padding: 2px 10px; border-radius: 10px; margin-top: 7px; }
+
+        /* 底部随机游戏（右栏） */
+        .recommend-card { padding: 14px 16px; }
+        .recommend-card .recommend-header { margin-bottom: 9px; }
+        .recommend-card .recommend-item { gap: 10px; padding: 10px; }
+        .recommend-card .recommend-thumb, .recommend-card .recommend-icon { width: 36px; height: 36px; border-radius: 10px; font-size: 18px; }
+        .recommend-card .recommend-content h4 { font-size: 13px; margin-bottom: 2px; }
+        .recommend-card .recommend-content p { font-size: 11px; line-height: 1.45; }
+
+        /* 左侧栏随机工具 */
+        .sidebar-tool-card { padding: 14px 16px; }
+        .sidebar-tool-card .recommend-header { margin-bottom: 9px; }
+        .sidebar-tool-card .recommend-item { gap: 10px; padding: 10px; }
+        .sidebar-tool-card .recommend-icon { width: 36px; height: 36px; border-radius: 10px; font-size: 18px; }
+        .sidebar-tool-card .recommend-content h4 { font-size: 13px; margin-bottom: 2px; }
+        .sidebar-tool-card .recommend-content p { font-size: 11px; line-height: 1.45; }
+
+        /* 右侧 */
+        .sidebar-right { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 24px; }
+        .clock-widget { padding: 20px; text-align: center; }
+        .clock-display { font-family: 'Courier New', monospace; font-size: 44px; font-weight: 700; color: var(--text-primary); letter-spacing: 3px; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .clock-separator { animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .clock-date { font-size: 11.5px; color: var(--text-muted); margin-top: 8px; }
+
+        .calendar-widget { padding: 18px; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .calendar-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
+        .calendar-day-label { font-size: 10.5px; color: var(--text-muted); padding: 5px; font-weight: 500; }
+        .calendar-day { font-size: 12.5px; padding: 7px 3px; border-radius: 8px; cursor: pointer; transition: var(--transition); color: var(--text-secondary); }
+        .calendar-day:hover { background: rgba(94,234,212,0.18); transform: scale(1.12); }
+        .calendar-day.today { background: linear-gradient(135deg, #5eead4, #38bdf8); color: white; font-weight: 600; box-shadow: 0 2px 8px rgba(45,212,191,0.35); }
+        .calendar-day.other-month { color: var(--text-muted); opacity: 0.45; }
+
+        .contact-widget { padding: 16px 18px; }
+        .contact-title { font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 11px; }
+        .contact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .contact-btn { display: flex; align-items: center; justify-content: center; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.5); text-decoration: none; transition: var(--transition); border: 1px solid var(--card-border); }
+        .contact-btn i { font-size: 16px; }
+        .contact-btn:hover { transform: scale(1.1); box-shadow: var(--shadow-sm); }
+        .contact-btn i.c-email { color: #DB4437; }
+        .contact-btn i.c-github { color: #1a1a2e; }
+        .contact-btn i.c-bili { color: #fb7299; }
+        .contact-btn i.c-douyin { color: #111; }
+        .contact-btn i.c-wechat { color: #07c160; }
+        .contact-btn i.c-rss { color: var(--accent-blue); }
+
+        .footer-card { padding: 14px 18px; text-align: center; font-size: 11.5px; color: var(--text-muted); }
+        .footer-card a { color: var(--text-secondary); text-decoration: none; }
+        .footer-card a:hover { color: var(--accent-teal); }
+
+        .alt-page-link { opacity: 0.2; transition: opacity 0.3s; font-size: 0.7rem; color: var(--text-muted); text-decoration: none; position: fixed; bottom: 8px; right: 12px; z-index: 50; }
+        .alt-page-link:hover { opacity: 0.7; }
+
+        @media (max-width: 1200px) { .main-container { grid-template-columns: 232px 1fr; } .sidebar-right { display: none; } }
+        @media (max-width: 768px) { .main-container { grid-template-columns: 1fr; padding: 44px 16px 8px; } .sidebar-left { position: static; } .clock-display { font-size: 36px; } .content-grid { grid-template-columns: 1fr; } .welcome-card { flex-wrap: wrap; } .welcome-card-top { flex-direction: column; gap: 14px; } .welcome-stats { width: 100%; grid-template-columns: repeat(6, 1fr); } }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(20,40,50,0.12); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(20,40,50,0.22); }
+
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .d1 { animation-delay: 0.08s; } .d2 { animation-delay: 0.16s; } .d3 { animation-delay: 0.24s; } .d4 { animation-delay: 0.32s; }
     </style>
 </head>
 <body>
-<div id="MathJax_Message" style="display: none;"></div>
-<!--[if lt IE 9]>
-<div class="notice--danger align-center" style="margin: 0;">You are using an <strong>outdated</strong> browser. Please
-    <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.
-</div><![endif]-->
-<div class="masthead">
-    <div class="masthead__inner-wrap">
-        <div class="masthead__menu">
-            <nav id="site-nav" class="greedy-nav">
-                <button class="hidden" count="0">
-                    <div class="navicon"></div>
-                </button>
-                <ul class="visible-links">
-                    <li class="masthead__menu-item masthead__menu-item--lg"><a href="https://JingW-ui.github.io/">WangJing</a>
-                    </li>
-                    <li class="masthead__menu-item"><a href="/resume/">Resume</a></li>
-                    <li class="masthead__menu-item"><a href="/cv/">CV</a></li>
-                    <li class="masthead__menu-item"><a href="/carousel/">Rewards</a></li>
-                    <li class="masthead__menu-item"><a href="/Software_Downloads/">Downloads
-                        </a></li>
-                    <li class="masthead__menu-item"><a href="/phone/">Receiver</a></li>
-                    <li class="masthead__menu-item"><a href="/videos/">Projects</a></li>
-                    <li class="masthead__menu-item"><a href="/Games/">Games</a></li>
-<!--                    <li class="masthead__menu-item"><a href="/web_demos/">Web Demos</a></li>-->
-                    <li class="masthead__menu-item"><a href="/tools/">Tools</a></li>
-                    <li class="masthead__menu-item"><a href="/skills/">Skills</a></li>
-                    <li class="masthead__menu-item"><a href="/director/">Director</a></li>
-                    <li class="masthead__menu-item"><a href="/ppt/">ppt</a></li>
-                </ul>
-                <ul class="hidden-links hidden"></ul>
-            </nav>
-        </div>
-    </div>
-</div>
-<div id="main" role="main">
-    <div class="sidebar sticky">
-        <div itemscope="" itemtype="http://schema.org/Person">
-            <div class="author__avatar"><img src="imgs/life_and_others/myavtar.png" class="author__avatar" alt="王京">
-            </div>
-            <div class="author__content"><h3 class="author__name">Wang Jing</h3>
-                <p class="author__bio">Master's student in Biomedical Engineering at the UESTC, research interests: High-Performance Computer Vision,AI-Native Software Engineering & Agents,Open-Source Driven Innovation
-                    and Medical Image Processing.</p></div>
-            <div class="author__urls-wrapper">
-                <button class="btn btn--inverse">Follow</button>
-                <ul class="author__urls social-icons">
-                    <li style="color: #DB4437;"><a href="mailto:2642144249@qq.com"><i class="fas fa-fw fa-envelope"
-                                                                                      aria-hidden="true"></i> <span
-                            style="color: #494e52;">Email</span></a></li>
-                    <li>
-                        <a href="https://www.douyin.com/user/MS4wLjABAAAAgTtnMEWyl9SeEZpMYAJgzY1zEu7sZ5Z2AkwLiN8tags?from_tab_name=main">
-                            <i class="fab fa-fw fa-tiktok icon-item"></i>
-                            douyin</a></li>
-                    <li><a href="https://github.com/JingW-ui"><i class="fab fa-fw fa-github" aria-hidden="true"></i>
-                        Github</a></li>
-<!--                    <li style="color: #4285F4;"><a-->
-<!--                            href="https://scholar.google.es/citations?user=pGHSxGMAAAAJ&amp;hl=en"><i-->
-<!--                            class="ai ai-google-scholar-square ai-fw"></i> <span-->
-<!--                            style="color: #494e52;">Google Scholar</span></a></li>-->
-                    <li><a href="https://space.bilibili.com/521967044?spm_id_from=333.1007.0.0"> <i
-                            class="fab fa-fw fa-bilibili icon-item"></i> Bilibili</a></li>
-                                        <li><a href="#" class="label-link" onclick="showWeChatQRCode(); return false;"> <i class="fab fa-fw fa-weixin"></i> WeiChat</a></li>
+    <div class="bg-decoration bg-decoration-1"></div>
+    <div class="bg-decoration bg-decoration-2"></div>
+    <div class="bg-decoration bg-decoration-3"></div>
 
-                </ul>
+    <div class="main-container">
+        <!-- 左侧导航（无头像，避免与中间重复） -->
+        <aside class="sidebar-left">
+            <div class="glass-card nav-section fade-in">
+                <div class="nav-label">求职</div>
+                <a href="/resume/" class="nav-item"><i class="fas fa-file-alt"></i> 简历</a>
+                <a href="/cv/" class="nav-item"><i class="fas fa-graduation-cap"></i> CV</a>
+                <a href="/carousel/" class="nav-item"><i class="fas fa-trophy"></i> 荣誉</a>
+                <div class="nav-label">项目</div>
+                <a href="/videos/" class="nav-item"><i class="fas fa-project-diagram"></i> 项目</a>
+                <a href="/Games/" class="nav-item"><i class="fas fa-gamepad"></i> 游戏</a>
+                <a href="/Software_Downloads/" class="nav-item"><i class="fas fa-download"></i> 软件下载</a>
+                <div class="nav-label">资源</div>
+                <a href="/tools/" class="nav-item"><i class="fas fa-wrench"></i> 工具箱</a>
+                <a href="/skills/" class="nav-item"><i class="fas fa-chart-bar"></i> 技能</a>
+                <a href="/director/" class="nav-item"><i class="fas fa-folder-open"></i> 导演</a>
+                <a href="/ppt/" class="nav-item"><i class="fas fa-desktop"></i> PPT</a>
             </div>
+
+            <!-- 随机工具 -->
+            <div class="glass-card sidebar-tool-card fade-in d2">
+                <div class="recommend-header">
+                    <span class="title">🧰 随机工具</span>
+                    <button class="reroll-btn" id="rerollBtn"><i class="fas fa-sync-alt"></i> 换</button>
+                </div>
+                <a href="/tools/" class="recommend-item" id="recommendItem">
+                    <div class="recommend-icon" id="recIcon">🧰</div>
+                    <div class="recommend-content">
+                        <h4 id="recName">工具箱</h4>
+                        <p id="recDesc">加载中…</p>
+                        <span class="recommend-tag" id="recTag">工具</span>
+                    </div>
+                </a>
+            </div>
+        </aside>
+
+        <!-- 中间内容 -->
+        <main class="content-area" id="mainContent">
+            <!-- 欢迎卡片（横向，非对称） -->
+            <div class="glass-card welcome-card fade-in d1">
+                <div class="welcome-card-top">
+                    <img src="imgs/life_and_others/myavtar.png" alt="王京" class="welcome-avatar">
+                    <div class="welcome-text">
+                        <h1 class="welcome-title" id="welcomeTitle">你好</h1>
+                        <p class="welcome-subtitle">我是 <span class="highlight">王京</span>，电子科技大学生物医学工程硕士</p>
+                        <div class="hero-tags">
+                            <span class="hero-tag">高性能计算机视觉</span>
+                            <span class="hero-tag">AI 原生软件工程</span>
+                            <span class="hero-tag">医学图像处理</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="welcome-stats">
+                    <div class="welcome-stat"><div class="stat-value">4.15</div><div class="stat-label">本科 GPA（前 2%）</div></div>
+                    <div class="welcome-stat"><div class="stat-value">2+</div><div class="stat-label">SCI 论文</div></div>
+                    <div class="welcome-stat"><div class="stat-value">5+</div><div class="stat-label">国家级奖项</div></div>
+                    <div class="welcome-stat"><div class="stat-value">200+</div><div class="stat-label">GitHub 收藏</div></div>
+                    <div class="welcome-stat"><div class="stat-value">20W+</div><div class="stat-label">B 站播放</div></div>
+                    <div class="welcome-stat"><div class="stat-value">5k+</div><div class="stat-label">抖音粉丝</div></div>
+                </div>
+            </div>
+
+            <!-- 简介 + 教育背景 融合 -->
+            <div class="glass-card section-card fade-in d2">
+                <div class="section-label">简介 · 教育背景</div>
+                <h2 class="section-title">成长路径</h2>
+                <div class="content-grid">
+                    <div class="about-text">
+                        <p><strong>电子科技大学</strong>生物医学工程硕士在读（本科推免），本科 GPA 4.15/5（专业前 2%，省优毕业生）。技术栈横跨前后端，从前端页面到后端服务、从桌面应用到部署运维均可快速上手。</p>
+                        <p>独立搭建并长期维护<strong>个人门户网站</strong>（2 年+），沉淀十余个独立子项目（游戏、工具、简历、可视化看板）。前端（HTML/CSS/JS、Vue、响应式）、后端（Java/Spring Boot、Python/Django）、PySide6 桌面端、Git + 服务器部署均有实战经验，乐于自学新技术并快速落地。</p>
+                        <p>代码之外，<strong>健身 vlog 博主</strong>（抖音 5000+ 粉丝、10w+ 获赞）与<strong>佳能签约摄影师</strong>（接客 100+），对内容创作、视觉表达与用户体验有直观感知。</p>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-year">2024 — 至今</div>
+                            <div class="timeline-title">硕士 · 电子科技大学（985）</div>
+                            <div class="timeline-desc">生物医学工程 · GPA 3.83/4（前 5%）· 导师：陈华富教授 · 神经信息教育部重点实验室</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">2020 — 2024</div>
+                            <div class="timeline-title">学士 · 西南科技大学</div>
+                            <div class="timeline-desc">生物医学工程 · GPA 4.15/5（前 2%）· 推免 · 四川省优秀毕业生</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 右侧小部件 -->
+        <aside class="sidebar-right">
+            <div class="glass-card clock-widget fade-in d1">
+                <div class="clock-display"><span id="hours">00</span><span class="clock-separator">:</span><span id="minutes">00</span></div>
+                <div class="clock-date" id="clockDate">--</div>
+            </div>
+
+            <div class="glass-card calendar-widget fade-in d2">
+                <div class="calendar-header">
+                    <span class="calendar-title" id="calendarTitle">--</span>
+                </div>
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+
+            <div class="glass-card contact-widget fade-in d3">
+                <div class="contact-title">联系方式</div>
+                <div class="contact-grid">
+                    <a href="mailto:2642144249@qq.com" class="contact-btn" title="邮箱"><i class="fas fa-envelope c-email"></i></a>
+                    <a href="https://github.com/JingW-ui" target="_blank" class="contact-btn" title="GitHub"><i class="fab fa-github c-github"></i></a>
+                    <a href="https://space.bilibili.com/521967044" target="_blank" class="contact-btn" title="B站"><i class="fab fa-bilibili c-bili"></i></a>
+                    <a href="https://www.douyin.com/user/MS4wLjABAAAAgTtnMEWyl9SeEZpMYAJgzY1zEu7sZ5Z2AkwLiN8tags" target="_blank" class="contact-btn" title="抖音"><i class="fab fa-tiktok c-douyin"></i></a>
+                    <a href="#" class="contact-btn" title="微信" onclick="openWeChat(); return false;"><i class="fab fa-weixin c-wechat"></i></a>
+                    <a href="https://JingW-ui.github.io/" class="contact-btn" title="RSS"><i class="fas fa-rss c-rss"></i></a>
+                </div>
+            </div>
+
+            <!-- 随机游戏 -->
+            <div class="glass-card recommend-card fade-in d4">
+                <div class="recommend-header">
+                    <span class="title">🎮 随机游戏</span>
+                    <button class="reroll-btn" id="rerollGameBtn"><i class="fas fa-sync-alt"></i> 换</button>
+                </div>
+                <a href="/Games/" class="recommend-item" id="recommendGame">
+                    <img src="/Games/assets/img/snake.webp" alt="" class="recommend-thumb" id="gameImg">
+                    <div class="recommend-content">
+                        <h4 id="gameName">游戏中心</h4>
+                        <p id="gameDesc">加载中…</p>
+                        <span class="recommend-tag">游戏</span>
+                    </div>
+                </a>
+            </div>
+        </aside>
+    </div>
+
+    <!-- 微信弹窗 -->
+    <div class="modal-overlay" id="wechatModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);justify-content:center;align-items:center;">
+        <div style="background:#fff;border-radius:20px;padding:1.4rem;text-align:center;max-width:300px;width:90%;">
+            <img src="imgs/life_and_others/weichat.png" alt="微信二维码" style="max-width:100%;border-radius:12px;margin-bottom:0.7rem;">
+            <p style="font-size:0.85rem;color:#5a6c7d;margin-bottom:0.75rem;">扫码添加微信</p>
+            <button onclick="closeWeChat()" style="padding:0.45rem 1.1rem;border-radius:9999px;background:#2dd4bf;color:#fff;border:none;font-size:0.78rem;cursor:pointer;">关闭</button>
         </div>
     </div>
-    <article class="page" itemscope="" itemtype="http://schema.org/CreativeWork">
-        <meta itemprop="headline" content="About me">
-        <meta itemprop="description" content="About me">
-        <div class="page__inner-wrap">
-            <header><h1 class="page__title" itemprop="headline">About me</h1></header>
-            <section class="page__content" itemprop="text"><p>I am a Master's student in Biomedical Engineering at the
-                University of Electronic Science and Technology of China. Currently, I focus on the research and
-                development of intelligent medical systems, integrating cutting-edge technologies such as deep learning,
-                computer vision, and software engineering to create innovative solutions for clinical diagnostics and
-                safety monitoring.</p>
-                <p>My academic pursuits aim to bridge the gap between technical innovation and medical application,
-                    delivering high-precision, user-friendly systems that drive advancements in disease detection, risk
-                    prevention, and medical workflow optimization.</p>
-                <h1 id="short-bio">Short Bio</h1>
-                <p>In 2024, I graduated with a Bachelor's degree in Biomedical Engineering from Southwest University of
-                    Science and Technology (top 2% GPA: 4.15/5, Outstanding Graduate of Sichuan Province) and am now
-                    pursuing a Master's at the University of Electronic Science and Technology of China (top 5% GPA:
-                    3.83/4), specializing in medical imaging and brain-computer interface.</p>
-                <p>Proficient in Python, Java, C/C++, and deep learning frameworks (YOLO, nnU-Net, Transformer), I've
-                    led award-winning projects (national first/second prizes) including colorectal cancer detection and
-                    brain MRI segmentation systems (Dice coefficient 0.9554). I hold 1 authorized patent and 4 software
-                    copyrights.</p>
-                <p>Beyond academics, I'm an influential fitness vlogger (5k+ Douyin followers) and professional
-                    photographer (100+ clients). My goal is to excel as a senior algorithm engineer in intelligent
-                    medical systems, driving impactful innovations in healthcare.</p></section>
-            <footer class="page__meta"></footer>
-        </div>
-    </article>
-</div>
-<div class="page__footer">
-    <footer> <!-- start custom footer snippets --> <!--<a href="/sitemap/">Sitemap</a>-->
-        <!-- end custom footer snippets -->
-        <div class="page__footer-follow">
-            <ul class="social-icons">
-                <li><strong>Follow:</strong></li>
-                <li><a href="https://jingw-ui.github.io/"><i class="fab fa-github" aria-hidden="true"></i> GitHub</a>
-                </li>
-                <li><a href="https://jingw-ui.github.io/"><i class="fa fa-fw fa-rss-square"
-                                                             aria-hidden="true"></i> Feed</a></li>
-            </ul>
-        </div>
-        <div class="page__footer-copyright">© 2025 Carlos Aumente Maestro. Powered by <a href="http://jekyllrb.com"
-                                                                                         rel="nofollow">Jekyll</a> &amp;
-            <a href="https://github.com/academicpages/academicpages.github.io">AcademicPages</a>, a fork of <a
-                    href="https://mademistakes.com/work/minimal-mistakes-jekyll-theme/" rel="nofollow">Minimal
-                Mistakes</a>.
-        </div>
-    </footer>
-</div>
-<script src="https://caumente.github.io/assets/js/main.min.js"></script>
-<script>
-    function showWeChatQRCode() {
-        var qrCodeContainer = document.getElementById('wechat-qrcode-container');
-        if (qrCodeContainer) {
-            qrCodeContainer.style.display = 'block';
-            // 添加关闭功能
-            qrCodeContainer.onclick = function(e) {
-                if (e.target === this) {
-                    this.style.display = 'none';
-                }
-            };
+
+    <a href="index_ai.html" class="alt-page-link" title="暗色现代版">◆</a>
+
+    <script>
+        function openWeChat() { const m = document.getElementById('wechatModal'); m.style.display = 'flex'; }
+        function closeWeChat() { document.getElementById('wechatModal').style.display = 'none'; }
+        document.getElementById('wechatModal').addEventListener('click', function(e) { if (e.target === this) closeWeChat(); });
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('hours').textContent = String(now.getHours()).padStart(2, '0');
+            document.getElementById('minutes').textContent = String(now.getMinutes()).padStart(2, '0');
+            const week = ['周日','周一','周二','周三','周四','周五','周六'][now.getDay()];
+            document.getElementById('clockDate').textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${week}`;
         }
-    }
+        updateClock();
+        setInterval(updateClock, 1000);
 
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){ (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) })(window,document,'script','//www.google-analytics.com/analytics.js','ga'); ga('create', '', 'auto'); ga('send', 'pageview');
-</script>
-<div id="aiknowledge_pdf_auto_upload"
-     style="position: fixed; top: 8px; right: 8px; z-index: 9999; background-color: white;"></div>
-<!-- 微信二维码容器 -->
-<div id="wechat-qrcode-container" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
-    <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
-        <img src="imgs/life_and_others/weichat.png" alt="微信二维码" style="max-width: 50%; max-height: 80vh;">
-        <p style="margin-top: 10px; color: #666;"></p>
-        <button onclick="document.getElementById('wechat-qrcode-container').style.display='none';" style="margin-top: 10px; padding: 5px 10px; border: none; background: #4285F4; color: white; border-radius: 5px; cursor: pointer;">关闭</button>
-    </div>
-</div>
-<a href="index_ai.html" class="alt-page-link" title="Modern">◆</a>
+        (function() {
+            const h = new Date().getHours();
+            let g = '你好';
+            if (h < 6) g = '夜深了';
+            else if (h < 11) g = '早上好';
+            else if (h < 13) g = '中午好';
+            else if (h < 18) g = '下午好';
+            else g = '晚上好';
+            const el = document.getElementById('welcomeTitle');
+            let i = 0; el.textContent = '';
+            function type() { if (i <= g.length) { el.textContent = g.slice(0, i); i++; setTimeout(type, 90); } }
+            type();
+        })();
+
+        function generateCalendar() {
+            const now = new Date();
+            const year = now.getFullYear(), month = now.getMonth(), today = now.getDate();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrev = new Date(year, month, 0).getDate();
+            const weekDays = ['一','二','三','四','五','六','日'];
+            const grid = document.getElementById('calendarGrid');
+            weekDays.forEach(d => { const l = document.createElement('div'); l.className = 'calendar-day-label'; l.textContent = d; grid.appendChild(l); });
+            const offset = firstDay === 0 ? 6 : firstDay - 1;
+            for (let i = offset - 1; i >= 0; i--) { const d = document.createElement('div'); d.className = 'calendar-day other-month'; d.textContent = daysInPrev - i; grid.appendChild(d); }
+            for (let i = 1; i <= daysInMonth; i++) { const d = document.createElement('div'); d.className = 'calendar-day'; d.textContent = i; if (i === today) d.classList.add('today'); grid.appendChild(d); }
+            const rem = (7 - ((offset + daysInMonth) % 7)) % 7;
+            for (let i = 1; i <= rem; i++) { const d = document.createElement('div'); d.className = 'calendar-day other-month'; d.textContent = i; grid.appendChild(d); }
+            document.getElementById('calendarTitle').textContent = `${year}年${month+1}月`;
+        }
+        generateCalendar();
+
+        const TOOLS = [
+            ['biji','笔记工具','便捷的在线笔记应用，支持文本编辑和保存功能','other'],
+            ['create_icon','图标创建','在线创建和自定义图标，支持多种格式导出','image'],
+            ['img2icon','图片转图标','将普通图片转换为图标格式，支持批量处理','image'],
+            ['img2pdf','图片转PDF','将图片文件转换为PDF文档，保持高质量输出','image'],
+            ['coin','硬币抛掷','在线抛硬币决策工具，支持自定义硬币贴图','other'],
+            ['danmu','显示弹幕','创建和生成视频弹幕效果，支持多种样式和动画','other'],
+            ['01-json-formatter','JSON 格式化','JSON 格式化、校验、压缩，支持转换为 CSV 和 XML','text'],
+            ['02-url-encoder','URL 编解码','URL 编码、解码、参数解析与拼接的一站式工具','text'],
+            ['03-base64-codec','Base64 编解码','文本和图片的 Base64 编解码，支持批量处理','text'],
+            ['04-markdown-editor','Markdown 编辑器','实时预览的 Markdown 编辑器，支持导出 HTML','text'],
+            ['05-text-diff','文本对比','对比两段文本的差异，高亮显示不同之处','text'],
+            ['06-text-case-converter','文本大小写转换','英文文本大小写转换，支持多种格式','text'],
+            ['07-regex-tester','正则表达式测试','在线测试正则表达式，实时显示匹配结果','text'],
+            ['08-word-counter','字数统计','统计文本的字符数、单词数、行数等信息','text'],
+            ['09-pinyin-converter','拼音转换','中文转拼音，支持多种拼音格式','text'],
+            ['10-code-formatter','代码格式化','格式化 HTML、CSS、JavaScript 等代码','text'],
+            ['11-crypto-tool','加密解密工具','MD5、SHA、AES 等常用加密算法','text'],
+            ['12-text-cleaner','文本清理','清理文本中的多余空格、换行和特殊字符','text'],
+            ['13-word-frequency','词频统计','统计文本中各词汇出现的频率','text'],
+            ['14-encoding-converter','编码转换','UTF-8、GBK、ASCII 等字符编码转换','text'],
+            ['15-timestamp-converter','时间戳转换','Unix 时间戳与日期时间互相转换','time'],
+            ['16-lunar-calendar','农历日历','公历农历互转，查询节气和节日','time'],
+            ['17-countdown-timer','倒计时器','设置目标时间，实时显示倒计时','time'],
+            ['18-date-diff-calculator','日期差计算器','计算两个日期之间的天数差','time'],
+            ['19-image-compressor','图片压缩','压缩图片文件大小，保持画质','image'],
+            ['20-image-cropper','图片裁剪','在线裁剪图片，支持自定义尺寸','image'],
+            ['21-image-to-base64','图片转 Base64','将图片转换为 Base64 编码字符串','image'],
+            ['22-color-picker','颜色选择器','选取颜色，获取 HEX、RGB、HSL 值','image'],
+            ['23-image-stitcher','图片拼接','将多张图片拼接成一张长图','image'],
+            ['24-bg-remover','背景移除','智能移除图片背景，生成透明背景','image'],
+            ['25-image-filter','图片滤镜','为图片添加各种滤镜效果','image'],
+            ['26-qrcode-tool','二维码工具','生成和识别二维码，支持自定义样式','image'],
+            ['27-base-converter','进制转换','二进制、八进制、十进制、十六进制互转','calc'],
+            ['28-scientific-calculator','科学计算器','支持三角函数、对数等科学计算','calc'],
+            ['29-unit-converter','单位换算','长度、重量、温度等常用单位换算','calc'],
+            ['30-bmi-calculator','BMI 计算器','根据身高体重计算 BMI 指数','calc'],
+            ['31-loan-calculator','贷款计算器','计算等额本息和等额本金还款方式','calc'],
+            ['32-random-generator','随机数生成器','生成指定范围的随机数或随机字符串','other'],
+            ['33-password-generator','密码生成器','生成高强度随机密码，可自定义规则','other'],
+            ['34-file-previewer','文件预览器','在线预览图片、PDF、文本等文件','other'],
+            ['35-todo-list','待办清单','简洁的待办事项管理工具','other'],
+            ['36-screen-ruler','屏幕尺子','在屏幕上测量像素距离','other'],
+            ['37-file-hash-checker','文件哈希校验','计算文件的 MD5、SHA1、SHA256 哈希值','other'],
+            ['38-drawing-board','画板','在线绘图工具，支持多种画笔和颜色','image'],
+            ['39-unicode-tool','Unicode 工具','字符与 Unicode 编码互相转换','text'],
+            ['40-lorem-generator','Lorem 生成器','生成占位文本，支持段落和单词数量自定义','text'],
+            ['lucky_draw','上课抽签器','像素风课堂点名工具，支持Excel导入和隐蔽数据管理','other'],
+            ['script_forge','脚本工坊','在线脚本编辑和管理工具','other'],
+            ['thrending','github热门榜单','github热门榜单','info'],
+            ['hot-dashboard','60s信息流','60s聚合信息流看板','info'],
+            ['academic_rank','学科评估数据面板','第四轮学科评估结果可视化，高校学科实力洞察','info'],
+            ['hupu','虎扑评分数据面板','虎扑JRs评分数据可视化，图鉴式人物榜单','info'],
+            ['60s','每天60秒','每天60秒看世界，聚合热榜、天气、实用数据','info'],
+            ['glb_viewer_meshy','3D模型查看器','3D模型查看器','other']
+        ];
+        const ICONS = { text:'📝', image:'🖼️', time:'⏰', calc:'🔢', other:'🧰', info:'📊' };
+        const TAGS = { text:'文本工具', image:'图像工具', time:'时间工具', calc:'计算工具', other:'其他工具', info:'信息面板' };
+        let lastIndex = -1;
+        function pickTool() {
+            let idx;
+            do { idx = Math.floor(Math.random() * TOOLS.length); } while (idx === lastIndex && TOOLS.length > 1);
+            lastIndex = idx;
+            const [slug, name, desc, cat] = TOOLS[idx];
+            document.getElementById('recommendItem').href = '/tools/' + slug + '/';
+            document.getElementById('recIcon').textContent = ICONS[cat] || '🧰';
+            document.getElementById('recName').textContent = name;
+            document.getElementById('recDesc').textContent = desc;
+            document.getElementById('recTag').textContent = TAGS[cat] || '工具';
+        }
+        pickTool();
+        document.getElementById('rerollBtn').addEventListener('click', pickTool);
+
+        const GAMES = [
+            ['2024/', '像素物语：4048小町', '像素风合成数字小游戏，趣味休闲', '2024.webp'],
+            ['ball/', '无限轨道弹跳球', 'Three.js 打造的 3D 弹跳球轨道挑战', 'ball.webp'],
+            ['snake/', '霓虹贪吃蛇', '经典贪吃蛇的霓虹赛博风格重制', 'snake.webp'],
+            ['dice_3D/', '3D 炫光骰子', '3D 立体骰子，炫光特效随叫随到', 'dice_3D.webp'],
+            ['racing/', '3D 极速赛车', '3D 赛车竞速，体验速度与激情', 'racing.webp'],
+            ['muyu/', '赛博木鱼', '赛博风格电子木鱼，敲出功德', 'muyu.webp'],
+            ['earth_3D/', '3D 地球模型', '可交互的 3D 地球模型查看', 'earth.webp'],
+            ['star_drift/', '星空漂流', '在浩瀚星空中漂流探索', 'star_drift.webp'],
+            ['suduku/', '数独挑战', '经典数独逻辑推理挑战', 'suduku.webp'],
+            ['puke/', '扑克牌游戏', '在线扑克牌休闲对战', 'puke.webp'],
+            ['jackrabbit/', 'Jackrabbit 跳跃兔子', '控制兔子跳跃避障的小游戏', 'jackrabbit.webp'],
+            ['warp_drift/', 'Warp Drift', '空间跃迁漂流挑战', 'warp_drift.webp'],
+            ['nerual_branch/', 'Neural Branch', '神经网络分支可视化交互', 'nerual_branch.webp'],
+            ['spider/', '交互式蜘蛛', '可交互的蜘蛛动画效果', 'spider.webp'],
+            ['morph_workshop/', '形态工坊', '形态变换创意工坊', 'morph_workshop.webp'],
+            ['CYBER_CORRIDOR/', '赛博回廊', '赛博朋克风格回廊探索', 'CYBER_CORRIDOR.webp'],
+            ['gestura/', 'Gesture Particle Sphere', '手势驱动的粒子球体交互', 'gestura.webp'],
+            ['Footsprout/', '枯木逢春', '枯木逢春，生机绽放', 'Footsprout.webp']
+        ];
+        let lastGameIndex = -1;
+        function pickGame() {
+            let idx;
+            do { idx = Math.floor(Math.random() * GAMES.length); } while (idx === lastGameIndex && GAMES.length > 1);
+            lastGameIndex = idx;
+            const [slug, name, desc, img] = GAMES[idx];
+            document.getElementById('recommendGame').href = '/Games/' + slug;
+            document.getElementById('gameImg').src = '/Games/assets/img/' + img;
+            document.getElementById('gameName').textContent = name;
+            document.getElementById('gameDesc').textContent = desc;
+        }
+        pickGame();
+        document.getElementById('rerollGameBtn').addEventListener('click', pickGame);
+
+        // 让融合卡底部与左右侧栏的随机卡片底部对齐
+        (function() {
+            const main = document.getElementById('mainContent');
+            if (!main) return;
+            const toolCard = document.querySelector('.sidebar-tool-card');
+            const gameCard = main.parentNode.querySelector('.sidebar-right .recommend-card');
+            const section = main.querySelector('.section-card');
+            if (!toolCard || !gameCard || !section) return;
+            function sync() {
+                if (window.innerWidth <= 1200) {
+                    if (section.style.minHeight) section.style.minHeight = '';
+                    return;
+                }
+                const mainRect = main.getBoundingClientRect();
+                // 工具卡 / 游戏卡底部相对主容器顶部的位置
+                const toolBottom = toolCard.getBoundingClientRect().bottom - mainRect.top;
+                const gameBottom = gameCard.getBoundingClientRect().bottom - mainRect.top;
+                const targetBottom = Math.max(toolBottom, gameBottom);
+                // section 顶部相对主容器顶部（= 欢迎卡高度 + gap）
+                const sectionTop = section.getBoundingClientRect().top - mainRect.top;
+                const needed = Math.round(targetBottom - sectionTop);
+                const current = parseInt(section.style.minHeight) || 0;
+                if (needed > 0 && Math.abs(current - needed) > 1) {
+                    section.style.minHeight = needed + 'px';
+                }
+            }
+            new ResizeObserver(sync).observe(main);
+            window.addEventListener('resize', sync);
+            sync();
+        })();
+    </script>
 </body>
-<div id="immersive-translate-popup" style="all: initial"></div>
-<style>.alt-page-link{opacity:0.12;transition:opacity 0.3s;font-size:0.6rem;color:#888;text-decoration:none;position:fixed;bottom:8px;right:12px;z-index:50;}.alt-page-link:hover{opacity:0.6;}</style>
 </html>
