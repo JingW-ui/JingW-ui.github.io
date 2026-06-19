@@ -7,33 +7,41 @@
     <title>Downloads</title>
     <style>
         :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --bg-card: #fafafa;
-            --bg-hover: #f0f0f0;
-            --accent-primary: #333333;
-            --accent-secondary: #666666;
-            --text-primary: #1a1a1a;
-            --text-secondary: #666666;
-            --text-muted: #999999;
-            --border-color: #e0e0e0;
-            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
-            --transition: all 0.2s ease;
+            --bg-gradient-1: #e7f1f0;
+            --bg-gradient-2: #dfe9ec;
+            --bg-gradient-3: #e6edf2;
+            --bg-primary: #eef3f4;
+            --bg-secondary: rgba(255, 255, 255, 0.55);
+            --bg-hover: rgba(255, 255, 255, 0.78);
+            --bg-card: rgba(255, 255, 255, 0.50);
+            --accent-primary: #2dd4bf;
+            --accent-secondary: #3b82f6;
+            --text-primary: #2c3e50;
+            --text-secondary: #5a6c7d;
+            --text-muted: #8e9aaf;
+            --border-color: rgba(255, 255, 255, 0.55);
+            --shadow-card: 0 6px 24px rgba(20, 40, 50, 0.08);
+            --shadow-hover: 0 16px 48px rgba(20, 40, 50, 0.16);
+            --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* 暗黑主题 */
         [data-theme="dark"] {
-            --bg-primary: #1a1a1a;
-            --bg-secondary: #2d2d2d;
-            --bg-card: #252525;
-            --bg-hover: #333333;
-            --accent-primary: #e0e0e0;
-            --accent-secondary: #b0b0b0;
-            --text-primary: #f0f0f0;
-            --text-secondary: #b0b0b0;
-            --text-muted: #808080;
-            --border-color: #404040;
-            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --bg-gradient-1: #14181c;
+            --bg-gradient-2: #1a1f24;
+            --bg-gradient-3: #14181c;
+            --bg-primary: #14181c;
+            --bg-secondary: rgba(255, 255, 255, 0.08);
+            --bg-hover: rgba(255, 255, 255, 0.14);
+            --bg-card: rgba(40, 50, 60, 0.45);
+            --accent-primary: #2dd4bf;
+            --accent-secondary: #7dd3fc;
+            --text-primary: #e8eef2;
+            --text-secondary: #aab4bf;
+            --text-muted: #7a8590;
+            --border-color: rgba(255, 255, 255, 0.10);
+            --shadow-card: 0 6px 24px rgba(0, 0, 0, 0.35);
+            --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.5);
         }
 
         * {
@@ -44,22 +52,35 @@
         }
 
         body {
-            background-color: var(--bg-primary);
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+            background-attachment: fixed;
             color: var(--text-primary);
             line-height: 1.6;
             min-height: 100vh;
-            padding: 30px 20px 20px;
+            padding: 40px 20px 20px;
+            overflow-x: hidden;
         }
+
+        /* 背景光斑装饰 */
+        .bg-decoration { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.4; pointer-events: none; z-index: 0; }
+        .bg-decoration-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(94,234,212,0.30) 0%, transparent 70%); top: -180px; left: -120px; animation: float 22s ease-in-out infinite; }
+        .bg-decoration-2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(125,211,252,0.28) 0%, transparent 70%); bottom: -140px; right: -120px; animation: float 26s ease-in-out infinite reverse; }
+        .bg-decoration-3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%); top: 48%; left: 52%; transform: translate(-50%, -50%); animation: pulse 16s ease-in-out infinite; }
+        [data-theme="dark"] .bg-decoration { opacity: 0.25; }
+        @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 33% { transform: translate(30px, -30px) rotate(120deg); } 66% { transform: translate(-20px, 20px) rotate(240deg); } }
+        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.45; } }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         /* 标题区域 */
         .title-section {
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
         }
 
         h1 {
@@ -70,9 +91,13 @@
         }
 
         .highlight {
-            color: var(--accent-primary);
             display: block;
             font-size: 1.7rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #3b82f6, #2dd4bf);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .subtitle {
@@ -82,10 +107,12 @@
         }
 
         .stats-banner {
-            background-color: var(--bg-secondary);
+            background: var(--bg-secondary);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             color: var(--text-secondary);
             padding: 0.25rem 0.8rem;
-            border-radius: 4px;
+            border-radius: 999px;
             font-size: 0.75rem;
             display: inline-flex;
             align-items: center;
@@ -103,7 +130,9 @@
 
         .software-card {
             background: var(--bg-card);
-            border-radius: 4px;
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            border-radius: 16px;
             padding: 0;
             border: 1px solid var(--border-color);
             transition: var(--transition);
@@ -112,11 +141,15 @@
             display: flex;
             flex-direction: column;
             min-height: 120px;
+            box-shadow: var(--shadow-card);
         }
 
         .software-card:hover {
-            border-color: #cccccc;
-            box-shadow: var(--shadow-card);
+            border-color: rgba(45, 212, 191, 0.4);
+            transform: perspective(800px) rotateX(1.5deg) rotateY(-1.5deg) translateY(-3px) scale(1.015);
+            box-shadow: var(--shadow-hover);
+            backdrop-filter: blur(28px) saturate(170%);
+            -webkit-backdrop-filter: blur(28px) saturate(170%);
         }
 
         .software-card-header {
@@ -171,7 +204,7 @@
             background: var(--bg-secondary);
             color: var(--text-primary);
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 999px;
             font-size: 0.75rem;
             font-weight: 500;
             transition: var(--transition);
@@ -183,7 +216,9 @@
         }
 
         .download-btn:hover {
-            background: var(--bg-hover);
+            background: var(--accent-primary);
+            color: #fff;
+            border-color: var(--accent-primary);
         }
 
         .download-icon {
@@ -217,6 +252,8 @@
             width: 32px;
             height: 32px;
             background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
             border-radius: 50%;
             cursor: pointer;
@@ -233,7 +270,7 @@
         .theme-toggle:hover {
             opacity: 1;
             transform: scale(1.15);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--shadow-hover);
         }
 
         /* 页脚样式 */
@@ -271,6 +308,8 @@
             bottom: 20px;
             left: 20px;
             background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-color);
             border-radius: 4px;
             padding: 6px 10px;
@@ -321,9 +360,18 @@
                 padding: 6px 6px 0 6px;
             }
         }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(20,40,50,0.12); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(20,40,50,0.22); }
     </style>
 </head>
 <body>
+    <div class="bg-decoration bg-decoration-1"></div>
+    <div class="bg-decoration bg-decoration-2"></div>
+    <div class="bg-decoration bg-decoration-3"></div>
+
     <div class="container">
         <div class="title-section">
             <h1>📦 软件下载中心<span class="highlight">Software Hub</span></h1>

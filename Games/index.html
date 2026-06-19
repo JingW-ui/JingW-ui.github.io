@@ -7,12 +7,28 @@
     <title>Games Hub</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet" media="print"
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" media="print"
           onload="this.media='all'">
     <noscript>
-        <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     </noscript>
     <style>
+        :root {
+            --bg-gradient-1: #e7f1f0;
+            --bg-gradient-2: #dfe9ec;
+            --bg-gradient-3: #e6edf2;
+            --card-bg: rgba(255, 255, 255, 0.50);
+            --card-border: rgba(255, 255, 255, 0.55);
+            --text-primary: #2c3e50;
+            --text-secondary: #5a6c7d;
+            --text-muted: #8e9aaf;
+            --accent-teal: #2dd4bf;
+            --accent-blue: #3b82f6;
+            --shadow-md: 0 6px 24px rgba(20, 40, 50, 0.08);
+            --shadow-lg: 0 16px 48px rgba(20, 40, 50, 0.16);
+            --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -21,29 +37,47 @@
         }
 
         body {
-            font-family: 'ZCOOL KuaiLe', cursive, sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+            background-attachment: fixed;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 40px 20px;
             overflow-x: hidden;
+            color: var(--text-primary);
         }
 
+        /* 背景光斑装饰 */
+        .bg-decoration { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.45; pointer-events: none; z-index: 0; }
+        .bg-decoration-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(94,234,212,0.30) 0%, transparent 70%); top: -180px; left: -120px; animation: float 22s ease-in-out infinite; }
+        .bg-decoration-2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(125,211,252,0.28) 0%, transparent 70%); bottom: -140px; right: -120px; animation: float 26s ease-in-out infinite reverse; }
+        .bg-decoration-3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%); top: 48%; left: 52%; transform: translate(-50%, -50%); animation: pulse 16s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 33% { transform: translate(30px, -30px) rotate(120deg); } 66% { transform: translate(-20px, 20px) rotate(240deg); } }
+        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.45; } }
+
         .page-title {
-            color: #fff;
             font-size: 3em;
+            font-weight: 700;
             text-align: center;
             margin-bottom: 10px;
+            background: linear-gradient(135deg, #3b82f6, #2dd4bf);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            z-index: 1;
         }
 
         .page-subtitle {
-            color: #b0b0b0;
+            color: var(--text-secondary);
             font-size: 1.2em;
             text-align: center;
             margin-bottom: 50px;
             letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
         }
 
         .games-container {
@@ -52,21 +86,29 @@
             gap: 20px;
             max-width: 1400px;
             width: 100%;
+            position: relative;
+            z-index: 1;
         }
 
-        /* 卡片 */
+        /* 卡片（玻璃拟态，尺寸保持不变） */
         .game-card {
-            background: #2a2a2a;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px) saturate(140%);
+            -webkit-backdrop-filter: blur(20px) saturate(140%);
+            border: 1px solid var(--card-border);
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, backdrop-filter 0.35s ease;
             cursor: pointer;
+            position: relative;
         }
 
         .game-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+            transform: perspective(800px) rotateX(2deg) rotateY(-2deg) translateY(-6px) scale(1.015);
+            box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            backdrop-filter: blur(28px) saturate(170%);
+            -webkit-backdrop-filter: blur(28px) saturate(170%);
         }
 
         /* 图片微放大 */
@@ -80,6 +122,29 @@
 
         .game-card:hover .game-image {
             transform: scale(1.08);
+        }
+
+        /* 标题悬浮层（不改变卡片尺寸） */
+        .game-overlay {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 14px 14px 12px;
+            background: linear-gradient(to top, rgba(20, 30, 40, 0.78) 0%, rgba(20, 30, 40, 0.35) 60%, transparent 100%);
+            color: #fff;
+            font-size: 0.92em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transform: translateY(20%);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .game-card:hover .game-overlay {
+            transform: translateY(0);
+            opacity: 1;
         }
 
         @media (max-width: 1200px) {
@@ -143,66 +208,93 @@
                 aspect-ratio: 5 / 3;
             }
         }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(20,40,50,0.12); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(20,40,50,0.22); }
     </style>
 </head>
 <body>
+<div class="bg-decoration bg-decoration-1"></div>
+<div class="bg-decoration bg-decoration-2"></div>
+<div class="bg-decoration bg-decoration-3"></div>
+
 <h1 class="page-title">🎮 游戏中心</h1>
 <p class="page-subtitle">选择你喜欢的游戏，开始畅玩吧！</p>
 
 <div class="games-container">
     <div class="game-card" data-href="/Games/2024/">
         <img src="assets/img/2024.webp" alt="像素物语：4048小町" class="game-image">
+        <div class="game-overlay">像素物语：4048小町</div>
     </div>
     <div class="game-card" data-href="/Games/ball">
         <img src="assets/img/ball.webp" alt="Three.js 无限轨道弹跳球" class="game-image">
+        <div class="game-overlay">无限轨道弹跳球</div>
     </div>
     <div class="game-card" data-href="/Games/snake">
         <img src="assets/img/snake.webp" alt="霓虹贪吃蛇" class="game-image">
+        <div class="game-overlay">霓虹贪吃蛇</div>
     </div>
     <div class="game-card" data-href="/Games/dice_3D/">
         <img src="assets/img/dice_3D.webp" alt="3D炫光骰子" class="game-image">
+        <div class="game-overlay">3D 炫光骰子</div>
     </div>
     <div class="game-card" data-href="racing/">
         <img src="assets/img/racing.webp" alt="3D极速赛车" class="game-image">
+        <div class="game-overlay">3D 极速赛车</div>
     </div>
     <div class="game-card" data-href="/Games/muyu/">
         <img src="assets/img/muyu.webp" alt="赛博木鱼" class="game-image">
+        <div class="game-overlay">赛博木鱼</div>
     </div>
     <div class="game-card" data-href="/Games/earth_3D/">
         <img src="assets/img/earth.webp" alt="3D地球模型" class="game-image">
+        <div class="game-overlay">3D 地球模型</div>
     </div>
     <div class="game-card" data-href="/Games/star_drift/">
         <img src="assets/img/star_drift.webp" alt="星空漂流" class="game-image">
+        <div class="game-overlay">星空漂流</div>
     </div>
     <div class="game-card" data-href="/Games/suduku/">
         <img src="assets/img/suduku.webp" alt="数独挑战" class="game-image">
+        <div class="game-overlay">数独挑战</div>
     </div>
     <div class="game-card" data-href="/Games/puke/">
         <img src="assets/img/puke.webp" alt="扑克牌游戏" class="game-image">
+        <div class="game-overlay">扑克牌游戏</div>
     </div>
     <div class="game-card" data-href="/Games/jackrabbit/">
         <img src="assets/img/jackrabbit.webp" alt="Jackrabbit 跳跃兔子" class="game-image">
+        <div class="game-overlay">Jackrabbit 跳跃兔子</div>
     </div>
     <div class="game-card" data-href="/Games/warp_drift/">
         <img src="assets/img/warp_drift.webp" alt="Warp Drift" class="game-image">
+        <div class="game-overlay">Warp Drift</div>
     </div>
     <div class="game-card" data-href="/Games/nerual_branch/">
         <img src="assets/img/nerual_branch.webp" alt="Neural Branch" class="game-image">
+        <div class="game-overlay">Neural Branch</div>
     </div>
     <div class="game-card" data-href="/Games/spider/">
         <img src="assets/img/spider.webp" alt="交互式蜘蛛" class="game-image">
+        <div class="game-overlay">交互式蜘蛛</div>
     </div>
     <div class="game-card" data-href="/Games/morph_workshop/">
         <img src="assets/img/morph_workshop.webp" alt="形态工坊" class="game-image">
+        <div class="game-overlay">形态工坊</div>
     </div>
     <div class="game-card" data-href="/Games/CYBER_CORRIDOR/">
         <img src="assets/img/CYBER_CORRIDOR.webp" alt="赛博回廊" class="game-image">
+        <div class="game-overlay">赛博回廊</div>
     </div>
     <div class="game-card" data-href="/Games/gestura/">
         <img src="assets/img/gestura.webp" alt="Gesture Particle Sphere" class="game-image">
+        <div class="game-overlay">Gesture Particle Sphere</div>
     </div>
     <div class="game-card" data-href="/Games/Footsprout/">
         <img src="assets/img/Footsprout.webp" alt="枯木逢春" class="game-image">
+        <div class="game-overlay">枯木逢春</div>
     </div>
 </div>
 
@@ -214,7 +306,7 @@
         card.style.opacity = '0';
         card.style.transform = 'translateY(20px)';
         setTimeout(() => {
-            card.style.transition = 'opacity 0.4s ease, transform 0.3s ease, box-shadow 0.3s ease';
+            card.style.transition = 'opacity 0.4s ease, transform 0.3s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease';
             card.style.opacity = '1';
             card.style.transform = 'translateY(0)';
         }, i * 60);
