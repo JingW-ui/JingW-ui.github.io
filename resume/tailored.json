@@ -158,5 +158,25 @@
     "date": "2026.06",
     "url": "/resume/resume_game_client_dev.html",
     "match": ""
+  },
+  {
+    "index": "17",
+    "company": "通用 · 机电类",
+    "role": "机器视觉应用开发工程师",
+    "direction": "机器视觉 / 算法 / 自动化",
+    "tags": ["YOLO 视觉算法", "视觉系统软件", "Python/C++", "图像分割"],
+    "date": "2026.06",
+    "url": "/resume/resume_machine_vision.html",
+    "match": ""
+  },
+  {
+    "index": "18",
+    "company": "通用 · 智造管理",
+    "role": "智造管理工程师",
+    "direction": "生产 / 投入产出 / 工业工程",
+    "tags": ["电子信息工科", "工业现场实习", "全流程管理", "数据分析"],
+    "date": "2026.06",
+    "url": "/resume/resume_smart_mfg_mgmt.html",
+    "match": ""
   }
 ]
