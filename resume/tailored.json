@@ -228,5 +228,15 @@
     "date": "2026.06",
     "url": "/resume/resume_medical_device_algo.html",
     "match": "high"
+  },
+  {
+    "index": "24",
+    "company": "通用 · 后端开发",
+    "role": "后端开发实习生",
+    "direction": "Java / Spring Boot / MySQL",
+    "tags": ["Java", "Spring Boot", "MySQL", "RESTful API"],
+    "date": "2026.06",
+    "url": "/resume/resume_backend_java.html",
+    "match": "high"
   }
 ]

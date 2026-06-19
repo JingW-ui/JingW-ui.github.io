@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 后端开发实习生 / Java 方向</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            line-height: 1.2; color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px; display: flex; justify-content: center;
+        }
+        .page { width: 210mm; min-height: 297mm; background: #ffffff; padding: 13mm 16mm; box-shadow: 0 4px 24px rgba(0,0,0,0.12); position: relative; }
+        .header { text-align: center; margin-bottom: 18px; padding: 0 0 14px; border-bottom: 2px solid #333; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+        .profile-container { display: flex; align-items: center; justify-content: center; gap: 24px; flex-wrap: wrap; }
+        .avatar { width: 96px; height: 106px; object-fit: cover; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+        .profile-info { text-align: left; }
+        .name { font-size: 26px; font-weight: bold; color: #1a1a1a; margin-bottom: 6px; }
+        .target { font-size: 13px; color: #4a90e2; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .contact-info { font-size: 12px; color: #666; line-height: 1.6; }
+        .contact-info a { color: #4a90e2; text-decoration: none; font-weight: 500; }
+        .contact-info a:hover { text-decoration: underline; }
+        .section { margin-bottom: 15px; }
+        .section-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 11px; border-left: 4px solid #333; padding-left: 10px; }
+        .summary { font-size: 12.5px; color: #444; line-height: 1.7; }
+        .summary strong { color: #1a1a1a; }
+        .subsection { margin-bottom: 10px; padding-bottom: 9px; border-bottom: 1px solid #f0f0f0; }
+        .subsection:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .subsection-title { font-size: 13px; font-weight: 600; color: #222; margin-bottom: 3px; }
+        .date { font-size: 11px; color: #999; margin-bottom: 5px; letter-spacing: 0.5px; }
+        .tech-line { font-size: 12px; color: #555; margin-bottom: 6px; }
+        .tech-line em { font-style: normal; color: #2d74bb; font-weight: 500; }
+        ul { padding-left: 18px; }
+        li { margin-bottom: 4px; font-size: 12px; color: #555; line-height: 1.55; }
+        .skill-line { font-size: 12px; color: #555; line-height: 1.7; margin-bottom: 5px; }
+        .skill-line:last-child { margin-bottom: 0; }
+        .skill-cat { color: #1a1a1a; font-weight: 600; margin-right: 2px; }
+        .skill-hl { color: #1a1a1a; font-weight: 600; }
+        .label-link { display: inline-block; background-color: #f5f5f5; padding: 1px 6px; border-radius: 4px; font-size: 10px; border: 1px solid #d0d0d0; color: #666; text-decoration: none; margin-left: 4px; font-weight: 500; }
+        .label-link:hover { background-color: #e0e0e0; color: #333; }
+        .github-label-link { display: inline-block; background-color: #1F883D; padding: 1px 6px; border-radius: 4px; font-size: 10px; color: #ffffff; text-decoration: none; margin-left: 4px; font-weight: 500; }
+        .github-label-link:hover { background-color: #176d31; }
+        @media print { body { background: #fff; padding: 0; } .page { box-shadow: none; width: auto; min-height: auto; padding: 0; } }
+        @media (max-width: 820px) { body { padding: 10px; } .page { width: 100%; min-height: auto; padding: 18px 16px; } .profile-container { flex-direction: column; text-align: center; } .profile-info { text-align: center; } .name { font-size: 22px; } }
+        html, body, .header, .label-link, .github-label-link, .target, .contact-info a { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        @media print { .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; } }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：后端开发实习生 / Java 后端方向（2027届）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士（2027届）<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            <strong>2027 届硕士毕业生</strong>，电子信息大类背景，具备完整的 <strong>Java / Spring Boot 后端项目经验</strong>——独立完成过基于 <strong>Spring Boot + MySQL</strong> 的考试系统<strong>数据库设计、RESTful 接口开发与测试</strong>，系统已投入校内实际使用。具备<strong>从需求分析、架构设计、详细设计到开发测试</strong>的完整软件工程能力，能独立进行<strong>系统问题定位与排查</strong>，注重<strong>代码规范</strong>与可维护性。开源项目累计 <strong>200+ Star</strong>，具备快速学习新技术与团队协作能力，可熟练使用 IntelliJ IDEA、Git/GitLab 进行工程化协作。
+        </div>
+    </div>
+
+    <!-- 教育背景 -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 电子信息大类 - 生物医学工程 · 硕士</div>
+            <div class="date">2024.09 - 2027.06 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授 · 神经信息教育部重点实验室</div>
+            <div class="tech-line"><em>研究方向：</em>软件系统设计 · 数据处理与存储 · 自动化工作流 · 系统稳定性与可扩展性</div>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 电子信息大类 - 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ 四川省优秀毕业生 · 推免生</div>
+            <div class="tech-line"><em>研究方向：</em>程序设计基础(C 语言) · 计算机原理 · 数据结构与算法 · 数据库系统 · 信号与系统</div>
+        </div>
+    </div>
+
+    <!-- 专业技能 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-line">
+            <span class="skill-cat">后端开发：</span><span class="skill-hl">Java</span> · <span class="skill-hl">Spring Boot</span> · Spring MVC · MyBatis（了解）· Spring Cloud（了解）· <span class="skill-hl">RESTful API 设计</span> · 接口开发与测试
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">数据库：</span><span class="skill-hl">MySQL</span> · <span class="skill-hl">数据库设计</span> · SQL 查询优化 · 索引与表结构优化
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">工程基础：</span><span class="skill-hl">数据结构与算法</span> · 面向对象编程思想 · <span class="skill-hl">JVM 运行原理</span> · 计算机网络 · 操作系统 · Linux 开发环境
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">工具链：</span><span class="skill-hl">IntelliJ IDEA</span> · <span class="skill-hl">Git / GitLab</span> · Maven · PyCharm · Postman 接口测试
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">其他：</span>Python · Django · Vue · <span class="skill-hl">代码规范意识</span> · 英语六级
+        </div>
+    </div>
+
+    <!-- 项目经验 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                Java 前后端项目：C 语言能力考试系统
+            </div>
+            <div class="date">2022.06 - 2022.11</div>
+            <div class="tech-line"><em>技术栈：</em>Spring Boot · MyBatis · MySQL · Java · Vue · RESTful API</div>
+            <ul>
+                <li>基于 <strong>Spring Boot</strong> 与 Vue 的考试系统：教师发布题目、设置考试时间、编辑成绩，系统按规则<strong>自动分配试卷</strong>，学生预约考试并在线作答，支持模拟考试与成绩查询，<strong>已投入学校实际使用，数百名学生使用</strong>。</li>
+                <li>主导 <strong>MySQL 数据库设计</strong>（题目/考试/学生/成绩多表关联与外键约束），按 <strong>RESTful 规范</strong>完成登录、试卷分配、成绩管理等<strong>后端接口设计与开发</strong>，编写单元与接口测试把控代码质量，保障数据交互的高效性与安全性。</li>
+                <li><strong>项目职责：</strong>后端主要开发，负责 MySQL 数据库设计、Spring Boot 后端 RESTful 接口开发与联调测试。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                全栈项目：结直肠癌智能检测与诊断系统
+                <a class="label-link" href="/imgs/competitions/8.png" target="_blank" rel="noopener">全国二等奖 / 省一等奖</a>
+            </div>
+            <div class="date">2023.04 - 2023.07</div>
+            <div class="tech-line"><em>技术栈：</em>Django · MySQL · Python · HTML / CSS · RESTful 接口</div>
+            <ul>
+                <li>独立完成<strong>前后端全栈</strong>开发：基于 Django 框架与 <strong>MySQL 数据库</strong>，完成病例图像上传、检测推理、结果存档等模块的<strong>接口设计与开发</strong>，并通过页面与后端高效集成。</li>
+                <li>完成 <strong>MySQL 表结构设计与查询优化</strong>，处理图像与诊断结果的存储与检索；对系统运行中的接口异常、数据一致性问题进行<strong>快速定位与修复</strong>，沉淀了一套问题排查流程。</li>
+                <li><strong>项目职责：</strong>独立全栈负责人，承担数据库设计、后端接口开发测试及前后端联调。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                Agent 应用系统：神经影像分析智能体 NEURA
+                <a class="github-label-link" href="https://github.com/NeuroScienceLab/NEURA" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" rel="noopener">论文</a>
+            </div>
+            <div class="date">2025.07 - 2026.02</div>
+            <div class="tech-line"><em>技术栈：</em>Python · Toolset 工具链集成 · 工作流编排 · 异构系统集成</div>
+            <ul>
+                <li>主导<strong>系统架构设计与详细设计</strong>，通过双知识图谱整合 SPM、FreeSurfer 等<strong>异构工具链</strong>，实现复杂工作流的自主编排与端到端自动化，体现<strong>系统设计、模块解耦与可扩展性</strong>把控能力。</li>
+                <li>负责<strong>系统问题定位与分析</strong>：在多工具链集成与运行中快速定位工具调用、数据流转类问题并修复，优化问题解决流程，论文已发表于 bioRxiv。</li>
+                <li><strong>项目职责：</strong>系统主导设计与开发，负责核心架构与异构系统集成，主导问题定位与稳定性优化。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                开源项目：AutoTask 自动化办公助手
+                <a class="github-label-link" href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank" rel="noopener">GitHub 70+ Star</a>
+                <a class="label-link" href="https://github.com/JingW-ui/AutoTask-UI-/releases" target="_blank" rel="noopener">下载</a>
+            </div>
+            <div class="date">2025.10 - 2026.01</div>
+            <div class="tech-line"><em>技术栈：</em>Python · 定时调度 · 批量任务管理 · 模块化设计</div>
+            <ul>
+                <li>独立设计与开发，沉淀 150+ 用户社群；负责<strong>架构设计、模块划分、迭代与测试</strong>，注重<strong>代码规范与可维护性</strong>，体现快速学习与工程交付能力。</li>
+                <li><strong>项目职责：</strong>独立负责人，承担架构设计、开发、测试与持续迭代。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 实习经历 -->
+    <div class="section">
+        <div class="section-title">实习经历</div>
+        <div class="subsection">
+            <div class="subsection-title">国网宁夏电力有限公司 · AI 算法实习生</div>
+            <div class="date">2023.10 - 2023.12</div>
+            <ul>
+                <li>参与作业行为管控系统的<strong>问题定位与算法实现</strong>：调研并实现头盔检测、人体姿态估计等算法，开发危险姿势识别与<strong>安全预警</strong>功能，协助采集与处理图像视频数据。</li>
+                <li><strong>项目职责：</strong>承担数据采集、算法调研实现及系统问题排查，融入团队完成既定任务。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 获奖荣誉 -->
+    <div class="section">
+        <div class="section-title">获奖荣誉</div>
+        <ul>
+            <li>第九届/第八届全国大学生生物医学工程创新设计竞赛 <strong>一等奖 / 二等奖</strong>（2024 / 2023）</li>
+            <li>第三/四/五届四川省生物医学工程创新设计大赛 <strong>一等奖 ×4</strong>（2023-2025）</li>
+            <li>国家励志奖学金 ×2、电子科技大学优秀研究生、学业奖学金一等奖、研究生"学术青苗"奖</li>
+            <li>四川省优秀毕业生、推免生（专业前 2%）</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
