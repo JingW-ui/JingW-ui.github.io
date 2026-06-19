@@ -218,5 +218,15 @@
     "date": "2026.06",
     "url": "/resume/resume_sde_general.html",
     "match": ""
+  },
+  {
+    "index": "23",
+    "company": "通用 · 医疗设备",
+    "role": "医疗设备算法工程师",
+    "direction": "信号处理 / 医学影像 AI / 智能化应用",
+    "tags": ["医学影像算法", "信号处理", "Python/C++", "医疗 AI"],
+    "date": "2026.06",
+    "url": "/resume/resume_medical_device_algo.html",
+    "match": "high"
   }
 ]

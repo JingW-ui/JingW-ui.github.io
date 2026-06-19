@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 图像算法算法工程师</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            line-height: 1.2;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            padding: 14mm 16mm;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 22px;
+            padding: 0 0 16px;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 100px;
+            height: 110px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .profile-info {
+            text-align: left;
+        }
+        .name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .target {
+            font-size: 13px;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .contact-info a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            border-left: 4px solid #333;
+            padding-left: 10px;
+        }
+        .summary {
+            font-size: 12.5px;
+            color: #444;
+            line-height: 1.7;
+        }
+        .summary strong {
+            color: #1a1a1a;
+        }
+        .subsection {
+            margin-bottom: 10px;
+            padding-bottom: 9px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 3px;
+        }
+        .date {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .tech-line {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .tech-line em {
+            font-style: normal;
+            color: #2d74bb;
+            font-weight: 500;
+        }
+        ul {
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.55;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .skill {
+            background: linear-gradient(135deg, #f5f5f5 0%, #f0f0f0 100%);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            border: 1px solid #e0e0e0;
+            color: #555;
+            font-weight: 500;
+        }
+        .skill.primary {
+            color: #1a1a1a;
+            font-weight: 700;
+            border-color: #bbb;
+        }
+        .skill-line {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 6px;
+        }
+        .skill-line:last-child {
+            margin-bottom: 0;
+        }
+        .skill-cat {
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-right: 2px;
+        }
+        .skill-hl {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .skill-group {
+            margin-bottom: 8px;
+        }
+        .skill-group:last-child {
+            margin-bottom: 0;
+        }
+        .label-link {
+            display: inline-block;
+            background-color: #f5f5f5;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .label-link:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .github-label-link {
+            display: inline-block;
+            background-color: #1F883D;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .github-label-link:hover {
+            background-color: #176d31;
+        }
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+            .page {
+                box-shadow: none;
+                width: auto;
+                min-height: auto;
+                padding: 0;
+            }
+        }
+        @media (max-width: 820px) {
+            body {
+                padding: 10px;
+            }
+            .page {
+                width: 100%;
+                min-height: auto;
+                padding: 18px 16px;
+            }
+            .profile-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-info {
+                text-align: center;
+            }
+            .name {
+                font-size: 22px;
+            }
+        }
+        html, body, .header, .skill, .skill.primary, .label-link, .github-label-link, .target, .contact-info a {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        @media print {
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：医疗设备算法工程师 / 信号处理与医学影像AI方向</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            <strong>生物医学工程本硕</strong>（电子科大 985 硕士，导师陈华富教授，GPA 前 5%），方向与岗位<strong>完全对口</strong>。长期围绕 <strong>MRI / CT / 内窥镜等医学影像</strong>开展算法研究与智能化应用开发：完成 MRI 海马体 3D 分割（Dice=0.9554，国赛一等奖）、脑肿瘤多模态 YOLO 检测（SCI 在审）、结直肠息肉智能检测系统（国赛二等奖）。主导研发 <strong>NEURA 神经影像智能体</strong>（Agent+LLM+RAG，bioRxiv 已发布，22+ Stars），探索医疗设备 AI 与临床辅助决策的落地路径。具备扎实的 <strong>Python / C / C++</strong> 编程基础与<strong>英文 SCI 论文</strong>撰写能力（六级），熟悉<strong>信号处理与数据分析</strong>全流程，获国家励志奖学金 ×2、省级 BME 竞赛一等奖 ×4、华为云杯血液图像大赛二等奖。
+        </div>
+    </div>
+
+    <!-- 科研成果 -->
+    <div class="section">
+        <div class="section-title">科研成果</div>
+        <div class="subsection">
+            <ul>
+                <li>SCI 论文（在审）：MediScreen-Brain — 基于 YOLO 的多模态脑肿瘤检测与 3D 定位便携式 GUI 系统<a class="github-label-link" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener">GitHub</a><a class="label-link" href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" rel="noopener">主页</a></li>
+                <li>SCI 论文（bioRxiv）：NEURA — 基于大语言模型的自主神经影像分析智能体系统<a class="github-label-link" href="https://github.com/NeuroScienceLab/NEURA" target="_blank" rel="noopener">GitHub</a><a class="label-link" href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" rel="noopener">论文</a></li>
+                <li>SCI 论文：Spatiotemporal patterns of brainstem tract atrophy predict disease progression in SCA3</li>
+                <li>专利：基于深度学习的 MRI 海马体 3D 智能分析诊断平台<a class="label-link" href="/imgs/patents_and_software/1.png" target="_blank" rel="noopener">证书</a></li>
+                <li>软著 ×5：结直肠息肉智能检测、脑肿瘤检测、摔倒行为识别、MRI 海马体分析、批量图像处理等</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 教育背景 -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 生物医学工程 · 硕士</div>
+            <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授 ｜ 神经信息教育部重点实验室</div>
+            <div class="tech-line"><em>研究方向：</em>医学影像智能分析 · 神经影像处理 · 医疗 AI 与智能化应用</div>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ 四川省优秀毕业生 · 推免生</div>
+            <div class="tech-line"><em>研究方向：</em>医学信号处理 · 深度学习与目标检测 · 医学图像处理</div>
+        </div>
+    </div>
+
+    <!-- 专业技能 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-line">
+            <span class="skill-cat">医学影像与信号处理：</span><span class="skill-hl">医学影像算法</span> · <span class="skill-hl">信号处理</span> · <span class="skill-hl">数据分析</span> · <span class="skill-hl">深度学习</span> · <span class="skill-hl">医疗 AI</span> · nnU-Net · YOLO · PyTorch · 3D Slicer · LLM Agent · RAG
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">编程与学术能力：</span><span class="skill-hl">Python</span> · <span class="skill-hl">C / C++</span> · <span class="skill-hl">英文文献读写</span> · <span class="skill-hl">SCI 论文</span> · Java · PySide6 / Qt · Django · MySQL · 英语六级 · 专利撰写
+        </div>
+    </div>
+
+    <!-- 项目经验 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                基于深度学习的脑部 MRI 海马体自动分割诊断系统
+                <a class="label-link" href="/imgs/competitions/9.png" target="_blank" rel="noopener">国赛一等奖</a>
+            </div>
+            <div class="date">2024.04 - 2024.07</div>
+            <div class="tech-line"><em>技术栈：</em>nnU-Net · Python · 3D Slicer · MRI 信号处理 · 数据增强</div>
+            <ul>
+                <li>基于 nnU-Net 3D 分割模型完成脑部 MRI 海马体自动分割，<strong>Dice=0.9554，HD95=1.0mm</strong>；覆盖数据预处理、增强、模型训练测试、3D/2D 可视化与历史记录查询，为临床提供便捷的在线诊断工具。</li>
+                <li><strong>项目职责：</strong>主要负责人，独立完成信号预处理、分割模型训练与测试、数据增强策略设计、GUI 与数据库设计、接口开发与联调。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                MediScreen-Brain 多模态脑肿瘤智能检测平台
+                <a class="github-label-link" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" rel="noopener">主页</a>
+            </div>
+            <div class="date">2025.02 - 2025.06</div>
+            <div class="tech-line"><em>技术栈：</em>YOLO · PyTorch · PySide6 · 多模态影像 · 3D 定位</div>
+            <ul>
+                <li>基于 YOLO 构建便携式脑肿瘤多模态检测与 3D 定位 GUI 系统，支持 MRI 多序列输入、毫秒级推理与可视化定位，成果发表于 SCI 期刊（在审）。</li>
+                <li><strong>项目职责：</strong>独立全栈负责人，主导算法选型、数据集构建、模型训练调优、GUI 设计与系统集成。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                NEURA 神经影像分析智能体系统（Agent + LLM）
+                <a class="github-label-link" href="https://github.com/NeuroScienceLab/NEURA" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" rel="noopener">bioRxiv</a>
+            </div>
+            <div class="date">2025.07 - 2026.02</div>
+            <div class="tech-line"><em>技术栈：</em>Agent · LLM · RAG · Chain-of-Thought · 双知识图谱（DiseaseKG / ToolKG）</div>
+            <ul>
+                <li>构建受认知科学启发的<strong>医疗 AI 智能体</strong>，通过双知识图谱动态桥接医学知识与异构软件工具（SPM、FreeSurfer 等），自主编排端到端多模态分析工作流，<strong>降低神经影像处理技术门槛并解决可复现性难题</strong>，对应监护 / 临床辅助决策等智能化应用方向。</li>
+                <li><strong>项目职责：</strong>核心研发，主导认知架构设计、双知识图谱构建、异构工具链集成与端到端自动化编排。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                结直肠息肉智能检测与诊断系统
+                <a class="label-link" href="/imgs/competitions/8.png" target="_blank" rel="noopener">国赛二等奖 / 省一等</a>
+            </div>
+            <div class="date">2023.04 - 2023.07</div>
+            <div class="tech-line"><em>技术栈：</em>YOLOv8 · Django · MySQL · Python · 医学图像分析</div>
+            <ul>
+                <li>面向<strong>医学检验 / 内窥镜场景</strong>，基于 YOLOv8 训练息肉检测模型，结合 Django+MySQL 开发 Web 辅助诊断系统，辅助医生进行结直肠癌<strong>早期筛查</strong>。</li>
+                <li><strong>项目职责：</strong>独立负责人，负责数据预处理、检测模型训练与测试、后端接口与数据库设计、Web 前端联调。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                摔倒行为智能识别与安全预警系统
+                <a class="label-link" href="/imgs/competitions/3.png" target="_blank" rel="noopener">省一等奖</a>
+            </div>
+            <div class="date">2025.04 - 2025.07</div>
+            <div class="tech-line"><em>技术栈：</em>YOLO-Pose · OpenPose · Transformer · PySide6 · 信号分析</div>
+            <ul>
+                <li>面向<strong>患者安全监测</strong>场景，基于人体骨架关键点提取时序特征，对比阈值法、机器学习、深度学习与 Transformer 方法进行跌倒检测，集成实时摄像头输入与短信预警，对应智能监测算法与预警应用。</li>
+                <li><strong>项目职责：</strong>主要负责人，自建数据集采集与标注、模型训练对比、阈值法设计与 Qt 客户端开发。</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- 获奖荣誉 -->
+    <div class="section">
+        <div class="section-title">获奖荣誉</div>
+        <ul>
+            <li>国家级 · 第九届全国大学生生物医学工程创新设计竞赛<strong>一等奖</strong>（2024）</li>
+            <li>国家级 · 第八届全国大学生生物医学工程创新设计竞赛<strong>二等奖</strong>（2023）</li>
+            <li>省级 · 四川省生物医学工程创新设计大赛<strong>一等奖 ×4</strong>（2022–2025）</li>
+            <li>省级 · 湖北省"华为云杯"昇腾云血液图像处理大赛<strong>二等奖</strong>（2025）</li>
+            <li>奖学金 · 国家励志奖学金 ×2、电子科技大学优秀研究生、学业一等奖学金、学术青苗奖</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
