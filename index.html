@@ -66,8 +66,8 @@
 
         .main-container { max-width: 1380px; margin: 0 auto; padding: 56px 20px 12px; display: grid; grid-template-columns: 248px 1fr 312px; gap: 20px; position: relative; z-index: 1; }
 
-        .glass-card { background: var(--card-bg); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border: 1px solid var(--card-border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); transition: var(--transition); overflow: hidden; }
-        .glass-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px) scale(1.012); }
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border: 1px solid var(--card-border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, backdrop-filter 0.35s ease; overflow: hidden; }
+        .glass-card:hover { box-shadow: 0 16px 48px rgba(20,40,50,0.16), 0 0 0 1px rgba(255,255,255,0.5) inset; transform: perspective(800px) rotateX(2deg) rotateY(-2deg) translateY(-4px) scale(1.015); backdrop-filter: blur(32px) saturate(180%) brightness(1.05); -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(1.05); }
 
         /* 左侧导航 */
         .sidebar-left { position: sticky; top: 24px; height: fit-content; display: flex; flex-direction: column; gap: 16px; }
@@ -86,11 +86,15 @@
         .welcome-card-top { display: flex; align-items: center; gap: 22px; flex: 1; min-width: 0; }
         .welcome-avatar { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; flex-shrink: 0; box-shadow: 0 8px 22px rgba(20,40,50,0.16); }
         .welcome-text { flex: 1; min-width: 0; }
+        .welcome-title-row { display: flex; align-items: center; gap: 10px; }
         .welcome-title { font-size: 24px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px; min-height: 30px; }
         .welcome-title .highlight { color: var(--accent-teal); }
+        .dev-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 12px; background: linear-gradient(135deg, rgba(45,212,191,0.15), rgba(59,130,246,0.15)); font-size: 11px; font-weight: 600; color: var(--accent-teal); white-space: nowrap; }
+        .dev-badge i { animation: pulse 1.5s ease-in-out infinite; font-size: 12px; }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.1); } }
         .welcome-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
         .hero-tags { display: flex; flex-wrap: wrap; gap: 7px; }
-        .hero-tag { font-size: 12.5px; padding: 6px 13px; border-radius: 18px; background: rgba(255,255,255,0.82); color: var(--text-primary); border: 1px solid rgba(45,212,191,0.32); font-weight: 600; box-shadow: 0 1px 3px rgba(20,40,50,0.05); }
+        .hero-tag { font-size: 11.5px; padding: 5px 12px; border-radius: 16px; background: transparent; color: var(--text-primary); border: none; font-weight: 600; box-shadow: 0 1px 3px rgba(20,40,50,0.05); }
         /* 欢迎卡右上角紧凑数据 */
         .welcome-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 5px; flex-shrink: 0; }
         .welcome-stat { text-align: center; padding: 5px 10px; border-radius: 10px; background: rgba(255,255,255,0.5); transition: var(--transition); min-width: 78px; }
@@ -100,7 +104,8 @@
 
         .content-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
         .section-card { padding: 22px 24px; }
-        #mainContent > .section-card { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        .mao-quote { position: absolute; top: 16px; right: 20px; max-width: 280px; font-size: 11px; color: var(--text-muted); line-height: 1.5; text-align: right; font-style: italic; opacity: 0.7; }
+        #mainContent > .section-card { display: flex; flex-direction: column; justify-content: center; align-items: stretch; text-align: left; }
         #mainContent > .section-card .content-grid { width: 100%; }
         .section-label { font-size: 11.5px; font-weight: 600; color: var(--accent-teal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         .section-title { font-size: 18px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
@@ -125,7 +130,7 @@
         .recommend-header .title { display: flex; align-items: center; gap: 8px; }
         .reroll-btn { font-size: 11.5px; color: var(--accent-teal); background: rgba(45,212,191,0.12); border: none; padding: 5px 12px; border-radius: 16px; cursor: pointer; transition: var(--transition); font-weight: 500; }
         .reroll-btn:hover { background: rgba(45,212,191,0.22); transform: scale(1.06); }
-        .recommend-item { display: flex; gap: 14px; padding: 13px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.5); text-decoration: none; transition: var(--transition); align-items: flex-start; }
+        .recommend-item { display: flex; gap: 14px; padding: 13px; border-radius: var(--radius-sm); background: var(--card-bg); text-decoration: none; transition: var(--transition); align-items: flex-start; }
         .recommend-item:hover { background: rgba(255,255,255,0.78); transform: scale(1.02); }
         .recommend-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #d9efef, #c4e3e8); display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
         .recommend-thumb { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: linear-gradient(135deg, #d9efef, #c4e3e8); }
@@ -240,6 +245,9 @@
                     </div>
                 </a>
             </div>
+
+            <!-- 历史上的今天 -->
+            <div id="historyToday" class="fade-in d3" style="padding: 8px 16px; font-size: 11px; color: var(--text-secondary); line-height: 1.6;"></div>
         </aside>
 
         <!-- 中间内容 -->
@@ -249,12 +257,18 @@
                 <div class="welcome-card-top">
                     <img src="imgs/life_and_others/myavtar.png" alt="王京" class="welcome-avatar">
                     <div class="welcome-text">
-                        <h1 class="welcome-title" id="welcomeTitle">你好</h1>
+                        <div class="welcome-title-row">
+                            <h1 class="welcome-title" id="welcomeTitle">你好</h1>
+                            <span class="dev-badge" id="statusBadge"></span>
+                        </div>
                         <p class="welcome-subtitle">我是 <span class="highlight">王京</span>，电子科技大学生物医学工程硕士</p>
                         <div class="hero-tags">
-                            <span class="hero-tag">高性能计算机视觉</span>
-                            <span class="hero-tag">AI 原生软件工程</span>
-                            <span class="hero-tag">医学图像处理</span>
+                            <span class="hero-tag">计算机视觉</span>
+                            <span class="hero-tag">全栈开发</span>
+                            <span class="hero-tag">Claude Code 重度用户</span>
+                            <span class="hero-tag">健身 vlog 博主</span>
+                            <span class="hero-tag">佳能摄影师</span>
+                            <span class="hero-tag">内容创作者</span>
                         </div>
                     </div>
                 </div>
@@ -269,7 +283,8 @@
             </div>
 
             <!-- 简介 + 教育背景 融合 -->
-            <div class="glass-card section-card fade-in d2">
+            <div class="glass-card section-card fade-in d2" style="position: relative;">
+                <div class="mao-quote" id="maoQuote"></div>
                 <div class="section-label">简介 · 教育背景</div>
                 <h2 class="section-title">成长路径</h2>
                 <div class="content-grid">
@@ -376,6 +391,74 @@
             let i = 0; el.textContent = '';
             function type() { if (i <= g.length) { el.textContent = g.slice(0, i); i++; setTimeout(type, 90); } }
             type();
+        })();
+
+        (function() {
+            const badge = document.getElementById('statusBadge');
+            if (!badge) return;
+            const now = new Date();
+            const day = now.getDay();
+            const hour = now.getHours();
+            const isWorkday = day >= 1 && day <= 5;
+            const isWorkHour = hour >= 9 && hour < 17;
+
+            if (isWorkday && isWorkHour) {
+                badge.innerHTML = '<i class="fas fa-briefcase"></i>955 工作中';
+            } else {
+                const activities = [
+                    { icon: 'fas fa-dumbbell', text: '健身ing' },
+                    { icon: 'fas fa-camera', text: '摄影ing' },
+                    { icon: 'fas fa-book', text: '学习中' }
+                ];
+                const random = activities[Math.floor(Math.random() * activities.length)];
+                badge.innerHTML = `<i class="${random.icon}"></i>${random.text}`;
+            }
+        })();
+
+        (function() {
+            const quoteEl = document.getElementById('maoQuote');
+            if (!quoteEl) return;
+
+            // 保底名言库（API失败时使用）
+            const fallbackQuotes = [
+                { text: "星星之火，可以燎原", author: "毛主席" },
+                { text: "人民，只有人民，才是创造世界历史的动力", author: "毛主席" },
+                { text: "没有调查，没有发言权", author: "毛主席" },
+                { text: "虚心使人进步，骄傲使人落后", author: "毛主席" },
+                { text: "数风流人物，还看今朝", author: "毛主席" }
+            ];
+
+            // 异步获取名人名言
+            async function fetchQuote() {
+                try {
+                    const response = await fetch('https://v1.hitokoto.cn/?c=i&c=d&c=k', {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (!response.ok) throw new Error('API请求失败');
+
+                    const data = await response.json();
+                    return {
+                        text: data.hitokoto,
+                        author: data.from || '佚名'
+                    };
+                } catch (error) {
+                    console.warn('获取名言失败，使用保底名言:', error);
+                    // API失败时使用保底名言（基于日期选择）
+                    const now = new Date();
+                    const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+                    return fallbackQuotes[dayOfYear % fallbackQuotes.length];
+                }
+            }
+
+            // 显示名言
+            async function displayQuote() {
+                const quote = await fetchQuote();
+                quoteEl.textContent = `"${quote.text}" —— ${quote.author}`;
+            }
+
+            displayQuote();
         })();
 
         function generateCalendar() {
@@ -502,6 +585,42 @@
         }
         pickGame();
         document.getElementById('rerollGameBtn').addEventListener('click', pickGame);
+
+        // 历史上的今天
+        (async function() {
+            const historyEl = document.getElementById('historyToday');
+            if (!historyEl) return;
+
+            try {
+                const response = await fetch('https://60s-api.viki.moe/v2/today-in-history');
+                if (!response.ok) throw new Error('API请求失败');
+
+                const result = await response.json();
+                const data = result.data || result;
+                const items = data.items || data;
+
+                if (Array.isArray(items) && items.length > 0) {
+                    // 随机选择一个事件
+                    const randomItem = items[Math.floor(Math.random() * items.length)];
+                    let year = randomItem.year || randomItem.date || '';
+                    const title = randomItem.title || randomItem.event || '';
+
+                    // 处理年份显示，避免"年年"重复
+                    year = String(year).replace(/年$/, '');
+
+                    historyEl.innerHTML = `
+                        <div style="color: var(--text-muted); margin-bottom: 4px; font-size: 11px;">历史上的今天</div>
+                        <div style="font-size: 11px; line-height: 1.5;">
+                            <span style="color: var(--text-secondary);">${year}</span>
+                            <span style="color: var(--text-secondary);">${title}</span>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.warn('获取历史上的今天失败:', error);
+                historyEl.innerHTML = '';
+            }
+        })();
 
         // 让融合卡底部与左右侧栏的随机卡片底部对齐
         (function() {
