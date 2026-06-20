@@ -64,7 +64,7 @@
         @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 33% { transform: translate(30px, -30px) rotate(120deg); } 66% { transform: translate(-20px, 20px) rotate(240deg); } }
         @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.45; } }
 
-        .main-container { max-width: 1380px; margin: 0 auto; padding: 56px 20px 12px; display: grid; grid-template-columns: 248px 1fr 312px; gap: 20px; position: relative; z-index: 1; }
+        .main-container { max-width: 1380px; margin: 0 auto; padding: 24px 20px 24px; display: grid; grid-template-columns: 248px 1fr 312px; gap: 20px; position: relative; z-index: 1; min-height: 100vh; align-content: center; }
 
         .glass-card { background: var(--card-bg); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border: 1px solid var(--card-border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, backdrop-filter 0.35s ease; overflow: hidden; }
         .glass-card:hover { box-shadow: 0 16px 48px rgba(20,40,50,0.16), 0 0 0 1px rgba(255,255,255,0.5) inset; transform: perspective(800px) rotateX(2deg) rotateY(-2deg) translateY(-4px) scale(1.015); backdrop-filter: blur(32px) saturate(180%) brightness(1.05); -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(1.05); }
