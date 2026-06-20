@@ -116,11 +116,11 @@
         .about-text p:last-child { margin-bottom: 0; }
         .about-text strong { color: var(--text-primary); }
 
-        .timeline { position: relative; padding-left: 22px; }
-        .timeline::before { content: ''; position: absolute; left: 5px; top: 4px; bottom: 4px; width: 2px; background: linear-gradient(to bottom, var(--accent-teal), #7dd3fc, transparent); }
+        .timeline { position: relative; padding-left: 24px; align-self: center; }
+        .timeline::before { content: ''; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(to bottom, var(--accent-teal), #7dd3fc, transparent); }
         .timeline-item { position: relative; margin-bottom: 16px; }
         .timeline-item:last-child { margin-bottom: 0; }
-        .timeline-item::before { content: ''; position: absolute; left: -22px; top: 5px; width: 12px; height: 12px; border-radius: 50%; background: var(--accent-teal); border: 2px solid #fff; box-shadow: 0 0 0 2px rgba(45,212,191,0.3); }
+        .timeline-item::before { content: ''; position: absolute; left: -24px; top: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-teal); border: 2px solid #fff; box-shadow: 0 0 0 2px rgba(45,212,191,0.3); }
         .timeline-item:not(:first-child)::before { background: #c4d0dd; box-shadow: 0 0 0 2px rgba(148,163,184,0.25); }
         .timeline-item:not(:first-child) .timeline-year { color: var(--text-muted); }
         .timeline-year { font-size: 11.5px; color: var(--accent-teal); font-weight: 600; margin-bottom: 3px; }
@@ -133,7 +133,7 @@
         .recommend-header .title { display: flex; align-items: center; gap: 8px; }
         .reroll-btn { font-size: 11.5px; color: var(--accent-teal); background: rgba(45,212,191,0.12); border: none; padding: 5px 12px; border-radius: 16px; cursor: pointer; transition: var(--transition); font-weight: 500; }
         .reroll-btn:hover { background: rgba(45,212,191,0.22); transform: scale(1.06); }
-        .recommend-item { display: flex; gap: 14px; padding: 13px; border-radius: var(--radius-sm); background: var(--card-bg); text-decoration: none; transition: var(--transition); align-items: flex-start; }
+        .recommend-item { display: flex; gap: 14px; padding: 13px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.28); text-decoration: none; transition: var(--transition); align-items: flex-start; }
         .recommend-item:hover { background: rgba(255,255,255,0.78); transform: scale(1.02); }
         .recommend-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #d9efef, #c4e3e8); display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
         .recommend-thumb { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: linear-gradient(135deg, #d9efef, #c4e3e8); }
@@ -161,8 +161,10 @@
         /* 右侧 */
         .sidebar-right { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 24px; }
         .clock-widget { padding: 20px; text-align: center; }
-        .clock-display { font-family: 'Courier New', monospace; font-size: 44px; font-weight: 700; color: var(--text-primary); letter-spacing: 3px; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .clock-separator { animation: blink 1s step-end infinite; }
+        .clock-display { font-family: 'Courier New', monospace; font-size: 44px; font-weight: 700; color: var(--text-primary); letter-spacing: 3px; line-height: 1; text-shadow: 0 2px 4px rgba(0,0,0,0.05); display: inline-flex; align-items: center; }
+        .clock-segment { display: inline-block; min-width: 2ch; text-align: center; transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), filter 0.45s ease; will-change: opacity, transform, filter; }
+        .clock-segment.flip { opacity: 0; transform: translateY(-8px); filter: blur(2px); }
+        .clock-separator { animation: blink 1.4s ease-in-out infinite; opacity: 0.85; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .clock-date { font-size: 11.5px; color: var(--text-muted); margin-top: 8px; }
 
@@ -312,12 +314,12 @@
                     </div>
                 </div>
                 <div class="welcome-stats">
-                    <div class="welcome-stat"><div class="stat-value">4.15</div><div class="stat-label">本科 GPA（前 2%）</div></div>
-                    <div class="welcome-stat"><div class="stat-value">2+</div><div class="stat-label">SCI 论文</div></div>
-                    <div class="welcome-stat"><div class="stat-value">5+</div><div class="stat-label">国家级奖项</div></div>
-                    <div class="welcome-stat"><div class="stat-value">200+</div><div class="stat-label">GitHub 收藏</div></div>
-                    <div class="welcome-stat"><div class="stat-value">20W+</div><div class="stat-label">B 站播放</div></div>
-                    <div class="welcome-stat"><div class="stat-value">5k+</div><div class="stat-label">抖音粉丝</div></div>
+                    <div class="welcome-stat"><div class="stat-value" data-target="4.15" data-decimals="2">0</div><div class="stat-label">本科 GPA（前 2%）</div></div>
+                    <div class="welcome-stat"><div class="stat-value" data-target="2" data-suffix="+">0</div><div class="stat-label">SCI 论文</div></div>
+                    <div class="welcome-stat"><div class="stat-value" data-target="5" data-suffix="+">0</div><div class="stat-label">国家级奖项</div></div>
+                    <div class="welcome-stat"><div class="stat-value" data-target="200" data-suffix="+">0</div><div class="stat-label">GitHub 收藏</div></div>
+                    <div class="welcome-stat"><div class="stat-value" data-target="20" data-suffix="W+">0</div><div class="stat-label">B 站播放</div></div>
+                    <div class="welcome-stat"><div class="stat-value" data-target="5" data-suffix="k+">0</div><div class="stat-label">抖音粉丝</div></div>
                 </div>
             </div>
 
@@ -329,7 +331,7 @@
                 <div class="content-grid">
                     <div class="about-text">
                         <p><strong>电子科技大学</strong>生物医学工程硕士在读（本科推免），本科 GPA 4.15/5（专业前 2%，省优毕业生）。</p>
-                        <p>技术栈横跨前后端：前端 HTML/CSS/JS、Vue 与响应式布局，后端 Java/Spring Boot、Python/Django，搭配 PySide6 桌面端与 Git + 服务器部署，均有独立完成游戏、工具、每日信息流等十余个子项目的实战沉淀，乐于自学新技术并快速落地。</p>
+                        <p>技术栈横跨前后端：前端 HTML/CSS/JS、Vue 与响应式布局，后端 Java/Spring Boot、Python/Django，搭配 PySide6 桌面端与 Git + 服务器部署，均有独立完成软件、游戏、网页工具等十余个子项目的实战沉淀，乐于自学新技术并快速落地。</p>
                         <p>立足<strong>生物医学工程</strong>，深入深度学习与医学图像分析，主导或参与结直肠息肉检测、脑部海马体分割、脑部肿瘤检测等多个国家级课题，擅长人体生理信号的处理与分析。技术栈覆盖 YOLO 系列、nnU-Net 等检测与分割模型，并主导落地一套覆盖 YOLOv8 至 YOLO26 的通用目标检测系统，训练并整合 40+ 私有权重，支持行人、车辆、交通标志、无人机等多场景类别的实时识别与部署。</p>
                         <p>代码之外，<strong>健身 vlog 博主</strong>（抖音 5000+ 粉丝、10w+ 获赞）与<strong>佳能签约摄影师</strong>（接客 100+），对内容创作、视觉表达与用户体验有直观感知。</p>
                     </div>
@@ -357,7 +359,7 @@
         <!-- 右侧小部件 -->
         <aside class="sidebar-right">
             <div class="glass-card clock-widget fade-in d1">
-                <div class="clock-display"><span id="hours">00</span><span class="clock-separator">:</span><span id="minutes">00</span></div>
+                <div class="clock-display"><span id="hours" class="clock-segment">00</span><span class="clock-separator">:</span><span id="minutes" class="clock-segment">00</span></div>
                 <div class="clock-date" id="clockDate">--</div>
             </div>
 
@@ -414,10 +416,18 @@
         function closeWeChat() { document.getElementById('wechatModal').style.display = 'none'; }
         document.getElementById('wechatModal').addEventListener('click', function(e) { if (e.target === this) closeWeChat(); });
 
+        // 时钟：仅在数字真正变化时触发翻转过渡，避免每秒跳变
+        const clockHours = document.getElementById('hours');
+        const clockMinutes = document.getElementById('minutes');
+        function setSegment(el, val) {
+            if (el.textContent === val) return;
+            el.classList.add('flip');
+            setTimeout(() => { el.textContent = val; el.classList.remove('flip'); }, 220);
+        }
         function updateClock() {
             const now = new Date();
-            document.getElementById('hours').textContent = String(now.getHours()).padStart(2, '0');
-            document.getElementById('minutes').textContent = String(now.getMinutes()).padStart(2, '0');
+            setSegment(clockHours, String(now.getHours()).padStart(2, '0'));
+            setSegment(clockMinutes, String(now.getMinutes()).padStart(2, '0'));
             const week = ['周日','周一','周二','周三','周四','周五','周六'][now.getDay()];
             document.getElementById('clockDate').textContent = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${week}`;
         }
@@ -436,6 +446,42 @@
             let i = 0; el.textContent = '';
             function type() { if (i <= g.length) { el.textContent = g.slice(0, i); i++; setTimeout(type, 90); } }
             type();
+        })();
+
+        // 统计数字滚动出场动画（欢迎卡进入视口后逐个触发）
+        (function() {
+            const stats = document.querySelectorAll('.welcome-stats .stat-value[data-target]');
+            if (!stats.length) return;
+            const easeOut = t => 1 - Math.pow(1 - t, 3); // easeOutCubic
+
+            function animate(el) {
+                if (el.dataset.done) return;
+                el.dataset.done = '1';
+                const target = parseFloat(el.dataset.target);
+                const decimals = parseInt(el.dataset.decimals || '0', 10);
+                const suffix = el.dataset.suffix || '';
+                const duration = 1200;
+                const start = performance.now();
+                function step(now) {
+                    const p = Math.min((now - start) / duration, 1);
+                    const val = target * easeOut(p);
+                    el.textContent = (decimals ? val.toFixed(decimals) : Math.round(val)) + suffix;
+                    if (p < 1) requestAnimationFrame(step);
+                    else el.textContent = (decimals ? target.toFixed(decimals) : target) + suffix;
+                }
+                requestAnimationFrame(step);
+            }
+
+            const io = new IntersectionObserver(entries => {
+                entries.forEach((entry, idx) => {
+                    if (entry.isIntersecting) {
+                        // 同一行/同批进入的项错开一点，形成逐个滚出的节奏
+                        setTimeout(() => animate(entry.target), idx * 90);
+                        io.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.4 });
+            stats.forEach(s => io.observe(s));
         })();
 
         (function() {
