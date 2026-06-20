@@ -104,7 +104,10 @@
 
         .content-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
         .section-card { padding: 22px 24px; }
-        .mao-quote { position: absolute; top: 16px; right: 20px; max-width: 280px; font-size: 11px; color: var(--text-muted); line-height: 1.5; text-align: right; font-style: italic; opacity: 0.7; }
+        .mao-quote { position: absolute; top: 16px; right: 20px; max-width: 420px; font-size: 12px; color: var(--text-muted); line-height: 1.6; text-align: right; font-style: italic; opacity: 0.7; }
+        /* 名言：句子尽量单行，仅在「 —— 作者」前换行 */
+        .mao-quote .quote-text { display: inline; }
+        .mao-quote .quote-author { display: block; margin-top: 4px; }
         #mainContent > .section-card { display: flex; flex-direction: column; justify-content: center; align-items: stretch; text-align: left; }
         #mainContent > .section-card .content-grid { width: 100%; }
         .section-label { font-size: 11.5px; font-weight: 600; color: var(--accent-teal); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
@@ -193,8 +196,44 @@
         .alt-page-link { opacity: 0.2; transition: opacity 0.3s; font-size: 0.7rem; color: var(--text-muted); text-decoration: none; position: fixed; bottom: 8px; right: 12px; z-index: 50; }
         .alt-page-link:hover { opacity: 0.7; }
 
-        @media (max-width: 1200px) { .main-container { grid-template-columns: 232px 1fr; } .sidebar-right { display: none; } }
-        @media (max-width: 768px) { .main-container { grid-template-columns: 1fr; padding: 44px 16px 8px; } .sidebar-left { position: static; } .clock-display { font-size: 36px; } .content-grid { grid-template-columns: 1fr; } .welcome-card { flex-wrap: wrap; } .welcome-card-top { flex-direction: column; gap: 14px; } .welcome-stats { width: 100%; grid-template-columns: repeat(6, 1fr); } }
+        /* 平板及以下：导航横向 + 右侧组件回流显示（不再隐藏） */
+        @media (max-width: 1200px) {
+            .main-container { grid-template-columns: 1fr; padding-top: 16px; }
+            /* 三栏容器展开，让内部卡片直接成为网格项以便重排顺序 */
+            .sidebar-left, .content-area, .sidebar-right { display: contents; }
+
+            /* 导航：吸顶横向滚动条 */
+            .nav-section { order: 0; position: sticky; top: 8px; z-index: 30; display: flex; flex-wrap: nowrap; gap: 6px; overflow-x: auto; padding: 10px 12px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+            .nav-section::-webkit-scrollbar { display: none; }
+            .nav-section .nav-label { display: none; }
+            .nav-section .nav-item { flex-shrink: 0; white-space: nowrap; padding: 8px 13px; margin-bottom: 0; }
+
+            .welcome-card { order: 1; }
+            .section-card { order: 2; }
+            .clock-widget { order: 3; }
+            .calendar-widget { order: 4; }
+            .contact-widget { order: 5; }
+            .sidebar-right .recommend-card { order: 6; }
+            .sidebar-tool-card { order: 7; }
+            #historyToday { order: 8; }
+        }
+
+        @media (max-width: 768px) {
+            .main-container { padding: 14px 14px 8px; gap: 14px; }
+            .welcome-card { padding: 20px 18px; flex-wrap: wrap; }
+            .welcome-card-top { flex-direction: column; gap: 14px; }
+            .welcome-avatar { width: 72px; height: 72px; }
+            .welcome-title { font-size: 21px; }
+            .welcome-stats { width: 100%; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+            .welcome-stat { min-width: 0; padding: 6px 4px; }
+            .welcome-stat .stat-value { font-size: 16px; }
+            .clock-display { font-size: 36px; letter-spacing: 2px; }
+            .content-grid { grid-template-columns: 1fr; }
+            .mao-quote { display: none; }
+            .section-card { padding: 18px 18px; }
+            .calendar-widget { padding: 14px; }
+            .nav-section .nav-item { padding: 8px 11px; font-size: 13px; }
+        }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
@@ -289,8 +328,9 @@
                 <h2 class="section-title">成长路径</h2>
                 <div class="content-grid">
                     <div class="about-text">
-                        <p><strong>电子科技大学</strong>生物医学工程硕士在读（本科推免），本科 GPA 4.15/5（专业前 2%，省优毕业生）。技术栈横跨前后端，从前端页面到后端服务、从桌面应用到部署运维均可快速上手。</p>
-                        <p>独立搭建并长期维护<strong>个人门户网站</strong>（2 年+），沉淀十余个独立子项目（游戏、工具、简历、可视化看板）。前端（HTML/CSS/JS、Vue、响应式）、后端（Java/Spring Boot、Python/Django）、PySide6 桌面端、Git + 服务器部署均有实战经验，乐于自学新技术并快速落地。</p>
+                        <p><strong>电子科技大学</strong>生物医学工程硕士在读（本科推免），本科 GPA 4.15/5（专业前 2%，省优毕业生）。</p>
+                        <p>技术栈横跨前后端：前端 HTML/CSS/JS、Vue 与响应式布局，后端 Java/Spring Boot、Python/Django，搭配 PySide6 桌面端与 Git + 服务器部署，均有独立完成游戏、工具、每日信息流等十余个子项目的实战沉淀，乐于自学新技术并快速落地。</p>
+                        <p>立足<strong>生物医学工程</strong>，深入深度学习与医学图像分析，主导或参与结直肠息肉检测、脑部海马体分割、脑部肿瘤检测等多个国家级课题，擅长人体生理信号的处理与分析。技术栈覆盖 YOLO 系列、nnU-Net 等检测与分割模型，并主导落地一套覆盖 YOLOv8 至 YOLO26 的通用目标检测系统，训练并整合 40+ 私有权重，支持行人、车辆、交通标志、无人机等多场景类别的实时识别与部署。</p>
                         <p>代码之外，<strong>健身 vlog 博主</strong>（抖音 5000+ 粉丝、10w+ 获赞）与<strong>佳能签约摄影师</strong>（接客 100+），对内容创作、视觉表达与用户体验有直观感知。</p>
                     </div>
                     <div class="timeline">
@@ -301,8 +341,13 @@
                         </div>
                         <div class="timeline-item">
                             <div class="timeline-year">2020 — 2024</div>
-                            <div class="timeline-title">学士 · 西南科技大学</div>
+                            <div class="timeline-title">学士 · 西南科技大学(省部共建)</div>
                             <div class="timeline-desc">生物医学工程 · GPA 4.15/5（前 2%）· 推免 · 四川省优秀毕业生</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">2017 — 2020</div>
+                            <div class="timeline-title">高中 · 梁平中学</div>
+                            <div class="timeline-desc">重庆市重点中学 · 理科 · 任班干部，养成自学习惯与时间管理能力</div>
                         </div>
                     </div>
                 </div>
@@ -452,10 +497,10 @@
                 }
             }
 
-            // 显示名言
+            // 显示名言（句子尽量单行，仅在「—— 作者」前换行）
             async function displayQuote() {
                 const quote = await fetchQuote();
-                quoteEl.textContent = `"${quote.text}" —— ${quote.author}`;
+                quoteEl.innerHTML = `<span class="quote-text">"${quote.text}"</span><span class="quote-author">—— ${quote.author}</span>`;
             }
 
             displayQuote();
