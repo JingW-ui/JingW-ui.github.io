@@ -441,23 +441,39 @@
         (function() {
             const badge = document.getElementById('statusBadge');
             if (!badge) return;
-            const now = new Date();
-            const day = now.getDay();
-            const hour = now.getHours();
-            const isWorkday = day >= 1 && day <= 5;
-            const isWorkHour = hour >= 9 && hour < 17;
+            const isWorkday = new Date().getDay() % 6 !== 0; // 周一~周五
 
-            if (isWorkday && isWorkHour) {
-                badge.innerHTML = '<i class="fas fa-briefcase"></i>955 工作中';
-            } else {
-                const activities = [
-                    { icon: 'fas fa-dumbbell', text: '健身ing' },
-                    { icon: 'fas fa-camera', text: '摄影ing' },
-                    { icon: 'fas fa-book', text: '学习中' }
-                ];
-                const random = activities[Math.floor(Math.random() * activities.length)];
-                badge.innerHTML = `<i class="${random.icon}"></i>${random.text}`;
+            // 按真实作息映射状态，仅晚间自由时间随机
+            function pickStatus() {
+                const hour = new Date().getHours();
+                if (hour < 7)  return { icon: 'fas fa-moon', text: '休息中' };        // 睡眠
+                if (hour < 9)  return { icon: 'fas fa-utensils', text: '干饭中' };    // 早餐
+                if (hour < 12) return isWorkday
+                    ? { icon: 'fas fa-briefcase', text: '955 工作中' }
+                    : { icon: 'fas fa-book', text: '学习中' };                         // 上午
+                if (hour < 13) return { icon: 'fas fa-utensils', text: '干饭中' };    // 午餐
+                if (hour < 14) return { icon: 'fas fa-moon', text: '休息中' };        // 午休
+                if (hour < 18) return isWorkday
+                    ? { icon: 'fas fa-briefcase', text: '955 工作中' }
+                    : { icon: 'fas fa-book', text: '学习中' };                         // 下午
+                if (hour < 19) return { icon: 'fas fa-utensils', text: '干饭中' };    // 晚餐
+                if (hour < 23) {                                                       // 晚间自由时间（随机）
+                    const free = [
+                        { icon: 'fas fa-dumbbell', text: '健身ing' },
+                        { icon: 'fas fa-camera', text: '摄影ing' },
+                        { icon: 'fas fa-book', text: '学习中' }
+                    ];
+                    return free[Math.floor(Math.random() * free.length)];
+                }
+                return { icon: 'fas fa-moon', text: '休息中' };                        // 深夜
             }
+
+            function render() {
+                const s = pickStatus();
+                badge.innerHTML = `<i class="${s.icon}"></i>${s.text}`;
+            }
+            render();
+            setInterval(render, 60000); // 每分钟刷新，跨时段自动切换
         })();
 
         (function() {
