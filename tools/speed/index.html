@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>反应速度测试</title>
+    <style>
+        /* 基础样式重置 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; /* 防止滚动 */
+        }
+
+        /* 整个屏幕作为点击区域 */
+        #game-area {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.1s;
+            user-select: none; /* 防止点击时选中文字 */
+            -webkit-user-select: none;
+        }
+
+        /* 文本样式 */
+        h1 {
+            font-size: 4rem;
+            margin: 0;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        p {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 20px;
+        }
+
+        /* 状态颜色定义 */
+        .state-start {
+            background-color: #2b87d1; /* 蓝色：初始/重试状态 */
+        }
+
+        .state-waiting {
+            background-color: #ce2636; /* 红色：等待变绿 */
+        }
+
+        .state-go {
+            background-color: #4bdb6a; /* 绿色：点击！ */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-area" class="state-start" onclick="handleClick()">
+        <h1 id="main-text">反应速度测试</h1>
+        <p id="sub-text">点击屏幕开始</p>
+    </div>
+
+    <script>
+        const gameArea = document.getElementById('game-area');
+        const mainText = document.getElementById('main-text');
+        const subText = document.getElementById('sub-text');
+
+        let startTime = 0;
+        let timeoutId = null;
+        let gameState = 'start'; // start, waiting, go, result
+
+        function handleClick() {
+            switch (gameState) {
+                case 'start':
+                case 'result':
+                    startGame();
+                    break;
+                case 'waiting':
+                    tooEarly();
+                    break;
+                case 'go':
+                    endGame();
+                    break;
+            }
+        }
+
+        function startGame() {
+            // 设置状态为等待（红色）
+            gameState = 'waiting';
+            gameArea.className = 'state-waiting';
+            mainText.innerText = "等待绿色...";
+            subText.innerText = "在变绿之前不要点击";
+
+            // 生成随机延迟 (2000ms 到 5000ms)
+            const randomDelay = Math.floor(Math.random() * 3000) + 2000;
+
+            // 设置定时器
+            timeoutId = setTimeout(() => {
+                turnGreen();
+            }, randomDelay);
+        }
+
+        function turnGreen() {
+            // 设置状态为点击（绿色）
+            gameState = 'go';
+            gameArea.className = 'state-go';
+            mainText.innerText = "点击!";
+            subText.innerText = "请立即点击";
+
+            // 记录开始时间 (高精度)
+            startTime = performance.now();
+        }
+
+        function endGame() {
+            const endTime = performance.now();
+            const reactionTime = Math.round(endTime - startTime);
+
+            gameState = 'result';
+            gameArea.className = 'state-start'; // 回到蓝色
+
+            mainText.innerText = reactionTime + " ms";
+
+            if (reactionTime < 200) {
+                subText.innerText = "惊人! 你是闪电侠吗？点击再试一次。";
+            } else if (reactionTime < 300) {
+                subText.innerText = "不错! 超过大多数人了。点击再试一次。";
+            } else {
+                subText.innerText = "有点慢哦，多试几次吧。点击再试一次。";
+            }
+        }
+
+        function tooEarly() {
+            // 用户在变绿前点击了
+            clearTimeout(timeoutId); // 取消变绿定时器
+            gameState = 'result';
+            gameArea.className = 'state-start';
+            mainText.innerText = "太早了!";
+            subText.innerText = "你还没等变绿就点了。点击重新开始。";
+        }
+    </script>
+</body>
+</html>

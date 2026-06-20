@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>万花筒 – 8 重对称绘图</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { overflow: hidden; background: #000; }
+  canvas {
+    display: block;
+    cursor: crosshair;
+  }
+  #hint {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.6);
+    font-family: sans-serif;
+    font-size: 14px;
+    pointer-events: none;
+    user-select: none;
+  }
+  #controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+  }
+  button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  button:hover { background: rgba(255,255,255,0.35); }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="hint">按住鼠标左键并移动，绘制万花筒图案</div>
+<div id="controls">
+  <button id="clearBtn">清空</button>
+  <button id="saveBtn">保存</button>
+</div>
+
+<script>
+/* ---------- 1. 基本设置 ---------- */
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+
+function resize() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+/* ---------- 2. 参数 ---------- */
+const SECTOR_COUNT = 8;               // 8 重对称
+const ANGLE_STEP   = (Math.PI * 2) / SECTOR_COUNT; // 45°
+
+/* ---------- 3. 绘制一段线条的对称副本 ---------- */
+function drawSymSegment(x1, y1, x2, y2, color) {
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+
+  // 相对于中心点的向量
+  const sx = x1 - cx, sy = y1 - cy;
+  const ex = x2 - cx, ey = y2 - cy;
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth   = 2;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+
+  for (let i = 0; i < SECTOR_COUNT; i++) {
+    const cos = Math.cos(ANGLE_STEP * i);
+    const sin = Math.sin(ANGLE_STEP * i);
+
+    // 旋转后的端点
+    const rx1 = sx * cos - sy * sin + cx;
+    const ry1 = sx * sin + sy * cos + cy;
+    const rx2 = ex * cos - ey * sin + cx;
+    const ry2 = ex * sin + ey * cos + cy;
+
+    ctx.beginPath();
+    ctx.moveTo(rx1, ry1);
+    ctx.lineTo(rx2, ry2);
+    ctx.stroke();
+  }
+}
+
+/* ---------- 4. 随机颜色（每次一段线条统一颜色） ---------- */
+function randomColor() {
+  const hue = Math.floor(Math.random() * 360);
+  return `hsl(${hue}, 80%, 60%)`;
+}
+
+/* ---------- 5. 鼠标/触摸交互 ---------- */
+let isDrawing = false;
+let lastX = 0, lastY = 0;
+
+function getPos(e) {
+  if (e.touches && e.touches.length > 0) {
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+  return { x: e.offsetX, y: e.offsetY };
+}
+
+function startDraw(e) {
+  isDrawing = true;
+  const p = getPos(e);
+  lastX = p.x;
+  lastY = p.y;
+}
+
+function moveDraw(e) {
+  if (!isDrawing) return;
+  e.preventDefault(); // 防止移动端页面滚动
+  const p   = getPos(e);
+  const col = randomColor();      // 本段统一颜色
+  drawSymSegment(lastX, lastY, p.x, p.y, col);
+  lastX = p.x;
+  lastY = p.y;
+}
+
+function endDraw() {
+  isDrawing = false;
+}
+
+/* 鼠标 */
+canvas.addEventListener('mousedown', startDraw);
+canvas.addEventListener('mousemove', moveDraw);
+canvas.addEventListener('mouseup',   endDraw);
+canvas.addEventListener('mouseleave', endDraw);
+
+/* 触摸 */
+canvas.addEventListener('touchstart', startDraw, { passive: false });
+canvas.addEventListener('touchmove',  moveDraw,  { passive: false });
+canvas.addEventListener('touchend',   endDraw);
+
+/* ---------- 6. 控制按钮 ---------- */
+document.getElementById('clearBtn').addEventListener('click', () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+document.getElementById('saveBtn').addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'kaleidoscope.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+/* ---------- 7. 初始提示隐藏 ---------- */
+window.addEventListener('keydown', e => {
+  if (e.key === 'c' || e.key === 'C') {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+});
+</script>
+
+</body>
+</html>

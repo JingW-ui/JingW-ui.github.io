@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深呼吸放松辅助</title>
+    <style>
+        :root {
+            --bg-color-1: #0f172a;
+            --bg-color-2: #1e1b4b;
+            --circle-inhale: rgba(45, 212, 191, 0.4);  /* 翡翠绿 - 吸气 */
+            --circle-hold: rgba(59, 130, 246, 0.4);    /* 经典蓝 - 呼气 */
+            --circle-exhale: rgba(139, 92, 246, 0.4);  /* 极光紫 - 屏息 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: radial-gradient(circle at center, var(--bg-color-2), var(--bg-color-1));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            color: #f8fafc;
+            overflow: hidden;
+            padding: 2rem;
+        }
+
+        /* 顶部标题与模式切换 */
+        header {
+            text-align: center;
+            margin-top: 1rem;
+            z-index: 10;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 300;
+            letter-spacing: 0.2rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        .modes {
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.3rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 呼吸主容器 */
+        .breathing-container {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+        }
+
+        /* 背景静态参考圈 */
+        .guide-circle {
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        /* 动态缩放的呼吸圈 */
+        .breathing-circle {
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: var(--circle-hold);
+            box-shadow: 0 0 50px rgba(59, 130, 246, 0.3);
+            transform: scale(1);
+            transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 1s ease, box-shadow 1s ease;
+        }
+
+        /* 中心文本 */
+        .text-overlay {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        #status {
+            font-size: 2rem;
+            font-weight: 400;
+            letter-spacing: 0.1rem;
+            margin-bottom: 0.5rem;
+            transition: opacity 0.3s;
+        }
+
+        #timer {
+            font-size: 3rem;
+            font-weight: 200;
+            font-family: monospace, sans-serif;
+            opacity: 0.9;
+        }
+
+        /* 底部控制按钮 */
+        footer {
+            margin-bottom: 2rem;
+            z-index: 10;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.9);
+            color: #0f172a;
+            border: none;
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            background: #ffffff;
+        }
+
+        .control-btn:active {
+            transform: translateY(1px);
+        }
+
+        .control-btn.running {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>静心呼吸</h1>
+        <div class="modes">
+            <button class="mode-btn active" onclick="switchMode('box')">盒子呼吸法 (4-4-4-4)</button>
+            <button class="mode-btn" onclick="switchMode('relax')">4-7-8 助眠法</button>
+        </div>
+    </header>
+
+    <div class="breathing-container">
+        <div class="guide-circle"></div>
+        <div class="breathing-circle" id="circle"></div>
+        <div class="text-overlay">
+            <span id="status">准备开始</span>
+            <span id="timer">-</span>
+        </div>
+    </div>
+
+    <footer>
+        <button class="control-btn" id="startBtn" onclick="toggleBreathing()">开始练习</button>
+    </footer>
+
+    <script>
+        const circle = document.getElementById('circle');
+        const statusText = document.getElementById('status');
+        const timerText = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+
+        let isRunning = false;
+        let currentPhaseIndex = 0;
+        let countdown = 0;
+        let stateInterval = null;
+        let timerInterval = null;
+
+        // 呼吸模式配置
+        const modes = {
+            box: [
+                { name: '吸气', duration: 4, scale: 2, color: 'rgba(45, 212, 191, 0.5)', glow: '0 0 60px rgba(45, 212, 191, 0.6)' },
+                { name: '屏息', duration: 4, scale: 2, color: 'rgba(59, 130, 246, 0.5)', glow: '0 0 60px rgba(59, 130, 246, 0.6)' },
+                { name: '呼气', duration: 4, scale: 1, color: 'rgba(139, 92, 246, 0.5)', glow: '0 0 60px rgba(139, 92, 246, 0.6)' },
+                { name: '屏息', duration: 4, scale: 1, color: 'rgba(59, 130, 246, 0.5)', glow: '0 0 60px rgba(59, 130, 246, 0.6)' }
+            ],
+            relax: [
+                { name: '吸气', duration: 4, scale: 2, color: 'rgba(45, 212, 191, 0.5)', glow: '0 0 60px rgba(45, 212, 191, 0.6)' },
+                { name: '屏息', duration: 7, scale: 2, color: 'rgba(59, 130, 246, 0.5)', glow: '0 0 60px rgba(59, 130, 246, 0.6)' },
+                { name: '呼气', duration: 8, scale: 1, color: 'rgba(139, 92, 246, 0.5)', glow: '0 0 60px rgba(139, 92, 246, 0.6)' }
+            ]
+        };
+
+        let currentMode = 'box';
+
+        function switchMode(mode) {
+            if (isRunning) {
+                stopBreathing();
+            }
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            resetUI();
+        }
+
+        function toggleBreathing() {
+            if (isRunning) {
+                stopBreathing();
+            } else {
+                startBreathing();
+            }
+        }
+
+        function startBreathing() {
+            isRunning = true;
+            startBtn.textContent = '停止';
+            startBtn.classList.add('running');
+            currentPhaseIndex = 0;
+            runPhase();
+        }
+
+        function stopBreathing() {
+            isRunning = false;
+            startBtn.textContent = '开始练习';
+            startBtn.classList.remove('running');
+            clearTimeout(stateInterval);
+            clearInterval(timerInterval);
+            resetUI();
+        }
+
+        function resetUI() {
+            statusText.textContent = '准备开始';
+            timerText.textContent = '-';
+            circle.style.transition = 'all 1s ease-in-out';
+            circle.style.transform = 'scale(1)';
+            circle.style.backgroundColor = 'rgba(59, 130, 246, 0.4)';
+            circle.style.boxShadow = '0 0 50px rgba(59, 130, 246, 0.3)';
+        }
+
+        function runPhase() {
+            if (!isRunning) return;
+
+            const phases = modes[currentMode];
+            const phase = phases[currentPhaseIndex];
+
+            // 更新文字与时间
+            statusText.textContent = phase.name;
+            countdown = phase.duration;
+            timerText.textContent = countdown;
+
+            // 应用平滑过渡动画（过渡时间正好等于当前阶段持续时间）
+            circle.style.transition = `transform ${phase.duration}s cubic-bezier(0.37, 0, 0.63, 1), background-color ${phase.duration}s ease-in-out, box-shadow ${phase.duration}s ease-in-out`;
+            circle.style.transform = `scale(${phase.scale})`;
+            circle.style.backgroundColor = phase.color;
+            circle.style.boxShadow = phase.glow;
+
+            // 秒表倒计时
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    timerText.textContent = countdown;
+                } else {
+                    clearInterval(timerInterval);
+                }
+            }, 1000);
+
+            // 阶段切换
+            clearTimeout(stateInterval);
+            stateInterval = setTimeout(() => {
+                currentPhaseIndex = (currentPhaseIndex + 1) % phases.length;
+                runPhase();
+            }, phase.duration * 1000);
+        }
+    </script>
+</body>
+</html>

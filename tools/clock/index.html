@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>世界时钟墙</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0c0c0e;
+            --fg: #e8e8ec;
+            --muted: #5a5a6e;
+            --accent: #c9a227;
+            --accent-dim: #8b7119;
+            --card: #161619;
+            --card-border: #2a2a30;
+            --red: #c74a4a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: var(--fg);
+            min-height: 100vh;
+        }
+
+        .mono-font {
+            font-family: 'Space Mono', monospace;
+        }
+
+        /* 背景纹理 */
+        .bg-texture {
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 30% 20%, rgba(201, 162, 39, 0.03) 0%, transparent 40%),
+                radial-gradient(circle at 70% 80%, rgba(201, 162, 39, 0.02) 0%, transparent 40%),
+                linear-gradient(180deg, var(--bg) 0%, #0f0f12 100%);
+            z-index: -2;
+        }
+
+        .grid-lines {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(201, 162, 39, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(201, 162, 39, 0.015) 1px, transparent 1px);
+            background-size: 80px 80px;
+            z-index: -1;
+        }
+
+        /* 时钟卡片 */
+        .clock-card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+        }
+
+        .clock-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-dim);
+        }
+
+        .clock-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-dim), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .clock-card:hover::after {
+            opacity: 1;
+        }
+
+        /* 时区标签 */
+        .tz-badge {
+            background: rgba(201, 162, 39, 0.1);
+            border: 1px solid var(--accent-dim);
+            color: var(--accent);
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+
+        /* 数字时间 */
+        .digital-time {
+            letter-spacing: 0.1em;
+        }
+
+        /* 入场动画 */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: slideUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .animate-in {
+                animation: none;
+                opacity: 1;
+            }
+            .clock-card {
+                transition: none;
+            }
+        }
+
+        /* 响应式 Canvas */
+        .clock-canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-texture"></div>
+    <div class="grid-lines"></div>
+
+    <div class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
+        <!-- 标题 -->
+        <header class="text-center mb-10 animate-in" style="animation-delay: 0.1s;">
+            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2" style="color: var(--fg);">
+                WORLD CLOCK
+            </h1>
+            <p class="text-sm tracking-widest uppercase" style="color: var(--muted);">
+                Beijing · London · New York · Tokyo
+            </p>
+        </header>
+
+        <!-- 时钟网格 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full max-w-6xl">
+
+            <!-- 北京 -->
+            <div class="clock-card animate-in" style="animation-delay: 0.15s;">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-semibold tracking-wide">BEIJING</h2>
+                        <p class="text-xs mt-0.5" style="color: var(--muted);">中国</p>
+                    </div>
+                    <span class="tz-badge mono-font">UTC+8</span>
+                </div>
+                <canvas id="clock-beijing" class="clock-canvas" width="180" height="180"></canvas>
+                <div class="mt-4 text-center">
+                    <div id="digital-beijing" class="mono-font digital-time text-xl font-bold" style="color: var(--accent);">--:--:--</div>
+                    <div id="date-beijing" class="text-xs mt-1.5" style="color: var(--muted);">----年--月--日</div>
+                </div>
+            </div>
+
+            <!-- 伦敦 -->
+            <div class="clock-card animate-in" style="animation-delay: 0.25s;">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-semibold tracking-wide">LONDON</h2>
+                        <p class="text-xs mt-0.5" style="color: var(--muted);">英国</p>
+                    </div>
+                    <span class="tz-badge mono-font">UTC+0</span>
+                </div>
+                <canvas id="clock-london" class="clock-canvas" width="180" height="180"></canvas>
+                <div class="mt-4 text-center">
+                    <div id="digital-london" class="mono-font digital-time text-xl font-bold" style="color: var(--accent);">--:--:--</div>
+                    <div id="date-london" class="text-xs mt-1.5" style="color: var(--muted);">----年--月--日</div>
+                </div>
+            </div>
+
+            <!-- 纽约 -->
+            <div class="clock-card animate-in" style="animation-delay: 0.35s;">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-semibold tracking-wide">NEW YORK</h2>
+                        <p class="text-xs mt-0.5" style="color: var(--muted);">美国</p>
+                    </div>
+                    <span class="tz-badge mono-font">UTC-5</span>
+                </div>
+                <canvas id="clock-newyork" class="clock-canvas" width="180" height="180"></canvas>
+                <div class="mt-4 text-center">
+                    <div id="digital-newyork" class="mono-font digital-time text-xl font-bold" style="color: var(--accent);">--:--:--</div>
+                    <div id="date-newyork" class="text-xs mt-1.5" style="color: var(--muted);">----年--月--日</div>
+                </div>
+            </div>
+
+            <!-- 东京 -->
+            <div class="clock-card animate-in" style="animation-delay: 0.45s;">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-lg font-semibold tracking-wide">TOKYO</h2>
+                        <p class="text-xs mt-0.5" style="color: var(--muted);">日本</p>
+                    </div>
+                    <span class="tz-badge mono-font">UTC+9</span>
+                </div>
+                <canvas id="clock-tokyo" class="clock-canvas" width="180" height="180"></canvas>
+                <div class="mt-4 text-center">
+                    <div id="digital-tokyo" class="mono-font digital-time text-xl font-bold" style="color: var(--accent);">--:--:--</div>
+                    <div id="date-tokyo" class="text-xs mt-1.5" style="color: var(--muted);">----年--月--日</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <footer class="mt-10 text-center animate-in" style="animation-delay: 0.55s;">
+            <p class="text-xs" style="color: var(--muted);">实时同步 · 精准时区</p>
+        </footer>
+    </div>
+
+    <script>
+        // 时区配置（初始化在最前面）
+        const TIMEZONES = {
+            beijing: { offset: 8, city: '北京' },
+            london: { offset: 0, city: '伦敦' },
+            newyork: { offset: -5, city: '纽约' },
+            tokyo: { offset: 9, city: '东京' }
+        };
+
+        // 颜色配置
+        const COLORS = {
+            face: '#1a1a1e',
+            faceInner: '#141416',
+            border: '#3a3a42',
+            borderAccent: '#c9a227',
+            hourHand: '#c9a227',
+            minuteHand: '#e8e8ec',
+            secondHand: '#c74a4a',
+            tick: '#3a3a42',
+            tickMajor: '#c9a227',
+            numbers: '#5a5a6e',
+            center: '#c9a227',
+            centerInner: '#0c0c0e'
+        };
+
+        // 最小值常量
+        const EPS = 0.001;
+
+        // 安全的数学运算
+        function safeRadius(r) {
+            return Math.max(EPS, r);
+        }
+
+        // 获取指定时区的时间
+        function getTimeInTimezone(offset) {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const cityTime = new Date(utc + (3600000 * offset));
+            return {
+                hours: cityTime.getHours(),
+                minutes: cityTime.getMinutes(),
+                seconds: cityTime.getSeconds(),
+                milliseconds: cityTime.getMilliseconds()
+            };
+        }
+
+        // 格式化数字时间
+        function formatTime(time) {
+            const h = time.hours.toString().padStart(2, '0');
+            const m = time.minutes.toString().padStart(2, '0');
+            const s = time.seconds.toString().padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        // 格式化日期
+        function formatDate(offset) {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const cityTime = new Date(utc + (3600000 * offset));
+
+            const year = cityTime.getFullYear();
+            const month = cityTime.getMonth() + 1;
+            const day = cityTime.getDate();
+            const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            const weekDay = weekDays[cityTime.getDay()];
+
+            return `${year}年${month}月${day}日 ${weekDay}`;
+        }
+
+        // 绘制时钟
+        function drawClock(canvasId, time) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = safeRadius(Math.min(width, height) / 2 - 8);
+
+            // 清空画布
+            ctx.clearRect(0, 0, width, height);
+
+            // 绘制表盘背景
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.fillStyle = COLORS.face;
+            ctx.fill();
+
+            // 绘制内圈
+            const innerRadius = safeRadius(radius - 6);
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+            ctx.fillStyle = COLORS.faceInner;
+            ctx.fill();
+
+            // 绘制外边框
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = COLORS.border;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // 绘制刻度
+            for (let i = 0; i < 60; i++) {
+                const angle = (i * 6 - 90) * Math.PI / 180;
+                const isMajor = i % 5 === 0;
+                const tickInner = safeRadius(isMajor ? radius - 20 : radius - 12);
+                const tickOuter = safeRadius(radius - 8);
+
+                const x1 = centerX + Math.cos(angle) * tickInner;
+                const y1 = centerY + Math.sin(angle) * tickInner;
+                const x2 = centerX + Math.cos(angle) * tickOuter;
+                const y2 = centerY + Math.sin(angle) * tickOuter;
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = isMajor ? COLORS.tickMajor : COLORS.tick;
+                ctx.lineWidth = isMajor ? 2 : 1;
+                ctx.stroke();
+            }
+
+            // 绘制数字
+            ctx.font = '600 12px Outfit';
+            ctx.fillStyle = COLORS.numbers;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            for (let i = 1; i <= 12; i++) {
+                const angle = (i * 30 - 90) * Math.PI / 180;
+                const numRadius = safeRadius(radius - 34);
+                const x = centerX + Math.cos(angle) * numRadius;
+                const y = centerY + Math.sin(angle) * numRadius;
+                ctx.fillText(i.toString(), x, y);
+            }
+
+            // 计算指针角度（平滑过渡）
+            const smoothSeconds = time.seconds + time.milliseconds / 1000;
+            const smoothMinutes = time.minutes + smoothSeconds / 60;
+            const smoothHours = (time.hours % 12) + smoothMinutes / 60;
+
+            const hourAngle = (smoothHours * 30 - 90) * Math.PI / 180;
+            const minuteAngle = (smoothMinutes * 6 - 90) * Math.PI / 180;
+            const secondAngle = (smoothSeconds * 6 - 90) * Math.PI / 180;
+
+            // 绘制时针
+            drawHand(ctx, centerX, centerY, hourAngle, radius * 0.42, 5, COLORS.hourHand);
+
+            // 绘制分针
+            drawHand(ctx, centerX, centerY, minuteAngle, radius * 0.62, 3, COLORS.minuteHand);
+
+            // 绘制秒针
+            drawSecondHand(ctx, centerX, centerY, secondAngle, radius * 0.72, COLORS.secondHand);
+
+            // 绘制中心圆点
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+            ctx.fillStyle = COLORS.center;
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 2, 0, Math.PI * 2);
+            ctx.fillStyle = COLORS.centerInner;
+            ctx.fill();
+        }
+
+        // 绘制时针/分针
+        function drawHand(ctx, cx, cy, angle, length, width, color) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+
+            const safeLength = safeRadius(length);
+            const safeWidth = Math.max(1, width);
+
+            ctx.beginPath();
+            ctx.moveTo(-12, 0);
+            ctx.lineTo(0, -safeWidth / 2);
+            ctx.lineTo(safeLength, 0);
+            ctx.lineTo(0, safeWidth / 2);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // 绘制秒针
+        function drawSecondHand(ctx, cx, cy, angle, length, color) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle);
+
+            const safeLength = safeRadius(length);
+
+            ctx.beginPath();
+            ctx.moveTo(-18, 0);
+            ctx.lineTo(safeLength, 0);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1.5;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            // 秒针尾部圆点
+            ctx.beginPath();
+            ctx.arc(-14, 0, 3, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // 更新所有时钟
+        function updateClocks() {
+            Object.keys(TIMEZONES).forEach(city => {
+                const config = TIMEZONES[city];
+                const time = getTimeInTimezone(config.offset);
+
+                // 更新模拟时钟
+                drawClock(`clock-${city}`, time);
+
+                // 更新数字时间
+                const digitalEl = document.getElementById(`digital-${city}`);
+                if (digitalEl) {
+                    digitalEl.textContent = formatTime(time);
+                }
+
+                // 更新日期
+                const dateEl = document.getElementById(`date-${city}`);
+                if (dateEl) {
+                    dateEl.textContent = formatDate(config.offset);
+                }
+            });
+        }
+
+        // 检查 reduced motion 偏好
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // 初始化并启动时钟
+        function init() {
+            updateClocks();
+
+            if (prefersReducedMotion) {
+                setInterval(updateClocks, 1000);
+            } else {
+                (function animate() {
+                    updateClocks();
+                    requestAnimationFrame(animate);
+                })();
+            }
+        }
+
+        // 启动
+        init();
+    </script>
+</body>
+</html>
