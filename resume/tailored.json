@@ -238,5 +238,45 @@
     "date": "2026.06",
     "url": "/resume/resume_backend_java.html",
     "match": "high"
+  },
+  {
+    "index": "25",
+    "company": "通用 · AI 应用",
+    "role": "AI 应用工程师",
+    "direction": "大模型应用 / Agent / RAG 工程化落地",
+    "tags": ["LLM/Agent 应用", "RAG / 向量库", "Python", "AI 工程化落地"],
+    "date": "2026.06",
+    "url": "/resume/resume_ai_app_guangzhou.html",
+    "match": "high"
+  },
+  {
+    "index": "26",
+    "company": "AI Scientist 团队 · 上海徐汇",
+    "role": "AI Scientist 暑期科研实习生",
+    "direction": "AI Agent / 医疗科研自动化 / 智能体系统",
+    "tags": ["AI Agent / AI Scientist", "Python / PyTorch / LLM", "多模态医学数据", "SCI 论文"],
+    "date": "2026.06",
+    "url": "/resume/resume_ai_scientist_summer.html",
+    "match": "high"
+  },
+  {
+    "index": "27",
+    "company": "蓝极星 · 深圳 · 27届",
+    "role": "运动健康 Agent 工程师",
+    "direction": "AI Agent / 穿戴设备运动健康算法",
+    "tags": ["AI Agent（推理/记忆/工具调用）", "运动健康多模态数据", "Python / PyTorch", "轻量化边缘端部署"],
+    "date": "2026.06",
+    "url": "/resume/resume_sport_health_agent.html",
+    "match": "high"
+  },
+  {
+    "index": "28",
+    "company": "通用 · 软件测试",
+    "role": "软件测试工程师",
+    "direction": "功能 / 回归 / 自动化测试",
+    "tags": ["Python 自动化测试", "功能/回归测试", "缺陷管理", "测试文档"],
+    "date": "2026.06",
+    "url": "/resume/resume_qa_test_general.html",
+    "match": ""
   }
 ]

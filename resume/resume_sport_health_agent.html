@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 运动健康 Agent 工程师</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            line-height: 1.2;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            padding: 14mm 16mm;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 22px;
+            padding: 0 0 16px;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 100px;
+            height: 110px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .profile-info {
+            text-align: left;
+        }
+        .name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .target {
+            font-size: 13px;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .contact-info a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            border-left: 4px solid #333;
+            padding-left: 10px;
+        }
+        .summary {
+            font-size: 12.5px;
+            color: #444;
+            line-height: 1.7;
+        }
+        .summary strong {
+            color: #1a1a1a;
+        }
+        .hl-red {
+            color: #fd0000;
+            font-weight: 600;
+        }
+        .subsection {
+            margin-bottom: 10px;
+            padding-bottom: 9px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 3px;
+        }
+        .date {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .tech-line {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .tech-line em {
+            font-style: normal;
+            color: #2d74bb;
+            font-weight: 500;
+        }
+        ul {
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.55;
+        }
+        .skill-line {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 6px;
+        }
+        .skill-line:last-child {
+            margin-bottom: 0;
+        }
+        .skill-cat {
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-right: 2px;
+        }
+        .skill-hl {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .label-link {
+            display: inline-block;
+            background-color: #f5f5f5;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .label-link:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .github-label-link {
+            display: inline-block;
+            background-color: #1F883D;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .github-label-link:hover {
+            background-color: #176d31;
+        }
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+            .page {
+                box-shadow: none;
+                width: auto;
+                min-height: auto;
+                padding: 0;
+            }
+        }
+        @media (max-width: 820px) {
+            body {
+                padding: 10px;
+            }
+            .page {
+                width: 100%;
+                min-height: auto;
+                padding: 18px 16px;
+            }
+            .profile-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-info {
+                text-align: center;
+            }
+            .name {
+                font-size: 22px;
+            }
+        }
+        /* print-color-fix */
+        html, body, .header, .label-link, .github-label-link, .target, .contact-info a {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        @media print {
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header：个人信息（不写政治面貌） -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：运动健康 Agent 工程师（27 届）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势：呼应 JD 核心要求，放量化成果 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            电子科技大学（985）生物医学工程硕士，同时具备 <strong>AI Agent 研发</strong>与<strong>运动健康/医学信号处理</strong>交叉背景，高度契合穿戴设备运动健康 Agent 方向。主导研发 LLM 驱动的<strong>自主智能体系统 NEURA</strong>（推理 / 记忆 / 工具调用闭环 + RAG + 工具链编排，SCI 论文 bioRxiv），能设计面向多模态数据的智能体原型并生成决策建议；有<strong>运动姿态识别</strong>项目经验（基于人体骨架与传感器时序信号的跌倒检测，省一等奖），理解运动生理学与运动轨迹分析。熟练 <strong>Python / PyTorch</strong>，具备轻量化模型与边缘端部署（PySide6 桌面端）、时序传感器数据处理能力。累计 <span class="hl-red">2 篇 SCI 论文</span>、<span class="hl-red">200+ GitHub Star</span>、多项国家级竞赛一等奖，英语六级，沟通协作能力强。
+        </div>
+    </div>
+
+    <!-- 教育背景（每条经历必须含学院与研究方向） -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 生命科学与技术学院 · 生物医学工程 · 硕士</div>
+            <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授 ｜ 神经信息教育部重点实验室</div>
+            <div class="tech-line"><em>研究方向：</em>AI 智能体（推理 / 记忆 / 工具调用） · 医学多模态数据分析 · 运动健康与神经影像智能分析</div>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 信息工程学院 · 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ <span class="hl-red">四川省优秀毕业生 · 推免生</span></div>
+            <div class="tech-line"><em>研究方向：</em>运动姿态与传感器信号处理 · 深度学习与目标检测 · 生理学与医学图像处理基础</div>
+        </div>
+    </div>
+
+    <!-- 专业技能：流式文本，不用按钮/标签样式 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-line">
+            <span class="skill-cat">AI Agent：</span><span class="skill-hl">推理 / 记忆 / 工具调用</span> · <span class="skill-hl">LLM 应用开发</span> · <span class="skill-hl">RAG / 向量库</span> · 多模态数据理解 · 个性化建议 / 干预决策生成
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">运动健康与信号：</span><span class="skill-hl">时序传感器数据处理</span> · 人体姿态估计（OpenPose / YOLO-Pose） · 运动轨迹分析 · 生理学 / 运动生理学基础 · 心率 / 睡眠 / 运动多模态数据
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">编码与部署：</span><span class="skill-hl">Python（主力）</span> · <span class="skill-hl">PyTorch</span> · C/C++ · <span class="skill-hl">轻量化模型与边缘端部署</span> · 软件架构设计 · Linux · Git
+        </div>
+    </div>
+
+    <!-- 项目经验：按 JD 相关度排序，最相关的前置 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+        <div class="subsection">
+            <div class="subsection-title">
+                AI Agent 研发：NEURA 自主智能体系统
+                <a class="github-label-link" href="https://github.com/NeuroScienceLab/NEURA" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" rel="noopener">bioRxiv 论文</a>
+            </div>
+            <div class="date">2025.07 - 2026.02</div>
+            <div class="tech-line"><em>技术栈：</em>LLM · Agent（推理 / 记忆 / 工具调用）· RAG · 双知识图谱 · Python</div>
+            <ul>
+                <li>跟踪 AI Agent 前沿技术（推理、记忆、工具调用），设计面向多模态数据的智能体原型：构建认知架构实现 Planning / Memory / Tool Use 闭环，自主理解需求并<strong>编排工具链生成决策建议</strong>，评估其在真实科研场景的可行性。</li>
+                <li>结合 RAG 与双知识图谱做多模态数据检索增强与工具选择，独立攻克工具链编排、流程中断等稳定性问题，完成原型开发与效果验证。</li>
+                <li><strong>项目成果：</strong>系统在真实多模态分析场景稳定运行，生成端到端自动化决策工作流；产出 <span class="hl-red">SCI 论文 1 篇</span>（bioRxiv）、GitHub 22+ Star。</li>
+                <li><strong>项目职责：</strong>独立主导系统设计与开发，承担认知架构、记忆与工具调用模块、工具链编排及原型验证全流程。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">
+                运动健康算法：基于人体骨架与传感器信号的摔倒行为识别预警系统
+                <a class="label-link" href="/imgs/competitions/3.png" target="_blank" rel="noopener">省一证书</a>
+            </div>
+            <div class="date">2025.04 - 2025.07</div>
+            <div class="tech-line"><em>技术栈：</em>YOLO-Pose · OpenPose · BlazePose · Transformer · PySide6 · Python</div>
+            <ul>
+                <li>面向运动健康与安全预警场景，设计运动姿态识别系统：基于 YOLO-Pose / OpenPose / BlazePose 估计人体姿态并提取骨骼点，处理时序运动信号，识别跌倒等危险行为并触发预警。</li>
+                <li>对比阈值法、机器学习、深度学习与 Transformer 方法做特征提取与决策，完成模型实验与调优；基于 PySide6 实现轻量化客户端，支持实时摄像头输入的高帧率检测，具备边缘端落地形态。</li>
+                <li><strong>项目成果：</strong>系统实现高帧率实时跌倒检测与短信预警，获 <span class="hl-red">四川省生物医学工程创新设计大赛一等奖</span>。</li>
+                <li><strong>项目职责：</strong>主要负责人，自建数据集采集与预处理、各类模型设计训练测试、轻量化客户端开发及测试全流程。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 实习经历 -->
+    <div class="section">
+        <div class="section-title">实习经历</div>
+        <div class="subsection">
+            <div class="subsection-title">国网宁夏电力有限公司 · AI 算法实习生</div>
+            <div class="date">2023.10 - 2023.12</div>
+            <div class="tech-line"><em>技术栈：</em>Python · YOLO · OpenPose · 无人机数据采集</div>
+            <ul>
+                <li>参与机器视觉与 AI 应用算法研发：采集处理图像/视频数据，实现头盔检测、人体姿态估计、危险姿势识别与安全预警，将算法落地真实作业场景。</li>
+                <li><strong>项目职责：</strong>负责数据采集与预处理、算法调研与实现、危险姿势识别与预警模块开发及测试。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 语言能力 -->
+    <div class="section">
+        <div class="section-title">语言能力</div>
+        <ul>
+            <li>英语六级（CET-6），能独立跟踪 AI 顶会与运动健康前沿文献（CVPR / NeurIPS / Nature 系等），具备英文论文与技术报告撰写能力。</li>
+            <li>普通话标准，沟通表达流畅，能与团队高效协作推进预研成果产品转化。</li>
+        </ul>
+    </div>
+
+    <!-- 获奖荣誉：仅保留与岗位相关或体现学习能力的 -->
+    <div class="section">
+        <div class="section-title">获奖荣誉与成果</div>
+        <ul>
+            <li><span class="hl-red">SCI 论文 2 篇</span>（NEURA 智能体系统 bioRxiv / MediScreen-Brain 多模态脑肿瘤检测），发明专利 1 项，软件著作权 5 项。</li>
+            <li>国家级：第九届全国大学生生物医学工程创新设计竞赛一等奖（2024）、第八届二等奖（2023）。</li>
+            <li>省级：第三/四/五届四川省生物医学工程创新设计大赛一等奖 ×4（2023-2025）；湖北"华为云杯"昇腾云血液图像处理大赛二等奖（2025）。</li>
+            <li>奖学金：国家励志奖学金 ×2、电子科技大学优秀研究生 ×2、学业奖学金一等奖 ×2、研究生"学术青苗"奖。</li>
+            <li>英语六级；GitHub 累计 <span class="hl-red">200+ Star</span>，持续开源贡献与技术输出。</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
