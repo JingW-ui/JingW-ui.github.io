@@ -278,5 +278,15 @@
     "date": "2026.06",
     "url": "/resume/resume_qa_test_general.html",
     "match": ""
+  },
+  {
+    "index": "29",
+    "company": "飞书 · 字节跳动 · 27暑期实习",
+    "role": "前沿部署工程师（FDE）实习生",
+    "direction": "AI 商业化 / 客户场景落地 / 工作流搭建",
+    "tags": ["AI 工作流搭建", "无代码/低代码", "业务调研", "SOP沉淀与培训"],
+    "date": "2026.06",
+    "url": "/resume/resume_feishu_fde.html",
+    "match": "high"
   }
 ]

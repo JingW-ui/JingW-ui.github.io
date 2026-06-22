@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 飞书 FDE 实习生 / 王京</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            line-height: 1.2;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            padding: 13mm 15mm;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 14px;
+            padding: 0 0 12px;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 92px;
+            height: 102px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .profile-info { text-align: left; }
+        .name {
+            font-size: 25px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+        .target {
+            font-size: 13px;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 7px;
+            letter-spacing: 0.5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .contact-info a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover { text-decoration: underline; }
+        .section { margin-bottom: 13px; }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            border-left: 4px solid #333;
+            padding-left: 10px;
+        }
+        .summary {
+            font-size: 12px;
+            color: #444;
+            line-height: 1.65;
+        }
+        .summary strong { color: #1a1a1a; }
+        .hl-red { color: #fd0000; font-weight: 600; }
+        .subsection {
+            margin-bottom: 8px;
+            padding-bottom: 7px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 2px;
+        }
+        .date {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+        .tech-line {
+            font-size: 11.5px;
+            color: #555;
+            margin-bottom: 4px;
+        }
+        .tech-line em {
+            font-style: normal;
+            color: #2d74bb;
+            font-weight: 500;
+        }
+        ul { padding-left: 16px; }
+        li {
+            margin-bottom: 3px;
+            font-size: 11.5px;
+            color: #555;
+            line-height: 1.5;
+        }
+        .skill-line {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 5px;
+        }
+        .skill-line:last-child { margin-bottom: 0; }
+        .skill-cat {
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-right: 2px;
+        }
+        .skill-hl {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .label-link {
+            display: inline-block;
+            background-color: #f5f5f5;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .label-link:hover { background-color: #e0e0e0; color: #333; }
+        .github-label-link {
+            display: inline-block;
+            background-color: #1F883D;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .github-label-link:hover { background-color: #176d31; }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .page { box-shadow: none; width: auto; min-height: auto; padding: 0; }
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+        }
+        @media (max-width: 820px) {
+            body { padding: 10px; }
+            .page { width: 100%; min-height: auto; padding: 18px 16px; }
+            .profile-container { flex-direction: column; text-align: center; }
+            .profile-info { text-align: center; }
+            .name { font-size: 22px; }
+        }
+        html, body, .header, .label-link, .github-label-link, .target, .contact-info a, .hl-red {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：前沿部署工程师（FDE）实习生 / 飞书 AI 商业化（字节跳动）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士 · 2027届<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            电子科技大学硕士（<strong>2027 届</strong>），电子信息大类·生物医学工程专业，兼具<strong>计算机/信息技术与工科复合背景</strong>，对 AI、大模型充满热情并重度动手实践。主导开发 <strong>NEURA 神经影像智能体</strong>（LLM+Agent+RAG，编排异构工具链实现端到端<strong>自动化工作流</strong>，bioRxiv 已发布）；独立打造 <strong>AutoTask 自动化办公助手</strong>（<span class="hl-red">70+ Star</span>、<span class="hl-red">150+ 用户社群</span>），用<strong>零代码可视化任务编排</strong>解决办公重复流程痛点，并将配置过程沉淀为可复用的<strong>使用指南（SOP）与演示模板</strong>供社群复用。曾深入国网一线现场调研业务痛点并落地安全预警算法；B 站教学视频播放 <span class="hl-red">20w+</span>，擅长把复杂技术用通俗语言向非技术人员讲清。享受在未知场景中主动试错求解，与 FDE「走到客户场景、动手搭 AI 工作流、沉淀资产、赋能伙伴」的职责高度契合。
+        </div>
+    </div>
+
+    <!-- 教育背景 -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 生命科学与技术学院 · 生物医学工程 · 硕士</div>
+            <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授 ｜ 神经信息教育部重点实验室</div>
+            <div class="tech-line"><em>研究方向：</em>大模型智能体与自动化工作流 · 医疗 AI 与智能化应用 · 业务场景 AI 落地</div>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 信息工程学院 · 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ <span class="hl-red">四川省优秀毕业生 · 推免生</span></div>
+            <div class="tech-line"><em>研究方向：</em>深度学习与目标检测 · 医学信号/图像处理 · 数据结构与算法基础</div>
+        </div>
+    </div>
+
+    <!-- 专业技能 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-line">
+            <span class="skill-cat">AI 与大模型落地：</span><span class="skill-hl">LLM/Agent 应用开发</span> · <span class="skill-hl">自动化工作流编排</span> · Prompt 工程 · RAG · <span class="skill-hl">无代码/低代码工具</span> · Function Calling
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">动手与工程：</span><span class="skill-hl">Python</span> · <span class="skill-hl">Vibe Coding</span> · PySide6/Qt · PyAutoGUI/RPA · MySQL · Spring Boot · Git/GitHub · 英语六级
+        </div>
+    </div>
+
+    <!-- 项目经验 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                NEURA 神经影像分析智能体（Agent 自动化工作流）
+                <a class="github-label-link" href="https://github.com/NeuroScienceLab/NEURA" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" rel="noopener">论文</a>
+            </div>
+            <div class="date">2025.07 - 2026.02</div>
+            <div class="tech-line"><em>技术栈：</em>LLM · Agent · Chain-of-Thought · RAG · 双知识图谱(DiseaseKG/ToolKG) · 异构工具链编排</div>
+            <ul>
+                <li>受认知科学启发、由大语言模型驱动的自主智能体系统，通过双知识图谱动态桥接领域知识与异构软件工具（SPM/FreeSurfer 等），自主理解需求并<strong>编排执行端到端多模态分析工作流</strong>，显著降低专业工具使用门槛、解决可复现性难题——典型的「AI 落地业务流程」实践。</li>
+                <li><strong>项目职责：</strong>主导设计与开发，构建核心认知架构与双知识图谱，编排异构工具链实现复杂工作流自主编排与端到端自动化。</li>
+                <li><strong>项目成果：</strong>论文 bioRxiv 已发布；GitHub <span class="hl-red">22 Star</span>，验证了「大模型+工具编排」落地科研场景的可行性。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                AutoTask 自动化办公助手（零代码工作流 · 痛点解决 · SOP 沉淀）
+                <a class="github-label-link" href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://qm.qq.com/q/8Bm7ntOXte" target="_blank" rel="noopener">用户群 150+</a>
+                <a class="label-link" href="https://www.bilibili.com/video/BV1FzpLzHEWL" target="_blank" rel="noopener">演示</a>
+            </div>
+            <div class="date">2025.10 - 2026.01</div>
+            <div class="tech-line"><em>技术栈：</em>Vibe Coding · PySide6 · PyAutoGUI · RPA · 可视化任务编排 · 定时调度</div>
+            <ul>
+                <li>面向办公重复流程痛点的<strong>零代码桌面自动化工具</strong>：可视化任务编排、桌面键鼠模拟、微信自动化、定时调度与批量任务管理，让非程序员也能拖拽搭建可运行的办公自动化方案——与飞书「无代码/低代码搭 AI 工作流」职责高度同构。</li>
+                <li><strong>项目职责：</strong>架构师与主迭代，负责整体架构、可视化编排设计、UI 样式优化与全流程测试。</li>
+                <li><strong>项目成果：</strong>GitHub <span class="hl-red">70+ Star</span>、<span class="hl-red">150+ 用户社群</span>；主动将搭建技巧沉淀为<strong>标准化使用指南（SOP）与演示模板</strong>分享给社群，帮助更多用户自助复用方案。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                通用目标检测与分割系统（低代码工具 · 多行业可复用）
+                <a class="github-label-link" href="https://github.com/JingW-ui/PI-MAPP/tree/main/project/universal_object_detection_plus" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://qm.qq.com/q/wZRWYGb78I" target="_blank" rel="noopener">用户群 50+</a>
+            </div>
+            <div class="date">2025.08 - 2025.10</div>
+            <div class="tech-line"><em>技术栈：</em>Vibe Coding · YOLOv8~YOLO26 · PyTorch · PySide6</div>
+            <ul>
+                <li>支持图片/视频/文件夹/摄像头/实时流多输入，内置 40+ 私有权重可一键切换，毫秒级输出检测与分割结果——可作为面向制造、零售等行业的<strong>可演示 Demo 模板</strong>直接给客户看效果。</li>
+                <li><strong>项目职责：</strong>架构设计、细节迭代、UI 样式优化与测试，独立完成低代码交互流程。</li>
+                <li><strong>项目成果：</strong>GitHub <span class="hl-red">110+ Star</span>、<span class="hl-red">50+ 用户社群</span>，验证了「低代码工具+多行业复用」的搭建思路。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                国网宁夏电力 · AI 算法实习生（一线业务调研 · 痛点落地）
+            </div>
+            <div class="date">2023.10 - 2023.12</div>
+            <div class="tech-line"><em>技术栈：</em>YOLO · OpenPose · Python · 无人机数据采集</div>
+            <ul>
+                <li>深入配电网不停电作业<strong>一线现场</strong>，跟着业务流程调研作业规范与安全痛点，采集图像/视频数据，发现「危险姿势预警」这一 AI 落地点并动手实现头盔检测、人体姿态估计与危险姿势识别预警。</li>
+                <li><strong>项目职责：</strong>现场数据采集与模拟作业、算法调研与实现、危险姿势分析与安全预警开发。</li>
+                <li><strong>项目成果：</strong>完成从<strong>业务调研→痛点识别→AI 方案搭建→落地预警</strong>的完整闭环，与 FDE 工作流一致。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                技术内容沉淀与培训（通俗表达 · 赋能传播）
+                <a class="label-link" href="https://www.bilibili.com/video/BV1Sd4y1J7k5/" target="_blank" rel="noopener">B站 20w+ 播放</a>
+            </div>
+            <div class="date">2025.08 - 2025.10</div>
+            <div class="tech-line"><em>形式：</em>教学视频 · 复习指南 · 通俗化讲解</div>
+            <ul>
+                <li>独立备课、讲解、录制《微机原理与接口技术》复习系列，把晦涩的技术内容拆解为清晰逻辑步骤并用通俗语言讲清，B 站播放 <span class="hl-red">20w+</span>、收藏 4000+——可直接迁移到「把 AI 方案讲给客户/培训生态伙伴」的场景。</li>
+                <li><strong>项目职责：</strong>备课、讲课、教学录制全流程独立负责。</li>
+                <li><strong>项目成果：</strong>播放 <span class="hl-red">20w+</span>，验证了技术方案通俗化表达与赋能传播的能力。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 获奖与科研成果 -->
+    <div class="section">
+        <div class="section-title">获奖与科研成果</div>
+        <ul>
+            <li>国家级：第九届（2024）/第八届（2023）全国大学生生物医学工程创新设计竞赛 一等奖 / 二等奖</li>
+            <li>省级：第三~五届四川省生物医学工程创新设计大赛一等奖 <span class="hl-red">×4</span>；湖北「华为云杯」昇腾云血液图像处理大赛二等奖（2025）</li>
+            <li>奖学金：国家励志奖学金 <span class="hl-red">×2</span>、电子科技大学优秀研究生、学业奖学金一等奖、研究生「学术青苗」奖</li>
+            <li>科研：SCI 论文 2 篇（MediScreen-Brain、NEURA·bioRxiv）；<span class="hl-red">发明专利 1 项，软件著作权 5 项</span>（含结直肠息肉检测、摔倒识别、脑肿瘤检测等可落地系统）</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
