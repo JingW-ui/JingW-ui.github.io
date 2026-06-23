@@ -288,5 +288,15 @@
     "date": "2026.06",
     "url": "/resume/resume_feishu_fde.html",
     "match": "high"
+  },
+  {
+    "index": "30",
+    "company": "通用 · 心脏医疗AI",
+    "role": "医疗信号算法工程师",
+    "direction": "生理信号 / 时序建模 / 心脏疾病AI辅助诊断",
+    "tags": ["PyTorch 时序建模", "医学信号处理", "多模态融合", "小样本数据增强"],
+    "date": "2026.06",
+    "url": "/resume/resume_medical_signal_cardiac.html",
+    "match": ""
   }
 ]

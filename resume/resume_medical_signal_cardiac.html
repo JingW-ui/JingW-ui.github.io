@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 医疗信号算法工程师 / 王京</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            line-height: 1.2;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            padding: 13mm 15mm;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 14px;
+            padding: 0 0 12px;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 92px;
+            height: 102px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .profile-info { text-align: left; }
+        .name {
+            font-size: 25px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 5px;
+        }
+        .target {
+            font-size: 13px;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 7px;
+            letter-spacing: 0.5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .contact-info a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover { text-decoration: underline; }
+        .section { margin-bottom: 13px; }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            border-left: 4px solid #333;
+            padding-left: 10px;
+        }
+        .summary {
+            font-size: 12px;
+            color: #444;
+            line-height: 1.65;
+        }
+        .summary strong { color: #1a1a1a; }
+        .hl-red { color: #fd0000; font-weight: 600; }
+        .subsection {
+            margin-bottom: 8px;
+            padding-bottom: 7px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 2px;
+        }
+        .date {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+        .tech-line {
+            font-size: 11.5px;
+            color: #555;
+            margin-bottom: 4px;
+        }
+        .tech-line em {
+            font-style: normal;
+            color: #2d74bb;
+            font-weight: 500;
+        }
+        ul { padding-left: 16px; }
+        li {
+            margin-bottom: 3px;
+            font-size: 11.5px;
+            color: #555;
+            line-height: 1.5;
+        }
+        .skill-line {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 5px;
+        }
+        .skill-line:last-child { margin-bottom: 0; }
+        .skill-cat {
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-right: 2px;
+        }
+        .skill-hl {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .label-link {
+            display: inline-block;
+            background-color: #f5f5f5;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .label-link:hover { background-color: #e0e0e0; color: #333; }
+        .github-label-link {
+            display: inline-block;
+            background-color: #1F883D;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .github-label-link:hover { background-color: #176d31; }
+        @media print {
+            body { background: #fff; padding: 0; }
+            .page { box-shadow: none; width: auto; min-height: auto; padding: 0; }
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+        }
+        @media (max-width: 820px) {
+            body { padding: 10px; }
+            .page { width: 100%; min-height: auto; padding: 18px 16px; }
+            .profile-container { flex-direction: column; text-align: center; }
+            .profile-info { text-align: center; }
+            .name { font-size: 22px; }
+        }
+        html, body, .header, .label-link, .github-label-link, .target, .contact-info a, .hl-red {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：医疗信号算法工程师 / 心脏疾病 AI 辅助诊断（生理信号 · PyTorch）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士 · 2027届<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            电子科技大学生物医学工程硕士（<strong>2027 届</strong>），本科同为生物医学工程、<strong>医学信号处理方向</strong>，具备生理信号处理与时序建模的系统基础。熟练掌握 <strong>PyTorch</strong>，有扎实的深度学习理论与实践经验：用 <strong>Transformer 对时序骨架序列建模</strong>实现跌倒检测（省一等奖），用 <strong>nnU-Net 3D 分割</strong>在医学小数据集上以数据增强抑制过拟合、Dice 达 <span class="hl-red">0.9554</span>（国赛一等奖）。具备<strong>多模态医学数据融合建模</strong>经验（NEURA 智能体、MediScreen-Brain，2 篇 SCI / bioRxiv 已发表），能快速阅读并复现 MICCAI/NeurIPS/CVPR 前沿论文。熟悉医学数据合规与临床诊断系统落地，自驱力强、乐于在心脏医疗垂类持续钻研，与「生理信号深度学习 + 算法工程化 + 临床落地」的岗位职责高度契合。
+        </div>
+    </div>
+
+    <!-- 教育背景 -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 生命科学与技术学院 · 生物医学工程 · 硕士</div>
+            <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授 ｜ 神经信息教育部重点实验室</div>
+            <div class="tech-line"><em>研究方向：</em>医学影像智能分析 · 多模态医学 AI 建模 · 时序信号深度学习</div>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 信息工程学院 · 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ <span class="hl-red">四川省优秀毕业生 · 推免生</span></div>
+            <div class="tech-line"><em>研究方向：</em>医学信号处理 · 信号与系统 · 深度学习与时序建模 · 医学图像处理</div>
+        </div>
+    </div>
+
+    <!-- 专业技能 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-line">
+            <span class="skill-cat">深度学习与时序建模：</span><span class="skill-hl">PyTorch</span> · <span class="skill-hl">1D-CNN / ResNet</span> · <span class="skill-hl">Transformer</span> · CNN/RNN · nnU-Net · YOLO 系列 · 注意力机制
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">生理信号与工程化：</span><span class="skill-hl">医学信号处理</span> · 了解 ECG/PCG 预处理与公开数据集 · <span class="skill-hl">数据增强 / 迁移学习</span> · 类别不平衡与小样本过拟合抑制 · 多模态融合 · 多卡分布式训练（了解）· 模型校准与不确定性量化（了解）
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">语言与工具：</span><span class="skill-hl">Python</span> · C/C++ · MySQL · Git/GitHub · 3D Slicer · 医疗数据合规处理 · 顶会论文复现（CVPR/ICCV/MICCAI）
+        </div>
+    </div>
+
+    <!-- 项目经验 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                基于人体骨架时序序列的摔倒行为智能识别（Transformer 时序建模）
+                <a class="label-link" href="/imgs/competitions/3.png" target="_blank" rel="noopener">省一等奖</a>
+            </div>
+            <div class="date">2025.04 - 2025.07</div>
+            <div class="tech-line"><em>技术栈：</em>PyTorch · YoloPose/OpenPose/BlazePose · Transformer · 机器学习/深度学习 · PySide6</div>
+            <ul>
+                <li>对人体<strong>时序骨架序列</strong>建模实现跌倒检测：先用姿态估计提取骨骼点序列，再设计并对比阈值法、机器学习法、深度学习法与 <strong>Transformer</strong> 进行时序特征提取，针对类别不平衡与误报做工程优化，最终对实时摄像头输入高帧率检测并提供短信预警。</li>
+                <li><strong>项目职责：</strong>主要负责人，自建数据集采集与预处理、环境配置、多模型设计训练测试、Qt 界面开发测试全流程独立完成。</li>
+                <li><strong>项目成果：</strong>获四川省一等奖；验证了 Transformer 在生理/行为时序信号上的建模有效性，可迁移至心电/心音等生理时序信号。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                基于 nnU-Net 的脑部 MRI 海马体自动分割（小样本 · 数据增强 · 医学深度学习）
+                <a class="label-link" href="/imgs/competitions/9.png" target="_blank" rel="noopener">国赛一等奖</a>
+            </div>
+            <div class="date">2024.04 - 2024.07</div>
+            <div class="tech-line"><em>技术栈：</em>PyTorch · nnU-Net（3D 分割）· 3D Slicer · 数据增强</div>
+            <ul>
+                <li>面向医学小数据集场景，基于 nnU-Net 3D 分割模型完成 MRI 海马体自动分割：综合运用<strong>数据增强、迁移策略</strong>抑制过拟合，攻克医学影像样本受限、类别不平衡等工程难题，提供 3D/2D 可视化与历史记录查询的在线诊断工具。</li>
+                <li><strong>项目职责：</strong>主要负责人，独立完成模型训练与测试、数据预处理与增强、页面设计、数据库与接口开发测试。</li>
+                <li><strong>项目成果：</strong>分割精度 Dice <span class="hl-red">0.9554</span>、HD95 1.0mm，获全国大学生生物医学工程创新设计竞赛<strong>一等奖</strong>。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                NEURA 神经影像分析智能体（多模态融合 · Agent 工作流）
+                <a class="github-label-link" href="https://github.com/NeuroScienceLab/NEURA" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" rel="noopener">论文</a>
+            </div>
+            <div class="date">2025.07 - 2026.02</div>
+            <div class="tech-line"><em>技术栈：</em>PyTorch · LLM/Agent · RAG · 多模态融合 · 双知识图谱</div>
+            <ul>
+                <li>由大模型驱动的自主智能体系统，通过双知识图谱桥接领域知识与异构工具，对<strong>多模态医学数据</strong>自主编排端到端分析工作流——体现多任务/多模态建模与算法落地能力。</li>
+                <li><strong>项目职责：</strong>主导设计与开发，构建核心认知架构与双知识图谱，整合异构工具链实现复杂工作流自主编排与自动化。</li>
+                <li><strong>项目成果：</strong>论文 bioRxiv 已发布，GitHub <span class="hl-red">22 Star</span>。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                MediScreen-Brain 多模态脑肿瘤检测平台（医学 AI · SCI）
+                <a class="github-label-link" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" rel="noopener">主页</a>
+            </div>
+            <div class="date">2024 - 2025</div>
+            <div class="tech-line"><em>技术栈：</em>PyTorch · YOLO · 多模态 · GUI</div>
+            <ul>
+                <li>支持多模态脑肿瘤检测与 3D 定位的便携式 GUI 平台，将深度学习模型工程化为可演示/可使用的临床辅助诊断工具，注重<strong>模型与临床业务需求结合</strong>。</li>
+                <li><strong>项目职责：</strong>主要负责人，模型训练与测试、前端页面设计与实现、多端一致性体验。</li>
+                <li><strong>项目成果：</strong>SCI 论文已发表并已开源。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                国网宁夏电力 · AI 算法实习生（算法工程化 · 数据管线）
+            </div>
+            <div class="date">2023.10 - 2023.12</div>
+            <div class="tech-line"><em>技术栈：</em>Python · YOLO · OpenPose · 无人机数据采集</div>
+            <ul>
+                <li>参与现场数据采集与<strong>训练数据管线建设</strong>，调研并实现头盔检测、人体姿态估计与危险姿势识别算法，完成从数据到预警的工程化落地，规范整理技术文档与测试记录。</li>
+                <li><strong>项目职责：</strong>现场数据采集与模拟作业、算法调研实现、危险姿势分析与安全预警开发。</li>
+                <li><strong>项目成果：</strong>完成「数据采集→预处理→模型训练→工程落地→文档归档」全流程闭环。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 获奖与科研成果 -->
+    <div class="section">
+        <div class="section-title">获奖与科研成果</div>
+        <ul>
+            <li>国家级：第九届（2024）/第八届（2023）全国大学生生物医学工程创新设计竞赛 一等奖 / 二等奖</li>
+            <li>省级：第三~五届四川省生物医学工程创新设计大赛一等奖 <span class="hl-red">×4</span>；湖北「华为云杯」昇腾云血液图像处理大赛二等奖（2025）；第十届 BOE 全球创新挑战赛二等奖（2025）</li>
+            <li>奖学金：国家励志奖学金 <span class="hl-red">×2</span>、电子科技大学优秀研究生、学业奖学金一等奖、研究生「学术青苗」奖</li>
+            <li>科研：SCI 论文 2 篇（MediScreen-Brain、NEURA·bioRxiv）；<span class="hl-red">发明专利 1 项，软件著作权 5 项</span>（含脑肿瘤检测、海马体分析、摔倒识别等医学 AI 系统）</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
