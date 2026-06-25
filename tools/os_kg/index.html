@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>手机操作系统知识图谱 - 环形布局</title>
+    <!-- 引入 ECharts 核心库 -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js">
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f5f7fa;
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            padding: 24px 28px 32px;
+        }
+
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            border-bottom: 1px solid #e9ecf0;
+            padding-bottom: 14px;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            color: #1a2634;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header h1 small {
+            font-size: 15px;
+            font-weight: 400;
+            color: #6b7a8a;
+            margin-left: 6px;
+        }
+
+        .legend-tag {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 18px;
+            background: #f0f3f7;
+            padding: 8px 18px;
+            border-radius: 40px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #1f2a36;
+        }
+
+        .legend-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .source-line {
+            font-size: 13px;
+            color: #5e6f7e;
+            background: #f2f5f9;
+            padding: 6px 16px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .source-line i {
+            font-style: normal;
+            font-weight: 500;
+            color: #2e3b48;
+        }
+
+        #graph-container {
+            width: 100%;
+            height: 750px;
+            background: #fbfdff;
+            border-radius: 18px;
+        }
+
+        .footer-note {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #6d7d8d;
+            border-top: 1px solid #edf0f4;
+            padding-top: 16px;
+        }
+
+        .footer-note .hint {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-note .hint span {
+            background: #eef2f7;
+            padding: 2px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            color: #3c4d5e;
+        }
+
+        .footer-note .data-ref {
+            display: flex;
+            gap: 18px;
+        }
+
+        .footer-note .data-ref a {
+            color: #3b6e9f;
+            text-decoration: none;
+            border-bottom: 1px dotted #b6c9dd;
+        }
+
+        .footer-note .data-ref a:hover {
+            color: #1a4b73;
+            border-bottom: 1px solid #1a4b73;
+        }
+
+        @media (max-width: 820px) {
+            .container {
+                padding: 16px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            .legend-tag {
+                padding: 6px 14px;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
+            #graph-container {
+                height: 560px;
+            }
+            .footer-note {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #graph-container {
+                height: 460px;
+            }
+            .header h1 {
+                font-size: 20px;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>
+                📱 手机 OS 知识图谱
+                <small>2026 Q1 · 环形布局</small>
+            </h1>
+            <div class="legend-tag">
+                <span class="legend-item">
+                    <span class="legend-dot" style="background:#5470c6;"></span> 操作系统
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot" style="background:#fac858;"></span> 品牌
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot" style="background:#ee6666;"></span> 地区
+                </span>
+                <span class="legend-item">
+                    <span class="legend-dot" style="background:#73c0de;"></span> 数据来源
+                </span>
+                <span class="source-line">
+                    📊 <i>Counterpoint</i> · <i>Omdia</i>
+                </span>
+            </div>
+        </div>
+
+        <div id="graph-container"></div>
+
+        <div class="footer-note">
+            <div class="hint">
+                <span>🖱 拖拽/缩放</span>
+                <span>🔍 悬停查看详情</span>
+                <span>⭕ 圆形布局</span>
+            </div>
+            <div class="data-ref">
+                <span>📋 数据源：</span>
+                <a href="https://www.counterpointresearch.com/" target="_blank">Counterpoint Research (2026 Q1)</a>
+                <a href="https://www.omdia.com/" target="_blank">Omdia (2026 Q1)</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- 1. 引入数据 (data.js)                                          -->
+    <!-- ============================================================ -->
+    <script src="./data.js"></script>
+
+    <!-- ============================================================ -->
+    <!-- 2. 主脚本：使用 circular 布局渲染                              -->
+    <!-- ============================================================ -->
+    <script>
+        (function() {
+            if (typeof knowledgeGraph === 'undefined') {
+                document.getElementById('graph-container').innerHTML =
+                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#a5b5c5;font-size:18px;">⚠️ 未找到数据，请确认 <code>data.js</code> 已加载且包含 <code>knowledgeGraph</code> 对象。</div>';
+                return;
+            }
+
+            const rawNodes = knowledgeGraph.nodes || [];
+            const rawEdges = knowledgeGraph.edges || [];
+
+            if (rawNodes.length === 0) {
+                document.getElementById('graph-container').innerHTML =
+                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#a5b5c5;font-size:18px;">📭 节点数据为空</div>';
+                return;
+            }
+
+            // ----- 分类与颜色映射 -----
+            const categoryMap = {
+                'OperatingSystem': { name: '操作系统', color: '#5470c6' },
+                'Brand': { name: '品牌', color: '#fac858' },
+                'Region': { name: '地区', color: '#ee6666' },
+                'Source': { name: '数据来源', color: '#73c0de' }
+            };
+
+            // ----- 操作系统真实图标 (使用 assets 目录下的真实图片资源) -----
+            // symbol 使用 'image://...' 形式加载本地图片，呈现为圆形图标节点
+            const osIconMap = {
+                'Android':   'image://./assets/andriod.svg',
+                'iOS':       'image://./assets/ios.png',
+                'HarmonyOS': 'image://./assets/HarmonyOS.webp'
+            };
+
+            // ----- 品牌真实 logo (统一圆形 SVG，位于 assets/brands/) -----
+            // 每个 *_circle.svg = 白底圆 + 浅灰描边 + 品色 logo，规格统一
+            const brandIconMap = {
+                'Samsung': 'image://./assets/brands/samsung_circle.svg',
+                'Apple':   'image://./assets/brands/apple_circle.svg',
+                'Xiaomi':  'image://./assets/brands/xiaomi_circle.svg',
+                'OPPO':    'image://./assets/brands/oppo_circle.svg',
+                'vivo':    'image://./assets/brands/vivo_circle.svg',
+                'Huawei':  'image://./assets/brands/huawei_circle.svg',
+                'Honor':   'image://./assets/brands/honor_circle.svg'
+            };
+
+            // ----- 地区图标 (国旗圆形裁剪 + Global 地球，位于 assets/regions/) -----
+            const regionIconMap = {
+                'China':  'image://./assets/regions/cn.svg',
+                'USA':    'image://./assets/regions/us.svg',
+                'India':  'image://./assets/regions/in.svg'
+            };
+
+            // ----- 构建节点 -----
+            const nodes = rawNodes.map((n) => {
+                let symbolSize = 36;
+                if (n.type === 'OperatingSystem') symbolSize = 52;
+                else if (n.type === 'Brand') symbolSize = 42;
+                else if (n.type === 'Region') symbolSize = 36;
+                else if (n.type === 'Source') symbolSize = 28;
+
+                // 为操作系统节点替换为真实图片图标
+                let symbol = 'circle';
+                let labelText = n.name;
+                let iconUrl = '';
+
+                if (n.type === 'OperatingSystem') {
+                    // 尝试匹配操作系统名称
+                    const nameKey = Object.keys(osIconMap).find(key =>
+                        n.name.toLowerCase().includes(key.toLowerCase())
+                    );
+                    if (nameKey) {
+                        iconUrl = osIconMap[nameKey];
+                        // 使用图片作为节点 symbol
+                        symbol = iconUrl;
+                        // 图片节点稍大一些，保证图标清晰
+                        symbolSize = 56;
+                    }
+                } else if (n.type === 'Brand') {
+                    // 尝试匹配品牌名称（精确匹配优先，回退到包含匹配）
+                    const exactKey = Object.keys(brandIconMap).find(key =>
+                        n.name.toLowerCase() === key.toLowerCase()
+                    );
+                    const nameKey = exactKey || Object.keys(brandIconMap).find(key =>
+                        n.name.toLowerCase().includes(key.toLowerCase())
+                    );
+                    if (nameKey) {
+                        iconUrl = brandIconMap[nameKey];
+                        symbol = iconUrl;
+                        // 品牌圆形 logo 节点
+                        symbolSize = 48;
+                    }
+                } else if (n.type === 'Region') {
+                    // 尝试匹配地区名称（精确匹配优先，回退到包含匹配）
+                    const exactKey = Object.keys(regionIconMap).find(key =>
+                        n.name.toLowerCase() === key.toLowerCase()
+                    );
+                    const nameKey = exactKey || Object.keys(regionIconMap).find(key =>
+                        n.name.toLowerCase().includes(key.toLowerCase())
+                    );
+                    if (nameKey) {
+                        iconUrl = regionIconMap[nameKey];
+                        symbol = iconUrl;
+                        // 地区圆形图标节点
+                        symbolSize = 44;
+                    }
+                }
+
+                return {
+                    id: n.id,
+                    name: n.name,
+                    value: n.marketShare || n.share || n.shipment || '',
+                    category: n.type || 'Other',
+                    symbolSize: symbolSize,
+                    symbol: symbol,
+                    // 保持图片原始比例，不被拉伸
+                    symbolKeepAspect: true,
+                    symbolRotate: 0,
+                    symbolOffset: [0, 0],
+                    raw: n,
+                    label: {
+                        show: true,
+                        formatter: (params) => {
+                            const d = params.data.raw;
+                            let extra = '';
+                            if (d.marketShare) extra = ` ${d.marketShare}`;
+                            else if (d.share) extra = ` ${d.share}`;
+                            return d.name + extra;
+                        },
+                        fontSize: 12,
+                        fontWeight: 500,
+                        color: '#1f2c39',
+                        position: 'bottom'
+                    },
+                    // 图片节点保持透明背景，不绘制底色与边框，呈现原图标外观
+                    itemStyle: iconUrl ? {
+                        color: 'transparent',
+                        borderColor: 'transparent',
+                        borderWidth: 0,
+                        shadowBlur: 0
+                    } : undefined,
+                };
+            });
+
+            // ----- 构建边 (不显示边的文字描述) -----
+            const links = rawEdges.map((e) => ({
+                source: e.source,
+                target: e.target,
+                // 不显示边标签
+                label: {
+                    show: false, // 关键：隐藏边的文字描述
+                },
+                rawRelation: e.relation,
+                rawValue: e.value || '',
+                lineStyle: {
+                    color: '#b8c7d9',
+                    width: 1.6,
+                    curveness: 0.15,
+                    opacity: 0.55,
+                },
+                emphasis: {
+                    lineStyle: {
+                        width: 2.8,
+                        color: '#3a6a9a',
+                        opacity: 0.9,
+                    }
+                }
+            }));
+
+            // ----- 分类 -----
+            const categories = Object.keys(categoryMap).map((key) => ({
+                name: key,
+                itemStyle: {
+                    color: categoryMap[key].color
+                },
+                label: {
+                    color: '#1f2c39'
+                }
+            }));
+
+            // ----- 初始化 ECharts -----
+            const container = document.getElementById('graph-container');
+            const myChart = echarts.init(container);
+
+            // ----- 配置项：使用 circular 布局 -----
+            const option = {
+                title: { show: false },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: (params) => {
+                        if (params.dataType === 'node') {
+                            const d = params.data.raw;
+                            let lines = `<strong>${d.name}</strong>`;
+                            if (d.type) lines += `<br/>类型：${d.type}`;
+                            if (d.marketShare) lines += `<br/>市场份额：${d.marketShare}`;
+                            if (d.shipment) lines += `<br/>出货量：${d.shipment}`;
+                            if (d.share) lines += `<br/>份额：${d.share}`;
+                            if (d.region) lines += `<br/>区域：${d.region}`;
+                            return lines;
+                        } else if (params.dataType === 'edge') {
+                            const d = params.data;
+                            let lines = `<strong>关系</strong><br/>`;
+                            lines += `从 ${d.source} 到 ${d.target}`;
+                            if (d.rawRelation) lines += `<br/>类型：${d.rawRelation}`;
+                            if (d.rawValue) lines += `<br/>数值：${d.rawValue}`;
+                            return lines;
+                        }
+                        return '';
+                    },
+                    backgroundColor: 'rgba(255,255,255,0.95)',
+                    borderColor: '#d0d9e3',
+                    borderWidth: 1,
+                    textStyle: { color: '#1f2c39', fontSize: 13 },
+                    extraCssText: 'box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-radius: 12px; padding: 12px 16px;'
+                },
+                legend: {
+                    show: true,
+                    data: categories.map(c => ({
+                        name: c.name,
+                        icon: 'circle',
+                        textStyle: { color: '#2d3c4c', fontSize: 13, fontWeight: 500 }
+                    })),
+                    orient: 'horizontal',
+                    left: 'center',
+                    top: 8,
+                    itemWidth: 14,
+                    itemHeight: 14,
+                    backgroundColor: 'rgba(255,255,255,0.6)',
+                    borderRadius: 30,
+                    padding: [4, 20],
+                },
+                series: [{
+                    type: 'graph',
+                    // 使用 circular 布局 — 所有节点排列为圆圈
+                    layout: 'circular',
+                    circular: {
+                        rotateLabel: false,
+                        // 可以调整圆形半径
+                        distance: 180, // 节点距中心距离
+                    },
+                    roam: true,
+                    draggable: true,
+                    data: nodes,
+                    links: links,
+                    categories: categories,
+                    itemStyle: {
+                        borderColor: '#ffffff',
+                        borderWidth: 1.8,
+                        shadowBlur: 8,
+                        shadowColor: 'rgba(0, 0, 0, 0.06)',
+                    },
+                    // 节点标签
+                    label: {
+                        show: true,
+                        position: 'bottom',
+                        fontSize: 12,
+                        fontWeight: 500,
+                        color: '#1f2c39',
+                    },
+                    // 边标签 — 已关闭
+                    edgeLabel: {
+                        show: false, // 完全隐藏边的文字
+                    },
+                    lineStyle: {
+                        color: 'source',
+                        curveness: 0.15,
+                        width: 1.6,
+                        opacity: 0.5,
+                    },
+                    emphasis: {
+                        focus: 'adjacency',
+                        lineStyle: {
+                            width: 3,
+                            color: '#3a6a9a',
+                        },
+                        itemStyle: {
+                            shadowBlur: 16,
+                            shadowColor: 'rgba(0,0,0,0.12)',
+                            borderWidth: 2.5,
+                            borderColor: '#1f4b7a',
+                        }
+                    },
+                    animationDuration: 1500,
+                    animationEasing: 'cubicOut',
+                }],
+                backgroundColor: '#fbfdff',
+            };
+
+            // ----- 渲染 -----
+            myChart.setOption(option);
+
+            window.addEventListener('resize', () => {
+                myChart.resize();
+            });
+
+            const resizeObserver = new ResizeObserver(() => {
+                myChart.resize();
+            });
+            resizeObserver.observe(container);
+
+            window.__graphChart = myChart;
+
+            console.log('✅ 环形知识图谱渲染完成，节点数:', nodes.length, '边数:', links.length);
+        })();
+    </script>
+
+</body>
+</html>
