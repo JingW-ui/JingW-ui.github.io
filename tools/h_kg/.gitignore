@@ -1,4 +1,6 @@
 node_modules
+dist
 .playwright-cli
 *.tsbuildinfo
 h_kg_*.png
+.idea
