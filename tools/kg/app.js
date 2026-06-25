@@ -38,6 +38,28 @@ const loadingEl = $("#loading");
 const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const isDark = () => document.documentElement.getAttribute("data-theme") !== "light";
 
+// 过滤疾病同义英文节点：仅保留中文名称，剔除作为「同义简称」目标的英文缩写节点
+// （如 AD / PD / MDD 等），并同步移除引用这些节点的连边；SCA3 / SCA2 / ADHD 等
+// 无中文对应名的独立疾病节点予以保留。
+function filterDiseaseSynonyms() {
+  if (!RAW || !RAW.nodes || !RAW.links) return;
+  const drop = new Set();
+  for (const l of RAW.links) {
+    if (l.relation === "同义简称") drop.add(l.target);
+  }
+  if (!drop.size) return;
+  RAW.nodes = RAW.nodes.filter(n => !drop.has(n.id));
+  RAW.links = RAW.links.filter(l => !drop.has(l.source) && !drop.has(l.target));
+  // 同步更新元数据计数，避免统计卡片显示陈旧数字
+  if (RAW.metadata) {
+    const counts = {};
+    for (const n of RAW.nodes) counts[n.type] = (counts[n.type] || 0) + 1;
+    RAW.metadata.entity_types = counts;
+    RAW.metadata.node_count = RAW.nodes.length;
+    RAW.metadata.link_count = RAW.links.length;
+  }
+}
+
 function computeDegrees() {
   degree = new Map();
   for (const n of RAW.nodes) degree.set(n.id, 0);
@@ -391,6 +413,7 @@ async function init() {
     const res = await fetch("kg_data.json", { cache: "no-cache" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     RAW = await res.json();
+    filterDiseaseSynonyms();
   } catch (err) {
     loadingEl.innerHTML = `<div style="color:var(--accent);font-weight:800">加载失败</div>
       <div style="font-size:11px;max-width:280px;text-align:center">无法读取 kg_data.json。<br>请通过本地 HTTP 服务打开（如 <code>python -m http.server</code>），<br>直接双击文件会因 CORS 受限。</div>`;
