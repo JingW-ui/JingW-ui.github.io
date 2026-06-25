@@ -3,545 +3,795 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>手机操作系统知识图谱 - 环形布局</title>
-    <!-- 引入 ECharts 核心库 -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js">
-    </script>
+    <title>手机 OS 数据仪表盘</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* ============================================================
+         * Design Tokens
+         * ============================================================ */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #e8eef6 0%, #f2f5fa 50%, #e4ecf4 100%);
+            --surface: #ffffff;
+            --surface-elevated: rgba(255,255,255,0.88);
+            --border-soft: #e4eaf1;
+            --border-subtle: #edf1f6;
+            --text-primary: #1a2634;
+            --text-secondary: #5a6b7d;
+            --text-muted: #8896a6;
+            --accent-blue: #5470c6;
+            --shadow-sm: 0 2px 8px rgba(31,41,55,0.05);
+            --shadow-md: 0 6px 20px rgba(31,41,55,0.07);
+            --shadow-hover: 0 10px 28px rgba(31,41,55,0.10);
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --font-sans: 'Segoe UI','PingFang SC','Microsoft YaHei',Roboto,'Helvetica Neue',sans-serif;
+            --transition-base: all 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        /* ============================================================
+         * Reset & Viewport-filling shell
+         * ============================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
         }
 
         body {
-            background: #f5f7fa;
-            font-family: 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-gradient);
+            font-family: var(--font-sans);
+            color: var(--text-primary);
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
+            padding: 10px 14px 8px;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            max-width: 1400px;
+        /* ============================================================
+         * Dashboard — fills viewport via flex
+         * ============================================================ */
+        .dashboard {
+            flex: 1;
+            min-height: 0;
+            max-width: 1520px;
             width: 100%;
-            background: #ffffff;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-            padding: 24px 28px 32px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
-        .header {
+        /* ---------- Header ---------- */
+        .dashboard-header {
+            flex-shrink: 0;
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 16px;
-            border-bottom: 1px solid #e9ecf0;
-            padding-bottom: 14px;
-        }
-
-        .header h1 {
-            font-size: 26px;
-            font-weight: 600;
-            color: #1a2634;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
             gap: 10px;
+            padding: 0 2px;
         }
 
-        .header h1 small {
-            font-size: 15px;
+        .header-title h1 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .header-title h1 .subtitle {
+            font-size: 12px;
             font-weight: 400;
-            color: #6b7a8a;
-            margin-left: 6px;
+            color: var(--text-muted);
+            margin-left: 4px;
         }
 
-        .legend-tag {
+        .header-badges {
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 18px;
-            background: #f0f3f7;
-            padding: 8px 18px;
-            border-radius: 40px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 13px;
-            color: #1f2a36;
-        }
-
-        .legend-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-        }
-
-        .source-line {
-            font-size: 13px;
-            color: #5e6f7e;
-            background: #f2f5f9;
-            padding: 6px 16px;
-            border-radius: 30px;
-            display: inline-flex;
-            align-items: center;
             gap: 6px;
         }
 
-        .source-line i {
-            font-style: normal;
+        .badge {
+            font-size: 11px;
             font-weight: 500;
-            color: #2e3b48;
+            color: var(--text-secondary);
+            background: var(--surface);
+            border: 1px solid var(--border-soft);
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .badge i { font-style: normal; font-weight: 600; color: var(--text-primary); }
+
+        /* ---------- Main Content — left graph + right side panel ---------- */
+        .main-content {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ---------- Graph Card — left 60% ---------- */
+        .graph-card {
+            flex: 6;
+            min-width: 0;
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .graph-card .card-header {
+            flex-shrink: 0;
         }
 
         #graph-container {
+            flex: 1;
+            min-height: 0;
             width: 100%;
-            height: 750px;
-            background: #fbfdff;
-            border-radius: 18px;
         }
 
-        .footer-note {
-            margin-top: 16px;
+        /* ---------- Side Panel — right 40%, 4 cards stacked ---------- */
+        .side-panel {
+            flex: 4;
+            min-width: 0;
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mini-card {
+            flex: 1;
+            min-height: 0;
+            background: var(--surface);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition-base);
+        }
+
+        .mini-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* ---------- Card Header ---------- */
+        .card-header {
+            display: flex;
+            align-items: center;
             justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            color: #6d7d8d;
-            border-top: 1px solid #edf0f4;
-            padding-top: 16px;
+            padding: 10px 18px 8px;
+            border-bottom: 1px solid var(--border-subtle);
+            flex-shrink: 0;
         }
 
-        .footer-note .hint {
+        .card-header h2 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
+            gap: 5px;
+        }
+
+        .card-tag {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: #f2f5fa;
+            padding: 2px 9px;
+            border-radius: 14px;
+        }
+
+        .chart-body {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .chart-body > div {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ---------- Footer ---------- */
+        .dashboard-footer {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 5px 10px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .footer-legend {
+            display: flex;
+            gap: 12px;
+        }
+
+        .footer-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: var(--text-secondary);
+        }
+
+        .footer-legend-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+
+        .footer-links {
+            display: flex;
             gap: 10px;
         }
 
-        .footer-note .hint span {
-            background: #eef2f7;
-            padding: 2px 14px;
-            border-radius: 30px;
-            font-size: 12px;
-            color: #3c4d5e;
-        }
-
-        .footer-note .data-ref {
-            display: flex;
-            gap: 18px;
-        }
-
-        .footer-note .data-ref a {
-            color: #3b6e9f;
+        .footer-links a {
+            color: var(--accent-blue);
             text-decoration: none;
-            border-bottom: 1px dotted #b6c9dd;
+            font-size: 10px;
         }
 
-        .footer-note .data-ref a:hover {
-            color: #1a4b73;
-            border-bottom: 1px solid #1a4b73;
-        }
+        .footer-links a:hover { text-decoration: underline; }
 
-        @media (max-width: 820px) {
-            .container {
-                padding: 16px;
-            }
-            .header {
+        /* ============================================================
+         * Responsive — narrow screens: stack vertically
+         * ============================================================ */
+        @media (max-width: 900px) {
+            html, body { height: auto; overflow: auto; }
+            body { padding: 12px 10px 20px; }
+            .main-content {
                 flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
             }
-            .legend-tag {
-                padding: 6px 14px;
-                gap: 12px;
-                flex-wrap: wrap;
+            .graph-card {
+                min-height: 50vh;
             }
-            #graph-container {
-                height: 560px;
+            .side-panel {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
             }
-            .footer-note {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
+            .mini-card {
+                min-height: 180px;
             }
         }
 
         @media (max-width: 480px) {
-            #graph-container {
-                height: 460px;
-            }
-            .header h1 {
-                font-size: 20px;
-                flex-wrap: wrap;
-            }
+            .side-panel { grid-template-columns: 1fr; }
+            .header-title h1 { font-size: 16px; }
+            .header-title h1 .subtitle { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <h1>
-                📱 手机 OS 知识图谱
-                <small>2026 Q1 · 环形布局</small>
-            </h1>
-            <div class="legend-tag">
-                <span class="legend-item">
-                    <span class="legend-dot" style="background:#5470c6;"></span> 操作系统
-                </span>
-                <span class="legend-item">
-                    <span class="legend-dot" style="background:#fac858;"></span> 品牌
-                </span>
-                <span class="legend-item">
-                    <span class="legend-dot" style="background:#ee6666;"></span> 地区
-                </span>
-                <span class="legend-item">
-                    <span class="legend-dot" style="background:#73c0de;"></span> 数据来源
-                </span>
-                <span class="source-line">
-                    📊 <i>Counterpoint</i> · <i>Omdia</i>
-                </span>
+<div class="dashboard">
+
+    <!-- ===================== Header ===================== -->
+    <header class="dashboard-header">
+        <div class="header-title">
+            <h1>📱 手机 OS 数据仪表盘<span class="subtitle">2026 Q1</span></h1>
+        </div>
+        <div class="header-badges">
+            <span class="badge">📊 <i>Counterpoint</i></span>
+            <span class="badge">📊 <i>Omdia</i></span>
+        </div>
+    </header>
+
+    <!-- ===================== Main Content: Graph + Side Panel ===================== -->
+    <div class="main-content">
+
+        <!-- Left: Knowledge Graph (60%) -->
+        <div class="graph-card">
+            <div class="card-header">
+                <h2>🕸️ 关系知识图谱</h2>
+                <span class="card-tag">环形布局 · 拖拽/缩放</span>
+            </div>
+            <div class="chart-body">
+                <div id="graph-container"></div>
             </div>
         </div>
 
-        <div id="graph-container"></div>
-
-        <div class="footer-note">
-            <div class="hint">
-                <span>🖱 拖拽/缩放</span>
-                <span>🔍 悬停查看详情</span>
-                <span>⭕ 圆形布局</span>
+        <!-- Right: 4 Mini Charts stacked (40%) -->
+        <div class="side-panel">
+            <div class="mini-card">
+                <div class="card-header">
+                    <h2>🥧 OS 市场份额</h2>
+                </div>
+                <div class="chart-body"><div id="os-share-chart"></div></div>
             </div>
-            <div class="data-ref">
-                <span>📋 数据源：</span>
-                <a href="https://www.counterpointresearch.com/" target="_blank">Counterpoint Research (2026 Q1)</a>
-                <a href="https://www.omdia.com/" target="_blank">Omdia (2026 Q1)</a>
+            <div class="mini-card">
+                <div class="card-header">
+                    <h2>📦 品牌出货量</h2>
+                </div>
+                <div class="chart-body"><div id="brand-shipment-chart"></div></div>
+            </div>
+            <div class="mini-card">
+                <div class="card-header">
+                    <h2>💰 收入份额</h2>
+                </div>
+                <div class="chart-body"><div id="revenue-chart"></div></div>
+            </div>
+            <div class="mini-card">
+                <div class="card-header">
+                    <h2>🌏 区域 OS 对比</h2>
+                </div>
+                <div class="chart-body"><div id="regional-chart"></div></div>
             </div>
         </div>
+
     </div>
 
-    <!-- ============================================================ -->
-    <!-- 1. 引入数据 (data.js)                                          -->
-    <!-- ============================================================ -->
-    <script src="./data.js"></script>
+    <!-- ===================== Footer ===================== -->
+    <footer class="dashboard-footer">
+        <div class="footer-legend">
+            <span class="footer-legend-item"><span class="footer-legend-dot" style="background:#5470c6;"></span>操作系统</span>
+            <span class="footer-legend-item"><span class="footer-legend-dot" style="background:#fac858;"></span>品牌</span>
+            <span class="footer-legend-item"><span class="footer-legend-dot" style="background:#ee6666;"></span>地区</span>
+            <span class="footer-legend-item"><span class="footer-legend-dot" style="background:#73c0de;"></span>来源</span>
+        </div>
+        <div class="footer-links">
+            <a href="https://www.counterpointresearch.com/" target="_blank">Counterpoint</a>
+            <a href="https://www.omdia.com/" target="_blank">Omdia</a>
+            <span>2026 Q1</span>
+        </div>
+    </footer>
 
-    <!-- ============================================================ -->
-    <!-- 2. 主脚本：使用 circular 布局渲染                              -->
-    <!-- ============================================================ -->
-    <script>
-        (function() {
-            if (typeof knowledgeGraph === 'undefined') {
-                document.getElementById('graph-container').innerHTML =
-                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#a5b5c5;font-size:18px;">⚠️ 未找到数据，请确认 <code>data.js</code> 已加载且包含 <code>knowledgeGraph</code> 对象。</div>';
-                return;
-            }
+</div>
 
-            const rawNodes = knowledgeGraph.nodes || [];
-            const rawEdges = knowledgeGraph.edges || [];
+<!-- ============================================================ -->
+<!-- Data                                                          -->
+<!-- ============================================================ -->
+<script src="./data.js"></script>
 
-            if (rawNodes.length === 0) {
-                document.getElementById('graph-container').innerHTML =
-                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#a5b5c5;font-size:18px;">📭 节点数据为空</div>';
-                return;
-            }
+<!-- ============================================================ -->
+<!-- Dashboard Script                                              -->
+<!-- ============================================================ -->
+<script>
+(function () {
+    'use strict';
 
-            // ----- 分类与颜色映射 -----
-            const categoryMap = {
-                'OperatingSystem': { name: '操作系统', color: '#5470c6' },
-                'Brand': { name: '品牌', color: '#fac858' },
-                'Region': { name: '地区', color: '#ee6666' },
-                'Source': { name: '数据来源', color: '#73c0de' }
-            };
+    if (typeof knowledgeGraph === 'undefined') {
+        document.getElementById('graph-container').innerHTML =
+            '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#a5b5c5;font-size:14px;">⚠️ 未找到数据，请确认 data.js 已加载</div>';
+        return;
+    }
 
-            // ----- 操作系统真实图标 (使用 assets 目录下的真实图片资源) -----
-            // symbol 使用 'image://...' 形式加载本地图片，呈现为圆形图标节点
-            const osIconMap = {
-                'Android':   'image://./assets/andriod.svg',
-                'iOS':       'image://./assets/ios.png',
-                'HarmonyOS': 'image://./assets/HarmonyOS.webp'
-            };
+    const kg = knowledgeGraph;
+    const rawNodes = kg.nodes || [];
+    const rawEdges = kg.edges || [];
 
-            // ----- 品牌真实 logo (统一圆形 SVG，位于 assets/brands/) -----
-            // 每个 *_circle.svg = 白底圆 + 浅灰描边 + 品色 logo，规格统一
-            const brandIconMap = {
-                'Samsung': 'image://./assets/brands/samsung_circle.svg',
-                'Apple':   'image://./assets/brands/apple_circle.svg',
-                'Xiaomi':  'image://./assets/brands/xiaomi_circle.svg',
-                'OPPO':    'image://./assets/brands/oppo_circle.svg',
-                'vivo':    'image://./assets/brands/vivo_circle.svg',
-                'Huawei':  'image://./assets/brands/huawei_circle.svg',
-                'Honor':   'image://./assets/brands/honor_circle.svg'
-            };
+    /* ==========================================================
+     * Data Extraction
+     * ========================================================== */
+    const nodeMap = Object.fromEntries(rawNodes.map(n => [n.id, n]));
 
-            // ----- 地区图标 (国旗圆形裁剪 + Global 地球，位于 assets/regions/) -----
-            const regionIconMap = {
-                'China':  'image://./assets/regions/cn.svg',
-                'USA':    'image://./assets/regions/us.svg',
-                'India':  'image://./assets/regions/in.svg'
-            };
+    function parsePercent(val) {
+        if (!val) return 0;
+        const n = parseFloat(String(val).replace(/[~％%]/g, ''));
+        return isNaN(n) ? 0 : n;
+    }
 
-            // ----- 构建节点 -----
-            const nodes = rawNodes.map((n) => {
-                let symbolSize = 36;
-                if (n.type === 'OperatingSystem') symbolSize = 52;
-                else if (n.type === 'Brand') symbolSize = 42;
-                else if (n.type === 'Region') symbolSize = 36;
-                else if (n.type === 'Source') symbolSize = 28;
+    function getOSGlobalShare() {
+        return rawEdges
+            .filter(e => e.relation === 'market_share_in' && e.target === 'Region_Global' && e.source.startsWith('OS_'))
+            .map(e => ({ name: nodeMap[e.source]?.name || e.source, value: parsePercent(e.value) }))
+            .sort((a, b) => b.value - a.value);
+    }
 
-                // 为操作系统节点替换为真实图片图标
-                let symbol = 'circle';
-                let labelText = n.name;
-                let iconUrl = '';
+    function getBrandShipment() {
+        return rawEdges
+            .filter(e => e.relation === 'shipment_share' && e.target === 'Region_Global')
+            .map(e => ({ name: nodeMap[e.source]?.name || e.source, value: parsePercent(e.value) }))
+            .sort((a, b) => b.value - a.value);
+    }
 
-                if (n.type === 'OperatingSystem') {
-                    // 尝试匹配操作系统名称
-                    const nameKey = Object.keys(osIconMap).find(key =>
-                        n.name.toLowerCase().includes(key.toLowerCase())
+    function getRevenueShare() {
+        return rawEdges
+            .filter(e => e.relation === 'revenue_share' && e.target === 'Region_Global')
+            .map(e => ({ name: nodeMap[e.source]?.name || e.source, value: parsePercent(e.value) }))
+            .sort((a, b) => b.value - a.value);
+    }
+
+    function getRegionalOS() {
+        const regionDefs = [
+            { id: 'Region_Global', name: '全球' },
+            { id: 'Region_China',  name: '中国' },
+            { id: 'Region_USA',    name: '美国' },
+            { id: 'Region_India',  name: '印度' },
+        ];
+        const osDefs = [
+            { id: 'OS_Android',   name: 'Android' },
+            { id: 'OS_iOS',       name: 'iOS' },
+            { id: 'OS_HarmonyOS', name: 'HarmonyOS' },
+        ];
+        return {
+            regions: regionDefs.map(r => r.name),
+            series: osDefs.map(os => ({
+                name: os.name,
+                data: regionDefs.map(region => {
+                    const edge = rawEdges.find(e =>
+                        e.source === os.id && e.target === region.id && e.relation === 'market_share_in'
                     );
-                    if (nameKey) {
-                        iconUrl = osIconMap[nameKey];
-                        // 使用图片作为节点 symbol
-                        symbol = iconUrl;
-                        // 图片节点稍大一些，保证图标清晰
-                        symbolSize = 56;
-                    }
-                } else if (n.type === 'Brand') {
-                    // 尝试匹配品牌名称（精确匹配优先，回退到包含匹配）
-                    const exactKey = Object.keys(brandIconMap).find(key =>
-                        n.name.toLowerCase() === key.toLowerCase()
-                    );
-                    const nameKey = exactKey || Object.keys(brandIconMap).find(key =>
-                        n.name.toLowerCase().includes(key.toLowerCase())
-                    );
-                    if (nameKey) {
-                        iconUrl = brandIconMap[nameKey];
-                        symbol = iconUrl;
-                        // 品牌圆形 logo 节点
-                        symbolSize = 48;
-                    }
-                } else if (n.type === 'Region') {
-                    // 尝试匹配地区名称（精确匹配优先，回退到包含匹配）
-                    const exactKey = Object.keys(regionIconMap).find(key =>
-                        n.name.toLowerCase() === key.toLowerCase()
-                    );
-                    const nameKey = exactKey || Object.keys(regionIconMap).find(key =>
-                        n.name.toLowerCase().includes(key.toLowerCase())
-                    );
-                    if (nameKey) {
-                        iconUrl = regionIconMap[nameKey];
-                        symbol = iconUrl;
-                        // 地区圆形图标节点
-                        symbolSize = 44;
-                    }
-                }
+                    return edge ? parsePercent(edge.value) : 0;
+                }),
+            })),
+        };
+    }
 
-                return {
-                    id: n.id,
-                    name: n.name,
-                    value: n.marketShare || n.share || n.shipment || '',
-                    category: n.type || 'Other',
-                    symbolSize: symbolSize,
-                    symbol: symbol,
-                    // 保持图片原始比例，不被拉伸
-                    symbolKeepAspect: true,
-                    symbolRotate: 0,
-                    symbolOffset: [0, 0],
-                    raw: n,
-                    label: {
-                        show: true,
-                        formatter: (params) => {
-                            const d = params.data.raw;
-                            let extra = '';
-                            if (d.marketShare) extra = ` ${d.marketShare}`;
-                            else if (d.share) extra = ` ${d.share}`;
-                            return d.name + extra;
-                        },
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: '#1f2c39',
-                        position: 'bottom'
-                    },
-                    // 图片节点保持透明背景，不绘制底色与边框，呈现原图标外观
-                    itemStyle: iconUrl ? {
-                        color: 'transparent',
-                        borderColor: 'transparent',
-                        borderWidth: 0,
-                        shadowBlur: 0
-                    } : undefined,
-                };
-            });
+    /* ==========================================================
+     * Color Palettes
+     * ========================================================== */
+    const OS_COLORS = { 'Android': '#3ddc84', 'iOS': '#007aff', 'HarmonyOS': '#c71724' };
+    const BRAND_PALETTE = ['#5470c6','#fac858','#ee6666','#73c0de','#91cc75','#ff9f7f','#3ba272'];
+    const CHART_TEXT = '#1f2c39';
+    const CHART_SUBTEXT = '#6b7a8a';
+    const TOOLTIP_STYLE = {
+        backgroundColor: 'rgba(255,255,255,0.97)',
+        borderColor: '#e0e6ed',
+        borderWidth: 1,
+        textStyle: { color: CHART_TEXT, fontSize: 12 },
+        extraCssText: 'box-shadow:0 6px 20px rgba(0,0,0,0.10);border-radius:10px;padding:10px 14px;',
+    };
 
-            // ----- 构建边 (不显示边的文字描述) -----
-            const links = rawEdges.map((e) => ({
-                source: e.source,
-                target: e.target,
-                // 不显示边标签
+    /* ==========================================================
+     * 1. Knowledge Graph
+     * ========================================================== */
+    function initGraph() {
+        const categoryMap = {
+            'OperatingSystem': { name: '操作系统', color: '#5470c6' },
+            'Brand':           { name: '品牌',     color: '#fac858' },
+            'Region':          { name: '地区',     color: '#ee6666' },
+            'Source':          { name: '数据来源', color: '#73c0de' },
+        };
+        const osIconMap = {
+            'Android':   'image://./assets/andriod.svg',
+            'iOS':       'image://./assets/ios.png',
+            'HarmonyOS': 'image://./assets/HarmonyOS.webp',
+        };
+        const brandIconMap = {
+            'Samsung': 'image://./assets/brands/samsung_circle.svg',
+            'Apple':   'image://./assets/brands/apple_circle.svg',
+            'Xiaomi':  'image://./assets/brands/xiaomi_circle.svg',
+            'OPPO':    'image://./assets/brands/oppo_circle.svg',
+            'vivo':    'image://./assets/brands/vivo_circle.svg',
+            'Huawei':  'image://./assets/brands/huawei_circle.svg',
+            'Honor':   'image://./assets/brands/honor_circle.svg',
+        };
+        const regionIconMap = {
+            'China': 'image://./assets/regions/cn.svg',
+            'USA':   'image://./assets/regions/us.svg',
+            'India': 'image://./assets/regions/in.svg',
+        };
+
+        const findIcon = (name, map) => {
+            const lower = name.toLowerCase();
+            const exact = Object.keys(map).find(k => k.toLowerCase() === lower);
+            return exact ? map[exact] : (Object.keys(map).find(k => lower.includes(k.toLowerCase())) || null);
+        };
+
+        const nodes = rawNodes.map(n => {
+            let symbolSize = 36, symbol = 'circle', iconUrl = '';
+            if (n.type === 'OperatingSystem') { symbolSize = 52; const ic = findIcon(n.name, osIconMap); if (ic) { iconUrl = ic; symbol = ic; symbolSize = 56; } }
+            else if (n.type === 'Brand')      { symbolSize = 42; const ic = findIcon(n.name, brandIconMap); if (ic) { iconUrl = ic; symbol = ic; symbolSize = 48; } }
+            else if (n.type === 'Region')     { symbolSize = 36; const ic = findIcon(n.name, regionIconMap); if (ic) { iconUrl = ic; symbol = ic; symbolSize = 44; } }
+            else if (n.type === 'Source')     { symbolSize = 28; }
+
+            return {
+                id: n.id, name: n.name,
+                value: n.marketShare || n.share || n.shipment || '',
+                category: n.type || 'Other',
+                symbolSize, symbol,
+                symbolKeepAspect: true,
+                raw: n,
                 label: {
-                    show: false, // 关键：隐藏边的文字描述
+                    show: true, fontSize: 12, fontWeight: 500,
+                    color: '#1f2c39', position: 'bottom',
+                    formatter: (p) => {
+                        const d = p.data.raw;
+                        const extra = d.marketShare || d.share || '';
+                        return d.name + (extra ? ` ${extra}` : '');
+                    },
                 },
-                rawRelation: e.relation,
-                rawValue: e.value || '',
-                lineStyle: {
-                    color: '#b8c7d9',
-                    width: 1.6,
-                    curveness: 0.15,
-                    opacity: 0.55,
+                itemStyle: iconUrl ? { color: 'transparent', borderColor: 'transparent', borderWidth: 0, shadowBlur: 0 } : undefined,
+            };
+        });
+
+        const links = rawEdges.map(e => ({
+            source: e.source, target: e.target,
+            label: { show: false },
+            rawRelation: e.relation, rawValue: e.value || '',
+            lineStyle: { color: '#b8c7d9', width: 1.6, curveness: 0.15, opacity: 0.55 },
+            emphasis: { lineStyle: { width: 2.8, color: '#3a6a9a', opacity: 0.9 } },
+        }));
+
+        const categories = Object.keys(categoryMap).map(k => ({
+            name: k,
+            itemStyle: { color: categoryMap[k].color },
+            label: { color: '#1f2c39' },
+        }));
+
+        const el = document.getElementById('graph-container');
+        const chart = echarts.init(el);
+        chart.setOption({
+            title: { show: false },
+            tooltip: {
+                trigger: 'item',
+                ...TOOLTIP_STYLE,
+                formatter: (params) => {
+                    if (params.dataType === 'node') {
+                        const d = params.data.raw;
+                        let s = `<strong>${d.name}</strong>`;
+                        if (d.type) s += `<br/>类型：${d.type}`;
+                        if (d.marketShare) s += `<br/>市场份额：${d.marketShare}`;
+                        if (d.shipment) s += `<br/>出货量：${d.shipment}`;
+                        if (d.share && d.share !== d.marketShare) s += `<br/>份额：${d.share}`;
+                        if (d.region) s += `<br/>区域：${d.region}`;
+                        return s;
+                    }
+                    if (params.dataType === 'edge') {
+                        const d = params.data;
+                        let s = `<strong>关系</strong><br/>${d.source} → ${d.target}`;
+                        if (d.rawRelation) s += `<br/>类型：${d.rawRelation}`;
+                        if (d.rawValue) s += `<br/>数值：${d.rawValue}`;
+                        return s;
+                    }
+                    return '';
                 },
+            },
+            legend: {
+                show: true,
+                data: categories.map(c => ({ name: c.name, icon: 'circle', textStyle: { color: '#2d3c4c', fontSize: 12, fontWeight: 500 } })),
+                orient: 'horizontal', left: 'center', top: 6,
+                itemWidth: 12, itemHeight: 12,
+                backgroundColor: 'rgba(255,255,255,0.8)',
+                borderRadius: 20, padding: [3, 16],
+            },
+            series: [{
+                type: 'graph',
+                layout: 'circular',
+                circular: { rotateLabel: false, distance: 180 },
+                roam: true, draggable: true,
+                data: nodes, links, categories,
+                itemStyle: { borderColor: '#ffffff', borderWidth: 1.8, shadowBlur: 8, shadowColor: 'rgba(0,0,0,0.06)' },
+                label: { show: true, position: 'bottom', fontSize: 12, fontWeight: 500, color: '#1f2c39' },
+                edgeLabel: { show: false },
+                lineStyle: { color: 'source', curveness: 0.15, width: 1.6, opacity: 0.5 },
                 emphasis: {
-                    lineStyle: {
-                        width: 2.8,
-                        color: '#3a6a9a',
-                        opacity: 0.9,
-                    }
-                }
-            }));
+                    focus: 'adjacency',
+                    lineStyle: { width: 3, color: '#3a6a9a' },
+                    itemStyle: { shadowBlur: 16, shadowColor: 'rgba(0,0,0,0.12)', borderWidth: 2.5, borderColor: '#1f4b7a' },
+                },
+                animationDuration: 1500, animationEasing: 'cubicOut',
+            }],
+            backgroundColor: '#fbfdff',
+        });
+        return chart;
+    }
 
-            // ----- 分类 -----
-            const categories = Object.keys(categoryMap).map((key) => ({
-                name: key,
+    /* ==========================================================
+     * 2. OS Pie — compact for mini card
+     * ========================================================== */
+    function initOSPie() {
+        const data = getOSGlobalShare();
+        const el = document.getElementById('os-share-chart');
+        const chart = echarts.init(el);
+        chart.setOption({
+            tooltip: {
+                trigger: 'item', ...TOOLTIP_STYLE,
+                formatter: (p) => `<strong>${p.name}</strong> ${p.value}%`,
+            },
+            legend: {
+                bottom: 2, left: 'center',
+                itemWidth: 8, itemHeight: 8, itemGap: 10,
+                textStyle: { color: CHART_TEXT, fontSize: 10 },
+            },
+            series: [{
+                type: 'pie',
+                radius: ['32%', '64%'],
+                center: ['50%', '44%'],
+                avoidLabelOverlap: true,
+                itemStyle: { borderRadius: 5, borderColor: '#fff', borderWidth: 2 },
+                label: {
+                    show: true, formatter: '{b} {d}%',
+                    fontSize: 10, fontWeight: 600, color: CHART_TEXT,
+                },
+                labelLine: { length: 8, length2: 6, lineStyle: { color: '#c4cdd8' } },
+                emphasis: {
+                    scaleSize: 5,
+                    itemStyle: { shadowBlur: 12, shadowColor: 'rgba(0,0,0,0.15)' },
+                },
+                data: data.map(d => ({
+                    name: d.name, value: d.value,
+                    itemStyle: { color: OS_COLORS[d.name] || '#999' },
+                })),
+                animationDuration: 1000,
+            }],
+            backgroundColor: 'transparent',
+        });
+        return chart;
+    }
+
+    /* ==========================================================
+     * 3. Brand Bar — compact horizontal bar
+     * ========================================================== */
+    function initBrandBar() {
+        const data = getBrandShipment();
+        const el = document.getElementById('brand-shipment-chart');
+        const chart = echarts.init(el);
+        chart.setOption({
+            tooltip: {
+                trigger: 'axis', ...TOOLTIP_STYLE,
+                axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(84,112,198,0.05)' } },
+                formatter: (p) => `<strong>${p[0].name}</strong> ${p[0].value}%`,
+            },
+            grid: { top: 8, right: 40, bottom: 8, left: 56, containLabel: false },
+            xAxis: {
+                type: 'value', max: 30,
+                axisLabel: { show: false },
+                splitLine: { lineStyle: { color: '#f0f3f7', type: 'dashed' } },
+                axisLine: { show: false }, axisTick: { show: false },
+            },
+            yAxis: {
+                type: 'category',
+                data: data.map(d => d.name).reverse(),
+                axisLabel: { fontSize: 10, fontWeight: 500, color: CHART_TEXT },
+                axisLine: { show: false }, axisTick: { show: false },
+            },
+            series: [{
+                type: 'bar',
+                data: data.map((d, i) => ({
+                    value: d.value,
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                            { offset: 0, color: BRAND_PALETTE[i % BRAND_PALETTE.length] },
+                            { offset: 1, color: BRAND_PALETTE[(i + 1) % BRAND_PALETTE.length] },
+                        ]),
+                        borderRadius: [0, 4, 4, 0],
+                    },
+                })).reverse(),
+                barWidth: 14,
+                label: {
+                    show: true, position: 'right',
+                    formatter: '{c}%', fontSize: 10, fontWeight: 600, color: CHART_TEXT,
+                },
+                animationDuration: 800,
+            }],
+            backgroundColor: 'transparent',
+        });
+        return chart;
+    }
+
+    /* ==========================================================
+     * 4. Regional Stacked Bar — compact
+     * ========================================================== */
+    function initRegionalChart() {
+        const { regions, series } = getRegionalOS();
+        const el = document.getElementById('regional-chart');
+        const chart = echarts.init(el);
+        chart.setOption({
+            tooltip: {
+                trigger: 'axis', ...TOOLTIP_STYLE,
+                axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(84,112,198,0.04)' } },
+                formatter: (params) => {
+                    let s = `<strong>${params[0].name}</strong>`;
+                    params.forEach(p => { s += `<br/>${p.marker} ${p.seriesName}：${p.value}%`; });
+                    return s;
+                },
+            },
+            legend: {
+                top: 2, right: 4,
+                itemWidth: 8, itemHeight: 8, itemGap: 8,
+                textStyle: { color: CHART_TEXT, fontSize: 9, fontWeight: 500 },
+            },
+            grid: { top: 22, right: 8, bottom: 16, left: 32, containLabel: true },
+            xAxis: {
+                type: 'category', data: regions,
+                axisLabel: { fontSize: 10, fontWeight: 600, color: CHART_TEXT },
+                axisLine: { lineStyle: { color: '#e0e6ed' } },
+                axisTick: { show: false },
+            },
+            yAxis: {
+                type: 'value', max: 100,
+                axisLabel: { formatter: '{value}%', fontSize: 9, color: CHART_SUBTEXT },
+                splitLine: { lineStyle: { color: '#f0f3f7', type: 'dashed' } },
+                axisLine: { show: false }, axisTick: { show: false },
+            },
+            series: series.map((s, i) => ({
+                name: s.name, type: 'bar', stack: 'total', data: s.data,
+                barWidth: 28,
                 itemStyle: {
-                    color: categoryMap[key].color
+                    color: Object.values(OS_COLORS)[i],
+                    borderRadius: i === series.length - 1 ? [4, 4, 0, 0] : [0, 0, 0, 0],
                 },
                 label: {
-                    color: '#1f2c39'
-                }
-            }));
-
-            // ----- 初始化 ECharts -----
-            const container = document.getElementById('graph-container');
-            const myChart = echarts.init(container);
-
-            // ----- 配置项：使用 circular 布局 -----
-            const option = {
-                title: { show: false },
-                tooltip: {
-                    trigger: 'item',
-                    formatter: (params) => {
-                        if (params.dataType === 'node') {
-                            const d = params.data.raw;
-                            let lines = `<strong>${d.name}</strong>`;
-                            if (d.type) lines += `<br/>类型：${d.type}`;
-                            if (d.marketShare) lines += `<br/>市场份额：${d.marketShare}`;
-                            if (d.shipment) lines += `<br/>出货量：${d.shipment}`;
-                            if (d.share) lines += `<br/>份额：${d.share}`;
-                            if (d.region) lines += `<br/>区域：${d.region}`;
-                            return lines;
-                        } else if (params.dataType === 'edge') {
-                            const d = params.data;
-                            let lines = `<strong>关系</strong><br/>`;
-                            lines += `从 ${d.source} 到 ${d.target}`;
-                            if (d.rawRelation) lines += `<br/>类型：${d.rawRelation}`;
-                            if (d.rawValue) lines += `<br/>数值：${d.rawValue}`;
-                            return lines;
-                        }
-                        return '';
-                    },
-                    backgroundColor: 'rgba(255,255,255,0.95)',
-                    borderColor: '#d0d9e3',
-                    borderWidth: 1,
-                    textStyle: { color: '#1f2c39', fontSize: 13 },
-                    extraCssText: 'box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-radius: 12px; padding: 12px 16px;'
+                    show: true, position: 'inside',
+                    formatter: (p) => p.value >= 12 ? `${p.value}%` : '',
+                    fontSize: 9, fontWeight: 600, color: '#fff',
                 },
-                legend: {
-                    show: true,
-                    data: categories.map(c => ({
-                        name: c.name,
-                        icon: 'circle',
-                        textStyle: { color: '#2d3c4c', fontSize: 13, fontWeight: 500 }
-                    })),
-                    orient: 'horizontal',
-                    left: 'center',
-                    top: 8,
-                    itemWidth: 14,
-                    itemHeight: 14,
-                    backgroundColor: 'rgba(255,255,255,0.6)',
-                    borderRadius: 30,
-                    padding: [4, 20],
+                animationDuration: 800,
+                animationDelay: (idx) => idx * 100,
+            })),
+            backgroundColor: 'transparent',
+        });
+        return chart;
+    }
+
+    /* ==========================================================
+     * 5. Revenue Donut — compact
+     * ========================================================== */
+    function initRevenueChart() {
+        const data = getRevenueShare();
+        const sum = data.reduce((acc, d) => acc + d.value, 0);
+        if (sum < 100) data.push({ name: '其他', value: 100 - sum });
+
+        const el = document.getElementById('revenue-chart');
+        const chart = echarts.init(el);
+        const revenuePalette = ['#fac858','#5470c6','#ee6666','#73c0de','#91cc75','#d8d8d8'];
+        chart.setOption({
+            tooltip: {
+                trigger: 'item', ...TOOLTIP_STYLE,
+                formatter: (p) => `<strong>${p.name}</strong> ${p.value}%`,
+            },
+            legend: {
+                bottom: 2, left: 'center',
+                itemWidth: 8, itemHeight: 8, itemGap: 8,
+                textStyle: { color: CHART_TEXT, fontSize: 10 },
+            },
+            series: [{
+                type: 'pie',
+                radius: ['36%', '64%'],
+                center: ['50%', '44%'],
+                avoidLabelOverlap: true,
+                itemStyle: { borderRadius: 4, borderColor: '#fff', borderWidth: 2 },
+                label: {
+                    show: true, formatter: '{b} {d}%',
+                    fontSize: 10, fontWeight: 600, color: CHART_TEXT,
                 },
-                series: [{
-                    type: 'graph',
-                    // 使用 circular 布局 — 所有节点排列为圆圈
-                    layout: 'circular',
-                    circular: {
-                        rotateLabel: false,
-                        // 可以调整圆形半径
-                        distance: 180, // 节点距中心距离
-                    },
-                    roam: true,
-                    draggable: true,
-                    data: nodes,
-                    links: links,
-                    categories: categories,
-                    itemStyle: {
-                        borderColor: '#ffffff',
-                        borderWidth: 1.8,
-                        shadowBlur: 8,
-                        shadowColor: 'rgba(0, 0, 0, 0.06)',
-                    },
-                    // 节点标签
-                    label: {
-                        show: true,
-                        position: 'bottom',
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: '#1f2c39',
-                    },
-                    // 边标签 — 已关闭
-                    edgeLabel: {
-                        show: false, // 完全隐藏边的文字
-                    },
-                    lineStyle: {
-                        color: 'source',
-                        curveness: 0.15,
-                        width: 1.6,
-                        opacity: 0.5,
-                    },
-                    emphasis: {
-                        focus: 'adjacency',
-                        lineStyle: {
-                            width: 3,
-                            color: '#3a6a9a',
-                        },
-                        itemStyle: {
-                            shadowBlur: 16,
-                            shadowColor: 'rgba(0,0,0,0.12)',
-                            borderWidth: 2.5,
-                            borderColor: '#1f4b7a',
-                        }
-                    },
-                    animationDuration: 1500,
-                    animationEasing: 'cubicOut',
-                }],
-                backgroundColor: '#fbfdff',
-            };
+                labelLine: { length: 8, length2: 6, lineStyle: { color: '#c4cdd8' } },
+                emphasis: {
+                    scaleSize: 4,
+                    itemStyle: { shadowBlur: 12, shadowColor: 'rgba(0,0,0,0.14)' },
+                },
+                data: data.map((d, i) => ({
+                    name: d.name, value: d.value,
+                    itemStyle: { color: revenuePalette[i % revenuePalette.length] },
+                })),
+                animationDuration: 1000,
+            }],
+            backgroundColor: 'transparent',
+        });
+        return chart;
+    }
 
-            // ----- 渲染 -----
-            myChart.setOption(option);
+    /* ==========================================================
+     * Bootstrap + Resize
+     * ========================================================== */
+    const allCharts = [];
+    try { allCharts.push(initGraph()); }         catch (e) { console.error('Graph:', e); }
+    try { allCharts.push(initOSPie()); }         catch (e) { console.error('OS Pie:', e); }
+    try { allCharts.push(initBrandBar()); }      catch (e) { console.error('Brand Bar:', e); }
+    try { allCharts.push(initRegionalChart()); } catch (e) { console.error('Regional:', e); }
+    try { allCharts.push(initRevenueChart()); }  catch (e) { console.error('Revenue:', e); }
 
-            window.addEventListener('resize', () => {
-                myChart.resize();
-            });
+    window.addEventListener('resize', () => allCharts.forEach(c => c && c.resize()));
+    const ro = new ResizeObserver(() => allCharts.forEach(c => c && c.resize()));
+    document.querySelectorAll('.chart-body > div').forEach(el => ro.observe(el));
 
-            const resizeObserver = new ResizeObserver(() => {
-                myChart.resize();
-            });
-            resizeObserver.observe(container);
-
-            window.__graphChart = myChart;
-
-            console.log('✅ 环形知识图谱渲染完成，节点数:', nodes.length, '边数:', links.length);
-        })();
-    </script>
+    window.__dashboardCharts = allCharts;
+    console.log(`✅ 仪表盘渲染完成 · ${allCharts.length} 个图表`);
+})();
+</script>
 
 </body>
 </html>
