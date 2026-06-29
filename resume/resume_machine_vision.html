@@ -27,6 +27,7 @@
         .section-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 10px; border-left: 4px solid #333; padding-left: 10px; }
         .summary { font-size: 12px; color: #444; line-height: 1.65; }
         .summary strong { color: #1a1a1a; }
+        .hl-red { color: #fd0000; font-weight: 600; }
         .subsection { margin-bottom: 9px; padding-bottom: 8px; border-bottom: 1px solid #f0f0f0; }
         .subsection:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .subsection-title { font-size: 12.5px; font-weight: 600; color: #222; margin-bottom: 2px; }
@@ -47,7 +48,7 @@
         @media print { body { background: #fff; padding: 0; } .page { box-shadow: none; width: auto; min-height: auto; padding: 0; } }
         @media (max-width: 820px) { body { padding: 10px; } .page { width: 100%; min-height: auto; padding: 18px 16px; } .profile-container { flex-direction: column; text-align: center; } .profile-info { text-align: center; } .name { font-size: 22px; } }
         /* print-color-fix */
-        html, body, .header, .skill, .skill.primary, .label-link, .github-label-link, .target, .contact-info a {
+        html, body, .header, .skill, .skill.primary, .label-link, .github-label-link, .target, .contact-info a, .hl-red {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
@@ -89,7 +90,7 @@
         <div class="section-title">教育背景</div>
         <div class="subsection">
             <div class="subsection-title">电子科技大学（985） · 生物医学工程（电子信息大类） · 硕士 · 2027届</div>
-            <div class="date">2024.09 - 2027.06 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授 · 神经信息教育部重点实验室</div>
+            <div class="date">2024.09 - 2027.06 ｜ GPA 3.83/4（<span class="hl-red">专业前 5%</span>）｜ 导师：陈华富教授 · 神经信息教育部重点实验室</div>
             <ul>
                 <li>研究方向：医学影像智能分析——目标检测 / 分割 / 姿态估计等视觉算法，与机器视觉软件开发同源。</li>
                 <li>相关课程：矩阵理论、统计推断、医学影像学进展——图像算法与数学基础。</li>
@@ -97,7 +98,7 @@
         </div>
         <div class="subsection">
             <div class="subsection-title">西南科技大学 · 生物医学工程 · 本科</div>
-            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ 四川省优秀毕业生 · 推免生</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（<span class="hl-red">专业前 2%</span>）｜ <span class="hl-red">四川省优秀毕业生 · 推免生</span></div>
             <ul>
                 <li>相关课程：医学图像处理、医学传感器、信号与系统、计算机原理及应用——图像与硬件基础。</li>
             </ul>
@@ -163,7 +164,7 @@
             <ul>
                 <li><strong>视觉方案设计：</strong>设计覆盖 <strong>图片 / 视频 / 文件夹 / 摄像头 / 实时视频流</strong> 多输入的机器视觉方案，构建从图像采集、预处理到模型推理、结果可视化的完整软件链路。</li>
                 <li><strong>软件与算法开发：</strong>基于 YOLO 系列完成目标检测与分割算法开发，内置 40+ 权重支持下载与切换，毫秒级推理输出，源与结果对比实时展示检测信息、位置、类别与置信度。</li>
-                <li><strong>性能与稳定性：</strong>面向真实用户持续优化推理性能与稳定性，开源获 110+ Stars、50+ 真实用户，体现工程化与问题正向分析能力。</li>
+                <li><strong>性能与稳定性：</strong>面向真实用户持续优化推理性能与稳定性，开源获 <span class="hl-red">110+ Stars</span>、<span class="hl-red">50+ 真实用户</span>，体现工程化与问题正向分析能力。</li>
                 <li><strong>项目职责：</strong>独立负责人，承担视觉方案设计、核心算法开发、GUI 软件开发、测试与版本迭代全流程。</li>
             </ul>
         </div>
@@ -173,11 +174,11 @@
                 图像算法开发 · 脑部 MRI 海马体自动分割系统
                 <a class="label-link" href="/imgs/competitions/9.png" target="_blank" rel="noopener">国一证书</a>
             </div>
-            <div class="date">2024.04 - 2024.07 ｜ 全国大学生生物医学工程创新设计竞赛 · 全国一等奖</div>
+            <div class="date">2024.04 - 2024.07 ｜ 全国大学生生物医学工程创新设计竞赛 · <span class="hl-red">全国一等奖</span></div>
             <div class="tech-line"><em>技术栈：</em>nnU-Net · PyTorch · 3D Slicer · Python</div>
             <ul>
                 <li><strong>图像算法基础：</strong>基于 nnU-Net 训练 3D 分割模型，掌握图像预处理、数据增强、训练策略等<strong>图像算法理论基础</strong>。</li>
-                <li><strong>精度攻坚：</strong>通过算法与数据策略迭代，将分割精度提升至 <strong>Dice=0.9554、HD95=1.0mm</strong>，达到临床可用水平，体现分析能力与对难题的攻坚韧性。</li>
+                <li><strong>精度攻坚：</strong>通过算法与数据策略迭代，将分割精度提升至 <span class="hl-red">Dice=0.9554、HD95=1.0mm</span>，达到临床可用水平，体现分析能力与对难题的攻坚韧性。</li>
                 <li><strong>软件落地：</strong>支持 3D / 2D 分割结果可视化与历史记录查询，为医生提供在线诊断工具。</li>
                 <li><strong>项目职责：</strong>主要负责人，独立完成数据预处理、模型训练与测试、页面设计、数据库与接口开发全流程。</li>
             </ul>
@@ -201,10 +202,10 @@
     <div class="section">
         <div class="section-title">开源贡献与获奖</div>
         <ul>
-            <li><strong>开源项目：</strong>GitHub 多个项目共 190+ Stars、200+ 真实用户，机器视觉相关项目已开源。</li>
-            <li><strong>论文：</strong>SCI ×3、专利 1 项、软著 ×5——图像算法与科研分析能力。</li>
-            <li>国家级 · 第九届全国大学生生物医学工程创新设计竞赛 <strong>一等奖</strong>（2024）。</li>
-            <li>省级 · 四川省生物医学工程创新设计大赛 <strong>一等奖 ×4</strong>（2023-2025）；湖北"华为云杯"昇腾云血液图像处理大赛二等奖（2025）。</li>
+            <li><strong>开源项目：</strong>GitHub 多个项目共 <span class="hl-red">190+ Stars</span>、<span class="hl-red">200+ 真实用户</span>，机器视觉相关项目已开源。</li>
+            <li><strong>论文：</strong><span class="hl-red">SCI ×3、专利 1 项、软著 ×5</span>——图像算法与科研分析能力。</li>
+            <li>国家级 · 第九届全国大学生生物医学工程创新设计竞赛 <span class="hl-red">一等奖</span>（2024）。</li>
+            <li>省级 · 四川省生物医学工程创新设计大赛 <strong>一等奖 <span class="hl-red">×4</span></strong>（2023-2025）；湖北"华为云杯"昇腾云血液图像处理大赛二等奖（2025）。</li>
             <li>其他 · 国家励志奖学金 ×2、四川省优秀毕业生、英语六级。</li>
         </ul>
     </div>
