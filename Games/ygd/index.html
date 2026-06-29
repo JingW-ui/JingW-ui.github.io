@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="description" content="一个都不能死 —— 多轨道同时奔跑的硬核反应小游戏，点击对应赛道让小人跳跃避障。">
+  <title>一个都不能死</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #1a1a2e;
+      font-family: "微软雅黑", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+
+    /* 游戏画布：由 link 引擎接管尺寸，这里只负责定位与禁止默认手势 */
+    #linkScreen {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      touch-action: none;
+      background: #ffffff;
+    }
+
+    /* 加载层：图片资源就绪前避免白屏闪烁 */
+    #loader {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: radial-gradient(circle at 50% 40%, #2a2a4a 0%, #1a1a2e 70%);
+      color: #fff;
+      transition: opacity .45s ease;
+    }
+    #loader.gone { opacity: 0; pointer-events: none; }
+    #loader .ring {
+      width: 46px; height: 46px;
+      border: 4px solid rgba(255,255,255,.18);
+      border-top-color: #6cf;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    #loader .txt { font-size: 15px; letter-spacing: 2px; color: #aab; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 顶部信息条：标题 + 极简玩法提示，不遮挡游戏区域 */
+    #hud {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      pointer-events: none;
+      color: #fff;
+      font-size: 13px;
+      text-shadow: 0 1px 3px rgba(0,0,0,.55);
+    }
+    #hud .title { font-weight: 700; font-size: 15px; letter-spacing: 1px; }
+    #hud .tip { opacity: .85; }
+
+    @media (max-width: 560px) {
+      #hud .tip { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="linkScreen"></canvas>
+
+  <div id="hud">
+    <span class="title">一个都不能死</span>
+    <span class="tip">点击对应赛道让小人起跳，所有人不能撞墙</span>
+  </div>
+
+  <div id="loader">
+    <div class="ring"></div>
+    <div class="txt">加载中…</div>
+  </div>
+
+  <script>
+    // 兼容原引擎遗留的统计/广告占位函数（引擎内部会调用）
+    window.dp_Ranking = window.dp_Ranking || function () {};
+    window.dp_share   = window.dp_share   || function () {};
+    window.dp_share2  = window.dp_share2  || function () {};
+
+    // 资源就绪后淡出加载层
+    (function () {
+      var loader = document.getElementById('loader');
+      function hide() {
+        loader.classList.add('gone');
+        setTimeout(function () { loader.style.display = 'none'; }, 500);
+      }
+      // 图片很小，给一个保守的最大等待，避免卡死
+      window.addEventListener('load', function () { setTimeout(hide, 1200); });
+      setTimeout(hide, 3500);
+    })();
+  </script>
+
+  <!-- require.js 必须先加载，main.js 内部依赖全局 require/define -->
+  <script src="js/require.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
