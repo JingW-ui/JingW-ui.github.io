@@ -2,20 +2,32 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>3D 炫光骰子</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
+        html, body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
             background: #000;
             font-family: 'Segoe UI', system-ui, sans-serif;
             user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            overscroll-behavior: none;
+            touch-action: none;
         }
         #canvas-container {
             width: 100vw;
             height: 100vh;
+            height: 100dvh;
             position: relative;
+        }
+        #canvas-container canvas {
+            display: block;
+            touch-action: none;
         }
         /* UI 层 */
         #ui-layer {
@@ -28,6 +40,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 5vh 20px;
+            padding: 5vh max(20px, env(safe-area-inset-left)) max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-right));
             z-index: 10;
         }
         .title {
@@ -50,7 +63,9 @@
         #settings-panel {
             position: absolute;
             top: 20px;
+            top: calc(20px + env(safe-area-inset-top));
             right: 20px;
+            right: calc(20px + env(safe-area-inset-right));
             pointer-events: auto;
             display: flex;
             align-items: center;
@@ -79,7 +94,7 @@
             width: 55px;
             border-radius: 999px;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 16px;
             transition: border-color 0.3s, background 0.3s;
         }
         #diceCountInput::-webkit-outer-spin-button,
@@ -155,20 +170,24 @@
 
         /* 移动端适配 */
         @media (max-width: 768px) {
+            #ui-layer {
+                padding-top: 4vh;
+                padding-bottom: 4vh;
+            }
             #settings-panel {
-                top: 12px;
-                right: 12px;
+                top: calc(12px + env(safe-area-inset-top));
+                right: calc(12px + env(safe-area-inset-right));
                 padding: 6px 10px;
                 gap: 6px;
-                font-size: 0.75rem;
+                font-size: 0.8rem;
             }
             #settings-panel label {
-                font-size: 0.75rem;
+                font-size: 0.8rem;
             }
             #diceCountInput {
-                width: 45px;
+                width: 48px;
                 padding: 6px 8px;
-                font-size: 0.8rem;
+                font-size: 16px;
             }
             .roll-btn {
                 padding: 16px 48px;
@@ -176,35 +195,68 @@
                 letter-spacing: 0.3em;
             }
             .hint {
-                font-size: 0.75rem;
+                font-size: 0.78rem;
                 margin-top: 8px;
+                line-height: 1.5;
             }
             .title {
                 font-size: clamp(1.5rem, 6vw, 2.5rem);
+                letter-spacing: 0.2em;
             }
         }
 
         @media (max-width: 480px) {
             #settings-panel {
-                top: 10px;
-                right: 10px;
-                padding: 5px 8px;
+                top: calc(10px + env(safe-area-inset-top));
+                right: calc(10px + env(safe-area-inset-right));
+                padding: 5px 9px;
                 gap: 5px;
-            }
-            #settings-panel label {
-                font-size: 0.7rem;
-            }
-            #diceCountInput {
-                width: 40px;
-                padding: 5px 6px;
                 font-size: 0.75rem;
             }
+            #settings-panel label {
+                font-size: 0.72rem;
+            }
+            #diceCountInput {
+                width: 42px;
+                padding: 5px 6px;
+                font-size: 16px;
+            }
             .roll-btn {
-                padding: 15px 42px;
+                padding: 15px 38px;
+                font-size: 1rem;
+                letter-spacing: 0.25em;
+            }
+            .hint {
+                font-size: 0.72rem;
+                padding: 0 8px;
+            }
+            .title {
+                letter-spacing: 0.15em;
+            }
+        }
+
+        /* 横屏手机：压低上下间距，避免按钮被地址栏遮挡 */
+        @media (max-width: 900px) and (orientation: landscape) and (max-height: 500px) {
+            #ui-layer {
+                padding-top: 2vh;
+                padding-bottom: 2vh;
+                justify-content: flex-end;
+            }
+            .title {
+                position: absolute;
+                top: calc(6px + env(safe-area-inset-top));
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 1.2rem;
+                letter-spacing: 0.15em;
+            }
+            .roll-btn {
+                padding: 12px 40px;
                 font-size: 1rem;
             }
             .hint {
                 font-size: 0.7rem;
+                margin-top: 6px;
             }
         }
     </style>
@@ -251,7 +303,24 @@
         scene.fog = new THREE.FogExp2(0x030303, 0.03);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.set(0, 5.5, 13.5);
+
+        // 根据屏幕方向自适应相机距离，竖屏下后退以容纳多骰子环形布局
+        function applyResponsiveCamera() {
+            const aspect = window.innerWidth / window.innerHeight;
+            let y = 5.5, z = 13.5;
+            if (aspect < 0.6) {          // 窄竖屏（多数手机竖屏）
+                y = 7.5; z = 21;
+            } else if (aspect < 0.85) {  // 宽竖屏 / 大屏手机
+                y = 6.5; z = 17;
+            } else if (aspect < 1.1) {   // 接近正方形 / 横屏手机
+                y = 6.0; z = 15;
+            } else {
+                y = 5.5; z = 13.5;       // 桌面横屏
+            }
+            camera.position.set(0, y, z);
+            controls.target.set(0, 0, 0);
+            controls.update();
+        }
 
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -273,6 +342,7 @@
         controls.minDistance = 4;
         controls.maxDistance = 30;
         controls.maxPolarAngle = Math.PI / 2 - 0.05;
+        applyResponsiveCamera();
 
         // ==================== 灯光系统（降低光照强度） ====================
         const ambientLight = new THREE.AmbientLight(0x222222, 0.18);
@@ -585,6 +655,13 @@
         const rollBtn = document.getElementById('rollBtn');
         const diceCountInput = document.getElementById('diceCountInput');
         const uiLayer = document.getElementById('ui-layer');
+        const hintEl = document.querySelector('.hint');
+
+        // 触屏设备使用摇动提示，桌面端保留空格键提示
+        const isTouchDevice = matchMedia('(hover: none), (pointer: coarse)').matches;
+        if (isTouchDevice && hintEl) {
+            hintEl.textContent = '选择骰子数量后点击按钮或摇动手机摇骰子';
+        }
 
         // 各数字朝上（+y方向）的目标旋转
         // 初始状态: +z面(数字1)朝向相机，+y面(数字2)朝上
@@ -790,12 +867,15 @@
         }, { passive: true });
 
         // ==================== 窗口自适应 ====================
-        window.addEventListener('resize', () => {
+        function handleResize() {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
             composer.setSize(window.innerWidth, window.innerHeight);
-        });
+            applyResponsiveCamera();
+        }
+        window.addEventListener('resize', handleResize);
+        window.addEventListener('orientationchange', () => setTimeout(handleResize, 250));
 
         // ==================== 渲染循环 ====================
         const clock = new THREE.Clock();
