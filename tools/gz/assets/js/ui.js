@@ -139,14 +139,14 @@ export function renderData() {
     document.getElementById('countdown').textContent = '--:--:--';
   }
 
-  // 下班进度条：已工作比例决定宽度，走满即代表下班；越接近下班色相越偏红（绿 140 → 红 0）
+  // 下班进度条：已工作比例决定宽度，走满即代表下班；越接近下班色相越偏绿（红 0 → 绿 140）
   const fill = document.getElementById('countdownFill');
   const noonMin = config.noonRestHour * 60;
   const totalWorkSec = Math.max(1, (endMin - startMin - noonMin) * 60);
   if (isWorkDay(now)) {
     const remainPct = Math.max(0, Math.min(1, remainSec / totalWorkSec));
     const progress = 1 - remainPct;          // 进度：从空走到满，走完即下班
-    const hue = Math.round(140 * remainPct); // 越接近下班越偏红
+    const hue = Math.round(140 * progress);  // 越接近下班越偏绿
     fill.style.width = (progress * 100) + '%';
     fill.style.background = 'hsl(' + hue + ', 72%, 46%)';
     fill.style.opacity = '1';
