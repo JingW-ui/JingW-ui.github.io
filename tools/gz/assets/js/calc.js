@@ -90,10 +90,12 @@ export function getEffectiveSeconds(date) {
 
 /* ==================== 薪资计算 ==================== */
 export function calcRates() {
+  // 月有效工时 = 每月工作日 × (每日工时 - 午休)，用于推导时薪/秒薪
   const monthlyHours = Math.max(1, config.workDaysMonth * config.workHourDay - config.workDaysMonth * config.noonRestHour);
   const hourly = config.salary / monthlyHours;
   const perSec = hourly / 3600;
-  const daily = hourly * config.workHourDay;
+  // 日薪 = 月薪 ÷ 每月工作日（按工作日均摊，与午休无关）
+  const daily = config.salary / Math.max(1, config.workDaysMonth);
   return { hourly, perSec, daily };
 }
 
