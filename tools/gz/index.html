@@ -8,142 +8,173 @@
 </head>
 <body>
 
-<!-- 主题切换 -->
-<button class="theme-toggle" id="themeToggle" aria-label="切换深浅色模式">☀</button>
-
 <!-- Toast容器 -->
 <div class="toast-container" id="toastContainer"></div>
 
-<div class="app">
-  <!-- 页头 -->
-  <header class="app-header glass">
-    <h1>实时毫秒薪计时器</h1>
+<!-- 顶部控制条：默认仅极简图标，点击向下滑出抽屉 -->
+<header class="topbar glass">
+  <button class="topbar-icon" id="drawerToggle" aria-label="打开配置与操作" title="配置与操作">⚙</button>
+  <div class="topbar-status">
     <div class="status-badge resting" id="statusBadge">
       <span class="dot"></span>
       <span id="statusText">等待配置</span>
     </div>
-  </header>
+  </div>
+  <button class="theme-toggle" id="themeToggle" aria-label="切换深浅色模式">☀</button>
+</header>
 
-  <!-- 设置区 -->
-  <section>
-    <div class="section-title glass" id="settingsToggle">
-      <span>配置参数</span>
-      <span class="arrow" id="settingsArrow">▼</span>
-    </div>
-    <div class="settings-section glass" id="settingsPanel">
-      <div class="settings-inner">
-        <!-- 月薪 -->
+<!-- 点击外部关闭抽屉的遮罩 -->
+<div class="drawer-scrim" id="drawerScrim"></div>
+
+<!-- 向下滑出的控制抽屉：配置参数 + 操作按钮 + 悬浮窗开关 -->
+<div class="control-drawer glass" id="controlDrawer" aria-hidden="true">
+  <!-- 配置参数（可折叠） -->
+  <div class="section-title" id="settingsToggle">
+    <span>配置参数</span>
+    <span class="arrow" id="settingsArrow">▼</span>
+  </div>
+  <div class="settings-section" id="settingsPanel">
+    <div class="settings-inner">
+      <!-- 月薪 -->
+      <div class="form-row">
+        <label class="form-label" for="salaryInput">月薪（元）</label>
+        <input class="form-input" type="number" id="salaryInput" placeholder="例如 10000" min="0" step="100">
+      </div>
+
+      <!-- 工作制模板 -->
+      <div class="form-row">
+        <label class="form-label">工作制模板</label>
+        <div class="template-grid" id="templateGrid">
+          <button class="tpl-btn" data-mode="955">标准955</button>
+          <button class="tpl-btn" data-mode="996">996</button>
+          <button class="tpl-btn" data-mode="1055">1055</button>
+          <button class="tpl-btn" data-mode="custom">自定义</button>
+        </div>
+      </div>
+
+      <!-- 自定义参数 -->
+      <div class="custom-grid" id="customFields">
+        <div class="form-row full">
+          <label class="form-label" for="startDateInput">开始工作日（用于补算此前已上班的天数）</label>
+          <input class="form-input" type="date" id="startDateInput">
+        </div>
         <div class="form-row">
-          <label class="form-label" for="salaryInput">月薪（元）</label>
-          <input class="form-input" type="number" id="salaryInput" placeholder="例如 10000" min="0" step="100">
+          <label class="form-label" for="workDaysInput">每月工作日（天）</label>
+          <input class="form-input" type="number" id="workDaysInput" placeholder="22" min="1" max="31">
         </div>
-
-        <!-- 工作制模板 -->
         <div class="form-row">
-          <label class="form-label">工作制模板</label>
-          <div class="template-grid" id="templateGrid">
-            <button class="tpl-btn" data-mode="955">标准955</button>
-            <button class="tpl-btn" data-mode="996">996</button>
-            <button class="tpl-btn" data-mode="1055">1055</button>
-            <button class="tpl-btn" data-mode="custom">自定义</button>
-          </div>
+          <label class="form-label" for="workHoursInput">每日工时（小时）</label>
+          <input class="form-input" type="number" id="workHoursInput" placeholder="8" min="0.5" max="24" step="0.5">
         </div>
+        <div class="form-row">
+          <label class="form-label" for="startTimeInput">上班时间</label>
+          <input class="form-input" type="time" id="startTimeInput" value="09:00">
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="endTimeInput">下班时间</label>
+          <input class="form-input" type="time" id="endTimeInput" value="17:00">
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="noonRestInput">午休时长（小时）</label>
+          <input class="form-input" type="number" id="noonRestInput" placeholder="1" min="0" max="8" step="0.5" value="0">
+        </div>
+      </div>
 
-        <!-- 自定义参数 -->
-        <div class="custom-grid" id="customFields">
-          <div class="form-row full">
-            <label class="form-label" for="startDateInput">开始工作日（用于补算此前已上班的天数）</label>
-            <input class="form-input" type="date" id="startDateInput">
-          </div>
-          <div class="form-row">
-            <label class="form-label" for="workDaysInput">每月工作日（天）</label>
-            <input class="form-input" type="number" id="workDaysInput" placeholder="22" min="1" max="31">
-          </div>
-          <div class="form-row">
-            <label class="form-label" for="workHoursInput">每日工时（小时）</label>
-            <input class="form-input" type="number" id="workHoursInput" placeholder="8" min="0.5" max="24" step="0.5">
-          </div>
-          <div class="form-row">
-            <label class="form-label" for="startTimeInput">上班时间</label>
-            <input class="form-input" type="time" id="startTimeInput" value="09:00">
-          </div>
-          <div class="form-row">
-            <label class="form-label" for="endTimeInput">下班时间</label>
-            <input class="form-input" type="time" id="endTimeInput" value="17:00">
-          </div>
-          <div class="form-row">
-            <label class="form-label" for="noonRestInput">午休时长（小时）</label>
-            <input class="form-input" type="number" id="noonRestInput" placeholder="1" min="0" max="8" step="0.5" value="0">
-          </div>
-        </div>
-
-        <!-- 保存 / 重置 -->
-        <div class="save-row">
-          <button class="btn btn-primary" id="saveBtn">保存配置</button>
-          <button class="btn btn-ghost" id="resetAllBtn">重置全部</button>
-        </div>
+      <!-- 保存 / 重置 -->
+      <div class="save-row">
+        <button class="btn btn-primary" id="saveBtn">保存配置</button>
+        <button class="btn btn-ghost" id="resetAllBtn">重置全部</button>
       </div>
     </div>
-  </section>
+  </div>
 
-  <!-- 数据展示区 -->
-  <section class="data-section glass" id="dataSection">
-    <div id="noConfigHint" class="no-config" style="display:none">
-      <p>请先配置薪资参数并保存</p>
-      <button class="btn btn-primary btn-sm" id="goConfigBtn">前往配置</button>
-    </div>
-    <div id="dataDisplay">
-      <!-- 实时秒收入 -->
-      <div class="second-income">
-        <div class="label">实时每秒收入</div>
-        <div><span class="value" id="secIncome">0.00</span><span class="unit">元/秒</span></div>
-      </div>
-
-      <!-- 今日 / 本月累计 -->
-      <div class="data-grid">
-        <div class="data-card">
-          <div class="dc-label">今日累计</div>
-          <div class="dc-value" id="todayIncome">0.00 元</div>
-          <div class="dc-sub" id="todaySeconds">已工作 0 秒</div>
-        </div>
-        <div class="data-card">
-          <div class="dc-label">本月累计</div>
-          <div class="dc-value" id="monthIncome">0.00 元</div>
-          <div class="dc-sub" id="monthSeconds">已工作 0 秒</div>
-        </div>
-        <!-- 入职至今总工资（跨所有月份，从开始工作日累计） -->
-        <div class="data-card full">
-          <div class="dc-label">入职至今总工资</div>
-          <div class="dc-value" id="totalIncome">0.00 元</div>
-          <div class="dc-sub" id="totalSub">自 — 起</div>
-        </div>
-      </div>
-
-      <!-- 辅助信息 -->
-      <div class="aux-row">
-        <div class="aux-item">
-          <div class="au-label">时薪</div>
-          <div class="au-value" id="hourlyRate">0.00</div>
-        </div>
-        <div class="aux-item">
-          <div class="au-label">日薪</div>
-          <div class="au-value" id="dailyRate">0.00</div>
-        </div>
-        <div class="aux-item">
-          <div class="au-label">下班倒计时</div>
-          <div class="au-value" id="countdown">--:--:--</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 操作区 -->
-  <section class="action-section glass" id="actionSection">
+  <!-- 操作按钮组 -->
+  <div class="drawer-actions">
     <button class="btn btn-primary" id="toggleTimerBtn">开始计时</button>
     <button class="btn btn-ghost btn-sm" id="resetTodayBtn">重置今日</button>
     <button class="btn btn-ghost btn-sm" id="resetMonthBtn">重置本月</button>
-    <button class="btn btn-ghost btn-sm" id="openFloatBtn">悬浮窗</button>
-  </section>
+  </div>
+
+  <!-- 悬浮窗开关 -->
+  <div class="float-toggle">
+    <span class="ft-label">悬浮窗</span>
+    <button class="switch" id="floatSwitch" role="switch" aria-checked="false" aria-label="切换悬浮窗">
+      <span class="switch-knob"></span>
+    </button>
+  </div>
+</div>
+
+<div class="app">
+  <!-- 主视觉区：今日累计为视觉锚点，其他数据环绕 -->
+  <main class="stage glass" id="dataSection">
+    <!-- 未配置提示 -->
+    <div id="noConfigHint" class="no-config" style="display:none">
+      <p>先配置薪资参数，让每一秒都被看见</p>
+      <button class="btn btn-primary btn-sm" id="goConfigBtn">前往配置</button>
+    </div>
+
+    <div id="dataDisplay">
+      <!-- 实时每秒收入：呼吸式副标题 -->
+      <div class="second-income">
+        <span class="live-dot"></span>
+        <span class="label">实时</span>
+        <span class="value" id="secIncome">0.00</span>
+        <span class="unit">元/秒</span>
+      </div>
+
+      <!-- 主视觉行：今日累计（左）+ 本月累计/入职至今（右，垂直堆叠，垂直居中） -->
+      <div class="hero-row">
+        <!-- 今日累计：绝对视觉中心 -->
+        <div class="hero">
+          <div class="hero-label">今日累计</div>
+          <div class="hero-value">
+            <span class="hero-num" id="todayIncome">0.00</span>
+          </div>
+          <div class="hero-sub" id="todaySeconds">已工作 0 秒</div>
+        </div>
+
+        <!-- 右侧垂直堆叠：本月累计 + 入职至今（无背景，垂直居中） -->
+        <div class="hero-side">
+          <div class="side-item">
+            <div class="side-label">本月累计</div>
+            <div class="side-value" id="monthIncome">0.00 元</div>
+            <div class="side-sub" id="monthSeconds">已工作 0 秒</div>
+          </div>
+          <div class="side-divider" aria-hidden="true"></div>
+          <div class="side-item">
+            <div class="side-label">入职至今总工资</div>
+            <div class="side-value side-value-lg" id="totalIncome">0.00 元</div>
+            <div class="side-sub" id="totalSub">自 — 起</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 迷你标签组：时薪 / 日薪 / 下班倒计时 -->
+      <div class="mini-row">
+        <div class="mini-item">
+          <span class="mi-ico">¥</span>
+          <span class="mi-label">时薪</span>
+          <span class="mi-value" id="hourlyRate">0.00</span>
+        </div>
+        <div class="mini-divider"></div>
+        <div class="mini-item">
+          <span class="mi-ico">日</span>
+          <span class="mi-label">日薪</span>
+          <span class="mi-value" id="dailyRate">0.00</span>
+        </div>
+        <div class="mini-divider"></div>
+        <div class="mini-item mini-countdown">
+          <span class="mi-ico">⏱</span>
+          <span class="mi-label">下班</span>
+          <span class="mi-value" id="countdown">--:--:--</span>
+        </div>
+      </div>
+      <!-- 下班倒计时渐变进度条：越接近下班越红 -->
+      <div class="countdown-track" aria-hidden="true">
+        <div class="countdown-fill" id="countdownFill"></div>
+      </div>
+    </div>
+  </main>
 </div>
 
 <!-- 悬浮窗 -->

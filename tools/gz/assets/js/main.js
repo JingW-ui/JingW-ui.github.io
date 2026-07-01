@@ -5,7 +5,8 @@ import { toISODate } from './utils.js';
 import { getEffectiveSeconds } from './calc.js';
 import { populateForm, renderData, toggleSettings, showToast, setLastDateStr } from './ui.js';
 import { applyTheme, toggleTheme } from './theme.js';
-import { openFloatWindow, closeFloatWindow, minimizeFloatWindow, initFloatWindowInteractions } from './float-window.js';
+import { closeFloatWindow, minimizeFloatWindow, initFloatWindowInteractions } from './float-window.js';
+import { initDrawer, closeDrawer } from './drawer.js';
 
 /* ==================== 事件绑定 ==================== */
 function initEvents() {
@@ -54,6 +55,7 @@ function initEvents() {
     state.monthResetDate = '';
     saveToStorage();
     toggleSettings(false);
+    closeDrawer();
     showToast('配置已保存');
     renderData();
   });
@@ -109,12 +111,12 @@ function initEvents() {
     renderData();
   });
 
-  // 悬浮窗
-  document.getElementById('openFloatBtn').addEventListener('click', openFloatWindow);
+  // 悬浮窗（开/关入口移至抽屉内的开关，见 drawer.js）
   document.getElementById('fwClose').addEventListener('click', closeFloatWindow);
   document.getElementById('fwMinimize').addEventListener('click', minimizeFloatWindow);
 
   initFloatWindowInteractions();
+  initDrawer();
 }
 
 /* ==================== 初始化 ==================== */
@@ -130,10 +132,8 @@ function init() {
     toggleSettings(false);
   }
 
-  // 恢复悬浮窗
-  if (state.floatWindowOpen) {
-    openFloatWindow();
-  }
+  // 悬浮窗默认关闭：加载时不自动恢复上次状态，需手动通过抽屉开关开启
+  state.floatWindowOpen = false;
 
   // 初始化日期字符串
   const now = new Date();
