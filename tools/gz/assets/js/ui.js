@@ -1,6 +1,6 @@
 /* ==================== UI 渲染 / 表单 / 设置折叠 / Toast ==================== */
 import { config, state, saveToStorage } from './store.js';
-import { calcRates, getWorkStatus, getEffectiveSeconds, pastWorkSecondsThisMonth } from './calc.js';
+import { calcRates, getWorkStatus, getEffectiveSeconds, pastWorkSecondsThisMonth, pastWorkSecondsSinceStart } from './calc.js';
 import { fmt, formatSeconds, formatCountdown, timeToMinutes, toISODate } from './utils.js';
 
 /* ==================== 日期检查：跨日/跨月重置 ==================== */
@@ -109,6 +109,8 @@ export function renderData() {
   const todaySec = state.todayZeroed ? 0 : (state.isTimerRun ? effectiveSec : state.todayTotal);
   // 当月应累计 = 本月此前（含开始工作日之前的补算）已完成的工作日秒数 + 当日
   const monthSec = pastWorkSecondsThisMonth(now) + todaySec;
+  // 入职至今总累计 = 自开始工作日到昨天的完整工作日秒数 + 当日（不受「重置本月」影响）
+  const totalSec = pastWorkSecondsSinceStart(now) + todaySec;
 
   // 渲染主页面
   // 累计收入使用 4 位小数，使毫秒级刷新时末位持续跳动；时薪/日薪保持 2 位
@@ -117,6 +119,8 @@ export function renderData() {
   document.getElementById('todaySeconds').textContent = formatSeconds(todaySec);
   document.getElementById('monthIncome').textContent = fmt(monthSec * rates.perSec, 4) + ' 元';
   document.getElementById('monthSeconds').textContent = formatSeconds(monthSec);
+  document.getElementById('totalIncome').textContent = fmt(totalSec * rates.perSec, 4) + ' 元';
+  document.getElementById('totalSub').textContent = config.startDate ? ('自 ' + config.startDate + ' 起') : '从今日起';
   document.getElementById('hourlyRate').textContent = fmt(rates.hourly);
   document.getElementById('dailyRate').textContent = fmt(rates.daily);
 
@@ -140,6 +144,7 @@ export function renderData() {
     document.getElementById('fwSec').textContent = fmt(rates.perSec, 4);
     document.getElementById('fwToday').textContent = fmt(todaySec * rates.perSec, 4);
     document.getElementById('fwMonth').textContent = fmt(monthSec * rates.perSec, 4);
+    document.getElementById('fwTotal').textContent = fmt(totalSec * rates.perSec, 4);
   }
 }
 

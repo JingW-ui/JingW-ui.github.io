@@ -41,6 +41,24 @@ export function pastWorkSecondsThisMonth(now) {
   return total;
 }
 
+/* 计算从「开始工作日」到昨天为止的累计有效工作秒数（跨越所有月份，不受「重置本月」影响）。
+   用于展示「入职至今总工资」——一个从开始工作到现在的累计值。
+   与 pastWorkSecondsThisMonth 的区别：后者只算本月内的历史工作日且受 monthResetDate 影响。 */
+export function pastWorkSecondsSinceStart(now) {
+  let start = parseDateStr(config.startDate);
+  if (!start) start = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // 无开始日则无历史
+  const today00 = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  let total = 0;
+  const d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  let guard = 0;
+  while (d < today00 && guard < 10000) {
+    if (isWorkDay(d)) total += fullWorkdaySeconds();
+    d.setDate(d.getDate() + 1);
+    guard++;
+  }
+  return total;
+}
+
 /* ==================== 有效工作秒数计算 ==================== */
 /* 返回「真实秒数」（含毫秒精度），便于页面以毫秒级刷新累计收入。
    注意：早期版本错误地返回了「分钟数」，导致累计被缩小 60 倍，此处修正。 */
