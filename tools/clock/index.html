@@ -136,6 +136,134 @@
             display: block;
             margin: 0 auto;
         }
+
+        /* 控制栏 */
+        .control-bar {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.6rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .city-select {
+            background: #0c0c0e;
+            border: 1px solid var(--card-border);
+            color: var(--fg);
+            border-radius: 8px;
+            padding: 0.5rem 0.75rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            cursor: pointer;
+            max-width: 240px;
+            flex: 1 1 180px;
+            min-width: 0;
+            transition: border-color 0.2s;
+        }
+
+        .city-select:focus,
+        .city-select:hover {
+            border-color: var(--accent-dim);
+        }
+
+        .city-select optgroup {
+            background: #0c0c0e;
+            color: var(--accent);
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        .city-select option {
+            background: #161619;
+            color: var(--fg);
+        }
+
+        .btn {
+            background: rgba(201, 162, 39, 0.12);
+            border: 1px solid var(--accent-dim);
+            color: var(--accent);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: rgba(201, 162, 39, 0.22);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border-color: var(--card-border);
+            color: var(--muted);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(201, 162, 39, 0.08);
+            color: var(--accent);
+            border-color: var(--accent-dim);
+        }
+
+        /* 移除按钮 */
+        .remove-btn {
+            position: absolute;
+            top: 0.6rem;
+            right: 0.6rem;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(199, 74, 74, 0.12);
+            border: 1px solid rgba(199, 74, 74, 0.4);
+            color: var(--red);
+            font-size: 0.8rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s, background 0.2s;
+            z-index: 2;
+        }
+
+        .clock-card:hover .remove-btn {
+            opacity: 1;
+        }
+
+        .remove-btn:hover {
+            background: rgba(199, 74, 74, 0.3);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* 卡片进入/离开动画 */
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .card-enter {
+            animation: cardIn 0.45s ease forwards;
+        }
     </style>
 </head>
 <body>
@@ -149,76 +277,23 @@
                 WORLD CLOCK
             </h1>
             <p class="text-sm tracking-widest uppercase" style="color: var(--muted);">
-                Beijing · London · New York · Tokyo
+                全球时区 · 自由添加
             </p>
         </header>
 
+        <!-- 控制栏 -->
+        <div class="control-bar animate-in w-full max-w-6xl mb-5" style="animation-delay: 0.12s;">
+            <select id="citySelect" class="city-select" aria-label="选择城市">
+                <option value="">＋ 添加城市 / 选择时区…</option>
+            </select>
+            <button id="addBtn" class="btn" type="button">添加</button>
+            <button id="resetBtn" class="btn btn-ghost" type="button" title="恢复默认城市">默认</button>
+            <span id="countLabel" class="text-xs mono-font ml-auto" style="color: var(--muted);">0 座城市</span>
+        </div>
+
         <!-- 时钟网格 -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full max-w-6xl">
-
-            <!-- 北京 -->
-            <div class="clock-card animate-in" style="animation-delay: 0.15s;">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 class="text-lg font-semibold tracking-wide">BEIJING</h2>
-                        <p class="text-xs mt-0.5" style="color: var(--muted);">中国</p>
-                    </div>
-                    <span class="tz-badge mono-font">UTC+8</span>
-                </div>
-                <canvas id="clock-beijing" class="clock-canvas" width="180" height="180"></canvas>
-                <div class="mt-4 text-center">
-                    <div id="digital-beijing" class="mono-font digital-time text-xl font-bold" style="color: var(--accent);">--:--:--</div>
-                    <div id="date-beijing" class="text-xs mt-1.5" style="color: var(--muted);">----年--月--日</div>
-                </div>
-            </div>
-
-            <!-- 伦敦 -->
-            <div class="clock-card animate-in" style="animation-delay: 0.25s;">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 class="text-lg font-semibold tracking-wide">LONDON</h2>
-                        <p class="text-xs mt-0.5" style="color: var(--muted);">英国</p>
-                    </div>
-                    <span class="tz-badge mono-font">UTC+0</span>
-                </div>
-                <canvas id="clock-london" class="clock-canvas" width="180" height="180"></canvas>
-                <div class="mt-4 text-center">
-                    <div id="digital-london" class="mono-font digital-time text-xl font-bold" style="color: var(--accent);">--:--:--</div>
-                    <div id="date-london" class="text-xs mt-1.5" style="color: var(--muted);">----年--月--日</div>
-                </div>
-            </div>
-
-            <!-- 纽约 -->
-            <div class="clock-card animate-in" style="animation-delay: 0.35s;">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 class="text-lg font-semibold tracking-wide">NEW YORK</h2>
-                        <p class="text-xs mt-0.5" style="color: var(--muted);">美国</p>
-                    </div>
-                    <span class="tz-badge mono-font">UTC-5</span>
-                </div>
-                <canvas id="clock-newyork" class="clock-canvas" width="180" height="180"></canvas>
-                <div class="mt-4 text-center">
-                    <div id="digital-newyork" class="mono-font digital-time text-xl font-bold" style="color: var(--accent);">--:--:--</div>
-                    <div id="date-newyork" class="text-xs mt-1.5" style="color: var(--muted);">----年--月--日</div>
-                </div>
-            </div>
-
-            <!-- 东京 -->
-            <div class="clock-card animate-in" style="animation-delay: 0.45s;">
-                <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <h2 class="text-lg font-semibold tracking-wide">TOKYO</h2>
-                        <p class="text-xs mt-0.5" style="color: var(--muted);">日本</p>
-                    </div>
-                    <span class="tz-badge mono-font">UTC+9</span>
-                </div>
-                <canvas id="clock-tokyo" class="clock-canvas" width="180" height="180"></canvas>
-                <div class="mt-4 text-center">
-                    <div id="digital-tokyo" class="mono-font digital-time text-xl font-bold" style="color: var(--accent);">--:--:--</div>
-                    <div id="date-tokyo" class="text-xs mt-1.5" style="color: var(--muted);">----年--月--日</div>
-                </div>
-            </div>
+        <div id="clockGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 w-full max-w-6xl">
+            <!-- 动态生成 -->
         </div>
 
         <!-- 底部 -->
@@ -228,13 +303,75 @@
     </div>
 
     <script>
-        // 时区配置（初始化在最前面）
-        const TIMEZONES = {
-            beijing: { offset: 8, city: '北京' },
-            london: { offset: 0, city: '伦敦' },
-            newyork: { offset: -5, city: '纽约' },
-            tokyo: { offset: 9, city: '东京' }
-        };
+        // 城市数据库（按地区分组，使用 IANA 时区名以正确处理夏令时）
+        const CITIES = [
+            // 亚洲
+            { id: 'beijing',  en: 'BEIJING',    zh: '北京',    country: '中国',     tz: 'Asia/Shanghai' },
+            { id: 'hongkong', en: 'HONG KONG',  zh: '香港',    country: '中国香港', tz: 'Asia/Hong_Kong' },
+            { id: 'tokyo',    en: 'TOKYO',      zh: '东京',    country: '日本',     tz: 'Asia/Tokyo' },
+            { id: 'seoul',    en: 'SEOUL',      zh: '首尔',    country: '韩国',     tz: 'Asia/Seoul' },
+            { id: 'singapore',en: 'SINGAPORE',  zh: '新加坡',  country: '新加坡',   tz: 'Asia/Singapore' },
+            { id: 'bangkok',  en: 'BANGKOK',    zh: '曼谷',    country: '泰国',     tz: 'Asia/Bangkok' },
+            { id: 'jakarta',  en: 'JAKARTA',    zh: '雅加达',  country: '印尼',     tz: 'Asia/Jakarta' },
+            { id: 'mumbai',   en: 'MUMBAI',     zh: '孟买',    country: '印度',     tz: 'Asia/Kolkata' },
+            { id: 'dubai',    en: 'DUBAI',      zh: '迪拜',    country: '阿联酋',   tz: 'Asia/Dubai' },
+            { id: 'manila',   en: 'MANILA',     zh: '马尼拉',  country: '菲律宾',   tz: 'Asia/Manila' },
+            // 大洋洲
+            { id: 'auckland', en: 'AUCKLAND',   zh: '奥克兰',  country: '新西兰',   tz: 'Pacific/Auckland' },
+            { id: 'wellington',en:'WELLINGTON',zh: '惠灵顿',  country: '新西兰',   tz: 'Pacific/Auckland' },
+            { id: 'sydney',   en: 'SYDNEY',     zh: '悉尼',    country: '澳大利亚', tz: 'Australia/Sydney' },
+            { id: 'melbourne',en:'MELBOURNE',  zh: '墨尔本',  country: '澳大利亚', tz: 'Australia/Melbourne' },
+            { id: 'perth',    en: 'PERTH',      zh: '珀斯',    country: '澳大利亚', tz: 'Australia/Perth' },
+            { id: 'suva',     en: 'SUVA',       zh: '苏瓦',    country: '斐济',     tz: 'Pacific/Fiji' },
+            // 欧洲
+            { id: 'london',   en: 'LONDON',     zh: '伦敦',    country: '英国',     tz: 'Europe/London' },
+            { id: 'paris',    en: 'PARIS',      zh: '巴黎',    country: '法国',     tz: 'Europe/Paris' },
+            { id: 'berlin',   en: 'BERLIN',     zh: '柏林',    country: '德国',     tz: 'Europe/Berlin' },
+            { id: 'madrid',   en: 'MADRID',     zh: '马德里',  country: '西班牙',   tz: 'Europe/Madrid' },
+            { id: 'rome',     en: 'ROME',       zh: '罗马',    country: '意大利',   tz: 'Europe/Rome' },
+            { id: 'amsterdam',en:'AMSTERDAM',  zh: '阿姆斯特丹',country:'荷兰',    tz: 'Europe/Amsterdam' },
+            { id: 'moscow',   en: 'MOSCOW',     zh: '莫斯科',  country: '俄罗斯',   tz: 'Europe/Moscow' },
+            { id: 'istanbul', en: 'ISTANBUL',  zh: '伊斯坦布尔',country:'土耳其',  tz: 'Europe/Istanbul' },
+            // 美洲
+            { id: 'newyork',  en: 'NEW YORK',   zh: '纽约',    country: '美国',     tz: 'America/New_York' },
+            { id: 'chicago',  en: 'CHICAGO',    zh: '芝加哥',  country: '美国',     tz: 'America/Chicago' },
+            { id: 'losangeles',en:'LOS ANGELES',zh: '洛杉矶',  country: '美国',     tz: 'America/Los_Angeles' },
+            { id: 'denver',   en: 'DENVER',     zh: '丹佛',    country: '美国',     tz: 'America/Denver' },
+            { id: 'honolulu', en: 'HONOLULU',   zh: '檀香山',  country: '美国夏威夷',tz: 'Pacific/Honolulu' },
+            { id: 'anchorage',en: 'ANCHORAGE', zh: '安克雷奇',country: '美国阿拉斯加',tz:'America/Anchorage' },
+            { id: 'toronto',  en: 'TORONTO',    zh: '多伦多',  country: '加拿大',   tz: 'America/Toronto' },
+            { id: 'vancouver',en: 'VANCOUVER',  zh: '温哥华',  country: '加拿大',   tz: 'America/Vancouver' },
+            { id: 'mexicocity',en:'MEXICO CITY',zh: '墨西哥城',country: '墨西哥',   tz: 'America/Mexico_City' },
+            { id: 'saopaulo', en: 'SÃO PAULO',  zh: '圣保罗',  country: '巴西',     tz: 'America/Sao_Paulo' },
+            { id: 'buenosaires',en:'BUENOS AIRES',zh:'布宜诺斯艾利斯',country:'阿根廷',tz:'America/Argentina/Buenos_Aires' },
+            { id: 'lima',     en: 'LIMA',        zh: '利马',    country: '秘鲁',     tz: 'America/Lima' },
+            // 非洲
+            { id: 'cairo',    en: 'CAIRO',      zh: '开罗',    country: '埃及',     tz: 'Africa/Cairo' },
+            { id: 'johannesburg',en:'JOHANNESBURG',zh:'约翰内斯堡',country:'南非',  tz: 'Africa/Johannesburg' },
+            { id: 'lagos',    en: 'LAGOS',       zh: '拉各斯',  country: '尼日利亚', tz: 'Africa/Lagos' },
+            { id: 'nairobi',  en: 'NAIROBI',     zh: '内罗毕',  country: '肯尼亚',   tz: 'Africa/Nairobi' },
+        ];
+
+        const DEFAULT_CITY_IDS = ['beijing', 'london', 'newyork', 'tokyo'];
+        const STORAGE_KEY = 'clock_wall_cities_v1';
+        const REGION_ORDER = ['亚洲', '大洋洲', '欧洲', '美洲', '非洲'];
+
+        // 城市按地区分组（用于下拉列表）
+        const CITY_GROUPS = (() => {
+            const groups = {};
+            REGION_ORDER.forEach(r => groups[r] = []);
+            CITIES.forEach(c => {
+                // 通过 tz 前缀粗判地区归属
+                let region;
+                if (c.tz.startsWith('Asia/')) region = '亚洲';
+                else if (c.tz.startsWith('Pacific/') || c.tz.startsWith('Australia/')) region = '大洋洲';
+                else if (c.tz.startsWith('Europe/')) region = '欧洲';
+                else if (c.tz.startsWith('America/')) region = '美洲';
+                else if (c.tz.startsWith('Africa/')) region = '非洲';
+                if (groups[region]) groups[region].push(c);
+            });
+            return groups;
+        })();
 
         // 颜色配置
         const COLORS = {
@@ -260,17 +397,62 @@
             return Math.max(EPS, r);
         }
 
-        // 获取指定时区的时间
-        function getTimeInTimezone(offset) {
+        // 通过 Intl 获取指定时区的“日期成分”（自动处理夏令时）
+        function getPartsInTimezone(tz) {
             const now = new Date();
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const cityTime = new Date(utc + (3600000 * offset));
+            const fmt = new Intl.DateTimeFormat('en-US', {
+                timeZone: tz,
+                hour12: false,
+                year: 'numeric', month: 'numeric', day: 'numeric',
+                weekday: 'short',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+            const parts = fmt.formatToParts(now);
+            const obj = {};
+            parts.forEach(p => { obj[p.type] = p.value; });
+            // weekday 形如 "Mon"
             return {
-                hours: cityTime.getHours(),
-                minutes: cityTime.getMinutes(),
-                seconds: cityTime.getSeconds(),
-                milliseconds: cityTime.getMilliseconds()
+                hour: parseInt(obj.hour, 10) % 24,
+                minute: parseInt(obj.minute, 10),
+                second: parseInt(obj.second, 10),
+                millisecond: now.getMilliseconds(),
+                year: parseInt(obj.year, 10),
+                month: parseInt(obj.month, 10),
+                day: parseInt(obj.day, 10),
+                weekday: obj.weekday
             };
+        }
+
+        // 获取指定时区的时间（用于绘图）
+        function getTimeInTimezone(tz) {
+            const p = getPartsInTimezone(tz);
+            return {
+                hours: p.hour,
+                minutes: p.minute,
+                seconds: p.second,
+                milliseconds: p.millisecond
+            };
+        }
+
+        // 计算某时区当前的 UTC 偏移标签（如 UTC+8 / UTC+13）——自动反映夏令时
+        function getUtcOffsetLabel(tz) {
+            try {
+                const fmt = new Intl.DateTimeFormat('en-US', { timeZone: tz, timeZoneName: 'shortOffset' });
+                const parts = fmt.formatToParts(new Date());
+                const tzName = parts.find(p => p.type === 'timeZoneName');
+                if (tzName) {
+                    return tzName.value.replace('GMT', 'UTC');
+                }
+            } catch (e) { /* 老浏览器不支持 shortOffset，降级 */ }
+            // 降级：手动计算
+            const date = new Date();
+            const local = new Date(date.toLocaleString('en-US', { timeZone: tz }));
+            const utc = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+            const diff = Math.round((local - utc) / 60000);
+            const sign = diff >= 0 ? '+' : '-';
+            const h = Math.floor(Math.abs(diff) / 60);
+            const m = Math.abs(diff) % 60;
+            return `UTC${sign}${h}${m ? ':' + String(m).padStart(2, '0') : ''}`;
         }
 
         // 格式化数字时间
@@ -281,19 +463,12 @@
             return `${h}:${m}:${s}`;
         }
 
-        // 格式化日期
-        function formatDate(offset) {
-            const now = new Date();
-            const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const cityTime = new Date(utc + (3600000 * offset));
-
-            const year = cityTime.getFullYear();
-            const month = cityTime.getMonth() + 1;
-            const day = cityTime.getDate();
-            const weekDays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-            const weekDay = weekDays[cityTime.getDay()];
-
-            return `${year}年${month}月${day}日 ${weekDay}`;
+        // 格式化日期（使用 Intl 取得的成分）
+        function formatDate(tz) {
+            const p = getPartsInTimezone(tz);
+            const weekMap = { Mon: '周一', Tue: '周二', Wed: '周三', Thu: '周四', Fri: '周五', Sat: '周六', Sun: '周日' };
+            const weekDay = weekMap[p.weekday] || '';
+            return `${p.year}年${p.month}月${p.day}日 ${weekDay}`;
         }
 
         // 绘制时钟
@@ -441,25 +616,151 @@
             ctx.restore();
         }
 
-        // 更新所有时钟
-        function updateClocks() {
-            Object.keys(TIMEZONES).forEach(city => {
-                const config = TIMEZONES[city];
-                const time = getTimeInTimezone(config.offset);
+        // ===== 状态管理 =====
+        let activeCityIds = [];
+        let lastMinute = -1;
 
-                // 更新模拟时钟
-                drawClock(`clock-${city}`, time);
+        const gridEl = () => document.getElementById('clockGrid');
+        const cityById = id => CITIES.find(c => c.id === id);
 
-                // 更新数字时间
-                const digitalEl = document.getElementById(`digital-${city}`);
-                if (digitalEl) {
-                    digitalEl.textContent = formatTime(time);
+        function loadState() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+                if (Array.isArray(saved) && saved.length) {
+                    // 过滤掉可能不存在的 id
+                    const valid = saved.filter(id => cityById(id));
+                    if (valid.length) return valid;
                 }
+            } catch (e) { /* ignore */ }
+            return DEFAULT_CITY_IDS.slice();
+        }
 
-                // 更新日期
-                const dateEl = document.getElementById(`date-${city}`);
-                if (dateEl) {
-                    dateEl.textContent = formatDate(config.offset);
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(activeCityIds));
+            } catch (e) { /* ignore */ }
+        }
+
+        // 填充下拉列表（按地区分组，隐藏已添加的城市）
+        function buildSelect() {
+            const sel = document.getElementById('citySelect');
+            const currentVal = sel.value;
+            // 保留第一个占位 option
+            sel.innerHTML = '<option value="">＋ 添加城市 / 选择时区…</option>';
+            REGION_ORDER.forEach(region => {
+                const cities = (CITY_GROUPS[region] || []).filter(c => !activeCityIds.includes(c.id));
+                if (!cities.length) return;
+                const group = document.createElement('optgroup');
+                group.label = region;
+                cities.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = `${c.zh} · ${c.country}`;
+                    group.appendChild(opt);
+                });
+                sel.appendChild(group);
+            });
+            sel.value = currentVal && sel.querySelector(`option[value="${currentVal}"]`) ? currentVal : '';
+        }
+
+        // 渲染网格（重建卡片）
+        function renderGrid() {
+            const grid = gridEl();
+            grid.innerHTML = '';
+
+            if (!activeCityIds.length) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.textContent = '还没有时钟 · 从上方下拉添加城市';
+                grid.appendChild(empty);
+                updateCountLabel();
+                return;
+            }
+
+            activeCityIds.forEach((id, i) => {
+                const c = cityById(id);
+                if (!c) return;
+                const card = document.createElement('div');
+                card.className = 'clock-card card-enter';
+                card.style.animationDelay = `${0.03 * i}s`;
+                card.dataset.cityId = id;
+
+                const offsetLabel = getUtcOffsetLabel(c.tz);
+
+                card.innerHTML = `
+                    <button class="remove-btn" type="button" aria-label="移除 ${c.zh}" title="移除">×</button>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 class="text-lg font-semibold tracking-wide">${c.en}</h2>
+                            <p class="text-xs mt-0.5" style="color: var(--muted);">${c.zh} · ${c.country}</p>
+                        </div>
+                        <span class="tz-badge mono-font" data-offset="${id}">${offsetLabel}</span>
+                    </div>
+                    <canvas id="clock-${id}" class="clock-canvas" width="180" height="180"></canvas>
+                    <div class="mt-4 text-center">
+                        <div id="digital-${id}" class="mono-font digital-time text-xl font-bold" style="color: var(--accent);">--:--:--</div>
+                        <div id="date-${id}" class="text-xs mt-1.5" style="color: var(--muted);">----年--月--日</div>
+                    </div>
+                `;
+
+                card.querySelector('.remove-btn').addEventListener('click', () => removeCity(id));
+                grid.appendChild(card);
+            });
+
+            updateCountLabel();
+            lastMinute = -1; // 触发下一帧刷新日期/偏移
+        }
+
+        function updateCountLabel() {
+            const el = document.getElementById('countLabel');
+            if (el) el.textContent = `${activeCityIds.length} 座城市`;
+        }
+
+        function addCity(id) {
+            if (!id || activeCityIds.includes(id)) return;
+            activeCityIds.push(id);
+            saveState();
+            renderGrid();
+            buildSelect();
+        }
+
+        function removeCity(id) {
+            activeCityIds = activeCityIds.filter(x => x !== id);
+            saveState();
+            renderGrid();
+            buildSelect();
+        }
+
+        function resetCities() {
+            activeCityIds = DEFAULT_CITY_IDS.slice();
+            saveState();
+            renderGrid();
+            buildSelect();
+        }
+
+        // 更新所有时钟（每帧调用）
+        function updateClocks() {
+            const now = new Date();
+            const curMinute = now.getHours() * 60 + now.getMinutes();
+            const minuteChanged = curMinute !== lastMinute;
+            lastMinute = curMinute;
+
+            activeCityIds.forEach(id => {
+                const c = cityById(id);
+                if (!c) return;
+                const time = getTimeInTimezone(c.tz);
+
+                drawClock(`clock-${id}`, time);
+
+                const digitalEl = document.getElementById(`digital-${id}`);
+                if (digitalEl) digitalEl.textContent = formatTime(time);
+
+                // 日期与偏移标签每分钟刷新一次（节流）
+                if (minuteChanged) {
+                    const dateEl = document.getElementById(`date-${id}`);
+                    if (dateEl) dateEl.textContent = formatDate(c.tz);
+                    const offEl = document.querySelector(`[data-offset="${id}"]`);
+                    if (offEl) offEl.textContent = getUtcOffsetLabel(c.tz);
                 }
             });
         }
@@ -467,10 +768,30 @@
         // 检查 reduced motion 偏好
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        // 初始化并启动时钟
+        // 初始化
         function init() {
-            updateClocks();
+            activeCityIds = loadState();
+            buildSelect();
+            renderGrid();
 
+            // 事件绑定
+            document.getElementById('addBtn').addEventListener('click', () => {
+                const sel = document.getElementById('citySelect');
+                if (sel.value) {
+                    addCity(sel.value);
+                    sel.value = '';
+                }
+            });
+            document.getElementById('citySelect').addEventListener('change', e => {
+                if (e.target.value) {
+                    addCity(e.target.value);
+                    e.target.value = '';
+                }
+            });
+            document.getElementById('resetBtn').addEventListener('click', resetCities);
+
+            // 启动时钟循环
+            updateClocks();
             if (prefersReducedMotion) {
                 setInterval(updateClocks, 1000);
             } else {
