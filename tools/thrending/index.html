@@ -19,6 +19,11 @@
     --card-hover:rgba(35,134,54,0.04);
     --shadow-sm:0 1px 2px rgba(0,0,0,0.04);
     --shadow-md:0 3px 12px rgba(0,0,0,0.06);
+    --red:#cf222e;--red-bg:rgba(207,34,46,0.08);--red-border:rgba(207,34,46,0.2);
+    --blue:#0969da;--blue-bg:rgba(9,105,218,0.08);--blue-border:rgba(9,105,218,0.2);
+    --purple:#8250df;--purple-bg:rgba(130,80,223,0.08);--purple-border:rgba(130,80,223,0.2);
+    --yellow:#9a6700;--yellow-bg:rgba(154,103,0,0.08);--yellow-border:rgba(154,103,0,0.2);
+    --orange:#bc4c00;--orange-bg:rgba(188,76,0,0.08);--orange-border:rgba(188,76,0,0.2);
   }
   html{scroll-behavior:smooth}
   body{
@@ -76,6 +81,14 @@
   }
   .pill.lang-pill.active{background:var(--green);color:#fff;border-color:var(--green)}
 
+  .badge-style-pill{
+    padding:5px 12px;border-radius:100px;
+    font-size:0.78rem;font-weight:500;
+    border:1.5px solid var(--border);background:var(--bg);color:var(--text-tertiary);
+    cursor:pointer;outline:none;transition:all 0.25s ease;
+  }
+  .badge-style-pill:hover{border-color:var(--green);color:var(--green)}
+
   .divider{
     width:1px;height:24px;background:var(--border);margin:0 4px;
   }
@@ -118,7 +131,6 @@
   }
   @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
 
-  /* exit animation */
   .repo-card.exiting{
     animation:cardOut 0.3s ease forwards;
   }
@@ -167,6 +179,38 @@
     color:var(--green);font-weight:600;
   }
 
+  /* ---- Assess Badge ---- */
+  .assess-badge{
+    font-size:0.72rem;font-weight:600;padding:3px 10px;border-radius:20px;
+    white-space:nowrap;border:1px solid transparent;flex-shrink:0;
+    display:inline-flex;align-items:center;gap:4px;
+  }
+  .a-hot{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+  .a-good{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+  .a-fresh{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-border)}
+  .a-fair{background:var(--yellow-bg);color:var(--yellow);border-color:var(--yellow-border)}
+  .a-cold{background:rgba(139,148,158,0.08);color:var(--text-tertiary);border-color:rgba(139,148,158,0.2)}
+
+  /* ---- Shields.io Badges Row ---- */
+  .repo-badges{
+    display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;
+    margin-top:12px;padding-top:12px;
+    border-top:1px dashed var(--border);
+  }
+  .repo-badges img{
+    height:20px;vertical-align:middle;border-radius:3px;
+    transition:opacity 0.15s;cursor:pointer;
+  }
+  .repo-badges img:hover{opacity:0.75}
+  .embed-btn{
+    background:var(--bg);color:var(--text-tertiary);border:1px solid var(--border);
+    border-radius:5px;padding:3px 9px;font-size:0.72rem;cursor:pointer;
+    transition:all 0.2s;white-space:nowrap;font-weight:500;
+    margin-left:auto;
+  }
+  .embed-btn:hover{color:var(--green);border-color:var(--green)}
+  .embed-btn.copied{color:var(--green);border-color:var(--green);background:var(--green-bg)}
+
   /* ---- Empty ---- */
   .empty-state{
     text-align:center;padding:80px 24px;
@@ -197,6 +241,8 @@
     .repo-rank{font-size:1.2rem;min-width:28px}
     .repo-name{font-size:0.98rem}
     .stats-bar{gap:20px}
+    .repo-badges{gap:5px 6px}
+    .repo-badges img{height:18px}
   }
 
   /* scrollbar */
@@ -279,6 +325,17 @@
     <button class="pill lang-pill" data-lang="typescript">TypeScript</button>
     <button class="pill lang-pill" data-lang="go">Go</button>
   </div>
+  <div class="divider"></div>
+  <div class="control-group">
+    <span class="control-label">Badge</span>
+    <select class="badge-style-pill" id="badgeStyleSel">
+      <option value="social">social</option>
+      <option value="flat">flat</option>
+      <option value="flat-square">flat-square</option>
+      <option value="plastic">plastic</option>
+      <option value="for-the-badge">for-the-badge</option>
+    </select>
+  </div>
 </div>
 
 <div class="container">
@@ -287,53 +344,126 @@
 
 <script>
 (function(){
-  const API_BASE = 'https://cloudflare-mcp1.zx1993.top/api/trending';
-  let currentSince = 'daily';
-  let currentLang = '';
-  let cachedData = {};
-  let loading = false;
+  var API_BASE = "https://cloudflare-mcp1.zx1993.top/api/trending";
+  var currentSince = "daily";
+  var currentLang = "";
+  var cachedData = {};
+  var loading = false;
 
-  const repoListEl = document.getElementById('repoList');
-  const statTotal = document.getElementById('statTotal');
-  const statStars = document.getElementById('statStars');
-  const statLangs = document.getElementById('statLangs');
+  var repoListEl = document.getElementById("repoList");
+  var statTotal = document.getElementById("statTotal");
+  var statStars = document.getElementById("statStars");
+  var statLangs = document.getElementById("statLangs");
+  var badgeStyleSel = document.getElementById("badgeStyleSel");
 
   // ---- Language color helper ----
   function langClass(lang) {
-    if (!lang) return 'lang-default';
-    const l = lang.toLowerCase().replace('++','plus').replace('#','sharp').replace(' ','');
-    return 'lang-' + l;
+    if (!lang) return "lang-default";
+    var l = lang.toLowerCase().replace("++", "plus").replace("#", "sharp").replace(" ", "");
+    return "lang-" + l;
   }
 
   // ---- Format numbers ----
   function fmtNum(n) {
-    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+    if (n >= 1000) return (n / 1000).toFixed(1).replace(/\.0$/, "") + "k";
     return n.toString();
+  }
+
+  // ---- Escape HTML ----
+  function escHtml(str) {
+    var d = document.createElement("div");
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  // ---- Assess learning value (based on stars) ----
+  function assess(stars) {
+    if (stars >= 50000) return { cls: "a-hot", txt: "Top Project", tip: "Star >= 50k" };
+    if (stars >= 10000) return { cls: "a-hot", txt: "Very Popular", tip: "Star >= 10k" };
+    if (stars >= 1000)  return { cls: "a-good", txt: "Worth Learning", tip: "Star >= 1k" };
+    if (stars >= 100)   return { cls: "a-fair", txt: "Niche but Useful", tip: "Star >= 100" };
+    return { cls: "a-cold", txt: "Emerging", tip: "Star < 100" };
   }
 
   // ---- Cache key ----
   function cacheKey(since, lang) {
-    return since + ':' + (lang || 'all');
+    return since + ":" + (lang || "all");
   }
 
   // ---- Fetch data ----
   async function fetchData(since, lang) {
-    const key = cacheKey(since, lang);
+    var key = cacheKey(since, lang);
     if (cachedData[key]) return cachedData[key];
 
-    let url = API_BASE + '?since=' + since;
-    if (lang) url += '&language=' + lang;
+    var url = API_BASE + "?since=" + since;
+    if (lang) url += "&language=" + lang;
 
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('API error');
-    const json = await res.json();
+    var res = await fetch(url);
+    if (!res.ok) throw new Error("API error");
+    var json = await res.json();
     cachedData[key] = json.data || [];
     return cachedData[key];
   }
 
+  // ---- Badge style ----
+  function getBadgeStyle() {
+    return badgeStyleSel ? badgeStyleSel.value : "social";
+  }
+
+  function badgeUrl(path) {
+    var base = "https://img.shields.io/" + path;
+    var style = getBadgeStyle();
+    if (style && style !== "social") base += "?style=" + encodeURIComponent(style);
+    return base;
+  }
+
+  // ---- Build shields.io badges HTML ----
+  function buildBadges(username, reponame) {
+    var enc = encodeURIComponent(username) + "/" + encodeURIComponent(reponame);
+    var defs = [
+      { path: "github/stars/" + enc,           alt: "stars" },
+      { path: "github/forks/" + enc,           alt: "forks" },
+      { path: "github/issues/" + enc,          alt: "issues" },
+      { path: "github/license/" + enc,         alt: "license" },
+      { path: "github/languages/top/" + enc,   alt: "language" },
+      { path: "github/last-commit/" + enc,     alt: "last commit" },
+      { path: "github/repo-size/" + enc,       alt: "repo size" },
+      { path: "github/contributors/" + enc,    alt: "contributors" }
+    ];
+    var html = "";
+    for (var i = 0; i < defs.length; i++) {
+      var b = defs[i];
+      html += '<a href="https://github.com/' + enc + '" target="_blank" rel="noopener">' +
+              '<img src="' + badgeUrl(b.path) + '" alt="' + b.alt + '" title="' + b.alt + '">' +
+              '</a>';
+    }
+    return html;
+  }
+
+  // ---- Build embed markdown ----
+  function buildEmbedMarkdown(username, reponame) {
+    var enc = encodeURIComponent(username) + "/" + encodeURIComponent(reponame);
+    var href = "https://github.com/" + enc;
+    var defs = [
+      { path: "github/stars/" + enc,         label: "stars" },
+      { path: "github/forks/" + enc,         label: "forks" },
+      { path: "github/issues/" + enc,        label: "issues" },
+      { path: "github/license/" + enc,       label: "license" },
+      { path: "github/languages/top/" + enc, label: "language" },
+      { path: "github/last-commit/" + enc,   label: "last commit" }
+    ];
+    var parts = [];
+    for (var i = 0; i < defs.length; i++) {
+      var b = defs[i];
+      var url = badgeUrl(b.path);
+      parts.push("[![" + b.label + "](" + url + ")](" + href + ")");
+    }
+    return parts.join(" ");
+  }
+
   // ---- Render cards ----
   function renderCards(repos) {
-    repoListEl.innerHTML = '';
+    repoListEl.innerHTML = "";
 
     if (!repos.length) {
       repoListEl.innerHTML = '<div class="empty-state"><p>No trending repositories found for this filter.</p></div>';
@@ -343,43 +473,53 @@
 
     updateStats(repos);
 
-    const frag = document.createDocumentFragment();
-    repos.forEach((repo, i) => {
-      const card = document.createElement('div');
-      card.className = 'repo-card';
-      card.style.animationDelay = (i * 50) + 'ms';
+    var frag = document.createDocumentFragment();
+    repos.forEach(function(repo, i) {
+      var card = document.createElement("div");
+      card.className = "repo-card";
+      card.style.animationDelay = (i * 50) + "ms";
 
-      const langColorHtml = repo.language
-        ? `<span class="lang-color ${langClass(repo.language)}"></span>`
-        : '';
+      var langColorHtml = repo.language
+        ? '<span class="lang-color ' + langClass(repo.language) + '"></span>'
+        : "";
 
-      const langHtml = repo.language
-        ? `<span class="meta-item lang-dot">${langColorHtml} ${repo.language}</span>`
-        : '';
+      var langHtml = repo.language
+        ? '<span class="meta-item lang-dot">' + langColorHtml + " " + escHtml(repo.language) + "</span>"
+        : "";
 
-      const starsTodayLabel = {
-        daily: 'stars today',
-        weekly: 'stars this week',
-        monthly: 'stars this month'
-      }[currentSince] || 'stars today';
+      var starsTodayLabel = {
+        daily: "stars today",
+        weekly: "stars this week",
+        monthly: "stars this month"
+      }[currentSince] || "stars today";
 
-      card.innerHTML = `
-        <div class="repo-top">
-          <div class="repo-rank">${repo.rank}</div>
-          <div class="repo-info">
-            <a class="repo-name" href="${repo.url}" target="_blank" rel="noopener">
-              <span class="owner">${repo.username}</span><span class="slash">/</span>${repo.reponame}
-            </a>
-            ${repo.description ? `<p class="repo-desc">${escHtml(repo.description)}</p>` : ''}
-          </div>
-        </div>
-        <div class="repo-meta">
-          ${langHtml}
-          <span class="meta-item">${fmtNum(repo.stars)} stars</span>
-          <span class="meta-item">${fmtNum(repo.forks)} forks</span>
-          <span class="meta-item"><span class="stars-today">+${fmtNum(repo.starsToday)}</span> ${starsTodayLabel}</span>
-        </div>
-      `;
+      var a = assess(repo.stars || 0);
+      var badgesHtml = buildBadges(repo.username, repo.reponame);
+      var repoUrl = "https://github.com/" + encodeURIComponent(repo.username) + "/" + encodeURIComponent(repo.reponame);
+
+      card.innerHTML =
+        '<div class="repo-top">' +
+          '<div class="repo-rank">' + repo.rank + '</div>' +
+          '<div class="repo-info">' +
+            '<a class="repo-name" href="' + repo.url + '" target="_blank" rel="noopener">' +
+              '<span class="owner">' + escHtml(repo.username) + '</span>' +
+              '<span class="slash">/</span>' +
+              escHtml(repo.reponame) +
+            '</a>' +
+            (repo.description ? '<p class="repo-desc">' + escHtml(repo.description) + '</p>' : '') +
+          '</div>' +
+          '<span class="assess-badge ' + a.cls + '" title="' + a.tip + '">' + a.txt + '</span>' +
+        '</div>' +
+        '<div class="repo-meta">' +
+          langHtml +
+          '<span class="meta-item">' + fmtNum(repo.stars) + ' stars</span>' +
+          '<span class="meta-item">' + fmtNum(repo.forks) + ' forks</span>' +
+          '<span class="meta-item"><span class="stars-today">+' + fmtNum(repo.starsToday) + '</span> ' + starsTodayLabel + '</span>' +
+        '</div>' +
+        '<div class="repo-badges">' +
+          badgesHtml +
+          '<button class="embed-btn" data-user="' + escHtml(repo.username) + '" data-repo="' + escHtml(repo.reponame) + '" title="Copy Markdown embed code">Copy Embed</button>' +
+        '</div>';
 
       frag.appendChild(card);
     });
@@ -387,52 +527,44 @@
     repoListEl.appendChild(frag);
 
     // Trigger entrance with stagger
-    requestAnimationFrame(() => {
-      const cards = repoListEl.querySelectorAll('.repo-card');
-      cards.forEach((card, i) => {
-        setTimeout(() => {
-          card.classList.add('visible');
+    requestAnimationFrame(function() {
+      var cards = repoListEl.querySelectorAll(".repo-card");
+      cards.forEach(function(card, i) {
+        setTimeout(function() {
+          card.classList.add("visible");
         }, i * 45);
       });
     });
   }
 
-  function escHtml(str) {
-    const d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
-  }
-
   function updateStats(repos) {
     if (!repos.length) {
-      statTotal.textContent = '0';
-      statStars.textContent = '0';
-      statLangs.textContent = '0';
+      statTotal.textContent = "0";
+      statStars.textContent = "0";
+      statLangs.textContent = "0";
       return;
     }
     statTotal.textContent = repos.length;
-    const totalGained = repos.reduce((s, r) => s + (r.starsToday || 0), 0);
+    var totalGained = repos.reduce(function(s, r) { return s + (r.starsToday || 0); }, 0);
     statStars.textContent = fmtNum(totalGained);
-    const langs = new Set(repos.map(r => r.language).filter(Boolean));
+    var langs = new Set(repos.map(function(r) { return r.language; }).filter(Boolean));
     statLangs.textContent = langs.size;
   }
 
   // ---- Load and render ----
-  async function loadAndRender(animate = true) {
+  async function loadAndRender(animate) {
     if (loading) return;
     loading = true;
 
-    // Show loading
     repoListEl.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div></div>';
 
     try {
-      const repos = await fetchData(currentSince, currentLang);
+      var repos = await fetchData(currentSince, currentLang);
 
-      // Animate transition
       if (animate) {
-        repoListEl.classList.add('transitioning');
+        repoListEl.classList.add("transitioning");
         await sleep(200);
-        repoListEl.classList.remove('transitioning');
+        repoListEl.classList.remove("transitioning");
       }
 
       renderCards(repos);
@@ -443,29 +575,58 @@
     loading = false;
   }
 
-  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+  function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 
   // ---- Event: since pills ----
-  document.querySelectorAll('.since-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const since = btn.dataset.since;
+  document.querySelectorAll(".since-pill").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var since = btn.dataset.since;
       if (since === currentSince) return;
-      document.querySelectorAll('.since-pill').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      document.querySelectorAll(".since-pill").forEach(function(b) { b.classList.remove("active"); });
+      btn.classList.add("active");
       currentSince = since;
-      loadAndRender();
+      loadAndRender(true);
     });
   });
 
   // ---- Event: language pills ----
-  document.querySelectorAll('.lang-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const lang = btn.dataset.lang;
+  document.querySelectorAll(".lang-pill").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var lang = btn.dataset.lang;
       if (lang === currentLang) return;
-      document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      document.querySelectorAll(".lang-pill").forEach(function(b) { b.classList.remove("active"); });
+      btn.classList.add("active");
       currentLang = lang;
-      loadAndRender();
+      loadAndRender(true);
+    });
+  });
+
+  // ---- Event: badge style change (re-render without refetch) ----
+  badgeStyleSel.addEventListener("change", function() {
+    var key = cacheKey(currentSince, currentLang);
+    if (cachedData[key]) {
+      renderCards(cachedData[key]);
+    }
+  });
+
+  // ---- Event: copy embed (delegated) ----
+  repoListEl.addEventListener("click", function(e) {
+    var btn = e.target.closest(".embed-btn");
+    if (!btn) return;
+    e.stopPropagation();
+    var user = btn.getAttribute("data-user");
+    var repo = btn.getAttribute("data-repo");
+    var md = buildEmbedMarkdown(user, repo);
+    navigator.clipboard.writeText(md).then(function() {
+      btn.textContent = "Copied!";
+      btn.classList.add("copied");
+      setTimeout(function() {
+        btn.textContent = "Copy Embed";
+        btn.classList.remove("copied");
+      }, 1800);
+    }).catch(function() {
+      btn.textContent = "Failed";
+      setTimeout(function() { btn.textContent = "Copy Embed"; }, 1500);
     });
   });
 
