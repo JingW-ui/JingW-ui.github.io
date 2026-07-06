@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repo Radar - GitHub 仓库嗅探</title>
+<style>
+:root {
+  --bg: #0d1117; --card: #161b22; --card-2: #1c2128;
+  --border: #30363d; --text: #e6edf3; --muted: #7d8590;
+  --blue: #2f81f7; --green: #238636; --green-b: #3fb950;
+  --yellow: #d29922; --red: #f85149; --purple: #a371f7;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.5;
+  min-height: 100vh; padding: 0 14px 70px;
+}
+.wrap { max-width: 820px; margin: 0 auto; }
+header { text-align: center; padding: 26px 0 16px; }
+h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: .5px; }
+h1 .accent { color: var(--blue); }
+.sub { color: var(--muted); font-size: .84rem; margin-top: 6px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+textarea {
+  width: 100%; min-height: 110px; resize: vertical;
+  background: #010409; border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); padding: 12px; font: inherit; font-size: .9rem; line-height: 1.5; outline: none;
+}
+textarea:focus { border-color: var(--blue); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.btn {
+  background: var(--green); color: #fff; border: 1px solid rgba(240,246,252,.1);
+  border-radius: 7px; padding: 10px 18px; font: inherit; font-weight: 600;
+  font-size: .9rem; cursor: pointer; transition: filter .15s, transform .05s;
+}
+.btn:hover { filter: brightness(1.12); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.ghost { background: var(--card-2); color: var(--text); border-color: var(--border); }
+.btn.sm { padding: 6px 12px; font-size: .8rem; }
+.toolbar { margin-top: 10px; gap: 8px; }
+.spacer { flex: 1 1 auto; }
+.status {
+  margin: 14px 0; font-size: .82rem; color: var(--muted);
+  display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+}
+.quota { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.quota b { color: var(--green-b); }
+.results-head { display: flex; align-items: center; justify-content: space-between; margin: 18px 2px 10px; }
+.results-head h2 { font-size: 1rem; font-weight: 600; }
+.sortsel {
+  background: var(--card-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 8px; font: inherit; font-size: .8rem; outline: none;
+}
+.repo {
+  background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px; margin-bottom: 10px; transition: border-color .15s;
+}
+.repo:hover { border-color: #4b5563; }
+.repo-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.repo-name { font-size: 1.02rem; font-weight: 600; word-break: break-all; }
+.repo-name a { color: var(--blue); text-decoration: none; }
+.repo-name a:hover { text-decoration: underline; }
+.repo-desc { color: var(--muted); font-size: .85rem; margin-top: 5px; }
+.badge {
+  font-size: .72rem; font-weight: 600; padding: 3px 8px; border-radius: 20px;
+  white-space: nowrap; border: 1px solid transparent; flex-shrink: 0;
+}
+.b-hot { background: rgba(248,81,73,.12); color: #ff7b72; border-color: rgba(248,81,73,.3); }
+.b-good { background: rgba(63,185,80,.12); color: var(--green-b); border-color: rgba(63,185,80,.3); }
+.b-fresh { background: rgba(163,113,247,.12); color: var(--purple); border-color: rgba(163,113,247,.3); }
+.b-fair { background: rgba(210,153,34,.12); color: var(--yellow); border-color: rgba(210,153,34,.3); }
+.b-cold { background: rgba(125,133,144,.12); color: var(--muted); border-color: rgba(125,133,144,.3); }
+.b-stale { background: rgba(125,133,144,.1); color: #f0883e; border-color: rgba(240,136,62,.3); }
+.repo-meta { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: .82rem; color: var(--muted); }
+.meta-item { display: inline-flex; align-items: center; gap: 4px; }
+.star-ic { color: var(--yellow); }
+.langs { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+.lang-pill { display: inline-flex; align-items: center; gap: 5px; font-size: .78rem; color: var(--muted); }
+.lang-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.lang-bar { display: flex; height: 5px; border-radius: 3px; overflow: hidden; margin-top: 8px; background: var(--card-2); }
+.lang-bar span { display: block; }
+.progress { height: 4px; background: var(--card-2); border-radius: 2px; overflow: hidden; margin: 6px 0; }
+.progress > i { display: block; height: 100%; background: var(--blue); width: 0; transition: width .25s; }
+.empty { text-align: center; color: var(--muted); padding: 30px 10px; font-size: .88rem; }
+.error-card { border-color: rgba(248,81,73,.4); opacity: .85; }
+.error-card .repo-name a { color: #ff7b72; }
+.skeleton { background: linear-gradient(90deg, var(--card) 25%, var(--card-2) 37%, var(--card) 63%); background-size: 400% 100%; animation: sk 1.4s ease infinite; border-radius: 6px; }
+@keyframes sk { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+.repo-badges {
+  display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center;
+  margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border);
+}
+.repo-badges img {
+  height: 20px; vertical-align: middle; border-radius: 3px; transition: opacity .15s;
+}
+.repo-badges img:hover { opacity: .8; }
+.embed-btn {
+  background: var(--card-2); color: var(--muted); border: 1px solid var(--border);
+  border-radius: 5px; padding: 3px 9px; font-size: .72rem; cursor: pointer;
+  transition: color .15s, border-color .15s; white-space: nowrap;
+}
+.embed-btn:hover { color: var(--text); border-color: var(--blue); }
+.embed-btn.copied { color: var(--green-b); border-color: var(--green-b); }
+.style-sel {
+  background: var(--card-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 8px; font: inherit; font-size: .8rem; outline: none;
+}
+footer { text-align: center; color: var(--muted); font-size: .75rem; margin-top: 28px; }
+footer a { color: var(--muted); }
+@media (max-width: 520px) {
+  h1 { font-size: 1.3rem; }
+  .repo { padding: 12px; }
+  .repo-top { flex-direction: column; }
+  .badge { align-self: flex-start; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Repo <span class="accent">Radar</span></h1>
+    <p class="sub">粘贴任意文本 / 自动嗅探 GitHub 仓库 / 一眼判断是否值得学习</p>
+  </header>
+  <main id="app">
+    <section class="card">
+      <textarea id="input" placeholder="把包含 GitHub 链接的文本粘贴到这里，例如：&#10;推荐几个好项目 https://github.com/vuejs/vue 和 https://github.com/facebook/react ，还有 https://github.com/torvalds/linux"></textarea>
+      <div class="row toolbar">
+        <button class="btn" id="analyzeBtn" type="button">嗅探分析</button>
+        <button class="btn ghost" id="pasteBtn" type="button">粘贴</button>
+        <button class="btn ghost" id="clearBtn" type="button">清空</button>
+      </div>
+    </section>
+
+    <div class="status" id="status"></div>
+
+    <div class="results-head" id="resultsHead" style="display:none">
+      <h2 id="resultsTitle">分析结果</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select class="sortsel" id="sortSel">
+          <option value="stars">按 Star 排序</option>
+          <option value="updated">按更新时间</option>
+          <option value="name">按名称</option>
+        </select>
+        <select class="style-sel" id="badgeStyleSel" title="徽章风格">
+          <option value="social">风格: social</option>
+          <option value="flat">风格: flat</option>
+          <option value="flat-square">风格: flat-square</option>
+          <option value="plastic">风格: plastic</option>
+          <option value="for-the-badge">风格: for-the-badge</option>
+        </select>
+      </div>
+    </div>
+    <div id="results"></div>
+
+    <footer>
+      <p>Repo Radar - GitHub 仓库嗅探与分析工具</p>
+    </footer>
+  </main>
+</div>
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var input = $("input");
+  var results = $("results");
+  var statusEl = $("status");
+  var analyzeBtn = $("analyzeBtn");
+  var resultsHead = $("resultsHead");
+  var sortSel = $("sortSel");
+
+  var LANG_COLORS = {
+    JavaScript: "#f1e05a", TypeScript: "#3178c6", Python: "#3572A5", Java: "#b07219",
+    Go: "#00ADD8", Rust: "#dea584", "C++": "#f34b7d", C: "#555555", "C#": "#178600",
+    Ruby: "#701516", PHP: "#4F5D95", Swift: "#F05138", Kotlin: "#A97BFF", Dart: "#00B4AB",
+    Shell: "#89e051", HTML: "#e34c26", CSS: "#563d7c", Vue: "#41b883", Svelte: "#ff3e00",
+    Lua: "#000080", Perl: "#0298c3", Scala: "#c22d40", Clojure: "#db5855", Elixir: "#6e4a7e",
+    Haskell: "#5e5086", R: "#198CE7", Julia: "#a270ba", Zig: "#ec915c", Nim: "#37775b",
+    "Jupyter Notebook": "#DA5B0B", Dockerfile: "#384d54", Makefile: "#427819", Assembly: "#6E4C13",
+    ObjectiveC: "#438eff", PowerShell: "#012456", OCaml: "#3be133", Erlang: "#B83998", "F#": "#b845fc",
+    Markdown: "#083fa1", SCSS: "#c6538c", Less: "#1d365d", Solidity: "#AA6741", Astro: "#ff5a03"
+  };
+
+  function langColor(l) { return LANG_COLORS[l] || "#8b949e"; }
+
+  var REPO_RE = /(?:https?:\/\/)?(?:www\.)?github\.com\/([A-Za-z0-9][A-Za-z0-9-]{0,38})\/([A-Za-z0-9._-]+)/g;
+  var RESERVED = new Set([
+    "settings", "orgs", "notifications", "explore", "features", "pricing",
+    "marketplace", "collections", "sponsors", "topics", "trending", "search",
+    "new", "login", "join", "about", "security", "enterprise", "team", "apps",
+    "oauth", "site", "github", "gist", "gists", "blog", "contact", "resources",
+    "developers", "events", "services", "partnership", "updates", "organizations"
+  ]);
+
+  var lastResults = [];
+
+  function extractRepos(text) {
+    var seen = new Set();
+    var out = [];
+    var m;
+    REPO_RE.lastIndex = 0;
+    while ((m = REPO_RE.exec(text)) !== null) {
+      var owner = m[1], repo = m[2];
+      if (repo.charAt(repo.length - 1) === ".") repo = repo.slice(0, -1);
+      if (RESERVED.has(owner.toLowerCase())) continue;
+      if (repo.length < 1 || repo.length > 100) continue;
+      var key = (owner + "/" + repo).toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ owner: owner, repo: repo, full: owner + "/" + repo });
+    }
+    return out;
+  }
+
+  function fmtNum(n) {
+    if (n == null) return "-";
+    if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, "") + "k";
+    return String(n);
+  }
+
+  function escapeHtml(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function relTime(iso) {
+    if (!iso) return "-";
+    var t = new Date(iso).getTime();
+    var d = (Date.now() - t) / 86400000;
+    if (d < 1) return "今天";
+    if (d < 30) return Math.floor(d) + " 天前";
+    if (d < 365) return Math.floor(d / 30) + " 个月前";
+    return Math.floor(d / 365) + " 年前";
+  }
+
+  function assess(r) {
+    var stars = r.stargazers_count || 0;
+    var months = (Date.now() - new Date(r.pushed_at || r.updated_at).getTime()) / 2592000000;
+    if (months > 24) return { cls: "b-stale", txt: "疑似停更", tip: "已 " + Math.floor(months) + " 个月未推送" };
+    if (stars >= 10000 && months <= 6) return { cls: "b-hot", txt: "热门活跃", tip: "高星且近期活跃" };
+    if (stars >= 1000) return { cls: "b-good", txt: "值得学习", tip: "社区认可度较高" };
+    if (months <= 3) return { cls: "b-fresh", txt: "活跃新项目", tip: "近期仍在更新" };
+    if (stars >= 100) return { cls: "b-fair", txt: "小众可用", tip: "有一定关注" };
+    return { cls: "b-cold", txt: "冷门项目", tip: "关注较少，自行评估" };
+  }
+
+  async function fetchRepo(owner, repo, signal) {
+    var headers = { "Accept": "application/vnd.github+json" };
+    var base = "https://api.github.com/repos/" + encodeURIComponent(owner) + "/" + encodeURIComponent(repo);
+    var resp = await fetch(base, { headers: headers, signal: signal });
+    if (resp.status === 404) return { error: "404", notFound: true };
+    if (resp.status === 403 || resp.status === 429) {
+      var remain = resp.headers.get("X-RateLimit-Remaining");
+      if (remain === "0") return { error: "rate" };
+      return { error: "forbid" };
+    }
+    if (!resp.ok) return { error: "http" + resp.status };
+    var data = await resp.json();
+    var langs = null;
+    try {
+      var lr = await fetch(base + "/languages", { headers: headers, signal: signal });
+      if (lr.ok) langs = await lr.json();
+    } catch (e) { /* ignore */ }
+    return { repo: data, langs: langs };
+  }
+
+  async function pool(items, worker, concurrency) {
+    var out = new Array(items.length);
+    var idx = 0;
+    var runners = Array.from({ length: Math.min(concurrency, items.length) }, async function () {
+      while (idx < items.length) {
+        var i = idx++;
+        out[i] = await worker(items[i], i);
+      }
+    });
+    await Promise.all(runners);
+    return out;
+  }
+
+  async function analyze() {
+    var text = input.value;
+    var repos = extractRepos(text);
+    resultsHead.style.display = "none";
+    results.innerHTML = "";
+
+    if (!repos.length) {
+      statusEl.innerHTML = '<span style="color:var(--yellow)">未在文本中检测到 GitHub 仓库链接</span>';
+      return;
+    }
+    var MAX = 30;
+    var truncated = repos.length > MAX;
+    var list = repos.slice(0, MAX);
+
+    statusEl.innerHTML = "<span>嗅探到 <b style=\"color:var(--text)\">" + repos.length + "</b> 个仓库" + (truncated ? "（仅分析前 " + MAX + " 个）" : "") + "，正在获取...</span>";
+    results.innerHTML = list.map(function () {
+      return '<div class="repo"><div class="skeleton" style="height:14px;width:55%;margin-bottom:8px"></div><div class="skeleton" style="height:12px;width:80%"></div><div class="skeleton" style="height:12px;width:40%;margin-top:8px"></div></div>';
+    }).join("");
+
+    var done = 0;
+    var fetched = await pool(list, async function (item) {
+      var res = await fetchRepo(item.owner, item.repo, null);
+      done++;
+      statusEl.innerHTML = "<span>获取中 " + done + "/" + list.length + "...</span>";
+      return { item: item, res: res };
+    }, 4);
+
+    lastResults = fetched;
+    statusEl.innerHTML = "<span>分析完成 / " + list.length + " 个仓库</span>";
+    resultsHead.style.display = "flex";
+    renderResults();
+  }
+
+  function renderResults() {
+    var sorted = lastResults.slice();
+    var v = sortSel.value;
+    sorted.sort(function (a, b) {
+      if (a.res.error && !b.res.error) return 1;
+      if (b.res.error && !a.res.error) return -1;
+      if (v === "name") return a.item.full.localeCompare(b.item.full);
+      if (v === "updated") {
+        var ta = a.res.repo ? new Date(a.res.repo.pushed_at || a.res.repo.updated_at).getTime() : 0;
+        var tb = b.res.repo ? new Date(b.res.repo.pushed_at || b.res.repo.updated_at).getTime() : 0;
+        return tb - ta;
+      }
+      var sa = a.res.repo ? (a.res.repo.stargazers_count || 0) : -1;
+      var sb = b.res.repo ? (b.res.repo.stargazers_count || 0) : -1;
+      return sb - sa;
+    });
+    results.innerHTML = sorted.map(function (o) { return renderRepo(o.item, o.res); }).join("") || '<div class="empty">无结果</div>';
+  }
+
+  function langList(langs) {
+    if (!langs) return "";
+    var entries = Object.entries(langs).filter(function (e) { return e[1] > 0; });
+    var total = entries.reduce(function (s, e) { return s + e[1]; }, 0);
+    if (!total) return "";
+    entries.sort(function (a, b) { return b[1] - a[1]; });
+    var top = entries.slice(0, 4);
+    var pills = top.map(function (e) {
+      var pct = (e[1] / total * 100).toFixed(1);
+      return '<span class="lang-pill"><span class="lang-dot" style="background:' + langColor(e[0]) + '"></span>' + escapeHtml(e[0]) + " " + pct + "%</span>";
+    }).join("");
+    var bar = entries.map(function (e) {
+      return '<span style="width:' + (e[1] / total * 100).toFixed(2) + '%;background:' + langColor(e[0]) + '" title="' + escapeHtml(e[0]) + '"></span>';
+    }).join("");
+    return '<div class="langs">' + pills + '</div><div class="lang-bar">' + bar + "</div>";
+  }
+
+  function getBadgeStyle() {
+    var sel = $("badgeStyleSel");
+    return sel ? sel.value : "social";
+  }
+
+  function badgeUrl(path, style) {
+    var base = "https://img.shields.io/" + path;
+    if (style && style !== "social") base += "?style=" + encodeURIComponent(style);
+    return base;
+  }
+
+  function buildBadges(owner, repo) {
+    var style = getBadgeStyle();
+    var enc = encodeURIComponent(owner) + "/" + encodeURIComponent(repo);
+    var defs = [
+      { path: "github/stars/" + enc, alt: "stars" },
+      { path: "github/forks/" + enc, alt: "forks" },
+      { path: "github/issues/" + enc, alt: "issues" },
+      { path: "github/license/" + enc, alt: "license" },
+      { path: "github/languages/top/" + enc, alt: "language" },
+      { path: "github/last-commit/" + enc, alt: "last commit" },
+      { path: "github/repo-size/" + enc, alt: "repo size" },
+      { path: "github/contributors/" + enc, alt: "contributors" }
+    ];
+    var html = defs.map(function (b) {
+      var src = badgeUrl(b.path, style);
+      return '<a href="https://github.com/' + enc + '" target="_blank" rel="noopener"><img src="' + src + '" alt="' + b.alt + '" title="' + b.alt + '"></a>';
+    }).join("");
+    return html;
+  }
+
+  function buildEmbedMarkdown(owner, repo) {
+    var style = getBadgeStyle();
+    var enc = encodeURIComponent(owner) + "/" + encodeURIComponent(repo);
+    var href = "https://github.com/" + enc;
+    var defs = [
+      { path: "github/stars/" + enc, label: "stars" },
+      { path: "github/forks/" + enc, label: "forks" },
+      { path: "github/issues/" + enc, label: "issues" },
+      { path: "github/license/" + enc, label: "license" },
+      { path: "github/languages/top/" + enc, label: "language" },
+      { path: "github/last-commit/" + enc, label: "last commit" }
+    ];
+    return defs.map(function (b) {
+      var url = badgeUrl(b.path, style);
+      return "[![" + b.label + "](" + url + ")](" + href + ")";
+    }).join(" ");
+  }
+
+  function renderRepo(item, res) {
+    var href = "https://github.com/" + item.owner + "/" + item.repo;
+    if (res.error) {
+      var msg;
+      if (res.error === "rate") msg = "已达 API 配额上限，请稍后再试";
+      else if (res.notFound) msg = "仓库不存在或已删除";
+      else if (res.error === "forbid") msg = "访问被拒绝";
+      else msg = "获取失败 (" + escapeHtml(res.error) + ")";
+      return '<div class="repo error-card"><div class="repo-top"><div class="repo-name"><a href="' + href + '" target="_blank" rel="noopener">' + escapeHtml(item.full) + '</a></div></div><p class="repo-desc">' + msg + "</p></div>";
+    }
+    var r = res.repo;
+    var a = assess(r);
+    var topics = "";
+    if (r.topics && r.topics.length) {
+      topics = '<div class="repo-meta"><span class="meta-item">' + r.topics.slice(0, 5).map(function (t) { return escapeHtml("#" + t); }).join(" ") + "</span></div>";
+    }
+    var badgesHtml = buildBadges(item.owner, item.repo);
+    return '<div class="repo">' +
+      '<div class="repo-top"><div>' +
+        '<div class="repo-name"><a href="' + (r.html_url || href) + '" target="_blank" rel="noopener">' + escapeHtml(r.full_name) + '</a></div>' +
+        (r.description ? '<p class="repo-desc">' + escapeHtml(r.description) + '</p>' : '') +
+      '</div><span class="badge ' + a.cls + '" title="' + escapeHtml(a.tip) + '">' + a.txt + '</span></div>' +
+      '<div class="repo-meta">' +
+        '<span class="meta-item"><span class="star-ic">&#9733;</span> ' + fmtNum(r.stargazers_count) + ' / ' + fmtNum(r.forks_count) + ' / ' + fmtNum(r.subscribers_count || r.watchers_count) + '</span>' +
+        '<span class="meta-item">' + (r.language ? escapeHtml(r.language) : "—") + '</span>' +
+        '<span class="meta-item">' + relTime(r.pushed_at) + '</span>' +
+        '<span class="meta-item">' + (r.license ? escapeHtml(r.license.spdx_id || r.license.name) : "无 License") + '</span>' +
+        '<span class="meta-item">' + fmtNum(r.open_issues_count) + ' open issue</span>' +
+      '</div>' +
+      topics +
+      langList(res.langs) +
+      '<div class="repo-badges">' +
+        badgesHtml +
+        '<button class="embed-btn" data-owner="' + escapeHtml(item.owner) + '" data-repo="' + escapeHtml(item.repo) + '" title="复制 Markdown 嵌入代码">复制 Embed</button>' +
+      '</div>' +
+    '</div>';
+  }
+
+  analyzeBtn.addEventListener("click", analyze);
+
+  $("clearBtn").addEventListener("click", function () {
+    input.value = "";
+    results.innerHTML = "";
+    statusEl.innerHTML = "";
+    resultsHead.style.display = "none";
+    lastResults = [];
+    input.focus();
+  });
+
+  $("pasteBtn").addEventListener("click", function () {
+    navigator.clipboard.readText().then(function (text) {
+      input.value = text;
+      input.focus();
+    }).catch(function () {
+      statusEl.innerHTML = '<span style="color:var(--yellow)">无法读取剪贴板，请手动 Ctrl+V 粘贴</span>';
+    });
+  });
+
+  sortSel.addEventListener("change", renderResults);
+  $("badgeStyleSel").addEventListener("change", renderResults);
+
+  results.addEventListener("click", function (e) {
+    var btn = e.target.closest(".embed-btn");
+    if (!btn) return;
+    var owner = btn.getAttribute("data-owner");
+    var repo = btn.getAttribute("data-repo");
+    var md = buildEmbedMarkdown(owner, repo);
+    navigator.clipboard.writeText(md).then(function () {
+      btn.textContent = "已复制!";
+      btn.classList.add("copied");
+      setTimeout(function () { btn.textContent = "复制 Embed"; btn.classList.remove("copied"); }, 1800);
+    }).catch(function () {
+      btn.textContent = "复制失败";
+      setTimeout(function () { btn.textContent = "复制 Embed"; }, 1500);
+    });
+  });
+
+  input.addEventListener("paste", function () { setTimeout(analyze, 50); });
+  input.addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") analyze();
+  });
+})();
+</script>
+</body>
+</html>
