@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏行业知识图谱</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --green:#238636;
+    --green-light:#2dba4e;
+    --green-glow:rgba(35,134,54,0.12);
+    --green-bg:rgba(35,134,54,0.06);
+    --green-border:rgba(35,134,54,0.18);
+    --bg:#ffffff;
+    --bg-soft:#f8fafb;
+    --text:#111111;
+    --text-secondary:#57606a;
+    --text-tertiary:#8b949e;
+    --border:rgba(208,215,222,0.6);
+    --border-strong:#d0d7de;
+    --card-hover:rgba(35,134,54,0.03);
+    --shadow-sm:0 1px 3px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.02);
+    --shadow-md:0 4px 16px rgba(0,0,0,0.06),0 1px 3px rgba(0,0,0,0.04);
+    --shadow-lg:0 12px 40px rgba(0,0,0,0.08),0 4px 12px rgba(0,0,0,0.04);
+    --shadow-glow:0 0 0 3px var(--green-glow);
+    --radius:12px;
+    --radius-sm:8px;
+    --radius-xs:6px;
+    --red:#cf222e;--blue:#0969da;--purple:#8250df;--yellow:#9a6700;--orange:#bc4c00;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",Helvetica,Arial,sans-serif;
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:var(--font);
+    background:var(--bg);color:var(--text);
+    line-height:1.5;min-height:100vh;overflow-x:hidden;
+    text-rendering:optimizeLegibility;
+    -webkit-font-smoothing:antialiased;
+    /* Signature: subtle dot grid background */
+    background-image:radial-gradient(rgba(0,0,0,0.03) 1px,transparent 1px);
+    background-size:24px 24px;
+  }
+
+  /* ---- Header ---- */
+  .header{
+    text-align:center;padding:56px 24px 0;position:relative;
+    opacity:0;transform:translateY(-24px);
+    animation:slideDown 0.7s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
+  }
+  @keyframes slideDown{to{opacity:1;transform:translateY(0)}}
+  .header::before{
+    content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
+    width:80px;height:3px;border-radius:2px;
+    background:linear-gradient(90deg,var(--green),var(--green-light));
+    opacity:0;animation:accentIn 0.5s ease 0.6s forwards;
+  }
+  @keyframes accentIn{to{opacity:1}}
+  .header h1{
+    font-size:clamp(1.8rem,4.5vw,2.8rem);font-weight:800;
+    letter-spacing:-0.03em;color:var(--text);margin-bottom:8px;
+    line-height:1.2;
+  }
+  .header h1 span{
+    color:var(--green);
+    background:linear-gradient(135deg,var(--green),var(--green-light));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+  }
+  .header .subtitle{
+    font-size:0.95rem;color:var(--text-secondary);font-weight:400;
+    max-width:560px;margin:0 auto;line-height:1.6;
+    opacity:0;animation:fadeIn 0.5s ease 0.45s forwards;
+  }
+
+  /* ---- Stats Bar ---- */
+  .stats-bar{
+    max-width:800px;margin:28px auto 0;padding:0 24px;
+    display:flex;justify-content:center;gap:6px;flex-wrap:wrap;
+    opacity:0;animation:fadeIn 0.5s ease 0.55s forwards;
+  }
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .stat-item{
+    text-align:center;padding:14px 20px;border-radius:var(--radius-sm);
+    background:var(--bg);border:1px solid var(--border);
+    min-width:100px;flex:1;max-width:140px;
+    transition:border-color 0.2s,box-shadow 0.2s;
+  }
+  .stat-item:hover{border-color:var(--green-border);box-shadow:var(--shadow-glow)}
+  .stat-value{
+    font-size:1.5rem;font-weight:800;color:var(--green);
+    font-variant-numeric:tabular-nums;line-height:1.2;
+  }
+  .stat-label{font-size:0.72rem;color:var(--text-tertiary);margin-top:4px;font-weight:500;letter-spacing:0.02em}
+
+  /* ---- Controls ---- */
+  .controls{
+    max-width:960px;margin:28px auto 0;padding:0 24px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:10px;
+    opacity:0;animation:fadeIn 0.5s ease 0.65s forwards;
+  }
+  .control-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .control-label{
+    font-size:0.72rem;font-weight:700;color:var(--text-tertiary);
+    text-transform:uppercase;letter-spacing:0.08em;
+    margin-right:4px;white-space:nowrap;
+  }
+  .pill{
+    padding:6px 14px;border-radius:100px;
+    font-size:0.8rem;font-weight:600;cursor:pointer;
+    transition:all 0.2s cubic-bezier(0.16,1,0.3,1);
+    border:1.5px solid var(--border);background:var(--bg);color:var(--text-secondary);
+    user-select:none;position:relative;
+  }
+  .pill:hover{border-color:var(--green-border);color:var(--green);background:var(--green-bg)}
+  .pill.active{
+    background:var(--green);color:#fff;border-color:var(--green);
+    box-shadow:0 2px 8px rgba(35,134,54,0.2);
+  }
+  .pill:active{transform:scale(0.96)}
+  .divider{width:1px;height:22px;background:var(--border);margin:0 4px}
+
+  /* ---- Graph Section ---- */
+  .graph-section{
+    max-width:1200px;margin:24px auto 0;padding:0 24px;
+    opacity:0;animation:fadeIn 0.5s ease 0.75s forwards;
+  }
+  .graph-card{
+    background:var(--bg);border:1px solid var(--border);
+    border-radius:var(--radius);overflow:hidden;position:relative;
+    box-shadow:var(--shadow-md);
+    /* Signature accent: gradient top border */
+    border-top:2px solid transparent;
+    background-clip:padding-box;
+  }
+  .graph-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,var(--green),var(--green-light),var(--blue),var(--purple));
+    z-index:1;
+  }
+  .graph-card-header{
+    padding:14px 20px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--bg-soft);
+  }
+  .graph-card-title{
+    font-size:0.88rem;font-weight:700;color:var(--text);
+    display:flex;align-items:center;gap:8px;
+  }
+  .graph-card-title::before{
+    content:'';width:6px;height:6px;border-radius:50%;
+    background:var(--green);display:inline-block;
+    box-shadow:0 0 0 3px var(--green-glow);
+  }
+  .graph-card-hint{font-size:0.75rem;color:var(--text-tertiary);font-weight:400}
+  #graphContainer{width:100%;height:560px;background:var(--bg)}
+
+  /* ---- Skeleton loading ---- */
+  .skeleton-container{
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;height:100%;gap:16px;padding:40px;
+  }
+  .skeleton-ring{
+    width:48px;height:48px;border-radius:50%;
+    border:3px solid var(--border);border-top-color:var(--green);
+    animation:spin 0.8s cubic-bezier(0.5,0,0.5,1) infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .skeleton-text{font-size:0.82rem;color:var(--text-tertiary);font-weight:500}
+  .skeleton-dots{display:flex;gap:6px}
+  .skeleton-dot{
+    width:6px;height:6px;border-radius:50%;background:var(--border);
+    animation:dotPulse 1.2s ease infinite;
+  }
+  .skeleton-dot:nth-child(2){animation-delay:0.15s}
+  .skeleton-dot:nth-child(3){animation-delay:0.3s}
+  @keyframes dotPulse{0%,80%,100%{opacity:0.3;transform:scale(0.8)}40%{opacity:1;transform:scale(1.1)}}
+
+  /* ---- Detail Panel ---- */
+  .detail-backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,0.08);
+    z-index:999;opacity:0;pointer-events:none;
+    transition:opacity 0.25s ease;
+    backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  }
+  .detail-backdrop.open{opacity:1;pointer-events:auto}
+  .detail-overlay{
+    position:fixed;top:0;right:0;bottom:0;width:380px;max-width:92vw;
+    background:var(--bg);border-left:1px solid var(--border);
+    box-shadow:-8px 0 32px rgba(0,0,0,0.06);
+    z-index:1000;transform:translateX(100%);
+    transition:transform 0.35s cubic-bezier(0.16,1,0.3,1);
+    overflow-y:auto;padding:0;
+  }
+  .detail-overlay.open{transform:translateX(0)}
+  .detail-header{
+    padding:24px 24px 16px;border-bottom:1px solid var(--border);
+    position:sticky;top:0;background:var(--bg);z-index:2;
+  }
+  .detail-body{padding:20px 24px 40px}
+  .detail-close{
+    position:absolute;top:16px;right:16px;
+    width:30px;height:30px;border-radius:var(--radius-xs);
+    border:1px solid var(--border);background:var(--bg);
+    cursor:pointer;display:flex;align-items:center;
+    justify-content:center;font-size:1rem;color:var(--text-tertiary);
+    transition:all 0.15s;
+  }
+  .detail-close:hover{border-color:var(--green);color:var(--green);background:var(--green-bg)}
+  .detail-type{
+    display:inline-block;font-size:0.68rem;font-weight:700;
+    padding:3px 10px;border-radius:20px;margin-bottom:10px;
+    letter-spacing:0.02em;
+  }
+  .detail-name{font-size:1.3rem;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-0.01em}
+  .detail-alias{font-size:0.82rem;color:var(--text-tertiary);margin-bottom:12px;font-style:italic}
+  .detail-desc{
+    font-size:0.88rem;color:var(--text-secondary);line-height:1.65;
+    margin-bottom:0;padding:12px 14px;border-radius:var(--radius-sm);
+    background:var(--bg-soft);border-left:3px solid var(--green-border);
+  }
+  .detail-section{margin-bottom:18px}
+  .detail-section-title{
+    font-size:0.7rem;font-weight:700;color:var(--text-tertiary);
+    text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;
+    padding-bottom:6px;border-bottom:1px solid var(--border);
+  }
+  .detail-row{
+    display:flex;gap:8px;margin-bottom:7px;font-size:0.84rem;
+    padding:4px 0;
+  }
+  .detail-key{color:var(--text-tertiary);min-width:72px;flex-shrink:0;font-weight:500}
+  .detail-val{color:var(--text);font-weight:500}
+  .detail-tags{display:flex;flex-wrap:wrap;gap:6px}
+  .detail-tag{
+    display:inline-block;font-size:0.73rem;padding:3px 10px;
+    border-radius:var(--radius-xs);background:var(--green-bg);color:var(--green);
+    border:1px solid var(--green-border);font-weight:500;
+    transition:all 0.15s;
+  }
+  .detail-tag:hover{background:var(--green);color:#fff}
+  .detail-relation{
+    display:flex;align-items:center;gap:8px;
+    padding:8px 12px;border-radius:var(--radius-sm);margin-bottom:4px;
+    background:var(--bg-soft);font-size:0.82rem;
+    border:1px solid transparent;
+    transition:all 0.15s;cursor:pointer;
+  }
+  .detail-relation:hover{border-color:var(--green-border);background:var(--green-bg)}
+  .relation-arrow{color:var(--text-tertiary);font-size:0.72rem;font-weight:600}
+  .relation-label{
+    font-size:0.65rem;color:var(--text-tertiary);font-weight:600;
+    padding:2px 6px;border-radius:4px;background:var(--bg);
+    border:1px solid var(--border);letter-spacing:0.02em;
+  }
+  .relation-name{color:var(--text);font-weight:600}
+
+  /* type badge colors */
+  .type-GameCompany{background:rgba(35,134,54,0.1);color:#1a7f37;border:1px solid rgba(35,134,54,0.2)}
+  .type-GameStudio{background:rgba(45,186,78,0.1);color:#1a7f37;border:1px solid rgba(45,186,78,0.2)}
+  .type-Game{background:rgba(9,105,218,0.1);color:#0969da;border:1px solid rgba(9,105,218,0.2)}
+  .type-GameEngine{background:rgba(207,34,46,0.1);color:#cf222e;border:1px solid rgba(207,34,46,0.2)}
+  .type-GameGenre{background:rgba(130,80,223,0.1);color:#8250df;border:1px solid rgba(130,80,223,0.2)}
+  .type-GamePlatform{background:rgba(154,103,0,0.1);color:#9a6700;border:1px solid rgba(154,103,0,0.2)}
+
+  /* ---- Charts Section ---- */
+  .charts-section{
+    max-width:1200px;margin:28px auto 80px;padding:0 24px;
+    display:grid;grid-template-columns:1fr 1fr;gap:18px;
+    opacity:0;animation:fadeIn 0.5s ease 0.9s forwards;
+  }
+  .chart-card{
+    background:var(--bg);border:1px solid var(--border);
+    border-radius:var(--radius);overflow:hidden;
+    box-shadow:var(--shadow-sm);
+    transition:box-shadow 0.25s,transform 0.25s;
+  }
+  .chart-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+  .chart-card-header{
+    padding:14px 18px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:10px;
+  }
+  .chart-accent{
+    width:4px;height:16px;border-radius:2px;flex-shrink:0;
+  }
+  .chart-accent.green{background:linear-gradient(180deg,var(--green),var(--green-light))}
+  .chart-accent.purple{background:linear-gradient(180deg,var(--purple),#a371f7)}
+  .chart-accent.red{background:linear-gradient(180deg,var(--red),#e5534b)}
+  .chart-accent.blue{background:linear-gradient(180deg,var(--blue),#54aeff)}
+  .chart-card-title{font-size:0.85rem;font-weight:700;color:var(--text)}
+  .chart-container{width:100%;height:320px}
+
+  /* ---- Utility ---- */
+  a{text-decoration:none;color:inherit}
+
+  ::-webkit-scrollbar{width:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--text-tertiary)}
+
+  /* ---- Reduced motion ---- */
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{
+      animation-duration:0.01ms !important;
+      transition-duration:0.01ms !important;
+    }
+  }
+
+  /* ---- Responsive ---- */
+  @media(max-width:768px){
+    .charts-section{grid-template-columns:1fr}
+    #graphContainer{height:420px}
+    .header{padding-top:36px}
+    .header h1{font-size:clamp(1.4rem,5vw,2rem)}
+    .stats-bar{gap:4px;padding:0 16px}
+    .stat-item{padding:10px 14px;min-width:80px}
+    .stat-value{font-size:1.25rem}
+    .stat-label{font-size:0.65rem}
+    .detail-overlay{width:100%;max-width:100%}
+  }
+  @media(max-width:480px){
+    .controls{gap:6px;padding:0 14px}
+    .pill{padding:5px 10px;font-size:0.72rem}
+    .divider{display:none}
+    .graph-section{padding:0 10px}
+    .charts-section{padding:0 10px;gap:12px}
+    .chart-container{height:260px}
+    #graphContainer{height:340px}
+    .stat-item{min-width:60px;padding:8px 10px}
+    .stat-value{font-size:1.1rem}
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>游戏行业<span>知识图谱</span></h1>
+  <p class="subtitle">涵盖游戏厂商、热门游戏、游戏引擎、类型、平台、工作室等实体及其关系</p>
+</header>
+
+<div class="stats-bar" id="statsBar">
+  <div class="stat-item"><div class="stat-value" id="statCompanies">--</div><div class="stat-label">游戏公司</div></div>
+  <div class="stat-item"><div class="stat-value" id="statStudios">--</div><div class="stat-label">工作室</div></div>
+  <div class="stat-item"><div class="stat-value" id="statGames">--</div><div class="stat-label">游戏作品</div></div>
+  <div class="stat-item"><div class="stat-value" id="statEngines">--</div><div class="stat-label">游戏引擎</div></div>
+  <div class="stat-item"><div class="stat-value" id="statRelations">--</div><div class="stat-label">关系连接</div></div>
+</div>
+
+<div class="controls">
+  <div class="control-group">
+    <span class="control-label">实体</span>
+    <button class="pill entity-pill active" data-type="">全部</button>
+    <button class="pill entity-pill" data-type="GameCompany">公司</button>
+    <button class="pill entity-pill" data-type="GameStudio">工作室</button>
+    <button class="pill entity-pill" data-type="Game">游戏</button>
+    <button class="pill entity-pill" data-type="GameEngine">引擎</button>
+    <button class="pill entity-pill" data-type="GameGenre">类型</button>
+    <button class="pill entity-pill" data-type="GamePlatform">平台</button>
+  </div>
+  <div class="divider"></div>
+  <div class="control-group">
+    <button class="pill" id="focusNetease">网易视角</button>
+  </div>
+</div>
+
+<section class="graph-section">
+  <div class="graph-card">
+    <div class="graph-card-header">
+      <span class="graph-card-title">知识图谱</span>
+      <span class="graph-card-hint">点击节点查看详情 · 滚轮缩放 · 拖拽移动</span>
+    </div>
+    <div id="graphContainer">
+      <div class="skeleton-container">
+        <div class="skeleton-ring"></div>
+        <div class="skeleton-text">加载知识图谱数据</div>
+        <div class="skeleton-dots"><div class="skeleton-dot"></div><div class="skeleton-dot"></div><div class="skeleton-dot"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="charts-section">
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div class="chart-accent green"></div>
+      <div class="chart-card-title">2025 iOS 收入排行 (USD)</div>
+    </div>
+    <div class="chart-container" id="revenueChart"></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div class="chart-accent purple"></div>
+      <div class="chart-card-title">网易游戏品类分布</div>
+    </div>
+    <div class="chart-container" id="genreChart"></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div class="chart-accent red"></div>
+      <div class="chart-card-title">游戏引擎使用情况</div>
+    </div>
+    <div class="chart-container" id="engineChart"></div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-card-header">
+      <div class="chart-accent blue"></div>
+      <div class="chart-card-title">平台覆盖分布</div>
+    </div>
+    <div class="chart-container" id="platformChart"></div>
+  </div>
+</section>
+
+<!-- Detail Panel -->
+<div class="detail-backdrop" id="detailBackdrop"></div>
+<div class="detail-overlay" id="detailPanel">
+  <div class="detail-header">
+    <button class="detail-close" id="detailClose">×</button>
+    <div id="detailHeader"></div>
+  </div>
+  <div class="detail-body" id="detailBody"></div>
+</div>
+
+<script>
+(function(){
+  var graphChart = null;
+  var data = null;
+  var currentFilter = '';
+  var neteaseFocus = false;
+  var allNodes = [];
+  var allLinks = [];
+  var entityMap = {};
+  var charts = [];
+
+  // Color map
+  var typeColors = {
+    'GameCompany': '#238636',
+    'GameStudio': '#2dba4e',
+    'Game': '#0969da',
+    'GameEngine': '#cf222e',
+    'GameGenre': '#8250df',
+    'GamePlatform': '#9a6700'
+  };
+  var typeLabels = {
+    'GameCompany': '公司',
+    'GameStudio': '工作室',
+    'Game': '游戏',
+    'GameEngine': '引擎',
+    'GameGenre': '类型',
+    'GamePlatform': '平台'
+  };
+  var relationLabels = {
+    'DEVELOPED_BY': '开发',
+    'PUBLISHED_BY': '发行',
+    'USES_ENGINE': '使用引擎',
+    'BELONGS_TO_GENRE': '属于类型',
+    'RUNS_ON_PLATFORM': '运行平台',
+    'SUBSIDIARY_OF': '隶属于',
+    'WORKS_IN': '工作于',
+    'CO_DEVELOPED_BY': '联合开发',
+    'PART_OF_STUDIO': '所属工作室',
+    'COLLABORATES_WITH': '合作'
+  };
+
+  // NetEase related IDs
+  var neteaseIds = new Set();
+
+  function isNeteaseRelated(id) {
+    if (!data) return false;
+    if (neteaseIds.size > 0) return neteaseIds.has(id);
+    var netCore = new Set(['company_001','company_020','company_021']);
+    data.entities.GameStudio.forEach(function(s){
+      if (s.parent && (s.parent.indexOf('网易') >= 0 || s.parent === '网易雷火事业群' || s.parent === '网易互娱事业群')) {
+        netCore.add(s.id);
+      }
+    });
+    data.entities.Game.forEach(function(g){
+      if (g.developer && g.developer.indexOf('网易') >= 0) netCore.add(g.id);
+      if (g.publisher && g.publisher.indexOf('网易') >= 0) netCore.add(g.id);
+    });
+    data.entities.GameEngine.forEach(function(e){
+      if (e.developer && e.developer.indexOf('网易') >= 0) netCore.add(e.id);
+    });
+    data.relationships.forEach(function(r){
+      if (netCore.has(r.from) || netCore.has(r.to)) {
+        netCore.add(r.from);
+        netCore.add(r.to);
+      }
+    });
+    var netGames = data.entities.Game.filter(function(g){ return netCore.has(g.id); });
+    netGames.forEach(function(g){
+      (g.genre||[]).forEach(function(gn){
+        data.entities.GameGenre.forEach(function(genre){
+          if (gn.indexOf(genre.name) >= 0 || genre.name.indexOf(gn) >= 0) netCore.add(genre.id);
+        });
+      });
+      (g.platform||[]).forEach(function(pl){
+        data.entities.GamePlatform.forEach(function(p){
+          if (pl === p.name) netCore.add(p.id);
+        });
+      });
+    });
+    neteaseIds = netCore;
+    return netCore.has(id);
+  }
+
+  function parseRevenue(str) {
+    if (!str) return 0;
+    var m = str.replace(/[^0-9.]/g, '');
+    return parseFloat(m) || 0;
+  }
+
+  // Counter animation
+  function animateCounter(el, target) {
+    var duration = 600;
+    var start = 0;
+    var startTime = null;
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  function buildNodesAndLinks() {
+    allNodes = [];
+    allLinks = [];
+    entityMap = {};
+
+    var types = ['GameCompany','GameStudio','Game','GameEngine','GameGenre','GamePlatform'];
+    var sizeMap = {
+      'GameCompany': 40,
+      'GameStudio': 26,
+      'Game': 16,
+      'GameEngine': 24,
+      'GameGenre': 14,
+      'GamePlatform': 14
+    };
+
+    types.forEach(function(type) {
+      var entities = data.entities[type] || [];
+      entities.forEach(function(e) {
+        var isNetease = type === 'GameCompany' && (e.id === 'company_001' || e.id === 'company_020' || e.id === 'company_021');
+        var node = {
+          id: e.id,
+          name: e.name,
+          type: type,
+          symbolSize: sizeMap[type],
+          category: types.indexOf(type),
+          entity: e,
+          itemStyle: {
+            color: typeColors[type],
+            borderColor: isNetease ? '#1a7f37' : 'rgba(255,255,255,0.8)',
+            borderWidth: isNetease ? 2.5 : 1.5,
+            shadowBlur: isNetease ? 12 : (type === 'GameCompany' ? 8 : 2),
+            shadowColor: isNetease ? 'rgba(35,134,54,0.3)' : 'rgba(0,0,0,0.08)'
+          },
+          label: {
+            show: sizeMap[type] >= 24,
+            fontSize: sizeMap[type] >= 30 ? 11 : 9.5,
+            fontWeight: sizeMap[type] >= 30 ? 700 : 500,
+            color: '#1f2937',
+            textBorderColor: 'rgba(255,255,255,0.8)',
+            textBorderWidth: 2
+          }
+        };
+        if (type === 'Game' && e.revenue_2025_ios) {
+          var rev = parseRevenue(e.revenue_2025_ios);
+          if (rev > 50000000) node.symbolSize = 26;
+          else if (rev > 10000000) node.symbolSize = 22;
+          else if (rev > 5000000) node.symbolSize = 19;
+        }
+        allNodes.push(node);
+        entityMap[e.id] = e;
+      });
+    });
+
+    var relationColors = {
+      'DEVELOPED_BY': '#238636',
+      'PUBLISHED_BY': '#2dba4e',
+      'USES_ENGINE': '#cf222e',
+      'BELONGS_TO_GENRE': '#8250df',
+      'RUNS_ON_PLATFORM': '#9a6700',
+      'SUBSIDIARY_OF': '#0969da',
+      'PART_OF_STUDIO': '#54aeff',
+      'CO_DEVELOPED_BY': '#bc4c00'
+    };
+
+    data.relationships.forEach(function(r) {
+      var edgeColor = relationColors[r.relation] || '#aaa';
+      allLinks.push({
+        source: r.from,
+        target: r.to,
+        relation: r.relation,
+        properties: r.properties || {},
+        lineStyle: {
+          color: edgeColor,
+          width: 1.2,
+          curveness: 0.15,
+          opacity: 0.35
+        },
+        label: {
+          show: false,
+          formatter: relationLabels[r.relation] || r.relation,
+          fontSize: 9,
+          color: '#888'
+        }
+      });
+    });
+  }
+
+  function getFilteredData() {
+    var nodes = allNodes;
+    var links = allLinks;
+
+    if (currentFilter) {
+      var filteredIds = new Set();
+      nodes.forEach(function(n){ if (n.type === currentFilter) filteredIds.add(n.id); });
+      links.forEach(function(l){
+        if (filteredIds.has(l.source) || filteredIds.has(l.target)) {
+          filteredIds.add(l.source);
+          filteredIds.add(l.target);
+        }
+      });
+      nodes = nodes.filter(function(n){ return filteredIds.has(n.id); });
+      links = links.filter(function(l){ return filteredIds.has(l.source) && filteredIds.has(l.target); });
+    }
+
+    if (neteaseFocus) {
+      nodes = nodes.map(function(n){
+        var isNet = isNeteaseRelated(n.id);
+        return Object.assign({}, n, {
+          itemStyle: Object.assign({}, n.itemStyle, { opacity: isNet ? 1 : 0.08 }),
+          label: Object.assign({}, n.label, { opacity: isNet ? 1 : 0.1 })
+        });
+      });
+      links = links.map(function(l){
+        var isNet = isNeteaseRelated(l.source) && isNeteaseRelated(l.target);
+        return Object.assign({}, l, {
+          lineStyle: Object.assign({}, l.lineStyle, { opacity: isNet ? 0.5 : 0.03 })
+        });
+      });
+    } else {
+      nodes = nodes.map(function(n){
+        return Object.assign({}, n, {
+          itemStyle: Object.assign({}, n.itemStyle, { opacity: 1 }),
+          label: Object.assign({}, n.label, { opacity: 1 })
+        });
+      });
+      links = links.map(function(l){
+        return Object.assign({}, l, {
+          lineStyle: Object.assign({}, l.lineStyle, { opacity: 0.35 })
+        });
+      });
+    }
+
+    return { nodes: nodes, links: links };
+  }
+
+  function renderGraph() {
+    var container = document.getElementById('graphContainer');
+    if (graphChart) graphChart.dispose();
+    graphChart = echarts.init(container);
+
+    var filtered = getFilteredData();
+    var categories = Object.keys(typeColors).map(function(k){
+      return { name: typeLabels[k], itemStyle: { color: typeColors[k] } };
+    });
+
+    var option = {
+      backgroundColor: 'transparent',
+      tooltip: {
+        trigger: 'item',
+        formatter: function(p) {
+          if (p.dataType === 'node') {
+            return '<div style="font-weight:700;font-size:13px;margin-bottom:2px">' + p.data.name + '</div>' +
+                   '<span style="font-size:11px;color:#8b949e">' + typeLabels[p.data.type] + '</span>';
+          }
+          if (p.dataType === 'edge') {
+            var src = entityMap[p.data.source];
+            var tgt = entityMap[p.data.target];
+            return '<span style="font-weight:600">' + (src?src.name:p.data.source) + '</span>' +
+                   ' <span style="color:#8b949e;font-size:11px">' + (relationLabels[p.data.relation]||p.data.relation) + '</span> ' +
+                   '<span style="font-weight:600">' + (tgt?tgt.name:p.data.target) + '</span>';
+          }
+        },
+        backgroundColor: '#fff',
+        borderColor: 'rgba(208,215,222,0.6)',
+        borderWidth: 1,
+        borderRadius: 8,
+        textStyle: { color: '#1f2937', fontSize: 12 },
+        padding: [10, 14],
+        extraCssText: 'box-shadow:0 4px 16px rgba(0,0,0,0.08);'
+      },
+      legend: {
+        data: categories.map(function(c){ return c.name; }),
+        bottom: 10,
+        textStyle: { color: '#57606a', fontSize: 11, fontWeight: 500 },
+        itemWidth: 10,
+        itemHeight: 10,
+        itemGap: 14,
+        icon: 'circle'
+      },
+      animationDuration: 1000,
+      animationEasingUpdate: 'quinticInOut',
+      series: [{
+        type: 'graph',
+        layout: 'force',
+        data: filtered.nodes,
+        links: filtered.links,
+        categories: categories,
+        roam: true,
+        draggable: true,
+        focusNodeAdjacency: true,
+        force: {
+          repulsion: 240,
+          edgeLength: [70, 180],
+          gravity: 0.06,
+          friction: 0.6,
+          layoutAnimation: true
+        },
+        edgeSymbol: ['none', 'arrow'],
+        edgeSymbolSize: [0, 5],
+        emphasis: {
+          focus: 'adjacency',
+          lineStyle: { width: 2.5, opacity: 0.8 },
+          label: { show: true, fontSize: 11, fontWeight: 600 },
+          itemStyle: {
+            shadowBlur: 16,
+            shadowColor: 'rgba(0,0,0,0.15)'
+          }
+        },
+        lineStyle: { curveness: 0.15 },
+        label: { position: 'bottom', distance: 5 },
+        edgeLabel: { fontSize: 9 }
+      }]
+    };
+
+    graphChart.setOption(option);
+
+    graphChart.on('click', function(params) {
+      if (params.dataType === 'node') {
+        showDetail(params.data);
+      }
+    });
+  }
+
+  function showDetail(nodeData) {
+    var panel = document.getElementById('detailPanel');
+    var backdrop = document.getElementById('detailBackdrop');
+    var headerEl = document.getElementById('detailHeader');
+    var bodyEl = document.getElementById('detailBody');
+    var e = nodeData.entity;
+    var type = nodeData.type;
+
+    // Header
+    var headerHtml = '';
+    headerHtml += '<span class="detail-type type-' + type + '">' + typeLabels[type] + '</span>';
+    headerHtml += '<div class="detail-name">' + escHtml(e.name) + '</div>';
+    if (e.alias && e.alias.length) {
+      headerHtml += '<div class="detail-alias">' + e.alias.join(' / ') + '</div>';
+    }
+    headerEl.innerHTML = headerHtml;
+
+    // Body
+    var bodyHtml = '';
+
+    if (e.description) {
+      bodyHtml += '<div class="detail-desc">' + escHtml(e.description) + '</div>';
+      bodyHtml += '<div style="height:16px"></div>';
+    }
+
+    // Properties
+    bodyHtml += '<div class="detail-section">';
+    bodyHtml += '<div class="detail-section-title">基本信息</div>';
+    if (e.founded) bodyHtml += rowHtml('成立', e.founded);
+    if (e.headquarters) bodyHtml += rowHtml('总部', e.headquarters);
+    if (e.stock_code) bodyHtml += rowHtml('股票代码', e.stock_code);
+    if (e.website) bodyHtml += rowHtml('官网', '<a href="' + e.website + '" target="_blank" style="color:var(--green);font-weight:600">' + escHtml(e.website) + '</a>');
+    if (e.parent) bodyHtml += rowHtml('上级', e.parent);
+    if (e.parent_company) bodyHtml += rowHtml('母公司', e.parent_company);
+    if (e.developer && type !== 'Game') bodyHtml += rowHtml('开发商', e.developer);
+    if (e.type) bodyHtml += rowHtml('类型', e.type);
+    if (e.license) bodyHtml += rowHtml('授权', e.license);
+    if (e.patents) bodyHtml += rowHtml('专利', e.patents);
+    if (e.release_date) bodyHtml += rowHtml('上线', e.release_date);
+    if (e.engine) bodyHtml += rowHtml('引擎', e.engine);
+    if (e.revenue_2025_ios) bodyHtml += rowHtml('2025 iOS收入', e.revenue_2025_ios);
+    if (e.rank_2025) bodyHtml += rowHtml('2025排名', e.rank_2025);
+    bodyHtml += '</div>';
+
+    // Tags sections
+    var tagSections = [
+      { key: 'genre', label: '游戏类型' },
+      { key: 'platform', label: '平台' },
+      { key: 'platforms', label: '支持平台' },
+      { key: 'programming_languages', label: '编程语言' },
+      { key: 'representative_works', label: '代表作品' },
+      { key: 'subsidiaries', label: '下属机构' }
+    ];
+    tagSections.forEach(function(sec){
+      if (e[sec.key] && e[sec.key].length) {
+        bodyHtml += '<div class="detail-section"><div class="detail-section-title">' + sec.label + '</div>';
+        bodyHtml += '<div class="detail-tags">';
+        e[sec.key].forEach(function(t){ bodyHtml += '<span class="detail-tag">' + escHtml(t) + '</span>'; });
+        bodyHtml += '</div></div>';
+      }
+    });
+
+    // Relationships
+    var rels = data.relationships.filter(function(r){ return r.from === nodeData.id || r.to === nodeData.id; });
+    if (rels.length) {
+      bodyHtml += '<div class="detail-section"><div class="detail-section-title">关系 (' + rels.length + ')</div>';
+      rels.forEach(function(r) {
+        var otherId = r.from === nodeData.id ? r.to : r.from;
+        var otherEntity = entityMap[otherId];
+        var otherName = otherEntity ? otherEntity.name : otherId;
+        var dir = r.from === nodeData.id ? '→' : '←';
+        var extra = '';
+        if (r.properties && r.properties.studio) extra = r.properties.studio;
+        if (r.properties && r.properties.partner) extra = r.properties.partner;
+        if (r.properties && r.properties.customized) extra = r.properties.customized;
+        if (r.properties && r.properties.since) extra = r.properties.since + '年起';
+        bodyHtml += '<div class="detail-relation" data-id="' + otherId + '">';
+        bodyHtml += '<span class="relation-arrow">' + dir + '</span>';
+        bodyHtml += '<span class="relation-label">' + (relationLabels[r.relation] || r.relation) + '</span>';
+        bodyHtml += '<span class="relation-name">' + escHtml(otherName) + '</span>';
+        if (extra) bodyHtml += '<span style="font-size:0.7rem;color:var(--text-tertiary);margin-left:auto;font-weight:500">' + escHtml(extra) + '</span>';
+        bodyHtml += '</div>';
+      });
+      bodyHtml += '</div>';
+    }
+
+    bodyEl.innerHTML = bodyHtml;
+    panel.classList.add('open');
+    backdrop.classList.add('open');
+
+    bodyEl.querySelectorAll('.detail-relation').forEach(function(el) {
+      el.addEventListener('click', function() {
+        var targetId = el.getAttribute('data-id');
+        var targetNode = allNodes.find(function(n){ return n.id === targetId; });
+        if (targetNode) showDetail(targetNode);
+      });
+    });
+  }
+
+  function closeDetail() {
+    document.getElementById('detailPanel').classList.remove('open');
+    document.getElementById('detailBackdrop').classList.remove('open');
+  }
+
+  function rowHtml(key, val) {
+    return '<div class="detail-row"><span class="detail-key">' + key + '</span><span class="detail-val">' + val + '</span></div>';
+  }
+
+  function escHtml(str) {
+    if (!str) return '';
+    var d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  // ---- Sub Charts ----
+  function makeTooltip() {
+    return {
+      backgroundColor: '#fff',
+      borderColor: 'rgba(208,215,222,0.6)',
+      borderWidth: 1,
+      borderRadius: 8,
+      textStyle: { color: '#1f2937', fontSize: 12 },
+      padding: [8, 12],
+      extraCssText: 'box-shadow:0 4px 16px rgba(0,0,0,0.08);'
+    };
+  }
+
+  function renderRevenueChart() {
+    var games = data.entities.Game.filter(function(g){ return g.revenue_2025_ios && parseRevenue(g.revenue_2025_ios) > 0; });
+    games.sort(function(a,b){ return parseRevenue(a.revenue_2025_ios) - parseRevenue(b.revenue_2025_ios); });
+
+    var chart = echarts.init(document.getElementById('revenueChart'));
+    charts.push(chart);
+    var names = games.map(function(g){ return g.name; });
+    var values = games.map(function(g){ return parseRevenue(g.revenue_2025_ios); });
+    var tip = makeTooltip();
+    tip.trigger = 'axis';
+    tip.axisPointer = { type: 'shadow' };
+    tip.formatter = function(p) {
+      return '<b>' + p[0].name + '</b><br/>$' + p[0].value.toLocaleString();
+    };
+
+    chart.setOption({
+      backgroundColor: 'transparent',
+      grid: { left: 110, right: 56, top: 16, bottom: 16 },
+      xAxis: {
+        type: 'value',
+        axisLabel: {
+          formatter: function(v){ return '$' + (v/1000000).toFixed(0) + 'M'; },
+          color: '#8b949e', fontSize: 10
+        },
+        splitLine: { lineStyle: { color: 'rgba(0,0,0,0.04)', type: 'dashed' } },
+        axisLine: { show: false },
+        axisTick: { show: false }
+      },
+      yAxis: {
+        type: 'category',
+        data: names,
+        axisLabel: { color: '#1f2937', fontSize: 11, fontWeight: 600 },
+        axisLine: { show: false },
+        axisTick: { show: false }
+      },
+      tooltip: tip,
+      series: [{
+        type: 'bar',
+        data: values,
+        barWidth: 12,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+            { offset: 0, color: 'rgba(35,134,54,0.7)' },
+            { offset: 1, color: '#238636' }
+          ]),
+          borderRadius: [0, 6, 6, 0]
+        },
+        emphasis: {
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+              { offset: 0, color: '#2dba4e' },
+              { offset: 1, color: '#1a7f37' }
+            ])
+          }
+        },
+        label: {
+          show: true,
+          position: 'right',
+          formatter: function(p){ return '$' + (p.value/1000000).toFixed(1) + 'M'; },
+          color: '#57606a',
+          fontSize: 10,
+          fontWeight: 500
+        },
+        animationDelay: function(idx){ return idx * 60; }
+      }],
+      animationEasing: 'cubicOut'
+    });
+  }
+
+  function renderGenreChart() {
+    var chart = echarts.init(document.getElementById('genreChart'));
+    charts.push(chart);
+    var cats = data.netease_summary.game_categories;
+    var pieData = Object.keys(cats).map(function(k){ return { name: k, value: cats[k] }; });
+    pieData.sort(function(a,b){ return b.value - a.value; });
+
+    var colors = ['#238636','#2dba4e','#56d364','#0969da','#8250df','#cf222e','#9a6700','#bc4c00','#8b949e'];
+    var tip = makeTooltip();
+    tip.trigger = 'item';
+    tip.formatter = '{b}: {c}款 ({d}%)';
+
+    chart.setOption({
+      backgroundColor: 'transparent',
+      tooltip: tip,
+      color: colors,
+      series: [{
+        type: 'pie',
+        radius: ['28%', '62%'],
+        center: ['50%', '50%'],
+        roseType: 'area',
+        data: pieData,
+        label: {
+          color: '#1f2937',
+          fontSize: 10.5,
+          fontWeight: 500,
+          formatter: '{b}\n{d}%'
+        },
+        labelLine: { lineStyle: { color: 'rgba(0,0,0,0.15)' } },
+        itemStyle: {
+          borderRadius: 5,
+          borderColor: '#fff',
+          borderWidth: 2
+        },
+        emphasis: {
+          itemStyle: { shadowBlur: 16, shadowColor: 'rgba(0,0,0,0.12)' },
+          scaleSize: 6
+        },
+        animationType: 'scale',
+        animationEasing: 'elasticOut'
+      }]
+    });
+  }
+
+  function renderEngineChart() {
+    var engineCount = {};
+    data.entities.Game.forEach(function(g){
+      if (g.engine) engineCount[g.engine] = (engineCount[g.engine] || 0) + 1;
+    });
+    data.relationships.forEach(function(r){
+      if (r.relation === 'USES_ENGINE') {
+        var eng = entityMap[r.to];
+        var game = entityMap[r.from];
+        if (eng && game && !game.engine) {
+          engineCount[eng.name] = (engineCount[eng.name] || 0) + 1;
+        }
+      }
+    });
+
+    var items = Object.keys(engineCount).map(function(k){ return { name: k, value: engineCount[k] }; });
+    items.sort(function(a,b){ return b.value - a.value; });
+
+    var chart = echarts.init(document.getElementById('engineChart'));
+    charts.push(chart);
+    var tip = makeTooltip();
+    tip.trigger = 'axis';
+    tip.axisPointer = { type: 'shadow' };
+    tip.formatter = function(p){ return '<b>' + p[0].name + '</b><br/>' + p[0].value + ' 款游戏使用'; };
+
+    chart.setOption({
+      backgroundColor: 'transparent',
+      grid: { left: 110, right: 48, top: 16, bottom: 16 },
+      xAxis: {
+        type: 'value',
+        axisLabel: { color: '#8b949e', fontSize: 10 },
+        splitLine: { lineStyle: { color: 'rgba(0,0,0,0.04)', type: 'dashed' } },
+        axisLine: { show: false },
+        axisTick: { show: false },
+        minInterval: 1
+      },
+      yAxis: {
+        type: 'category',
+        data: items.map(function(i){ return i.name; }),
+        axisLabel: { color: '#1f2937', fontSize: 11, fontWeight: 600 },
+        axisLine: { show: false },
+        axisTick: { show: false }
+      },
+      tooltip: tip,
+      series: [{
+        type: 'bar',
+        data: items.map(function(i){ return i.value; }),
+        barWidth: 12,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+            { offset: 0, color: 'rgba(207,34,46,0.6)' },
+            { offset: 1, color: '#cf222e' }
+          ]),
+          borderRadius: [0, 6, 6, 0]
+        },
+        emphasis: {
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+              { offset: 0, color: '#e5534b' },
+              { offset: 1, color: '#a40e26' }
+            ])
+          }
+        },
+        label: {
+          show: true,
+          position: 'right',
+          formatter: '{c} 款',
+          color: '#57606a',
+          fontSize: 10,
+          fontWeight: 500
+        },
+        animationDelay: function(idx){ return idx * 80; }
+      }],
+      animationEasing: 'cubicOut'
+    });
+  }
+
+  function renderPlatformChart() {
+    var platCount = {};
+    data.entities.Game.forEach(function(g){
+      (g.platform || []).forEach(function(p){
+        platCount[p] = (platCount[p] || 0) + 1;
+      });
+    });
+
+    var items = Object.keys(platCount).map(function(k){ return { name: k, value: platCount[k] }; });
+    items.sort(function(a,b){ return b.value - a.value; });
+
+    var chart = echarts.init(document.getElementById('platformChart'));
+    charts.push(chart);
+    var colors = ['#0969da','#238636','#8250df','#9a6700','#cf222e','#57606a','#2dba4e','#bc4c00','#8b949e','#636c76'];
+    var tip = makeTooltip();
+    tip.trigger = 'item';
+    tip.formatter = '{b}: {c}款 ({d}%)';
+
+    chart.setOption({
+      backgroundColor: 'transparent',
+      tooltip: tip,
+      color: colors,
+      legend: {
+        bottom: 6,
+        textStyle: { color: '#57606a', fontSize: 10, fontWeight: 500 },
+        itemWidth: 8,
+        itemHeight: 8,
+        itemGap: 8,
+        icon: 'circle'
+      },
+      series: [{
+        type: 'pie',
+        radius: ['0%', '52%'],
+        center: ['50%', '44%'],
+        data: items,
+        label: {
+          color: '#1f2937',
+          fontSize: 10,
+          fontWeight: 500,
+          formatter: '{b}\n{c}款'
+        },
+        labelLine: { lineStyle: { color: 'rgba(0,0,0,0.15)' } },
+        itemStyle: {
+          borderRadius: 4,
+          borderColor: '#fff',
+          borderWidth: 2
+        },
+        emphasis: {
+          itemStyle: { shadowBlur: 16, shadowColor: 'rgba(0,0,0,0.12)' },
+          scaleSize: 5
+        },
+        animationType: 'scale',
+        animationEasing: 'elasticOut'
+      }]
+    });
+  }
+
+  // ---- Stats ----
+  function updateStats() {
+    var stats = data.statistics;
+    animateCounter(document.getElementById('statCompanies'), stats.total_companies);
+    animateCounter(document.getElementById('statStudios'), stats.total_studios);
+    animateCounter(document.getElementById('statGames'), stats.total_games);
+    animateCounter(document.getElementById('statEngines'), stats.total_engines);
+    animateCounter(document.getElementById('statRelations'), stats.total_relationships);
+  }
+
+  // ---- Events ----
+  document.querySelectorAll('.entity-pill').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var type = btn.dataset.type;
+      if (type === currentFilter) return;
+      document.querySelectorAll('.entity-pill').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      currentFilter = type;
+      renderGraph();
+    });
+  });
+
+  document.getElementById('focusNetease').addEventListener('click', function(){
+    neteaseFocus = !neteaseFocus;
+    this.classList.toggle('active', neteaseFocus);
+    renderGraph();
+  });
+
+  document.getElementById('detailClose').addEventListener('click', closeDetail);
+  document.getElementById('detailBackdrop').addEventListener('click', closeDetail);
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') closeDetail();
+  });
+
+  window.addEventListener('resize', function(){
+    if (graphChart) graphChart.resize();
+    charts.forEach(function(c){ c.resize(); });
+  });
+
+  // ---- Init ----
+  fetch('./game_knowledge_graph.json')
+    .then(function(res){ return res.json(); })
+    .then(function(json){
+      data = json;
+      updateStats();
+      buildNodesAndLinks();
+      renderGraph();
+      renderRevenueChart();
+      renderGenreChart();
+      renderEngineChart();
+      renderPlatformChart();
+    })
+    .catch(function(err){
+      document.getElementById('graphContainer').innerHTML =
+        '<div style="text-align:center;padding:80px 24px;color:var(--text-tertiary)"><p style="font-size:1rem;font-weight:500">数据加载失败</p><p style="font-size:0.85rem;margin-top:8px">请确保 game_knowledge_graph.json 在同目录下</p></div>';
+    });
+})();
+</script>
+</body>
+</html>

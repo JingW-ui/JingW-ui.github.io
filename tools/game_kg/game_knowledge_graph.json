@@ -1,0 +1,1570 @@
+{
+  "meta": {
+    "name": "游戏行业知识图谱",
+    "description": "涵盖游戏厂商、热门游戏、游戏引擎、游戏类型、游戏平台、工作室等实体及其关系的知识图谱",
+    "focus": "网易游戏",
+    "generated_at": "2026-07-07",
+    "data_sources": [
+      "网易游戏官网",
+      "好游快爆",
+      "时代财经/点点数据 2025常青游戏榜",
+      "买购网2025十大热门网易游戏",
+      "中国游戏TOP30榜单",
+      "公开行业研报"
+    ]
+  },
+  "entity_types": [
+    "GameCompany",
+    "GameStudio",
+    "Game",
+    "GameEngine",
+    "GameGenre",
+    "GamePlatform",
+    "GamePublisher"
+  ],
+  "relation_types": [
+    "DEVELOPED_BY",
+    "PUBLISHED_BY",
+    "USES_ENGINE",
+    "BELONGS_TO_GENRE",
+    "RUNS_ON_PLATFORM",
+    "SUBSIDIARY_OF",
+    "WORKS_IN",
+    "CO_DEVELOPED_BY",
+    "PART_OF_STUDIO",
+    "COLLABORATES_WITH"
+  ],
+  "entities": {
+    "GameCompany": [
+      {
+        "id": "company_001",
+        "name": "网易游戏",
+        "alias": ["NetEase Games", "猪厂"],
+        "founded": "2001年（在线游戏事业部成立）",
+        "headquarters": "中国广州/杭州",
+        "stock_code": "09999.HK",
+        "description": "中国第二大游戏公司，以精品自研和长线运营能力著称，拥有最深厚的研发底蕴和IP储备",
+        "subsidiaries": ["网易互娱事业群", "网易雷火事业群"],
+        "website": "https://game.163.com"
+      },
+      {
+        "id": "company_002",
+        "name": "腾讯游戏",
+        "alias": ["Tencent Games"],
+        "founded": "2003年",
+        "headquarters": "中国深圳",
+        "description": "全球最大的游戏公司，核心优势在于社交渠道(微信/QQ)、巨大的资本与投资布局和强大的发行能力",
+        "subsidiaries": ["天美工作室群", "光子工作室群", "魔方工作室群", "北极光工作室群"]
+      },
+      {
+        "id": "company_003",
+        "name": "米哈游",
+        "alias": ["miHoYo", "HoYoverse"],
+        "founded": "2012年",
+        "headquarters": "中国上海",
+        "description": "凭借《原神》和《崩坏》系列一跃成为行业新贵，核心优势是技术驱动+内容卓越和全球化发行",
+        "representative_works": ["原神", "崩坏:星穹铁道", "崩坏3", "绝区零"]
+      },
+      {
+        "id": "company_004",
+        "name": "莉莉丝游戏",
+        "alias": ["Lilith Games"],
+        "description": "中国游戏出海的标杆企业，以全球化审美和出色的玩法创新闻名",
+        "representative_works": ["万国觉醒", "剑与远征", "Warpath"]
+      },
+      {
+        "id": "company_005",
+        "name": "叠纸游戏",
+        "alias": ["Papergames"],
+        "description": "女性向赛道的绝对王者和技术美术的追求者",
+        "representative_works": ["恋与制作人", "闪耀暖暖", "恋与深空", "无限暖暖"]
+      },
+      {
+        "id": "company_006",
+        "name": "鹰角网络",
+        "alias": ["Hypergryph"],
+        "description": "二次元细分领域的顶级代表，以精良的美术和独特的世界观设计著称",
+        "representative_works": ["明日方舟"]
+      },
+      {
+        "id": "company_007",
+        "name": "完美世界",
+        "description": "老牌端游大厂，优势在于端游及主机游戏研发积累和影游联动",
+        "representative_works": ["完美世界", "诛仙", "幻塔"]
+      },
+      {
+        "id": "company_008",
+        "name": "三七互娱",
+        "description": "A股龙头，以精准买量和SLG/MMORPG赛道专业化闻名"
+      },
+      {
+        "id": "company_009",
+        "name": "世纪华通",
+        "description": "盛趣游戏+点点互动，A股最大游戏公司之一，顶级IP储备和强大出海能力",
+        "representative_works": ["传奇", "冒险岛", "无尽冬日"]
+      },
+      {
+        "id": "company_010",
+        "name": "心动公司",
+        "description": "拥有渠道(TapTap)和研发双重身份，以《香肠派对》和TapTap平台闻名"
+      },
+      {
+        "id": "company_011",
+        "name": "Epic Games",
+        "description": "虚幻引擎开发商，Epic Games Store平台运营商",
+        "representative_works": ["虚幻引擎", "堡垒之夜"]
+      },
+      {
+        "id": "company_012",
+        "name": "Unity Technologies",
+        "description": "Unity引擎开发商，全球使用最广泛的游戏引擎之一"
+      },
+      {
+        "id": "company_013",
+        "name": "Cocos",
+        "description": "中国团队开发的游戏引擎，在2D和小游戏市场占据重要地位"
+      },
+      {
+        "id": "company_014",
+        "name": "Electronic Arts",
+        "description": "美国游戏巨头，Frostbite引擎持有者",
+        "representative_works": ["战地", "FIFA", "星球大战:前线"]
+      },
+      {
+        "id": "company_015",
+        "name": "Rockstar Games",
+        "description": "RAGE引擎持有者，以开放世界游戏闻名",
+        "representative_works": ["GTA5", "荒野大镖客2"]
+      },
+      {
+        "id": "company_016",
+        "name": "Capcom",
+        "description": "日本游戏厂商，RE引擎持有者",
+        "representative_works": ["生化危机系列", "鬼泣5", "龙之信条2"]
+      },
+      {
+        "id": "company_017",
+        "name": "灵犀互娱",
+        "description": "阿里旗下游戏公司，依托阿里生态，通过三国SLG品类成功站稳脚跟",
+        "representative_works": ["三国志·战略版"]
+      },
+      {
+        "id": "company_018",
+        "name": "多益网络",
+        "description": "以自研自运和独特的公司文化著称",
+        "representative_works": ["神武系列", "梦想世界"]
+      },
+      {
+        "id": "company_019",
+        "name": "巨人网络",
+        "description": "老牌厂商，以征途IP和球球大作战为核心",
+        "representative_works": ["征途", "球球大作战"]
+      },
+      {
+        "id": "company_020",
+        "name": "网易雷火事业群",
+        "alias": ["雷火", "NetEase Leihuo"],
+        "founded": "2007年",
+        "headquarters": "中国杭州",
+        "description": "网易在杭州的游戏工作室群，拥有近2500名员工，具备国内一流研发、运营、营销实力",
+        "parent_company": "网易游戏",
+        "representative_works": ["倩女幽魂", "天谕", "逆水寒", "永劫无间"]
+      },
+      {
+        "id": "company_021",
+        "name": "网易互娱事业群",
+        "alias": ["互娱"],
+        "description": "网易游戏主体事业群之一，管理多个事业部和工作室",
+        "parent_company": "网易游戏"
+      }
+    ],
+    "GameStudio": [
+      {
+        "id": "studio_001",
+        "name": "24 Entertainment",
+        "parent": "网易雷火事业群",
+        "representative_works": ["永劫无间"],
+        "description": "2021年8月研发了端游《永劫无间》"
+      },
+      {
+        "id": "studio_002",
+        "name": "网易伏羲AI实验室",
+        "parent": "网易雷火事业群",
+        "description": "国内唯一专注于游戏领域人工智能研发运用的工作室"
+      },
+      {
+        "id": "studio_003",
+        "name": "梦幻事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["梦幻西游系列", "大唐无双", "梦幻西游三维版"]
+      },
+      {
+        "id": "studio_004",
+        "name": "Zen事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["阴阳师", "阴阳师:妖怪屋", "哈利波特:魔法觉醒"]
+      },
+      {
+        "id": "studio_005",
+        "name": "大话事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["大话西游系列", "决战平安京", "巅峰极速"]
+      },
+      {
+        "id": "studio_006",
+        "name": "Joker事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["第五人格"]
+      },
+      {
+        "id": "studio_007",
+        "name": "奇点事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["明日之后", "暗黑破坏神:不朽"]
+      },
+      {
+        "id": "studio_008",
+        "name": "神迹事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["神都夜行录", "王牌竞速"]
+      },
+      {
+        "id": "studio_009",
+        "name": "水滴事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["一梦江湖"]
+      },
+      {
+        "id": "studio_010",
+        "name": "海神事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["阴阳师:百闻牌"]
+      },
+      {
+        "id": "studio_011",
+        "name": "第十事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["率土之滨", "无尽的拉格朗日"]
+      },
+      {
+        "id": "studio_012",
+        "name": "天下事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["天下3", "荒野行动"]
+      },
+      {
+        "id": "studio_013",
+        "name": "Eggy事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["蛋仔派对"]
+      },
+      {
+        "id": "studio_014",
+        "name": "荒野事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["荒野行动"]
+      },
+      {
+        "id": "studio_015",
+        "name": "ACE事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["猫和老鼠"]
+      },
+      {
+        "id": "studio_016",
+        "name": "星间事业部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["时空中的绘旅人"]
+      },
+      {
+        "id": "studio_017",
+        "name": "合作产品部",
+        "parent": "网易互娱事业群",
+        "representative_works": ["我的世界", "星战前夜", "光·遇", "游戏王:决斗链接", "影之诗"]
+      },
+      {
+        "id": "studio_018",
+        "name": "天美工作室群",
+        "parent": "腾讯游戏",
+        "representative_works": ["王者荣耀", "QQ飞车", "穿越火线手游"]
+      },
+      {
+        "id": "studio_019",
+        "name": "光子工作室群",
+        "parent": "腾讯游戏",
+        "representative_works": ["和平精英", "PUBG MOBILE", "黎明觉醒:生机", "高能英雄"]
+      },
+      {
+        "id": "studio_020",
+        "name": "魔方工作室群",
+        "parent": "腾讯游戏",
+        "representative_works": ["火影忍者手游", "QQ炫舞"]
+      },
+      {
+        "id": "studio_021",
+        "name": "北极光工作室群",
+        "parent": "腾讯游戏",
+        "representative_works": ["天涯明月刀"]
+      }
+    ],
+    "Game": [
+      {
+        "id": "game_001",
+        "name": "梦幻西游",
+        "alias": ["梦幻西游手游", "梦幻西游电脑版"],
+        "genre": ["MMORPG", "回合制RPG"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易游戏(梦幻事业部)",
+        "publisher": "网易游戏",
+        "engine": "NeoX引擎",
+        "release_date": "2015-03(手游)",
+        "description": "国民级回合RPG，中国第一款成功运营的大型多人在线游戏，注册玩家数超过3.6亿",
+        "revenue_2025_ios": "$36,322,990",
+        "rank_2025": "常青榜第4名"
+      },
+      {
+        "id": "game_002",
+        "name": "第五人格",
+        "genre": ["非对称竞技", "生存恐怖"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易游戏(Joker事业部)",
+        "publisher": "网易游戏",
+        "release_date": "2018-05",
+        "description": "哥特风非对称竞技常青树，全球累计下载量突破5亿，全球用户突破4亿",
+        "revenue_2025_ios": "$15,723,530",
+        "rank_2025": "常青榜第8名"
+      },
+      {
+        "id": "game_003",
+        "name": "蛋仔派对",
+        "genre": ["派对游戏", "休闲竞技"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易游戏(Eggy事业部)",
+        "publisher": "网易游戏",
+        "release_date": "2022-05",
+        "description": "潮玩题材的休闲竞技手游，Q萌画风与UGC工坊系统助力持续破圈",
+        "revenue_2025_ios": "$9,654,410",
+        "rank_2025": "常青榜第15名"
+      },
+      {
+        "id": "game_004",
+        "name": "逆水寒手游",
+        "genre": ["武侠", "开放世界", "MMORPG"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易雷火事业群",
+        "publisher": "网易游戏",
+        "engine": "Messiah引擎",
+        "release_date": "2023-06",
+        "description": "电影级画面重塑北宋江湖，开创MMO新模式的武侠游戏，被称为会呼吸的江湖",
+        "revenue_2025_ios": "$10,327,020",
+        "rank_2025": "潜力常青榜第7名"
+      },
+      {
+        "id": "game_005",
+        "name": "永劫无间",
+        "genre": ["动作竞技", "大逃杀"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "24 Entertainment(网易雷火)",
+        "publisher": "网易游戏",
+        "engine": "Unity",
+        "release_date": "2021-08(端游)",
+        "description": "武侠题材多人动作竞技大制作，端游标志性的飞索系统与振刀机制"
+      },
+      {
+        "id": "game_006",
+        "name": "阴阳师",
+        "genre": ["RPG", "策略回合制"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(Zen事业部)",
+        "publisher": "网易游戏",
+        "engine": "NeoX引擎",
+        "release_date": "2016-09",
+        "description": "CV控策略回合制RPG，以精良的日式和风美术和声优阵容著称",
+        "revenue_2025_ios": "$4,829,700",
+        "rank_2025": "常青榜第29名"
+      },
+      {
+        "id": "game_007",
+        "name": "率土之滨",
+        "genre": ["SLG", "策略战争"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(第十事业部)",
+        "publisher": "网易游戏",
+        "engine": "NeoX引擎",
+        "release_date": "2015-10",
+        "description": "三国题材策略战争手游，以邦无定交、土无定主的核心玩法著称",
+        "revenue_2025_ios": "$5,895,710",
+        "rank_2025": "常青榜第21名"
+      },
+      {
+        "id": "game_008",
+        "name": "大话西游手游",
+        "genre": ["MMORPG", "回合制"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(大话事业部)",
+        "publisher": "网易游戏",
+        "release_date": "2015-09",
+        "description": "经典回合制西游题材MMORPG",
+        "revenue_2025_ios": "$4,791,500",
+        "rank_2025": "常青榜第30名"
+      },
+      {
+        "id": "game_009",
+        "name": "倩女幽魂手游",
+        "genre": ["MMORPG", "即时战斗"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易雷火事业群",
+        "publisher": "网易游戏",
+        "release_date": "2016-05",
+        "description": "旗舰级MMORPG手游，源自雷火经典端游IP",
+        "revenue_2025_ios": "$4,758,330",
+        "rank_2025": "常青榜第31名"
+      },
+      {
+        "id": "game_010",
+        "name": "燕云十六声",
+        "genre": ["动作角色扮演", "开放世界"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "开放世界武侠动作RPG，2025年热门网易游戏之一"
+      },
+      {
+        "id": "game_011",
+        "name": "光·遇",
+        "genre": ["社交冒险", "独立游戏"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "thatgamecompany/网易合作",
+        "publisher": "网易游戏(合作产品部)",
+        "description": "唯美治愈的社交冒险游戏，与同伴携手在天空王国中翱翔"
+      },
+      {
+        "id": "game_012",
+        "name": "明日之后",
+        "genre": ["生存", "冒险"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易游戏(奇点事业部)",
+        "publisher": "网易游戏",
+        "description": "末日生存题材多平台手游，玩家在僵尸世界中建造、探索、求生"
+      },
+      {
+        "id": "game_013",
+        "name": "荒野行动",
+        "genre": ["射击", "战术竞技"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易游戏(天下/荒野事业部)",
+        "publisher": "网易游戏",
+        "engine": "Messiah引擎",
+        "description": "战术竞技射击手游，Messiah引擎的代表作之一"
+      },
+      {
+        "id": "game_014",
+        "name": "哈利波特:魔法觉醒",
+        "genre": ["RPG", "策略"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(Zen事业部)",
+        "publisher": "网易游戏",
+        "engine": "NeoX引擎",
+        "description": "获《哈利·波特》原著授权的RPG手游巨制"
+      },
+      {
+        "id": "game_015",
+        "name": "一梦江湖",
+        "genre": ["武侠", "MMORPG", "开放世界"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(水滴事业部)",
+        "publisher": "网易游戏",
+        "description": "开放世界武侠RPG，以高自由度和精美画面著称"
+      },
+      {
+        "id": "game_016",
+        "name": "巅峰极速",
+        "genre": ["赛车", "竞速"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(大话事业部)",
+        "publisher": "网易游戏",
+        "description": "3A级跨平台拟真操控竞速游戏，海量授权品牌车辆"
+      },
+      {
+        "id": "game_017",
+        "name": "实况足球",
+        "genre": ["体育", "足球竞技"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "拥有FIFPro授权的足球竞技游戏"
+      },
+      {
+        "id": "game_018",
+        "name": "漫威争锋",
+        "genre": ["第三人称射击", "英雄射击"],
+        "platform": ["PC"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "漫威IP英雄第三人称射击端游"
+      },
+      {
+        "id": "game_019",
+        "name": "归唐",
+        "genre": ["未知"],
+        "platform": ["PC"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "网易2025年新游之一"
+      },
+      {
+        "id": "game_020",
+        "name": "无限大",
+        "genre": ["都市开放世界", "角色扮演"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "网易都市开放世界RPG新游，对标腾讯《王者荣耀世界》"
+      },
+      {
+        "id": "game_021",
+        "name": "命运:群星",
+        "genre": ["射击", "开放世界"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "release_date": "2025-10-16",
+        "description": "多人联机射击开放世界手游，2025年10月正式公测"
+      },
+      {
+        "id": "game_022",
+        "name": "妖妖棋",
+        "genre": ["棋牌"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "网易新游，2025年12月测试中"
+      },
+      {
+        "id": "game_023",
+        "name": "灵兽大冒险",
+        "genre": ["MMO", "抓宠", "回合制"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "抓宠回合制MMO手游"
+      },
+      {
+        "id": "game_024",
+        "name": "七日世界",
+        "genre": ["生存", "开放世界", "搜打撤"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "多平台开放世界生存游戏"
+      },
+      {
+        "id": "game_025",
+        "name": "萤火突击",
+        "genre": ["战术竞技", "搜打撤", "射击"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "类逃离塔科夫的战术射击手游"
+      },
+      {
+        "id": "game_026",
+        "name": "猫和老鼠官方手游",
+        "genre": ["非对称竞技", "多人联机"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(ACE事业部)",
+        "publisher": "网易游戏",
+        "description": "经典动漫IP改编的非对称竞技手游"
+      },
+      {
+        "id": "game_027",
+        "name": "暗黑破坏神:不朽",
+        "genre": ["地牢", "刷宝", "ARPG"],
+        "platform": ["Android", "iOS"],
+        "developer": "暴雪/网易(奇点事业部)",
+        "publisher": "网易游戏",
+        "description": "暴雪正版暗黑系列手游"
+      },
+      {
+        "id": "game_028",
+        "name": "我的世界",
+        "genre": ["沙盒", "建造", "冒险"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "Mojang/网易(合作产品部)",
+        "publisher": "网易游戏(中国区)",
+        "description": "全球最受欢迎的沙盒建造游戏，网易代理中国区"
+      },
+      {
+        "id": "game_029",
+        "name": "天下3",
+        "genre": ["MMORPG", "武侠"],
+        "platform": ["PC"],
+        "developer": "网易游戏(天下事业部)",
+        "publisher": "网易游戏",
+        "description": "经典武侠MMORPG端游"
+      },
+      {
+        "id": "game_030",
+        "name": "新倩女幽魂",
+        "genre": ["MMORPG"],
+        "platform": ["PC"],
+        "developer": "网易雷火事业群",
+        "publisher": "网易游戏",
+        "description": "雷火旗舰级MMORPG端游"
+      },
+      {
+        "id": "game_031",
+        "name": "逆水寒(端游)",
+        "genre": ["武侠", "MMORPG"],
+        "platform": ["PC"],
+        "developer": "网易雷火事业群",
+        "publisher": "网易游戏",
+        "engine": "Messiah引擎",
+        "description": "开创MMO新模式的武侠端游，自由开放的宋朝大世界"
+      },
+      {
+        "id": "game_032",
+        "name": "大话2经典版",
+        "genre": ["MMORPG", "回合制"],
+        "platform": ["PC"],
+        "developer": "网易游戏(大话事业部)",
+        "publisher": "网易游戏",
+        "description": "经典回合制MMORPG端游"
+      },
+      {
+        "id": "game_033",
+        "name": "天谕",
+        "genre": ["MMORPG", "动作"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易雷火事业群(盘古)",
+        "publisher": "网易游戏",
+        "description": "旗舰级东方玄幻MMORPG"
+      },
+      {
+        "id": "game_034",
+        "name": "无尽的拉格朗日",
+        "genre": ["SLG", "太空策略"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "网易游戏(第十事业部)",
+        "publisher": "网易游戏",
+        "description": "星际太空SLG策略手游"
+      },
+      {
+        "id": "game_035",
+        "name": "决战!平安京",
+        "genre": ["MOBA", "竞技"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(大话事业部)",
+        "publisher": "网易游戏",
+        "description": "阴阳师IP改编的MOBA竞技手游"
+      },
+      {
+        "id": "game_036",
+        "name": "狼人杀",
+        "genre": ["策略", "社交", "桌游"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "官方正版狼人杀手游"
+      },
+      {
+        "id": "game_037",
+        "name": "影之诗",
+        "genre": ["策略", "卡牌"],
+        "platform": ["Android", "iOS"],
+        "developer": "Cygames/网易(合作产品部)",
+        "publisher": "网易游戏(中国区)",
+        "description": "二次元卡牌对战手游"
+      },
+      {
+        "id": "game_038",
+        "name": "游戏王:决斗链接",
+        "genre": ["TCG", "策略"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易(合作产品部)",
+        "publisher": "网易游戏",
+        "description": "经典IP游戏王官方授权TCG手游"
+      },
+      {
+        "id": "game_039",
+        "name": "时空中的绘旅人",
+        "genre": ["恋爱", "女性向", "剧情"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(星间事业部)",
+        "publisher": "网易游戏",
+        "description": "高评分女性向恋爱剧情手游"
+      },
+      {
+        "id": "game_040",
+        "name": "世界之外",
+        "genre": ["乙女", "剧情", "恋爱"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "女性向恋爱剧情手游新作"
+      },
+      {
+        "id": "game_041",
+        "name": "遗忘之海",
+        "genre": ["未知"],
+        "platform": ["PC"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "网易新游端游"
+      },
+      {
+        "id": "game_042",
+        "name": "界外狂潮",
+        "genre": ["战术FPS"],
+        "platform": ["PC"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "网易战术FPS端游新作"
+      },
+      {
+        "id": "game_043",
+        "name": "星绘友晴天",
+        "genre": ["未知"],
+        "platform": ["PC"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "网易新游端游"
+      },
+      {
+        "id": "game_044",
+        "name": "unVEIL the world",
+        "genre": ["未知"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "网易新游手游"
+      },
+      {
+        "id": "game_045",
+        "name": "蛋仔滑滑",
+        "genre": ["消除", "建造", "合成"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "蛋仔IP衍生消除建造手游"
+      },
+      {
+        "id": "game_046",
+        "name": "全明星街球派对",
+        "genre": ["篮球", "竞技", "体育"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "NBA官方球员工会正版授权的街球手游"
+      },
+      {
+        "id": "game_047",
+        "name": "超凡先锋",
+        "genre": ["搜打撤", "射击"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "类逃离塔科夫战术射击手游"
+      },
+      {
+        "id": "game_048",
+        "name": "阴阳师:百闻牌",
+        "genre": ["策略", "卡牌", "竞技"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(海神事业部)",
+        "publisher": "网易游戏",
+        "description": "阴阳师IP衍生卡牌竞技手游"
+      },
+      {
+        "id": "game_049",
+        "name": "遇见逆水寒",
+        "genre": ["恋爱", "剧情", "女性向"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "逆水寒IP衍生女性向恋爱手游"
+      },
+      {
+        "id": "game_050",
+        "name": "绝对演绎",
+        "genre": ["女性向", "角色扮演", "养成"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "女性向演艺圈养成手游"
+      },
+      {
+        "id": "game_051",
+        "name": "忘川风华录",
+        "genre": ["中国风", "养成", "策略"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "中国历史名士题材策略养成手游"
+      },
+      {
+        "id": "game_052",
+        "name": "绿茵信仰",
+        "genre": ["体育", "足球", "竞技"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "拥有FIFPro授权的足球竞技手游"
+      },
+      {
+        "id": "game_053",
+        "name": "坦克世界闪击战",
+        "genre": ["策略", "多人联机", "战争"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "经典坦克对战手游"
+      },
+      {
+        "id": "game_054",
+        "name": "战舰世界闪击战",
+        "genre": ["策略", "多人联机", "战争"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "经典战舰对战手游"
+      },
+      {
+        "id": "game_055",
+        "name": "星战前夜:无烬星河",
+        "genre": ["太空", "沙盒", "策略"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易(合作产品部)",
+        "publisher": "网易游戏",
+        "description": "EVE Online移动版，太空沙盒策略手游"
+      },
+      {
+        "id": "game_056",
+        "name": "猎魂觉醒",
+        "genre": ["动作", "多人联机", "角色扮演"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "共斗狩猎题材动作RPG"
+      },
+      {
+        "id": "game_057",
+        "name": "大唐无双",
+        "genre": ["即时战斗", "角色扮演", "MMO"],
+        "platform": ["PC", "Android"],
+        "developer": "网易游戏(梦幻事业部)",
+        "publisher": "网易游戏",
+        "description": "经典国风MMO"
+      },
+      {
+        "id": "game_058",
+        "name": "重装上阵",
+        "genre": ["建造", "竞技", "沙盒"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "沙盒建造竞技手游"
+      },
+      {
+        "id": "game_059",
+        "name": "阴阳师:妖怪屋",
+        "genre": ["休闲", "养成", "日系"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(Zen事业部)",
+        "publisher": "网易游戏",
+        "description": "阴阳师IP衍生休闲养成手游"
+      },
+      {
+        "id": "game_060",
+        "name": "歧路旅人:大陆的霸者",
+        "genre": ["像素", "角色扮演"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "经典JRPG《八方旅人》手游版"
+      },
+      {
+        "id": "game_061",
+        "name": "冰汽时代:最后的家园",
+        "genre": ["模拟经营", "建造", "生存"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "冰汽时代IP移动版"
+      },
+      {
+        "id": "game_062",
+        "name": "漫威终极逆转",
+        "genre": ["CCG", "竞技", "动漫改编"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "漫威IP卡牌竞技手游"
+      },
+      {
+        "id": "game_063",
+        "name": "漫威对决",
+        "genre": ["CCG", "策略", "竞技"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "漫威IP卡牌对战手游"
+      },
+      {
+        "id": "game_064",
+        "name": "乱斗西游2",
+        "genre": ["MOBA", "即时战斗", "西游"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "西游题材MOBA手游"
+      },
+      {
+        "id": "game_065",
+        "name": "大航海之路",
+        "genre": ["卡牌", "模拟经营", "养成"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(大话事业部)",
+        "publisher": "网易游戏",
+        "description": "航海题材模拟经营手游"
+      },
+      {
+        "id": "game_066",
+        "name": "镇魔曲",
+        "genre": ["动作", "角色扮演", "MMO"],
+        "platform": ["PC", "Android"],
+        "developer": "网易游戏(梦幻事业部)",
+        "publisher": "网易游戏",
+        "description": "动作MMORPG"
+      },
+      {
+        "id": "game_067",
+        "name": "权力与纷争",
+        "genre": ["策略", "战争", "多人联机"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "策略战争SLG手游"
+      },
+      {
+        "id": "game_068",
+        "name": "神都夜行录",
+        "genre": ["RPG", "动作"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏(神迹事业部)",
+        "publisher": "网易游戏",
+        "description": "国风妖怪题材动作RPG"
+      },
+      {
+        "id": "game_069",
+        "name": "永远的7日之都",
+        "genre": ["二次元", "动作", "剧情"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "二次元剧情向动作手游"
+      },
+      {
+        "id": "game_070",
+        "name": "青璃",
+        "genre": ["武侠", "冒险", "解谜"],
+        "platform": ["Android", "iOS"],
+        "developer": "网易游戏",
+        "publisher": "网易游戏",
+        "description": "高评分武侠解谜冒险手游"
+      },
+      {
+        "id": "game_071",
+        "name": "王者荣耀",
+        "genre": ["MOBA", "竞技", "多人联机"],
+        "platform": ["Android", "iOS"],
+        "developer": "腾讯游戏(天美工作室群)",
+        "publisher": "腾讯游戏",
+        "engine": "Unity",
+        "release_date": "2015-10",
+        "description": "全球收入最高的手游之一，中国国民级MOBA游戏",
+        "revenue_2025_ios": "$165,155,260",
+        "rank_2025": "常青榜第1名"
+      },
+      {
+        "id": "game_072",
+        "name": "和平精英",
+        "genre": ["战术竞技", "射击"],
+        "platform": ["Android", "iOS"],
+        "developer": "腾讯游戏(光子工作室群)",
+        "publisher": "腾讯游戏",
+        "engine": "Unreal Engine",
+        "release_date": "2018-02",
+        "description": "中国最受欢迎的战术竞技射击手游",
+        "revenue_2025_ios": "$83,216,280",
+        "rank_2025": "常青榜第2名"
+      },
+      {
+        "id": "game_073",
+        "name": "原神",
+        "genre": ["开放世界", "ARPG"],
+        "platform": ["PC", "Android", "iOS", "PlayStation"],
+        "developer": "米哈游",
+        "publisher": "米哈游",
+        "engine": "Unity(深度定制)",
+        "release_date": "2020-09",
+        "description": "现象级开放世界ARPG，全球化发行标杆",
+        "revenue_2025_ios": "$14,118,330",
+        "rank_2025": "常青榜第9名"
+      },
+      {
+        "id": "game_074",
+        "name": "崩坏:星穹铁道",
+        "genre": ["回合制RPG"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "米哈游",
+        "publisher": "米哈游",
+        "engine": "Unity(深度定制)",
+        "release_date": "2023-04",
+        "description": "星际冒险主题回合制RPG",
+        "revenue_2025_ios": "$13,093,690",
+        "rank_2025": "潜力常青榜第6名"
+      },
+      {
+        "id": "game_075",
+        "name": "绝区零",
+        "genre": ["动作RPG"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "米哈游",
+        "publisher": "米哈游",
+        "engine": "Unity(深度定制)",
+        "release_date": "2024-07",
+        "description": "米哈游都市题材动作RPG新作",
+        "rank_2025": "潜力常青榜第12名"
+      },
+      {
+        "id": "game_076",
+        "name": "明日方舟",
+        "genre": ["策略", "塔防", "二次元"],
+        "platform": ["Android", "iOS"],
+        "developer": "鹰角网络",
+        "publisher": "鹰角网络",
+        "release_date": "2019-05",
+        "description": "二次元塔防策略手游，以独特美术风格和世界观设计著称",
+        "revenue_2025_ios": "$6,704,370",
+        "rank_2025": "常青榜第19名"
+      },
+      {
+        "id": "game_077",
+        "name": "恋与深空",
+        "genre": ["恋爱", "女性向", "动作"],
+        "platform": ["Android", "iOS"],
+        "developer": "叠纸游戏",
+        "publisher": "叠纸游戏",
+        "release_date": "2024-01",
+        "description": "叠纸女性向3D恋爱动作手游，2024年年营收31.94亿",
+        "revenue_2025_ios": "$15,422,600",
+        "rank_2025": "潜力常青榜第4名"
+      },
+      {
+        "id": "game_078",
+        "name": "万国觉醒",
+        "genre": ["SLG", "策略"],
+        "platform": ["Android", "iOS"],
+        "developer": "莉莉丝游戏",
+        "publisher": "莉莉丝游戏",
+        "description": "全球化SLG策略手游标杆"
+      },
+      {
+        "id": "game_079",
+        "name": "地下城与勇士:起源",
+        "genre": ["动作RPG", "横版格斗"],
+        "platform": ["Android", "iOS"],
+        "developer": "腾讯游戏",
+        "publisher": "腾讯游戏",
+        "release_date": "2024-05",
+        "description": "经典端游DNF移动版",
+        "revenue_2025_ios": "$48,855,490",
+        "rank_2025": "潜力常青榜第1名"
+      },
+      {
+        "id": "game_080",
+        "name": "无尽冬日",
+        "genre": ["SLG", "生存"],
+        "platform": ["Android", "iOS"],
+        "developer": "点点互动(世纪华通)",
+        "publisher": "世纪华通",
+        "release_date": "2024-05",
+        "description": "冰雪生存SLG手游，出口转内销成功案例",
+        "revenue_2025_ios": "$45,137,080",
+        "rank_2025": "潜力常青榜第2名"
+      },
+      {
+        "id": "game_081",
+        "name": "三角洲行动",
+        "genre": ["战术射击", "FPS"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "腾讯游戏",
+        "publisher": "腾讯游戏",
+        "release_date": "2024-09",
+        "description": "腾讯硬核射击新作",
+        "revenue_2025_ios": "$43,776,660",
+        "rank_2025": "潜力常青榜第3名"
+      },
+      {
+        "id": "game_082",
+        "name": "金铲铲之战",
+        "genre": ["自走棋", "策略"],
+        "platform": ["Android", "iOS"],
+        "developer": "腾讯游戏(天美工作室群)",
+        "publisher": "腾讯游戏",
+        "release_date": "2021-11",
+        "description": "英雄联盟IP自走棋手游",
+        "revenue_2025_ios": "$36,877,780",
+        "rank_2025": "常青榜第3名"
+      },
+      {
+        "id": "game_083",
+        "name": "穿越火线手游",
+        "genre": ["FPS", "射击"],
+        "platform": ["Android", "iOS"],
+        "developer": "腾讯游戏(天美工作室群)",
+        "publisher": "腾讯游戏",
+        "release_date": "2015-12",
+        "description": "经典FPS穿越火线移动版",
+        "revenue_2025_ios": "$30,105,540",
+        "rank_2025": "常青榜第5名"
+      },
+      {
+        "id": "game_084",
+        "name": "黑神话:悟空",
+        "genre": ["动作RPG", "魂类"],
+        "platform": ["PC", "PlayStation"],
+        "developer": "游戏科学",
+        "publisher": "游戏科学",
+        "engine": "Unreal Engine 5",
+        "release_date": "2024-08",
+        "description": "中国首款3A级动作RPG，基于UE5开发"
+      },
+      {
+        "id": "game_085",
+        "name": "鸣潮",
+        "genre": ["开放世界", "ARPG"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "库洛游戏",
+        "publisher": "库洛游戏",
+        "release_date": "2024-05",
+        "description": "开放世界ARPG新作",
+        "rank_2025": "潜力常青榜第10名"
+      },
+      {
+        "id": "game_086",
+        "name": "三国志·战略版",
+        "genre": ["SLG", "策略"],
+        "platform": ["Android", "iOS"],
+        "developer": "灵犀互娱",
+        "publisher": "灵犀互娱",
+        "release_date": "2019-09",
+        "description": "三国题材SLG策略手游",
+        "revenue_2025_ios": "$10,268,060",
+        "rank_2025": "常青榜第14名"
+      },
+      {
+        "id": "game_087",
+        "name": "幻塔",
+        "genre": ["开放世界", "ARPG"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "完美世界",
+        "publisher": "完美世界",
+        "description": "完美世界开放世界ARPG"
+      },
+      {
+        "id": "game_088",
+        "name": "天涯明月刀",
+        "genre": ["武侠", "MMORPG"],
+        "platform": ["PC", "Android", "iOS"],
+        "developer": "腾讯游戏(北极光工作室群)",
+        "publisher": "腾讯游戏",
+        "description": "腾讯武侠MMORPG旗舰"
+      },
+      {
+        "id": "game_089",
+        "name": "堡垒之夜",
+        "genre": ["大逃杀", "建造射击"],
+        "platform": ["PC", "PlayStation", "Xbox", "Nintendo Switch"],
+        "developer": "Epic Games",
+        "publisher": "Epic Games",
+        "engine": "Unreal Engine 5",
+        "description": "全球现象级大逃杀建造射击游戏"
+      },
+      {
+        "id": "game_090",
+        "name": "PUBG: Battlegrounds",
+        "genre": ["大逃杀", "战术射击"],
+        "platform": ["PC", "PlayStation", "Xbox"],
+        "developer": "Krafton",
+        "publisher": "Krafton",
+        "engine": "Unreal Engine",
+        "description": "大逃杀品类开创者"
+      }
+    ],
+    "GameEngine": [
+      {
+        "id": "engine_001",
+        "name": "Unity",
+        "alias": ["Unity3D", "U3D"],
+        "developer": "Unity Technologies",
+        "type": "商用引擎",
+        "description": "全球使用最广泛的跨平台游戏引擎，支持2D/3D游戏开发，上手简单、生态最全",
+        "platforms": ["PC", "Android", "iOS", "PlayStation", "Xbox", "Nintendo Switch", "WebGL"],
+        "programming_languages": ["C#", "JavaScript", "Boo"],
+        "representative_games": ["王者荣耀", "原神", "崩坏:星穹铁道", "纪念碑谷", "永劫无间"],
+        "license": "商业授权(按收入分成/订阅)"
+      },
+      {
+        "id": "engine_002",
+        "name": "Unreal Engine",
+        "alias": ["UE", "虚幻引擎"],
+        "developer": "Epic Games",
+        "type": "商用引擎",
+        "description": "画质天花板，3A大作和主机高画质手游首选，UE5的Nanite和Lumen技术引领行业",
+        "platforms": ["PC", "PlayStation", "Xbox", "Nintendo Switch", "Android", "iOS"],
+        "programming_languages": ["C++", "蓝图可视化脚本"],
+        "representative_games": ["黑神话:悟空", "和平精英", "堡垒之夜", "GTA5", "赛博朋克2077"],
+        "license": "商业授权(按收入分成)"
+      },
+      {
+        "id": "engine_003",
+        "name": "Godot",
+        "developer": "Godot开源社区",
+        "type": "开源引擎",
+        "description": "完全免费开源的游戏引擎，2D性能优异，2025年全球占比升至7.1%",
+        "platforms": ["PC", "Android", "iOS", "Web"],
+        "programming_languages": ["GDScript", "C#", "C++"],
+        "representative_games": ["杀戮尖塔2", "文字游戏"],
+        "license": "MIT开源协议(完全免费)"
+      },
+      {
+        "id": "engine_004",
+        "name": "Cocos Creator",
+        "developer": "Cocos团队(中国)",
+        "type": "商用引擎",
+        "description": "轻量级跨平台引擎，中国团队开发，在2D和小游戏市场(微信小游戏等)占据重要地位",
+        "platforms": ["PC", "Android", "iOS", "Web", "微信小游戏"],
+        "programming_languages": ["JavaScript", "TypeScript"],
+        "representative_games": ["开心消消乐", "咸鱼之王"],
+        "license": "免费/商业授权可选"
+      },
+      {
+        "id": "engine_005",
+        "name": "Cocos2d-x",
+        "developer": "Cocos团队(中国)",
+        "type": "开源引擎",
+        "description": "经典开源跨平台2D游戏开发框架",
+        "platforms": ["PC", "Android", "iOS", "Tizen"],
+        "programming_languages": ["C++", "Lua", "JavaScript"],
+        "representative_games": ["梦幻西游手游(早期)"],
+        "license": "MIT开源协议"
+      },
+      {
+        "id": "engine_006",
+        "name": "LayaAir",
+        "developer": "中国团队",
+        "type": "商用引擎",
+        "description": "中国H5游戏主流引擎之一，2D渲染能力出色",
+        "platforms": ["Web", "Android", "iOS", "PC"],
+        "programming_languages": ["JavaScript", "TypeScript"],
+        "representative_games": ["三国:冰河时代"],
+        "license": "商业授权"
+      },
+      {
+        "id": "engine_007",
+        "name": "Frostbite Engine",
+        "alias": ["寒霜引擎"],
+        "developer": "EA DICE",
+        "type": "自研引擎",
+        "description": "EA专属引擎，战场级环境破坏效果，光影和粒子效果出色",
+        "platforms": ["PC", "PlayStation", "Xbox"],
+        "programming_languages": ["C++"],
+        "representative_games": ["战地系列", "FIFA系列", "星球大战:前线"],
+        "license": "EA内部使用"
+      },
+      {
+        "id": "engine_008",
+        "name": "RAGE Engine",
+        "alias": ["Rockstar Advanced Game Engine"],
+        "developer": "Rockstar Games",
+        "type": "自研引擎",
+        "description": "R星专属引擎，开放世界表现极强，物理模拟接近现实",
+        "platforms": ["PC", "PlayStation", "Xbox"],
+        "programming_languages": ["C++"],
+        "representative_games": ["GTA5", "荒野大镖客2"],
+        "license": "Rockstar内部使用"
+      },
+      {
+        "id": "engine_009",
+        "name": "RE Engine",
+        "developer": "Capcom",
+        "type": "自研引擎",
+        "description": "卡普空专属引擎，画面表现力极强，优化优秀",
+        "platforms": ["PC", "PlayStation", "Xbox"],
+        "programming_languages": ["C++"],
+        "representative_games": ["生化危机7/8", "生化危机4重制版", "鬼泣5", "龙之信条2"],
+        "license": "Capcom内部使用"
+      },
+      {
+        "id": "engine_010",
+        "name": "NeoX引擎",
+        "developer": "网易游戏",
+        "type": "自研引擎",
+        "description": "网易2007年启动研发的首款跨平台3D游戏引擎，支持PBR、全局光照等高级渲染效果",
+        "platforms": ["PC", "Android", "iOS"],
+        "programming_languages": ["C++"],
+        "representative_games": ["梦幻西游手游", "阴阳师", "率土之滨", "哈利波特:魔法觉醒"],
+        "license": "网易内部使用",
+        "patents": "多项渲染技术专利"
+      },
+      {
+        "id": "engine_011",
+        "name": "Messiah引擎",
+        "developer": "网易游戏",
+        "type": "自研引擎",
+        "description": "网易2013年启动研发的全3D跨平台引擎，支持PBR、法线贴图、GPU粒子、实时光照等，约半年一次大型更新",
+        "platforms": ["PC", "Android", "iOS", "主机"],
+        "programming_languages": ["C++"],
+        "representative_games": ["荒野行动", "逆水寒(端游/手游)"],
+        "license": "网易内部使用",
+        "patents": "20多项独创专利技术"
+      },
+      {
+        "id": "engine_012",
+        "name": "Creation Engine",
+        "developer": "Bethesda",
+        "type": "自研引擎",
+        "description": "Bethesda专属引擎，以强大的MOD社区生态闻名",
+        "platforms": ["PC", "PlayStation", "Xbox"],
+        "representative_games": ["上古卷轴5", "星空"]
+      },
+      {
+        "id": "engine_013",
+        "name": "Source 2",
+        "developer": "Valve",
+        "type": "自研引擎",
+        "description": "Valve新一代引擎，物理交互极强",
+        "platforms": ["PC", "PlayStation", "Xbox"],
+        "representative_games": ["Dota 2", "Half-Life: Alyx"]
+      },
+      {
+        "id": "engine_014",
+        "name": "CryEngine",
+        "developer": "Crytek",
+        "type": "商用引擎",
+        "description": "早年孤岛危机御用引擎，极致画质，现在使用减少",
+        "platforms": ["PC", "PlayStation", "Xbox"],
+        "representative_games": ["孤岛危机系列"]
+      },
+      {
+        "id": "engine_015",
+        "name": "GameMaker",
+        "developer": "YoYo Games",
+        "type": "商用引擎",
+        "description": "老牌2D小游戏引擎，像素游戏和独立游戏常用",
+        "platforms": ["PC", "Android", "iOS", "Web"],
+        "programming_languages": ["GML"]
+      },
+      {
+        "id": "engine_016",
+        "name": "RPG Maker",
+        "developer": "KADOKAWA",
+        "type": "商用引擎",
+        "description": "专门做日式RPG的傻瓜式引擎，拖拽操作无需编程",
+        "platforms": ["PC", "Android", "iOS"]
+      },
+      {
+        "id": "engine_017",
+        "name": "Egret",
+        "alias": ["白鹭引擎"],
+        "developer": "中国团队",
+        "type": "商用引擎",
+        "description": "微信小游戏、H5游戏常用引擎",
+        "platforms": ["Web", "微信小游戏"]
+      },
+      {
+        "id": "engine_018",
+        "name": "Roblox Studio",
+        "developer": "Roblox Corporation",
+        "type": "UGC平台引擎",
+        "description": "Roblox专属UGC创作平台，自带社交和发行",
+        "platforms": ["PC", "Android", "iOS", "Xbox"]
+      }
+    ],
+    "GameGenre": [
+      { "id": "genre_001", "name": "MMORPG", "description": "大型多人在线角色扮演游戏" },
+      { "id": "genre_002", "name": "MOBA", "description": "多人在线战术竞技游戏" },
+      { "id": "genre_003", "name": "FPS/TPS", "description": "第一/第三人称射击游戏" },
+      { "id": "genre_004", "name": "ARPG", "description": "动作角色扮演游戏" },
+      { "id": "genre_005", "name": "RPG", "description": "角色扮演游戏" },
+      { "id": "genre_006", "name": "回合制RPG", "description": "回合制角色扮演游戏" },
+      { "id": "genre_007", "name": "SLG", "description": "策略模拟游戏" },
+      { "id": "genre_008", "name": "开放世界", "description": "高自由度探索类游戏" },
+      { "id": "genre_009", "name": "武侠", "description": "中国武侠题材游戏" },
+      { "id": "genre_010", "name": "二次元", "description": "日系动漫风格游戏" },
+      { "id": "genre_011", "name": "非对称竞技", "description": "不对等人数对抗游戏" },
+      { "id": "genre_012", "name": "派对游戏", "description": "多人休闲竞技派对游戏" },
+      { "id": "genre_013", "name": "生存", "description": "生存冒险类游戏" },
+      { "id": "genre_014", "name": "卡牌/CCG", "description": "卡牌收集对战游戏" },
+      { "id": "genre_015", "name": "体育/竞速", "description": "体育竞技和赛车游戏" },
+      { "id": "genre_016", "name": "女性向/恋爱", "description": "面向女性玩家的恋爱养成游戏" },
+      { "id": "genre_017", "name": "沙盒/建造", "description": "高自由度建造创造类游戏" },
+      { "id": "genre_018", "name": "大逃杀", "description": "生存竞技吃鸡类游戏" },
+      { "id": "genre_019", "name": "塔防", "description": "策略塔防类游戏" },
+      { "id": "genre_020", "name": "休闲/消除", "description": "轻量级休闲娱乐游戏" },
+      { "id": "genre_021", "name": "社交冒险", "description": "注重社交互动的冒险游戏" },
+      { "id": "genre_022", "name": "即时战斗", "description": "实时动作战斗类游戏" },
+      { "id": "genre_023", "name": "模拟经营", "description": "模拟经营建设类游戏" },
+      { "id": "genre_024", "name": "战术射击", "description": "硬核战术类射击游戏" },
+      { "id": "genre_025", "name": "搜打撤", "description": "搜索-战斗-撤离类射击游戏" }
+    ],
+    "GamePlatform": [
+      { "id": "platform_001", "name": "PC", "description": "个人电脑平台" },
+      { "id": "platform_002", "name": "Android", "description": "安卓移动平台" },
+      { "id": "platform_003", "name": "iOS", "description": "苹果移动平台" },
+      { "id": "platform_004", "name": "PlayStation", "description": "索尼家用游戏主机" },
+      { "id": "platform_005", "name": "Xbox", "description": "微软家用游戏主机" },
+      { "id": "platform_006", "name": "Nintendo Switch", "description": "任天堂混合式游戏主机" },
+      { "id": "platform_007", "name": "Web/HTML5", "description": "网页浏览器平台" },
+      { "id": "platform_008", "name": "微信小游戏", "description": "微信小程序游戏平台" },
+      { "id": "platform_009", "name": "Steam", "description": "Valve公司PC游戏数字发行平台" },
+      { "id": "platform_010", "name": "Epic Games Store", "description": "Epic Games PC游戏发行平台" }
+    ]
+  },
+  "relationships": [
+    { "from": "game_001", "to": "company_001", "relation": "DEVELOPED_BY", "properties": { "studio": "梦幻事业部" } },
+    { "from": "game_001", "to": "engine_010", "relation": "USES_ENGINE" },
+    { "from": "game_001", "to": "genre_001", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_001", "to": "genre_006", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_002", "to": "company_001", "relation": "DEVELOPED_BY", "properties": { "studio": "Joker事业部" } },
+    { "from": "game_002", "to": "genre_011", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_003", "to": "company_001", "relation": "DEVELOPED_BY", "properties": { "studio": "Eggy事业部" } },
+    { "from": "game_003", "to": "genre_012", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_004", "to": "company_020", "relation": "DEVELOPED_BY", "properties": { "studio": "雷火事业群" } },
+    { "from": "game_004", "to": "engine_011", "relation": "USES_ENGINE" },
+    { "from": "game_004", "to": "genre_008", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_004", "to": "genre_009", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_005", "to": "studio_001", "relation": "DEVELOPED_BY" },
+    { "from": "game_005", "to": "engine_001", "relation": "USES_ENGINE" },
+    { "from": "game_005", "to": "genre_018", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_006", "to": "studio_004", "relation": "DEVELOPED_BY" },
+    { "from": "game_006", "to": "engine_010", "relation": "USES_ENGINE" },
+    { "from": "game_006", "to": "genre_010", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_007", "to": "studio_011", "relation": "DEVELOPED_BY" },
+    { "from": "game_007", "to": "engine_010", "relation": "USES_ENGINE" },
+    { "from": "game_007", "to": "genre_007", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_008", "to": "studio_005", "relation": "DEVELOPED_BY" },
+    { "from": "game_008", "to": "genre_001", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_009", "to": "company_020", "relation": "DEVELOPED_BY" },
+    { "from": "game_009", "to": "genre_001", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_013", "to": "engine_011", "relation": "USES_ENGINE" },
+    { "from": "game_014", "to": "studio_004", "relation": "DEVELOPED_BY" },
+    { "from": "game_014", "to": "engine_010", "relation": "USES_ENGINE" },
+    { "from": "game_071", "to": "studio_018", "relation": "DEVELOPED_BY" },
+    { "from": "game_071", "to": "engine_001", "relation": "USES_ENGINE" },
+    { "from": "game_071", "to": "genre_002", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_072", "to": "studio_019", "relation": "DEVELOPED_BY" },
+    { "from": "game_072", "to": "engine_002", "relation": "USES_ENGINE" },
+    { "from": "game_072", "to": "genre_024", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_073", "to": "company_003", "relation": "DEVELOPED_BY" },
+    { "from": "game_073", "to": "engine_001", "relation": "USES_ENGINE", "properties": { "customized": "深度定制渲染管线" } },
+    { "from": "game_073", "to": "genre_008", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_074", "to": "company_003", "relation": "DEVELOPED_BY" },
+    { "from": "game_074", "to": "engine_001", "relation": "USES_ENGINE", "properties": { "customized": "深度定制渲染管线" } },
+    { "from": "game_074", "to": "genre_006", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_075", "to": "company_003", "relation": "DEVELOPED_BY" },
+    { "from": "game_075", "to": "engine_001", "relation": "USES_ENGINE" },
+    { "from": "game_076", "to": "company_006", "relation": "DEVELOPED_BY" },
+    { "from": "game_076", "to": "genre_019", "relation": "BELONGS_TO_GENRE" },
+    { "from": "game_077", "to": "company_005", "relation": "DEVELOPED_BY" },
+    { "from": "game_078", "to": "company_004", "relation": "DEVELOPED_BY" },
+    { "from": "game_084", "to": "engine_002", "relation": "USES_ENGINE" },
+    { "from": "company_020", "to": "company_001", "relation": "SUBSIDIARY_OF" },
+    { "from": "company_021", "to": "company_001", "relation": "SUBSIDIARY_OF" },
+    { "from": "studio_001", "to": "company_020", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_003", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_004", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_005", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_006", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_007", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_008", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_009", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_010", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_011", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_012", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_013", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_014", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_015", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_016", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_017", "to": "company_021", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_018", "to": "company_002", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_019", "to": "company_002", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_020", "to": "company_002", "relation": "PART_OF_STUDIO" },
+    { "from": "studio_021", "to": "company_002", "relation": "PART_OF_STUDIO" },
+    { "from": "engine_010", "to": "company_001", "relation": "DEVELOPED_BY", "properties": { "since": 2007 } },
+    { "from": "engine_011", "to": "company_001", "relation": "DEVELOPED_BY", "properties": { "since": 2013 } },
+    { "from": "engine_007", "to": "company_014", "relation": "DEVELOPED_BY" },
+    { "from": "engine_008", "to": "company_015", "relation": "DEVELOPED_BY" },
+    { "from": "engine_009", "to": "company_016", "relation": "DEVELOPED_BY" },
+    { "from": "engine_002", "to": "company_011", "relation": "DEVELOPED_BY" },
+    { "from": "engine_001", "to": "company_012", "relation": "DEVELOPED_BY" },
+    { "from": "engine_004", "to": "company_013", "relation": "DEVELOPED_BY" },
+    { "from": "game_027", "to": "company_001", "relation": "CO_DEVELOPED_BY", "properties": { "partner": "暴雪娱乐" } },
+    { "from": "game_028", "to": "company_001", "relation": "CO_DEVELOPED_BY", "properties": { "partner": "Mojang" } },
+    { "from": "game_089", "to": "engine_002", "relation": "USES_ENGINE" },
+    { "from": "game_090", "to": "engine_002", "relation": "USES_ENGINE" },
+    { "from": "game_001", "to": "platform_001", "relation": "RUNS_ON_PLATFORM" },
+    { "from": "game_001", "to": "platform_002", "relation": "RUNS_ON_PLATFORM" },
+    { "from": "game_001", "to": "platform_003", "relation": "RUNS_ON_PLATFORM" },
+    { "from": "game_071", "to": "platform_002", "relation": "RUNS_ON_PLATFORM" },
+    { "from": "game_071", "to": "platform_003", "relation": "RUNS_ON_PLATFORM" },
+    { "from": "game_073", "to": "platform_001", "relation": "RUNS_ON_PLATFORM" },
+    { "from": "game_073", "to": "platform_002", "relation": "RUNS_ON_PLATFORM" },
+    { "from": "game_073", "to": "platform_003", "relation": "RUNS_ON_PLATFORM" },
+    { "from": "game_073", "to": "platform_004", "relation": "RUNS_ON_PLATFORM" },
+    { "from": "game_084", "to": "platform_001", "relation": "RUNS_ON_PLATFORM" },
+    { "from": "game_084", "to": "platform_004", "relation": "RUNS_ON_PLATFORM" }
+  ],
+  "statistics": {
+    "total_companies": 21,
+    "total_studios": 21,
+    "total_games": 90,
+    "netease_games_count": 70,
+    "total_engines": 18,
+    "total_genres": 25,
+    "total_platforms": 10,
+    "total_relationships": 102,
+    "netease_self_developed_engines": ["NeoX引擎", "Messiah引擎"]
+  },
+  "netease_summary": {
+    "company": "网易游戏",
+    "stock_code": "09999.HK",
+    "total_games": 70,
+    "top_grossing_games_2025": [
+      { "game": "梦幻西游", "rank": "常青榜第4", "ios_revenue_usd": 36322990 },
+      { "game": "第五人格", "rank": "常青榜第8", "ios_revenue_usd": 15723530 },
+      { "game": "蛋仔派对", "rank": "常青榜第15", "ios_revenue_usd": 9654410 },
+      { "game": "逆水寒手游", "rank": "潜力常青榜第7", "ios_revenue_usd": 10327020 },
+      { "game": "大话西游", "rank": "常青榜第30", "ios_revenue_usd": 4791500 }
+    ],
+    "self_developed_engines": [
+      { "name": "NeoX引擎", "since": 2007, "games": ["梦幻西游手游", "阴阳师", "率土之滨", "哈利波特:魔法觉醒"] },
+      { "name": "Messiah引擎", "since": 2013, "games": ["荒野行动", "逆水寒"], "patents": "20+" }
+    ],
+    "studios": {
+      "雷火事业群": ["倩女幽魂", "天谕", "逆水寒", "永劫无间"],
+      "互娱事业群": ["梦幻西游", "大话西游", "第五人格", "阴阳师", "率土之滨", "蛋仔派对", "明日之后", "一梦江湖"]
+    },
+    "game_categories": {
+      "MMORPG": 15,
+      "策略/SLG": 8,
+      "竞技/MOBA/FPS": 12,
+      "休闲/派对": 6,
+      "女性向/恋爱": 5,
+      "生存/冒险": 5,
+      "其他": 19
+    }
+  }
+}
