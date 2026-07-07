@@ -111,15 +111,69 @@ textarea:focus { border-color: var(--blue); }
 }
 footer { text-align: center; color: var(--muted); font-size: .75rem; margin-top: 28px; }
 footer a { color: var(--muted); }
+
+/* ---- Mobile: 520px ---- */
 @media (max-width: 520px) {
-  h1 { font-size: 1.3rem; }
-  .repo { padding: 12px; }
-  .repo-top { flex-direction: column; }
-  .badge { align-self: flex-start; }
+  body { padding: 0 6px 40px; }
+  body.centered {
+    display: flex; flex-direction: column;
+    min-height: 100vh;
+    padding-bottom: 0;
+  }
+  body.centered .wrap { width: 100%; margin-top: 18vh; margin-bottom: auto; }
+  header { padding: 14px 0 8px; }
+  .sub { font-size: .65rem; margin-top: 3px; }
+  .card { padding: 8px; border-radius: 7px; }
+  textarea { min-height: 100px; padding: 6px 8px; font-size: .7rem; border-radius: 6px; }
+  .btn { padding: 5px 10px; font-size: .7rem; border-radius: 5px; }
+  .toolbar { margin-top: 6px; gap: 5px; }
+  .status { margin: 8px 0; font-size: .65rem; gap: 8px; }
+  .results-head { margin: 10px 0 6px; }
+  .results-head h2 { font-size: .78rem; }
+  .sortsel, .style-sel { padding: 3px 5px; font-size: .65rem; border-radius: 4px; }
+  .repo { padding: 8px; border-radius: 7px; margin-bottom: 6px; }
+  .repo-top { flex-direction: column; gap: 5px; }
+  .repo-name { font-size: .82rem; }
+  .repo-desc { font-size: .68rem; margin-top: 3px; }
+  .badge { font-size: .56rem; padding: 2px 5px; border-radius: 12px; align-self: flex-start; }
+  .repo-meta { gap: 6px; margin-top: 6px; font-size: .65rem; }
+  .meta-item { gap: 2px; }
+  .langs { gap: 3px 8px; margin-top: 6px; }
+  .lang-pill { font-size: .6rem; gap: 3px; }
+  .lang-dot { width: 6px; height: 6px; }
+  .lang-bar { height: 3px; margin-top: 4px; }
+  .empty { padding: 16px 6px; font-size: .7rem; }
+  .repo-badges { gap: 3px 5px; margin-top: 6px; padding-top: 6px; }
+  .repo-badges img { height: 14px; }
+  .embed-btn { padding: 2px 5px; font-size: .56rem; border-radius: 3px; }
+  footer { font-size: .56rem; margin-top: 14px; }
+}
+
+/* ---- Mobile: 400px ---- */
+@media (max-width: 400px) {
+  body { padding: 0 5px 32px; }
+  .sub { font-size: .58rem; }
+  .card { padding: 6px; }
+  textarea { min-height: 80px; padding: 5px 6px; font-size: .62rem; }
+  .btn { padding: 4px 8px; font-size: .62rem; }
+  .toolbar { gap: 4px; }
+  .status { font-size: .58rem; }
+  .results-head h2 { font-size: .7rem; }
+  .sortsel, .style-sel { padding: 2px 4px; font-size: .58rem; }
+  .repo { padding: 6px; margin-bottom: 5px; }
+  .repo-name { font-size: .75rem; }
+  .repo-desc { font-size: .6rem; }
+  .badge { font-size: .5rem; padding: 1px 4px; }
+  .repo-meta { gap: 4px; font-size: .58rem; }
+  .lang-pill { font-size: .54rem; }
+  .lang-dot { width: 5px; height: 5px; }
+  .repo-badges img { height: 12px; }
+  .embed-btn { font-size: .5rem; padding: 1px 4px; }
+  footer { font-size: .5rem; }
 }
 </style>
 </head>
-<body>
+<body class="centered">
 <div class="wrap">
   <header>
     <h1>Repo <span class="accent">Radar</span></h1>
@@ -290,6 +344,7 @@ footer a { color: var(--muted); }
     var repos = extractRepos(text);
     resultsHead.style.display = "none";
     results.innerHTML = "";
+    document.body.classList.remove("centered");
 
     if (!repos.length) {
       statusEl.innerHTML = '<span style="color:var(--yellow)">未在文本中检测到 GitHub 仓库链接</span>';
@@ -449,6 +504,7 @@ footer a { color: var(--muted); }
     statusEl.innerHTML = "";
     resultsHead.style.display = "none";
     lastResults = [];
+    document.body.classList.add("centered");
     input.focus();
   });
 
