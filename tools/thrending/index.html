@@ -234,15 +234,58 @@
 
   /* ---- Responsive ---- */
   @media(max-width:640px){
-    .header{padding-top:48px}
-    .controls{gap:10px}
+    .header{padding-top:40px}
+    .header h1{font-size:clamp(1.6rem,5vw,2.4rem)}
+    .header .subtitle{font-size:0.88rem}
+
+    .controls{gap:8px;margin-top:28px;padding:0 16px}
+    .control-label{font-size:0.72rem}
+    .pill{padding:5px 11px;font-size:0.76rem;border-radius:80px}
+    .badge-style-pill{padding:4px 9px;font-size:0.7rem}
     .divider{display:none}
-    .repo-card{padding:16px 18px}
-    .repo-rank{font-size:1.2rem;min-width:28px}
-    .repo-name{font-size:0.98rem}
-    .stats-bar{gap:20px}
-    .repo-badges{gap:5px 6px}
-    .repo-badges img{height:18px}
+
+    .stats-bar{gap:18px;margin-bottom:28px;padding:0 16px}
+    .stat-value{font-size:1.15rem}
+    .stat-label{font-size:0.68rem}
+
+    .container{padding:0 12px;margin-top:20px}
+    .repo-card{padding:14px 14px}
+    .repo-rank{font-size:1.15rem;min-width:26px}
+    .repo-info{min-width:0}
+    .repo-name{font-size:0.92rem}
+    .repo-desc{font-size:0.8rem;margin-top:4px;-webkit-line-clamp:2}
+    .repo-meta{gap:10px;margin-top:8px}
+    .meta-item{font-size:0.74rem;gap:3px}
+    .lang-color{width:8px;height:8px}
+
+    .assess-badge{font-size:0.65rem;padding:2px 7px;border-radius:14px}
+
+    .repo-badges{gap:4px 6px;margin-top:10px;padding-top:10px}
+    .repo-badges img{height:17px}
+    .embed-btn{padding:2px 7px;font-size:0.65rem;border-radius:4px}
+
+    .empty-state{padding:50px 16px}
+    .empty-state p{font-size:0.95rem}
+  }
+
+  @media(max-width:400px){
+    .header h1{font-size:1.5rem}
+    .header .subtitle{font-size:0.8rem}
+    .controls{gap:6px;margin-top:20px}
+    .pill{padding:4px 9px;font-size:0.7rem}
+    .badge-style-pill{padding:3px 7px;font-size:0.65rem}
+    .stats-bar{gap:12px}
+    .stat-value{font-size:1rem}
+    .stat-label{font-size:0.62rem}
+    .repo-card{padding:11px 11px}
+    .repo-rank{font-size:1rem;min-width:22px}
+    .repo-name{font-size:0.85rem}
+    .repo-desc{font-size:0.74rem}
+    .repo-meta{gap:7px}
+    .meta-item{font-size:0.68rem}
+    .assess-badge{font-size:0.6rem;padding:2px 6px}
+    .repo-badges img{height:15px}
+    .embed-btn{font-size:0.6rem;padding:2px 5px}
   }
 
   /* scrollbar */
