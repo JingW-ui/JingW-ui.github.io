@@ -250,26 +250,65 @@
          * ============================================================ */
         @media (max-width: 900px) {
             html, body { height: auto; overflow: auto; }
-            body { padding: 12px 10px 20px; }
+            body { padding: 10px 8px 16px; }
+            .dashboard { gap: 6px; min-height: auto; }
+            .dashboard-header { flex-wrap: wrap; gap: 6px; }
+            .header-title h1 { font-size: 15px; gap: 5px; }
+            .header-badges { gap: 4px; }
+            .badge { font-size: 10px; padding: 2px 8px; }
             .main-content {
                 flex-direction: column;
+                gap: 6px;
+                min-height: auto;
             }
             .graph-card {
-                min-height: 50vh;
+                height: 55vh;
+                min-height: 320px;
+                flex: none;
             }
+            .graph-card .chart-body {
+                flex: 1;
+                min-height: 0;
+            }
+            .graph-card .chart-body > div {
+                height: 100%;
+            }
+            .card-header { padding: 7px 12px 6px; }
+            .card-header h2 { font-size: 12px; }
+            .card-tag { font-size: 9px; padding: 2px 7px; }
             .side-panel {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
+                gap: 6px;
             }
             .mini-card {
-                min-height: 180px;
+                min-height: 170px;
+            }
+            .dashboard-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                padding: 4px 6px;
             }
         }
 
         @media (max-width: 480px) {
-            .side-panel { grid-template-columns: 1fr; }
-            .header-title h1 { font-size: 16px; }
+            body { padding: 8px 5px 12px; }
+            .dashboard { gap: 5px; }
+            .dashboard-header { gap: 4px; }
+            .header-title h1 { font-size: 13px; }
             .header-title h1 .subtitle { display: none; }
+            .badge { font-size: 9px; padding: 2px 6px; }
+            .graph-card { height: 48vh; min-height: 260px; }
+            .card-header { padding: 5px 8px 4px; }
+            .card-header h2 { font-size: 11px; gap: 3px; }
+            .card-tag { font-size: 8px; padding: 1px 5px; }
+            .side-panel { grid-template-columns: 1fr; gap: 5px; }
+            .mini-card { min-height: 150px; }
+            .footer-legend { gap: 8px; }
+            .footer-legend-item { font-size: 9px; }
+            .footer-links { gap: 8px; }
+            .footer-links a { font-size: 9px; }
         }
     </style>
 </head>
@@ -280,11 +319,11 @@
     <!-- ===================== Header ===================== -->
     <header class="dashboard-header">
         <div class="header-title">
-            <h1>📱 手机 OS 数据仪表盘<span class="subtitle">2026 Q1</span></h1>
+            <h1>手机 OS 数据仪表盘<span class="subtitle">2026 Q1</span></h1>
         </div>
         <div class="header-badges">
-            <span class="badge">📊 <i>Counterpoint</i></span>
-            <span class="badge">📊 <i>Omdia</i></span>
+            <span class="badge"><i>Counterpoint</i></span>
+            <span class="badge"><i>Omdia</i></span>
         </div>
     </header>
 
@@ -294,7 +333,7 @@
         <!-- Left: Knowledge Graph (60%) -->
         <div class="graph-card">
             <div class="card-header">
-                <h2>🕸️ 关系知识图谱</h2>
+                <h2>关系知识图谱</h2>
                 <span class="card-tag">环形布局 · 拖拽/缩放</span>
             </div>
             <div class="chart-body">
@@ -306,25 +345,25 @@
         <div class="side-panel">
             <div class="mini-card">
                 <div class="card-header">
-                    <h2>🥧 OS 市场份额</h2>
+                    <h2>OS 市场份额</h2>
                 </div>
                 <div class="chart-body"><div id="os-share-chart"></div></div>
             </div>
             <div class="mini-card">
                 <div class="card-header">
-                    <h2>📦 品牌出货量</h2>
+                    <h2>品牌出货量</h2>
                 </div>
                 <div class="chart-body"><div id="brand-shipment-chart"></div></div>
             </div>
             <div class="mini-card">
                 <div class="card-header">
-                    <h2>💰 收入份额</h2>
+                    <h2>收入份额</h2>
                 </div>
                 <div class="chart-body"><div id="revenue-chart"></div></div>
             </div>
             <div class="mini-card">
                 <div class="card-header">
-                    <h2>🌏 区域 OS 对比</h2>
+                    <h2>区域 OS 对比</h2>
                 </div>
                 <div class="chart-body"><div id="regional-chart"></div></div>
             </div>
@@ -448,6 +487,8 @@
      * 1. Knowledge Graph
      * ========================================================== */
     function initGraph() {
+        const isMobile = window.innerWidth < 900;
+        const isSmall = window.innerWidth < 480;
         const categoryMap = {
             'OperatingSystem': { name: '操作系统', color: '#5470c6' },
             'Brand':           { name: '品牌',     color: '#fac858' },
@@ -474,6 +515,11 @@
             'India': 'image://./assets/regions/in.svg',
         };
 
+        /* Mobile-adaptive sizes */
+        const sizeScale = isSmall ? 0.55 : (isMobile ? 0.7 : 1);
+        const labelSize = isSmall ? 9 : (isMobile ? 10 : 12);
+        const circDist  = isSmall ? 90 : (isMobile ? 120 : 180);
+
         const findIcon = (name, map) => {
             const lower = name.toLowerCase();
             const exact = Object.keys(map).find(k => k.toLowerCase() === lower);
@@ -481,11 +527,11 @@
         };
 
         const nodes = rawNodes.map(n => {
-            let symbolSize = 36, symbol = 'circle', iconUrl = '';
-            if (n.type === 'OperatingSystem') { symbolSize = 52; const ic = findIcon(n.name, osIconMap); if (ic) { iconUrl = ic; symbol = ic; symbolSize = 56; } }
-            else if (n.type === 'Brand')      { symbolSize = 42; const ic = findIcon(n.name, brandIconMap); if (ic) { iconUrl = ic; symbol = ic; symbolSize = 48; } }
-            else if (n.type === 'Region')     { symbolSize = 36; const ic = findIcon(n.name, regionIconMap); if (ic) { iconUrl = ic; symbol = ic; symbolSize = 44; } }
-            else if (n.type === 'Source')     { symbolSize = 28; }
+            let symbolSize = Math.round(36 * sizeScale), symbol = 'circle', iconUrl = '';
+            if (n.type === 'OperatingSystem') { symbolSize = Math.round(52 * sizeScale); const ic = findIcon(n.name, osIconMap); if (ic) { iconUrl = ic; symbol = ic; symbolSize = Math.round(56 * sizeScale); } }
+            else if (n.type === 'Brand')      { symbolSize = Math.round(42 * sizeScale); const ic = findIcon(n.name, brandIconMap); if (ic) { iconUrl = ic; symbol = ic; symbolSize = Math.round(48 * sizeScale); } }
+            else if (n.type === 'Region')     { symbolSize = Math.round(36 * sizeScale); const ic = findIcon(n.name, regionIconMap); if (ic) { iconUrl = ic; symbol = ic; symbolSize = Math.round(44 * sizeScale); } }
+            else if (n.type === 'Source')     { symbolSize = Math.round(28 * sizeScale); }
 
             return {
                 id: n.id, name: n.name,
@@ -495,7 +541,7 @@
                 symbolKeepAspect: true,
                 raw: n,
                 label: {
-                    show: true, fontSize: 12, fontWeight: 500,
+                    show: true, fontSize: labelSize, fontWeight: 500,
                     color: '#1f2c39', position: 'bottom',
                     formatter: (p) => {
                         const d = p.data.raw;
@@ -550,23 +596,23 @@
                 },
             },
             legend: {
-                show: true,
-                data: categories.map(c => ({ name: c.name, icon: 'circle', textStyle: { color: '#2d3c4c', fontSize: 12, fontWeight: 500 } })),
+                show: !isSmall,
+                data: categories.map(c => ({ name: c.name, icon: 'circle', textStyle: { color: '#2d3c4c', fontSize: isMobile ? 10 : 12, fontWeight: 500 } })),
                 orient: 'horizontal', left: 'center', top: 6,
-                itemWidth: 12, itemHeight: 12,
+                itemWidth: isMobile ? 9 : 12, itemHeight: isMobile ? 9 : 12,
                 backgroundColor: 'rgba(255,255,255,0.8)',
                 borderRadius: 20, padding: [3, 16],
             },
             series: [{
                 type: 'graph',
                 layout: 'circular',
-                circular: { rotateLabel: false, distance: 180 },
+                circular: { rotateLabel: false, distance: circDist },
                 roam: true, draggable: true,
                 data: nodes, links, categories,
                 itemStyle: { borderColor: '#ffffff', borderWidth: 1.8, shadowBlur: 8, shadowColor: 'rgba(0,0,0,0.06)' },
-                label: { show: true, position: 'bottom', fontSize: 12, fontWeight: 500, color: '#1f2c39' },
+                label: { show: true, position: 'bottom', fontSize: labelSize, fontWeight: 500, color: '#1f2c39' },
                 edgeLabel: { show: false },
-                lineStyle: { color: 'source', curveness: 0.15, width: 1.6, opacity: 0.5 },
+                lineStyle: { color: 'source', curveness: 0.15, width: isMobile ? 1 : 1.6, opacity: 0.5 },
                 emphasis: {
                     focus: 'adjacency',
                     lineStyle: { width: 3, color: '#3a6a9a' },
