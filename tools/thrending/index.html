@@ -79,8 +79,6 @@
     background:var(--green);color:#fff;border-color:var(--green);
     box-shadow:0 2px 8px rgba(35,134,54,0.25);
   }
-  .pill.lang-pill.active{background:var(--green);color:#fff;border-color:var(--green)}
-
   .badge-style-pill{
     padding:5px 12px;border-radius:100px;
     font-size:0.78rem;font-weight:500;
@@ -360,13 +358,9 @@
   <div class="divider"></div>
   <div class="control-group">
     <span class="control-label">Language</span>
-    <button class="pill lang-pill active" data-lang="">All</button>
-    <button class="pill lang-pill" data-lang="python">Python</button>
-    <button class="pill lang-pill" data-lang="rust">Rust</button>
-    <button class="pill lang-pill" data-lang="javascript">JavaScript</button>
-    <button class="pill lang-pill" data-lang="html">HTML</button>
-    <button class="pill lang-pill" data-lang="typescript">TypeScript</button>
-    <button class="pill lang-pill" data-lang="go">Go</button>
+    <select class="badge-style-pill" id="langSel" title="筛选语言">
+      <option value="">All</option>
+    </select>
   </div>
   <div class="divider"></div>
   <div class="control-group">
@@ -393,11 +387,38 @@
   var cachedData = {};
   var loading = false;
 
+  // 支持的全部语言 [slug, 显示名],按显示名字母序;含特殊字符的 slug(c++/c#/f#)在 fetchData 中统一编码
+  var LANGS = [
+    ["ada", "Ada"], ["assembly", "Assembly"], ["astro", "Astro"],
+    ["c", "C"], ["c#", "C#"], ["c++", "C++"],
+    ["clojure", "Clojure"], ["cmake", "CMake"], ["coffee-script", "CoffeeScript"],
+    ["crystal", "Crystal"], ["css", "CSS"], ["d", "D"],
+    ["dart", "Dart"], ["dockerfile", "Dockerfile"], ["elixir", "Elixir"],
+    ["elm", "Elm"], ["emacs-lisp", "Emacs Lisp"], ["erlang", "Erlang"],
+    ["f#", "F#"], ["fennel", "Fennel"], ["fortran", "Fortran"],
+    ["glsl", "GLSL"], ["go", "Go"], ["groovy", "Groovy"],
+    ["haskell", "Haskell"], ["hcl", "HCL"], ["html", "HTML"],
+    ["java", "Java"], ["javascript", "JavaScript"], ["julia", "Julia"],
+    ["jupyter-notebook", "Jupyter Notebook"], ["kotlin", "Kotlin"], ["less", "Less"],
+    ["lisp", "Lisp"], ["lua", "Lua"], ["makefile", "Makefile"],
+    ["matlab", "MATLAB"], ["nim", "Nim"], ["nix", "Nix"],
+    ["objective-c", "Objective-C"], ["ocaml", "OCaml"], ["pascal", "Pascal"],
+    ["perl", "Perl"], ["php", "PHP"], ["powershell", "PowerShell"],
+    ["prolog", "Prolog"], ["purescript", "PureScript"], ["python", "Python"],
+    ["r", "R"], ["ruby", "Ruby"], ["rust", "Rust"],
+    ["sass", "Sass"], ["scala", "Scala"], ["scheme", "Scheme"],
+    ["scss", "SCSS"], ["shell", "Shell"], ["solidity", "Solidity"],
+    ["svelte", "Svelte"], ["swift", "Swift"], ["tex", "TeX"],
+    ["typescript", "TypeScript"], ["vala", "Vala"], ["vim-script", "Vim Script"],
+    ["vue", "Vue"], ["webassembly", "WebAssembly"], ["zig", "Zig"]
+  ];
+
   var repoListEl = document.getElementById("repoList");
   var statTotal = document.getElementById("statTotal");
   var statStars = document.getElementById("statStars");
   var statLangs = document.getElementById("statLangs");
   var badgeStyleSel = document.getElementById("badgeStyleSel");
+  var langSel = document.getElementById("langSel");
 
   // ---- Language color helper ----
   function langClass(lang) {
@@ -439,7 +460,7 @@
     if (cachedData[key]) return cachedData[key];
 
     var url = API_BASE + "?since=" + since;
-    if (lang) url += "&language=" + lang;
+    if (lang) url += "&language=" + encodeURIComponent(lang);
 
     var res = await fetch(url);
     if (!res.ok) throw new Error("API error");
@@ -632,16 +653,12 @@
     });
   });
 
-  // ---- Event: language pills ----
-  document.querySelectorAll(".lang-pill").forEach(function(btn) {
-    btn.addEventListener("click", function() {
-      var lang = btn.dataset.lang;
-      if (lang === currentLang) return;
-      document.querySelectorAll(".lang-pill").forEach(function(b) { b.classList.remove("active"); });
-      btn.classList.add("active");
-      currentLang = lang;
-      loadAndRender(true);
-    });
+  // ---- Event: language select ----
+  langSel.addEventListener("change", function() {
+    var lang = langSel.value;
+    if (lang === currentLang) return;
+    currentLang = lang;
+    loadAndRender(true);
   });
 
   // ---- Event: badge style change (re-render without refetch) ----
@@ -672,6 +689,18 @@
       setTimeout(function() { btn.textContent = "Copy Embed"; }, 1500);
     });
   });
+
+  // ---- 填充语言下拉框 ----
+  if (langSel) {
+    var langFrag = document.createDocumentFragment();
+    LANGS.forEach(function(item) {
+      var opt = document.createElement("option");
+      opt.value = item[0];
+      opt.textContent = item[1];
+      langFrag.appendChild(opt);
+    });
+    langSel.appendChild(langFrag);
+  }
 
   // ---- Initial load ----
   loadAndRender(false);
