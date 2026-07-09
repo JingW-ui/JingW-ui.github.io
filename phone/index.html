@@ -1008,6 +1008,7 @@
     let currentStatusStartTime = null;  // 当前状态开始时间
     let currentLongStatus = null; // 当前长任务状态文本（用于覆盖层与计时器更新）
     let currentLongIcon = null;   // 当前长任务图标
+    let currentLongContent = '';  // 当前长任务附加内容 (如模型名/语言名)
     let autoReconnectEnabled = true;  // 自动重连开关
     let reconnectTimer = null;  // 重连定时器
     let reconnectAttempts = 0;  // 重连尝试次数
@@ -1334,7 +1335,7 @@
 
                 // 更新PC状态（始终更新，包含耗时信息）
                 if (messageData.status) {
-                    updatePCStatus(messageData.status, messageData.elapsed);
+                    updatePCStatus(messageData.status, messageData.elapsed, messageData.content);
                 }
 
                 // 语音识别专用：当收到识别过程中或识别结果时，弹出大面板以便手机端查看（仅显示状态，移除复制）
@@ -1355,7 +1356,10 @@
                 }
 
                 // 仅当有实际内容时才显示消息（纯状态标记不显示在主消息区）
-                if (messageData.content && messageData.content.trim() !== '') {
+                // 长任务状态的内容已显示在大覆盖层副标题中，避免重复刷屏
+                const _longTaskStatuses = new Set(['OCR分析中','LLM分析中','VLM分析中','整体代码中','整理代码中','自动写入中','录音识别中']);
+                const _isLongTask = messageData.status && _longTaskStatuses.has(messageData.status);
+                if (messageData.content && messageData.content.trim() !== '' && !_isLongTask) {
                     isFromWebSocket = true;  // 标记为WebSocket消息
                     displayMessage(messageData.content);
                     isFromWebSocket = false;  // 重置标记
@@ -1365,6 +1369,19 @@
             ws.onclose = (event) => {
                 // console log removed
                 updateStatus(false);
+
+                // 【内存泄露修复】连接断开时清理所有定时器与覆盖层，避免 setInterval 持续运行
+                try {
+                    if (statusTimerInterval) { clearInterval(statusTimerInterval); statusTimerInterval = null; }
+                    if (speechTimerInterval) { clearInterval(speechTimerInterval); speechTimerInterval = null; }
+                    currentStatusStartTime = null;
+                    currentLongStatus = null;
+                    currentLongIcon = null;
+                    currentLongContent = '';
+                    speechState = 'idle';
+                    hideBusyOverlay();
+                    hideSpeechPanel();
+                } catch (e) { /* ignore */ }
 
                 // 如果是手动关闭，不进行重连
                 if (isManualClose) {
@@ -1398,7 +1415,7 @@
     }
 
     // 更新PC端工作状态
-    function updatePCStatus(status, elapsed = null) {
+    function updatePCStatus(status, elapsed = null, content = '') {
         const pcStatusEl = document.getElementById('pc-status');
 
         // 确保状态元素可见
@@ -1435,6 +1452,21 @@
                 icon: '🤖',
                 bg: 'rgba(156, 39, 176, 0.1)',
                 color: '#9c27b0'
+            },
+            'VLM分析中': {
+                icon: '👁️',
+                bg: 'rgba(156, 39, 176, 0.1)',
+                color: '#9c27b0'
+            },
+            '切换模型': {
+                icon: '🔀',
+                bg: 'rgba(0, 150, 136, 0.1)',
+                color: '#009688'
+            },
+            '切换语言': {
+                icon: '🔤',
+                bg: 'rgba(0, 150, 136, 0.1)',
+                color: '#009688'
             },
             '整理代码中': {
                 icon: '📝',
@@ -1476,12 +1508,13 @@
         const config = statusConfig[status] || statusConfig['待命'];
 
         // 如果需要计时的状态，启动计时器
-        if (status === 'OCR分析中' || status === 'LLM分析中' ||
+        if (status === 'OCR分析中' || status === 'LLM分析中' || status === 'VLM分析中' ||
             status === '整体代码中' || status === '整理代码中' || status === '自动写入中' ||
             status === '录音识别中') {
             // 记录当前长任务状态和图标
             currentLongStatus = status;
             currentLongIcon = config.icon;
+            currentLongContent = content || '';
 
             // 如果计时器未运行或时间被重置，重新启动计时器
             if (!statusTimerInterval || currentStatusStartTime === null) {
@@ -1491,7 +1524,7 @@
                 // 计时器已经在运行，更新显示内容（保持计时）
                 // 立即同步更新显示和覆盖层标签
                 updateTimerDisplay(currentLongStatus, currentLongIcon);
-                showBusyOverlay(currentLongStatus, currentLongIcon);
+                showBusyOverlay(currentLongStatus, currentLongIcon, currentLongContent);
             }
         } else {
             // 其他状态：仅在收到明确的结束/错误/待命时停止计时器
@@ -1537,7 +1570,7 @@
 
         // 立即更新一次并显示醒目的全局等待覆盖层
         updateTimerDisplay(currentLongStatus, currentLongIcon);
-        showBusyOverlay(currentLongStatus, currentLongIcon);
+        showBusyOverlay(currentLongStatus, currentLongIcon, currentLongContent);
 
         // 每秒更新一次（使用全局 currentLongStatus/currentLongIcon，便于在运行时切换状态）
         statusTimerInterval = setInterval(() => {
@@ -1574,6 +1607,7 @@
         // 清理长任务标记
         currentLongStatus = null;
         currentLongIcon = null;
+        currentLongContent = '';
     }
 
     // ========== 全局醒目等待覆盖层（用于长时间运行的OCR/LLM/整理代码等） ==========
@@ -1621,6 +1655,19 @@
             `;
             box.appendChild(label);
 
+            const subtitle = document.createElement('div');
+            subtitle.id = 'globalBusySubtitle';
+            subtitle.style.cssText = `
+                font-size: 16px;
+                color: #e0e0e0;
+                opacity: 0.9;
+                margin-bottom: 10px;
+                max-width: 80vw;
+                word-break: break-word;
+                white-space: pre-wrap;
+            `;
+            box.appendChild(subtitle);
+
             const timer = document.createElement('div');
             timer.id = 'globalBusyTimer';
             timer.style.cssText = `
@@ -1653,12 +1700,17 @@
     }
 
     // 显示覆盖层
-    function showBusyOverlay(status, icon) {
+    function showBusyOverlay(status, icon, content) {
         const overlay = ensureBusyOverlay();
         const label = document.getElementById('globalBusyLabel');
         const timer = document.getElementById('globalBusyTimer');
+        const subtitle = document.getElementById('globalBusySubtitle');
 
         label.textContent = `${icon || ''} ${status || '处理中...'} `;
+        if (subtitle) {
+            subtitle.textContent = content || '';
+            subtitle.style.display = content ? 'block' : 'none';
+        }
         timer.textContent = `0s`;
 
         overlay.style.display = 'flex';
