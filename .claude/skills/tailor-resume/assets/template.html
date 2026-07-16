@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<!--
+  A4 定向简历模板 — tailor-resume 技能使用说明：
+  1. 直接复用本文件的全部 CSS，不要重新发明样式。
+  2. 只改 body 内的内容：header 个人信息、各 section 标题与条目。
+  3. 按 JD 适配方法论重排板块顺序、取舍内容、改写措辞。
+  4. 高亮与 JD 最相关的技能标签用 class="skill primary"（灰底黑字加粗，勿用深色填充背景）。
+  5. 不写政治面貌；不用 icon/emoji；不引外部 CDN。
+-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 岗位 / 公司</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            line-height: 1.2;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            padding: 14mm 16mm;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 22px;
+            padding: 0 0 16px;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 100px;
+            height: 110px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .profile-info {
+            text-align: left;
+        }
+        .name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .target {
+            font-size: 13px;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .contact-info a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            border-left: 4px solid #333;
+            padding-left: 10px;
+        }
+        .summary {
+            font-size: 12.5px;
+            color: #444;
+            line-height: 1.7;
+        }
+        .summary strong {
+            color: #1a1a1a;
+        }
+        .subsection {
+            margin-bottom: 10px;
+            padding-bottom: 9px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 3px;
+        }
+        .date {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .tech-line {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .tech-line em {
+            font-style: normal;
+            color: #2d74bb;
+            font-weight: 500;
+        }
+        ul {
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 4px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.55;
+        }
+        .skill-line {
+            font-size: 12px;
+            color: #555;
+            line-height: 1.7;
+            margin-bottom: 6px;
+        }
+        .skill-line:last-child {
+            margin-bottom: 0;
+        }
+        .skill-cat {
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-right: 2px;
+        }
+        .skill-hl {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .label-link {
+            display: inline-block;
+            background-color: #f5f5f5;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .label-link:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .github-label-link {
+            display: inline-block;
+            background-color: #1F883D;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .github-label-link:hover {
+            background-color: #176d31;
+        }
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+            }
+            .page {
+                box-shadow: none;
+                width: auto;
+                min-height: auto;
+                padding: 0;
+            }
+        }
+        @media (max-width: 820px) {
+            body {
+                padding: 10px;
+            }
+            .page {
+                width: 100%;
+                min-height: auto;
+                padding: 18px 16px;
+            }
+            .profile-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-info {
+                text-align: center;
+            }
+            .name {
+                font-size: 22px;
+            }
+        }
+        /* print-color-fix */
+        html, body, .header, .label-link, .github-label-link, .target, .contact-info a {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        @media print {
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header：个人信息（不写政治面貌） -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：XX岗位 / XX方向（公司名）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势：呼应 JD 核心要求，放量化成果 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            一段话讲清"为什么适配该岗位"，用 <strong>加粗</strong> 突出关键词，附量化成果。
+        </div>
+    </div>
+
+    <!-- 教育背景（每条经历必须含研究方向） -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 生物医学工程 · 硕士</div>
+            <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授</div>
+            <div class="tech-line"><em>研究方向：</em>医学影像智能分析 · 神经影像处理 · 医疗 AI 与智能化应用</div>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ 四川省优秀毕业生 · 推免生</div>
+            <div class="tech-line"><em>研究方向：</em>医学信号处理 · 深度学习与目标检测 · 医学图像处理</div>
+        </div>
+    </div>
+
+    <!-- 专业技能：流式文本两行，不用按钮/标签样式 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-line">
+            <span class="skill-cat">分类1（与 JD 最相关）：</span><span class="skill-hl">核心技能1</span> · <span class="skill-hl">核心技能2</span> · 普通技能1 · 普通技能2 · 普通技能3
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">分类2：</span><span class="skill-hl">核心技能3</span> · <span class="skill-hl">核心技能4</span> · 普通技能4 · 普通技能5 · 普通技能6
+        </div>
+    </div>
+
+    <!-- 项目/经历：按 JD 相关度排序，最相关的前置 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+        <div class="subsection">
+            <div class="subsection-title">
+                项目名
+                <a class="github-label-link" href="#" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="#" target="_blank" rel="noopener">链接</a>
+            </div>
+            <div class="date">时间区间</div>
+            <div class="tech-line"><em>技术栈：</em>...</div>
+            <ul>
+                <li>用 JD 关键词原词改写的项目描述。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 其余板块按需保留/删除：实习经历、科研成果、获奖荣誉等 -->
+    <div class="section">
+        <div class="section-title">获奖荣誉</div>
+        <ul>
+            <li>仅保留与岗位相关或能体现学习能力的获奖。</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>

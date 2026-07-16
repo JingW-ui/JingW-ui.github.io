@@ -1,0 +1,76 @@
+2. Methods
+2.1. System Implementation and Clinical Deployment
+MediScreen-Brain​ was developed as a CPU-optimized, zero-configuration application to facilitate deployment in resource-constrained clinical environments. Distributed as a standalone Windows executable requiring no Python runtime or GPU drivers, the system eliminates environmental barriers for end-users. It is registered with the China National Copyright Administration (Registration No. 2026SR0047786) and is fully open-source. The system evolves from the PI-MAPP/project/universal_object_detection_plus​ framework (https://github.com/JingW-ui/PI-MAPP), extending its general-purpose detection backbone with dedicated neuro-oncology workflows and anatomy-guided localization algorithms. The complete source code and documentation are maintained at https://github.com/JingW-ui/MediScreen-Brain.
+Supporting diverse clinical workflows, MediScreen-Brain​ natively processes 2D images, batch folders, real-time video streams, and full 3D NIfTI volumes. Inference is strictly optimized for CPU-only execution, achieving approximately 26 milliseconds per 2D image and completing volumetric tumor localization within two seconds on a standard Intel i7 processor. These latencies satisfy the requirements for interactive primary care screening.
+Beyond detection, MediScreen-Brain​ generates structured diagnostic reports to translate AI outputs into clinical insights. Deterministic post-processing extracts morphometric measurements—such as maximum tumor diameter and cross-sectional area—scaled to physical units via voxel-spacing metadata. Reports are rendered as editable PDFs following institutional templates, supporting human-AI collaborative interpretation and ensuring that automation augments, rather than replaces, professional judgment.
+2.2 Object Detection Model: Lightweight YOLO Ensemble for Brain Tumor Detection
+2.2.1 Dataset and Preprocessing
+We conducted a comprehensive survey of publicly available datasets for brain tumor detection and segmentation. Although benchmark datasets such as BraTS are widely recognized, they predominantly consist of skull-stripped volumes and lack realistic anatomical context. Furthermore, recent research published in Medical Image Analysishas[1] highlighted that the uniform anatomical orientation in BraTS may inadvertently provide shortcut learning opportunities for deep networks. Motivated by these limitations, we selected the “MRI for Brain Tumor with Bounding Boxes” dataset hosted on Kaggle. This dataset contains 5,249 T1-weighted MRI slices across sagittal, axial, and coronal planes, annotated with bounding boxes in YOLO format for four diagnostic categories: Glioma, Meningioma, Pituitary tumor, and No Tumor. Annotations were manually generated using the LabelImg tool by a specialized labeling team, ensuring high fidelity.
+
+
+
+
+From this dataset, we excluded 711 images labeled as “No Tumor,” retaining 4,026 images encompassing 4,351 annotated instances for training and 412 images with 438 instances for validation. To mitigate potential overfitting and enhance robustness against scanner-induced variability, we employed extensive data augmentation techniques including random rotations, elastic deformations, and intensity scaling. Finally, to rigorously assess generalization performance and clinical applicability, all final evaluations were conducted on a proprietary dataset comprising 90 anonymized tumor MRI scans (in NIfTI format, .nii.gz), graciously provided by our collaborating institution, Southwest Hospital. These scans originate from multiple vendors (e.g., Siemens, GE, Philips) and encompass heterogeneous acquisition protocols, thereby enabling robust evaluation under real-world domain shifts.
+From the public “MRI for Brain Tumor with Bounding Boxes” dataset, we excluded 711 images labeled as “No Tumor.” The remaining 4,026 images, containing 4,351 annotated tumor instances, were used for training, while 412 images with 438 instances were held out for validation. To mitigate overfitting and improve robustness against scanner-related variability, we applied extensive data augmentation, including random rotations, elastic deformations, and intensity scaling.
+To rigorously evaluate generalization and clinical applicability, all final assessments were conducted on a fully independent, proprietary dataset collected at Southwest Hospital, comprising 561 anonymized MRI volumes in NIfTI format (.nii.gz). This cohort consisted of 305 normal subjects and 256 patients with histologically confirmed brain tumors, acquired across multiple vendors (Siemens, GE, Philips) and imaging protocols. Notably, all scans were isotropic with 1 mm³ voxel resolution, providing a realistic and challenging test bed for evaluating robustness under real-world domain shifts.
+Among the 257 tumor cases, the test set included 156 gliomas, 92 meningiomas, and 9 pituitary tumors. This distribution reflects routine clinical prevalence, with gliomas representing the most heterogeneous and aggressive group, meningiomas forming the dominant extra-axial tumor category, and pituitary tumors constituting a smaller but clinically critical subset typically characterized by small size and sellar location. The tumor cohort exhibited substantial radiological and metabolic diversity: gliomas frequently demonstrated elevated choline (Cho), reduced N-acetylaspartate (NAA), and Cho/NAA ratios greater than 2 on magnetic resonance spectroscopy (MRS), often accompanied by necrosis, cystic change, and peritumoral edema; meningiomas typically presented as extra-axial, durally based masses with homogeneous enhancement and a “dural tail” sign; pituitary tumors were generally small, well-circumscribed sellar lesions with mild to moderate contrast enhancement. Collectively, this heterogeneity ensured that the evaluation covered the full spectrum of diagnostic difficulty encountered in real-world brain tumor screening.
+2.2.2 Model Selection and Training Strategy
+For clinically deployable brain tumor detection systems, the YOLO framework offers distinct advantages over alternatives such as Faster R-CNN, SSD, and U-Net. Although Faster R-CNN achieves high mean Average Precision (mAP) through its two-stage architecture, its large computational footprint—approximately 1.2 billion parameters in its v2 iteration—makes it unsuitable for CPU-only clinical settings. SSD and RetinaNet improve inference speed but often still require GPU acceleration to meet real-time demands (e.g., SSD300 reaches 59 FPS only on a Titan X). In contrast, YOLOv8-nano maintains 45 FPS on a standard Intel i7 CPU with just 3.2 million parameters, making it well-aligned with real-world clinical throughput needs.
+Given the limited computing power of edge devices common in community healthcare facilities, our detection pipeline emphasizes a careful trade-off between diagnostic accuracy and low latency. We performed a comprehensive comparison of the latest lightweight YOLO variants—YOLOv8-nano, YOLOv9-tiny, YOLOv10-nano, YOLO11-nano, and the recently released YOLO26-nano—all tested in their smallest “nano” or “tiny” configurations. This ensures deployment feasibility on consumer-grade hardware without dependence on high-end GPUs. The YOLO platform is open-source; specific training details follow the official Ultralytics guidelines. Our system uses the unmodified YOLO architecture solely to train an inference engine that outputs 2D bounding box coordinates (x, y, w, h) for tumors in brain MRI slices. For 3D NIfTI inputs, the system integrates the Anatomy-Guided Rapid Tumor Localization algorithm described in Section 2.3, leveraging YOLO inference to achieve fast lesion localization and classification.
+Considering the clinical requirement for low-latency and CPU-friendly inference, YOLOv26 was selected as the 2D detector due to its favorable speed–accuracy trade-off and strong community support. Alternatives such as Faster R-CNN or RetinaNet generally incur higher computational costs and are less suitable for large-scale screening scenarios.
+2.3 Anatomy-Guided Rapid Tumor Localization in NIfTI Volumes
+Processing full 3D brain MRI volumes (typically stored as NIfTI .nii.gz files) with slice-wise deep detectors incurs prohibitive computational costs—especially on CPU-only systems common in resource-constrained clinical settings. A naïve approach evaluates all slices along the axial (z), sagittal (x), and coronal (y) axes, resulting in a time complexity of O(Nx+Ny+Nz), where Nd denotes the number of slices along dimension d. For a standard T1-weighted scan (Nx,Ny,Nz≈256), this yields over 700 inference calls per volume—far exceeding real-time requirements.
+
+
+To address this, we propose an anatomy-guided bidirectional search algorithm that leverages two key anatomical priors:
+(i) spatial continuity of intracranial tumors along the superior–inferior (axial) direction, and
+(ii) cross-sectional consistency across orthogonal imaging planes.
+The algorithm operates in three synergistic phases:
+2.3.1 Coarse Axial Search with Adaptive Slice Skipping
+We first perform a coarse scan along the axial axis (z) with a stride s=2, exploiting the fact that most brain tumors span multiple consecutive axial slices. To further reduce redundant computation, we introduce a content-aware pre-filtering mechanism that discards low-information slices before model inference.
+Let Iz∈ℝH×W denote the 2D axial slice at index z. We define a slice as “informative” if it satisfies:
+
+ϕ(Iz)=True,ifρ(Iz)≥τρandσ(Iz)≥τσFalse,otherwise
+
+where
+- ρ(Iz)=∥Iz∥0HW is the non-zero pixel ratio,
+- σ(Iz)=1HWi,j​(Iz(i,j)−μz)2 is the intensity standard deviation,
+- μz is the mean intensity of Iz,
+- τρ and τσ are adaptive, subject-specific thresholds derived from global volumetric statistics of the input volume, enabling robust slice filtering across diverse anatomies and imaging protocols.
+Only slices passing ϕ(Iz)=True are fed to the detector. For each evaluated slice, the model outputs bounding boxes in center-width-height format (cx,cy,w,h). While the product w⋅h provides a computationally convenient proxy for lesion size, it does not represent the true tumor area, as tumors are irregular and often approximated by ellipsoids within the rectangular detection box.
+To obtain a more physiologically plausible estimate, we model the tumor cross-section as an ellipse inscribed in the bounding box and compute its area as:
+
+Az=π4⋅w⋅h,
+
+which corresponds to the area of an ellipse with semi-axes w/2 and h/2. This correction aligns with standard radiological practice, where maximal cross-sectional area is used for volumetric approximation under the assumption of rotational symmetry [Ref]. The axial index z∗ corresponding to the global maximum corrected area during coarse search is recorded:
+
+zcoarse∗=argmaxz∈ZcoarseAz, Zcoarse={0,s,2s,…,Nz−1}.
+2.3.2 Local Refinement Around Candidate Slice
+To compensate for potential misalignment due to coarse sampling, we perform a local refinement within the immediate neighborhood {zcoarse∗−1,zcoarse∗+1}—excluding zcoarse∗ itself, which has already been processed. This avoids redundant inference while ensuring sub-slice precision. The refined optimal axial index is then:
+
+z∗=argmaxz∈{zcoarse∗−1, zcoarse∗, zcoarse∗+1}Az.
+2.3.3 Cross-Axis Projection and Constrained Search
+Starting from the axial dimension, we sample the volume with stride saxial=2 and perform inference on each valid slice that passes a lightweight pre‑filter (non‑zero pixel ratio and intensity standard deviation). All positive detections are retained and aggregated into a coarse 3D binary volume M3D (same spatial dimensions as the input). Each axial slice contributes its detections by setting the corresponding voxels to 1.
+To compensate for the axial subsampling (stride 2), we apply a morphological closing operation along the z-axis with a structuring element of radius 1. This fills the single‑slice gaps in the aggregated binary mask, ensuring that the largest connected component faithfully represents the entire tumor volume without spurious fragmentation. After closing, we extract the largest connected component (CC) using 26‑connectivity, which effectively suppresses isolated false positives while preserving the main tumor mass. Let the axis‑aligned bounding box of this CC project onto the sagittal and coronal axes as:
+imin,imax along the sagittal (x) direction,
+jmin,jmax along the coronal (y) direction.
+To accommodate discretisation errors, partial volume effects, and minor segmentation uncertainties, we expand this projected range by a small physical margin δ=3.0 mm. The margin is converted to voxel counts using the known spacings:
+mi=δsx, mj=δsy,
+where sx and sy are the sagittal and coronal voxel spacings, respectively. The constrained search intervals for the two remaining orthogonal axes become:
+5.Sagittal search interval (along x):
+X=[max(0, imin−mi), min(Nx−1, imax+mi)]
+6.Coronal search interval (along y):
+Y=[max(0, jmin−mj), min(Ny−1, jmax+mj)]
+Within these geometrically restricted intervals X and Y, we apply a coarse‑then‑fine hierarchical detection strategy (coarse stride s=2, followed by ±1 local refinement). By aggregating all axial detections and closing the gaps, the 3D CC provides a complete spatial prior for the x and y dimensions. This approach reduces the effective search space from O(Nx+Ny) to the tumor’s physical footprint O((imax−imin)+(jmax−jmin)), significantly accelerates inference on the sagittal and coronal planes, and eliminates false positives from anatomically irrelevant slices.
+2.3.4 Complexity and Empirical Efficiency
+Let Kz, Kx, and Ky denote the number of unique slices actually processed along each axis. Under our method:
+•Axial: Kz=Nz2⋅ppass+2,
+where ppass∈(0,1) is the empirical pass rate of the pre-filter (observed ≈0.9);
+•Sagittal: Kx≤|X|2⋅ppass+2;
+•Coronal: Ky≤|Y|2⋅ppass+2.
+For a typical tumor with w,h≈40 voxels, |X|,|Y|≈40, yielding Kx,Ky≲22. With Nz=256, we get Kz≈130. Thus, total inferences:
+
+Ktotal=Kz+Kx+Ky≈170,
+
+compared to Nx+Ny+Nz=768 for exhaustive search—a 77.8% reduction in model calls. On an Intel  CPU (no GPU), this enables end-to-end processing in 1–2 seconds per volume, meeting the latency requirements for point-of-care screening in primary hospitals.
+Remark on Area Estimation: The use of π4wh assumes the tumor cross-section is approximately elliptical—a clinically accepted simplification for spherical or ovoid lesions such as meningiomas and pituitary adenomas. For highly irregular gliomas, this remains a conservative upper-bound proxy; final volumetric quantification in the reporting module employs 3D segmentation masks when available, ensuring diagnostic-grade accuracy.
