@@ -1,0 +1,61 @@
+# ========================
+# IDE / 编辑器
+# ========================
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# ========================
+# Node.js
+# ========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+
+# ========================
+# Claude Code
+# ========================
+skills-lock.json
+
+# ========================
+# OS
+# ========================
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ========================
+# 临时 / 备份 / 输出
+# ========================
+output/
+**/backup/
+**/temp/
+**/temps/
+*.tmp
+*.log
+
+# ========================
+# 测试 / 调试文件
+# ========================
+use_test.py
+test.html
