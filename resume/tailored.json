@@ -298,5 +298,15 @@
     "date": "2026.06",
     "url": "/resume/resume_medical_signal_cardiac.html",
     "match": ""
+  },
+  {
+    "index": "31",
+    "company": "华为 · ITC BG",
+    "role": "软件开发工程师",
+    "direction": "全栈开发 / 智能化演进 / AI 智能体",
+    "tags": ["Python/Java/C++", "AI Agent 开发", "模块化重构", "开源竞赛"],
+    "date": "2026.07",
+    "url": "/resume/resume_huawei_itc.html",
+    "match": "high"
   }
 ]
