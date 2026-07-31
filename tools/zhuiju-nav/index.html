@@ -180,16 +180,14 @@ body {
     padding: 7px 15px;
     font-size: 13px;
     color: var(--text-secondary);
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
+    background: transparent;
+    border: 1px solid transparent;
     border-radius: 999px;
     cursor: pointer;
     transition: var(--transition);
     user-select: none;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
 }
-.tab:hover { background: var(--card-bg-strong); transform: translateY(-1px); }
+.tab:hover { color: var(--text-primary); border-color: var(--card-border); transform: translateY(-1px); }
 .tab.active {
     background: linear-gradient(135deg, var(--accent-teal), var(--accent-blue));
     color: #fff;
@@ -285,8 +283,8 @@ body {
 /* 卡片网格 */
 .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+    gap: 12px;
     margin-top: 4px;
 }
 
@@ -294,8 +292,8 @@ body {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 18px 18px 16px;
+    gap: 10px;
+    padding: 14px 14px 12px;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: var(--radius-md);
@@ -322,7 +320,7 @@ body {
     gap: 10px;
 }
 .card-name {
-    font-size: 16.5px;
+    font-size: 15px;
     font-weight: 700;
     color: var(--text-primary);
     line-height: 1.35;
@@ -332,7 +330,7 @@ body {
     display: flex;
     gap: 5px;
     flex-wrap: wrap;
-    margin-top: 5px;
+    margin-top: 4px;
 }
 .badge {
     display: inline-flex;
@@ -346,36 +344,42 @@ body {
 }
 .badge-cat {
     color: var(--accent-blue);
-    background: rgba(59,130,246,0.10);
-    border: 1px solid rgba(59,130,246,0.22);
+    background: transparent;
+    border: 1px solid rgba(59,130,246,0.32);
 }
-.badge-ok   { color: var(--ok);   background: var(--ok-bg);   border: 1px solid rgba(22,163,74,0.25); }
-.badge-warn { color: var(--warn); background: var(--warn-bg); border: 1px solid rgba(217,119,6,0.28); }
+.badge-ok   { color: var(--ok);   background: transparent; border: 1px solid rgba(22,163,74,0.35); }
+.badge-warn { color: var(--warn); background: transparent; border: 1px solid rgba(217,119,6,0.38); }
 
 .score-circle {
     flex: 0 0 auto;
-    width: 46px; height: 46px;
+    width: 38px; height: 38px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 700;
     font-family: 'Courier New', monospace;
-    color: #fff;
-    background: linear-gradient(135deg, var(--accent-teal), var(--accent-blue));
-    box-shadow: var(--shadow-sm);
+    color: var(--ok);
+    background: transparent;
+    border: 1px solid rgba(22, 163, 74, 0.35);
 }
-.score-circle.is-gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
-.score-circle.is-red  { background: linear-gradient(135deg, #f87171, #dc2626); }
+.score-circle.is-gold {
+    color: var(--warn);
+    border-color: rgba(217, 119, 6, 0.32);
+}
+.score-circle.is-red {
+    color: var(--bad);
+    border-color: rgba(220, 38, 38, 0.28);
+}
 
-.card-desc { font-size: 13px; color: var(--text-secondary); min-height: 20px; }
+.card-desc { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; }
 
 .card-tags { display: flex; flex-wrap: wrap; gap: 5px; }
 .tag {
     font-size: 11px;
     color: var(--text-muted);
-    background: rgba(139,154,175,0.10);
+    background: transparent;
     padding: 1px 8px;
     border-radius: 6px;
     white-space: nowrap;
@@ -385,9 +389,9 @@ body {
 .card-scores {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4px 16px;
-    padding: 10px 12px;
-    background: rgba(255,255,255,0.35);
+    gap: 3px 12px;
+    padding: 8px 10px;
+    background: transparent;
     border-radius: var(--radius-sm);
 }
 .score-row {
@@ -401,9 +405,9 @@ body {
     flex: 0 0 auto;
     width: 30px;
 }
-.dots { display: flex; gap: 3px; }
+.dots { display: flex; gap: 2px; }
 .dot {
-    width: 7px; height: 7px;
+    width: 6px; height: 6px;
     border-radius: 50%;
     background: rgba(139,154,175,0.28);
 }
@@ -428,7 +432,7 @@ body {
 /* 操作区 */
 .card-actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     margin-top: auto;
     padding-top: 2px;
     flex-wrap: wrap;
@@ -437,8 +441,8 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 15px;
-    font-size: 13px;
+    padding: 6px 12px;
+    font-size: 12.5px;
     font-weight: 500;
     font-family: inherit;
     border-radius: 999px;
@@ -459,19 +463,19 @@ body {
     box-shadow: 0 4px 14px rgba(45, 212, 191, 0.22);
 }
 .btn-ghost {
-    background: var(--card-bg-strong);
+    background: transparent;
     color: var(--text-secondary);
     border: 1px solid var(--card-border);
 }
-.btn-ghost:hover { color: var(--text-primary); background: #fff; }
+.btn-ghost:hover { color: var(--text-primary); border-color: rgba(139,154,175,0.5); }
 .btn-ghost.copied { color: var(--ok); border-color: rgba(22,163,74,0.4); }
 .btn-config {
-    background: rgba(244,114,182,0.14);
+    background: transparent;
     color: #be185d;
-    border: 1px solid rgba(244,114,182,0.35);
+    border: 1px solid rgba(244,114,182,0.4);
 }
-.btn-config:hover { background: rgba(244,114,182,0.24); }
-.btn-config.copied { color: var(--ok); border-color: rgba(22,163,74,0.4); background: var(--ok-bg); }
+.btn-config:hover { border-color: rgba(244,114,182,0.65); }
+.btn-config.copied { color: var(--ok); border-color: rgba(22,163,74,0.4); }
 
 /* 空状态 */
 .empty {
@@ -505,7 +509,7 @@ footer a:hover { text-decoration: underline; }
 
 /* ============ 响应式 ============ */
 @media (max-width: 900px) {
-    .grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 }
 @media (max-width: 560px) {
     .page { padding: 18px 14px 30px; }
