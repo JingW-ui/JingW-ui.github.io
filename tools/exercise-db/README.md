@@ -1,0 +1,43 @@
+# 健身动作数据库 Exercise Database
+
+1,324 个健身动作的检索工具:按**身体部位 / 器械 / 目标肌群**筛选,支持中英文搜索与分步教程,动作缩略图与动画经 CDN 加载。
+
+数据源自 [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset)(MIT),裁剪为中文 + 英文分步指令(1.46MB)后静态内嵌;动作媒体版权 © Gym Visual,经 jsdelivr CDN 引用并署名,未复制进仓库。
+
+## 功能
+
+- 🔍 中英文搜索(动作名 / 编号)
+- 🏷️ 部位芯片 + 器械 / 肌群下拉筛选
+- 🖼️ 卡片画廊(懒加载缩略图,分页 150/页)
+- 📋 详情弹窗:中文分步教程、目标/次要肌群、GIF 动画(悬停自动播放)
+- 🔄 中文 ↔ 英文指令切换
+- 🎲 随机动作
+
+## 目录结构
+
+```
+exercise-db/
+  index.html
+  scripts/build_data.py      # 数据裁剪脚本(可从 CDN 或本地重新生成)
+  assets/
+    data/exercises.js        # 裁剪数据(1324 条, 1.46MB)
+    css/style.css            # 玻璃态设计系统
+    js/config.js             # 中文词表(部位/器械/肌群)
+    js/app.js                # 检索/筛选/弹窗逻辑
+```
+
+## 重新生成数据
+
+```bash
+python scripts/build_data.py                       # 从 jsdelivr CDN 下载生成
+SOURCE=/path/exercises.json python scripts/build_data.py   # 或用本地源文件
+```
+
+## 本地运行
+
+```bash
+python -m http.server 8080   # 或 npx serve
+# 打开 http://localhost:8080/tools/exercise-db/
+```
+
+> 使用了 ES Module 与 CDN 媒体,需通过 HTTP 服务访问。

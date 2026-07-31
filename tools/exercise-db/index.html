@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>健身动作数据库 - Exercise Database</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- 背景装饰光斑 -->
+<div class="bg-decoration bg-decoration-1"></div>
+<div class="bg-decoration bg-decoration-2"></div>
+<div class="bg-decoration bg-decoration-3"></div>
+
+<!-- 顶栏 -->
+<header class="topbar glass">
+  <div class="brand">
+    <span class="brand-icon">💪</span>
+    <div class="brand-text">
+      <h1>健身动作数据库</h1>
+      <p class="subtitle">1,324 个动作 · 中文分步教程 · 按部位 / 器械 / 肌群检索</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="search-box">
+      <input type="search" id="searchInput" placeholder="搜索动作名称…" autocomplete="off">
+    </div>
+    <button class="btn-random" id="randomBtn" title="随机一个动作">🎲 随机</button>
+  </div>
+</header>
+
+<!-- 筛选栏 -->
+<section class="filters glass">
+  <div class="filter-row">
+    <span class="filter-label">部位</span>
+    <div class="chips" id="partChips"></div>
+  </div>
+  <div class="filter-row">
+    <span class="filter-label">器械</span>
+    <select class="filter-select" id="equipSel">
+      <option value="">全部器械</option>
+    </select>
+    <span class="filter-label">肌群</span>
+    <select class="filter-select" id="muscleSel">
+      <option value="">全部肌群</option>
+    </select>
+    <button class="btn-reset" id="resetBtn">重置</button>
+  </div>
+</section>
+
+<!-- 结果 -->
+<div class="result-bar">
+  <span>共 <b id="count">0</b> 个动作</span>
+  <span class="result-hint" id="emptyHint" hidden>没有匹配的动作,试试其他筛选</span>
+</div>
+
+<!-- 卡片画廊 -->
+<main class="grid" id="grid"></main>
+
+<footer class="foot">
+  数据: hasaneyldrm/exercises-dataset (MIT) · 动作图/动画 © Gym Visual,经 jsdelivr CDN 引用并署名
+</footer>
+
+<!-- 详情弹窗 -->
+<div class="modal" id="modal" hidden>
+  <div class="modal-scrim" id="modalScrim"></div>
+  <div class="modal-box glass">
+    <button class="modal-close" id="modalClose" title="关闭">×</button>
+    <div class="media">
+      <img id="mImg" alt="动作图示">
+      <img id="mGif" alt="动作动画" hidden>
+      <button class="gif-toggle" id="gifToggle">▶ 播放动画</button>
+    </div>
+    <h2 class="m-name" id="mName"></h2>
+    <div class="m-badges" id="mBadges"></div>
+    <div class="m-muscles" id="mMuscles"></div>
+    <h3 class="m-sec">分步教程</h3>
+    <ol class="m-steps" id="mSteps"></ol>
+    <button class="m-lang" id="mLangBtn">EN 英文</button>
+    <div class="m-attr" id="mAttr"></div>
+  </div>
+</div>
+
+<script src="assets/data/exercises.js"></script>
+<script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
