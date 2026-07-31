@@ -1,0 +1,42 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: 🌍
+      - generic [ref=e5]:
+        - heading "世界实时监控" [level=1] [ref=e6]
+        - paragraph [ref=e7]: 实时地震 · 自然事件 · 态势感知
+    - generic [ref=e8]:
+      - generic "数据源健康状态" [ref=e9]:
+        - generic "地震(🌊) 加载中" [ref=e10]
+        - generic "自然事件(🌍) 加载中" [ref=e11]
+      - generic [ref=e12]: —
+      - generic "自动刷新开关" [ref=e13] [cursor=pointer]:
+        - generic [ref=e14]: 自动
+        - switch "自动" [checked] [ref=e15]
+      - button "刷新数据" [ref=e17] [cursor=pointer]: ⟳
+  - main [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - button "全部" [ref=e21] [cursor=pointer]
+        - button "地震" [ref=e22] [cursor=pointer]
+        - button "野火" [ref=e23] [cursor=pointer]
+        - button "洪水" [ref=e24] [cursor=pointer]
+        - button "风暴" [ref=e25] [cursor=pointer]
+        - button "火山" [ref=e26] [cursor=pointer]
+        - button "其他" [ref=e27] [cursor=pointer]
+      - generic [ref=e28]:
+        - generic [ref=e29]: 最新事件
+        - generic [ref=e30]: "0"
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - img [ref=e34]
+        - generic [ref=e36]: 加载世界地图…
+      - generic [ref=e37]:
+        - generic [ref=e38]: 地震
+        - generic [ref=e40]: 野火
+        - generic [ref=e42]: 洪水
+        - generic [ref=e44]: 风暴
+        - generic [ref=e46]: 火山
+        - generic [ref=e48]: 其他
+    - generic [ref=e53]: 点击地图或列表中的事件查看详情
+  - contentinfo [ref=e55]: 数据来源:USGS 地震 · NASA EONET 自然事件 · 地图数据 world-atlas。仅供信息展示,不代表任何官方立场。

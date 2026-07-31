@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>世界实时监控 - World Monitor</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- 背景装饰光斑 -->
+<div class="bg-decoration bg-decoration-1"></div>
+<div class="bg-decoration bg-decoration-2"></div>
+<div class="bg-decoration bg-decoration-3"></div>
+
+<!-- 顶栏 -->
+<header class="topbar glass">
+  <div class="brand">
+    <span class="brand-icon">🌍</span>
+    <div class="brand-text">
+      <h1>世界实时监控</h1>
+      <p class="subtitle">实时地震 · 自然事件 · 态势感知</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="source-status" id="sourceStatus" title="数据源健康状态"></div>
+    <div class="updated" id="lastUpdated">—</div>
+    <label class="autorefresh" title="自动刷新开关">
+      <span>自动</span>
+      <button class="switch" id="autoSwitch" role="switch" aria-checked="true">
+        <span class="switch-knob"></span>
+      </button>
+    </label>
+    <button class="btn-refresh" id="refreshBtn" title="手动刷新" aria-label="刷新数据">⟳</button>
+  </div>
+</header>
+
+<!-- 主面板 -->
+<main class="dashboard">
+  <!-- 左列:筛选 + 事件列表 -->
+  <section class="col-left glass">
+    <div class="tabs" id="tabs"></div>
+    <div class="list-head">
+      <span>最新事件</span>
+      <span class="list-count" id="listCount">0</span>
+    </div>
+    <div class="event-list" id="eventList"></div>
+    <div class="list-empty" id="listEmpty" hidden>暂无符合条件的事件</div>
+  </section>
+
+  <!-- 中列:世界地图 -->
+  <section class="col-map glass">
+    <div class="map-wrap">
+      <svg id="mapSvg" viewBox="0 0 960 480" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="map-loading" id="mapLoading">加载世界地图…</div>
+      <div class="map-tooltip" id="mapTooltip" hidden></div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <!-- 右列:统计 + 详情 -->
+  <section class="col-right">
+    <div class="stats glass" id="stats"></div>
+    <div class="detail glass" id="detail">
+      <div class="detail-empty">点击地图或列表中的事件查看详情</div>
+    </div>
+  </section>
+</main>
+
+<!-- 底部滚动条 -->
+<div class="ticker glass" id="ticker"></div>
+
+<footer class="foot">
+  数据来源:USGS 地震 · NASA EONET 自然事件 · 地图数据 world-atlas。仅供信息展示,不代表任何官方立场。
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
