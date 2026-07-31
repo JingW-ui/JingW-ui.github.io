@@ -145,9 +145,9 @@ function cardEl(ex, idx = 0) {
   div.querySelector('.card-img').appendChild(img);
   // 入树后再设置 src,保证 loading=lazy 生效
   requestAnimationFrame(() => { if (!img.src) img.src = MEDIA_BASE + ex.image; });
-  // 悬停或点击 → 右下角异步加载动图预览
+  // 悬停 → 右下角小预览;点击 → 居中放大显示
   div.addEventListener('mouseenter', () => previewExercise(ex));
-  div.addEventListener('click', () => previewExercise(ex));
+  div.addEventListener('click', () => openLightbox(ex));
   // 入场动画
   requestAnimationFrame(() => setTimeout(() => div.classList.add('show'), Math.min(idx, 40) * 18));
   return div;
@@ -165,12 +165,13 @@ function onCardImgError(e) {
   }
 }
 
-/* ---------------- 右下角动图预览卡 ----------------
-   悬停动作卡片时,异步加载该动作的 GIF 在右下角展示。
-   已加载过的动作缓存,避免重复请求;快速切换时丢弃过期结果。 */
+/* ---------------- GIF 共享加载系统 ----------------
+   右下角预览卡与居中灯箱复用同一份加载状态:请求去重、结果广播。
+   gifState: id -> { status:'loading'|'ok'|'fail', url, waiters:[cb] } */
 
-const previewCache = new Map(); // id -> 'loading' | 'ok' | 'fail'
+const gifState = new Map();
 let previewReqId = null;
+let lightboxReqId = null;
 
 function loadWithFallback(imgEl, path, onOk, onFail) {
   const tryHost = i => {
@@ -186,36 +187,69 @@ function loadWithFallback(imgEl, path, onOk, onFail) {
   tryHost(0);
 }
 
+/* 确保 ex 的 GIF 已解析:ok→cb(url,'ok') / fail→cb(null,'fail') / loading→挂起等待 */
+function ensureGif(ex, cb) {
+  const st = gifState.get(ex.id);
+  if (st && st.status === 'ok') { cb(st.url, 'ok'); return; }
+  if (st && st.status === 'fail') { cb(null, 'fail'); return; }
+  if (st && st.status === 'loading') { st.waiters.push(cb); return; }
+  const entry = { status: 'loading', url: null, waiters: [cb] };
+  gifState.set(ex.id, entry);
+  const img = new Image();
+  loadWithFallback(img, ex.gif,
+    () => { entry.status = 'ok'; entry.url = img.src; entry.waiters.forEach(w => w(entry.url, 'ok')); entry.waiters = []; },
+    () => { entry.status = 'fail'; entry.waiters.forEach(w => w(null, 'fail')); entry.waiters = []; }
+  );
+}
+
+/* 把 ex 的 GIF 挂到指定 img + 加载层;isCurrent 用于丢弃过期回调 */
+function bindGif(ex, gifEl, loadingEl, isCurrent) {
+  const showLoading = () => { gifEl.hidden = true; loadingEl.hidden = false; loadingEl.textContent = '加载动图…'; };
+  const showOk = url => { gifEl.src = url; gifEl.hidden = false; loadingEl.hidden = true; };
+  const showFail = () => { gifEl.hidden = true; loadingEl.hidden = false; loadingEl.textContent = '动图加载失败'; };
+  ensureGif(ex, (url, status) => {
+    if (isCurrent && !isCurrent()) return;
+    if (status === 'ok' && url) showOk(url);
+    else if (status === 'fail') showFail();
+  });
+  // 首次/进行中:立即显示加载态
+  const st = gifState.get(ex.id);
+  if (!st || st.status === 'loading') showLoading();
+}
+
+/* ---------------- 右下角预览卡(悬停) ---------------- */
+
 function previewExercise(ex) {
   previewReqId = ex.id;
-  const card = $('previewCard');
   $('previewName').textContent = ex.name;
-  card.hidden = false;
-
-  const gif = $('previewGif'), loading = $('previewLoading');
-  const st = previewCache.get(ex.id);
-
-  if (st === 'ok') {
-    gif.hidden = false;
-    loading.hidden = true;
-    return;
-  }
-  if (st === 'loading') return; // 请求进行中,等待完成
-
-  previewCache.set(ex.id, 'loading');
-  gif.hidden = true;
-  loading.hidden = false;
-  loading.textContent = '加载动图…';
-  loadWithFallback(gif, ex.gif,
-    () => { previewCache.set(ex.id, 'ok'); if (previewReqId !== ex.id) return; loading.hidden = true; gif.hidden = false; },
-    () => { previewCache.set(ex.id, 'fail'); if (previewReqId !== ex.id) return; loading.hidden = false; loading.textContent = '动图加载失败'; gif.hidden = true; }
-  );
+  $('previewCard').hidden = false;
+  bindGif(ex, $('previewGif'), $('previewLoading'), () => previewReqId === ex.id);
 }
 
 function closePreview() {
   previewReqId = null;
   $('previewCard').hidden = true;
   $('previewGif').removeAttribute('src');
+}
+
+/* ---------------- 居中放大灯箱(点击) ---------------- */
+
+function openLightbox(ex) {
+  lightboxReqId = ex.id;
+  closePreview(); // 收起右下角小预览
+  $('lightboxName').textContent = ex.name;
+  $('lightbox').hidden = false;
+  document.body.style.overflow = 'hidden';
+  bindGif(ex, $('lightboxGif'), $('lightboxLoading'), () => lightboxReqId === ex.id);
+}
+
+function closeLightbox() {
+  lightboxReqId = null;
+  $('lightbox').hidden = true;
+  document.body.style.overflow = '';
+  const g = $('lightboxGif');
+  g.onload = null; g.onerror = null;
+  g.removeAttribute('src');
 }
 
 /* ---------------- 初始化 ---------------- */
@@ -242,6 +276,15 @@ function bindUI() {
 
   // 关闭预览
   $('previewClose').addEventListener('click', closePreview);
+
+  // 关闭灯箱:× / 遮罩 / Esc
+  $('lightboxClose').addEventListener('click', closeLightbox);
+  $('lightboxScrim').addEventListener('click', closeLightbox);
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if (!$('lightbox').hidden) closeLightbox();
+    else if (!$('previewCard').hidden) closePreview();
+  });
 }
 
 function init() {

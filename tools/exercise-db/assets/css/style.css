@@ -327,6 +327,78 @@ body {
   text-overflow: ellipsis;
 }
 
+/* ============ 居中放大灯箱(点击卡片) ============ */
+.lightbox {
+  position: fixed; inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.lightbox[hidden] { display: none; }
+.lightbox-scrim {
+  position: absolute; inset: 0;
+  background: rgba(20, 40, 50, 0.5);
+  backdrop-filter: blur(6px);
+  animation: lb-fade-in 0.25s ease both;
+}
+@keyframes lb-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.lightbox-box {
+  position: relative;
+  z-index: 1;
+  max-width: min(82vw, 600px);
+  width: 100%;
+  padding: 18px 18px 16px;
+  animation: lb-pop-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes lb-pop-in {
+  from { opacity: 0; transform: scale(0.95) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.lightbox-close {
+  position: absolute; top: 8px; right: 10px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.85);
+  color: var(--text-soft);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+  transition: var(--transition);
+}
+.lightbox-close:hover { color: #dc2626; transform: rotate(90deg); }
+.lightbox-media {
+  position: relative;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: #f2f6f8;
+  aspect-ratio: 1;
+}
+.lightbox-media img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.lightbox-loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  background: #f2f6f8;
+  animation: blink 1.4s ease-in-out infinite;
+}
+.lightbox-loading[hidden] { display: none; }
+.lightbox-name {
+  margin-top: 12px;
+  padding-right: 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* ============ 页脚 ============ */
 .foot {
   max-width: 1280px;

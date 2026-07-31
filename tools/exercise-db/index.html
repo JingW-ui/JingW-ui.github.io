@@ -67,6 +67,19 @@
   <div class="preview-name" id="previewName"></div>
 </div>
 
+<!-- 居中放大灯箱:点击动作卡片时异步加载并放大播放 GIF -->
+<div class="lightbox" id="lightbox" hidden>
+  <div class="lightbox-scrim" id="lightboxScrim"></div>
+  <div class="lightbox-box glass">
+    <button class="lightbox-close" id="lightboxClose" title="关闭" aria-label="关闭">×</button>
+    <div class="lightbox-media">
+      <div class="lightbox-loading" id="lightboxLoading">加载动图…</div>
+      <img id="lightboxGif" alt="动作动画" decoding="async">
+    </div>
+    <div class="lightbox-name" id="lightboxName"></div>
+  </div>
+</div>
+
 <footer class="foot">
   数据: hasaneyldrm/exercises-dataset (MIT) · 动作图/动画 © Gym Visual,经 jsdelivr CDN 引用并署名
 </footer>
