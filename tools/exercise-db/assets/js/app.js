@@ -4,11 +4,13 @@
    卡片为静态展示,不可点击
    ============================================================ */
 
-import { MEDIA_BASE, MEDIA_HOSTS, BODY_PARTS, EQUIPMENT, MUSCLES, t } from './config.js';
+import { MEDIA_BASE, MEDIA_HOSTS, BODY_PARTS, EQUIPMENT, MUSCLES } from './config.js';
 
 const $ = id => document.getElementById(id);
 
 const PAGE_SIZE = 150;
+
+const LANG_KEY = 'exercise_db_lang';
 
 const state = {
   search: '',
@@ -17,14 +19,22 @@ const state = {
   muscle: null,
   page: 1,
   all: window.EXERCISES || [],
+  lang: 'zh', // 默认中文;localStorage 记忆
 };
+try { state.lang = localStorage.getItem(LANG_KEY) === 'en' ? 'en' : 'zh'; } catch (e) { /* ignore */ }
+
+/* 名称与标签的多语言取值:中文优先用 name_zh / 词表,英文用原文 */
+const nm = ex => state.lang === 'zh' ? (ex.name_zh || ex.name) : ex.name;
+const lb = (map, key) => state.lang === 'zh' ? (map[key] || key) : key;
 
 /* ---------------- 筛选 ---------------- */
 
 function filtered() {
   const q = state.search.trim().toLowerCase();
   return state.all.filter(ex => {
-    if (q && !ex.name.toLowerCase().includes(q) && !String(ex.id).includes(q)) return false;
+    if (q && !ex.name.toLowerCase().includes(q) &&
+        !(ex.name_zh || '').toLowerCase().includes(q) &&
+        !String(ex.id).includes(q)) return false;
     if (state.part && ex.body_part !== state.part) return false;
     if (state.equip && ex.equipment !== state.equip) return false;
     if (state.muscle) {
@@ -46,10 +56,10 @@ function renderPartChips() {
   all.textContent = '全部';
   all.dataset.part = '';
   box.appendChild(all);
-  for (const [key, label] of Object.entries(BODY_PARTS)) {
+  for (const [key] of Object.entries(BODY_PARTS)) {
     const chip = document.createElement('button');
     chip.className = 'chip' + (state.part === key ? ' active' : '');
-    chip.textContent = label;
+    chip.textContent = lb(BODY_PARTS, key);
     chip.dataset.part = key;
     box.appendChild(chip);
   }
@@ -64,14 +74,15 @@ function renderPartChips() {
 }
 
 function renderSelects() {
+  const zh = state.lang === 'zh';
   const eq = $('equipSel');
-  eq.innerHTML = '<option value="">全部器械</option>' +
-    Object.keys(EQUIPMENT).sort().map(k => `<option value="${k}">${t(EQUIPMENT, k)}</option>`).join('');
+  eq.innerHTML = '<option value="">' + (zh ? '全部器械' : 'All equipment') + '</option>' +
+    Object.keys(EQUIPMENT).sort().map(k => `<option value="${k}">${lb(EQUIPMENT, k)}</option>`).join('');
   eq.value = state.equip || '';
 
   const mu = $('muscleSel');
-  mu.innerHTML = '<option value="">全部肌群</option>' +
-    Object.keys(MUSCLES).sort().map(k => `<option value="${k}">${t(MUSCLES, k)} (${k})</option>`).join('');
+  mu.innerHTML = '<option value="">' + (zh ? '全部肌群' : 'All muscles') + '</option>' +
+    Object.keys(MUSCLES).sort().map(k => `<option value="${k}">${zh ? `${lb(MUSCLES, k)} (${k})` : k}</option>`).join('');
   mu.value = state.muscle || '';
 
   eq.addEventListener('change', () => { state.equip = eq.value || null; resetPage(); render(); });
@@ -129,11 +140,11 @@ function cardEl(ex, idx = 0) {
   div.innerHTML = `
     <div class="card-img"></div>
     <div class="card-body">
-      <h3 class="card-name" title="${ex.name}">${ex.name}</h3>
+      <h3 class="card-name" title="${nm(ex)}">${nm(ex)}</h3>
       <div class="card-tags">
-        <span class="tag part">${t(BODY_PARTS, ex.body_part)}</span>
-        <span class="tag equip">${t(EQUIPMENT, ex.equipment)}</span>
-        <span class="tag muscle">${t(MUSCLES, ex.target)}</span>
+        <span class="tag part">${lb(BODY_PARTS, ex.body_part)}</span>
+        <span class="tag equip">${lb(EQUIPMENT, ex.equipment)}</span>
+        <span class="tag muscle">${lb(MUSCLES, ex.target)}</span>
       </div>
     </div>`;
   // 缩略图:懒加载 + CDN fallback
@@ -254,19 +265,23 @@ function closeLightbox() {
 
 /* ---------------- 周训计划 ---------------- */
 
-const DAY_NAMES = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+const DAY_NAMES = {
+  zh: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+  en: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+};
 
 /* 训练目标 → 数据中的身体部位 */
 const TARGETS = {
-  chest:     { label: '胸部', parts: ['chest'] },
-  back:      { label: '背部', parts: ['back'] },
-  shoulders: { label: '肩部', parts: ['shoulders'] },
-  arms:      { label: '手臂', parts: ['upper arms', 'lower arms'] },
-  legs:      { label: '腿部', parts: ['upper legs', 'lower legs'] },
-  waist:     { label: '腰腹', parts: ['waist'] },
-  cardio:    { label: '有氧', parts: ['cardio'] },
-  rest:      { label: '休息', parts: [] },
+  chest:     { label: '胸部', en: 'Chest', parts: ['chest'] },
+  back:      { label: '背部', en: 'Back', parts: ['back'] },
+  shoulders: { label: '肩部', en: 'Shoulders', parts: ['shoulders'] },
+  arms:      { label: '手臂', en: 'Arms', parts: ['upper arms', 'lower arms'] },
+  legs:      { label: '腿部', en: 'Legs', parts: ['upper legs', 'lower legs'] },
+  waist:     { label: '腰腹', en: 'Core', parts: ['waist'] },
+  cardio:    { label: '有氧', en: 'Cardio', parts: ['cardio'] },
+  rest:      { label: '休息', en: 'Rest', parts: [] },
 };
+const targetLabel = key => state.lang === 'zh' ? (TARGETS[key] ? TARGETS[key].label : key) : (TARGETS[key] ? TARGETS[key].en : key);
 
 /* 周计划模板 */
 const TEMPLATES = {
@@ -280,9 +295,10 @@ const PLAN_KEY = 'exercise_db_plan';
 
 const plan = { template: 'ppl', count: 5, days: [] };
 
-/* 组数 × 每组次数建议(按身体部位 + 器械的规则区间) */
+/* 组数 × 每组次数建议(按身体部位 + 器械的规则区间,支持中英) */
 function suggestSets(ex) {
-  if (ex.body_part === 'cardio') return '3 组 × 30-60 秒';
+  const zh = state.lang === 'zh';
+  if (ex.body_part === 'cardio') return zh ? '3 组 × 30-60 秒' : '3 sets × 30-60 sec';
   const base = {
     chest: [4, '8-12'], back: [4, '8-12'], shoulders: [3, '10-15'],
     'upper arms': [3, '10-15'], 'lower arms': [3, '12-15'],
@@ -297,7 +313,7 @@ function suggestSets(ex) {
   if (ex.equipment === 'body weight') reps = ex.body_part === 'waist' ? '15-25' : '12-20';
   // 弹力带/平衡类 → 高次数
   if (['band', 'resistance band', 'stability ball', 'bosu ball'].includes(ex.equipment)) reps = '12-20';
-  return `${sets} 组 × ${reps} 次`;
+  return zh ? `${sets} 组 × ${reps} 次` : `${sets} sets × ${reps} reps`;
 }
 
 function poolForTarget(target) {
@@ -377,10 +393,10 @@ function renderPlan() {
     head.className = 'plan-day-head';
     const name = document.createElement('span');
     name.className = 'plan-day-name';
-    name.textContent = DAY_NAMES[i];
+    name.textContent = DAY_NAMES[state.lang][i];
     const sel = document.createElement('select');
     sel.className = 'filter-select plan-day-target';
-    sel.innerHTML = Object.entries(TARGETS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('');
+    sel.innerHTML = Object.entries(TARGETS).map(([k, v]) => `<option value="${k}">${targetLabel(k)}</option>`).join('');
     sel.value = day.target;
     sel.addEventListener('change', () => {
       day.target = sel.value;
@@ -405,14 +421,14 @@ function renderPlan() {
     if (rest) {
       const li = document.createElement('li');
       li.className = 'plan-day-empty';
-      li.textContent = '🛌 休息日';
+      li.textContent = state.lang === 'zh' ? '🛌 休息日' : '🛌 Rest Day';
       list.appendChild(li);
     } else if (day.exIds.length) {
       day.exIds.forEach((id, k) => {
         const ex = state.all.find(x => x.id === id);
         if (!ex) return;
         const li = document.createElement('li');
-        li.innerHTML = `<span class="idx">${k + 1}</span><span class="en">${ex.name}</span><span class="sets">${suggestSets(ex)}</span>`;
+        li.innerHTML = `<span class="idx">${k + 1}</span><span class="en">${nm(ex)}</span><span class="sets">${suggestSets(ex)}</span>`;
         li.addEventListener('click', () => openLightbox(ex));
         list.appendChild(li);
       });
@@ -461,6 +477,16 @@ function bindPlanUI() {
   });
 }
 
+/* 语言切换:重绘所有按语言变化的界面 */
+function applyLang() {
+  const btn = $('langToggle');
+  if (btn) btn.textContent = state.lang === 'zh' ? '中文' : 'EN';
+  renderPartChips();
+  renderSelects();
+  render();
+  renderPlan();
+}
+
 /* 视图切换:动作库 / 周训计划 */
 function bindViewTabs() {
   $('viewTabs').addEventListener('click', e => {
@@ -495,6 +521,13 @@ function bindUI() {
     render();
   });
 
+  // 中英文切换
+  $('langToggle').addEventListener('click', () => {
+    state.lang = state.lang === 'zh' ? 'en' : 'zh';
+    try { localStorage.setItem(LANG_KEY, state.lang); } catch (e) { /* ignore */ }
+    applyLang();
+  });
+
   // 关闭预览
   $('previewClose').addEventListener('click', closePreview);
 
@@ -524,6 +557,9 @@ function init() {
   bindPlanUI();
   bindViewTabs();
   renderPlan();
+
+  // 语言按钮初始态
+  applyLang();
 }
 
 init();

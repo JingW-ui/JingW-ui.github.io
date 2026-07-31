@@ -430,6 +430,20 @@ body {
 }
 
 /* ============ 周训计划 ============ */
+.lang-toggle {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.55);
+  color: var(--text-soft);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+.lang-toggle:hover { background: var(--card-hover); color: var(--accent); }
+
 .btn-random {
   padding: 8px 16px;
   border-radius: 999px;
