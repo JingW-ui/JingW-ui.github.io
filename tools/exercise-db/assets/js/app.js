@@ -280,6 +280,26 @@ const PLAN_KEY = 'exercise_db_plan';
 
 const plan = { template: 'ppl', count: 5, days: [] };
 
+/* 组数 × 每组次数建议(按身体部位 + 器械的规则区间) */
+function suggestSets(ex) {
+  if (ex.body_part === 'cardio') return '3 组 × 30-60 秒';
+  const base = {
+    chest: [4, '8-12'], back: [4, '8-12'], shoulders: [3, '10-15'],
+    'upper arms': [3, '10-15'], 'lower arms': [3, '12-15'],
+    'upper legs': [4, '8-12'], 'lower legs': [4, '12-20'],
+    waist: [3, '15-20'], neck: [3, '12-15'],
+  };
+  const [sets, def] = base[ex.body_part] || [3, '10-15'];
+  let reps = def;
+  // 大重量复合(杠铃类)→ 偏低次数练力量/肌肥大
+  if (['barbell', 'olympic barbell', 'trap bar', 'smith machine'].includes(ex.equipment)) reps = '6-10';
+  // 徒手/自重 → 偏高次数
+  if (ex.equipment === 'body weight') reps = ex.body_part === 'waist' ? '15-25' : '12-20';
+  // 弹力带/平衡类 → 高次数
+  if (['band', 'resistance band', 'stability ball', 'bosu ball'].includes(ex.equipment)) reps = '12-20';
+  return `${sets} 组 × ${reps} 次`;
+}
+
 function poolForTarget(target) {
   const parts = TARGETS[target] ? TARGETS[target].parts : [];
   return state.all.filter(ex => parts.includes(ex.body_part));
@@ -392,7 +412,7 @@ function renderPlan() {
         const ex = state.all.find(x => x.id === id);
         if (!ex) return;
         const li = document.createElement('li');
-        li.innerHTML = `<span class="idx">${k + 1}</span><span class="en">${ex.name}</span>`;
+        li.innerHTML = `<span class="idx">${k + 1}</span><span class="en">${ex.name}</span><span class="sets">${suggestSets(ex)}</span>`;
         li.addEventListener('click', () => openLightbox(ex));
         list.appendChild(li);
       });

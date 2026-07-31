@@ -514,7 +514,17 @@ body {
   font-size: 0.66rem;
   display: inline-flex; align-items: center; justify-content: center;
 }
-.plan-day-list .en { color: var(--text-soft); }
+.plan-day-list .en { color: var(--text-soft); min-width: 0; }
+.plan-day-list .sets {
+  margin-left: auto;
+  flex: none;
+  font-size: 0.66rem;
+  color: var(--text-dim);
+  background: rgba(45,212,191,0.12);
+  border-radius: 6px;
+  padding: 1px 7px;
+  white-space: nowrap;
+}
 .plan-day-empty { color: var(--text-dim); font-size: 0.78rem; padding: 10px 8px; }
 .plan-day.rest .plan-day-name { color: var(--text-dim); }
 
