@@ -142,9 +142,9 @@
   function setStatus(kind, extra) {
     var map = {
       loading:  ['fa-spinner fa-spin', '加载中…', ''],
-      checking: ['fa-spinner fa-spin', '正在检测可用性…', ''],
-      fresh:    ['fa-circle-check', '今日已检测可用', ''],
-      same:     ['fa-circle-check', '今日已检测可用', ''],
+      checking: ['fa-spinner fa-spin', '正在检测…', ''],
+      fresh:    ['fa-circle', '今日已检测', ''],
+      same:     ['fa-circle', '今日已检测', ''],
       stale:    ['fa-triangle-exclamation', '离线快照 · ' + (extra || '—'), 'stale'],
       error:    ['fa-triangle-exclamation', '加载失败', 'stale']
     };
@@ -247,19 +247,31 @@
     return '<div class="card-scores">' + rows + '</div>';
   }
 
-  /* ---------- 渲染：风险胶囊 ---------- */
+  /* ---------- 渲染：风险（单行低饱和文本） ----------
+     规则：
+     - 版权风险在此类站点属常态，一律灰标，不制造恐慌；
+     - 未知状态不占位（折叠）；
+     - 红色仅用于真正的高危维度（安全/隐私/支付 high）。 */
   function renderRisks(risks) {
-    var html = '';
+    var segs = [];
     var keys = ['copyright', 'safety', 'privacy', 'payment'];
     for (var i = 0; i < keys.length; i++) {
       var k = keys[i];
       var lvl = risks[k] || 'unknown';
       if (!RISK_TEXT[lvl]) lvl = 'unknown';
-      html += '<span class="risk risk-' + lvl + '" title="' +
-        RISK_LABELS[k] + '风险：' + RISK_TEXT[lvl] + '">' +
-        RISK_LABELS[k] + ' ' + RISK_TEXT[lvl] + '</span>';
+      if (lvl === 'unknown') continue;
+      var label = RISK_LABELS[k] + ' ' + RISK_TEXT[lvl];
+      if (k === 'copyright') {
+        segs.push('<span class="risk-seg" title="版权风险：' + RISK_TEXT[lvl] + '">' + label + '</span>');
+      } else if (lvl === 'high') {
+        segs.push('<span class="risk-seg high" title="' + RISK_LABELS[k] + '风险：' + RISK_TEXT[lvl] + '">' + label + '</span>');
+      } else if (lvl === 'low') {
+        segs.push('<span class="risk-seg low" title="' + RISK_LABELS[k] + '风险：' + RISK_TEXT[lvl] + '">' + label + '</span>');
+      } else {
+        segs.push('<span class="risk-seg" title="' + RISK_LABELS[k] + '风险：' + RISK_TEXT[lvl] + '">' + label + '</span>');
+      }
     }
-    return '<div class="card-risks">' + html + '</div>';
+    return '<div class="risk-line">' + segs.join('') + '</div>';
   }
 
   /* ---------- 渲染：卡片 ---------- */
@@ -271,13 +283,8 @@
   function cardHTML(r, idx) {
     var openUrl = r.link_url || r.url;
     var avg = scoreAvg(r.scores);
+    // 评分环：一律灰色（数据中 65% 均分为 5.0，按分值着色会铺满青色，失去意义）
     var circleClass = '';
-    if (avg != null) {
-      if (avg >= 4.9) circleClass = ' is-top'; // 满分才用青色强调
-      else if (avg >= 4) circleClass = '';      // 4.x 灰色调，安静
-      else if (avg >= 3) circleClass = ' is-gold';
-      else circleClass = ' is-red';
-    }
 
     var statusBadge = '';
     if (r.verification.status === 'recommended') {
@@ -297,7 +304,7 @@
     var tags = (r.github && r.github.stars != null)
       ? ['★ ' + formatStars(r.github.stars)].concat(r.tags)
       : r.tags.slice();
-    var shown = tags.slice(0, 4);
+    var shown = tags.slice(0, 3);
     var tagHTML = shown.map(function (t) {
       return '<span class="tag">' + escapeHtml(t) + '</span>';
     }).join('');
