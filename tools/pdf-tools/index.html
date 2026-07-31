@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF 工具 - PDF Tools</title>
+<style>
+:root {
+  --bg-gradient-1:#e7f1f0; --bg-gradient-2:#dfe9ec; --bg-gradient-3:#e6edf2;
+  --card:rgba(255,255,255,.50); --card-hover:rgba(255,255,255,.72);
+  --border:rgba(255,255,255,.55); --text:#2c3e50; --text-soft:#5a6c7d; --text-dim:#8e9aaf;
+  --accent:#2dd4bf; --accent-2:#3b82f6;
+  --shadow-sm:0 2px 8px rgba(20,40,50,.05); --shadow-md:0 6px 24px rgba(20,40,50,.08);
+  --radius-sm:14px; --radius-md:20px;
+  --transition:all .28s cubic-bezier(.4,0,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Noto Sans SC',-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;
+  background:linear-gradient(135deg,var(--bg-gradient-1) 0%,var(--bg-gradient-2) 50%,var(--bg-gradient-3) 100%);
+  background-attachment:fixed; color:var(--text); line-height:1.6; min-height:100vh; padding:22px 18px 28px;
+  -webkit-font-smoothing:antialiased; position:relative; overflow-x:hidden;
+}
+.bg-decoration{position:fixed;border-radius:50%;filter:blur(90px);opacity:.45;pointer-events:none;z-index:0}
+.bg-decoration-1{width:560px;height:560px;background:radial-gradient(circle,rgba(94,234,212,.30) 0%,transparent 70%);top:-180px;left:-120px;animation:float 22s ease-in-out infinite}
+.bg-decoration-2{width:480px;height:480px;background:radial-gradient(circle,rgba(125,211,252,.28) 0%,transparent 70%);bottom:-140px;right:-120px;animation:float 26s ease-in-out infinite reverse}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-26px) translateX(18px)}}
+.glass{background:var(--card);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-md)}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+.topbar{max-width:1080px;margin:0 auto 18px;padding:14px 22px;display:flex;align-items:center;gap:14px;position:relative;z-index:2;animation:rise .5s cubic-bezier(.22,1,.36,1) .02s both}
+.brand-icon{width:46px;height:46px;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,#d9efef,#c4e3e8);border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.6);flex:none}
+.brand-text h1{font-size:1.25rem;line-height:1.2;background:linear-gradient(120deg,#2dd4bf 30%,#3b82f6 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:.78rem;color:var(--text-soft)}
+
+.grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;position:relative;z-index:1}
+.tool{display:flex;flex-direction:column;padding:20px 22px;animation:rise .5s cubic-bezier(.22,1,.36,1) both}
+.tool:nth-child(2){animation-delay:.06s}.tool:nth-child(3){animation-delay:.12s}
+.tool-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tool-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;background:rgba(45,212,191,.14);flex:none}
+.tool-title{font-size:1rem;font-weight:700}
+.tool-desc{font-size:.74rem;color:var(--text-dim);margin-top:2px}
+.tool-body{flex:1;display:flex;flex-direction:column;gap:10px}
+.file-box{position:relative;border:1.5px dashed var(--border);border-radius:var(--radius-sm);padding:22px 14px;text-align:center;cursor:pointer;transition:var(--transition);background:rgba(255,255,255,.4)}
+.file-box:hover{border-color:var(--accent);background:var(--card-hover)}
+.file-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-box .fb-ico{font-size:26px}
+.file-box .fb-text{font-size:.8rem;color:var(--text-soft);margin-top:4px}
+.file-list{font-size:.78rem;color:var(--text-soft);max-height:110px;overflow-y:auto;display:flex;flex-direction:column;gap:3px}
+.file-list .fl-item{display:flex;justify-content:space-between;gap:8px;background:rgba(255,255,255,.45);padding:4px 10px;border-radius:8px}
+.file-list .fl-rm{color:var(--text-dim);cursor:pointer;flex:none;padding:0 4px}
+.file-list .fl-rm:hover{color:#dc2626}
+.range-input{width:100%;padding:9px 14px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.6);color:var(--text);font-size:.85rem;outline:none}
+.range-input:focus{border-color:var(--accent)}
+.rotate-opts{display:flex;gap:8px}
+.rotate-opts .ro-btn{flex:1;padding:8px 6px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.5);color:var(--text-soft);font-size:.8rem;cursor:pointer;transition:var(--transition)}
+.rotate-opts .ro-btn.active{background:linear-gradient(120deg,#2dd4bf,#3b82f6);color:#fff;border-color:transparent}
+.btn{width:100%;padding:11px 16px;border-radius:12px;border:none;background:linear-gradient(120deg,#2dd4bf,#3b82f6);color:#fff;font-size:.9rem;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.status{font-size:.76rem;color:var(--text-soft);text-align:center;min-height:1.2em}
+.status.ok{color:#16a34a}
+.status.err{color:#dc2626}
+.foot{max-width:1080px;margin:20px auto 0;text-align:center;font-size:.7rem;color:var(--text-dim);position:relative;z-index:1}
+@media (max-width:640px){body{padding:14px 10px 20px}.topbar{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="bg-decoration bg-decoration-1"></div>
+<div class="bg-decoration bg-decoration-2"></div>
+
+<header class="topbar glass">
+  <span class="brand-icon">📄</span>
+  <div class="brand-text">
+    <h1>PDF 工具</h1>
+    <p class="subtitle">合并 · 提取 · 旋转 —— 全部在浏览器本地处理,文件不上传</p>
+  </div>
+</header>
+
+<main class="grid">
+  <!-- 合并 -->
+  <section class="tool glass">
+    <div class="tool-head">
+      <span class="tool-ico">🔗</span>
+      <div>
+        <div class="tool-title">合并 PDF</div>
+        <div class="tool-desc">把多个 PDF 按顺序合成一个</div>
+      </div>
+    </div>
+    <div class="tool-body">
+      <div class="file-box" id="mergeBox">
+        <input type="file" id="mergeInput" accept=".pdf,application/pdf" multiple>
+        <div class="fb-ico">📂</div>
+        <div class="fb-text">点击选择多个 PDF(按住 Ctrl 多选)</div>
+      </div>
+      <div class="file-list" id="mergeList"></div>
+      <button class="btn" id="mergeBtn" disabled>🔗 合并并下载</button>
+      <div class="status" id="mergeStatus"></div>
+    </div>
+  </section>
+
+  <!-- 提取 -->
+  <section class="tool glass">
+    <div class="tool-head">
+      <span class="tool-ico">✂️</span>
+      <div>
+        <div class="tool-title">提取页面</div>
+        <div class="tool-desc">按页范围提取生成新 PDF</div>
+      </div>
+    </div>
+    <div class="tool-body">
+      <div class="file-box" id="extractBox">
+        <input type="file" id="extractInput" accept=".pdf,application/pdf">
+        <div class="fb-ico">📂</div>
+        <div class="fb-text">选择一个 PDF</div>
+      </div>
+      <input class="range-input" id="extractRange" placeholder="页范围,如 1-3,5,8(留空=全部)">
+      <button class="btn" id="extractBtn" disabled>✂️ 提取并下载</button>
+      <div class="status" id="extractStatus"></div>
+    </div>
+  </section>
+
+  <!-- 旋转 -->
+  <section class="tool glass">
+    <div class="tool-head">
+      <span class="tool-ico">🔄</span>
+      <div>
+        <div class="tool-title">旋转页面</div>
+        <div class="tool-desc">整本或按范围旋转 PDF 页面</div>
+      </div>
+    </div>
+    <div class="tool-body">
+      <div class="file-box" id="rotateBox">
+        <input type="file" id="rotateInput" accept=".pdf,application/pdf">
+        <div class="fb-ico">📂</div>
+        <div class="fb-text">选择一个 PDF</div>
+      </div>
+      <input class="range-input" id="rotateRange" placeholder="页范围(留空=全部)">
+      <div class="rotate-opts">
+        <button class="ro-btn" data-deg="90">90°</button>
+        <button class="ro-btn active" data-deg="180">180°</button>
+        <button class="ro-btn" data-deg="270">270°</button>
+      </div>
+      <button class="btn" id="rotateBtn" disabled>🔄 旋转并下载</button>
+      <div class="status" id="rotateStatus"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">基于 pdf-lib (MIT) · 文件仅在本机浏览器处理,不会上传</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script>
+(function () {
+  const { PDFDocument, degrees } = PDFLib;
+  const $ = id => document.getElementById(id);
+  const st = id => $(id);
+
+  function downloadBlob(bytes, filename) {
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 3000);
+  }
+
+  function parseRanges(str, pageCount) {
+    if (!str.trim()) return Array.from({ length: pageCount }, (_, i) => i);
+    const idx = new Set();
+    for (const part of str.split(',')) {
+      const m = part.trim().match(/^(\d+)\s*-\s*(\d+)$/);
+      if (m) {
+        let a = +m[1], b = +m[2];
+        if (a > b) [a, b] = [b, a];
+        for (let p = a; p <= b; p++) if (p >= 1 && p <= pageCount) idx.add(p - 1);
+      } else if (/^\d+$/.test(part.trim())) {
+        const p = +part.trim();
+        if (p >= 1 && p <= pageCount) idx.add(p - 1);
+      }
+    }
+    return [...idx].sort((a, b) => a - b);
+  }
+
+  async function loadDoc(file) {
+    const bytes = await file.arrayBuffer();
+    return PDFDocument.load(bytes, { ignoreEncryption: true });
+  }
+
+  /* --- 合并 --- */
+  let mergeFiles = [];
+  $('mergeInput').addEventListener('change', e => {
+    mergeFiles = [...e.target.files];
+    $('mergeList').innerHTML = mergeFiles.map((f, i) =>
+      `<div class="fl-item"><span>${f.name}</span><span class="fl-rm" data-i="${i}">✕</span></div>`).join('');
+    $('mergeBtn').disabled = mergeFiles.length < 2;
+    st('mergeStatus').textContent = mergeFiles.length ? `已选 ${mergeFiles.length} 个文件` : '';
+  });
+  $('mergeList').addEventListener('click', e => {
+    const rm = e.target.closest('.fl-rm'); if (!rm) return;
+    mergeFiles.splice(+rm.dataset.i, 1);
+    $('mergeInput').value = '';
+    $('mergeInput').dispatchEvent(new Event('change'));
+  });
+  $('mergeBtn').addEventListener('click', async () => {
+    const s = st('mergeStatus'); s.className = 'status'; s.textContent = '处理中…';
+    try {
+      const merged = await PDFDocument.create();
+      for (const f of mergeFiles) {
+        const doc = await loadDoc(f);
+        const pages = await merged.copyPages(doc, doc.getPageIndices());
+        pages.forEach(p => merged.addPage(p));
+      }
+      downloadBlob(await merged.save(), 'merged.pdf');
+      s.className = 'status ok'; s.textContent = '✅ 合并完成,已开始下载';
+    } catch (err) { s.className = 'status err'; s.textContent = '❌ ' + (err.message || '处理失败'); }
+  });
+
+  /* --- 提取 --- */
+  $('extractInput').addEventListener('change', e => {
+    $('extractBtn').disabled = !e.target.files.length;
+    st('extractStatus').textContent = e.target.files.length ? `已选:${e.target.files[0].name}` : '';
+  });
+  $('extractBtn').addEventListener('click', async () => {
+    const s = st('extractStatus'); s.className = 'status'; s.textContent = '处理中…';
+    const file = $('extractInput').files[0];
+    try {
+      const src = await loadDoc(file);
+      const indices = parseRanges($('extractRange').value, src.getPageCount());
+      if (!indices.length) { s.className = 'status err'; s.textContent = '❌ 页码范围无效或超出'; return; }
+      const out = await PDFDocument.create();
+      const pages = await out.copyPages(src, indices);
+      pages.forEach(p => out.addPage(p));
+      downloadBlob(await out.save(), 'extracted.pdf');
+      s.className = 'status ok'; s.textContent = `✅ 已提取 ${indices.length} 页`;
+    } catch (err) { s.className = 'status err'; s.textContent = '❌ ' + (err.message || '处理失败'); }
+  });
+
+  /* --- 旋转 --- */
+  let rotateDeg = 180;
+  document.querySelectorAll('.ro-btn').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.ro-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    rotateDeg = +b.dataset.deg;
+  }));
+  $('rotateInput').addEventListener('change', e => {
+    $('rotateBtn').disabled = !e.target.files.length;
+    st('rotateStatus').textContent = e.target.files.length ? `已选:${e.target.files[0].name}` : '';
+  });
+  $('rotateBtn').addEventListener('click', async () => {
+    const s = st('rotateStatus'); s.className = 'status'; s.textContent = '处理中…';
+    const file = $('rotateInput').files[0];
+    try {
+      const doc = await loadDoc(file);
+      const indices = parseRanges($('rotateRange').value, doc.getPageCount());
+      if (!indices.length) { s.className = 'status err'; s.textContent = '❌ 页码范围无效或超出'; return; }
+      const pages = doc.getPages();
+      indices.forEach(i => pages[i].setRotation(degrees(rotateDeg)));
+      downloadBlob(await doc.save(), 'rotated.pdf');
+      s.className = 'status ok'; s.textContent = `✅ 已旋转 ${indices.length} 页(${rotateDeg}°)`;
+    } catch (err) { s.className = 'status err'; s.textContent = '❌ ' + (err.message || '处理失败'); }
+  });
+})();
+</script>
+</body>
+</html>
