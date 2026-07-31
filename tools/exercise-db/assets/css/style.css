@@ -514,15 +514,20 @@ body {
   font-size: 0.66rem;
   display: inline-flex; align-items: center; justify-content: center;
 }
-.plan-day-list .en { color: var(--text-soft); min-width: 0; }
+.plan-day-list .en {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-soft);
+}
 .plan-day-list .sets {
-  margin-left: auto;
   flex: none;
-  font-size: 0.66rem;
+  margin-left: 6px;
+  font-size: 0.58rem;
+  line-height: 1;
   color: var(--text-dim);
-  background: rgba(45,212,191,0.12);
-  border-radius: 6px;
-  padding: 1px 7px;
   white-space: nowrap;
 }
 .plan-day-empty { color: var(--text-dim); font-size: 0.78rem; padding: 10px 8px; }
