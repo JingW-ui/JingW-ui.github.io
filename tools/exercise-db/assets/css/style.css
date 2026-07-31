@@ -241,12 +241,13 @@ body {
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+  cursor: pointer;
   transition: var(--transition);
   opacity: 0;
   transform: translateY(16px);
 }
 .card.show { opacity: 1; transform: translateY(0); }
-.card:hover { border-color: var(--border-hover); }
+.card:hover { border-color: var(--border-hover); box-shadow: var(--shadow-md); }
 .card-img { aspect-ratio: 1; background: #f2f6f8; overflow: hidden; }
 .card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .card-body { padding: 10px 12px 12px; }
@@ -268,6 +269,63 @@ body {
 .tag.part { background: rgba(45,212,191,0.15); color: #0d9488; }
 .tag.equip { background: rgba(59,130,246,0.14); color: #2563eb; }
 .tag.muscle { background: rgba(139,92,246,0.13); color: #7c3aed; }
+
+/* ============ 右下角动图预览卡 ============ */
+.preview-card {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 50;
+  width: 200px;
+  padding: 12px;
+  animation: preview-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.preview-card[hidden] { display: none; }
+@keyframes preview-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.preview-close {
+  position: absolute; top: 6px; right: 8px;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.85);
+  color: var(--text-soft);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: var(--transition);
+  z-index: 2;
+}
+.preview-close:hover { color: #dc2626; }
+.preview-media {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f2f6f8;
+}
+.preview-media img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.preview-loading {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  background: #f2f6f8;
+  animation: blink 1.4s ease-in-out infinite;
+}
+.preview-loading[hidden] { display: none; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.45; } }
+.preview-name {
+  margin-top: 8px;
+  padding-right: 18px;
+  font-size: 0.75rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 /* ============ 页脚 ============ */
 .foot {

@@ -57,6 +57,16 @@
 <!-- 卡片画廊 -->
 <main class="grid" id="grid"></main>
 
+<!-- 右下角动图预览卡:悬停动作卡片时异步加载并播放 GIF -->
+<div class="preview-card glass" id="previewCard" hidden>
+  <button class="preview-close" id="previewClose" title="关闭预览" aria-label="关闭预览">×</button>
+  <div class="preview-media">
+    <div class="preview-loading" id="previewLoading">加载动图…</div>
+    <img id="previewGif" alt="动作动画" decoding="async">
+  </div>
+  <div class="preview-name" id="previewName"></div>
+</div>
+
 <footer class="foot">
   数据: hasaneyldrm/exercises-dataset (MIT) · 动作图/动画 © Gym Visual,经 jsdelivr CDN 引用并署名
 </footer>

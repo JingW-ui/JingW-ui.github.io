@@ -145,6 +145,9 @@ function cardEl(ex, idx = 0) {
   div.querySelector('.card-img').appendChild(img);
   // 入树后再设置 src,保证 loading=lazy 生效
   requestAnimationFrame(() => { if (!img.src) img.src = MEDIA_BASE + ex.image; });
+  // 悬停或点击 → 右下角异步加载动图预览
+  div.addEventListener('mouseenter', () => previewExercise(ex));
+  div.addEventListener('click', () => previewExercise(ex));
   // 入场动画
   requestAnimationFrame(() => setTimeout(() => div.classList.add('show'), Math.min(idx, 40) * 18));
   return div;
@@ -160,6 +163,59 @@ function onCardImgError(e) {
     // 全部节点失败:隐藏图片,保留灰底与文字
     img.style.visibility = 'hidden';
   }
+}
+
+/* ---------------- 右下角动图预览卡 ----------------
+   悬停动作卡片时,异步加载该动作的 GIF 在右下角展示。
+   已加载过的动作缓存,避免重复请求;快速切换时丢弃过期结果。 */
+
+const previewCache = new Map(); // id -> 'loading' | 'ok' | 'fail'
+let previewReqId = null;
+
+function loadWithFallback(imgEl, path, onOk, onFail) {
+  const tryHost = i => {
+    if (i >= MEDIA_HOSTS.length) {
+      imgEl.onload = null; imgEl.onerror = null;
+      if (onFail) onFail();
+      return;
+    }
+    imgEl.onload = () => { imgEl.onerror = null; if (onOk) onOk(); };
+    imgEl.onerror = () => tryHost(i + 1);
+    imgEl.src = MEDIA_HOSTS[i] + path;
+  };
+  tryHost(0);
+}
+
+function previewExercise(ex) {
+  previewReqId = ex.id;
+  const card = $('previewCard');
+  $('previewName').textContent = ex.name;
+  card.hidden = false;
+
+  const gif = $('previewGif'), loading = $('previewLoading');
+  const st = previewCache.get(ex.id);
+
+  if (st === 'ok') {
+    gif.hidden = false;
+    loading.hidden = true;
+    return;
+  }
+  if (st === 'loading') return; // 请求进行中,等待完成
+
+  previewCache.set(ex.id, 'loading');
+  gif.hidden = true;
+  loading.hidden = false;
+  loading.textContent = '加载动图…';
+  loadWithFallback(gif, ex.gif,
+    () => { previewCache.set(ex.id, 'ok'); if (previewReqId !== ex.id) return; loading.hidden = true; gif.hidden = false; },
+    () => { previewCache.set(ex.id, 'fail'); if (previewReqId !== ex.id) return; loading.hidden = false; loading.textContent = '动图加载失败'; gif.hidden = true; }
+  );
+}
+
+function closePreview() {
+  previewReqId = null;
+  $('previewCard').hidden = true;
+  $('previewGif').removeAttribute('src');
 }
 
 /* ---------------- 初始化 ---------------- */
@@ -183,6 +239,9 @@ function bindUI() {
     resetPage();
     render();
   });
+
+  // 关闭预览
+  $('previewClose').addEventListener('click', closePreview);
 }
 
 function init() {
