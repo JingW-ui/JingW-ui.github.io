@@ -458,7 +458,7 @@ body {
 .plan-hint { font-size: 0.75rem; color: var(--text-dim); padding: 10px 6px 4px; }
 .plan-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-top: 8px;
   animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
@@ -473,6 +473,8 @@ body {
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 .plan-day-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .plan-day-name {
@@ -545,10 +547,14 @@ body {
 }
 
 /* ============ 响应式 ============ */
+@media (max-width: 1080px) {
+  .plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (max-width: 640px) {
   body { padding: 14px 10px 20px; }
   .topbar { flex-direction: column; align-items: stretch; }
   .topbar-right { justify-content: space-between; }
   .search-box input { width: 100%; }
   .grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .plan-grid { grid-template-columns: minmax(0, 1fr); }
 }
