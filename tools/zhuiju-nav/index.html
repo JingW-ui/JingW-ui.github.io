@@ -107,69 +107,185 @@ body {
     z-index: 1;
 }
 
-/* 顶栏 */
-.topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 16px 22px;
+/* ============ Hero 一体化 Banner ============ */
+.hero {
+    padding: 30px 32px 64px;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    flex-wrap: wrap;
+    position: relative;
 }
-.topbar-brand {
+.hero-head {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
+    flex-wrap: wrap;
 }
-.topbar-logo {
-    width: 42px; height: 42px;
-    border-radius: 12px;
+.hero-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+.hero-logo {
+    flex: 0 0 auto;
+    width: 44px; height: 44px;
+    border-radius: 13px;
     background: linear-gradient(135deg, rgba(45,212,191,0.85), rgba(59,130,246,0.85));
     display: flex; align-items: center; justify-content: center;
     color: #fff;
     font-size: 19px;
     box-shadow: var(--shadow-sm);
 }
-.topbar-title { font-size: 18px; font-weight: 700; letter-spacing: .5px; }
-.topbar-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+.hero-title {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: .5px;
+    line-height: 1.2;
+}
+.hero-accent { color: var(--accent-teal); }
 
 .status-pill {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    padding: 6px 14px;
-    font-size: 12.5px;
+    gap: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #5d7d76;
+    background: #eaf7f3;
+    border: 1px solid rgba(63,184,154,0.22);
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.status-pill i { color: #3fb89a; }
+.status-pill.is-stale {
+    color: #8a6d3b;
+    background: #faf3e6;
+    border-color: rgba(196,150,58,0.25);
+}
+.status-pill.is-stale i { color: #d99a2b; }
+
+.hero-sub {
+    margin-top: 14px;
+    color: var(--text-secondary);
+    font-size: 14.5px;
+}
+.hero-stats {
+    margin-top: 16px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+.stat-num {
+    font-family: 'Courier New', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.stat-unit { color: var(--text-muted); margin-left: 5px; }
+.stat-sep { color: rgba(139,154,175,0.45); }
+.stat-label { color: var(--text-muted); }
+.stat-date { color: var(--text-muted); opacity: 0.78; }
+
+/* ============ 搜索工具栏（悬浮于 banner 底部边缘） ============ */
+.search-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: -36px;
+    position: relative;
+    z-index: 5;
+    flex-wrap: wrap;
+}
+.search-box {
+    position: relative;
+    flex: 1 1 300px;
+    min-width: 220px;
+}
+.search-box i {
+    position: absolute;
+    left: 15px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 13px;
+    pointer-events: none;
+}
+.search-box input {
+    width: 100%;
+    padding: 12px 16px 12px 40px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-primary);
+    background: var(--card-bg-strong);
+    border: 1px solid var(--card-border);
+    border-radius: 999px;
+    outline: none;
+    transition: var(--transition);
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+.search-box input::placeholder { color: var(--text-muted); }
+.search-box input:focus {
+    background: #fff;
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 3px rgba(45,212,191,0.18), var(--shadow-md);
+}
+.select-wrap {
+    position: relative;
+    flex: 0 0 auto;
+}
+.select-wrap select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 12px 34px 12px 16px;
+    font-size: 13.5px;
+    font-family: inherit;
     color: var(--text-secondary);
     background: var(--card-bg-strong);
     border: 1px solid var(--card-border);
     border-radius: 999px;
-    box-shadow: var(--shadow-sm);
-    white-space: nowrap;
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
 }
-.status-pill i { color: var(--accent-teal); }
-.status-pill.is-stale i { color: var(--warn); }
+.select-wrap select:hover { background: #fff; }
+.select-wrap select:focus {
+    background: #fff;
+    border-color: var(--accent-teal);
+    box-shadow: 0 0 0 3px rgba(45,212,191,0.18);
+}
+.select-wrap::after {
+    content: "\f078";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 10px;
+    color: var(--text-muted);
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
 
-/* Hero */
-.hero { text-align: center; padding: 40px 12px 8px; }
-.hero h1 { font-size: 32px; font-weight: 700; letter-spacing: 1px; }
-.hero h1 .dot { color: var(--accent-teal); }
-.hero p { margin-top: 8px; color: var(--text-secondary); font-size: 14.5px; }
-.hero-stats { margin-top: 16px; font-size: 13px; color: var(--text-muted); }
-.hero-stats b { color: var(--text-primary); font-family: 'Courier New', monospace; font-size: 15px; }
-
-/* 控制条 */
-.controls { margin-top: 26px; }
+/* ============ 分类工具栏 ============ */
 .tabs {
     display: flex;
     gap: 8px;
     overflow-x: auto;
-    padding: 4px 2px 10px;
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.45);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
     scrollbar-width: thin;
     scrollbar-color: rgba(139,154,175,0.35) transparent;
 }
@@ -187,95 +303,17 @@ body {
     transition: var(--transition);
     user-select: none;
 }
-.tab:hover { color: var(--text-primary); border-color: var(--card-border); transform: translateY(-1px); }
+.tab:hover { background: rgba(255,255,255,0.6); color: var(--text-primary); }
 .tab.active {
-    background: linear-gradient(135deg, var(--accent-teal), var(--accent-blue));
+    background: #2f9f95;
     color: #fff;
     border-color: transparent;
-    box-shadow: 0 4px 14px rgba(45,212,191,0.35);
+    box-shadow: none;
 }
 .tab .count {
     font-size: 11px;
-    opacity: 0.75;
+    opacity: 0.8;
     margin-left: 3px;
-}
-
-.toolbar {
-    display: flex;
-    gap: 10px;
-    margin-top: 4px;
-    align-items: center;
-    flex-wrap: wrap;
-}
-.search-box {
-    position: relative;
-    flex: 1 1 260px;
-    min-width: 200px;
-}
-.search-box i {
-    position: absolute;
-    left: 14px; top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-size: 13px;
-    pointer-events: none;
-}
-.search-box input {
-    width: 100%;
-    padding: 10px 14px 10px 38px;
-    font-size: 14px;
-    font-family: inherit;
-    color: var(--text-primary);
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 999px;
-    outline: none;
-    transition: var(--transition);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-.search-box input::placeholder { color: var(--text-muted); }
-.search-box input:focus {
-    background: var(--card-bg-strong);
-    border-color: var(--accent-teal);
-    box-shadow: 0 0 0 3px rgba(45,212,191,0.18);
-}
-.select-wrap {
-    position: relative;
-    flex: 0 0 auto;
-}
-.select-wrap select {
-    appearance: none;
-    -webkit-appearance: none;
-    padding: 10px 34px 10px 16px;
-    font-size: 13.5px;
-    font-family: inherit;
-    color: var(--text-secondary);
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 999px;
-    outline: none;
-    cursor: pointer;
-    transition: var(--transition);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-.select-wrap select:hover { background: var(--card-bg-strong); }
-.select-wrap select:focus {
-    background: var(--card-bg-strong);
-    border-color: var(--accent-teal);
-    box-shadow: 0 0 0 3px rgba(45,212,191,0.18);
-}
-.select-wrap::after {
-    content: "\f078";
-    font-family: "Font Awesome 6 Free";
-    font-weight: 900;
-    font-size: 10px;
-    color: var(--text-muted);
-    position: absolute;
-    right: 14px; top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
 }
 
 .result-info { font-size: 12.5px; color: var(--text-muted); margin: 2px 2px 12px; }
@@ -514,10 +552,12 @@ footer a:hover { text-decoration: underline; }
     .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
 }
 @media (max-width: 560px) {
-    .page { padding: 18px 14px 30px; }
-    .hero h1 { font-size: 26px; }
+    .page { padding: 16px 14px 30px; }
+    .hero { padding: 24px 20px 68px; }
+    .hero-title { font-size: 24px; }
+    .hero-logo { width: 38px; height: 38px; font-size: 16px; }
+    .search-toolbar { margin-top: -40px; }
     .grid { grid-template-columns: 1fr; }
-    .topbar { padding: 14px 16px; }
     .card-scores { grid-template-columns: 1fr; }
 }
 
@@ -538,48 +578,47 @@ footer a:hover { text-decoration: underline; }
 <div class="bg-decoration bg-decoration-3"></div>
 
 <div class="page">
-    <!-- 顶栏 -->
-    <header class="topbar">
-        <div class="topbar-brand">
-            <div class="topbar-logo"><i class="fa-solid fa-play"></i></div>
-            <div>
-                <div class="topbar-title">免费追剧导航</div>
-                <div class="topbar-sub">Free &amp; Ad-free 资源索引</div>
+    <!-- Hero 一体化 Banner -->
+    <section class="hero">
+        <div class="hero-head">
+            <div class="hero-brand">
+                <div class="hero-logo"><i class="fa-solid fa-play"></i></div>
+                <h1 class="hero-title">免费追剧资源<span class="hero-accent">导航</span></h1>
+            </div>
+            <div class="status-pill" id="statusPill">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span id="statusText">加载中…</span>
             </div>
         </div>
-        <div class="status-pill" id="statusPill">
-            <i class="fa-solid fa-sync-alt"></i>
-            <span id="statusText">加载中…</span>
-        </div>
-    </header>
-
-    <!-- Hero -->
-    <section class="hero">
-        <h1>免费追剧<span class="dot">·</span>导航</h1>
-        <p>人工筛选 · 每日可用性检测 · 收录免费无广告的追剧资源入口</p>
+        <p class="hero-sub">人工筛选 · 每日可用性检测 · 无广告追剧资源入口</p>
         <div class="hero-stats">
-            <b id="statTotal">-</b> 个资源 · <b id="statCats">-</b> 个分类 · 数据更新于 <b id="statUpdated">-</b>
+            <span class="stat-num" id="statTotal">–</span><span class="stat-unit">个资源</span>
+            <span class="stat-sep">·</span>
+            <span class="stat-num" id="statCats">–</span><span class="stat-unit">个分类</span>
+            <span class="stat-sep">·</span>
+            <span class="stat-label">更新于</span><span class="stat-date" id="statUpdated">–</span>
         </div>
     </section>
 
-    <!-- 控制条 -->
-    <div class="controls">
-        <div class="tabs" id="tabs" role="tablist" aria-label="资源分类"></div>
-        <div class="toolbar">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="search" id="searchInput" placeholder="搜索影视、TVBox、磁力、字幕…" aria-label="搜索资源">
-            </div>
-            <div class="select-wrap">
-                <select id="sortSelect" aria-label="排序方式">
-                    <option value="default">默认排序</option>
-                    <option value="rating">按评分排序</option>
-                    <option value="latest">最近收录</option>
-                </select>
-            </div>
+    <!-- 搜索工具栏（悬浮于 banner 与内容区之间） -->
+    <div class="search-toolbar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="search" id="searchInput" placeholder="搜索站点、剧集类型、TVBox、磁力、字幕…" aria-label="搜索资源">
         </div>
-        <div class="result-info" id="resultInfo"></div>
+        <div class="select-wrap">
+            <select id="sortSelect" aria-label="排序方式">
+                <option value="default">默认排序</option>
+                <option value="rating">按评分排序</option>
+                <option value="latest">最近收录</option>
+            </select>
+        </div>
     </div>
+
+    <!-- 分类工具栏 -->
+    <div class="tabs" id="tabs" role="tablist" aria-label="资源分类"></div>
+
+    <div class="result-info" id="resultInfo"></div>
 
     <!-- 卡片网格 -->
     <main class="grid" id="grid"></main>

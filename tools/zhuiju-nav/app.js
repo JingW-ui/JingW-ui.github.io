@@ -55,6 +55,7 @@
   var resultInfoEl = document.getElementById('resultInfo');
   var statusTextEl = document.getElementById('statusText');
   var statusPillEl = document.getElementById('statusPill');
+  var statusIconEl = statusPillEl.querySelector('i');
 
   /* ---------- 工具函数 ---------- */
   function escapeHtml(s) {
@@ -140,16 +141,17 @@
 
   function setStatus(kind, extra) {
     var map = {
-      loading:  ['加载中…', ''],
-      checking: ['正在检测最新数据…', ''],
-      fresh:    ['已更新至 ' + (extra || '—'), ''],
-      same:     ['数据已是最新 · ' + (extra || ''), ''],
-      stale:    ['离线快照 · ' + (extra || ''), 'stale'],
-      error:    ['数据加载失败', 'stale']
+      loading:  ['fa-spinner fa-spin', '加载中…', ''],
+      checking: ['fa-spinner fa-spin', '正在检测可用性…', ''],
+      fresh:    ['fa-circle-check', '今日已检测可用', ''],
+      same:     ['fa-circle-check', '今日已检测可用', ''],
+      stale:    ['fa-triangle-exclamation', '离线快照 · ' + (extra || '—'), 'stale'],
+      error:    ['fa-triangle-exclamation', '加载失败', 'stale']
     };
     var m = map[kind] || map.loading;
-    statusTextEl.textContent = m[0];
-    statusPillEl.classList.toggle('is-stale', m[1] === 'stale');
+    statusIconEl.className = 'fa-solid ' + m[0];
+    statusTextEl.textContent = m[1];
+    statusPillEl.classList.toggle('is-stale', m[2] === 'stale');
   }
 
   function loadData() {
