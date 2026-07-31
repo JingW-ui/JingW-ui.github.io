@@ -26,7 +26,6 @@
     <div class="search-box">
       <input type="search" id="searchInput" placeholder="搜索动作名称…" autocomplete="off">
     </div>
-    <button class="btn-random" id="randomBtn" title="随机一个动作">🎲 随机</button>
   </div>
 </header>
 
@@ -61,26 +60,6 @@
 <footer class="foot">
   数据: hasaneyldrm/exercises-dataset (MIT) · 动作图/动画 © Gym Visual,经 jsdelivr CDN 引用并署名
 </footer>
-
-<!-- 详情弹窗 -->
-<div class="modal" id="modal" hidden>
-  <div class="modal-scrim" id="modalScrim"></div>
-  <div class="modal-box glass">
-    <button class="modal-close" id="modalClose" title="关闭">×</button>
-    <div class="media">
-      <img id="mImg" alt="动作图示">
-      <img id="mGif" alt="动作动画" hidden>
-      <button class="gif-toggle" id="gifToggle">▶ 播放动画</button>
-    </div>
-    <h2 class="m-name" id="mName"></h2>
-    <div class="m-badges" id="mBadges"></div>
-    <div class="m-muscles" id="mMuscles"></div>
-    <h3 class="m-sec">分步教程</h3>
-    <ol class="m-steps" id="mSteps"></ol>
-    <button class="m-lang" id="mLangBtn">EN 英文</button>
-    <div class="m-attr" id="mAttr"></div>
-  </div>
-</div>
 
 <script src="assets/data/exercises.js"></script>
 <script type="module" src="assets/js/app.js"></script>

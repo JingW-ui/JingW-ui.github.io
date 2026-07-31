@@ -1,8 +1,10 @@
 /* ============================================================
    健身动作数据库 - 应用逻辑
+   纯画廊浏览:搜索 + 部位/器械/肌群筛选 + 分页
+   卡片为静态展示,不可点击
    ============================================================ */
 
-import { MEDIA_BASE, BODY_PARTS, EQUIPMENT, MUSCLES, t } from './config.js';
+import { MEDIA_BASE, MEDIA_HOSTS, BODY_PARTS, EQUIPMENT, MUSCLES, t } from './config.js';
 
 const $ = id => document.getElementById(id);
 
@@ -13,7 +15,6 @@ const state = {
   part: null,
   equip: null,
   muscle: null,
-  lang: 'zh',
   page: 1,
   all: window.EXERCISES || [],
 };
@@ -90,11 +91,9 @@ function render() {
   const total = list.length;
   const visible = list.slice(0, state.page * PAGE_SIZE);
 
-  // 重建 grid(分页显示)
   grid.innerHTML = '';
   visible.forEach((ex, i) => grid.appendChild(cardEl(ex, i)));
 
-  // 加载更多按钮
   const moreBtn = $('moreBtn');
   if (total > visible.length) {
     if (!moreBtn) {
@@ -112,7 +111,6 @@ function render() {
   }
 }
 
-/* 分页追加(无整页重排,避免闪烁) */
 function renderMore() {
   const list = filtered();
   const grid = $('grid');
@@ -129,9 +127,7 @@ function cardEl(ex, idx = 0) {
   div.className = 'card';
   div.dataset.id = ex.id;
   div.innerHTML = `
-    <div class="card-img">
-      <img loading="lazy" src="${MEDIA_BASE}${ex.image}" alt="${ex.name}">
-    </div>
+    <div class="card-img"></div>
     <div class="card-body">
       <h3 class="card-name" title="${ex.name}">${ex.name}</h3>
       <div class="card-tags">
@@ -140,67 +136,30 @@ function cardEl(ex, idx = 0) {
         <span class="tag muscle">${t(MUSCLES, ex.target)}</span>
       </div>
     </div>`;
+  // 缩略图:懒加载 + CDN fallback
+  const img = document.createElement('img');
+  img.loading = 'lazy';
+  img.alt = ex.name;
+  img.dataset.path = ex.image;
+  img.addEventListener('error', onCardImgError);
+  div.querySelector('.card-img').appendChild(img);
+  // 入树后再设置 src,保证 loading=lazy 生效
+  requestAnimationFrame(() => { if (!img.src) img.src = MEDIA_BASE + ex.image; });
   // 入场动画
   requestAnimationFrame(() => setTimeout(() => div.classList.add('show'), Math.min(idx, 40) * 18));
   return div;
 }
 
-/* ---------------- 详情弹窗 ---------------- */
-
-function openModal(id) {
-  const ex = state.all.find(x => x.id === id);
-  if (!ex) return;
-  state.lang = 'zh';
-
-  const img = $('mImg'), gif = $('mGif');
-  img.src = MEDIA_BASE + ex.image;
-  gif.src = MEDIA_BASE + ex.gif;
-  gif.hidden = true;
-  $('gifToggle').textContent = '▶ 播放动画';
-
-  $('mName').textContent = ex.name;
-  $('mBadges').innerHTML = `
-    <span class="tag part">${t(BODY_PARTS, ex.body_part)}</span>
-    <span class="tag equip">${t(EQUIPMENT, ex.equipment)}</span>
-    <span class="tag muscle">${t(MUSCLES, ex.target)}</span>`;
-
-  const muscles = [`主要肌群: ${muscleLabel(ex.muscle_group)}`];
-  if (ex.secondary_muscles && ex.secondary_muscles.length) {
-    muscles.push(`次要肌群: ${ex.secondary_muscles.map(muscleLabel).join('、')}`);
+function onCardImgError(e) {
+  const img = e.target;
+  const n = +(img.dataset.tries || 0);
+  if (n < MEDIA_HOSTS.length - 1) {
+    img.dataset.tries = String(n + 1);
+    img.src = MEDIA_HOSTS[n + 1] + img.dataset.path;
+  } else {
+    // 全部节点失败:隐藏图片,保留灰底与文字
+    img.style.visibility = 'hidden';
   }
-  $('mMuscles').textContent = muscles.join(' · ');
-  $('mAttr').textContent = ex.attr || '';
-
-  renderSteps(ex);
-  $('modal').hidden = false;
-  document.body.style.overflow = 'hidden';
-}
-
-function muscleLabel(m) { return `${t(MUSCLES, m)} (${m})`; }
-
-function renderSteps(ex) {
-  const steps = (ex.steps && ex.steps[state.lang]) || [];
-  const fallback = steps.length ? null : ((ex.steps && ex.steps.zh) || ex.steps.en || []);
-  const list = steps.length ? steps : (fallback || []);
-  const ol = $('mSteps');
-  ol.innerHTML = list.length
-    ? list.map(s => `<li>${s}</li>`).join('')
-    : '<li>该语言暂无分步教程</li>';
-  $('mLangBtn').textContent = state.lang === 'zh' ? 'EN 英文' : '中文';
-}
-
-function closeModal() {
-  $('modal').hidden = true;
-  document.body.style.overflow = '';
-  $('mImg').removeAttribute('src');
-  $('mGif').removeAttribute('src');
-}
-
-/* ---------------- 随机 ---------------- */
-
-function randomExercise() {
-  const ex = state.all[Math.floor(Math.random() * state.all.length)];
-  openModal(ex.id);
 }
 
 /* ---------------- 初始化 ---------------- */
@@ -217,49 +176,12 @@ function bindUI() {
     state.part = null;
     state.equip = null;
     state.muscle = null;
-    state.lang = 'zh';
     $('searchInput').value = '';
     renderPartChips();
     $('equipSel').value = '';
     $('muscleSel').value = '';
     resetPage();
     render();
-  });
-
-  $('randomBtn').addEventListener('click', randomExercise);
-
-  // 卡片点击(委托,记录当前 id 供中英切换使用)
-  $('grid').addEventListener('click', e => {
-    const card = e.target.closest('.card');
-    if (card) {
-      state._currentId = card.dataset.id;
-      openModal(card.dataset.id);
-    }
-  });
-
-  // 弹窗关闭
-  $('modalClose').addEventListener('click', closeModal);
-  $('modalScrim').addEventListener('click', closeModal);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-  // 动画播放切换 + hover 自动预览
-  const media = document.querySelector('.media');
-  const gifToggle = $('gifToggle');
-  const swapToGif = () => {
-    if ($('mImg').src) { $('mImg').hidden = true; $('mGif').hidden = false; gifToggle.textContent = '■ 停止'; }
-  };
-  const swapToImg = () => {
-    if ($('mImg').src) { $('mImg').hidden = false; $('mGif').hidden = true; gifToggle.textContent = '▶ 播放动画'; }
-  };
-  gifToggle.addEventListener('click', () => ($('mGif').hidden ? swapToGif() : swapToImg()));
-  media.addEventListener('mouseenter', swapToGif);
-  media.addEventListener('mouseleave', swapToImg);
-
-  // 中英切换
-  $('mLangBtn').addEventListener('click', () => {
-    state.lang = state.lang === 'zh' ? 'en' : 'zh';
-    const ex = state.all.find(x => x.id === state._currentId);
-    if (ex) renderSteps(ex);
   });
 }
 

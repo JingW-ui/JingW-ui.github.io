@@ -4,8 +4,14 @@
    媒体:© Gym Visual,通过 jsdelivr CDN 引用,不内嵌
    ============================================================ */
 
-/* 媒体 CDN 基址(数据里的 image/gif 为相对路径) */
-export const MEDIA_BASE = 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/';
+/* 媒体 CDN 基址(数据里的 image/gif 为相对路径)。
+   jsdelivr 在国内部分网络下可能慢/不稳,提供多节点按序 fallback。 */
+export const MEDIA_HOSTS = [
+  'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/',
+  'https://fastly.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/',
+  'https://gcore.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/',
+];
+export const MEDIA_BASE = MEDIA_HOSTS[0];
 
 /* 身体部位 → 中文 */
 export const BODY_PARTS = {

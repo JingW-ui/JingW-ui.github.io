@@ -1,17 +1,15 @@
 # 健身动作数据库 Exercise Database
 
-1,324 个健身动作的检索工具:按**身体部位 / 器械 / 目标肌群**筛选,支持中英文搜索与分步教程,动作缩略图与动画经 CDN 加载。
+1,324 个健身动作的浏览检索工具:按**身体部位 / 器械 / 目标肌群**筛选,支持中英文搜索,动作缩略图经 CDN 加载。
 
-数据源自 [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset)(MIT),裁剪为中文 + 英文分步指令(1.46MB)后静态内嵌;动作媒体版权 © Gym Visual,经 jsdelivr CDN 引用并署名,未复制进仓库。
+数据源自 [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset)(MIT),裁剪为中文 + 英文分步指令(1.46MB)后静态内嵌;动作缩略图版权 © Gym Visual,经 jsdelivr CDN 引用(多节点 fallback)并署名,未复制进仓库。
 
 ## 功能
 
 - 🔍 中英文搜索(动作名 / 编号)
 - 🏷️ 部位芯片 + 器械 / 肌群下拉筛选
 - 🖼️ 卡片画廊(懒加载缩略图,分页 150/页)
-- 📋 详情弹窗:中文分步教程、目标/次要肌群、GIF 动画(悬停自动播放)
-- 🔄 中文 ↔ 英文指令切换
-- 🎲 随机动作
+- 🔧 CDN 多节点 fallback,单节点失效自动切换
 
 ## 目录结构
 
