@@ -343,12 +343,12 @@ body {
     white-space: nowrap;
 }
 .badge-cat {
-    color: var(--accent-blue);
+    color: #6b7f96;
     background: transparent;
-    border: 1px solid rgba(59,130,246,0.32);
+    border: 1px solid rgba(107,127,150,0.28);
 }
-.badge-ok   { color: var(--ok);   background: transparent; border: 1px solid rgba(22,163,74,0.35); }
-.badge-warn { color: var(--warn); background: transparent; border: 1px solid rgba(217,119,6,0.38); }
+.badge-ok   { color: #5b9a86; background: transparent; border: 1px solid rgba(91,154,134,0.32); }
+.badge-warn { color: #b0883f; background: transparent; border: 1px solid rgba(176,136,63,0.35); }
 
 .score-circle {
     flex: 0 0 auto;
@@ -357,20 +357,24 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 12.5px;
+    font-weight: 600;
     font-family: 'Courier New', monospace;
-    color: var(--ok);
+    color: var(--text-muted);
     background: transparent;
-    border: 1px solid rgba(22, 163, 74, 0.35);
+    border: 1px solid rgba(139,154,175,0.35);
+}
+.score-circle.is-top {
+    color: #4a8f8b;
+    border-color: rgba(74,143,139,0.42);
 }
 .score-circle.is-gold {
-    color: var(--warn);
-    border-color: rgba(217, 119, 6, 0.32);
+    color: #b0883f;
+    border-color: rgba(176,136,63,0.35);
 }
 .score-circle.is-red {
-    color: var(--bad);
-    border-color: rgba(220, 38, 38, 0.28);
+    color: #c05b5b;
+    border-color: rgba(192,91,91,0.30);
 }
 
 .card-desc { font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; }
@@ -424,10 +428,10 @@ body {
     border-radius: 999px;
     cursor: default;
 }
-.risk-low     { color: var(--ok);   background: var(--ok-bg);   border: 1px solid rgba(22,163,74,0.22); }
-.risk-mid     { color: var(--warn); background: var(--warn-bg); border: 1px solid rgba(217,119,6,0.26); }
-.risk-high    { color: var(--bad);  background: var(--bad-bg);  border: 1px solid rgba(220,38,38,0.24); }
-.risk-unknown { color: var(--gray); background: var(--gray-bg); border: 1px solid rgba(100,116,139,0.22); }
+.risk-low     { color: #5b9a86; border: 1px solid rgba(91,154,134,0.28); }
+.risk-medium  { color: var(--text-muted); border: 1px solid rgba(139,154,175,0.30); }
+.risk-high    { color: #c05b5b; border: 1px solid rgba(192,91,91,0.30); }
+.risk-unknown { color: var(--text-muted); border: 1px solid rgba(139,154,175,0.28); }
 
 /* 操作区 */
 .card-actions {
@@ -452,30 +456,28 @@ body {
     transition: var(--transition);
 }
 .btn-open {
-    background: rgba(45, 212, 191, 0.12);
-    color: #0f766e;
-    border: 1px solid rgba(45, 212, 191, 0.35);
+    background: transparent;
+    color: #4a8f8b;
+    border: 1px solid #c9ebea;
 }
 .btn-open:hover {
-    background: rgba(45, 212, 191, 0.22);
-    border-color: rgba(45, 212, 191, 0.55);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(45, 212, 191, 0.22);
+    background: #eaf7f5;
+    border-color: #b3dfdd;
 }
 .btn-ghost {
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1px solid var(--card-border);
+    background: none;
+    color: #8a9a9a;
+    border: 1px solid transparent;
 }
-.btn-ghost:hover { color: var(--text-primary); border-color: rgba(139,154,175,0.5); }
-.btn-ghost.copied { color: var(--ok); border-color: rgba(22,163,74,0.4); }
+.btn-ghost:hover { color: #4a8f8b; text-decoration: underline; }
+.btn-ghost.copied { color: var(--ok); text-decoration: none; }
 .btn-config {
-    background: transparent;
-    color: #be185d;
-    border: 1px solid rgba(244,114,182,0.4);
+    background: none;
+    color: #a97b8e;
+    border: 1px solid transparent;
 }
-.btn-config:hover { border-color: rgba(244,114,182,0.65); }
-.btn-config.copied { color: var(--ok); border-color: rgba(22,163,74,0.4); }
+.btn-config:hover { color: #c07a97; text-decoration: underline; }
+.btn-config.copied { color: var(--ok); text-decoration: none; }
 
 /* 空状态 */
 .empty {

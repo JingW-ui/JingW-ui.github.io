@@ -271,7 +271,8 @@
     var avg = scoreAvg(r.scores);
     var circleClass = '';
     if (avg != null) {
-      if (avg >= 4) circleClass = '';
+      if (avg >= 4.9) circleClass = ' is-top'; // 满分才用青色强调
+      else if (avg >= 4) circleClass = '';      // 4.x 灰色调，安静
       else if (avg >= 3) circleClass = ' is-gold';
       else circleClass = ' is-red';
     }
@@ -294,7 +295,7 @@
     var tags = (r.github && r.github.stars != null)
       ? ['★ ' + formatStars(r.github.stars)].concat(r.tags)
       : r.tags.slice();
-    var shown = tags.slice(0, 6);
+    var shown = tags.slice(0, 4);
     var tagHTML = shown.map(function (t) {
       return '<span class="tag">' + escapeHtml(t) + '</span>';
     }).join('');
