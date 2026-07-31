@@ -487,7 +487,7 @@ function applyLang() {
   renderPlan();
 }
 
-/* 视图切换:动作库 / 周训计划 */
+/* 视图切换:动作库 / 周训计划 / 月训打卡 */
 function bindViewTabs() {
   $('viewTabs').addEventListener('click', e => {
     const btn = e.target.closest('.view-tab');
@@ -495,7 +495,168 @@ function bindViewTabs() {
     document.querySelectorAll('.view-tab').forEach(b => b.classList.toggle('active', b === btn));
     $('galleryView').hidden = btn.dataset.view !== 'gallery';
     $('planView').hidden = btn.dataset.view !== 'plan';
+    $('checkinView').hidden = btn.dataset.view !== 'checkin';
     if (btn.dataset.view === 'plan') renderPlan();
+    if (btn.dataset.view === 'checkin') renderCheckin();
+  });
+}
+
+/* ---------------- 月训打卡 ----------------
+   前台 + 近 30s 内有操作 → 每秒计为今日活跃;达到阈值自动打卡(每天一次)。
+   挂机(超 30s 无操作)或切后台不计;数据存 localStorage。 */
+
+const CHECKIN_KEY = 'exercise_db_checkin';
+const IDLE_MS = 30000;
+
+const checkin = {
+  threshold: 1200, // 秒(默认 20 分钟)
+  days: {},         // 'YYYY-MM-DD' -> { sec, checked, ts }
+  today: '',
+  secToday: 0,
+  lastActivity: 0,
+  tickCount: 0,
+};
+
+function fmtDate(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function checkinTodayKey() { return fmtDate(new Date()); }
+
+function loadCheckin() {
+  try {
+    const raw = localStorage.getItem(CHECKIN_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p && p.days) Object.assign(checkin, p);
+    }
+  } catch (e) { /* ignore */ }
+  checkin.today = checkinTodayKey();
+  if (!checkin.days[checkin.today]) checkin.days[checkin.today] = { sec: 0, checked: false, ts: 0 };
+  checkin.secToday = checkin.days[checkin.today].sec;
+  checkin.lastActivity = Date.now();
+}
+
+function saveCheckin() {
+  try { localStorage.setItem(CHECKIN_KEY, JSON.stringify({ threshold: checkin.threshold, days: checkin.days })); } catch (e) { /* ignore */ }
+}
+
+function markActivity() { checkin.lastActivity = Date.now(); }
+
+/* 每秒 tick:前台且有操作 → 累计活跃秒;达标 → 打卡;定期落盘 */
+function checkinTick() {
+  const now = Date.now();
+  const key = checkinTodayKey();
+  if (key !== checkin.today) {
+    checkin.today = key;
+    if (!checkin.days[key]) checkin.days[key] = { sec: 0, checked: false, ts: 0 };
+    checkin.secToday = checkin.days[key].sec;
+  }
+  const rec = checkin.days[key];
+  if (document.visibilityState === 'visible' && now - checkin.lastActivity < IDLE_MS) {
+    rec.sec++;
+    checkin.secToday = rec.sec;
+    if (!rec.checked && rec.sec >= checkin.threshold) {
+      rec.checked = true;
+      rec.ts = now;
+      saveCheckin();
+    }
+  }
+  checkin.tickCount++;
+  if (checkin.tickCount % 10 === 0) saveCheckin();
+  // 打卡视图可见时实时刷新
+  if (!$('checkinView').hidden) renderCheckin();
+}
+
+function startActivityTracking() {
+  const throttledMove = (() => {
+    let last = 0;
+    return () => { const n = Date.now(); if (n - last >= 500) { last = n; checkin.lastActivity = n; } };
+  })();
+  ['pointermove', 'mousedown', 'touchstart', 'keydown', 'scroll'].forEach(ev =>
+    window.addEventListener(ev, ev === 'pointermove' ? throttledMove : markActivity, { passive: true })
+  );
+  window.addEventListener('pagehide', saveCheckin);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveCheckin(); });
+  checkin.lastActivity = Date.now();
+  setInterval(checkinTick, 1000);
+}
+
+/* 连续打卡天数:从今天(若已打卡)或昨天起向前数 */
+function calcStreak() {
+  const d = new Date();
+  if (!checkin.days[fmtDate(d)] || !checkin.days[fmtDate(d)].checked) d.setDate(d.getDate() - 1);
+  let streak = 0;
+  for (let i = 0; i < 400; i++) {
+    const rec = checkin.days[fmtDate(d)];
+    if (rec && rec.checked) { streak++; d.setDate(d.getDate() - 1); } else break;
+  }
+  return streak;
+}
+
+function countCheckedMonth(year, month) {
+  let n = 0;
+  const daysIn = new Date(year, month + 1, 0).getDate();
+  for (let day = 1; day <= daysIn; day++) {
+    const rec = checkin.days[fmtDate(new Date(year, month, day))];
+    if (rec && rec.checked) n++;
+  }
+  return n;
+}
+
+function renderCheckin() {
+  const now = new Date();
+  const year = now.getFullYear(), month = now.getMonth();
+  const today = checkinTodayKey();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const rec = checkin.days[today];
+  const mins = Math.floor(rec.sec / 60);
+  const pct = Math.min(100, Math.round(rec.sec / checkin.threshold * 100));
+
+  $('checkinStats').innerHTML = `
+    <div class="checkin-stat"><b>${countCheckedMonth(year, month)}</b><span>本月打卡天数</span></div>
+    <div class="checkin-stat"><b>${calcStreak()}</b><span>连续打卡</span></div>
+    <div class="checkin-stat"><b>${mins}</b><span>今日活跃(分)</span></div>
+    <div class="checkin-progress">
+      <div class="cp-bar"><div class="cp-fill" style="width:${pct}%"></div></div>
+      <span class="cp-label">${mins} / ${Math.round(checkin.threshold / 60)} 分钟${rec.checked ? ' · 已打卡 ✓' : ''}</span>
+    </div>`;
+
+  $('checkinMonth').textContent = `${year} 年 ${month + 1} 月`;
+
+  const grid = $('checkinGrid');
+  grid.innerHTML = '';
+  const startDow = (new Date(year, month, 1).getDay() + 6) % 7; // 周一=0
+  for (let i = 0; i < startDow; i++) {
+    const b = document.createElement('div');
+    b.className = 'checkin-cell blank';
+    grid.appendChild(b);
+  }
+  for (let day = 1; day <= daysInMonth; day++) {
+    const key = fmtDate(new Date(year, month, day));
+    const r = checkin.days[key];
+    const cell = document.createElement('div');
+    cell.className = 'checkin-cell';
+    if (key === today) cell.classList.add('today');
+    if (day > now.getDate()) cell.classList.add('future');
+    if (r && r.checked) cell.classList.add('checked');
+    else if (r && r.sec > 0 && day <= now.getDate()) cell.classList.add('partial');
+    let inner = `<span class="cc-day">${day}</span>`;
+    if (r && r.checked) inner += `<span class="cc-ok">✓</span>`;
+    else if (r && r.sec > 0) inner += `<span class="cc-min">${Math.floor(r.sec / 60)}m</span>`;
+    cell.innerHTML = inner;
+    grid.appendChild(cell);
+  }
+}
+
+function bindCheckinUI() {
+  $('checkinThreshold').addEventListener('change', () => {
+    checkin.threshold = +$('checkinThreshold').value;
+    // 只影响今日起:重新评估今天
+    const rec = checkin.days[checkin.today];
+    if (rec && !rec.checked && rec.sec >= checkin.threshold) { rec.checked = true; rec.ts = Date.now(); }
+    saveCheckin();
+    renderCheckin();
   });
 }
 
@@ -557,6 +718,13 @@ function init() {
   bindPlanUI();
   bindViewTabs();
   renderPlan();
+
+  // 月训打卡
+  loadCheckin();
+  bindCheckinUI();
+  $('checkinThreshold').value = String(checkin.threshold);
+  startActivityTracking();
+  renderCheckin();
 
   // 语言按钮初始态
   applyLang();

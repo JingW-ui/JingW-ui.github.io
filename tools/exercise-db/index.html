@@ -34,6 +34,7 @@
 <nav class="view-tabs glass" id="viewTabs">
   <button class="view-tab active" data-view="gallery">💪 动作库</button>
   <button class="view-tab" data-view="plan">📅 周训计划</button>
+  <button class="view-tab" data-view="checkin">✅ 月训打卡</button>
 </nav>
 
 <!-- 动作库视图 -->
@@ -82,6 +83,31 @@
   </section>
   <div class="plan-hint">点击每天的 ↻ 可单独换一批;数据自动保存在浏览器(localStorage)。</div>
   <div class="plan-grid" id="planGrid"></div>
+</div>
+
+<!-- 月训打卡视图 -->
+<div class="checkin-view" id="checkinView" hidden>
+  <section class="checkin-stats glass" id="checkinStats"></section>
+  <section class="checkin-calendar glass">
+    <div class="checkin-cal-head">
+      <span class="checkin-month" id="checkinMonth"></span>
+      <label class="filter-label" for="checkinThreshold">达标时长</label>
+      <select class="filter-select" id="checkinThreshold">
+        <option value="600">10 分钟</option>
+        <option value="900">15 分钟</option>
+        <option value="1200">20 分钟</option>
+        <option value="1800">30 分钟</option>
+      </select>
+    </div>
+    <div class="checkin-week"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+    <div class="checkin-grid" id="checkinGrid"></div>
+    <div class="checkin-legend">
+      <span><i class="dot checked"></i>已打卡</span>
+      <span><i class="dot partial"></i>有活跃</span>
+      <span><i class="dot none"></i>未打卡</span>
+    </div>
+  </section>
+  <div class="plan-hint">在前台且有操作时自动累计今日活跃时长,达标即打卡;挂机或切后台不计。数据保存在浏览器(localStorage)。</div>
 </div>
 
 <!-- 右下角动图预览卡:悬停动作卡片时异步加载并播放 GIF -->
