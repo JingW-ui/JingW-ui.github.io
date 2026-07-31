@@ -399,6 +399,125 @@ body {
   text-overflow: ellipsis;
 }
 
+/* ============ 视图切换 ============ */
+.view-tabs {
+  max-width: 1280px;
+  margin: 0 auto 14px;
+  padding: 6px;
+  display: flex;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.04s both;
+}
+.view-tab {
+  flex: 1;
+  padding: 9px 14px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.view-tab:hover { background: var(--card-hover); }
+.view-tab.active {
+  background: linear-gradient(120deg, #2dd4bf, #3b82f6);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============ 周训计划 ============ */
+.btn-random {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(120deg, #2dd4bf, #3b82f6);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-random:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+
+.plan-view {
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.plan-toolbar {
+  padding: 14px 20px;
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+}
+.plan-toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.plan-saved { font-size: 0.75rem; color: #16a34a; }
+.plan-hint { font-size: 0.75rem; color: var(--text-dim); padding: 10px 6px 4px; }
+.plan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
+  margin-top: 8px;
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+.plan-day {
+  background: var(--card);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+}
+.plan-day-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.plan-day-name {
+  font-size: 0.9rem; font-weight: 700; color: var(--text);
+  flex: none;
+}
+.plan-day-target { flex: 1; min-width: 0; }
+.plan-day-reshuffle {
+  width: 30px; height: 30px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.55);
+  color: var(--text-soft);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+  flex: none;
+}
+.plan-day-reshuffle:hover { background: var(--card-hover); color: var(--accent); transform: rotate(180deg); }
+.plan-day-list { list-style: none; flex: 1; min-width: 0; }
+.plan-day-list li {
+  font-size: 0.78rem;
+  color: var(--text);
+  padding: 6px 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.plan-day-list li:hover { background: var(--card-hover); }
+.plan-day-list .idx {
+  width: 18px; height: 18px;
+  flex: none;
+  border-radius: 50%;
+  background: rgba(45,212,191,0.16);
+  color: #0d9488;
+  font-size: 0.66rem;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.plan-day-list .en { color: var(--text-soft); }
+.plan-day-empty { color: var(--text-dim); font-size: 0.78rem; padding: 10px 8px; }
+.plan-day.rest .plan-day-name { color: var(--text-dim); }
+
 /* ============ 页脚 ============ */
 .foot {
   max-width: 1280px;

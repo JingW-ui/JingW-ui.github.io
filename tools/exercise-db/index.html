@@ -29,33 +29,59 @@
   </div>
 </header>
 
-<!-- 筛选栏 -->
-<section class="filters glass">
-  <div class="filter-row">
-    <span class="filter-label">部位</span>
-    <div class="chips" id="partChips"></div>
-  </div>
-  <div class="filter-row">
-    <span class="filter-label">器械</span>
-    <select class="filter-select" id="equipSel">
-      <option value="">全部器械</option>
-    </select>
-    <span class="filter-label">肌群</span>
-    <select class="filter-select" id="muscleSel">
-      <option value="">全部肌群</option>
-    </select>
-    <button class="btn-reset" id="resetBtn">重置</button>
-  </div>
-</section>
+<!-- 视图切换 -->
+<nav class="view-tabs glass" id="viewTabs">
+  <button class="view-tab active" data-view="gallery">💪 动作库</button>
+  <button class="view-tab" data-view="plan">📅 周训计划</button>
+</nav>
 
-<!-- 结果 -->
-<div class="result-bar">
-  <span>共 <b id="count">0</b> 个动作</span>
-  <span class="result-hint" id="emptyHint" hidden>没有匹配的动作,试试其他筛选</span>
+<!-- 动作库视图 -->
+<div id="galleryView">
+  <!-- 筛选栏 -->
+  <section class="filters glass">
+    <div class="filter-row">
+      <span class="filter-label">部位</span>
+      <div class="chips" id="partChips"></div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">器械</span>
+      <select class="filter-select" id="equipSel">
+        <option value="">全部器械</option>
+      </select>
+      <span class="filter-label">肌群</span>
+      <select class="filter-select" id="muscleSel">
+        <option value="">全部肌群</option>
+      </select>
+      <button class="btn-reset" id="resetBtn">重置</button>
+    </div>
+  </section>
+
+  <!-- 结果 -->
+  <div class="result-bar">
+    <span>共 <b id="count">0</b> 个动作</span>
+    <span class="result-hint" id="emptyHint" hidden>没有匹配的动作,试试其他筛选</span>
+  </div>
+
+  <!-- 卡片画廊 -->
+  <main class="grid" id="grid"></main>
 </div>
 
-<!-- 卡片画廊 -->
-<main class="grid" id="grid"></main>
+<!-- 周训计划视图 -->
+<div class="plan-view" id="planView" hidden>
+  <section class="plan-toolbar glass">
+    <div class="plan-toolbar-row">
+      <label class="filter-label" for="planTemplate">模板</label>
+      <select class="filter-select" id="planTemplate"></select>
+      <label class="filter-label" for="planCount">每部位动作数</label>
+      <select class="filter-select" id="planCount"></select>
+      <button class="btn-random" id="planGenerate">🔄 一键生成</button>
+      <button class="btn-reset" id="planClear">清空计划</button>
+      <span class="plan-saved" id="planSaved" hidden>✓ 已保存到浏览器</span>
+    </div>
+  </section>
+  <div class="plan-hint">点击每天的 ↻ 可单独换一批;数据自动保存在浏览器(localStorage)。</div>
+  <div class="plan-grid" id="planGrid"></div>
+</div>
 
 <!-- 右下角动图预览卡:悬停动作卡片时异步加载并播放 GIF -->
 <div class="preview-card glass" id="previewCard" hidden>

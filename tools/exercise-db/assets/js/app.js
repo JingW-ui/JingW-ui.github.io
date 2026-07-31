@@ -252,6 +252,207 @@ function closeLightbox() {
   g.removeAttribute('src');
 }
 
+/* ---------------- 周训计划 ---------------- */
+
+const DAY_NAMES = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+
+/* 训练目标 → 数据中的身体部位 */
+const TARGETS = {
+  chest:     { label: '胸部', parts: ['chest'] },
+  back:      { label: '背部', parts: ['back'] },
+  shoulders: { label: '肩部', parts: ['shoulders'] },
+  arms:      { label: '手臂', parts: ['upper arms', 'lower arms'] },
+  legs:      { label: '腿部', parts: ['upper legs', 'lower legs'] },
+  waist:     { label: '腰腹', parts: ['waist'] },
+  cardio:    { label: '有氧', parts: ['cardio'] },
+  rest:      { label: '休息', parts: [] },
+};
+
+/* 周计划模板 */
+const TEMPLATES = {
+  ppl:        { label: '推拉腿', days: ['chest', 'back', 'legs', 'chest', 'back', 'legs', 'rest'] },
+  upperlower: { label: '上下肢', days: ['chest', 'legs', 'back', 'legs', 'shoulders', 'arms', 'rest'] },
+  fullbody:   { label: '全身', days: ['chest', 'back', 'legs', 'waist', 'chest', 'back', 'rest'] },
+  custom:     { label: '自定义', days: ['rest', 'rest', 'rest', 'rest', 'rest', 'rest', 'rest'] },
+};
+
+const PLAN_KEY = 'exercise_db_plan';
+
+const plan = { template: 'ppl', count: 5, days: [] };
+
+function poolForTarget(target) {
+  const parts = TARGETS[target] ? TARGETS[target].parts : [];
+  return state.all.filter(ex => parts.includes(ex.body_part));
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* 生成某目标的一天动作:优先未在其它天用过的动作,数量不足则从全池补 */
+function generateExercises(target, count, usedIds) {
+  if (target === 'rest') return [];
+  const pool = poolForTarget(target);
+  if (!pool.length) return [];
+  const fresh = pool.filter(ex => !usedIds.has(ex.id));
+  const src = fresh.length >= count ? fresh : pool;
+  return shuffle(src).slice(0, count).map(ex => ex.id);
+}
+
+function buildPlan(template, count) {
+  const tpl = TEMPLATES[template] || TEMPLATES.ppl;
+  const used = new Set();
+  return tpl.days.map(target => {
+    const exIds = generateExercises(target, count, used);
+    exIds.forEach(id => used.add(id));
+    return { target, exIds };
+  });
+}
+
+function usedIdsExcept(i) {
+  const s = new Set();
+  plan.days.forEach((d, k) => { if (k !== i) d.exIds.forEach(id => s.add(id)); });
+  return s;
+}
+
+/* localStorage 持久化 */
+function loadPlan() {
+  try {
+    const raw = localStorage.getItem(PLAN_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p && Array.isArray(p.days) && p.days.length === 7) { Object.assign(plan, p); return; }
+    }
+  } catch (e) { /* ignore */ }
+  plan.template = TEMPLATES[plan.template] ? plan.template : 'ppl';
+  plan.days = buildPlan(plan.template, plan.count);
+}
+
+let savedTimer = null;
+function savePlan() {
+  try {
+    localStorage.setItem(PLAN_KEY, JSON.stringify(plan));
+    const el = $('planSaved');
+    el.hidden = false;
+    clearTimeout(savedTimer);
+    savedTimer = setTimeout(() => { el.hidden = true; }, 1500);
+  } catch (e) { /* ignore */ }
+}
+
+function renderPlan() {
+  const grid = $('planGrid');
+  grid.innerHTML = '';
+  plan.days.forEach((day, i) => {
+    const rest = day.target === 'rest';
+    const card = document.createElement('div');
+    card.className = 'plan-day' + (rest ? ' rest' : '');
+    card.dataset.day = i;
+
+    const head = document.createElement('div');
+    head.className = 'plan-day-head';
+    const name = document.createElement('span');
+    name.className = 'plan-day-name';
+    name.textContent = DAY_NAMES[i];
+    const sel = document.createElement('select');
+    sel.className = 'filter-select plan-day-target';
+    sel.innerHTML = Object.entries(TARGETS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('');
+    sel.value = day.target;
+    sel.addEventListener('change', () => {
+      day.target = sel.value;
+      day.exIds = generateExercises(day.target, plan.count, usedIdsExcept(i));
+      savePlan();
+      renderPlan();
+    });
+    const resh = document.createElement('button');
+    resh.className = 'plan-day-reshuffle';
+    resh.textContent = '↻';
+    resh.title = '换一批';
+    resh.addEventListener('click', () => {
+      day.exIds = generateExercises(day.target, plan.count, usedIdsExcept(i));
+      savePlan();
+      renderPlan();
+    });
+    head.append(name, sel, resh);
+    card.appendChild(head);
+
+    const list = document.createElement('ul');
+    list.className = 'plan-day-list';
+    if (rest) {
+      const li = document.createElement('li');
+      li.className = 'plan-day-empty';
+      li.textContent = '🛌 休息日';
+      list.appendChild(li);
+    } else if (day.exIds.length) {
+      day.exIds.forEach((id, k) => {
+        const ex = state.all.find(x => x.id === id);
+        if (!ex) return;
+        const li = document.createElement('li');
+        li.innerHTML = `<span class="idx">${k + 1}</span><span class="en">${ex.name}</span>`;
+        li.addEventListener('click', () => openLightbox(ex));
+        list.appendChild(li);
+      });
+    } else {
+      const li = document.createElement('li');
+      li.className = 'plan-day-empty';
+      li.textContent = '暂无动作,点↻生成';
+      list.appendChild(li);
+    }
+    card.appendChild(list);
+    grid.appendChild(card);
+  });
+}
+
+function renderPlanControls() {
+  const t = $('planTemplate');
+  t.innerHTML = Object.entries(TEMPLATES).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('');
+  t.value = plan.template;
+  const c = $('planCount');
+  c.innerHTML = [4, 5, 6, 7, 8].map(n => `<option value="${n}">${n}</option>`).join('');
+  c.value = plan.count;
+}
+
+function bindPlanUI() {
+  $('planTemplate').addEventListener('change', () => {
+    plan.template = $('planTemplate').value;
+    plan.days = buildPlan(plan.template, plan.count);
+    savePlan();
+    renderPlan();
+  });
+  $('planCount').addEventListener('change', () => {
+    plan.count = +$('planCount').value;
+    plan.days = buildPlan(plan.template, plan.count);
+    savePlan();
+    renderPlan();
+  });
+  $('planGenerate').addEventListener('click', () => {
+    plan.days = buildPlan(plan.template, plan.count);
+    savePlan();
+    renderPlan();
+  });
+  $('planClear').addEventListener('click', () => {
+    plan.days = Array.from({ length: 7 }, () => ({ target: 'rest', exIds: [] }));
+    savePlan();
+    renderPlan();
+  });
+}
+
+/* 视图切换:动作库 / 周训计划 */
+function bindViewTabs() {
+  $('viewTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.view-tab');
+    if (!btn) return;
+    document.querySelectorAll('.view-tab').forEach(b => b.classList.toggle('active', b === btn));
+    $('galleryView').hidden = btn.dataset.view !== 'gallery';
+    $('planView').hidden = btn.dataset.view !== 'plan';
+    if (btn.dataset.view === 'plan') renderPlan();
+  });
+}
+
 /* ---------------- 初始化 ---------------- */
 
 function bindUI() {
@@ -296,6 +497,13 @@ function init() {
   renderSelects();
   bindUI();
   render();
+
+  // 周训计划
+  loadPlan();
+  renderPlanControls();
+  bindPlanUI();
+  bindViewTabs();
+  renderPlan();
 }
 
 init();
