@@ -42,6 +42,36 @@ textarea:focus { border-color: var(--blue); }
 .btn.ghost { background: var(--card-2); color: var(--text); border-color: var(--border); }
 .btn.sm { padding: 6px 12px; font-size: .8rem; }
 .toolbar { margin-top: 10px; gap: 8px; }
+.token-inp {
+  flex: 1; min-width: 180px; background: #010409; border: 1px solid var(--border);
+  border-radius: 7px; color: var(--text); padding: 6px 10px; font: inherit;
+  font-size: .78rem; outline: none; transition: border-color .15s;
+}
+.token-inp:focus { border-color: var(--purple); }
+.token-inp::placeholder { color: var(--muted); opacity: .6; }
+.max-sel {
+  background: var(--card-2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 8px; font: inherit; font-size: .78rem; outline: none;
+}
+.quota-bar {
+  display: inline-flex; align-items: center; gap: 5px; font-size: .75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: var(--card-2); border-radius: 5px; padding: 2px 8px;
+}
+.quota-bar.low { color: var(--yellow); }
+.quota-bar.exhausted { color: var(--red); }
+.cache-tag {
+  font-size: .65rem; color: var(--purple); background: rgba(163,113,247,.1);
+  border-radius: 3px; padding: 1px 5px; margin-left: 4px; vertical-align: middle;
+}
+.lang-load-btn {
+  background: var(--card-2); color: var(--blue); border: 1px solid var(--border);
+  border-radius: 5px; padding: 3px 10px; font-size: .72rem; cursor: pointer;
+  margin-top: 8px; transition: color .15s, border-color .15s;
+}
+.lang-load-btn:hover { border-color: var(--blue); }
+.lang-load-btn:disabled { opacity: .5; cursor: not-allowed; }
+.lang-load-btn.loaded { color: var(--green-b); border-color: rgba(63,185,80,.3); }
 .spacer { flex: 1 1 auto; }
 .status {
   margin: 14px 0; font-size: .82rem; color: var(--muted);
@@ -88,6 +118,45 @@ textarea:focus { border-color: var(--blue); }
 .empty { text-align: center; color: var(--muted); padding: 30px 10px; font-size: .88rem; }
 .error-card { border-color: rgba(248,81,73,.4); opacity: .85; }
 .error-card .repo-name a { color: #ff7b72; }
+.history-wrap { margin-top: 10px; }
+.history-toggle {
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  font: inherit; font-size: .78rem; padding: 4px 0; display: flex; align-items: center; gap: 4px;
+}
+.history-toggle:hover { color: var(--text); }
+.history-list { display: none; margin-top: 4px; }
+.history-list.open { display: block; }
+.history-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: .78rem;
+  color: var(--muted); transition: background .12s; border: 1px solid transparent;
+}
+.history-item:hover { background: var(--card-2); color: var(--text); border-color: var(--border); }
+.history-item .hi-time { font-size: .7rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+.history-item .hi-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+.history-clear { font-size: .7rem; color: var(--red); cursor: pointer; background: none; border: none; }
+.history-clear:hover { text-decoration: underline; }
+.fav-quick { margin-top: 10px; }
+.fav-quick-btn {
+  display: flex; align-items: center; justify-content: space-between; width: 100%;
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+  color: var(--text); padding: 8px 12px; font: inherit; font-size: .8rem;
+  cursor: pointer; transition: border-color .15s, background .12s;
+}
+.fav-quick-btn:hover { border-color: var(--yellow); background: var(--card-2); }
+.fav-btn {
+  background: none; border: none; cursor: pointer; font-size: .95rem; padding: 0 4px;
+  color: var(--muted); transition: color .12s, transform .1s; line-height: 1;
+  vertical-align: middle; flex-shrink: 0;
+}
+.fav-btn:hover { color: var(--yellow); transform: scale(1.15); }
+.fav-btn.active { color: var(--yellow); }
+.fav-filter {
+  background: var(--card-2); color: var(--muted); border: 1px solid var(--border);
+  border-radius: 6px; padding: 4px 10px; font: inherit; font-size: .75rem; cursor: pointer;
+  transition: color .12s, border-color .12s; white-space: nowrap;
+}
+.fav-filter.active { color: var(--yellow); border-color: var(--yellow); }
 .skeleton { background: linear-gradient(90deg, var(--card) 25%, var(--card-2) 37%, var(--card) 63%); background-size: 400% 100%; animation: sk 1.4s ease infinite; border-radius: 6px; }
 @keyframes sk { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
 .repo-badges {
@@ -147,6 +216,16 @@ footer a { color: var(--muted); }
   .repo-badges img { height: 14px; }
   .embed-btn { padding: 2px 5px; font-size: .56rem; border-radius: 3px; }
   footer { font-size: .56rem; margin-top: 14px; }
+      .token-inp { font-size: .6rem; padding: 3px 6px; min-width: 0; }
+      .max-sel { font-size: .6rem; padding: 2px 4px; }
+      .quota-bar { font-size: .6rem; padding: 1px 5px; }
+      .cache-tag { font-size: .52rem; }
+      .lang-load-btn { font-size: .58rem; padding: 2px 7px; }
+      .history-item { font-size: .65rem; padding: 4px 6px; }
+      .history-toggle { font-size: .65rem; }
+      .fav-btn { font-size: .8rem; }
+      .fav-filter { font-size: .6rem; padding: 2px 6px; }
+      .fav-quick-btn { font-size: .65rem; padding: 5px 8px; }
 }
 
 /* ---- Mobile: 400px ---- */
@@ -170,6 +249,11 @@ footer a { color: var(--muted); }
   .repo-badges img { height: 12px; }
   .embed-btn { font-size: .5rem; padding: 1px 4px; }
   footer { font-size: .5rem; }
+      .token-inp { font-size: .5rem; padding: 2px 4px; min-width: 0; }
+      .max-sel { font-size: .5rem; padding: 1px 3px; }
+      .quota-bar { font-size: .5rem; }
+      .cache-tag { font-size: .45rem; }
+      .lang-load-btn { font-size: .48rem; padding: 1px 5px; }
 }
 </style>
 </head>
@@ -186,14 +270,39 @@ footer a { color: var(--muted); }
         <button class="btn" id="analyzeBtn" type="button">嗅探分析</button>
         <button class="btn ghost" id="pasteBtn" type="button">粘贴</button>
         <button class="btn ghost" id="clearBtn" type="button">清空</button>
+        <div class="spacer"></div>
+        <select class="max-sel" id="maxSel" title="最大分析数量">
+          <option value="10">10 个</option>
+          <option value="20" selected>20 个</option>
+          <option value="30">30 个</option>
+          <option value="50">50 个</option>
+        </select>
+      </div>
+      <div class="row" style="margin-top:6px;gap:8px;">
+        <input class="token-inp" id="tokenInput" type="password" placeholder="GitHub Token (可选，提升额度至 5000/h)" autocomplete="off">
+        <a href="https://github.com/settings/tokens/new?description=Repo%20Radar" target="_blank" rel="noopener" style="color:var(--blue);font-size:.75rem;white-space:nowrap;text-decoration:none" title="无需勾选任何权限，创建后粘贴即可">🔑 获取 →</a>
+        <span id="quotaDisplay" class="quota-bar" style="display:none"></span>
       </div>
     </section>
+
+    <div class="history-wrap" id="historyWrap" style="display:none">
+      <button class="history-toggle" id="historyToggle"><span>📋</span> 最近搜索 <span id="historyCount"></span></button>
+      <div class="history-list" id="historyList"></div>
+    </div>
+
+    <div class="fav-quick" id="favQuick" style="display:none">
+      <button class="fav-quick-btn" id="favQuickBtn">
+        <span>★ 我的收藏 (<span id="favQuickCount">0</span>)</span>
+        <span style="font-size:.75rem;color:var(--muted)">点击查看 →</span>
+      </button>
+    </div>
 
     <div class="status" id="status"></div>
 
     <div class="results-head" id="resultsHead" style="display:none">
       <h2 id="resultsTitle">分析结果</h2>
       <div style="display:flex;gap:8px;align-items:center">
+        <button class="fav-filter" id="favFilter" title="仅显示已收藏">★ 收藏</button>
         <select class="sortsel" id="sortSel">
           <option value="stars">按 Star 排序</option>
           <option value="updated">按更新时间</option>
@@ -226,6 +335,277 @@ footer a { color: var(--muted); }
   var analyzeBtn = $("analyzeBtn");
   var resultsHead = $("resultsHead");
   var sortSel = $("sortSel");
+
+  // ---- Cache layer ----
+  var CACHE_PREFIX = "rr_cache_";
+  var CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+  function cacheGet(key) {
+    try {
+      var raw = localStorage.getItem(CACHE_PREFIX + key);
+      if (!raw) return null;
+      var entry = JSON.parse(raw);
+      if (Date.now() - entry.ts > CACHE_TTL) {
+        localStorage.removeItem(CACHE_PREFIX + key);
+        return null;
+      }
+      return entry.data;
+    } catch (e) { return null; }
+  }
+
+  function cacheSet(key, data) {
+    try {
+      localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ ts: Date.now(), data: data }));
+    } catch (e) { /* storage full, ignore */ }
+  }
+
+  function sleep(ms) {
+    return new Promise(function (r) { setTimeout(r, ms); });
+  }
+
+  // ---- Quota state ----
+  var quotaRemain = null;
+  var quotaTotal = null;
+  var quotaUsedApprox = 0;
+
+  function updateQuotaDisplay() {
+    var el = $("quotaDisplay");
+    if (!el) return;
+    if (quotaRemain == null) { el.style.display = "none"; return; }
+    el.style.display = "";
+    var cls = "quota-bar";
+    if (quotaRemain === 0) cls += " exhausted";
+    else if (quotaRemain < 10) cls += " low";
+    el.className = cls;
+    el.textContent = "配额剩余: " + quotaRemain + (quotaTotal ? " / " + quotaTotal : "") + " | 已用约: " + quotaUsedApprox;
+  }
+
+  function recordQuota(headers) {
+    var r = headers.get("X-RateLimit-Remaining");
+    var t = headers.get("X-RateLimit-Limit");
+    if (r != null) quotaRemain = parseInt(r, 10);
+    if (t != null) quotaTotal = parseInt(t, 10);
+    updateQuotaDisplay();
+  }
+
+  // ---- Search history (rr_history) ----
+  var HISTORY_KEY = "rr_history";
+  var HISTORY_MAX = 20;
+
+  function loadHistory() {
+    try {
+      var raw = localStorage.getItem(HISTORY_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { return []; }
+  }
+
+  function saveHistory(text, repoCount) {
+    var list = loadHistory();
+    // Deduplicate: remove existing entry with same text
+    list = list.filter(function (h) { return h.text !== text; });
+    // Prepend new entry
+    list.unshift({ ts: Date.now(), text: text, count: repoCount });
+    // Cap at HISTORY_MAX
+    if (list.length > HISTORY_MAX) list = list.slice(0, HISTORY_MAX);
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) { /* ignore */ }
+    renderHistory();
+  }
+
+  function clearHistory() {
+    try { localStorage.removeItem(HISTORY_KEY); } catch (e) { /* ignore */ }
+    renderHistory();
+  }
+
+  function renderHistory() {
+    var wrap = $("historyWrap");
+    var listEl = $("historyList");
+    var countEl = $("historyCount");
+    var toggle = $("historyToggle");
+    if (!wrap) return;
+    var list = loadHistory();
+    if (!list.length) { wrap.style.display = "none"; return; }
+    wrap.style.display = "";
+    countEl.textContent = "(" + list.length + ")";
+
+    listEl.innerHTML = list.map(function (h) {
+      var time = new Date(h.ts);
+      var timeStr = (time.getMonth() + 1) + "/" + time.getDate() + " " +
+        String(time.getHours()).padStart(2, "0") + ":" + String(time.getMinutes()).padStart(2, "0");
+      // Extract first 3 repo names for display
+      var repos = extractRepos(h.text).slice(0, 3);
+      var preview = repos.map(function (r) { return r.full; }).join(" ");
+      if (!preview) preview = h.text.slice(0, 50);
+      return '<div class="history-item" data-text="' + escapeHtml(h.text) + '">' +
+        '<span class="hi-text">' + escapeHtml(preview) + (h.count > 3 ? " …+" + (h.count - 3) : "") + '</span>' +
+        '<span class="hi-time">' + timeStr + '</span>' +
+      '</div>';
+    }).join("") +
+    '<button class="history-clear" id="historyClearBtn">清空全部</button>';
+
+    // Toggle open/close
+    if (!toggle._bound) {
+      toggle._bound = true;
+      toggle.addEventListener("click", function () {
+        var open = listEl.classList.toggle("open");
+        toggle.querySelector("span").textContent = open ? "📂" : "📋";
+      });
+    }
+
+    // Click to restore text and analyze
+    if (!listEl._bound) {
+      listEl._bound = true;
+      listEl.addEventListener("click", function (e) {
+        if (e.target.id === "historyClearBtn") { clearHistory(); return; }
+        var item = e.target.closest(".history-item");
+        if (!item) return;
+        var text = item.getAttribute("data-text");
+        if (text) {
+          input.value = text;
+          analyze();
+        }
+      });
+    }
+    // Also update favorites quick-access
+    renderFavQuick();
+  }
+
+  // ---- Favorites (rr_favorites) ----
+  var FAV_KEY = "rr_favorites";
+  var FAV_DATA_PREFIX = "rr_favdata_";
+  var FAV_DATA_TTL = 7 * 24 * 60 * 60 * 1000; // 1 week
+
+  function favDataGet(key) {
+    try {
+      var raw = localStorage.getItem(FAV_DATA_PREFIX + key);
+      if (!raw) return null;
+      var entry = JSON.parse(raw);
+      if (Date.now() - entry.ts > FAV_DATA_TTL) {
+        localStorage.removeItem(FAV_DATA_PREFIX + key);
+        return null;
+      }
+      return entry.data;
+    } catch (e) { return null; }
+  }
+
+  function favDataSet(key, data) {
+    try {
+      localStorage.setItem(FAV_DATA_PREFIX + key, JSON.stringify({ ts: Date.now(), data: data }));
+    } catch (e) { /* ignore */ }
+  }
+
+  function loadFavorites() {
+    try {
+      var raw = localStorage.getItem(FAV_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+
+  function saveFavorites(favs) {
+    try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch (e) { /* ignore */ }
+  }
+
+  function isFavorite(owner, repo) {
+    var key = (owner + "/" + repo).toLowerCase();
+    return !!loadFavorites()[key];
+  }
+
+  function toggleFavorite(owner, repo) {
+    var favs = loadFavorites();
+    var key = (owner + "/" + repo).toLowerCase();
+    if (favs[key]) {
+      delete favs[key];
+    } else {
+      favs[key] = { owner: owner, repo: repo, full: owner + "/" + repo, savedAt: Date.now() };
+      // Save full API data to long-term cache (1 week TTL)
+      for (var i = 0; i < lastResults.length; i++) {
+        var r = lastResults[i];
+        if (r.item && r.item.owner === owner && r.item.repo === repo && r.res && r.res.repo) {
+          favDataSet(key, { repo: r.res.repo, langs: r.res.langs });
+          break;
+        }
+      }
+    }
+    saveFavorites(favs);
+  }
+
+  var favFilterOn = false;
+
+  function renderFavQuick() {
+    var el = $("favQuick");
+    var countEl = $("favQuickCount");
+    if (!el) return;
+    var favs = loadFavorites();
+    var keys = Object.keys(favs);
+    if (!keys.length) { el.style.display = "none"; return; }
+    el.style.display = "";
+    countEl.textContent = keys.length;
+  }
+
+  function viewFavorites() {
+    var favs = loadFavorites();
+    var keys = Object.keys(favs);
+    if (!keys.length) {
+      statusEl.innerHTML = '<span style="color:var(--muted)">还没有收藏任何仓库</span>';
+      return;
+    }
+    document.body.classList.remove("centered");
+    resultsHead.style.display = "flex";
+    favFilterOn = true;
+    var token = ($("tokenInput") && $("tokenInput").value.trim()) || null;
+    var tokenUrl = "https://github.com/settings/tokens/new?description=Repo%20Radar";
+    var cacheHits = 0;
+
+    lastResults = keys.map(function (key) {
+      var f = favs[key];
+      var cached = favDataGet(key);
+      if (cached && cached.repo) {
+        cacheHits++;
+        return { item: { owner: f.owner, repo: f.repo, full: f.full }, res: cached, fromCache: true };
+      }
+      // Needs fetch — show lite card initially, will be replaced if token available
+      return { item: { owner: f.owner, repo: f.repo, full: f.full }, res: { error: "skipped" }, _needsFetch: true };
+    });
+
+    var statusMsg = "<span>已收藏 <b style=\"color:var(--text)\">" + keys.length + "</b> 个仓库";
+    if (cacheHits > 0) statusMsg += "（" + cacheHits + " 个有完整数据）";
+    if (cacheHits < keys.length && token) statusMsg += " · 正在获取剩余数据...";
+    if (!token) statusMsg += ' · <a href="' + tokenUrl + '" target="_blank" style="color:var(--blue)">添加 Token</a> 可获取完整信息';
+    statusMsg += "</span>";
+    statusEl.innerHTML = statusMsg;
+
+    renderResults();
+
+    // Fetch missing data if token available
+    if (token && cacheHits < keys.length) {
+      fetchFavoritesData(lastResults, token);
+    }
+  }
+
+  async function fetchFavoritesData(entries, token) {
+    var controller = new AbortController();
+    var fetched = 0;
+    for (var i = 0; i < entries.length; i++) {
+      if (!entries[i]._needsFetch) continue;
+      var item = entries[i].item;
+      if (controller.signal.aborted) break;
+      var res = await fetchRepo(item.owner, item.repo, controller.signal, token);
+      if (res && res.repo) {
+        entries[i].res = res;
+        entries[i]._needsFetch = false;
+        entries[i].fromCache = false;
+        var key = (item.owner + "/" + item.repo).toLowerCase();
+        favDataSet(key, { repo: res.repo, langs: res.langs });
+        fetched++;
+        if (fetched === 1) renderResults(); // show first result immediately
+      }
+    }
+    if (fetched > 0) {
+      var keys = entries.length;
+      var cachedCount = entries.filter(function(e) { return e.res && e.res.repo && !e._needsFetch; }).length;
+      statusEl.innerHTML = "<span>已收藏 <b style=\"color:var(--text)\">" + keys + "</b> 个仓库（完整数据 " + cachedCount + " 个）</span>";
+      renderResults();
+    }
+  }
 
   var LANG_COLORS = {
     JavaScript: "#f1e05a", TypeScript: "#3178c6", Python: "#3572A5", Java: "#b07219",
@@ -295,44 +675,104 @@ footer a { color: var(--muted); }
     return Math.floor(d / 365) + " 年前";
   }
 
+  // Languages with smaller ecosystems — lower the bar for "worth learning"
+  var HIGH_ECOSYSTEM = new Set(["JavaScript", "TypeScript", "Python", "Java", "Go", "HTML", "CSS"]);
+  var LOW_ECOSYSTEM = new Set(["Rust", "C", "C++", "C#", "Kotlin", "Swift", "Dart", "Lua", "Perl", "Scala",
+    "Clojure", "Elixir", "Haskell", "R", "Julia", "Zig", "Nim", "OCaml", "Erlang", "F#", "Assembly", "Solidity"]);
+
   function assess(r) {
     var stars = r.stargazers_count || 0;
+    var lang = r.language || "";
     var months = (Date.now() - new Date(r.pushed_at || r.updated_at).getTime()) / 2592000000;
     if (months > 24) return { cls: "b-stale", txt: "疑似停更", tip: "已 " + Math.floor(months) + " 个月未推送" };
-    if (stars >= 10000 && months <= 6) return { cls: "b-hot", txt: "热门活跃", tip: "高星且近期活跃" };
-    if (stars >= 1000) return { cls: "b-good", txt: "值得学习", tip: "社区认可度较高" };
+
+    // Adjust thresholds for language ecosystem size
+    var hotThreshold = LOW_ECOSYSTEM.has(lang) ? 3000 : 10000;
+    var goodThreshold = LOW_ECOSYSTEM.has(lang) ? 500 : 1000;
+    var fairThreshold = LOW_ECOSYSTEM.has(lang) ? 50 : 100;
+
+    // For very high-ecosystem languages, slightly raise the bar
+    if (HIGH_ECOSYSTEM.has(lang)) {
+      hotThreshold = 15000;
+      goodThreshold = 2000;
+      fairThreshold = 200;
+    }
+
+    if (stars >= hotThreshold && months <= 6) return { cls: "b-hot", txt: "热门活跃", tip: "高星且近期活跃" };
+    if (stars >= goodThreshold) return { cls: "b-good", txt: "值得学习", tip: "社区认可度较高" };
     if (months <= 3) return { cls: "b-fresh", txt: "活跃新项目", tip: "近期仍在更新" };
-    if (stars >= 100) return { cls: "b-fair", txt: "小众可用", tip: "有一定关注" };
+    if (stars >= fairThreshold) return { cls: "b-fair", txt: "小众可用", tip: "有一定关注" };
     return { cls: "b-cold", txt: "冷门项目", tip: "关注较少，自行评估" };
   }
 
-  async function fetchRepo(owner, repo, signal) {
+  async function fetchRepo(owner, repo, signal, token) {
+    var cacheKey = (owner + "/" + repo).toLowerCase();
+    var cached = cacheGet(cacheKey);
+    if (cached) return cached;
+
     var headers = { "Accept": "application/vnd.github+json" };
+    if (token) headers["Authorization"] = "Bearer " + token;
     var base = "https://api.github.com/repos/" + encodeURIComponent(owner) + "/" + encodeURIComponent(repo);
-    var resp = await fetch(base, { headers: headers, signal: signal });
-    if (resp.status === 404) return { error: "404", notFound: true };
-    if (resp.status === 403 || resp.status === 429) {
-      var remain = resp.headers.get("X-RateLimit-Remaining");
-      if (remain === "0") return { error: "rate" };
-      return { error: "forbid" };
+
+    var attempt = 0;
+    var maxAttempts = 2;
+    var resp;
+
+    while (attempt < maxAttempts) {
+      attempt++;
+      try {
+        resp = await fetch(base, { headers: headers, signal: signal });
+      } catch (e) {
+        if (e.name === "AbortError") return { error: "aborted" };
+        throw e;
+      }
+
+      recordQuota(resp.headers);
+
+      if (resp.status === 404) return { error: "404", notFound: true };
+
+      // Rate-limited — try Retry-After
+      if (resp.status === 429 || (resp.status === 403 && resp.headers.get("X-RateLimit-Remaining") === "0")) {
+        var retryAfter = resp.headers.get("Retry-After");
+        var wait = retryAfter ? parseInt(retryAfter, 10) : 60;
+        if (wait <= 30 && attempt < maxAttempts) {
+          await sleep(wait * 1000 + 500);
+          continue;
+        }
+        return { error: "rate" };
+      }
+
+      if (resp.status === 403) return { error: "forbid" };
+      if (!resp.ok) return { error: "http" + resp.status };
+
+      break; // success
     }
-    if (!resp.ok) return { error: "http" + resp.status };
+
     var data = await resp.json();
     var langs = null;
     try {
       var lr = await fetch(base + "/languages", { headers: headers, signal: signal });
+      recordQuota(lr.headers);
       if (lr.ok) langs = await lr.json();
     } catch (e) { /* ignore */ }
-    return { repo: data, langs: langs };
+
+    var result = { repo: data, langs: langs, fromCache: false };
+    cacheSet(cacheKey, result);
+    return result;
   }
 
-  async function pool(items, worker, concurrency) {
+  async function pool(items, worker, concurrency, abortState) {
     var out = new Array(items.length);
     var idx = 0;
     var runners = Array.from({ length: Math.min(concurrency, items.length) }, async function () {
       while (idx < items.length) {
+        if (abortState && abortState.aborted) break;
         var i = idx++;
         out[i] = await worker(items[i], i);
+        // If this result is a rate-limit error, signal abort to all runners
+        if (abortState && out[i] && out[i].res && out[i].res.error === "rate") {
+          abortState.aborted = true;
+        }
       }
     });
     await Promise.all(runners);
@@ -345,32 +785,131 @@ footer a { color: var(--muted); }
     resultsHead.style.display = "none";
     results.innerHTML = "";
     document.body.classList.remove("centered");
+    quotaRemain = null;
+    quotaTotal = null;
+    quotaUsedApprox = 0;
+    updateQuotaDisplay();
 
     if (!repos.length) {
       statusEl.innerHTML = '<span style="color:var(--yellow)">未在文本中检测到 GitHub 仓库链接</span>';
       return;
     }
-    var MAX = 30;
+
+    var maxSel = $("maxSel");
+    var MAX = maxSel ? parseInt(maxSel.value, 10) : 20;
+    var token = ($("tokenInput") && $("tokenInput").value.trim()) || null;
     var truncated = repos.length > MAX;
     var list = repos.slice(0, MAX);
 
-    statusEl.innerHTML = "<span>嗅探到 <b style=\"color:var(--text)\">" + repos.length + "</b> 个仓库" + (truncated ? "（仅分析前 " + MAX + " 个）" : "") + "，正在获取...</span>";
+    var tokenNote = token ? " (已认证)" : "";
+    statusEl.innerHTML = "<span>嗅探到 <b style=\"color:var(--text)\">" + repos.length + "</b> 个仓库"
+      + (truncated ? "（仅分析前 " + MAX + " 个）" : "")
+      + tokenNote + "，正在获取...</span>";
+
     results.innerHTML = list.map(function () {
       return '<div class="repo"><div class="skeleton" style="height:14px;width:55%;margin-bottom:8px"></div><div class="skeleton" style="height:12px;width:80%"></div><div class="skeleton" style="height:12px;width:40%;margin-top:8px"></div></div>';
     }).join("");
 
-    var done = 0;
-    var fetched = await pool(list, async function (item) {
-      var res = await fetchRepo(item.owner, item.repo, null);
-      done++;
-      statusEl.innerHTML = "<span>获取中 " + done + "/" + list.length + "...</span>";
-      return { item: item, res: res };
-    }, 4);
+    // ---- Phase 1: Fetch main repo data (no languages) ----
+    var controller = new AbortController();
+    var abortState = { aborted: false };
 
-    lastResults = fetched;
-    statusEl.innerHTML = "<span>分析完成 / " + list.length + " 个仓库</span>";
+    // Adaptive concurrency: start at 4, drop to 1 when quota is low
+    var concurrency = 4;
+
+    var done = 0;
+    var skipped = 0;
+    var phase1Fetched = await pool(list, async function (item) {
+      if (abortState.aborted) {
+        skipped++;
+        return { item: item, res: { error: "skipped" } };
+      }
+
+      // Adaptive concurrency: check remaining quota and throttle
+      if (quotaRemain != null && quotaRemain <= 10 && concurrency > 1) {
+        concurrency = 1;
+      }
+      if (quotaRemain === 0) {
+        abortState.aborted = true;
+        skipped++;
+        return { item: item, res: { error: "rate" } };
+      }
+
+      var res = await fetchRepo(item.owner, item.repo, controller.signal, token);
+      quotaUsedApprox++;
+      done++;
+      updateQuotaDisplay();
+
+      var cacheMarker = res.fromCache ? " 缓存" : "";
+      statusEl.innerHTML = "<span>获取中 " + done + "/" + list.length + cacheMarker + "...</span>";
+      return { item: item, res: res };
+    }, concurrency, abortState);
+
+    // After rate limit hit, abort pending requests
+    if (abortState.aborted) {
+      try { controller.abort(); } catch (e) { /* ignore */ }
+    }
+
+    // Mark remaining unfilled slots as skipped
+    for (var i = 0; i < phase1Fetched.length; i++) {
+      if (!phase1Fetched[i]) phase1Fetched[i] = { item: list[i], res: { error: "skipped" } };
+    }
+
+    lastResults = phase1Fetched;
+
+    var rateHit = phase1Fetched.some(function (f) { return f.res.error === "rate"; });
+    var tokenUrl = "https://github.com/settings/tokens/new?description=Repo%20Radar";
+    var statusText = "分析完成 / " + list.length + " 个仓库";
+    if (rateHit) statusText += ' · <a href="' + tokenUrl + '" target="_blank" style="color:var(--blue)">获取 Token</a> 提升额度';
+    if (skipped > 0) statusText += "，跳过 " + skipped + " 个";
+    statusEl.innerHTML = "<span>" + statusText + "</span>";
+
     resultsHead.style.display = "flex";
     renderResults();
+
+    // ---- Phase 2: Lazy-load languages for repos that got main data ----
+    loadLanguagesLazy(phase1Fetched, controller.signal, token);
+
+    // Save to search history if we got any actual data
+    var hasData = phase1Fetched.some(function (f) { return f.res && f.res.repo; });
+    if (hasData) saveHistory(text, list.length);
+  }
+
+  // Lazily load language data for repos that have main data but no language data yet
+  async function loadLanguagesLazy(fetched, signal, token) {
+    var needLang = fetched.filter(function (f) {
+      return f.res && f.res.repo && !f.res.langs && !f.res.error;
+    });
+    if (!needLang.length) return;
+
+    var done = 0;
+    for (var i = 0; i < needLang.length; i++) {
+      if (signal && signal.aborted) break;
+      var f = needLang[i];
+      var cacheKey = (f.item.owner + "/" + f.item.repo).toLowerCase();
+      var cached = cacheGet(cacheKey);
+      if (cached && cached.langs) {
+        f.res.langs = cached.langs;
+        continue;
+      }
+      try {
+        var base = "https://api.github.com/repos/" + encodeURIComponent(f.item.owner) + "/" + encodeURIComponent(f.item.repo);
+        var headers = { "Accept": "application/vnd.github+json" };
+        if (token) headers["Authorization"] = "Bearer " + token;
+        var lr = await fetch(base + "/languages", { headers: headers, signal: signal });
+        recordQuota(lr.headers);
+        if (lr.ok) {
+          f.res.langs = await lr.json();
+          // Update cache
+          cacheSet(cacheKey, { repo: f.res.repo, langs: f.res.langs, fromCache: false });
+        }
+      } catch (e) { /* ignore */ }
+      done++;
+    }
+    if (done > 0) {
+      statusEl.innerHTML = "<span>分析完成 / " + fetched.length + " 个仓库 (语言数据已补全 " + done + " 个)</span>";
+      renderResults();
+    }
   }
 
   function renderResults() {
@@ -389,7 +928,23 @@ footer a { color: var(--muted); }
       var sb = b.res.repo ? (b.res.repo.stargazers_count || 0) : -1;
       return sb - sa;
     });
-    results.innerHTML = sorted.map(function (o) { return renderRepo(o.item, o.res); }).join("") || '<div class="empty">无结果</div>';
+
+    // Apply favorites filter
+    if (favFilterOn) {
+      sorted = sorted.filter(function (o) { return isFavorite(o.item.owner, o.item.repo); });
+    }
+
+    // Update favorites filter button state
+    var favBtn = $("favFilter");
+    if (favBtn) {
+      if (favFilterOn) { favBtn.classList.add("active"); favBtn.textContent = "★ 全部"; }
+      else { favBtn.classList.remove("active"); var fc = Object.keys(loadFavorites()).length; favBtn.textContent = fc > 0 ? "★ 收藏 (" + fc + ")" : "★ 收藏"; }
+    }
+
+    var html = sorted.map(function (o) { return renderRepo(o.item, o.res); }).join("");
+    if (favFilterOn && !sorted.length) html = '<div class="empty">没有已收藏的仓库</div>';
+    if (!html) html = '<div class="empty">无结果</div>';
+    results.innerHTML = html;
   }
 
   function langList(langs) {
@@ -458,11 +1013,37 @@ footer a { color: var(--muted); }
     }).join(" ");
   }
 
+  function renderLiteRepo(item) {
+    var href = "https://github.com/" + item.owner + "/" + item.repo;
+    var badgesHtml = buildBadges(item.owner, item.repo);
+    var tokenUrl = "https://github.com/settings/tokens/new?description=Repo%20Radar";
+    var hasToken = ($("tokenInput") && $("tokenInput").value.trim());
+    var favClass = isFavorite(item.owner, item.repo) ? "fav-btn active" : "fav-btn";
+    var favStar = isFavorite(item.owner, item.repo) ? "★" : "☆";
+    var descHtml = hasToken
+      ? '<span style="color:var(--muted)">正在获取数据...</span>'
+      : '🔑 <a href="' + tokenUrl + '" target="_blank" rel="noopener" style="color:var(--blue)">添加 Token</a> 可解锁项目描述、质量评分与语言详情';
+    return '<div class="repo">' +
+      '<div class="repo-top"><div>' +
+        '<div class="repo-name"><a href="' + href + '" target="_blank" rel="noopener">' + escapeHtml(item.full) + '</a>' +
+        '<button class="' + favClass + '" data-action="fav" data-owner="' + escapeHtml(item.owner) + '" data-repo="' + escapeHtml(item.repo) + '" title="收藏 / 取消收藏" style="margin-left:6px">' + favStar + '</button></div>' +
+        '<p class="repo-desc">' + descHtml + '</p>' +
+      '</div></div>' +
+      '<div class="repo-badges" style="margin-top:8px;padding-top:0;border-top:none">' +
+        badgesHtml +
+        '<button class="embed-btn" data-owner="' + escapeHtml(item.owner) + '" data-repo="' + escapeHtml(item.repo) + '" title="复制 Markdown 嵌入代码">复制 Embed</button>' +
+      '</div>' +
+    '</div>';
+  }
+
   function renderRepo(item, res) {
     var href = "https://github.com/" + item.owner + "/" + item.repo;
     if (res.error) {
+      if (res.error === "rate" || res.error === "skipped") {
+        return renderLiteRepo(item);
+      }
       var msg;
-      if (res.error === "rate") msg = "已达 API 配额上限，请稍后再试";
+      if (res.error === "aborted") msg = "已取消（配额不足）";
       else if (res.notFound) msg = "仓库不存在或已删除";
       else if (res.error === "forbid") msg = "访问被拒绝";
       else msg = "获取失败 (" + escapeHtml(res.error) + ")";
@@ -475,11 +1056,18 @@ footer a { color: var(--muted); }
       topics = '<div class="repo-meta"><span class="meta-item">' + r.topics.slice(0, 5).map(function (t) { return escapeHtml("#" + t); }).join(" ") + "</span></div>";
     }
     var badgesHtml = buildBadges(item.owner, item.repo);
-    return '<div class="repo">' +
+    var cacheTag = res.fromCache ? '<span class="cache-tag">缓存</span>' : "";
+    var langSection = langList(res.langs);
+    var favClass = isFavorite(item.owner, item.repo) ? "fav-btn active" : "fav-btn";
+    var favStar = isFavorite(item.owner, item.repo) ? "★" : "☆";
+    return '<div class="repo" data-owner="' + escapeHtml(item.owner) + '" data-repo="' + escapeHtml(item.repo) + '">' +
       '<div class="repo-top"><div>' +
-        '<div class="repo-name"><a href="' + (r.html_url || href) + '" target="_blank" rel="noopener">' + escapeHtml(r.full_name) + '</a></div>' +
+        '<div class="repo-name"><a href="' + (r.html_url || href) + '" target="_blank" rel="noopener">' + escapeHtml(r.full_name) + '</a>' + cacheTag + '</div>' +
         (r.description ? '<p class="repo-desc">' + escapeHtml(r.description) + '</p>' : '') +
-      '</div><span class="badge ' + a.cls + '" title="' + escapeHtml(a.tip) + '">' + a.txt + '</span></div>' +
+      '</div><div style="display:flex;align-items:center;gap:4px;flex-shrink:0">' +
+        '<button class="' + favClass + '" data-action="fav" data-owner="' + escapeHtml(item.owner) + '" data-repo="' + escapeHtml(item.repo) + '" title="收藏 / 取消收藏">' + favStar + '</button>' +
+        '<span class="badge ' + a.cls + '" title="' + escapeHtml(a.tip) + '">' + a.txt + '</span>' +
+      '</div></div>' +
       '<div class="repo-meta">' +
         '<span class="meta-item"><span class="star-ic">&#9733;</span> ' + fmtNum(r.stargazers_count) + ' / ' + fmtNum(r.forks_count) + ' / ' + fmtNum(r.subscribers_count || r.watchers_count) + '</span>' +
         '<span class="meta-item">' + (r.language ? escapeHtml(r.language) : "—") + '</span>' +
@@ -488,7 +1076,7 @@ footer a { color: var(--muted); }
         '<span class="meta-item">' + fmtNum(r.open_issues_count) + ' open issue</span>' +
       '</div>' +
       topics +
-      langList(res.langs) +
+      langSection +
       '<div class="repo-badges">' +
         badgesHtml +
         '<button class="embed-btn" data-owner="' + escapeHtml(item.owner) + '" data-repo="' + escapeHtml(item.repo) + '" title="复制 Markdown 嵌入代码">复制 Embed</button>' +
@@ -504,6 +1092,10 @@ footer a { color: var(--muted); }
     statusEl.innerHTML = "";
     resultsHead.style.display = "none";
     lastResults = [];
+    quotaRemain = null;
+    quotaTotal = null;
+    quotaUsedApprox = 0;
+    updateQuotaDisplay();
     document.body.classList.add("centered");
     input.focus();
   });
@@ -520,7 +1112,47 @@ footer a { color: var(--muted); }
   sortSel.addEventListener("change", renderResults);
   $("badgeStyleSel").addEventListener("change", renderResults);
 
+  // Token input: persist to localStorage for convenience
+  var tokenInputEl = $("tokenInput");
+  if (tokenInputEl) {
+    // Restore saved token
+    try {
+      var saved = localStorage.getItem("rr_token");
+      if (saved) tokenInputEl.value = saved;
+    } catch (e) { /* ignore */ }
+    tokenInputEl.addEventListener("change", function () {
+      try {
+        var v = tokenInputEl.value.trim();
+        if (v) localStorage.setItem("rr_token", v);
+        else localStorage.removeItem("rr_token");
+      } catch (e) { /* ignore */ }
+    });
+  }
+
+  // MAX select: warn for high values when unauthenticated
+  var maxSelEl = $("maxSel");
+  if (maxSelEl) {
+    maxSelEl.addEventListener("change", function () {
+      var v = parseInt(maxSelEl.value, 10);
+      var hasToken = tokenInputEl && tokenInputEl.value.trim();
+      if (v > 20 && !hasToken) {
+        statusEl.innerHTML = '<span style="color:var(--yellow)">⚠ 未认证模式下建议 ≤20 个，避免配额不足。可添加 GitHub Token 提升额度。</span>';
+      }
+    });
+  }
+
   results.addEventListener("click", function (e) {
+    // Handle favorite toggle
+    var favBtn = e.target.closest("[data-action='fav']");
+    if (favBtn) {
+      var owner = favBtn.getAttribute("data-owner");
+      var repo = favBtn.getAttribute("data-repo");
+      toggleFavorite(owner, repo);
+      renderResults();
+      renderFavQuick();
+      return;
+    }
+    // Handle embed copy
     var btn = e.target.closest(".embed-btn");
     if (!btn) return;
     var owner = btn.getAttribute("data-owner");
@@ -536,10 +1168,29 @@ footer a { color: var(--muted); }
     });
   });
 
+  // Favorites quick-access button
+  var favQuickBtn = $("favQuickBtn");
+  if (favQuickBtn) {
+    favQuickBtn.addEventListener("click", function () { viewFavorites(); });
+  }
+
+  // Favorites filter toggle
+  var favFilterBtn = $("favFilter");
+  if (favFilterBtn) {
+    favFilterBtn.addEventListener("click", function () {
+      favFilterOn = !favFilterOn;
+      renderResults();
+    });
+  }
+
   input.addEventListener("paste", function () { setTimeout(analyze, 50); });
   input.addEventListener("keydown", function (e) {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") analyze();
   });
+
+  // Init: render search history + favorites quick-access on page load
+  renderHistory();
+  renderFavQuick();
 })();
 </script>
 </body>
