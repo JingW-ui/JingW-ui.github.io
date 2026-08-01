@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <title>思维导图 - Markdown Mindmap</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23667eea'/%3E%3Cg stroke='white' stroke-width='6' stroke-linecap='round'%3E%3Cline x1='50' y1='50' x2='80' y2='25'/%3E%3Cline x1='50' y1='50' x2='25' y2='40'/%3E%3Cline x1='50' y1='50' x2='60' y2='80'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='12' fill='white'/%3E%3Ccircle cx='80' cy='25' r='8' fill='white'/%3E%3Ccircle cx='25' cy='40' r='8' fill='white'/%3E%3Ccircle cx='60' cy='80' r='8' fill='white'/%3E%3Cpath d='M50 44L52 48 L56 50 L52 52 L50 56 L48 52 L44 50 L48 48 Z' fill='%23764ba2'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%232dd4bf'/%3E%3Cg stroke='white' stroke-width='6' stroke-linecap='round'%3E%3Cline x1='50' y1='50' x2='80' y2='25'/%3E%3Cline x1='50' y1='50' x2='25' y2='40'/%3E%3Cline x1='50' y1='50' x2='60' y2='80'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='12' fill='white'/%3E%3Ccircle cx='80' cy='25' r='8' fill='white'/%3E%3Ccircle cx='25' cy='40' r='8' fill='white'/%3E%3Ccircle cx='60' cy='80' r='8' fill='white'/%3E%3Cpath d='M50 44L52 48 L56 50 L52 52 L50 56 L48 52 L44 50 L48 48 Z' fill='%233b82f6'/%3E%3C/svg%3E">
 <script src="https://unpkg.com/d3@7.8.5/dist/d3.min.js"></script>
 <script src="https://unpkg.com/markmap-lib@0.15.3/dist/browser/index.js"></script>
 <script src="https://unpkg.com/markmap-view@0.15.3/dist/browser/index.js"></script>
@@ -794,11 +794,121 @@
         opacity: 1;
         pointer-events: auto;
     }
+/* ================= 站点玻璃态主题(对齐 tools 主页设计系统) ================= */
+:root {
+  --bg-gradient-1:#e7f1f0; --bg-gradient-2:#dfe9ec; --bg-gradient-3:#e6edf2;
+  --card:rgba(255,255,255,.50); --card-hover:rgba(255,255,255,.72);
+  --border:rgba(255,255,255,.55); --text:#2c3e50; --text-soft:#5a6c7d; --text-dim:#8e9aaf;
+  --accent:#2dd4bf; --accent-2:#3b82f6;
+  --accent-grad:linear-gradient(120deg,#2dd4bf,#3b82f6);
+  --shadow-sm:0 2px 8px rgba(20,40,50,.05); --shadow-md:0 6px 24px rgba(20,40,50,.08);
+  --radius-sm:14px; --radius-md:20px;
+  --transition:all .28s cubic-bezier(.4,0,.2,1);
+}
+body {
+  background:linear-gradient(135deg,var(--bg-gradient-1) 0%,var(--bg-gradient-2) 50%,var(--bg-gradient-3) 100%) fixed;
+  color:var(--text); overflow-x:hidden; position:relative;
+}
+/* 背景装饰光斑(与站点一致) */
+body::before, body::after {
+  content:""; position:fixed; border-radius:50%; filter:blur(90px); opacity:.45; pointer-events:none; z-index:0;
+}
+body::before {
+  width:560px; height:560px; background:radial-gradient(circle,rgba(94,234,212,.30) 0%,transparent 70%);
+  top:-180px; left:-120px; animation:siteFloat 22s ease-in-out infinite;
+}
+body::after {
+  width:480px; height:480px; background:radial-gradient(circle,rgba(125,211,252,.28) 0%,transparent 70%);
+  bottom:-140px; right:-120px; animation:siteFloat 26s ease-in-out infinite reverse;
+}
+@keyframes siteFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-26px) translateX(18px)} }
+
+.header { background:var(--card); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-bottom:1px solid var(--border); position:relative; z-index:1; }
+.header h1 { color:var(--text); }
+.ai-badge { background:rgba(45,212,191,.14); color:#0d9488; border:1px solid rgba(45,212,191,.3); border-radius:20px; padding:.25rem .7rem; animation:none; font-weight:500; }
+.github-link { color:var(--text-soft); }
+.lang-btn { background:transparent; border:1px solid rgba(44,62,80,.12); color:var(--text-soft); border-radius:10px; transition:var(--transition); }
+.lang-btn:hover { background:rgba(45,212,191,.10); color:var(--text); }
+.lang-btn.active { background:rgba(45,212,191,.12); color:var(--text); border-color:transparent; font-weight:600; }
+.container { position:relative; z-index:1; }
+.editor-panel, .mindmap-panel { background:var(--card); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-md); }
+.panel-header { background:rgba(255,255,255,.4); border-bottom:1px solid var(--border); }
+.panel-title { color:var(--text); }
+.ai-config, .panel-section { background:rgba(255,255,255,.35); border-bottom:1px solid var(--border); }
+.config-label { color:var(--text-soft); }
+.config-input, .model-select, .text-input, .content-display { background:rgba(255,255,255,.6); border:1px solid var(--border); border-radius:10px; color:var(--text); }
+.config-input:focus, .model-select:focus, .text-input:focus, .content-display:focus { border-color:var(--accent); outline:none; }
+.text-input, .content-display { border-radius:12px; }
+.query-models-btn { background:transparent; border:1px solid rgba(44,62,80,.12); color:var(--text-soft); border-radius:10px; transition:var(--transition); }
+.query-models-btn:hover { background:rgba(45,212,191,.10); box-shadow:none; transform:none; }
+.control-btn { border-radius:10px; transition:var(--transition); }
+.control-btn.ai-btn { background:transparent; color:var(--text-soft); border:1px solid rgba(44,62,80,.12); }
+.control-btn.ai-btn:hover { background:rgba(45,212,191,.10); transform:none; box-shadow:none; }
+.control-btn.view-btn { background:transparent; color:var(--text-soft); border:1px solid rgba(44,62,80,.12); }
+.control-btn.view-btn:hover { background:rgba(45,212,191,.10); color:var(--text); transform:none; box-shadow:none; }
+.control-btn.view-btn.active { background:rgba(45,212,191,.12); color:var(--text); border-color:transparent; box-shadow:none; }
+.control-btn.markdown-btn { background:transparent; color:var(--text-soft); border:1px solid rgba(44,62,80,.12); }
+.control-btn.markdown-btn:hover { background:rgba(34,197,94,.08); transform:none; box-shadow:none; }
+.control-btn.markdown-btn.active { background:rgba(34,197,94,.12); color:var(--text); border-color:transparent; box-shadow:none; }
+.control-btn.clear-btn { background:transparent; color:var(--text-soft); border:1px solid rgba(44,62,80,.12); }
+.control-btn.clear-btn:hover { background:rgba(239,68,68,.08); transform:none; box-shadow:none; }
+.mindmap-header { background:rgba(255,255,255,.4); border-bottom:1px solid var(--border); color:var(--text); }
+.mindmap-header .panel-title { color:var(--text); }
+.export-btn { background:transparent; color:var(--text-soft); border:1px solid rgba(44,62,80,.12); border-radius:10px; transition:var(--transition); }
+.export-btn:hover { background:rgba(45,212,191,.10); color:var(--text); transform:none; box-shadow:none; }
+.result-tab-btn { background:transparent; color:var(--text-soft); border:1px solid rgba(44,62,80,.12); border-radius:10px; transition:var(--transition); }
+.result-tab-btn:hover { background:rgba(45,212,191,.10); color:var(--text); }
+.result-tab-btn.active { background:rgba(45,212,191,.12); color:var(--text); border-color:transparent; font-weight:700; }
+.mindmap-container { background:rgba(255,255,255,.65); }
+.loading-overlay { background:rgba(255,255,255,.85); color:var(--text-soft); }
+.loading-spinner { border:5px solid rgba(45,212,191,.15); border-top:5px solid var(--accent); }
+#timer-display { color:var(--accent-2); }
+.modal-content { background:rgba(255,255,255,.92); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-md); }
+.modal-close-btn { color:var(--text-dim); }
+.modal-close-btn:hover { color:var(--text); }
+#settings-btn, #prompt-settings-btn { background:transparent; color:var(--text-soft); border:1px solid rgba(44,62,80,.12); border-radius:10px; transition:var(--transition); }
+#settings-btn:hover, #prompt-settings-btn:hover { background:rgba(45,212,191,.10); color:var(--text); transform:none; box-shadow:none; }
+.prompt-tip { background:rgba(45,212,191,.12); border:1px solid rgba(45,212,191,.3); color:#0d9488; border-radius:12px; }
+.prompt-tip code { background:rgba(255,255,255,.7); color:#0f766e; }
+#version-slider { background:rgba(45,212,191,.2); border:1px solid rgba(45,212,191,.3); }
+#version-slider::-webkit-slider-thumb { border:3px solid #5eead4; box-shadow:none; }
+#version-slider:hover::-webkit-slider-thumb { background:var(--accent); border-color:var(--accent); }
+#version-slider::-moz-range-thumb { border:3px solid #5eead4; box-shadow:none; }
+#version-slider:hover::-moz-range-thumb { background:var(--accent); border-color:var(--accent); }
+#version-count-display { color:var(--accent-2); }
+.visibility-toggle-btn { color:var(--text-dim); }
+.visibility-toggle-btn:hover { color:var(--text); }
+.context-menu { background:rgba(255,255,255,.92); backdrop-filter:blur(24px); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow-md); }
+.context-menu-item { color:var(--text); }
+.context-menu-item:hover { background:rgba(45,212,191,.1); }
+.info-modal-content { color:var(--text); }
+.info-modal-content h2 { color:var(--accent-2); border-bottom:2px solid var(--border); }
+.info-modal-content h3 { color:#0d9488; }
+.info-modal-content strong { color:var(--accent-2); }
+.info-modal-content code { background:rgba(45,212,191,.12); color:#0d9488; }
+.hamburger-btn span { background:var(--text); }
+.mobile-menu { background:rgba(255,255,255,.92); backdrop-filter:blur(24px); border-bottom:1px solid var(--border); }
+.mobile-menu-item { background:transparent; border:1px solid rgba(44,62,80,.12); border-radius:12px; color:var(--text); transition:var(--transition); }
+.mobile-menu-item:hover { background:rgba(45,212,191,.10); color:var(--text); }
+.mobile-menu .lang-btn { background:transparent; color:var(--text-soft); border:1px solid rgba(44,62,80,.12); }
+.mobile-menu .lang-btn.active { background:rgba(45,212,191,.12); color:var(--text); border-color:transparent; }
+.mobile-tab-bar { background:rgba(255,255,255,.92); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-top:1px solid var(--border); }
+.mobile-tab-bar .tab-btn { color:var(--text-soft); }
+.mobile-tab-bar .tab-btn.active { color:var(--accent); }
+.landscape-mode-overlay { background:var(--bg-gradient-1); }
+.landscape-mode-header { background:rgba(255,255,255,.4); border-bottom:1px solid var(--border); }
+.landscape-mode-header .title { color:var(--text); }
+.landscape-mode-header .close-btn, .landscape-export-btn, .landscape-tab-btn { background:transparent; border:1px solid rgba(44,62,80,.12); color:var(--text-soft); border-radius:10px; transition:var(--transition); }
+.landscape-mode-header .close-btn:hover, .landscape-export-btn:hover, .landscape-tab-btn:hover { background:rgba(45,212,191,.10); }
+.landscape-tab-btn.active { background:rgba(45,212,191,.12); color:var(--text); border-color:transparent; font-weight:700; }
+.landscape-mode-content { background:rgba(255,255,255,.65); }
+/* hover 时边框转青,呼应主色调 */
+.control-btn:hover, .lang-btn:hover, .export-btn:hover, .result-tab-btn:hover, .query-models-btn:hover, #settings-btn:hover, #prompt-settings-btn:hover, .mobile-menu-item:hover, .mobile-menu .lang-btn:hover, .landscape-mode-header .close-btn:hover, .landscape-export-btn:hover, .landscape-tab-btn:hover { border-color:rgba(45,212,191,.45); }
 </style>
 </head>
 <body>
 <div class="header">
-    <h1>AiMarkmap <span class="ai-badge">AI Powered</span></h1>
+    <h1>AiMarkmap</h1>
     <div class="header-right">
         <button id="info-btn" class="github-link" style="background:none; border:none; cursor:pointer; padding:0; color:white;" data-t-title="helpBtnTitle">
             <svg class="github-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
@@ -1057,17 +1167,17 @@ let currentLanguage = 'zh';
 
 const translations = {
     zh: {
-        'promptSettingsBtn': '📝 Prompt设置',
-        'apiSettingsBtn': '⚙️ API设置',
+        'promptSettingsBtn': 'Prompt 设置',
+        'apiSettingsBtn': 'API 设置',
         'modelLabel': '模型:',
         'modelLabelMobile': '模型选择:',
-        'queryBtn': '🔍 查询',
+        'queryBtn': '查询',
         'versionsLabel': '版本数量:',
-        'generateBtn': '🚀 AI生成',
-        'pasteGenerateBtn': '📋 粘贴并生成',
-        'showOriginalBtn': '📄 显示原文',
-        'showMarkdownBtn': '📝 显示Markdown',
-        'clearBtn': '🗑️ 清空',
+        'generateBtn': 'AI 生成',
+        'pasteGenerateBtn': '粘贴并生成',
+        'showOriginalBtn': '显示原文',
+        'showMarkdownBtn': '显示 Markdown',
+        'clearBtn': '清空',
         'fullscreenBtn': '全屏显示(F11)',
         'exportPngBtn': '导出 PNG',
         'exportSvgBtn': '导出 SVG',
@@ -1077,7 +1187,7 @@ const translations = {
         'apiUrlLabel': 'API地址:',
         'apiTypeLabel': 'API类型:',
         'apiKeyLabel': 'API秘钥:',
-        'saveAndCloseBtn': '💾 保存并关闭',
+        'saveAndCloseBtn': '保存并关闭',
         'promptSettingsTitle': '📝 Prompt 设置',
         'promptTip': '请确保在Prompt模板中包含 <code>{{CONTENT}}</code>，它将被替换为左侧的输入内容。',
         'editNodeTitle': '✏️ 编辑节点',
@@ -1254,17 +1364,17 @@ const translations = {
 作为思维导图架构师，你必须遵守上述Rules，按照Workflows执行任务。`
     },
     en: {
-        'promptSettingsBtn': '📝 Prompt Settings',
-        'apiSettingsBtn': '⚙️ API Settings',
+        'promptSettingsBtn': 'Prompt Settings',
+        'apiSettingsBtn': 'API Settings',
         'modelLabel': 'Model:',
         'modelLabelMobile': 'Model Select:',
-        'queryBtn': '🔍 Query',
+        'queryBtn': 'Query',
         'versionsLabel': 'Versions:',
-        'generateBtn': '🚀 AI Generate',
-        'pasteGenerateBtn': '📋 Paste & Generate',
-        'showOriginalBtn': '📄 Show Original',
-        'showMarkdownBtn': '📝 Show Markdown',
-        'clearBtn': '🗑️ Clear',
+        'generateBtn': 'AI Generate',
+        'pasteGenerateBtn': 'Paste & Generate',
+        'showOriginalBtn': 'Show Original',
+        'showMarkdownBtn': 'Show Markdown',
+        'clearBtn': 'Clear',
         'fullscreenBtn': 'Fullscreen (F11)',
         'exportPngBtn': 'Export PNG',
         'exportSvgBtn': 'Export SVG',
@@ -1274,7 +1384,7 @@ const translations = {
         'apiUrlLabel': 'API URL:',
         'apiTypeLabel': 'API Type:',
         'apiKeyLabel': 'API Key:',
-        'saveAndCloseBtn': '💾 Save & Close',
+        'saveAndCloseBtn': 'Save & Close',
         'promptSettingsTitle': '📝 Prompt Settings',
         'promptTip': 'Please make sure to include <code>{{CONTENT}}</code> in the prompt template, which will be replaced with the input content from the left.',
         'editNodeTitle': '✏️ Edit Node',
@@ -1516,16 +1626,16 @@ const promptInput = document.getElementById('prompt-input');
 const LAST_SUCCESSFUL_MODEL_KEY = 'ai-mindmap-last-successful-model';
 
 const colorPalette = [
-  '#3B82F6',
-  '#16A34A',
-  '#F97316',
-  '#9333EA',
-  '#E11D48',
-  '#0891B2',
+  '#2dd4bf',
+  '#3b82f6',
+  '#06b6d4',
+  '#38bdf8',
+  '#14b8a6',
+  '#60a5fa',
 ];
 
 function getNodeColor(node) {
-  if (node.depth === 0) return '#374151';
+  if (node.depth === 0) return '#334155';
   const index = (node.depth - 1) % colorPalette.length;
   return colorPalette[index];
 }
