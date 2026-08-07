@@ -157,6 +157,23 @@ textarea:focus { border-color: var(--blue); }
   transition: color .12s, border-color .12s; white-space: nowrap;
 }
 .fav-filter.active { color: var(--yellow); border-color: var(--yellow); }
+.fav-list { display: none; margin-top: 4px; }
+.fav-list.open { display: block; }
+.fav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: .78rem;
+  color: var(--muted); transition: background .12s; border: 1px solid transparent;
+}
+.fav-item:hover { background: var(--card-2); color: var(--text); border-color: var(--border); }
+.fav-item .fi-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+.fav-item .fi-sub {
+  font-size: .7rem; color: var(--muted); max-width: 40%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex-shrink: 1;
+}
+.fav-item-rm { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .9rem; padding: 0 2px; flex-shrink: 0; }
+.fav-item-rm:hover { color: var(--red); }
+.fav-quick-arrow { display: inline-block; font-size: .75rem; color: var(--muted); transition: transform .15s; }
+.fav-quick-arrow.open { transform: rotate(90deg); }
 .skeleton { background: linear-gradient(90deg, var(--card) 25%, var(--card-2) 37%, var(--card) 63%); background-size: 400% 100%; animation: sk 1.4s ease infinite; border-radius: 6px; }
 @keyframes sk { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
 .repo-badges {
@@ -226,6 +243,10 @@ footer a { color: var(--muted); }
       .fav-btn { font-size: .8rem; }
       .fav-filter { font-size: .6rem; padding: 2px 6px; }
       .fav-quick-btn { font-size: .65rem; padding: 5px 8px; }
+      .fav-item { font-size: .65rem; padding: 4px 6px; gap: 5px; }
+      .fav-item-rm { font-size: .8rem; }
+      .fav-item .fi-sub { max-width: 55%; }
+      .fav-quick-arrow { font-size: .65rem; }
 }
 
 /* ---- Mobile: 400px ---- */
@@ -265,7 +286,7 @@ footer a { color: var(--muted); }
   </header>
   <main id="app">
     <section class="card">
-      <textarea id="input" placeholder="把包含 GitHub 链接的文本粘贴到这里，例如：&#10;推荐几个好项目 https://github.com/vuejs/vue 和 https://github.com/facebook/react ，还有 https://github.com/torvalds/linux"></textarea>
+      <textarea id="input" placeholder="把包含 GitHub 链接或 Owner/Repo 简写的文本粘贴到这里，例如：&#10;推荐几个好项目 TencentCloud/TencentDB-Agent-Memory 和 https://github.com/facebook/react"></textarea>
       <div class="row toolbar">
         <button class="btn" id="analyzeBtn" type="button">嗅探分析</button>
         <button class="btn ghost" id="pasteBtn" type="button">粘贴</button>
@@ -293,8 +314,9 @@ footer a { color: var(--muted); }
     <div class="fav-quick" id="favQuick" style="display:none">
       <button class="fav-quick-btn" id="favQuickBtn">
         <span>★ 我的收藏 (<span id="favQuickCount">0</span>)</span>
-        <span style="font-size:.75rem;color:var(--muted)">点击查看 →</span>
+        <span class="fav-quick-arrow" id="favQuickArrow">▸</span>
       </button>
+      <div class="fav-list" id="favList"></div>
     </div>
 
     <div class="status" id="status"></div>
@@ -465,8 +487,6 @@ footer a { color: var(--muted); }
         }
       });
     }
-    // Also update favorites quick-access
-    renderFavQuick();
   }
 
   // ---- Favorites (rr_favorites) ----
@@ -493,14 +513,19 @@ footer a { color: var(--muted); }
     } catch (e) { /* ignore */ }
   }
 
+  var favCache = null;
+
   function loadFavorites() {
+    if (favCache) return favCache;
     try {
       var raw = localStorage.getItem(FAV_KEY);
-      return raw ? JSON.parse(raw) : {};
-    } catch (e) { return {}; }
+      favCache = raw ? JSON.parse(raw) : {};
+    } catch (e) { favCache = {}; }
+    return favCache;
   }
 
   function saveFavorites(favs) {
+    favCache = favs;
     try { localStorage.setItem(FAV_KEY, JSON.stringify(favs)); } catch (e) { /* ignore */ }
   }
 
@@ -520,7 +545,7 @@ footer a { color: var(--muted); }
       for (var i = 0; i < lastResults.length; i++) {
         var r = lastResults[i];
         if (r.item && r.item.owner === owner && r.item.repo === repo && r.res && r.res.repo) {
-          favDataSet(key, { repo: r.res.repo, langs: r.res.langs });
+          favDataSet(key, { repo: r.res.repo, langs: cropLangs(r.res.langs) });
           break;
         }
       }
@@ -529,6 +554,17 @@ footer a { color: var(--muted); }
   }
 
   var favFilterOn = false;
+  var favListOpen = false;
+
+  function cropLangs(langs) {
+    if (!langs) return langs;
+    var entries = Object.entries(langs).filter(function (e) { return e[1] > 0; });
+    entries.sort(function (a, b) { return b[1] - a[1]; });
+    if (entries.length <= 4) return langs;
+    var out = {};
+    for (var i = 0; i < 4; i++) out[entries[i][0]] = entries[i][1];
+    return out;
+  }
 
   function renderFavQuick() {
     var el = $("favQuick");
@@ -536,75 +572,74 @@ footer a { color: var(--muted); }
     if (!el) return;
     var favs = loadFavorites();
     var keys = Object.keys(favs);
-    if (!keys.length) { el.style.display = "none"; return; }
+    if (!keys.length) {
+      el.style.display = "none";
+      favListOpen = false;
+      var listEl = $("favList");
+      if (listEl) listEl.classList.remove("open");
+      return;
+    }
     el.style.display = "";
     countEl.textContent = keys.length;
+    var arrow = $("favQuickArrow");
+    if (arrow) {
+      arrow.textContent = favListOpen ? "▾" : "▸";
+      arrow.classList.toggle("open", favListOpen);
+    }
+    renderFavList();
   }
 
-  function viewFavorites() {
+  function renderFavList() {
+    var listEl = $("favList");
+    if (!listEl) return;
+    listEl.classList.toggle("open", favListOpen);
+    if (!favListOpen) return;
     var favs = loadFavorites();
     var keys = Object.keys(favs);
     if (!keys.length) {
-      statusEl.innerHTML = '<span style="color:var(--muted)">还没有收藏任何仓库</span>';
+      favListOpen = false;
+      renderFavQuick();
       return;
     }
-    document.body.classList.remove("centered");
-    resultsHead.style.display = "flex";
-    favFilterOn = true;
-    var token = ($("tokenInput") && $("tokenInput").value.trim()) || null;
-    var tokenUrl = "https://github.com/settings/tokens/new?description=Repo%20Radar";
-    var cacheHits = 0;
-
-    lastResults = keys.map(function (key) {
+    listEl.innerHTML = keys.map(function (key) {
       var f = favs[key];
       var cached = favDataGet(key);
+      var sub = "点击查看";
       if (cached && cached.repo) {
-        cacheHits++;
-        return { item: { owner: f.owner, repo: f.repo, full: f.full }, res: cached, fromCache: true };
+        var bits = [];
+        if (cached.repo.stargazers_count != null) bits.push("★ " + fmtNum(cached.repo.stargazers_count));
+        if (cached.repo.language) bits.push(cached.repo.language);
+        if (bits.length) sub = bits.join(" · ");
       }
-      // Needs fetch — show lite card initially, will be replaced if token available
-      return { item: { owner: f.owner, repo: f.repo, full: f.full }, res: { error: "skipped" }, _needsFetch: true };
-    });
-
-    var statusMsg = "<span>已收藏 <b style=\"color:var(--text)\">" + keys.length + "</b> 个仓库";
-    if (cacheHits > 0) statusMsg += "（" + cacheHits + " 个有完整数据）";
-    if (cacheHits < keys.length && token) statusMsg += " · 正在获取剩余数据...";
-    if (!token) statusMsg += ' · <a href="' + tokenUrl + '" target="_blank" style="color:var(--blue)">添加 Token</a> 可获取完整信息';
-    statusMsg += "</span>";
-    statusEl.innerHTML = statusMsg;
-
-    renderResults();
-
-    // Fetch missing data if token available
-    if (token && cacheHits < keys.length) {
-      fetchFavoritesData(lastResults, token);
-    }
+      return '<div class="fav-item" data-owner="' + escapeHtml(f.owner) + '" data-repo="' + escapeHtml(f.repo) + '">' +
+        '<span class="fi-text">' + escapeHtml(f.full) + '</span>' +
+        '<span class="fi-sub">' + escapeHtml(sub) + '</span>' +
+        '<button class="fav-item-rm" data-owner="' + escapeHtml(f.owner) + '" data-repo="' + escapeHtml(f.repo) + '" title="取消收藏">×</button>' +
+      '</div>';
+    }).join("");
   }
 
-  async function fetchFavoritesData(entries, token) {
+  function toggleFavList() {
+    favListOpen = !favListOpen;
+    renderFavQuick();
+    if (favListOpen) refreshFavPanelData();
+  }
+
+  async function refreshFavPanelData() {
+    var token = ($("tokenInput") && $("tokenInput").value.trim()) || null;
+    if (!token) return;
+    var favs = loadFavorites();
+    var missing = Object.keys(favs).filter(function (k) { return !favDataGet(k); });
+    if (!missing.length) return;
     var controller = new AbortController();
-    var fetched = 0;
-    for (var i = 0; i < entries.length; i++) {
-      if (!entries[i]._needsFetch) continue;
-      var item = entries[i].item;
-      if (controller.signal.aborted) break;
-      var res = await fetchRepo(item.owner, item.repo, controller.signal, token);
-      if (res && res.repo) {
-        entries[i].res = res;
-        entries[i]._needsFetch = false;
-        entries[i].fromCache = false;
-        var key = (item.owner + "/" + item.repo).toLowerCase();
-        favDataSet(key, { repo: res.repo, langs: res.langs });
-        fetched++;
-        if (fetched === 1) renderResults(); // show first result immediately
-      }
-    }
-    if (fetched > 0) {
-      var keys = entries.length;
-      var cachedCount = entries.filter(function(e) { return e.res && e.res.repo && !e._needsFetch; }).length;
-      statusEl.innerHTML = "<span>已收藏 <b style=\"color:var(--text)\">" + keys + "</b> 个仓库（完整数据 " + cachedCount + " 个）</span>";
-      renderResults();
-    }
+    var abortState = { aborted: false };
+    await pool(missing, function (key) {
+      var f = favs[key];
+      return fetchRepo(f.owner, f.repo, controller.signal, token).then(function (res) {
+        if (res && res.repo) favDataSet(key, { repo: res.repo, langs: cropLangs(res.langs) });
+      });
+    }, 4, abortState);
+    if (favListOpen) renderFavList();
   }
 
   var LANG_COLORS = {
@@ -621,7 +656,12 @@ footer a { color: var(--muted); }
 
   function langColor(l) { return LANG_COLORS[l] || "#8b949e"; }
 
-  var REPO_RE = /(?:https?:\/\/)?(?:www\.)?github\.com\/([A-Za-z0-9][A-Za-z0-9-]{0,38})\/([A-Za-z0-9._-]+)/g;
+  var REPO_RE = /(?:https?:\/\/)?(?:www\.)?github\.com\/([A-Za-z0-9][A-Za-z0-9_-]{0,38})\/([A-Za-z0-9._-]+)/g;
+  // Bare "Owner/Repo" references without a github.com prefix (e.g. TencentCloud/TencentDB-Agent-Memory).
+  // Greedy repo token consumes trailing separators; extractRepos rejects path/query continuations
+  // (Owner/Repo/…) via the character right after the match, trims trailing separators, and requires the
+  // owner to look org-like (contain an uppercase letter) so prose like "src/main" or "path/to" is not matched.
+  var BARE_RE = /(?<![A-Za-z0-9._/-])([A-Za-z0-9][A-Za-z0-9-]{2,38})\/([A-Za-z0-9][A-Za-z0-9._-]*)/g;
   var RESERVED = new Set([
     "settings", "orgs", "notifications", "explore", "features", "pricing",
     "marketplace", "collections", "sponsors", "topics", "trending", "search",
@@ -635,17 +675,34 @@ footer a { color: var(--muted); }
   function extractRepos(text) {
     var seen = new Set();
     var out = [];
-    var m;
-    REPO_RE.lastIndex = 0;
-    while ((m = REPO_RE.exec(text)) !== null) {
-      var owner = m[1], repo = m[2];
+    var add = function (owner, repo) {
       if (repo.charAt(repo.length - 1) === ".") repo = repo.slice(0, -1);
-      if (RESERVED.has(owner.toLowerCase())) continue;
-      if (repo.length < 1 || repo.length > 100) continue;
+      if (RESERVED.has(owner.toLowerCase())) return;
+      if (repo.length < 1 || repo.length > 100) return;
       var key = (owner + "/" + repo).toLowerCase();
-      if (seen.has(key)) continue;
+      if (seen.has(key)) return;
       seen.add(key);
       out.push({ owner: owner, repo: repo, full: owner + "/" + repo });
+    };
+    var m;
+    // 1) Full / partial github.com URLs
+    REPO_RE.lastIndex = 0;
+    while ((m = REPO_RE.exec(text)) !== null) add(m[1], m[2]);
+    // 2) Bare "Owner/Repo" refs without a URL prefix.
+    //    Owner must look org-like (contain an uppercase letter) to avoid matching prose
+    //    like "src/main"; repo must contain a letter to avoid version-like "1.0.3".
+    BARE_RE.lastIndex = 0;
+    while ((m = BARE_RE.exec(text)) !== null) {
+      var owner = m[1], repo = m[2];
+      if (owner.charAt(owner.length - 1) === "-") continue;
+      if (!/[A-Z]/.test(owner)) continue;
+      // Greedy repo already consumed trailing separators — reject only if the bare ref
+      // continues into a path/query (Owner/Repo/…) or a URL-ish tail.
+      var after = text.charAt(m.index + m[0].length);
+      if (after === "/" || after === "?" || after === "#") continue;
+      repo = repo.replace(/[._-]+$/, "");
+      if (!/[A-Za-z]/.test(repo)) continue;
+      add(owner, repo);
     }
     return out;
   }
@@ -784,6 +841,7 @@ footer a { color: var(--muted); }
     var repos = extractRepos(text);
     resultsHead.style.display = "none";
     results.innerHTML = "";
+    favFilterOn = false;
     document.body.classList.remove("centered");
     quotaRemain = null;
     quotaTotal = null;
@@ -1148,6 +1206,10 @@ footer a { color: var(--muted); }
       var owner = favBtn.getAttribute("data-owner");
       var repo = favBtn.getAttribute("data-repo");
       toggleFavorite(owner, repo);
+      // Auto-exit favorites filter when the last favorite is removed
+      if (!Object.keys(loadFavorites()).length && favFilterOn) {
+        favFilterOn = false;
+      }
       renderResults();
       renderFavQuick();
       return;
@@ -1168,10 +1230,31 @@ footer a { color: var(--muted); }
     });
   });
 
-  // Favorites quick-access button
+  // Favorites quick-access panel: toggle expand/collapse
   var favQuickBtn = $("favQuickBtn");
   if (favQuickBtn) {
-    favQuickBtn.addEventListener("click", function () { viewFavorites(); });
+    favQuickBtn.addEventListener("click", toggleFavList);
+  }
+
+  // Favorites quick-access panel: item click / remove (event delegation)
+  var favQuickEl = $("favQuick");
+  if (favQuickEl) {
+    favQuickEl.addEventListener("click", function (e) {
+      var rm = e.target.closest(".fav-item-rm");
+      if (rm) {
+        toggleFavorite(rm.getAttribute("data-owner"), rm.getAttribute("data-repo"));
+        if (!Object.keys(loadFavorites()).length && favFilterOn) {
+          favFilterOn = false;
+        }
+        renderFavQuick();
+        renderResults();
+        return;
+      }
+      var item = e.target.closest(".fav-item");
+      if (!item) return;
+      input.value = "https://github.com/" + item.getAttribute("data-owner") + "/" + item.getAttribute("data-repo");
+      analyze();
+    });
   }
 
   // Favorites filter toggle
