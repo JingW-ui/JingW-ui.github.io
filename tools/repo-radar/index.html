@@ -286,7 +286,7 @@ footer a { color: var(--muted); }
   </header>
   <main id="app">
     <section class="card">
-      <textarea id="input" placeholder="把包含 GitHub 链接或 Owner/Repo 简写的文本粘贴到这里，例如：&#10;推荐几个好项目 TencentCloud/TencentDB-Agent-Memory 和 https://github.com/facebook/react"></textarea>
+      <textarea id="input" placeholder="把包含 GitHub 链接或 Owner/Repo 简写的文本粘贴到这里，例如：&#10;推荐几个好项目 TencentCloud/TencentDB-Agent-Memory 和 facebook/react 这样的小写简写也会被自动探查确认，链接如 https://github.com/vuejs/vue"></textarea>
       <div class="row toolbar">
         <button class="btn" id="analyzeBtn" type="button">嗅探分析</button>
         <button class="btn ghost" id="pasteBtn" type="button">粘贴</button>
@@ -379,6 +379,51 @@ footer a { color: var(--muted); }
     try {
       localStorage.setItem(CACHE_PREFIX + key, JSON.stringify({ ts: Date.now(), data: data }));
     } catch (e) { /* storage full, ignore */ }
+  }
+
+  // ---- Probe negative cache (rr_probe_neg) ----
+  // Records "owner/repo" shorthand candidates that were probed and came back 404.
+  // Lets extractRepos skip re-probing the same prose false positives (src/main, path/to…)
+  // on repeated runs, saving API quota. Explicit github.com URLs are not subject to it.
+  var NEG_KEY = "rr_probe_neg";
+  var NEG_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days
+  var NEG_MAX = 500;
+  var negCache = null;
+
+  function loadNeg() {
+    if (negCache) return negCache;
+    try {
+      var raw = localStorage.getItem(NEG_KEY);
+      negCache = raw ? JSON.parse(raw) : {};
+    } catch (e) { negCache = {}; }
+    return negCache;
+  }
+
+  function saveNeg(n) {
+    negCache = n;
+    try { localStorage.setItem(NEG_KEY, JSON.stringify(n)); } catch (e) { /* ignore */ }
+  }
+
+  function negMark(key) {
+    var n = loadNeg();
+    var now = Date.now();
+    n[key] = now;
+    // Prune: drop expired entries, then if still over the cap drop the oldest.
+    var keys = Object.keys(n);
+    var expired = keys.filter(function (k) { return now - n[k] > NEG_TTL; });
+    expired.forEach(function (k) { delete n[k]; });
+    if (keys.length - expired.length > NEG_MAX) {
+      var alive = Object.keys(n).sort(function (a, b) { return n[b] - n[a]; });
+      alive.slice(NEG_MAX).forEach(function (k) { delete n[k]; });
+    }
+    saveNeg(n);
+  }
+
+  function negHas(key) {
+    var n = loadNeg();
+    if (!(key in n)) return false;
+    if (Date.now() - n[key] > NEG_TTL) { delete n[key]; saveNeg(n); return false; }
+    return true;
   }
 
   function sleep(ms) {
@@ -671,38 +716,41 @@ footer a { color: var(--muted); }
   ]);
 
   var lastResults = [];
+  var lastDropped = 0; // count of bare shorthands probed-404 and dropped this run
 
   function extractRepos(text) {
     var seen = new Set();
     var out = [];
-    var add = function (owner, repo) {
+    var add = function (owner, repo, src) {
       if (repo.charAt(repo.length - 1) === ".") repo = repo.slice(0, -1);
       if (RESERVED.has(owner.toLowerCase())) return;
       if (repo.length < 1 || repo.length > 100) return;
       var key = (owner + "/" + repo).toLowerCase();
       if (seen.has(key)) return;
       seen.add(key);
-      out.push({ owner: owner, repo: repo, full: owner + "/" + repo });
+      out.push({ owner: owner, repo: repo, full: owner + "/" + repo, src: src });
     };
     var m;
-    // 1) Full / partial github.com URLs
+    // 1) Full / partial github.com URLs — explicitly written, keep even if the repo is gone
+    //    (a typo'd link should surface as "仓库不存在", not silently vanish).
     REPO_RE.lastIndex = 0;
-    while ((m = REPO_RE.exec(text)) !== null) add(m[1], m[2]);
-    // 2) Bare "Owner/Repo" refs without a URL prefix.
-    //    Owner must look org-like (contain an uppercase letter) to avoid matching prose
-    //    like "src/main"; repo must contain a letter to avoid version-like "1.0.3".
+    while ((m = REPO_RE.exec(text)) !== null) add(m[1], m[2], "url");
+    // 2) Bare "Owner/Repo" refs without a URL prefix — any casing; existence is decided by
+    //    probing (fetchRepo 404), and previously-probed-404 refs are skipped via the negative
+    //    cache so prose like "src/main" doesn't burn quota on every run.
     BARE_RE.lastIndex = 0;
     while ((m = BARE_RE.exec(text)) !== null) {
       var owner = m[1], repo = m[2];
       if (owner.charAt(owner.length - 1) === "-") continue;
-      if (!/[A-Z]/.test(owner)) continue;
       // Greedy repo already consumed trailing separators — reject only if the bare ref
       // continues into a path/query (Owner/Repo/…) or a URL-ish tail.
       var after = text.charAt(m.index + m[0].length);
       if (after === "/" || after === "?" || after === "#") continue;
       repo = repo.replace(/[._-]+$/, "");
+      // Repo must contain a letter, else it's version-like ("1.0.3", "v2").
       if (!/[A-Za-z]/.test(repo)) continue;
-      add(owner, repo);
+      if (negHas((owner + "/" + repo).toLowerCase())) continue;
+      add(owner, repo, "bare");
     }
     return out;
   }
@@ -786,7 +834,10 @@ footer a { color: var(--muted); }
 
       recordQuota(resp.headers);
 
-      if (resp.status === 404) return { error: "404", notFound: true };
+      if (resp.status === 404) {
+        negMark(cacheKey); // remember this owner/repo as non-existent so we don't re-probe it
+        return { error: "404", notFound: true };
+      }
 
       // Rate-limited — try Retry-After
       if (resp.status === 429 || (resp.status === 403 && resp.headers.get("X-RateLimit-Remaining") === "0")) {
@@ -860,7 +911,7 @@ footer a { color: var(--muted); }
     var list = repos.slice(0, MAX);
 
     var tokenNote = token ? " (已认证)" : "";
-    statusEl.innerHTML = "<span>嗅探到 <b style=\"color:var(--text)\">" + repos.length + "</b> 个仓库"
+    statusEl.innerHTML = "<span>嗅探到 <b style=\"color:var(--text)\">" + repos.length + "</b> 个候选仓库"
       + (truncated ? "（仅分析前 " + MAX + " 个）" : "")
       + tokenNote + "，正在获取...</span>";
 
@@ -915,9 +966,16 @@ footer a { color: var(--muted); }
 
     lastResults = phase1Fetched;
 
+    // Count bare shorthands that probed 404 and were dropped from display (prose noise)
+    var dropped = phase1Fetched.filter(function (f) {
+      return f.res && f.res.notFound && f.item.src === "bare";
+    }).length;
+    lastDropped = dropped;
+
     var rateHit = phase1Fetched.some(function (f) { return f.res.error === "rate"; });
     var tokenUrl = "https://github.com/settings/tokens/new?description=Repo%20Radar";
-    var statusText = "分析完成 / " + list.length + " 个仓库";
+    var statusText = "分析完成 / " + list.length + " 个候选";
+    if (dropped > 0) statusText += "，忽略 " + dropped + " 个不存在/无效";
     if (rateHit) statusText += ' · <a href="' + tokenUrl + '" target="_blank" style="color:var(--blue)">获取 Token</a> 提升额度';
     if (skipped > 0) statusText += "，跳过 " + skipped + " 个";
     statusEl.innerHTML = "<span>" + statusText + "</span>";
@@ -992,6 +1050,12 @@ footer a { color: var(--muted); }
       sorted = sorted.filter(function (o) { return isFavorite(o.item.owner, o.item.repo); });
     }
 
+    // Bare shorthand that probed 404 was prose noise (src/main, path/to…) — drop it silently.
+    // Explicit github.com URLs that 404 keep their error card so typos stay visible.
+    sorted = sorted.filter(function (o) {
+      return !(o.res && o.res.notFound && o.item.src === "bare");
+    });
+
     // Update favorites filter button state
     var favBtn = $("favFilter");
     if (favBtn) {
@@ -1001,7 +1065,7 @@ footer a { color: var(--muted); }
 
     var html = sorted.map(function (o) { return renderRepo(o.item, o.res); }).join("");
     if (favFilterOn && !sorted.length) html = '<div class="empty">没有已收藏的仓库</div>';
-    if (!html) html = '<div class="empty">无结果</div>';
+    if (!html) html = '<div class="empty">无结果' + (lastDropped > 0 ? "（已忽略 " + lastDropped + " 个不存在的引用）" : "") + '</div>';
     results.innerHTML = html;
   }
 
