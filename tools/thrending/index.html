@@ -226,6 +226,11 @@
   .stat-value{font-size:1.5rem;font-weight:800;color:var(--green)}
   .stat-label{font-size:0.78rem;color:var(--text-tertiary);margin-top:2px}
 
+  .updated-at{
+    max-width:960px;margin:16px auto 0;padding:0 24px;
+    text-align:center;font-size:0.78rem;color:var(--text-tertiary);
+  }
+
   /* ---- Utility ---- */
   @keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
   @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -348,6 +353,8 @@
   </div>
 </div>
 
+<p class="updated-at" id="updatedAt"></p>
+
 <div class="controls">
   <div class="control-group">
     <span class="control-label">Period</span>
@@ -373,6 +380,8 @@
       <option value="for-the-badge">for-the-badge</option>
     </select>
   </div>
+  <div class="divider"></div>
+  <button class="pill" id="refreshBtn" title="清除缓存并重新拉取">↻ 刷新</button>
 </div>
 
 <div class="container">
@@ -381,17 +390,29 @@
 
 <script>
 (function(){
-  var API_BASE = "https://cloudflare-mcp1.zx1993.top/api/trending";
+  var DATA_HOST = "https://cdn.jsdelivr.net/gh/isboyjc/github-trending-api/data";
   var currentSince = "daily";
   var currentLang = "";
   var cachedData = {};
+  var lastPubDate = "";
+  var refreshNonce = "";
   var loading = false;
+
+  // ---- 本地日期 YYYY-MM-DD：用于每日缓存穿透（源接口浏览器缓存 7 天）----
+  function today() {
+    var d = new Date();
+    var m = String(d.getMonth() + 1);
+    var day = String(d.getDate());
+    if (m.length < 2) m = "0" + m;
+    if (day.length < 2) day = "0" + day;
+    return d.getFullYear() + "-" + m + "-" + day;
+  }
 
   // 支持的全部语言 [slug, 显示名],按显示名字母序;含特殊字符的 slug(c++/c#/f#)在 fetchData 中统一编码
   var LANGS = [
     ["ada", "Ada"], ["assembly", "Assembly"], ["astro", "Astro"],
     ["c", "C"], ["c#", "C#"], ["c++", "C++"],
-    ["clojure", "Clojure"], ["cmake", "CMake"], ["coffee-script", "CoffeeScript"],
+    ["clojure", "Clojure"], ["cmake", "CMake"],
     ["crystal", "Crystal"], ["css", "CSS"], ["d", "D"],
     ["dart", "Dart"], ["dockerfile", "Dockerfile"], ["elixir", "Elixir"],
     ["elm", "Elm"], ["emacs-lisp", "Emacs Lisp"], ["erlang", "Erlang"],
@@ -400,7 +421,7 @@
     ["haskell", "Haskell"], ["hcl", "HCL"], ["html", "HTML"],
     ["java", "Java"], ["javascript", "JavaScript"], ["julia", "Julia"],
     ["jupyter-notebook", "Jupyter Notebook"], ["kotlin", "Kotlin"], ["less", "Less"],
-    ["lisp", "Lisp"], ["lua", "Lua"], ["makefile", "Makefile"],
+    ["lua", "Lua"], ["makefile", "Makefile"],
     ["matlab", "MATLAB"], ["nim", "Nim"], ["nix", "Nix"],
     ["objective-c", "Objective-C"], ["ocaml", "OCaml"], ["pascal", "Pascal"],
     ["perl", "Perl"], ["php", "PHP"], ["powershell", "PowerShell"],
@@ -419,6 +440,8 @@
   var statLangs = document.getElementById("statLangs");
   var badgeStyleSel = document.getElementById("badgeStyleSel");
   var langSel = document.getElementById("langSel");
+  var updatedAtEl = document.getElementById("updatedAt");
+  var refreshBtn = document.getElementById("refreshBtn");
 
   // ---- Language color helper ----
   function langClass(lang) {
@@ -449,9 +472,50 @@
     return { cls: "a-cold", txt: "Emerging", tip: "Star < 100" };
   }
 
-  // ---- Cache key ----
+  // ---- Cache key：带上日期，内存缓存每天自动失效 ----
   function cacheKey(since, lang) {
-    return since + ":" + (lang || "all");
+    return today() + "|" + since + ":" + (lang || "all");
+  }
+
+  // ---- 数字解析：兼容 "7,626"、"+1,616" 与裸 number ----
+  function parseNum(v) {
+    if (v === null || v === undefined || v === "") return 0;
+    if (typeof v === "number") return v;
+    var n = parseFloat(String(v).replace(/[^\d.\-]/g, ""));
+    return isNaN(n) ? 0 : n;
+  }
+
+  // ---- 数据归一化：把 isboyjc 源格式映射为页面渲染所需形状 ----
+  function normalize(json) {
+    var items = Array.isArray(json) ? json
+              : (json && Array.isArray(json.items)) ? json.items
+              : (json && Array.isArray(json.data)) ? json.data
+              : [];
+
+    return items.map(function(it, i) {
+      var username, reponame;
+      var m = /^https?:\/\/github\.com\/([^/]+)\/([^/?#]+)/.exec(it.url || "");
+      if (m) {
+        username = m[1];
+        reponame = m[2];
+      } else {
+        var t = String(it.title || "owner/repo").split("/");
+        username = t[0] || "unknown";
+        reponame = t.slice(1).join("/") || "repo";
+      }
+      return {
+        rank: i + 1,
+        username: username,
+        reponame: reponame,
+        url: it.url || ("https://github.com/" + encodeURIComponent(username) + "/" + encodeURIComponent(reponame)),
+        description: it.description || "",
+        language: it.language || "",
+        languageColor: it.languageColor || null,
+        stars: parseNum(it.stars),
+        forks: parseNum(it.forks),
+        starsToday: parseNum(it.addStars)
+      };
+    });
   }
 
   // ---- Fetch data ----
@@ -459,14 +523,22 @@
     var key = cacheKey(since, lang);
     if (cachedData[key]) return cachedData[key];
 
-    var url = API_BASE + "?since=" + since;
-    if (lang) url += "&language=" + encodeURIComponent(lang);
+    var slug = (lang || "all").toLowerCase();
+    var url = DATA_HOST + "/" + since + "/" + encodeURIComponent(slug) + ".json?v=" + today();
+    if (refreshNonce) url += "&_=" + refreshNonce;
 
     var res = await fetch(url);
+    if (res.status === 404) {
+      cachedData[key] = [];
+      return [];
+    }
     if (!res.ok) throw new Error("API error");
+
     var json = await res.json();
-    cachedData[key] = json.data || [];
-    return cachedData[key];
+    var items = normalize(json);
+    lastPubDate = (json && json.pubDate) || "";
+    cachedData[key] = items;
+    return items;
   }
 
   // ---- Badge style ----
@@ -530,7 +602,10 @@
     repoListEl.innerHTML = "";
 
     if (!repos.length) {
-      repoListEl.innerHTML = '<div class="empty-state"><p>No trending repositories found for this filter.</p></div>';
+      var emptyMsg = currentLang
+        ? "该语言暂无趋势数据（上游可能未收录）"
+        : "No trending repositories found for this filter.";
+      repoListEl.innerHTML = '<div class="empty-state"><p>' + escHtml(emptyMsg) + '</p></div>';
       updateStats([]);
       return;
     }
@@ -543,9 +618,12 @@
       card.className = "repo-card";
       card.style.animationDelay = (i * 50) + "ms";
 
-      var langColorHtml = repo.language
-        ? '<span class="lang-color ' + langClass(repo.language) + '"></span>'
-        : "";
+      var langColorHtml = "";
+      if (repo.languageColor) {
+        langColorHtml = '<span class="lang-color" style="background:' + repo.languageColor + '"></span>';
+      } else if (repo.language) {
+        langColorHtml = '<span class="lang-color ' + langClass(repo.language) + '"></span>';
+      }
 
       var langHtml = repo.language
         ? '<span class="meta-item lang-dot">' + langColorHtml + " " + escHtml(repo.language) + "</span>"
@@ -578,7 +656,7 @@
           langHtml +
           '<span class="meta-item">' + fmtNum(repo.stars) + ' stars</span>' +
           '<span class="meta-item">' + fmtNum(repo.forks) + ' forks</span>' +
-          '<span class="meta-item"><span class="stars-today">+' + fmtNum(repo.starsToday) + '</span> ' + starsTodayLabel + '</span>' +
+          '<span class="meta-item"><span class="stars-today">+' + fmtNum(Math.max(0, repo.starsToday || 0)) + '</span> ' + starsTodayLabel + '</span>' +
         '</div>' +
         '<div class="repo-badges">' +
           badgesHtml +
@@ -632,6 +710,7 @@
       }
 
       renderCards(repos);
+      renderUpdatedAt();
     } catch (err) {
       repoListEl.innerHTML = '<div class="empty-state"><p>Failed to load trending data. Please try again.</p></div>';
     }
@@ -640,6 +719,14 @@
   }
 
   function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+  // ---- 展示数据更新时间 ----
+  function renderUpdatedAt() {
+    if (!updatedAtEl) return;
+    updatedAtEl.textContent = lastPubDate
+      ? "数据更新于 " + new Date(lastPubDate).toLocaleString("zh-CN", { hour12: false })
+      : "";
+  }
 
   // ---- Event: since pills ----
   document.querySelectorAll(".since-pill").forEach(function(btn) {
@@ -667,6 +754,13 @@
     if (cachedData[key]) {
       renderCards(cachedData[key]);
     }
+  });
+
+  // ---- Event: manual refresh (clear caches + refetch) ----
+  refreshBtn.addEventListener("click", function() {
+    refreshNonce = "_" + Date.now();
+    cachedData = {};
+    loadAndRender(true);
   });
 
   // ---- Event: copy embed (delegated) ----
