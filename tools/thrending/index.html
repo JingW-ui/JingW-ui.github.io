@@ -408,6 +408,13 @@
     return d.getFullYear() + "-" + m + "-" + day;
   }
 
+  // ---- 请求超时：避免上游卡死时无限转圈 ----
+  function fetchWithTimeout(url, ms) {
+    var ctrl = new AbortController();
+    var timer = setTimeout(function() { ctrl.abort(); }, ms || 15000);
+    return fetch(url, { signal: ctrl.signal }).finally(function() { clearTimeout(timer); });
+  }
+
   // 支持的全部语言 [slug, 显示名],按显示名字母序;含特殊字符的 slug(c++/c#/f#)在 fetchData 中统一编码
   var LANGS = [
     ["ada", "Ada"], ["assembly", "Assembly"], ["astro", "Astro"],
@@ -527,7 +534,7 @@
     var url = DATA_HOST + "/" + since + "/" + encodeURIComponent(slug) + ".json?v=" + today();
     if (refreshNonce) url += "&_=" + refreshNonce;
 
-    var res = await fetch(url);
+    var res = await fetchWithTimeout(url);
     if (res.status === 404) {
       cachedData[key] = [];
       return [];
