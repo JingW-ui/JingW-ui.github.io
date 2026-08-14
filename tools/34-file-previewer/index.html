@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>本地文件预览器</title>
+<link rel="stylesheet" href="../common.css">
 <style>
   :root {
     --green: #2da44e;
@@ -16,14 +17,14 @@
     --text: #1f2328;
     --text2: #656d76;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     padding: 20px;
-  }
+  ;display:block;flex-direction:row}
 
   .container { max-width: 1200px; margin: 0 auto; }
 
@@ -99,7 +100,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-  }
+  ;justify-content:normal;font-family:Arial}
   .btn:hover { background: var(--bg); }
   .btn-primary { background: var(--green); color: white; border-color: var(--green); }
   .btn-primary:hover { background: var(--green2); }
@@ -294,6 +295,10 @@
   </div>
 </div>
 
+<script src="../common.js"></script>
+<script>
+configureToast({reuse:false,duration:2000,removeDelay:300,styles:{position:'fixed',bottom:'20px',left:'50%',transform:'translateX(-50%)',background:'#24292f',color:'white',padding:'10px 20px',borderRadius:'6px',fontSize:'14px',zIndex:'9999',boxShadow:'0 4px 12px rgba(0,0,0,.15)',transition:'none'}});
+</script>
 <script>
 let currentFile = null;
 let currentContent = '';
@@ -499,9 +504,7 @@ function performSearch(keyword) {
 
 function copyContent() {
   if (!currentContent) return;
-  navigator.clipboard.writeText(originalContent).then(() => {
-    showToast('✅ 内容已复制到剪贴板');
-  });
+  copyText(originalContent, '✅ 内容已复制到剪贴板');
 }
 
 function downloadFile() {
@@ -553,18 +556,6 @@ function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function showToast(msg) {
-  const t = document.createElement('div');
-  t.textContent = msg;
-  Object.assign(t.style, {
-    position: 'fixed', bottom: '20px', left: '50%', transform: 'translateX(-50%)',
-    background: '#24292f', color: 'white', padding: '10px 20px',
-    borderRadius: '6px', fontSize: '14px', zIndex: '9999',
-    boxShadow: '0 4px 12px rgba(0,0,0,.15)'
-  });
-  document.body.appendChild(t);
-  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2000);
-}
 </script>
 </body>
 </html>

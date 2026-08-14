@@ -4,18 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>文件哈希校验工具</title>
+<link rel="stylesheet" href="../common.css">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
+  
   :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --red:#cf222e; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
-  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
-  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+  
+  
   .hi { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; }
-  header h1 { font-size:18px; font-weight:600; }
-  header p { font-size:13px; color:var(--text2); }
+  
+  
   .main { flex:1; padding:20px 24px; max-width:900px; margin:0 auto; width:100%; display:flex; flex-direction:column; gap:16px; }
-  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); }
-  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; }
-  .card-body { padding:18px; }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); ;display:block;flex-direction:row}
+  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; ;display:block;justify-content:normal;align-items:normal}
+  .card-body { padding:18px; ;flex:0 1 auto;display:block;flex-direction:row;gap:normal}
   .drop-zone { border:2px dashed var(--border); border-radius:8px; padding:48px 24px; text-align:center; cursor:pointer; transition:all .2s; }
   .drop-zone:hover,.drop-zone.dragover { border-color:var(--green); background:rgba(45,164,78,.04); }
   .drop-zone input[type=file] { display:none; }
@@ -35,7 +36,7 @@
   .verify-row { display:flex; gap:8px; align-items:center; }
   .verify-input { flex:1; padding:8px 14px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Consolas',monospace; font-size:13px; background:var(--bg); color:var(--text); outline:none; }
   .verify-input:focus { border-color:var(--green); }
-  .btn { display:inline-flex; align-items:center; gap:5px; padding:7px 16px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:7px 16px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; ;justify-content:normal}
   .btn:hover { background:var(--bg3); }
   .btn-primary { background:var(--green); color:white; border-color:var(--green); }
   .btn-primary:hover { background:var(--green2); }
@@ -102,6 +103,7 @@
   </div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('dragover'); }
 function onDragLeave(e) { document.getElementById('dropZone').classList.remove('dragover'); }
@@ -149,7 +151,7 @@ async function handleFile(file) {
       tbody.innerHTML += `<tr>
         <td class="hash-name">${algo}</td>
         <td id="hash-${algo}">${hash}</td>
-        <td><button class="copy-btn" onclick="navigator.clipboard.writeText('${hash}').then(()=>showToast('已复制'))">复制</button></td>
+        <td><button class="copy-btn" onclick="copyText('${hash}')">复制</button></td>
       </tr>`;
       const pct = Math.round((i+1)/algorithms.length*100);
       document.getElementById('progressFill').style.width = pct + '%';
@@ -199,12 +201,6 @@ function fmtSize(bytes) {
 }
 
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-function showToast(msg) {
-  let t=document.getElementById('_toast');
-  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;';document.body.appendChild(t);}
-  t.textContent=msg;t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',1800);
-}
 
 // MD5 implementation (simplified)
 function md5(buffer) {

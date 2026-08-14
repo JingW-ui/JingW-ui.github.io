@@ -4,18 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>正则表达式测试器</title>
+<link rel="stylesheet" href="../common.css">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
+  
   :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --red:#cf222e; --blue:#0969da; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
-  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
-  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
-  .header-icon { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; }
-  header h1 { font-size:18px; font-weight:600; }
-  header p { font-size:13px; color:var(--text2); }
+  
+  
+  .header-icon { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; ;font-size:16px}
+  
+  
   .main { flex:1; padding:20px 24px; display:flex; flex-direction:column; gap:16px; max-width:1100px; margin:0 auto; width:100%; }
-  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); ;display:block;flex-direction:row}
   .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
-  .card-body { padding:16px 18px; }
+  .card-body { padding:16px 18px; ;flex:0 1 auto;display:block;flex-direction:row;gap:normal}
   .regex-input-row { display:flex; gap:8px; align-items:center; margin-bottom:12px; }
   .regex-wrap { display:flex; align-items:center; border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; flex:1; transition:border-color .15s; }
   .regex-wrap:focus-within { border-color:var(--green); box-shadow:0 0 0 3px rgba(45,164,78,.12); }
@@ -42,7 +43,7 @@
   .match-pos { width:100px; color:var(--text2); flex-shrink:0; }
   .match-val { color:var(--blue); font-weight:500; }
   .match-groups { color:var(--text2); font-size:11px; }
-  .btn { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:6px 14px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; ;justify-content:normal}
   .btn:hover { background:var(--bg3); }
   .btn-primary { background:var(--green); color:white; border-color:var(--green); }
   .btn-primary:hover { background:var(--green2); }
@@ -151,6 +152,7 @@ Date: 2024-01-15, Price: $99.99</textarea>
   </div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 const templates = [
   { name: '邮箱地址', pattern: '[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}', flags: 'g' },
@@ -286,7 +288,7 @@ function clearRegex() {
 
 function copyReplace() {
   const v = document.getElementById('replaceResult').textContent;
-  navigator.clipboard.writeText(v).then(() => showToast('已复制'));
+  copyText(v);
 }
 
 function loadSampleText() {
@@ -295,12 +297,6 @@ Visit https://www.example.com for more info.
 Date: 2024-01-15, Price: $99.99, Color: #FF5733
 UUID: 550e8400-e29b-41d4-a716-446655440000`;
   runTest();
-}
-
-function showToast(msg) {
-  let t=document.getElementById('_toast');
-  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;';document.body.appendChild(t);}
-  t.textContent=msg;t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',1800);
 }
 
 // 初始化

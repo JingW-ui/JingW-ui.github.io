@@ -1,7 +1,24 @@
-# tools/ 共享层迁移配方（增量版）
+# tools/ 共享层迁移配方
 
-> 供后续 ~37 个编号工具"用到才改"时参照。目标：**视觉逐像素不变**。
-> 试点完成页：`06-text-case-converter`、`29-unit-converter`、`38-drawing-board`（全部通过 Playwright 前后像素对比 / computed-style / console / toast 四项验证）。
+> 目标：**视觉逐像素不变**。所有 40 个编号工具已迁移到共享层 `common.css` / `common.js`，A/B 像素对比 + computed-style 扫描 + console + toast 行为四重验证通过（**PASS 364 / FAIL 0**，桌面 1280×900 + 手机 375×667 双视口）。
+
+## 迁移进度（已完成）
+
+- **试点 3 页**（提交 `c9af1bc`）：`06-text-case-converter`、`29-unit-converter`、`38-drawing-board`。
+- **全量 37 页**（本次提交）：01–05、07–28、30–37、39–40。净减 ~119 行。
+- **验证方式**：`git show HEAD:…` 起 8082 起旧版、工作树 8081 起新版，Playwright 逐页 A/B：①截图像素 diff=0；②`getComputedStyle` 43 属性全元素扫描一致；③console 无错误、common.css/js 返回 200；④toast 行为复刻（Family A 复用、Family C 移除、Family B 不抛错）。非确定性内容页（15 时钟 / 32 随机 / 33 随机密码 / 35 名言 API）由 harness 冻结 Date + 播种 Math.random + 屏蔽外部 API 保证前后一致。
+
+## 例外与保留（有意为之）
+
+| 页 | 例外 | 原因 |
+|----|------|------|
+| `01-json-formatter` | 保留 `navigator.clipboard.writeText` | 本页无 toast，复制反馈走 `setStatus`（状态栏），转 `copyText` 会凭空引入 toast 视觉 |
+| `22-color-picker`、`32-random-generator` | 保留 `navigator.clipboard.writeText` | 无 toast 机制，转 `copyText` 会引入新视觉 |
+| `35-todo-list` | **Family B**，保留内联 `showToast` | class 切换式 toast（2200–3000ms），本轮不统一，toast 保持内联 |
+| `04-markdown-editor` | Family A 但 `configureToast({duration:2000})` | 原 toast 时长 2000ms，非默认 1800ms |
+| `34-file-previewer`、`39-unicode-tool`、`40-lorem-generator` | **Family C**，`configureToast({reuse:false,duration:2000,styles:{…#24292f 底部居中…}})` | create/destroy 式 toast，底部居中 `#24292f` 2000ms |
+| `05-text-diff`、`17-countdown-timer`、`27-base-converter`、`28-scientific-calculator`、`36-screen-ruler` | 无 toast | 原页即无 toast，未引入 |
+| `38-drawing-board` | 保留 `saveCanvas`（data-URL）/ `copyCanvas`（图片 ClipboardItem） | data-URL 下载与图片复制不转 `downloadBlob`/`copyText` |
 
 ## 共享层是什么
 
@@ -60,5 +77,5 @@
 4. **console 干净**：无 ReferenceError/TypeError；common.css/js 返回 200。
 5. **toast 行为**：触发后 `#_toast` 恰好 1 个，二次触发仍 1 个（不重复建）。
 
-## 明确不做（本轮）
-Family B toast 统一、37 页编号工具全量迁移（留给增量）、tools/index.html 数据驱动化、ES module 化编号工具。
+## 明确不做
+Family B toast 统一（35/biji/create_icon/script_forge/glb_viewer_meshy）、非编号页（biji/create_icon/glb_viewer_meshy/script_forge 等）迁移、tools/index.html 数据驱动化、ES module 化编号工具。

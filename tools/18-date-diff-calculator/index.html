@@ -4,23 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>日期差计算工具</title>
+<link rel="stylesheet" href="../common.css">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh;display:block;flex-direction:row}
 :root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
-header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
-header h1{font-size:18px;font-weight:600}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px;box-shadow:none}
+
 header p{font-size:13px;color:#656d76;margin-left:auto}
 .container{max-width:900px;margin:24px auto;padding:0 16px}
-.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
-.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
-.card-body{padding:20px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;display:block;flex-direction:row}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;justify-content:normal}
+.card-body{padding:20px;flex:0 1 auto;display:block;flex-direction:row;gap:normal}
 .date-row{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
 .field{display:flex;flex-direction:column;gap:4px}
 .field label{font-size:12px;color:#656d76;font-weight:500}
 input[type=date],input[type=datetime-local]{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:14px;background:#fff;outline:none;transition:border-color .15s}
 input:focus{border-color:var(--green)}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;justify-content:normal;font-family:Arial}
 .btn-primary{background:var(--green);color:#fff}
 .btn-primary:hover{background:var(--green2)}
 .btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
@@ -164,6 +165,7 @@ input:focus{border-color:var(--green)}
   </div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 const now = new Date();
 const today = now.toISOString().split('T')[0];
@@ -364,12 +366,6 @@ function calcWorkdays() {
     </div>
     <div style="margin-top:12px;font-size:12px;color:#656d76">* 仅统计周一至周五，未考虑法定节假日调休</div>
   `;
-}
-
-function showToast(msg) {
-  let t = document.getElementById('_toast');
-  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
-  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
 }
 
 // 自动计算今天到年末

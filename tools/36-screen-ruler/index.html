@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>屏幕标尺工具</title>
+<link rel="stylesheet" href="../common.css">
 <style>
   :root {
     --green: #2da44e;
@@ -16,14 +17,14 @@
     --text: #1f2328;
     --text2: #656d76;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     background: var(--bg);
     color: var(--text);
     overflow: hidden;
     height: 100vh;
-  }
+  ;min-height:0;display:block;flex-direction:row}
 
   .header {
     background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%);
@@ -47,7 +48,7 @@
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
-  }
+  ;display:inline-block;align-items:normal;justify-content:normal;gap:normal;font-family:Arial}
   .btn:hover { background: rgba(255,255,255,0.25); }
 
   .controls {
@@ -408,6 +409,7 @@
   </div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 let mode = 'ruler';
 let measuring = false;

@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>科学计算器</title>
+<link rel="stylesheet" href="../common.css">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+  
+  
   body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; align-items:center; padding:20px; }
   header { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); width:100%; max-width:480px; margin-bottom:16px; }
   .hi { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:16px; font-weight:bold; }
-  header h1 { font-size:18px; font-weight:600; }
+  
   .calc { background:var(--bg); border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow); width:100%; max-width:480px; overflow:hidden; }
   .display { background:#1f2328; padding:16px 20px; }
   .expr { font-size:13px; color:#9198a1; font-family:monospace; min-height:20px; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -54,6 +55,7 @@
   <div id="btn-area"></div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 let display = '0';
 let expr = '';

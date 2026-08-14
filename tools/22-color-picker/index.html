@@ -4,25 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>颜色取色 / 色值转换工具</title>
+<link rel="stylesheet" href="../common.css">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
-  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
-  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+  
+  
+  
+  
   .hi { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:18px; }
-  header h1 { font-size:18px; font-weight:600; }
+  
   .main { flex:1; padding:20px 24px; display:grid; grid-template-columns:340px 1fr; gap:16px; max-width:1100px; margin:0 auto; width:100%; }
   @media(max-width:800px) { .main { grid-template-columns:1fr; } }
-  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); }
-  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; }
-  .card-body { padding:18px; }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); ;display:block;flex-direction:row}
+  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; ;display:block;justify-content:normal;align-items:normal}
+  .card-body { padding:18px; ;flex:0 1 auto;display:block;flex-direction:row;gap:normal}
   .color-preview { width:100%; height:120px; border-radius:var(--radius); border:1px solid var(--border); margin-bottom:14px; transition:background .2s; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; }
   input[type=color] { width:100%; height:50px; border:1px solid var(--border); border-radius:var(--radius); cursor:pointer; padding:2px; background:var(--bg); }
   .label { font-size:12px; color:var(--text2); font-weight:500; margin-bottom:5px; margin-top:10px; }
   .value-row { display:flex; gap:8px; align-items:center; }
   .val-input { flex:1; padding:8px 12px; border:1px solid var(--border); border-radius:var(--radius); font-family:'Consolas',monospace; font-size:14px; background:var(--bg); color:var(--text); outline:none; transition:border-color .15s; }
   .val-input:focus { border-color:var(--green); }
-  .btn { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:12px; cursor:pointer; transition:all .15s; font-family:inherit; }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:12px; cursor:pointer; transition:all .15s; font-family:inherit; ;justify-content:normal}
   .btn:hover { background:var(--bg3); }
   .btn-primary { background:var(--green); color:white; border-color:var(--green); }
   .btn-primary:hover { background:var(--green2); }
@@ -166,6 +167,7 @@
   </div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 // 预设颜色
 const presets = ['#000000','#1f2328','#333333','#555555','#888888','#aaaaaa','#cccccc','#e5e5e5','#f5f5f5','#ffffff',
@@ -327,7 +329,7 @@ function genPalette(type) {
 }
 
 function copyVal(id) {
-  navigator.clipboard.writeText(document.getElementById(id).value).then(() => showToast('已复制'));
+  copyText(document.getElementById(id).value);
 }
 
 async function pickEyedropper() {
@@ -337,12 +339,6 @@ async function pickEyedropper() {
     const result = await ed.open();
     onColorChange(result.sRGBHex);
   } catch(e) {}
-}
-
-function showToast(msg) {
-  let t=document.getElementById('_toast');
-  if(!t){t=document.createElement('div');t.id='_toast';t.style.cssText='position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;';document.body.appendChild(t);}
-  t.textContent=msg;t.style.opacity='1';clearTimeout(t._to);t._to=setTimeout(()=>t.style.opacity='0',1800);
 }
 
 initPresets();

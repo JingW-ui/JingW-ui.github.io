@@ -4,20 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>词频统计工具</title>
+<link rel="stylesheet" href="../common.css">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh;display:block;flex-direction:row}
 :root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
-header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
-header h1{font-size:18px;font-weight:600}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px;box-shadow:none}
+
 header p{font-size:13px;color:#656d76;margin-left:auto}
 .container{max-width:1100px;margin:24px auto;padding:0 16px}
-.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;display:block;flex-direction:row}
 .card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-.card-body{padding:16px}
-textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;resize:vertical;min-height:160px;font-family:inherit;line-height:1.6;outline:none;transition:border-color .15s}
-textarea:focus{border-color:var(--green)}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.card-body{padding:16px;flex:0 1 auto;display:block;flex-direction:row;gap:normal}
+textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;resize:vertical;min-height:160px;font-family:inherit;line-height:1.6;outline:none;transition:border-color .15s;background:#fff;color:#000}
+textarea:focus{border-color:var(--green);outline:none;box-shadow:none}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;justify-content:normal;font-family:Arial}
 .btn-primary{background:var(--green);color:#fff}
 .btn-primary:hover{background:var(--green2)}
 .btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
@@ -136,6 +137,7 @@ select{padding:5px 8px;border:1px solid var(--border);border-radius:var(--radius
   </div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 // 英文停用词
 const EN_STOP = new Set(['the','a','an','and','or','but','in','on','at','to','for','of','with','by','from','is','are','was','were','be','been','being','have','has','had','do','does','did','will','would','could','should','may','might','shall','can','need','dare','used','it','its','this','that','these','those','i','you','he','she','we','they','me','him','her','us','them','my','your','his','our','their','mine','yours','hers','ours','theirs','not','no','nor','so','yet','both','either','neither','each','every','all','any','few','more','most','other','some','such','than','too','very','just','about','above','after','before','between','into','through','during','against','without','within','along','following','across','behind','beyond','plus','except','up','out','around','down','off','above','over','under']);
@@ -246,7 +248,7 @@ function sortBy(key) {
 function copyTable() {
   if (freqData.length === 0) { showToast('没有数据可复制'); return; }
   const lines = ['排名\t词语\t频次\t占比', ...freqData.map((item,i) => `${i+1}\t${item.word}\t${item.count}\t${item.pct}`)];
-  navigator.clipboard.writeText(lines.join('\n')).then(() => showToast('表格已复制（TSV格式）'));
+  copyText(lines.join('\n'), '表格已复制（TSV格式）');
 }
 
 function clearAll() {
@@ -260,11 +262,6 @@ function clearAll() {
 
 function escHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-function showToast(msg) {
-  let t = document.getElementById('_toast');
-  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
-  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
-}
 </script>
 </body>
 </html>

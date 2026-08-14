@@ -4,18 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>倒计时 / 正计时工具</title>
+<link rel="stylesheet" href="../common.css">
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
+  
   :root { --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de; --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b; --red:#cf222e; --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
-  body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif; background:var(--bg2); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
-  header { background:var(--bg); border-bottom:1px solid var(--border); padding:12px 24px; display:flex; align-items:center; gap:12px; box-shadow:var(--shadow); }
+  
+  
   .hi { width:32px; height:32px; background:var(--green); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; color:white; font-size:18px; }
-  header h1 { font-size:18px; font-weight:600; }
+  
   .main { flex:1; padding:20px 24px; display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:1000px; margin:0 auto; width:100%; }
   @media(max-width:700px) { .main { grid-template-columns:1fr; } }
-  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); }
-  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; }
-  .card-body { padding:20px 18px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+  .card { background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden; box-shadow:var(--shadow); ;display:block;flex-direction:row}
+  .card-header { padding:12px 18px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:14px; font-weight:600; ;display:block;justify-content:normal;align-items:normal}
+  .card-body { padding:20px 18px; display:flex; flex-direction:column; align-items:center; gap:16px; ;flex:0 1 auto}
   .timer-display { font-size:60px; font-weight:700; font-family:'Courier New',monospace; letter-spacing:4px; color:var(--text); text-align:center; line-height:1; }
   .timer-display.running { color:var(--green); }
   .timer-display.finished { color:var(--red); animation:blink 1s infinite; }
@@ -25,7 +26,7 @@
   .progress-fill.low { background:#ff9f43; }
   .progress-fill.critical { background:var(--red); }
   .btn-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
-  .btn { display:inline-flex; align-items:center; gap:5px; padding:8px 20px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:14px; cursor:pointer; transition:all .15s; font-family:inherit; font-weight:500; }
+  .btn { display:inline-flex; align-items:center; gap:5px; padding:8px 20px; border-radius:var(--radius); border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:14px; cursor:pointer; transition:all .15s; font-family:inherit; font-weight:500; ;justify-content:normal}
   .btn:hover { background:var(--bg3); }
   .btn-primary { background:var(--green); color:white; border-color:var(--green); min-width:80px; }
   .btn-primary:hover { background:var(--green2); }
@@ -112,6 +113,7 @@
   </div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 // ===== 倒计时 =====
 let cdTimer = null;

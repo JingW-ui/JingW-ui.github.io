@@ -5,6 +5,8 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>手账风格周计划 To Do List</title>
+<link rel="stylesheet" href="../common.css">
+<script src="../common.js"></script>
 <script src="https://image.uc.cn/s/uae/g/3n/mos-production/0915/3.4.17.js"></script>
 <script src="https://image.uc.cn/s/uae/g/3n/mos-production/fontawesome-free-7.1.0-web/js/all.min.js"></script>
 <link href="https://image.uc.cn/s/uae/g/3n/mos-production/fontawesome-free-7.1.0-web/css/fontawesome.min.css" rel="stylesheet"/>
@@ -15,6 +17,11 @@
          * 使用柔和的色调和手绘风格的边框
          */
         @import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&display=swap');
+
+        /* 中和 common.css 泄漏：本页 <header> 由 utility class 布局，h1/textarea 保持原计算值 */
+        header { display:block; background:transparent; padding:0; box-shadow:none; align-items:normal; gap:normal; border-bottom:0 solid #e5e7eb; }
+        header h1 { font-weight: 400; }
+        textarea#task-input { min-height: 0; }
 
         body {
             background-color: #f5f5f5; /* 浅灰色背景 */

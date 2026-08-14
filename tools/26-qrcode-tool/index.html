@@ -4,28 +4,29 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>二维码生成/解析工具</title>
+<link rel="stylesheet" href="../common.css">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh}
+
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f6f8fa;color:#1f2328;min-height:100vh;display:block;flex-direction:row}
 :root{--green:#2da44e;--green2:#2c974b;--border:#d0d7de;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
-header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px}
-header h1{font-size:18px;font-weight:600}
+header{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;gap:12px;box-shadow:none}
+
 header p{font-size:13px;color:#656d76;margin-left:auto}
 .container{max-width:900px;margin:24px auto;padding:0 16px}
-.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px}
-.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.card-body{padding:16px}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px;display:block;flex-direction:row}
+.card-header{background:#f6f8fa;border-bottom:1px solid var(--border);padding:10px 16px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:normal}
+.card-body{padding:16px;flex:0 1 auto;display:block;flex-direction:row;gap:normal}
 .tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px}
 .tab{padding:8px 20px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:#656d76;transition:all .15s}
 .tab.active{border-bottom-color:var(--green);color:var(--green);font-weight:600}
-.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:var(--radius);border:none;cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;justify-content:normal;font-family:Arial}
 .btn-primary{background:var(--green);color:#fff}
 .btn-primary:hover{background:var(--green2)}
 .btn-secondary{background:#f6f8fa;color:#1f2328;border:1px solid var(--border)}
 .btn-secondary:hover{background:#f0f2f5}
 .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 textarea,input[type=text],input[type=url]{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;outline:none;transition:border-color .15s;font-family:inherit}
-textarea{resize:vertical;min-height:100px}
+textarea{resize:vertical;min-height:100px;line-height:normal;background:#fff;color:#000}
 textarea:focus,input:focus{border-color:var(--green)}
 .layout{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start}
 @media(max-width:640px){.layout{grid-template-columns:1fr}}
@@ -181,6 +182,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   </div>
 </div>
 
+<script src="../common.js"></script>
 <script>
 // ====== QR Code 生成器（纯JS实现，无依赖）======
 // 使用简化版QR码算法（仅支持字母数字模式中等内容）
@@ -454,13 +456,7 @@ function decodeQR(file) {
 }
 
 function copyDecoded() {
-  navigator.clipboard.writeText(document.getElementById('decode-content').textContent).then(() => showToast('已复制'));
-}
-
-function showToast(msg) {
-  let t = document.getElementById('_toast');
-  if (!t) { t = document.createElement('div'); t.id = '_toast'; t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1f2328;color:#fff;padding:8px 18px;border-radius:6px;font-size:13px;z-index:9999;transition:opacity .3s;'; document.body.appendChild(t); }
-  t.textContent = msg; t.style.opacity = '1'; clearTimeout(t._to); t._to = setTimeout(() => t.style.opacity = '0', 1800);
+  copyText(document.getElementById('decode-content').textContent);
 }
 
 // 默认示例
