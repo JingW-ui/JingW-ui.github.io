@@ -1,0 +1,25 @@
+/*
+ * tools/common.css — 编号工具共享 GitHub-light 骨架（短命名方言）
+ * 通过 <link rel="stylesheet" href="../common.css"> 在页面内联 <style> 之前加载。
+ * 只收"逐字节相同"的骨架规则；.container / @media / 网格布局 / 工具专属 widget
+ * 留在各页内联 <style>（内联规则优先级高于此文件，可放心覆盖）。
+ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{ --bg:#fff; --bg2:#f6f8fa; --bg3:#f0f2f5; --border:#d0d7de;
+  --text:#1f2328; --text2:#656d76; --green:#2da44e; --green2:#2c974b;
+  --radius:6px; --shadow:0 1px 3px rgba(0,0,0,.08); }
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Microsoft YaHei',sans-serif;background:var(--bg2);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--bg);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+.header-icon{width:32px;height:32px;background:var(--green);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:white;font-weight:bold;font-size:14px}
+header h1{font-size:18px;font-weight:600}
+header p{font-size:13px;color:var(--text2)}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.card-header{padding:12px 18px;background:var(--bg2);border-bottom:1px solid var(--border);font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.card-body{padding:16px 18px;flex:1;display:flex;flex-direction:column;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 14px;border-radius:var(--radius);border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;cursor:pointer;transition:all .15s;font-family:inherit}
+.btn:hover{background:var(--bg3)}
+.btn-primary{background:var(--green);color:white;border-color:var(--green)}
+.btn-primary:hover{background:var(--green2)}
+textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);font-family:'Consolas',monospace;font-size:13px;line-height:1.6;resize:vertical;min-height:130px;background:var(--bg);color:var(--text);transition:border-color .15s}
+textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px rgba(45,164,78,.12)}
+.label{font-size:12px;color:var(--text2);font-weight:500;margin-bottom:4px}
