@@ -454,8 +454,9 @@ function parseCSVLine(line) {
 }
 
 function parseMarkdown(text) {
-  // Simple Markdown parser
-  let html = text
+  // Simple Markdown parser（先转义 HTML，防止上传文件注入原始标签）
+  let html = String(text)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/^### (.*$)/gim, '<h3>$1</h3>')
     .replace(/^## (.*$)/gim, '<h2>$1</h2>')
     .replace(/^# (.*$)/gim, '<h1>$1</h1>')
@@ -479,7 +480,7 @@ function syntaxHighlightJson(json) {
     } else if (/null/.test(match)) {
       cls = 'json-null';
     }
-    return `<span class="${cls}">${match}</span>`;
+    return `<span class="${cls}">${match.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>`;
   });
 }
 

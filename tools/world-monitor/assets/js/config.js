@@ -6,7 +6,7 @@
 export const CONFIG = {
   title: '世界实时监控',
   map: {
-    geoUrl: 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json',
+    geoUrl: 'https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json',
     width: 960,
     height: 480,
     maxAgeMs: 24 * 3600 * 1000, // 地图数据缓存时长(会话内)

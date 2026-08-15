@@ -16,7 +16,7 @@
 |---|---|---|
 | USGS 地震 | `earthquake.usgs.gov/fdsnws/event/1/query` | 近 24h, M≥4 |
 | NASA EONET | `eonet.gsfc.nasa.gov/api/v3/events` | 活跃自然事件 |
-| 地图 | `cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json` | TopoJSON |
+| 地图 | `cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json` | TopoJSON |
 
 所有数据源均为免费公开接口,浏览器直接跨域访问(CORS `*`),无任何密钥。
 

@@ -115,6 +115,12 @@
 <script>
 configureToast({duration:2000});
 // ===== 简单 Markdown 渲染器 =====
+// URL 白名单：仅放行 http/https/mailto，拦截 javascript:/data:/vbscript: 等危险 scheme
+function safeUrl(u) {
+  var s = String(u || '').trim();
+  return /^(https?:|mailto:)/i.test(s) ? s : '';
+}
+
 function parseMarkdown(md) {
   let html = md
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -154,10 +160,16 @@ function parseMarkdown(md) {
     .replace(/\*(.+?)\*/g, '<em>$1</em>')
     // 删除线
     .replace(/~~(.+?)~~/g, '<del>$1</del>')
-    // 图片
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">')
-    // 链接
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+    // 图片（URL 过安全白名单，拦截 javascript:/data: 等）
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (m, alt, url) => {
+      const u = safeUrl(url);
+      return u ? `<img src="${u}" alt="${alt}">` : m;
+    })
+    // 链接（URL 过安全白名单，并加 rel=noopener 防 tabnabbing）
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, text, url) => {
+      const u = safeUrl(url);
+      return u ? `<a href="${u}" target="_blank" rel="noopener noreferrer">${text}</a>` : text;
+    })
     // 段落
     .replace(/\n\n/g, '</p><p>')
     // 换行
