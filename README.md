@@ -13,6 +13,7 @@
 - [🖼️ 获奖展示](https://jingw-ui.github.io/carousel/) - 竞赛证书与作品图片
 - [🎮 游戏中心](https://jingw-ui.github.io/Games/) - 个人开发的小游戏
 - [🛠️ 技能库](https://jingw-ui.github.io/skills/) - AI Agent Skills集合
+- [🎬 演示文稿](https://jingw-ui.github.io/ppt/) - 求职面试幻灯片
 - [💻 GitHub](https://github.com/JingW-ui) - 开源代码仓库
 
 ---

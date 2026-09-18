@@ -1,1735 +1,541 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>王京 - 华为求职面试</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;700&display=swap');
-  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Source+Serif+4:wght@400;500;600;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>演示文稿 - Presentations</title>
+    <style>
+        :root {
+            /* 背景渐变（浅色 glassmorphism） */
+            --bg-gradient-1: #e7f1f0;  /* 浅青绿 */
+            --bg-gradient-2: #dfe9ec;  /* 浅灰蓝 */
+            --bg-gradient-3: #e6edf2;  /* 浅蓝灰 */
+            --bg: #e7f1f0;
 
-  :root {
-    --bg: #fcfff2;
-    --ink: #10212d;
-    --muted: #5f6f7c;
-    --accent: #2F6A95;
-    --accent-2: #4187b8;
-    --panel: #ffffff;
-    --line: #f4efef;
-    --shadow: 0 12px 40px rgba(47, 106, 149, 0.08);
-    --card-gradient: linear-gradient(145deg, #ffffff, #f9fbfa);
-  }
+            /* 卡片样式：半透明白玻璃 */
+            --card: rgba(255, 255, 255, 0.50);
+            --card-hover: rgba(255, 255, 255, 0.72);
+            --border: rgba(255, 255, 255, 0.55);
+            --border-hover: rgba(255, 255, 255, 0.85);
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+            /* 文字层级 */
+            --text: #2c3e50;
+            --text-soft: #5a6c7d;
+            --text-dim: #8e9aaf;
 
-  html {
-    scroll-behavior: smooth;
-    scroll-snap-type: y mandatory;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(47,106,149,0.2) transparent;
-  }
+            /* 强调色 */
+            --accent: #2dd4bf;
+            --accent-2: #3b82f6;
+            --accent-green: #2dd4bf;
+            --accent-amber: #e8c47a;
 
-  body {
-    font-family: "Sora", "Noto Sans SC", sans-serif;
-    background: radial-gradient(circle at 10% -20%, #d2dfda 0%, transparent 40%),
-                radial-gradient(circle at 90% 120%, #f8ddc9 0%, transparent 40%),
-                var(--bg);
-    color: var(--ink);
-    overflow-x: hidden;
-    line-height: 1.6;
-  }
+            /* 阴影层级 */
+            --shadow-sm: 0 2px 8px rgba(20, 40, 50, 0.05);
+            --shadow-md: 0 6px 24px rgba(20, 40, 50, 0.08);
+            --shadow-lg: 0 12px 40px rgba(20, 40, 50, 0.12);
 
-  /* ====== BG ORBS ====== */
-  .bg-orb {
-    position: fixed;
-    border-radius: 999px;
-    filter: blur(70px);
-    opacity: 0.25;
-    z-index: -1;
-    transition: transform 0.3s ease;
-  }
-  .orb-a {
-    width: 320px; height: 320px;
-    background: var(--accent);
-    top: -100px; right: -80px;
-  }
-  .orb-b {
-    width: 260px; height: 260px;
-    background: var(--accent-2);
-    bottom: -80px; left: -60px;
-  }
+            /* 圆角尺寸 */
+            --radius-sm: 14px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
 
-  /* ====== PROGRESS BAR ====== */
-  .progress-bar {
-    position: fixed;
-    top: 0; left: 0;
-    height: 3px;
-    background: rgba(16, 33, 45, 0.25);
-    z-index: 9999;
-    transition: width 0.15s;
-  }
+            --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-  /* ====== NAV DOTS ====== */
-  .nav-dots {
-    position: fixed;
-    right: 24px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  .nav-dots a {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: rgba(16,33,45,0.15);
-    transition: all 0.3s;
-    display: block;
-    position: relative;
-  }
-  .nav-dots a:hover, .nav-dots a.active {
-    background: var(--accent);
-    transform: scale(1.4);
-  }
-  .nav-dots a .tooltip {
-    position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(16,33,45,0.9);
-    color: #fff;
-    padding: 4px 12px;
-    border-radius: 6px;
-    font-size: 11px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-    font-family: "Sora", sans-serif;
-  }
-  .nav-dots a:hover .tooltip { opacity: 1; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  /* ====== SLIDE NUMBER ====== */
-  .slide-num {
-    position: fixed;
-    bottom: 20px;
-    left: 24px;
-    font-size: 12px;
-    color: rgba(16,33,45,0.25);
-    z-index: 1000;
-    font-weight: 500;
-  }
+        html {
+            scroll-behavior: smooth;
+        }
 
-  /* ====== SECTIONS / SLIDES ====== */
-  .slide {
-    min-height: 100vh;
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 60px 80px;
-    position: relative;
-  }
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+            background-attachment: fixed;
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 30px 20px 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-  /* ====== ANIMATIONS ====== */
-  .fade-up {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  .fade-up.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+        /* 背景装饰光斑：营造通透玻璃氛围 */
+        .bg-decoration {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.45;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .bg-decoration-1 {
+            width: 560px; height: 560px;
+            background: radial-gradient(circle, rgba(94, 234, 212, 0.30) 0%, transparent 70%);
+            top: -180px; left: -120px;
+            animation: float 22s ease-in-out infinite;
+        }
+        .bg-decoration-2 {
+            width: 480px; height: 480px;
+            background: radial-gradient(circle, rgba(125, 211, 252, 0.28) 0%, transparent 70%);
+            bottom: -140px; right: -120px;
+            animation: float 26s ease-in-out infinite reverse;
+        }
+        .bg-decoration-3 {
+            width: 380px; height: 380px;
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.18) 0%, transparent 70%);
+            top: 48%; left: 52%;
+            transform: translate(-50%, -50%);
+            animation: pulse 16s ease-in-out infinite;
+        }
 
-  /* ====== SLIDE 1: COVER ====== */
-  .slide-cover {
-    text-align: center;
-    position: relative;
-  }
-  .slide-cover::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(ellipse at 30% 20%, rgba(47,106,149,0.06) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(204,109,47,0.05) 0%, transparent 50%);
-    animation: pulse 8s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.7; }
-  }
-  .slide-cover .content { position: relative; z-index: 2; }
-  .huawei-logo-top {
-    position: absolute;
-    top: 40px;
-    left: 80px;
-    z-index: 3;
-  }
-  .huawei-logo-top img {
-    height: 36px;
-    width: auto;
-    object-fit: contain;
-  }
-  .slide-cover .eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.74rem;
-    color: var(--accent);
-    font-weight: 700;
-    margin-bottom: 14px;
-  }
-  .slide-cover h1 {
-    font-family: "Source Serif 4", "Noto Serif SC", serif;
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
-    font-weight: 700;
-    margin-bottom: 14px;
-    color: var(--ink);
-    line-height: 1.15;
-  }
-  .slide-cover .subtitle {
-    font-size: 1.1rem;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-  .slide-cover .tags {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 24px;
-  }
-  .slide-cover .tags span {
-    padding: 6px 18px;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    font-size: 13px;
-    color: var(--muted);
-    transition: all 0.2s;
-  }
-  .slide-cover .tags span:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-  .scroll-hint {
-    position: absolute;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-    animation: bounce 2s ease-in-out infinite;
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .scroll-hint span { display: block; font-size: 24px; margin-top: 4px; }
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(10px); }
-  }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
 
-  /* ====== SECTION TITLE & HEADING ====== */
-  .section-title {
-    font-family: "Source Serif 4", "Noto Serif SC", serif;
-    font-size: clamp(1.5rem, 3vw, 2.4rem);
-    font-weight: 600;
-    margin-bottom: 6px;
-    color: var(--ink);
-    text-align: center;
-  }
-  .section-eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    font-size: 0.74rem;
-    color: var(--accent);
-    font-weight: 700;
-    margin-bottom: 8px;
-    text-align: center;
-  }
-  .section-line {
-    width: 50px;
-    height: 3px;
-    background: var(--accent);
-    border-radius: 2px;
-    margin: 0 auto 40px;
-  }
+        /* 标题区域 */
+        .title-section {
+            text-align: center;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(18px);
+            animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.02s forwards;
+        }
 
-  /* ====== SLIDE 2: ABOUT ====== */
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.4fr;
-    gap: 60px;
-    align-items: center;
-    max-width: 1100px;
-    width: 100%;
-  }
-  .about-avatar {
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 72px;
-    margin: 0 auto;
-    box-shadow: 0 0 50px rgba(47,106,149,0.15);
-    position: relative;
-    overflow: hidden;
-  }
-  .about-avatar::after {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    border: 2px solid rgba(47,106,149,0.25);
-    animation: ring 3s ease-in-out infinite;
-  }
-  @keyframes ring {
-    0%, 100% { transform: scale(1); opacity: 0.4; }
-    50% { transform: scale(1.08); opacity: 0.15; }
-  }
-  .about-info h2 {
-    font-family: "Source Serif 4", "Noto Serif SC", serif;
-    font-size: 36px;
-    margin-bottom: 6px;
-    color: var(--ink);
-  }
-  .about-info .role {
-    color: var(--accent);
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 16px;
-  }
-  .about-info .bio {
-    color: var(--muted);
-    font-size: 14px;
-    line-height: 1.8;
-    margin-bottom: 24px;
-  }
-  .info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .info-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .info-item .icon {
-    width: 32px; height: 32px;
-    background: rgba(47,106,149,0.08);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    flex-shrink: 0;
-  }
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+            line-height: 1.2;
+            color: var(--text);
+        }
 
-  /* ====== PANEL (reusable card container) ====== */
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    padding: 36px;
-    box-shadow: var(--shadow);
-    width: 100%;
-    max-width: 1100px;
-  }
-  .panel h3.panel-title {
-    font-family: "Source Serif 4", "Noto Serif SC", serif;
-    font-size: 1rem;
-    color: var(--accent);
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-  .panel h2.panel-heading {
-    font-family: "Source Serif 4", "Noto Serif SC", serif;
-    font-size: clamp(1.5rem, 3vw, 2.2rem);
-    margin-bottom: 6px;
-    color: var(--ink);
-  }
-  .panel .panel-sub {
-    color: var(--muted);
-    font-size: 0.88rem;
-    margin-bottom: 24px;
-  }
+        .highlight {
+            background: linear-gradient(120deg, #2dd4bf 30%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            font-size: 1.7rem;
+            font-weight: 700;
+        }
 
-  /* ====== SLIDE 3: EDUCATION ====== */
-  .edu-container {
-    max-width: 900px;
-    width: 100%;
-  }
-  .edu-card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 28px 32px;
-    margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: transform 0.3s, box-shadow 0.3s;
-  }
-  .edu-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(47,106,149,0.12);
-  }
-  .edu-card::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 4px;
-    background: var(--accent);
-    border-radius: 0 4px 4px 0;
-  }
-  .edu-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 10px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .edu-header h3 {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--ink);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .school-logo {
-    height: 32px;
-    width: auto;
-    object-fit: contain;
-  }
-  .school-logo-light {
-    height: 32px;
-    width: auto;
-    object-fit: contain;
-    filter: brightness(0) saturate(100%) invert(15%) sepia(78%) saturate(2848%) hue-rotate(203deg) brightness(96%) contrast(101%);
-  }
-  .edu-meta {
-    font-size: 12px;
-    color: var(--muted);
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-  }
-  .edu-meta span {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .edu-highlight {
-    color: var(--accent-2);
-    font-weight: 600;
-    font-size: 13px;
-    margin-top: 6px;
-  }
-  .edu-tags {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-  }
-  .edu-tags .tag {
-    padding: 3px 12px;
-    background: rgba(47,106,149,0.06);
-    color: var(--accent);
-    border-radius: 12px;
-    font-size: 12px;
-    border: 1px solid rgba(47,106,149,0.1);
-  }
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-soft);
+            margin-bottom: 0.5rem;
+        }
 
-  /* ====== SLIDE 4: RESEARCH ====== */
-  .research-container {
-    max-width: 1100px;
-    width: 100%;
-  }
-  .research-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-  .research-card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 16px 18px;
-    transition: transform 0.3s, box-shadow 0.3s;
-    position: relative;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-  }
-  .research-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(47,106,149,0.12);
-  }
-  .research-card .card-icon {
-    font-size: 22px;
-    margin-bottom: 8px;
-  }
-  .research-card h3 {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 6px;
-    line-height: 1.3;
-  }
-  .research-card p {
-    font-size: 11.5px;
-    color: var(--muted);
-    line-height: 1.55;
-  }
-  .tech-tags {
-    display: flex;
-    gap: 5px;
-    flex-wrap: wrap;
-    margin-top: 8px;
-  }
-  .tech-tags span {
-    padding: 2px 8px;
-    background: rgba(47,106,149,0.06);
-    color: var(--accent);
-    border-radius: 8px;
-    font-size: 10px;
-    border: 1px solid rgba(47,106,149,0.1);
-  }
-  .achievement-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    padding: 2px 8px;
-    color: var(--accent-2);
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 600;
-    border: 1px solid rgba(204,109,47,0.15);
-  }
+        .stats-banner {
+            background-color: var(--card);
+            color: var(--text-dim);
+            padding: 0.35rem 1rem;
+            border-radius: 16px;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid var(--border);
+            margin-top: 0.3rem;
+        }
 
-  /* ====== SLIDE 5: PUBLICATIONS ====== */
-  .pub-container {
-    max-width: 1300px;
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-  .pub-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .pub-card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 14px 18px;
-    transition: transform 0.3s;
-    box-shadow: var(--shadow);
-  }
-  .pub-card:hover { transform: translateX(3px); }
-  .pub-type {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 6px;
-    font-size: 10px;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-  .pub-type.sci { background: rgba(47,106,149,0.08); color: var(--accent); }
-  .pub-type.patent { background: rgba(204,109,47,0.08); color: var(--accent-2); }
-  .pub-type.soft { background: rgba(95,111,124,0.08); color: var(--muted); border: 1px solid rgba(95,111,124,0.15); }
-  .pub-card h3 {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 4px;
-    line-height: 1.4;
-  }
-  .pub-card p {
-    font-size: 11px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-  
-  /* 证书轮播区 */
-  .cert-carousel {
-    background: transparent;
-    border: none;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: none;
-    display: flex;
-    flex-direction: column;
-  }
-  .cert-carousel h4 {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 12px;
-    text-align: center;
-  }
-  .cert-viewer {
-    flex: 1;
-    position: relative;
-    background: transparent;
-    border-radius: 8px;
-    overflow: hidden;
-    min-height: 280px;
-    cursor: pointer;
-    perspective: 1000px;
-  }
-  .cert-item {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 80%;
-    height: 85%;
-    transform: translate(-50%, -50%);
-    opacity: 0;
-    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .cert-item.active {
-    opacity: 1;
-    z-index: 10;
-    transform: translate(-50%, -50%) translateX(0) rotateY(0) scale(1.1);
-  }
-  .cert-item.prev {
-    opacity: 0.7;
-    z-index: 9;
-    transform: translate(-50%, -50%) translateX(-40%) rotateY(-12deg) scale(0.95);
-  }
-  .cert-item.next {
-    opacity: 0.7;
-    z-index: 8;
-    transform: translate(-50%, -50%) translateX(40%) rotateY(12deg) scale(0.95);
-  }
-  .cert-item img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    background: white;
-    transition: none;
-  }
-  .cert-item.active img {
-    background: white;
-  }
-  .cert-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 12px;
-    gap: 8px;
-  }
-  .cert-btn {
-    flex: 1;
-    padding: 4px 8px;
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid rgba(95,111,124,0.2);
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 10px;
-    font-weight: 500;
-    transition: all 0.2s;
-    opacity: 0.5;
-  }
-  .cert-btn:hover {
-    background: rgba(47,106,149,0.05);
-    color: var(--accent);
-    border-color: rgba(47,106,149,0.3);
-    opacity: 1;
-    transform: none;
-  }
-  .cert-indicator {
-    font-size: 10px;
-    color: var(--muted);
-    font-weight: 500;
-    min-width: 45px;
-    text-align: center;
-    opacity: 0.6;
-  }
-  .cert-dots {
-    display: flex;
-    justify-content: center;
-    gap: 4px;
-    margin-top: 6px;
-    flex-wrap: wrap;
-  }
-  .cert-dot {
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: rgba(95,111,124,0.2);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .cert-dot:hover {
-    background: rgba(95,111,124,0.4);
-  }
-  .cert-dot.active {
-    background: var(--accent);
-    opacity: 0.8;
-  }
-  
-  /* 证书放大预览覆盖层 */
-  .cert-overlay {
-    position: fixed;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.85);
-    z-index: 10000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    cursor: zoom-out;
-  }
-  .cert-overlay.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .cert-overlay img {
-    max-width: 90vw;
-    max-height: 90vh;
-    object-fit: contain;
-    border-radius: 8px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-    cursor: default;
-  }
+        /* 搜索框 */
+        .search-container {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: rise 0.45s ease 0.08s forwards;
+        }
 
-  /* ====== SLIDE 6: SKILLS ====== */
-  .skills-container {
-    max-width: 1000px;
-    width: 100%;
-  }
-  .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-  }
-  .skill-card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 22px 18px;
-    text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
-    box-shadow: var(--shadow);
-  }
-  .skill-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(47,106,149,0.12);
-  }
-  .skill-card .skill-icon {
-    font-size: 32px;
-    margin-bottom: 10px;
-  }
-  .skill-card h4 {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 4px;
-  }
-  .skill-card p {
-    font-size: 11px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-  .skill-level {
-    margin-top: 10px;
-    height: 4px;
-    background: rgba(47,106,149,0.08);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .skill-level .fill {
-    height: 100%;
-    border-radius: 2px;
-    background: #2F6A95;
-    transition: width 1s ease;
-    width: 0;
-  }
+        .search-box {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px 18px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--card);
+            color: var(--text);
+            font-size: 0.85rem;
+            transition: var(--transition);
+            backdrop-filter: blur(6px);
+        }
 
-  /* ====== SLIDE 7: ACHIEVEMENTS ====== */
-  .achieve-container {
-    max-width: 1000px;
-    width: 100%;
-  }
-  .achieve-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-  }
-  .achieve-card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 24px 20px;
-    text-align: center;
-    transition: transform 0.3s;
-    box-shadow: var(--shadow);
-    position: relative;
-    overflow: hidden;
-  }
-  .achieve-card:hover { transform: translateY(-3px); }
-  .achieve-card .medal {
-    font-size: 36px;
-    margin-bottom: 8px;
-  }
-  .achieve-card h4 {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 6px;
-  }
-  .achieve-card p {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-  .achieve-card.featured {
-    border-color: rgba(204,109,47,0.25);
-    background: rgba(204,109,47,0.02);
-  }
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.18);
+        }
 
-  /* ====== SLIDE 8: OPEN SOURCE ====== */
-  .oss-container {
-    max-width: 1000px;
-    width: 100%;
-  }
-  .oss-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-  }
-  .oss-card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    padding: 24px;
-    transition: transform 0.3s;
-    box-shadow: var(--shadow);
-  }
-  .oss-card:hover { transform: translateY(-3px); }
-  .oss-card h4 {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 6px;
-  }
-  .oss-card p {
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.6;
-    margin-bottom: 10px;
-  }
-  .oss-card .stats {
-    display: flex;
-    gap: 14px;
-    font-size: 12px;
-    color: var(--muted);
-  }
-  .oss-card .stats span {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
+        /* 分类标签 */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: rise 0.45s ease 0.14s forwards;
+        }
 
-  /* ====== SLIDE 9: WHY HUAWEI ====== */
-  .why-container {
-    max-width: 1000px;
-    width: 100%;
-  }
-  .why-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-  .why-card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 28px;
-    transition: transform 0.3s;
-    box-shadow: var(--shadow);
-  }
-  .why-card:hover { transform: translateY(-3px); }
-  .why-card .why-icon { font-size: 28px; margin-bottom: 10px; }
-  .why-card h4 { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
-  .why-card p { font-size: 13px; color: var(--muted); line-height: 1.7; }
+        .category-tab {
+            padding: 8px 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            transition: var(--transition);
+            user-select: none;
+            backdrop-filter: blur(6px);
+        }
 
-  /* ====== SLIDE 10: END ====== */
-  .slide-end {
-    text-align: center;
-    position: relative;
-  }
-  .slide-end h1 {
-    font-family: "Source Serif 4", "Noto Serif SC", serif;
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 700;
-    color: var(--ink);
-    margin-bottom: 14px;
-  }
-  .slide-end .end-sub {
-    font-size: 1rem;
-    color: var(--muted);
-    margin-bottom: 30px;
-  }
-  .slide-end .contact-info {
-    display: flex;
-    gap: 28px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
-  .slide-end .contact-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: var(--muted);
-  }
-  .slide-end .thank-you {
-    font-size: 15px;
-    color: var(--muted);
-    margin-top: 30px;
-    font-style: italic;
-  }
+        .category-tab:hover {
+            background: var(--card-hover);
+            border-color: var(--border-hover);
+            color: var(--text);
+        }
 
-  /* ====== RESPONSIVE ====== */
-  @media (max-width: 768px) {
-    .slide { padding: 40px 24px; }
-    .about-grid { grid-template-columns: 1fr; text-align: center; }
-    .research-grid { grid-template-columns: 1fr; }
-    .pub-container { grid-template-columns: 1fr; }
-    .cert-viewer { min-height: 200px; }
-    .skills-grid { grid-template-columns: repeat(2, 1fr); }
-    .achieve-grid { grid-template-columns: 1fr 1fr; }
-    .oss-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr; }
-    .info-grid { grid-template-columns: 1fr; }
-    .nav-dots { right: 10px; }
-  }
-</style>
+        .category-tab.active {
+            background: rgba(45, 212, 191, 0.15);
+            color: var(--accent);
+            border-color: rgba(45, 212, 191, 0.35);
+        }
+
+        /* 演示文稿网格 */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 12px;
+            padding: 0;
+        }
+
+        .tool-card {
+            background: var(--card);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border-radius: var(--radius-md);
+            padding: 0;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.35s ease,
+                        backdrop-filter 0.35s ease,
+                        background 0.35s ease,
+                        border-color 0.35s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 85px;
+            cursor: pointer;
+            text-decoration: none;
+            opacity: 0;
+            transform: translateY(16px);
+            animation: rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* hover 光泽扫过 */
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.55) 48%, transparent 66%);
+            transform: translateX(-120%);
+            transition: transform 0.7s ease;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .tool-card:hover {
+            background: var(--card-hover);
+            border-color: var(--border-hover);
+            box-shadow: 0 16px 48px rgba(20, 40, 50, 0.16),
+                        0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            transform: perspective(800px) rotateX(2deg) rotateY(-2deg)
+                       translateY(-4px) scale(1.015);
+            backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
+            -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
+        }
+
+        .tool-card:hover::before {
+            transform: translateX(120%);
+        }
+
+        .tool-label {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding: 3px 8px;
+            background: rgba(45, 212, 191, 0.12);
+            border: 1px solid rgba(45, 212, 191, 0.25);
+            border-radius: 12px;
+            font-size: 0.6rem;
+            color: var(--accent);
+            z-index: 3;
+            line-height: 1.2;
+            font-weight: 600;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        .tool-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px 12px 0 12px;
+            margin-bottom: 0;
+            padding-right: 60px;
+        }
+
+        .tool-icon {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            background: linear-gradient(135deg, #d9efef, #c4e3e8);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tool-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 4px;
+        }
+
+        .tool-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tool-name {
+            font-size: 0.85rem;
+            font-weight: 650;
+            color: var(--text);
+            margin-bottom: 3px;
+            line-height: 1.3;
+            letter-spacing: -0.2px;
+        }
+
+        .tool-description {
+            color: var(--text-soft);
+            font-size: 0.68rem;
+            line-height: 1.4;
+            margin-bottom: 0;
+            padding-bottom: 10px;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        /* 页脚样式 */
+        .footer {
+            text-align: center;
+            padding: 30px 0 20px;
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            opacity: 0;
+            animation: rise 0.45s ease 0.3s forwards;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* 动画关键帧 */
+        @keyframes rise {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 背景光斑缓慢漂移 */
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        /* 光斑呼吸 */
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.45; }
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            body { padding: 20px 14px 16px; }
+            h1 { font-size: 1.2rem; }
+            .highlight { font-size: 1.35rem; }
+            .subtitle { font-size: 0.75rem; }
+            .search-container { margin-bottom: 0.75rem; }
+            .search-box { padding: 8px 14px; font-size: 0.78rem; border-radius: 14px; }
+            .category-tabs { gap: 6px; margin-bottom: 0.75rem; }
+            .category-tab { padding: 6px 12px; font-size: 0.68rem; }
+            .tools-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+            .tool-card { min-height: 70px; border-radius: 14px; }
+            .tool-card-header { padding: 9px 9px 0 9px; padding-right: 48px; gap: 7px; }
+            .tool-icon { width: 28px; height: 28px; min-width: 28px; border-radius: 8px; }
+            .tool-name { font-size: 0.74rem; }
+            .tool-description { font-size: 0.6rem; padding-bottom: 8px; }
+            .tool-label { font-size: 0.55rem; padding: 2px 6px; }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 16px 10px 12px; }
+            h1 { font-size: 1rem; }
+            .highlight { font-size: 1.15rem; }
+            .tools-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; }
+            .tool-card { min-height: 62px; border-radius: 12px; }
+            .tool-card-header { padding: 7px 7px 0 7px; padding-right: 40px; gap: 5px; }
+            .tool-icon { width: 24px; height: 24px; min-width: 24px; border-radius: 7px; }
+            .tool-name { font-size: 0.68rem; }
+            .tool-description { font-size: 0.56rem; }
+        }
+    </style>
 </head>
 <body>
+    <!-- 背景装饰光斑 -->
+    <div class="bg-decoration bg-decoration-1"></div>
+    <div class="bg-decoration bg-decoration-2"></div>
+    <div class="bg-decoration bg-decoration-3"></div>
 
-<!-- Background Orbs -->
-<div class="bg-orb orb-a"></div>
-<div class="bg-orb orb-b"></div>
+    <div class="container">
+        <!-- 标题区域 -->
+        <div class="title-section">
+            <h1><span class="highlight">演示文稿</span>面试演示集合</h1>
+            <p class="subtitle">面向不同公司的求职面试幻灯片</p>
+            <div class="stats-banner">
+                📦 共创建 2 套演示文稿
+            </div>
+        </div>
 
-<!-- Progress Bar -->
-<div class="progress-bar" id="progressBar"></div>
+        <!-- 搜索框 -->
+        <div class="search-container">
+            <input type="text" class="search-box" id="searchBox" placeholder="搜索演示文稿名称或描述...">
+        </div>
 
-<!-- Navigation Dots -->
-<div class="nav-dots" id="navDots"></div>
+        <!-- 分类标签 -->
+        <div class="category-tabs">
+            <div class="category-tab active" data-category="all">全部</div>
+            <div class="category-tab" data-category="interview">求职面试</div>
+        </div>
 
-<!-- Slide Number -->
-<div class="slide-num" id="slideNum"></div>
+        <!-- 演示文稿网格 -->
+        <div class="tools-grid" id="toolsGrid">
+            <!-- 华为求职面试 -->
+            <a href="/ppt/hw/" class="tool-card" data-category="interview" data-name="华为求职面试" data-desc="面向华为的求职面试演示，涵盖科研经历、技术能力、竞赛荣誉与求职意向">
+                <span class="tool-label">求职面试</span>
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="/ppt/assets/huawei_logo.png" alt="华为求职面试"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">华为求职面试</h3>
+                        <p class="tool-description">科研经历 / 技术能力 / 求职意向</p>
+                    </div>
+                </div>
+            </a>
 
-<!-- ==================== SLIDE 1: COVER ==================== -->
-<section class="slide slide-cover" id="slide1">
-  <div class="huawei-logo-top fade-up">
-    <img src="./assets/huawei_logo.png" alt="华为">
-  </div>
-  <div class="content">
-    <div class="eyebrow fade-up">求职面试 · 华为</div>
-    <h1 class="fade-up" style="transition-delay: 0.2s">王 京</h1>
-    <p class="subtitle fade-up" style="transition-delay: 0.4s">生物医学工程硕士 · 电子科技大学（985）</p>
-    <div class="tags fade-up" style="transition-delay: 0.6s">
-      <span>医学图像处理</span>
-      <span>AI Agent</span>
-      <span>全栈开发</span>
+            <!-- 网易求职面试 -->
+            <a href="/ppt/netease/" class="tool-card" data-category="interview" data-name="网易求职面试" data-desc="面向网易的求职面试演示，涵盖科研经历、技术能力与求职意向">
+                <span class="tool-label">求职面试</span>
+                <div class="tool-card-header">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e36d6e' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='14' rx='2'/%3E%3Cpath d='M8 21h8M12 18v3'/%3E%3C/svg%3E" alt="网易求职面试"></div>
+                    <div class="tool-content">
+                        <h3 class="tool-name">网易求职面试</h3>
+                        <p class="tool-description">科研经历 / 技术能力 / 求职意向</p>
+                    </div>
+                </div>
+            </a>
+
+            <div class="empty-state" id="emptyState">没有匹配的演示文稿</div>
+        </div>
+
+        <!-- 页脚 -->
+        <div class="footer">
+            <p>王京 · 演示文稿集合 · <a href="/">返回个人主页</a></p>
+        </div>
     </div>
-  </div>
-  <div class="scroll-hint">
-    向下滚动查看更多
-    <span>⌄</span>
-  </div>
-</section>
 
-<!-- ==================== SLIDE 2: ABOUT ME ==================== -->
-<section class="slide" id="slide2">
-  <div class="section-eyebrow fade-up">关于我</div>
-  <div class="section-title fade-up" style="transition-delay:0.05s">个人简介</div>
-  <div class="section-line fade-up" style="transition-delay:0.1s"></div>
-  <div class="about-grid">
-    <div class="fade-up">
-      <div class="about-avatar"><img src="../imgs/life_and_others/io_pic.png" alt="王京" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
-    </div>
-    <div class="about-info fade-up" style="transition-delay:0.15s">
-      <h2>王京</h2>
-      <p class="role">硕士研究生 · 电子科技大学 · 神经信息教育部重点实验室</p>
-      <p class="bio">
-        专注于生物医学工程领域，研究方向涵盖医学图像处理与机器学习。
-        具备扎实的深度学习与全栈开发能力，在多项国家级竞赛中获奖，撰写多篇SCI论文（在审/预印本）。
-        热爱技术，追求卓越，致力于将AI技术应用于医疗健康领域。
-      </p>
-      <div class="info-grid">
-        <div class="info-item">
-          <div class="">📮</div>
-          <span>2642144249@qq.com</span>
-        </div>
-        <div class="info-item">
-          <div class="">🎓</div>
-          <span>英语六级 · 可流畅阅读前沿论文</span>
-        </div>
-        <div class="info-item">
-          <div class="">💪</div>
-          <span>健身博主 · 抖音 5k+ 粉丝 · 获赞 10w+</span>
-        </div>
-        <div class="info-item">
-          <div class="">📸</div>
-          <span>佳能摄影师 · 100+ 组客片</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+    <script>
+        // 搜索和分类过滤功能
+        const searchBox = document.getElementById('searchBox');
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const cards = document.querySelectorAll('.tool-card');
+        const emptyState = document.getElementById('emptyState');
+        let currentCategory = 'all';
+        let currentSearch = '';
 
-<!-- ==================== SLIDE 3: EDUCATION ==================== -->
-<section class="slide" id="slide3">
-  <div class="section-eyebrow fade-up">教育经历</div>
-  <div class="section-title fade-up" style="transition-delay:0.05s">学业背景</div>
-  <div class="section-line fade-up" style="transition-delay:0.1s"></div>
-  <div class="edu-container">
-    <div class="edu-card fade-up">
-      <div class="edu-header">
-        <h3><img src="/Games/ball/img/UESTC_ico.png" alt="UESTC" class="school-logo"></h3>
-        <div class="edu-meta">
-          <span>2024.09 - 至今</span>
-          <span>GPA 3.83/4 (前5%)</span>
-        </div>
-      </div>
-      <p class="edu-highlight">导师：陈华富教授 · 神经信息教育部重点实验室</p>
-      <div class="edu-tags">
-        <span class="tag">生物医学工程 硕士</span>
-        <span class="tag">优秀研究生 ×2</span>
-        <span class="tag">学业奖学金一等奖 ×2</span>
-        <span class="tag">学术青苗奖</span>
-      </div>
-      <div style="margin-top:12px;font-size:12px;">
-        <a href="https://jingw-ui.github.io/cv/" target="_blank" style="color:var(--accent);text-decoration:none;">📄 简历</a>
-        &nbsp;·&nbsp;
-        <a href="https://jingw-ui.github.io/resume/" target="_blank" style="color:var(--accent);text-decoration:none;">📋 详细简历</a>
-                <a href="https://jingw-ui.github.io/carousel/" target="_blank" style="color:var(--accent);text-decoration:none;">🏆 荣誉墙</a>
+        // 搜索功能
+        searchBox.addEventListener('input', (e) => {
+            currentSearch = e.target.value.toLowerCase().trim();
+            filterCards();
+        });
 
-      </div>
-    </div>
-    <div class="edu-card fade-up" style="transition-delay:0.15s">
-      <div class="edu-header">
-        <h3><img src="./assets/logo_swust.svg" alt="SWUST" class="school-logo-light"> </h3>
-        <div class="edu-meta">
-          <span>2020.09 - 2024.06</span>
-          <span>GPA 4.15/5 (前2%)</span>
-        </div>
-      </div>
-      <p class="edu-highlight">导师：周颖玥 · ACM项目组 & BMELab</p>
-      <div class="edu-tags">
-        <span class="tag">生物医学工程 本科</span>
-        <span class="tag">四川省优秀毕业生</span>
-        <span class="tag">推免生</span>
-        <span class="tag">国家励志奖学金 ×2</span>
-      </div>
-      <div style="margin-top:12px;font-size:12px;">
-        <a href="https://jingw-ui.github.io/carousel/" target="_blank" style="color:var(--accent);text-decoration:none;">🏆 荣誉墙</a>
-      </div>
-    </div>
-  </div>
-</section>
+        // 分类标签点击事件
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentCategory = tab.dataset.category;
+                filterCards();
+            });
+        });
 
-<!-- ==================== SLIDE 4: RESEARCH ==================== -->
-<section class="slide" id="slide4">
-  <div class="section-eyebrow fade-up">科研经历</div>
-  <div class="section-title fade-up" style="transition-delay:0.05s">核心科研项目</div>
-  <div class="section-line fade-up" style="transition-delay:0.1s"></div>
-  <div class="research-container">
-    <div class="research-grid">
-      <!-- Card 1 -->
-      <div class="research-card fade-up">
-        <div class="achievement-badge">📄 SCI在审</div>
-        <div class="card-icon"></div>
-        <h3>NEURA 神经影像智能体系统</h3>
-        <p>受认知科学启发的大语言模型驱动自主智能体，双知识图谱架构（DiseaseKG/ToolKG）动态桥接医学知识与异构工具，实现端到端多模态神经影像分析工作流自动化。</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;">
-          <div class="tech-tags" style="margin-top:0;">
-            <span>Agent</span><span>LLM</span><span>RAG</span><span>CoT</span><span>Python</span>
-          </div>
-          <div style="font-size:12px;white-space:nowrap;">
-            <a href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" style="color:var(--accent);text-decoration:none;">📄 阅读论文</a>
-          </div>
-        </div>
-      </div>
-      <!-- Card 2 -->
-      <div class="research-card fade-up" style="transition-delay:0.1s">
-        <div class="achievement-badge">📄 SCI在审</div>
-        <div class="card-icon"></div>
-        <h3>MediScreen-Brain 脑肿瘤检测平台</h3>
-        <p>基于YOLO的CPU优化GUI平台，支持NIfTI 3D MRI解析，自动生成三视图，精准定位肿瘤并测量体积。零配置，双击即用。</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;">
-          <div class="tech-tags" style="margin-top:0;">
-            <span>YOLO</span><span>PyTorch</span><span>PySide6</span><span>NiBabel</span>
-          </div>
-          <div style="font-size:12px;white-space:nowrap;">
-            <a href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" style="color:var(--accent);text-decoration:none;">🔗 访问平台</a>
-          </div>
-        </div>
-      </div>
-      <!-- Card 3 -->
-      <div class="research-card fade-up" style="transition-delay:0.2s">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <img src="./assets/logo_lianying.png" alt="海马体分割" style="height:25px;width:auto;">
-          <div class="achievement-badge" style="position:static;">🏆 国赛一等奖</div>
-        </div>
-        <h3>海马体自动分割诊断系统</h3>
-        <p>基于nnU-Net 3D分割模型，Dice系数达0.9554，HD95仅1.0mm，支持3D/2D可视化及历史记录查询。</p>
-        <div class="tech-tags">
-          <span>nnU-Net</span><span>3D Slicer</span><span>MRI</span><span>Python</span>
-        </div>
-      </div>
-      <!-- Card 4 -->
-      <div class="research-card fade-up" style="transition-delay:0.3s">
-        <div class="achievement-badge">🏆 全国二等奖</div>
-        <div class="card-icon"></div>
-        <h3>结直肠癌智能检测与诊断系统</h3>
-        <p>基于YOLOv8的目标检测模型，结合Django + Vue + MySQL，实现结直肠癌早期筛查辅助诊断系统。</p>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <div class="tech-tags" style="margin-top:0;">
-            <span>YOLOv8</span><span>Django</span><span>Vue</span><span>MySQL</span>
-          </div>
-          <div style="font-size:12px;white-space:nowrap;">
-            <a href="https://jingw-ui.github.io/videos/" target="_blank" style="color:var(--accent);text-decoration:none;">🎥 查看演示视频</a>
-          </div>
-        </div>
-      </div>
-      <!-- Card 5 -->
-      <div class="research-card fade-up" style="transition-delay:0.4s">
-        <div class="achievement-badge">🏆 省一等奖</div>
-        <div class="card-icon">🚨</div>
-        <h3>摔倒行为识别与安全预警系统</h3>
-        <p>融合YoloPose、OpenPose、BlazePose多种姿态估计，对比阈值法、机器学习、深度学习与Transformer方法。</p>
-        <div class="tech-tags">
-          <span>YOLO-Pose</span><span>Transformer</span><span>PySide6</span>
-        </div>
-      </div>
-      <!-- Card 6 -->
-      <div class="research-card fade-up" style="transition-delay:0.5s">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <img src="./assets/logo_dianwang.png" alt="国网宁夏电力" style="height:50px;width:auto;">
-          <div class="achievement-badge" style="position:static;">💼 实习</div>
-        </div>
-        <h3>国网宁夏电力 · AI算法实习</h3>
-        <p>采集2k+带电作业图像，基于YOLOv8+OpenPose实现头盔佩戴与危险姿态识别，mAP@0.5提升7.3%。</p>
-        <div class="tech-tags">
-          <span>YOLOv8</span><span>OpenPose</span><span>Python</span><span>数据标注</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+        // 过滤函数
+        function filterCards() {
+            let visible = 0;
+            cards.forEach(card => {
+                const category = card.dataset.category;
+                const name = (card.dataset.name || '').toLowerCase();
+                const desc = (card.dataset.desc || '').toLowerCase();
 
-<!-- ==================== SLIDE 5: PUBLICATIONS ==================== -->
-<section class="slide" id="slide5">
-  <div class="section-eyebrow fade-up">学术成果</div>
-  <div class="section-title fade-up" style="transition-delay:0.05s">论文 · 专利 · 软著</div>
-  <div class="section-line fade-up" style="transition-delay:0.1s"></div>
-  <div class="pub-container">
-    <!-- 左侧：论文与专利列表 -->
-    <div class="pub-list">
-      <div class="pub-card fade-up">
-        <div class="pub-type sci">SCI 论文</div>
-        <h3>MediScreen-Brain: A Portable, YOLO-powered GUI for Multi-Modal Brain Tumor Detection and 3D Localization</h3>
-        <p>提出基于YOLO的便携化脑肿瘤检测GUI系统，支持多模态MRI数据的3D定位与可视化分析。</p>
-      </div>
-      <div class="pub-card fade-up" style="transition-delay:0.05s">
-        <div class="pub-type sci">SCI 论文（bioRxiv）</div>
-        <h3>NEURA: An Agentic System for Autonomous Neuroimaging Workflows</h3>
-        <p>大语言模型驱动的自主神经影像分析智能体，双知识图谱架构实现复杂工作流端到端自动化。</p>
-      </div>
-      <div class="pub-card fade-up" style="transition-delay:0.1s">
-        <div class="pub-type sci">SCI 论文（在审）</div>
-        <h3>Spatiotemporal Patterns of Brainstem Tract Atrophy Predict Disease Progression in SCA3</h3>
-        <p>脑干束萎缩的时空模式预测脊髓小脑性共济失调3型的疾病进展。</p>
-      </div>
-      <div class="pub-card fade-up" style="transition-delay:0.15s">
-        <div class="pub-type patent">专利</div>
-        <h3>基于深度学习的MRI海马体3D智能分析诊断平台</h3>
-        <p>发明专利：利用深度学习技术实现MRI海马体区域的自动化3D分割与病理分析。</p>
-      </div>
-      <div class="pub-card fade-up" style="transition-delay:0.2s">
-        <div class="pub-type soft">软著 ×5</div>
-        <h3>结直肠息肉检测 · 摔倒行为识别 · 批量图像处理 · 脑肿瘤检测 · 海马体分析</h3>
-        <p>多项软件著作权覆盖医学影像分析、目标检测、行为识别等多个方向。</p>
-      </div>
-    </div>
-    
-    <!-- 右侧：证书轮播 -->
-    <div class="cert-carousel fade-up" style="transition-delay:0.25s">
-      <h4>📜 专利与软著证书</h4>
-      <div class="cert-viewer" id="certViewer">
-        <!-- 证书图片将通过JS动态生成 -->
-      </div>
-      <div class="cert-nav">
-        <button class="cert-btn" onclick="prevCert()">◀ 上一张</button>
-        <span class="cert-indicator" id="certIndicator">1 / 11</span>
-        <button class="cert-btn" onclick="nextCert()">下一张 ▶</button>
-      </div>
-      <div class="cert-dots" id="certDots"></div>
-    </div>
-  </div>
-</section>
+                const categoryMatch = currentCategory === 'all' || category === currentCategory;
+                const searchMatch = !currentSearch ||
+                    name.includes(currentSearch) ||
+                    desc.includes(currentSearch);
 
-<!-- ==================== SLIDE 6: SKILLS ==================== -->
-<section class="slide" id="slide6">
-  <div class="section-eyebrow fade-up">技术能力</div>
-  <div class="section-title fade-up" style="transition-delay:0.05s">技能专长</div>
-  <div class="section-line fade-up" style="transition-delay:0.1s"></div>
-  <div class="skills-container">
-    <div class="skills-grid">
-      <div class="skill-card fade-up">
-        <h4>Python</h4>
-        <p>深度学习/数据分析/自动化</p>
-        <div class="skill-level"><div class="fill" data-width="95%"></div></div>
-      </div>
-      <div class="skill-card fade-up" style="transition-delay:0.05s">
-        <h4>深度学习</h4>
-        <p>YOLO系列/PyTorch/nnU-Net</p>
-        <div class="skill-level"><div class="fill" data-width="90%"></div></div>
-      </div>
-      <div class="skill-card fade-up" style="transition-delay:0.1s">
-        <h4>AI Agent 开发</h4>
-        <p>LLM/RAG/CoT/Toolset</p>
-        <div class="skill-level"><div class="fill" data-width="85%"></div></div>
-      </div>
-      <div class="skill-card fade-up" style="transition-delay:0.15s">
-        <h4>PySide6 / Qt</h4>
-        <p>GUI开发/桌面应用</p>
-        <div class="skill-level"><div class="fill" data-width="88%"></div></div>
-      </div>
-      <div class="skill-card fade-up" style="transition-delay:0.2s">
-        <h4>全栈开发</h4>
-        <p>Spring Boot/Vue/Django</p>
-        <div class="skill-level"><div class="fill" data-width="80%"></div></div>
-      </div>
-      <div class="skill-card fade-up" style="transition-delay:0.25s">
-        <h4>Java / MySQL</h4>
-        <p>后端开发/数据库设计</p>
-        <div class="skill-level"><div class="fill" data-width="75%"></div></div>
-      </div>
-      <div class="skill-card fade-up" style="transition-delay:0.3s">
-        <h4>医学影像处理</h4>
-        <p>MRI/NIfTI/3D Slicer</p>
-        <div class="skill-level"><div class="fill" data-width="88%"></div></div>
-      </div>
-      <div class="skill-card fade-up" style="transition-delay:0.35s">
-        <h4>英语六级</h4>
-        <p>论文阅读/技术文档</p>
-        <div class="skill-level"><div class="fill" data-width="82%"></div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== SLIDE 7: ACHIEVEMENTS ==================== -->
-<section class="slide" id="slide7">
-  <div class="section-eyebrow fade-up">竞赛荣誉</div>
-  <div class="section-title fade-up" style="transition-delay:0.05s">获奖经历</div>
-  <div class="section-line fade-up" style="transition-delay:0.1s"></div>
-  <div class="achieve-container">
-    <div class="achieve-grid">
-      <div class="achieve-card fade-up">
-        <div class="medal">🥇</div>
-        <h4>全国大学生生医工竞赛 一等奖</h4>
-        <p>第九届（2024）· 海马体分割系统 · 国家级</p>
-      </div>
-      <div class="achieve-card fade-up" style="transition-delay:0.1s">
-        <div class="medal">🥈</div>
-        <h4>全国大学生生医工竞赛 二等奖</h4>
-        <p>第八届（2023）· 结直肠癌检测 · 国家级</p>
-      </div>
-      <div class="achieve-card featured fade-up" style="transition-delay:0.2s">
-        <div class="medal">🏆</div>
-        <h4>四川省生医工竞赛 一等奖 ×4</h4>
-        <p>第五/四/三届（2023-2025）· 省级</p>
-      </div>
-      <div class="achieve-card fade-up" style="transition-delay:0.3s">
-        <div class="medal">🥈</div>
-        <h4>BOE全球创新挑战赛 二等奖</h4>
-        <p>第十届（2025）· 国家级企业赛道</p>
-      </div>
-      <div class="achieve-card fade-up" style="transition-delay:0.4s">
-        <img src="./assets/huawei_logo.png" alt="华为" style="height:32px;width:auto;margin-bottom:8px;">
-        <h4>华为云杯昇腾云 二等奖</h4>
-        <p>血液图像处理大赛（2025）· 省级</p>
-      </div>
-      <div class="achieve-card fade-up" style="transition-delay:0.5s">
-        <img src="./assets/huawei_logo.png" alt="华为" style="height:32px;width:auto;margin-bottom:8px;">
-        <h4>CSIG图像图形技术挑战赛 第八名</h4>
-        <p>2025 "Camera学术之星" 影像算法竞赛</p>
-        <div style="margin-top:10px;font-size:12px;">
-          <a href="https://developer.huaweicloud.com/competition/information/1300000173/html2" target="_blank" style="color:var(--accent);text-decoration:none;">查看比赛详情</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== SLIDE 8: OPEN SOURCE ==================== -->
-<section class="slide" id="slide8">
-  <div class="section-eyebrow fade-up">开源项目</div>
-  <div class="section-title fade-up" style="transition-delay:0.05s">社区贡献</div>
-  <div class="section-line fade-up" style="transition-delay:0.1s"></div>
-  <div class="oss-container">
-    <div class="oss-grid">
-      <div class="oss-card fade-up">
-        <h4>🔧 AutoTask 自动化办公</h4>
-        <p>基于 PySide6 + PyAutoGUI 的零代码桌面自动化工具，支持可视化任务编排与定时调度。</p>
-        <div class="stats">
-          <span><img src="https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-?style=social" alt="stars" style="height:18px;vertical-align:middle;"></span>
-          <span>👥 150+ 用户</span>
-        </div>
-        <div style="margin-top:10px;font-size:12px;">
-          <a href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank" style="color:var(--accent);text-decoration:none;">查看GitHub</a>
-          <a href="https://jingw-ui.github.io/Software_Downloads/" target="_blank" style="color:var(--accent);text-decoration:none;">软件下载</a>
-        </div>
-      </div>
-      <div class="oss-card fade-up" style="transition-delay:0.1s">
-        <h4>🎯 通用目标检测系统</h4>
-        <p>基于 YOLOv8-v26 的通用目标检测平台，支持图片/视频/摄像头/文件夹批量检测。</p>
-        <div class="stats">
-          <span><img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP?style=social" alt="stars" style="height:18px;vertical-align:middle;"></span>
-          <span>👥 50+ 用户</span>
-        </div>
-        <div style="margin-top:10px;font-size:12px;">
-          <a href="https://github.com/JingW-ui/PI-MAPP" target="_blank" style="color:var(--accent);text-decoration:none;">查看GitHub</a>
-          <a href="https://jingw-ui.github.io/Software_Downloads/" target="_blank" style="color:var(--accent);text-decoration:none;">软件下载</a>
-        </div>
-      </div>
-      <div class="oss-card fade-up" style="transition-delay:0.2s">
-        <h4><img src="./assets/logo_brain.png" alt="MediScreen-Brain" style="height:20px;vertical-align:middle;margin-right:6px;"> MediScreen-Brain</h4>
-        <p>零配置脑肿瘤检测系统，支持 NIfTI 3D MRI 解析，自动生成三视图与诊断报告。</p>
-        <div class="stats">
-          <span>📦 开源</span>
-          <span>🔬 SCI论文</span>
-        </div>
-        <div style="margin-top:10px;font-size:12px;">
-          <a href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" style="color:var(--accent);text-decoration:none;">访问项目</a>
-          <a href="https://jingw-ui.github.io/Software_Downloads/" target="_blank" style="color:var(--accent);text-decoration:none;">软件下载</a>
-        </div>
-      </div>
-      <div class="oss-card fade-up" style="transition-delay:0.3s">
-        <h4>📚 Nature Academic Skills</h4>
-        <p>面向 Nature 系列期刊的 AI Agent Skills 集合，涵盖文献搜索、写作、图表、润色等。</p>
-        <div class="stats">
-          <span>📦 开源</span>
-          <span>🤖 Agent Skills</span>
-        </div>
-        <div style="margin-top:10px;font-size:12px;">
-          <a href="https://jingw-ui.github.io/skills/" target="_blank" style="color:var(--accent);text-decoration:none;">查看Skills</a>
-        </div>
-      </div>
-      <div class="oss-card fade-up" style="transition-delay:0.4s">
-        <h4>🎮 游戏中心 & 工具箱 & 虚拟导演</h4>
-        <p>48+ 在线工具箱（图片处理/编码转换/计算器等）+ 18款 Three.js 3D 游戏 + AI Gallery 与排序算法可视化等虚拟导演项目。</p>
-        <div class="stats">
-          <span>📦 开源</span>
-          <span>🌐 Web</span>
-        </div>
-        <div style="margin-top:10px;font-size:12px;">
-          <a href="https://jingw-ui.github.io/tools/" target="_blank" style="color:var(--accent);text-decoration:none;">访问工具箱</a>
-          &nbsp;·&nbsp;
-          <a href="https://jingw-ui.github.io/Games/" target="_blank" style="color:var(--accent);text-decoration:none;">游戏中心</a>
-            &nbsp;·&nbsp;
-          <a href="https://jingw-ui.github.io/director/" target="_blank" style="color:var(--accent);text-decoration:none;">3D探索</a>
-        </div>
-      </div>
-      <div class="oss-card fade-up" style="transition-delay:0.5s">
-        <h4>📖 微机原理期末复习</h4>
-        <p>B站课程视频，播放量 20w+，收藏 4000+，帮助大量考生高效复习。</p>
-        <div class="stats">
-          <span>▶️ 20w+ 播放</span>
-          <span>⭐ 4000+ 收藏</span>
-        </div>
-        <div style="margin-top:10px;font-size:12px;">
-          <a href="https://space.bilibili.com/521967044" target="_blank" style="color:var(--accent);text-decoration:none;">前往B站观看</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== SLIDE 9: WHY HUAWEI ==================== -->
-<section class="slide" id="slide9">
-  <div class="section-eyebrow fade-up">求职意向</div>
-  <div class="section-title fade-up" style="transition-delay:0.05s">为什么选择华为</div>
-  <div class="section-line fade-up" style="transition-delay:0.1s"></div>
-  <div class="why-container">
-    <div class="why-grid">
-      <div class="why-card fade-up">
-        <div class="why-icon">🔬</div>
-        <h4>研究方向高度契合</h4>
-        <p>华为在医疗AI、智能视觉、云计算等领域深度布局。我的医学影像AI研究经验，可直接对接华为医疗BU与云AI研发需求。</p>
-      </div>
-      <div class="why-card fade-up" style="transition-delay:0.1s">
-        <div class="why-icon">💡</div>
-        <h4>全栈技术能力</h4>
-        <p>从深度学习模型（YOLO/PyTorch）到全栈开发（Spring Boot/Vue/Django），从桌面GUI到Web平台，具备端到端交付能力。</p>
-      </div>
-      <div class="why-card fade-up" style="transition-delay:0.2s">
-        <div class="why-icon">🏆</div>
-        <h4>竞赛验证的创新能力</h4>
-        <p>多项国家级竞赛获奖，证明了在限定时间内快速建模、迭代优化的能力，以及将前沿算法落地为可用系统的执行力。</p>
-      </div>
-      <div class="why-card fade-up" style="transition-delay:0.3s">
-        <div class="why-icon">🌟</div>
-        <h4>持续学习与影响力</h4>
-        <p>开源社区活跃贡献者，B站教育内容创作者，具备技术传播与团队协作能力，与华为"开放、协作、共赢"的价值观高度一致。</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== SLIDE 10: END ==================== -->
-<section class="slide slide-end" id="slide10">
-  <div class="fade-up">
-    <h1>感谢聆听</h1>
-    <p class="end-sub">保持好奇 · 保持谦逊 · 保持代码整洁</p>
-    <div class="contact-info">
-      <div class="contact-item">
-        <span>📱</span> 177-0237-6984
-      </div>
-      <div class="contact-item">
-        <span>📮</span> 2642144249@qq.com
-      </div>
-      <div class="contact-item">
-        <a href="https://github.com/JingW-ui" target="_blank" style="color:inherit;text-decoration:none;">🐙 github.com/JingW-ui</a>
-      </div>
-      <div class="contact-item">
-        <a href="https://space.bilibili.com/521967044" target="_blank" style="color:inherit;text-decoration:none;">📹 B站 @京W</a>
-      </div>
-    </div>
-    <p class="thank-you">期待与华为一起，用技术改变世界 🚀</p>
-  </div>
-</section>
-
-<!-- ==================== JAVASCRIPT ==================== -->
-<script>
-(function() {
-  const totalSlides = 10;
-
-  // Init nav dots
-  const navDots = document.getElementById('navDots');
-  const slideNames = [
-    '封面', '简介', '教育', '科研', '成果',
-    '技能', '获奖', '开源', '求职', '感谢'
-  ];
-  for (let i = 1; i <= totalSlides; i++) {
-    const a = document.createElement('a');
-    a.href = '#slide' + i;
-    a.innerHTML = '<span class="tooltip">' + slideNames[i-1] + '</span>';
-    navDots.appendChild(a);
-  }
-
-  // Intersection Observer for animations
-  const fadeEls = document.querySelectorAll('.fade-up');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
-  fadeEls.forEach(el => observer.observe(el));
-
-  // Skill bar animation
-  const skillFills = document.querySelectorAll('.skill-level .fill');
-  const skillObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const width = entry.target.getAttribute('data-width');
-        entry.target.style.width = width;
-        skillObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.3 });
-  skillFills.forEach(el => skillObserver.observe(el));
-
-  // Progress bar & active dot & slide num
-  const progressBar = document.getElementById('progressBar');
-  const slideNumEl = document.getElementById('slideNum');
-  const dots = navDots.querySelectorAll('a');
-
-  function updateUI() {
-    const scrollTop = window.scrollY;
-    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const pct = (scrollTop / scrollHeight) * 100;
-    progressBar.style.width = pct + '%';
-
-    // Find current slide
-    const slides = document.querySelectorAll('.slide');
-    let current = 0;
-    slides.forEach((s, i) => {
-      const rect = s.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.4) current = i;
-    });
-
-    dots.forEach((d, i) => {
-      d.classList.toggle('active', i === current);
-    });
-    slideNumEl.textContent = (current + 1) + ' / ' + totalSlides;
-
-    // Parallax orbs
-    const orbs = document.querySelectorAll('.bg-orb');
-    orbs.forEach((orb, i) => {
-      const factor = i === 0 ? 0.02 : -0.015;
-      orb.style.transform = 'translateY(' + (scrollTop * factor) + 'px)';
-    });
-
-    requestAnimationFrame(updateUI);
-  }
-  requestAnimationFrame(updateUI);
-
-  // 证书3D轮播功能
-  const certImages = [
-    '/imgs/patents_and_software/1.png',
-    '/imgs/patents_and_software/2.png',
-    '/imgs/patents_and_software/3.png',
-    '/imgs/patents_and_software/4.png',
-    '/imgs/patents_and_software/5.png',
-    '/imgs/patents_and_software/6.png',
-    '/imgs/patents_and_software/7.png',
-    '/imgs/patents_and_software/8.png',
-    '/imgs/patents_and_software/9.png',
-    '/imgs/patents_and_software/10.png',
-    '/imgs/patents_and_software/11.png'
-  ];
-  let currentCertIndex = 0;
-  let certAutoPlay = null;
-  
-  // 初始化证书轮播
-  function initCertCarousel() {
-    const viewer = document.getElementById('certViewer');
-    if (!viewer) return;
-    
-    viewer.innerHTML = '';
-    
-    // 创建所有证书项
-    certImages.forEach((src, index) => {
-      const item = document.createElement('div');
-      item.className = 'cert-item';
-      item.innerHTML = `<img src="${src}" alt="证书 ${index + 1}">`;
-      
-      // 点击放大预览
-      item.querySelector('img').addEventListener('click', (e) => {
-        e.stopPropagation();
-        openCertPreview(src);
-      });
-      
-      viewer.appendChild(item);
-    });
-    
-    // 创建指示点
-    updateCertDots();
-    
-    // 更新初始状态
-    updateCertCarousel();
-    
-    // 开始自动播放
-    startCertAutoplay();
-    
-    // 点击切换功能（仅在非图片区域）
-    viewer.addEventListener('click', (e) => {
-      if (e.target.tagName === 'IMG') return; // 点击图片不切换
-      
-      const rect = viewer.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const threshold = rect.width * 0.3;
-      
-      if (clickX < threshold) {
-        prevCert();
-      } else if (clickX > rect.width - threshold) {
-        nextCert();
-      }
-    });
-    
-    // 鼠标悬停暂停
-    viewer.addEventListener('mouseenter', () => {
-      clearInterval(certAutoPlay);
-    });
-    viewer.addEventListener('mouseleave', () => {
-      startCertAutoplay();
-    });
-    
-    // 创建预览覆盖层
-    createCertOverlay();
-  }
-  
-  // 更新轮播状态
-  function updateCertCarousel() {
-    const items = document.querySelectorAll('.cert-item');
-    const total = items.length;
-    
-    if (total === 0) return;
-    
-    // 清除所有状态
-    items.forEach(item => {
-      item.classList.remove('active', 'prev', 'next');
-    });
-    
-    // 计算索引
-    const activeIdx = currentCertIndex;
-    const prevIdx = (currentCertIndex - 1 + total) % total;
-    const nextIdx = (currentCertIndex + 1) % total;
-    
-    // 设置状态
-    if (items[activeIdx]) items[activeIdx].classList.add('active');
-    if (items[prevIdx]) items[prevIdx].classList.add('prev');
-    if (items[nextIdx]) items[nextIdx].classList.add('next');
-    
-    // 更新指示器
-    updateCertIndicator();
-    updateCertDots();
-  }
-  
-  // 下一张
-  window.nextCert = function() {
-    currentCertIndex = (currentCertIndex + 1) % certImages.length;
-    updateCertCarousel();
-  };
-  
-  // 上一张
-  window.prevCert = function() {
-    currentCertIndex = (currentCertIndex - 1 + certImages.length) % certImages.length;
-    updateCertCarousel();
-  };
-  
-  // 更新指示器
-  function updateCertIndicator() {
-    const indicator = document.getElementById('certIndicator');
-    if (indicator) {
-      indicator.textContent = `${currentCertIndex + 1} / ${certImages.length}`;
-    }
-  }
-  
-  // 更新指示点
-  function updateCertDots() {
-    const dotsContainer = document.getElementById('certDots');
-    if (!dotsContainer) return;
-    
-    dotsContainer.innerHTML = '';
-    certImages.forEach((_, index) => {
-      const dot = document.createElement('span');
-      dot.className = `cert-dot ${index === currentCertIndex ? 'active' : ''}`;
-      dot.onclick = () => {
-        currentCertIndex = index;
-        updateCertCarousel();
-        resetCertAutoplay();
-      };
-      dotsContainer.appendChild(dot);
-    });
-  }
-  
-  // 自动播放
-  function startCertAutoplay() {
-    clearInterval(certAutoPlay);
-    certAutoPlay = setInterval(() => {
-      nextCert();
-    }, 2000);
-  }
-  
-  // 重置自动播放
-  function resetCertAutoplay() {
-    clearInterval(certAutoPlay);
-    startCertAutoplay();
-  }
-  
-  // 初始化轮播
-  setTimeout(initCertCarousel, 100);
-  
-  // 创建预览覆盖层
-  function createCertOverlay() {
-    const overlay = document.createElement('div');
-    overlay.className = 'cert-overlay';
-    overlay.id = 'certOverlay';
-    overlay.innerHTML = '<img src="" alt="证书预览">';
-    document.body.appendChild(overlay);
-    
-    // 点击背景关闭
-    overlay.addEventListener('click', () => {
-      closeCertPreview();
-    });
-    
-    // 点击图片不关闭
-    overlay.querySelector('img').addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-    
-    // ESC键关闭
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        closeCertPreview();
-      }
-    });
-  }
-  
-  // 打开预览
-  function openCertPreview(src) {
-    const overlay = document.getElementById('certOverlay');
-    if (!overlay) return;
-    
-    const img = overlay.querySelector('img');
-    img.src = src;
-    overlay.classList.add('show');
-    
-    // 暂停自动播放
-    clearInterval(certAutoPlay);
-  }
-  
-  // 关闭预览
-  function closeCertPreview() {
-    const overlay = document.getElementById('certOverlay');
-    if (!overlay) return;
-    
-    overlay.classList.remove('show');
-    
-    // 恢复自动播放
-    startCertAutoplay();
-  }
-
-  // Keyboard nav
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-      e.preventDefault();
-      const current = Math.round(window.scrollY / window.innerHeight);
-      const next = Math.min(current + 1, totalSlides - 1);
-      document.getElementById('slide' + (next + 1)).scrollIntoView({ behavior: 'smooth' });
-    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-      e.preventDefault();
-      const current = Math.round(window.scrollY / window.innerHeight);
-      const prev = Math.max(current - 1, 0);
-      document.getElementById('slide' + (prev + 1)).scrollIntoView({ behavior: 'smooth' });
-    }
-  });
-})();
-</script>
-
+                if (categoryMatch && searchMatch) {
+                    card.style.display = 'flex';
+                    visible++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            emptyState.style.display = visible === 0 ? 'block' : 'none';
+        }
+    </script>
 </body>
 </html>
