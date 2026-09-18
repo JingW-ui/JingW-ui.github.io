@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+<title>王京 - 网易实习答辩</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Source+Serif+4:wght@400;500;600;700&display=swap');
+
+  :root {
+    /* 网易品牌色板（取自原 PPT 的 srgbClr） */
+    --brand: #A30B09;        /* 封面/章节页底 */
+    --brand-deep: #A80D0B;   /* 内容页标题、主色条 */
+    --brand-orange: #D55816; /* 第二色条、强调 */
+    --brand-watermark: #F0C9C2; /* 章节页描边数字 */
+    --card: #F7F4F3;         /* 卡片底 */
+    --muted: #7A6A66;        /* 次级文字 */
+    --ink: #1a1a1a;
+    --white: #ffffff;
+    --line: #E6E0DE;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(168,13,11,0.25) transparent;
+  }
+
+  body {
+    font-family: "Sora", "Noto Sans SC", sans-serif;
+    background: var(--white);
+    color: var(--ink);
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ====== PROGRESS BAR ====== */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--brand), var(--brand-orange));
+    width: 0%;
+    z-index: 1100;
+    transition: width 0.1s linear;
+  }
+
+  /* ====== NAV DOTS ====== */
+  .nav-dots {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .nav-dots a {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(168,13,11,0.22);
+    transition: all 0.3s;
+    display: block;
+    position: relative;
+  }
+  .nav-dots a:hover, .nav-dots a.active {
+    background: var(--brand-deep);
+    transform: scale(1.5);
+  }
+  .nav-dots a .tooltip {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(163,11,9,0.92);
+    color: #fff;
+    padding: 4px 11px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+  }
+  .nav-dots a:hover .tooltip { opacity: 1; }
+
+  /* ====== SLIDE NUMBER ====== */
+  .slide-num {
+    position: fixed;
+    bottom: 20px;
+    left: 24px;
+    font-size: 12px;
+    color: rgba(26,26,26,0.3);
+    z-index: 1000;
+    font-weight: 500;
+  }
+  /* 深色页上自动反色 */
+  body.on-dark .slide-num { color: rgba(255,255,255,0.55); }
+
+  /* ====== SLIDES ====== */
+  .slide {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 72px 80px;
+    position: relative;
+    background: var(--white);
+  }
+
+  /* ====== ANIMATIONS ====== */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ====== 红色满屏页（封面 / 章节 / 尾页） ====== */
+  .slide-red {
+    background: var(--brand);
+    color: var(--white);
+    justify-content: center;
+    overflow: hidden;
+  }
+  .slide-red::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url('/ppt/netease/assets/bg_architecture.jpg') center/cover no-repeat;
+    opacity: 0.18;
+    mix-blend-mode: luminosity;
+  }
+  .slide-red > * { position: relative; z-index: 2; }
+
+  /* 章节页的蓝色玻璃字水印 */
+  .watermark {
+    position: absolute;
+    right: -2vw;
+    top: 46%;
+    transform: translateY(-50%);
+    font-size: clamp(14rem, 30vw, 30rem);
+    font-weight: 900;
+    line-height: 1;
+    color: rgba(255,255,255,0.045);
+    -webkit-text-stroke: 2px rgba(240,201,194,0.16);
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+    font-family: "Sora", sans-serif;
+  }
+
+  /* ====== 封面 ====== */
+  .cover-badge {
+    display: inline-block;
+    background: var(--white);
+    color: var(--brand);
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 7px 22px;
+    letter-spacing: 0.05em;
+    margin-bottom: 26px;
+    align-self: flex-start;
+  }
+  .cover-title {
+    font-family: "Noto Sans SC", sans-serif;
+    font-size: clamp(2.4rem, 6vw, 4.6rem);
+    font-weight: 900;
+    line-height: 1.14;
+    letter-spacing: 0.01em;
+    margin-bottom: 34px;
+    align-self: flex-start;
+    max-width: 15ch;
+  }
+  .cover-meta {
+    border-left: 2px solid rgba(255,255,255,0.5);
+    padding-left: 16px;
+    font-size: 1.02rem;
+    line-height: 2;
+    color: rgba(255,255,255,0.94);
+    align-self: flex-start;
+  }
+  .cover-meta b { font-weight: 400; color: rgba(255,255,255,0.72); }
+
+  /* ====== 右下角品牌角标 ====== */
+  .brand-corner {
+    position: absolute;
+    right: 40px;
+    bottom: 30px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-corner img {
+    height: 15px;
+    width: auto;
+    opacity: 0.95;
+  }
+  .brand-corner .pgnum {
+    font-size: 12px;
+    color: rgba(26,26,26,0.34);
+  }
+  .slide-red .brand-corner .pgnum { color: rgba(255,255,255,0.6); }
+
+  /* ====== 章节过渡页 ====== */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+  }
+  .section-divider .rule {
+    width: 64px;
+    height: 2px;
+    background: rgba(255,255,255,0.85);
+    flex-shrink: 0;
+  }
+  .section-divider .txt h2 {
+    font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    line-height: 1.25;
+  }
+  .section-divider .txt p {
+    margin-top: 10px;
+    font-size: 0.92rem;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 0.06em;
+  }
+  .section-divider .en {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-left: 14px;
+  }
+
+  /* ====== 内容页标题 ====== */
+  .page-title {
+    font-family: "Noto Sans SC", sans-serif;
+    font-size: clamp(1.45rem, 3vw, 2.15rem);
+    font-weight: 900;
+    color: var(--brand-deep);
+    letter-spacing: 0.01em;
+    padding-bottom: 12px;
+    margin-bottom: 40px;
+    position: relative;
+    align-self: flex-start;
+  }
+  .page-title::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 72px; height: 4px;
+    background: var(--brand-deep);
+  }
+  .slide.dark .page-title { color: #fff; }
+  .slide.dark .page-title::after { background: #E5342B; }
+
+  /* ====== 正文块 ====== */
+  .lede {
+    font-size: 1.02rem;
+    color: var(--ink);
+    line-height: 1.85;
+    max-width: 62ch;
+    margin-bottom: 18px;
+  }
+  .lede strong { color: var(--brand-deep); font-weight: 700; }
+  .kicker {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .rule-line {
+    height: 1px;
+    background: var(--line);
+    margin: 26px 0 30px;
+  }
+
+  /* ====== 卡片 ====== */
+  .cards {
+    display: grid;
+    gap: 18px;
+    width: 100%;
+  }
+  .cards.c2 { grid-template-columns: repeat(2, 1fr); }
+  .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+  .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+
+  .card {
+    background: var(--card);
+    border-left: 5px solid var(--brand-deep);
+    padding: 20px 22px;
+    min-width: 0;
+  }
+  .card.orange { border-left-color: var(--brand-orange); }
+  .card .c-label {
+    font-size: 0.76rem;
+    color: var(--muted);
+    margin-bottom: 7px;
+    letter-spacing: 0.04em;
+  }
+  .card .c-title {
+    font-size: 1.32rem;
+    font-weight: 800;
+    color: var(--brand-deep);
+    line-height: 1.35;
+    margin-bottom: 7px;
+  }
+  .card.orange .c-title { color: var(--brand-orange); }
+  .card .c-sub {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .card ul { list-style: none; }
+  .card ul li {
+    font-size: 0.82rem;
+    color: var(--ink);
+    line-height: 1.75;
+    padding-left: 13px;
+    position: relative;
+  }
+  .card ul li::before {
+    content: '·';
+    position: absolute;
+    left: 2px;
+    color: var(--brand-deep);
+    font-weight: 900;
+  }
+  .card.orange ul li::before { color: var(--brand-orange); }
+
+  /* L1–L4 能力阶梯 */
+  .ladder .card { border-left: none; border-top: 5px solid var(--brand-deep); }
+  .ladder .card.orange { border-top-color: var(--brand-orange); }
+  .ladder .c-title { font-size: 1.15rem; }
+  .ladder .c-title em {
+    font-style: normal;
+    color: var(--ink);
+    font-size: 0.92rem;
+    margin-left: 8px;
+    font-weight: 600;
+  }
+
+  /* ====== 图文两栏 ====== */
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    width: 100%;
+  }
+  .split.wide-right { grid-template-columns: 1fr 1.15fr; }
+  .split img {
+    width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 10px 34px rgba(26,26,26,0.13);
+    display: block;
+  }
+  .stack > * + * { margin-top: 26px; }
+
+  /* ====== 满幅截图页 ====== */
+  .slide.shot {
+    padding: 60px 56px;
+    justify-content: center;
+    gap: 16px;
+  }
+  .shot-cap {
+    font-size: 0.86rem;
+    color: var(--muted);
+    letter-spacing: 0.03em;
+  }
+  .shot-cap b { color: var(--brand-deep); font-weight: 700; }
+  .slide.shot img.full {
+    width: 100%;
+    height: auto;
+    max-height: 74vh;
+    object-fit: contain;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    box-shadow: 0 14px 44px rgba(26,26,26,0.16);
+    display: block;
+  }
+
+  /* ====== 暗色页（过程可视化） ====== */
+  .slide.dark {
+    background: #16181d;
+    color: #e8e4e2;
+    justify-content: center;
+    gap: 22px;
+  }
+  .slide.dark .lede { color: #cfc9c6; }
+  .slide.dark .shot-cap { color: #9aa4b2; }
+  .trace-block { width: 100%; }
+  .trace-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 9px;
+  }
+  .trace-head .m-name {
+    font-size: 1.15rem;
+    color: #fff;
+    font-weight: 600;
+  }
+  .trace-head .m-logo {
+    height: 22px;
+    width: auto;
+    background: #fff;
+    border-radius: 3px;
+    padding: 2px 6px;
+  }
+  .trace-head .m-time {
+    margin-left: auto;
+    color: #FF0000;
+    font-size: 1.02rem;
+    font-weight: 700;
+  }
+  .trace-head .m-note {
+    font-size: 0.72rem;
+    color: #8B949E;
+  }
+  .slide.dark img.trace {
+    width: 100%;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid #2b3038;
+    display: block;
+  }
+  .slide.dark .conclusion {
+    font-size: 0.95rem;
+    color: #cfc9c6;
+  }
+  .slide.dark .conclusion b { color: #fff; }
+
+  /* ====== 三行要点（实习感受） ====== */
+  .insight {
+    display: flex;
+    gap: 26px;
+    background: var(--card);
+    border-left: 5px solid var(--brand-deep);
+    padding: 20px 26px;
+  }
+  .insight.orange { border-left-color: var(--brand-orange); }
+  .insight .i-key {
+    font-size: 1.28rem;
+    font-weight: 800;
+    color: var(--brand-deep);
+    flex-shrink: 0;
+    width: 4.2em;
+  }
+  .insight.orange .i-key { color: var(--brand-orange); }
+  .insight .i-body {
+    font-size: 0.92rem;
+    color: var(--ink);
+    line-height: 1.85;
+  }
+
+  /* ====== 尾页 ====== */
+  .slide-end { text-align: center; }
+  .slide-end h1 {
+    font-family: "Sora", sans-serif;
+    font-size: clamp(2.6rem, 7vw, 5.4rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 26px;
+  }
+  .slide-end .end-sub {
+    font-size: 1.15rem;
+    color: rgba(255,255,255,0.92);
+    letter-spacing: 0.05em;
+  }
+
+  /* ====== 返回入口 ====== */
+  .back-link {
+    position: absolute;
+    top: 26px;
+    left: 32px;
+    z-index: 10;
+    font-size: 0.76rem;
+    color: rgba(26,26,26,0.42);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--brand-deep); }
+  .slide-red .back-link { color: rgba(255,255,255,0.62); }
+  .slide-red .back-link:hover { color: #fff; }
+  .slide.dark .back-link { color: rgba(255,255,255,0.45); }
+  .slide.dark .back-link:hover { color: #fff; }
+
+  /* ====== 滚动提示 ====== */
+  .scroll-hint {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
+    animation: bounce 2s ease-in-out infinite;
+    z-index: 3;
+    text-align: center;
+  }
+  .scroll-hint span { display: block; font-size: 22px; margin-top: 2px; }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(9px); }
+  }
+
+  /* ====== 响应式 ====== */
+  @media (max-width: 900px) {
+    .slide { padding: 56px 26px; }
+    .slide.shot { padding: 52px 18px; }
+    .brand-corner { right: 18px; bottom: 18px; }
+    .back-link { top: 18px; left: 18px; }
+    .nav-dots { right: 9px; gap: 6px; }
+    .nav-dots a { width: 6px; height: 6px; }
+    .nav-dots a .tooltip { display: none; }
+    .slide-num { left: 14px; bottom: 14px; font-size: 11px; }
+    .cards.c3, .cards.c4, .cards.c2 { grid-template-columns: 1fr; }
+    .split, .split.wide-right { grid-template-columns: 1fr; gap: 22px; }
+    .section-divider { flex-direction: column; align-items: flex-start; gap: 14px; }
+    .section-divider .rule { width: 42px; }
+    .watermark { font-size: 40vw; right: -6vw; }
+    .cover-title { max-width: none; }
+    .insight { flex-direction: column; gap: 8px; padding: 16px 18px; }
+    .insight .i-key { width: auto; }
+    .trace-head { flex-wrap: wrap; gap: 8px; }
+    .trace-head .m-time { margin-left: 0; width: 100%; }
+  }
+  @media (max-width: 480px) {
+    .slide { padding: 48px 18px; }
+    .page-title { margin-bottom: 26px; }
+    .lede { font-size: 0.9rem; }
+    .card .c-title { font-size: 1.12rem; }
+    .brand-corner img { height: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="nav-dots" id="navDots"></div>
+<div class="slide-num" id="slideNum"></div>
+
+<!-- ==================== 1: 封面 ==================== -->
+<section class="slide slide-red slide-cover" id="slide1">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="fade-up">
+    <div class="cover-badge">2027 届</div>
+    <h1 class="cover-title">校招实习<br>成果汇报</h1>
+    <div class="cover-meta">
+      <div><b>个人姓名：</b>王京</div>
+      <div><b>实习岗位：</b>游戏测试开发工程师</div>
+      <div><b>导师姓名：</b>龙秋朦、宋京涛</div>
+    </div>
+  </div>
+  <div class="scroll-hint">向下滚动查看更多<span>⌄</span></div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo_white.png" alt="网易 NETEASE">
+  </div>
+</section>
+
+<!-- ==================== 2: 目录 ==================== -->
+<section class="slide slide-red" id="slide2">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="watermark">C</div>
+  <div class="fade-up" style="width:100%">
+    <h2 style="font-family:'Sora',sans-serif;font-size:clamp(2rem,5vw,3.6rem);font-weight:700;letter-spacing:0.06em;text-align:center;margin-bottom:56px;">CONTENTS</h2>
+    <div style="display:flex;flex-direction:column;gap:16px;max-width:640px;">
+      <div style="font-size:1.15rem;letter-spacing:0.03em;">01 · 自我介绍</div>
+      <div style="font-size:1.15rem;letter-spacing:0.03em;">02 · 两个业务 skill</div>
+      <div style="font-size:1.15rem;letter-spacing:0.03em;">03 · 评测系统（核心成果）</div>
+      <div style="font-size:1.15rem;letter-spacing:0.03em;">04 · 实习感受</div>
+    </div>
+    <div style="height:1px;background:rgba(255,255,255,0.45);margin-top:52px;max-width:640px;"></div>
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo_white.png" alt="网易 NETEASE">
+    <span class="pgnum">02</span>
+  </div>
+</section>
+
+<!-- ==================== 3: 章节 01 ==================== -->
+<section class="slide slide-red" id="slide3">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="watermark">01</div>
+  <div class="section-divider fade-up">
+    <div class="rule"></div>
+    <div class="txt">
+      <h2>自我介绍</h2>
+      <p>个人背景 · 岗位理解</p>
+    </div>
+    <div class="en">Self Introduction</div>
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo_white.png" alt="网易 NETEASE">
+    <span class="pgnum">03</span>
+  </div>
+</section>
+
+<!-- ==================== 4: 自我介绍 ==================== -->
+<section class="slide" id="slide4">
+  <div class="page-title fade-up">自我介绍</div>
+  <div class="lede fade-up" style="transition-delay:0.05s">我是电子科技大学的硕士研究生，二〇二七年毕业。</div>
+  <div class="rule-line fade-up" style="transition-delay:0.1s"></div>
+  <div class="cards c3 fade-up" style="transition-delay:0.15s">
+    <div class="card">
+      <div class="c-label">身份</div>
+      <div class="c-title">硕士在读</div>
+      <div class="c-sub">电子科技大学 · 二〇二七届</div>
+    </div>
+    <div class="card orange">
+      <div class="c-label">岗位</div>
+      <div class="c-title">游戏测试开发</div>
+      <div class="c-sub">远程 PC 自动化方向</div>
+    </div>
+    <div class="card">
+      <div class="c-label">爱好</div>
+      <div class="c-title">运动及摄影</div>
+      <div class="c-sub">乒羽双修选手</div>
+    </div>
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">04</span>
+  </div>
+</section>
+
+<!-- ==================== 5: 实习内容 ==================== -->
+<section class="slide" id="slide5">
+  <div class="page-title fade-up">实习内容</div>
+  <div class="cards c3 fade-up" style="transition-delay:0.08s">
+    <div class="card">
+      <div class="c-label">真实业务场景</div>
+      <div class="c-title">UU 取号</div>
+      <ul>
+        <li>为多台远程 PC 安装 UU 远程</li>
+        <li>配置验证码并写入 DK 备注</li>
+        <li>支持在 airLab 上跑测</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="c-label">真实业务场景</div>
+      <div class="c-title">G66 部署</div>
+      <ul>
+        <li>为多台远程 PC 设备下载</li>
+        <li>安装游戏环境</li>
+        <li>替换游戏引擎并启动</li>
+      </ul>
+    </div>
+    <div class="card orange">
+      <div class="c-label">针对这些场景</div>
+      <div class="c-title">评测系统</div>
+      <ul>
+        <li>model 选型、agent 选型</li>
+        <li>目的驱动</li>
+        <li>过程可视化</li>
+      </ul>
+    </div>
+  </div>
+  <div class="lede fade-up" style="transition-delay:0.16s;margin-top:34px;">
+    前两个是真实的自动化业务场景，第三个则是针对这些真实业务场景搭建的评测系统。
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">05</span>
+  </div>
+</section>
+
+<!-- ==================== 6: 章节 02 ==================== -->
+<section class="slide slide-red" id="slide6">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="watermark">02</div>
+  <div class="section-divider fade-up">
+    <div class="rule"></div>
+    <div class="txt">
+      <h2>两个业务 skill</h2>
+      <p>UU 取号 · G66 部署</p>
+    </div>
+    <div class="en">Business Skills</div>
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo_white.png" alt="网易 NETEASE">
+    <span class="pgnum">06</span>
+  </div>
+</section>
+
+<!-- ==================== 7: UU 取号 ==================== -->
+<section class="slide" id="slide7">
+  <div class="page-title fade-up">UU 取号：从一台台手装到并行批量</div>
+  <div class="split wide-right fade-up" style="transition-delay:0.08s">
+    <div class="stack">
+      <div>
+        <div class="kicker">痛点</div>
+        <div class="lede" style="margin-bottom:0;">给远程 PC 配 UU 远程，以前要一台一台手动装客户端，再逐个取设备 ID 与验证码；取到的号记在 txt 或表格里，零散、没规范。</div>
+      </div>
+      <div>
+        <div class="kicker">我的解决方案</div>
+        <div class="lede" style="margin-bottom:0;">引入 <strong>agent + skill</strong> 的方式实现，能够灵活处理各种分支情况：运行环境的检查，安装状态的检查，软件界面是否在桌面可见，是否开启他人远程协作按钮等。</div>
+      </div>
+      <div class="card orange" style="border-left-color:var(--brand-orange)">
+        <div class="c-label">成果</div>
+        <div class="c-title" style="font-size:1.5rem;">并行高效，低成本</div>
+        <div class="c-sub">从一台台手装到一次发起多台，10 台设备以前人工装需要 2 个多小时，现在只需要 10 分钟，每一台成本在 1 元以内。</div>
+      </div>
+    </div>
+    <img src="/ppt/netease/assets/shot_uu_remote.png" alt="UU 远程界面">
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">07</span>
+  </div>
+</section>
+
+<!-- ==================== 8: G66 部署 ==================== -->
+<section class="slide" id="slide8">
+  <div class="page-title fade-up">G66 部署：从人工逐台到自动完成</div>
+  <div class="split wide-right fade-up" style="transition-delay:0.08s">
+    <div class="stack">
+      <div>
+        <div class="kicker">痛点</div>
+        <div class="lede" style="margin-bottom:0;">人工一台一台去准备游戏环境（100GB 的量级），从 0 到 1 的下载到准备完成往往需要花费 3~4 个小时，启动脚本能否正常启动还得人工确认。</div>
+      </div>
+      <div>
+        <div class="kicker">我的解决方案</div>
+        <div class="lede" style="margin-bottom:0;">引入 <strong>agent + skill</strong> 的方式实现，自动判断目标机状态，自动传输，启动后自动验证。</div>
+      </div>
+      <div class="cards c2" style="gap:14px">
+        <div class="card" style="padding:14px 16px">
+          <div class="c-label">阶段 1 · 正常流程</div>
+          <div class="c-sub" style="color:var(--ink)">从官网下载安装包，下载 patch，替换引擎</div>
+        </div>
+        <div class="card orange" style="padding:14px 16px">
+          <div class="c-label">阶段 2 · 内网分发</div>
+          <div class="c-sub" style="color:var(--ink)">传输快，极大地提升效率</div>
+        </div>
+      </div>
+      <div class="card orange" style="border-left-color:var(--brand-orange)">
+        <div class="c-label">成果</div>
+        <div class="c-title" style="font-size:1.5rem;">提效明显</div>
+        <div class="c-sub">3 小时压缩到 30 分钟左右。</div>
+      </div>
+    </div>
+    <img src="/ppt/netease/assets/art_g66.jpg" alt="G66 部署 · 明日之后">
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">08</span>
+  </div>
+</section>
+
+<!-- ==================== 9: 章节 03 ==================== -->
+<section class="slide slide-red" id="slide9">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="watermark">03</div>
+  <div class="section-divider fade-up">
+    <div class="rule"></div>
+    <div class="txt">
+      <h2>评测系统</h2>
+      <p>判题思想 · 跑测闭环 · 过程可视化 · 选型结论</p>
+    </div>
+    <div class="en">Evaluation System</div>
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo_white.png" alt="网易 NETEASE">
+    <span class="pgnum">09</span>
+  </div>
+</section>
+
+<!-- ==================== 10: 动机与三指标 ==================== -->
+<section class="slide" id="slide10">
+  <div class="page-title fade-up">评测系统：动机与三指标</div>
+  <div class="split fade-up" style="transition-delay:0.08s;margin-bottom:34px;">
+    <div>
+      <div class="lede">skill 能把需求自动化完成，但它的瓶颈在哪儿？内部实现细节又是怎样的？</div>
+      <div class="lede">在提示词等前置环境不变的情况下，哪种 agent 搭配哪种模型，才能最高效、低成本、稳定地完成自动化需求？</div>
+      <div class="kicker" style="margin-top:26px;">从三点核心指标出发，量化任务的跑测结果</div>
+    </div>
+    <img src="/ppt/netease/assets/chart_radar.png" alt="模型对比雷达" style="max-height:38vh;object-fit:contain;background:transparent;box-shadow:none;">
+  </div>
+  <div class="cards c3 fade-up" style="transition-delay:0.16s">
+    <div class="card">
+      <div class="c-label">① 成功率</div>
+      <div class="c-title">SR</div>
+      <div class="c-sub">任务是否真正达成目标</div>
+    </div>
+    <div class="card">
+      <div class="c-label">② 耗时</div>
+      <div class="c-title">Duration</div>
+      <div class="c-sub">任务跑完用了多久</div>
+    </div>
+    <div class="card orange">
+      <div class="c-label">③ 成本</div>
+      <div class="c-title">Cost</div>
+      <div class="c-sub">单次任务花了多少钱</div>
+    </div>
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">10</span>
+  </div>
+</section>
+
+<!-- ==================== 11: 判题思想与跑测闭环 ==================== -->
+<section class="slide" id="slide11">
+  <div class="page-title fade-up">评测系统的判题思想与跑测闭环</div>
+  <div class="fade-up" style="transition-delay:0.06s">
+    <div class="kicker">判题思想 · 判世界</div>
+    <div class="lede" style="margin-bottom:6px;">① 看影响：只看 agent 操作之后世界实际发生了什么变化，不读模型的自述</div>
+    <div class="lede" style="margin-bottom:6px;">② 读真值：从这些影响里读出客观的事实真值</div>
+    <div class="lede" style="margin-bottom:14px;">③ 比预期：与预期答案对比，判定成败</div>
+    <div class="lede" style="font-weight:700;color:var(--brand-deep);">判的是「世界发生了什么」，不是「模型说了什么」。</div>
+  </div>
+  <div class="rule-line fade-up" style="transition-delay:0.1s"></div>
+  <div class="kicker fade-up" style="transition-delay:0.12s">跑测闭环 · 自主设计一张 L1–L4 能力卷（能力阶梯，业务解耦可复用）</div>
+  <div class="cards c4 ladder fade-up" style="transition-delay:0.16s;margin-bottom:30px;">
+    <div class="card">
+      <div class="c-title">L1 <em>单步操作</em></div>
+      <div class="c-sub">能跑通基本指令</div>
+    </div>
+    <div class="card">
+      <div class="c-title">L2 <em>复合操作</em></div>
+      <div class="c-sub">装包、传文件、起进程</div>
+    </div>
+    <div class="card">
+      <div class="c-title">L3 <em>真实场景</em></div>
+      <div class="c-sub">多步串联，如配 UU 再写 DK</div>
+    </div>
+    <div class="card orange">
+      <div class="c-title">L4 <em>诚实判决</em></div>
+      <div class="c-sub">面对失败与干扰如实汇报</div>
+    </div>
+  </div>
+  <div class="lede fade-up" style="transition-delay:0.2s;margin-bottom:8px;">发起跑测：多 agent × 多模型 × 多设备，批量并发，同一套题目横向对齐；结论由目的驱动。</div>
+  <div class="lede fade-up" style="transition-delay:0.22s;color:var(--muted);">同一张卷子、同一批设备、同一组题目——结果才可比。</div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">11</span>
+  </div>
+</section>
+
+<!-- ==================== 12–17: 评测看板截图 ==================== -->
+<section class="slide shot" id="slide12">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="shot-cap fade-up"><b>评测看板 ①</b> · 新建场次：设定评测目的、对比模型与目标题库</div>
+  <img class="full fade-up" style="transition-delay:0.06s" src="/ppt/netease/assets/board_1.png" alt="评测看板 · 新建场次">
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">12</span>
+  </div>
+</section>
+
+<section class="slide shot" id="slide13">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="shot-cap fade-up"><b>评测看板 ②</b> · 场次报告：结论推荐与逐条明细</div>
+  <img class="full fade-up" style="transition-delay:0.06s" src="/ppt/netease/assets/board_2.png" alt="评测看板 · 场次报告">
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">13</span>
+  </div>
+</section>
+
+<section class="slide shot" id="slide14">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="shot-cap fade-up"><b>评测看板 ③</b> · 矩阵视图：多模型横向对比</div>
+  <img class="full fade-up" style="transition-delay:0.06s" src="/ppt/netease/assets/board_3.png" alt="评测看板 · 矩阵视图">
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">14</span>
+  </div>
+</section>
+
+<section class="slide shot" id="slide15">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="shot-cap fade-up"><b>评测看板 ④</b> · 单会话详情：任务与耗时拆解</div>
+  <img class="full fade-up" style="transition-delay:0.06s" src="/ppt/netease/assets/board_4.png" alt="评测看板 · 单会话详情">
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">15</span>
+  </div>
+</section>
+
+<section class="slide shot" id="slide16">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="shot-cap fade-up"><b>评测看板 ⑤</b> · 技能与级别维度的结果汇总</div>
+  <img class="full fade-up" style="transition-delay:0.06s" src="/ppt/netease/assets/board_5.png" alt="评测看板 · 结果汇总">
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">16</span>
+  </div>
+</section>
+
+<section class="slide shot" id="slide17">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="shot-cap fade-up"><b>评测看板 ⑥</b> · 原始日志：可追溯到每一次工具调用</div>
+  <img class="full fade-up" style="transition-delay:0.06s" src="/ppt/netease/assets/board_6.png" alt="评测看板 · 原始日志">
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">17</span>
+  </div>
+</section>
+
+<!-- ==================== 18: 过程可视化 ==================== -->
+<section class="slide dark" id="slide18">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="page-title fade-up">过程可视化：轨迹对比</div>
+  <div class="lede fade-up" style="transition-delay:0.05s;margin-bottom:6px;">参考 <strong style="color:#E5342B">DeepSeek harness</strong> 的轨迹源码，实现了工具链调用与模型内部耗时分布的可视化。</div>
+
+  <div class="trace-block fade-up" style="transition-delay:0.1s">
+    <div class="trace-head">
+      <span class="m-name">glm-5.3-flash</span>
+      <img class="m-logo" src="/ppt/netease/assets/logo_zhipu.png" alt="智谱">
+      <span class="m-note">38 条记录 · 全范围 5.4m</span>
+      <span class="m-time">任务整体耗时：5.4 分钟</span>
+    </div>
+    <img class="trace" src="/ppt/netease/assets/trace_glm.png" alt="glm-5.3-flash 轨迹">
+  </div>
+
+  <div class="trace-block fade-up" style="transition-delay:0.16s">
+    <div class="trace-head">
+      <span class="m-name">deepseek-v4-pro</span>
+      <img class="m-logo" src="/ppt/netease/assets/logo_deepseek.png" alt="deepseek">
+      <span class="m-note">39 条记录 · 全范围 2.1m</span>
+      <span class="m-time">任务整体耗时：2.1 分钟</span>
+    </div>
+    <img class="trace" src="/ppt/netease/assets/trace_deepseek.png" alt="deepseek-v4-pro 轨迹">
+  </div>
+
+  <div class="conclusion fade-up" style="transition-delay:0.22s;margin-top:8px;">直观看出「<b>慢在哪、干了什么</b>」，而不是只看到一个总耗时。</div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo_white.png" alt="网易 NETEASE">
+    <span class="pgnum">18</span>
+  </div>
+</section>
+
+<!-- ==================== 19: 泛化与拓展 ==================== -->
+<section class="slide" id="slide19">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="page-title fade-up">评测系统的泛化与拓展</div>
+  <div class="fade-up" style="transition-delay:0.06s">
+    <img src="/ppt/netease/assets/report_generalize.png" alt="场次报告 · 泛化结论" style="width:100%;height:auto;border:1px solid var(--line);border-radius:6px;box-shadow:0 14px 44px rgba(26,26,26,0.16);display:block;">
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">19</span>
+  </div>
+</section>
+
+<!-- ==================== 20: 实习感受 ==================== -->
+<section class="slide" id="slide20">
+  <div class="page-title fade-up">实习感受</div>
+  <div class="kicker fade-up" style="transition-delay:0.05s">三点感受</div>
+  <div class="stack fade-up" style="transition-delay:0.1s;margin-top:26px;">
+    <div class="insight">
+      <div class="i-key">较真</div>
+      <div class="i-body">以前 AI 说「装好了」我就信。后来发现它说成功不一定真成功，逼着自己去想什么叫「真的干好了」，再用数据把它量出来。</div>
+    </div>
+    <div class="insight orange">
+      <div class="i-key">交付</div>
+      <div class="i-body">做的工具是要给团队用的。得让接手的人看得懂、接得住，不能只自己会用。</div>
+    </div>
+    <div class="insight">
+      <div class="i-key">感谢</div>
+      <div class="i-body">感谢三位导师和团队在整个实习期间的帮助与信任。</div>
+    </div>
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo.png" alt="网易 NETEASE">
+    <span class="pgnum">20</span>
+  </div>
+</section>
+
+<!-- ==================== 21: 尾页 ==================== -->
+<section class="slide slide-red slide-end" id="slide21">
+  <a href="/ppt/" class="back-link">← 演示文稿集合</a>
+  <div class="fade-up">
+    <h1>THANK YOU</h1>
+    <p class="end-sub">王京 - 游戏测试开发工程师</p>
+  </div>
+  <div class="brand-corner">
+    <img src="/ppt/netease/assets/netease_logo_white.png" alt="网易 NETEASE">
+  </div>
+</section>
+
+<script>
+(function() {
+  const totalSlides = 21;
+
+  const slideNames = [
+    '封面', '目录', '章节01',
+    '自我介绍', '实习内容', '章节02',
+    'UU 取号', 'G66 部署', '章节03',
+    '三指标', '判题思想', '看板①',
+    '看板②', '看板③', '看板④',
+    '看板⑤', '看板⑥', '过程可视化',
+    '泛化拓展', '实习感受', '感谢'
+  ];
+
+  // 深色页索引（1-based），用于页码反色
+  const DARK_SLIDES = [1, 2, 3, 6, 9, 18, 21];
+
+  // ---- 导航点 ----
+  const navDots = document.getElementById('navDots');
+  for (let i = 1; i <= totalSlides; i++) {
+    const a = document.createElement('a');
+    a.href = '#slide' + i;
+    a.innerHTML = '<span class="tooltip">' + (slideNames[i - 1] || ('第 ' + i + ' 页')) + '</span>';
+    navDots.appendChild(a);
+  }
+  const dots = navDots.querySelectorAll('a');
+
+  // ---- 入场动画 ----
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // ---- 进度条 / 页码 / 当前页 ----
+  const progressBar = document.getElementById('progressBar');
+  const slideNumEl = document.getElementById('slideNum');
+  const slides = document.querySelectorAll('.slide');
+
+  let lastDark = null;
+  function updateUI() {
+    const scrollTop = window.scrollY;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+    progressBar.style.width = pct + '%';
+
+    let current = 0;
+    slides.forEach((s, i) => {
+      const rect = s.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.4) current = i;
+    });
+
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+    slideNumEl.textContent = (current + 1) + ' / ' + totalSlides;
+
+    const isDark = DARK_SLIDES.indexOf(current + 1) !== -1;
+    if (isDark !== lastDark) {
+      document.body.classList.toggle('on-dark', isDark);
+      lastDark = isDark;
+    }
+
+    requestAnimationFrame(updateUI);
+  }
+  requestAnimationFrame(updateUI);
+
+  // ---- 方向键翻页 ----
+  document.addEventListener('keydown', (e) => {
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+
+    let target = null;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+      target = Math.min(Math.round(window.scrollY / window.innerHeight) + 1, totalSlides - 1);
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      target = Math.max(Math.round(window.scrollY / window.innerHeight) - 1, 0);
+    }
+    if (target !== null) {
+      e.preventDefault();
+      const el = document.getElementById('slide' + (target + 1));
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+})();
+</script>
+</body>
+</html>

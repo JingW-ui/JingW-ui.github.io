@@ -60,3 +60,8 @@ output/
 use_test.py
 test.html
 .playwright-cli/
+
+# ========================
+# PPT 源文件（体积大，仅保留 HTML 转换产物）
+# ========================
+ppt/**/*.pptx
