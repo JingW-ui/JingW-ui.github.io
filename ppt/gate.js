@@ -19,10 +19,19 @@
   var GUARD_ID = 'ppt-gate-guard';
   var SESSION_KEY = 'ppt_ok';
 
-  // 会话内已验证过就直接放行（sessionStorage：关掉标签页即失效）
+  // 会话内已验证过就直接放行：
+  // 注意必须「解锁」而不是简单 return —— ppt-locked 是写在 <html> 上的，
+  // 直接 return 会让页面永久隐藏且没有输入框可交互。
+  var alreadyOk = false;
   try {
-    if (sessionStorage.getItem(SESSION_KEY) === '1') return;
+    alreadyOk = sessionStorage.getItem(SESSION_KEY) === '1';
   } catch (e) { /* 隐私模式等场景下 sessionStorage 可能不可用，继续走验证 */ }
+
+  if (alreadyOk) {
+    document.documentElement.classList.remove('ppt-locked');
+    document.dispatchEvent(new CustomEvent('ppt:unlocked'));
+    return;
+  }
 
   // ---- 默认遮挡：内容先藏起来 ----
   // 关键：锁定的类必须由「页面自己的 <style>」先加上（见 index.html 里的
