@@ -594,15 +594,11 @@
 
         <div class="subsection">
             <div class="subsection-title">网易互娱 — 游戏测试开发工程师（实习）</div>
-            <div class="date">2027.07 - 至今</div>
             <div class="tech-line"><em>技术栈：</em>Python · LLM · Agent · Skill 开发 · PC 自动化 · Agent/Model 评测</div>
             <ul>
-                <li>面向<strong>远程 PC 自动化</strong>方向，以 agent + skill 方式替代人工逐台操作，落地两个真实业务场景：<strong>UU 取号</strong>（批量安装 UU 远程并自动配置验证码、写入 DK 备注，支持 airLab 跑测）与 <strong>G66 部署</strong>（自动判断目标机状态、下载安装包与 patch、替换游戏引擎并启动验证）。</li>
-                <li>UU 取号将 10 台设备的人工装机从 <strong>2 小时压缩至 10 分钟</strong>，单台成本控制在 1 元以内；G66 部署将 100GB 量级游戏环境的准备时间从 <strong>3~4 小时压缩至约 30 分钟</strong>，并支持内网分发加速。</li>
-                <li>针对上述场景自主设计并搭建 <strong>Agent 评测系统</strong>，以成功率（SR）、耗时（Duration）、成本（Cost）三指标量化选型结论；提出「<strong>判世界不判自述</strong>」判题思想——只看 agent 操作后世界的真实变化、读取客观真值、再与预期比对，避免采信模型自述。</li>
-                <li>设计 <strong>L1–L4 能力阶梯</strong>题库（单步操作 / 复合操作 / 真实场景 / 诚实判决），业务解耦、可复用；支持多 agent × 多模型 × 多设备批量并发跑测，同一套题目横向对齐，保证结果可比。</li>
-                <li>参考 DeepSeek harness 轨迹源码实现<strong>过程可视化</strong>，呈现工具链调用与模型内部耗时分布，定位「慢在哪、干了什么」，替代只看总耗时的事后归因。</li>
-                <li><strong>项目职责：</strong>业务 skill 设计与开发、评测系统从 0 到 1 搭建（指标定义、判题逻辑、题库设计、结果可视化）、agent 与 model 选型结论输出。</li>
+                <li>面向游戏测试的<strong>远程 PC 自动化</strong>方向，以 agent + skill 替代人工逐台操作，落地 <strong>UU 取号</strong>与 <strong>G66 部署</strong>两个真实业务场景，实现批量并发执行与自动校验，显著压缩环境准备耗时。</li>
+                <li>针对上述场景自主搭建 <strong>Agent 评测系统</strong>，以成功率、耗时、成本三指标量化 agent 与 model 选型；提出「<strong>判世界不判自述</strong>」判题思想，只看操作后世界的真实变化而非模型自述，并设计 L1–L4 能力阶梯题库，业务解耦可复用。</li>
+                <li><strong>项目职责：</strong>业务 skill 设计与开发、评测系统从 0 到 1 搭建（指标定义、判题逻辑、题库设计、结果可视化）。</li>
             </ul>
         </div>
     </div>
