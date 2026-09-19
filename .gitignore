@@ -60,6 +60,11 @@ output/
 use_test.py
 test.html
 .playwright-cli/
+.test_*.png
+.t.js
+.t2.js
+.t3.js
+.tighten.py
 
 # ========================
 # PPT 源文件（体积大，仅保留 HTML 转换产物）
@@ -67,9 +72,15 @@ test.html
 ppt/**/*.pptx
 
 # ========================
-# BOSS直聘抓取（临时工具，不进仓库）
+# 求职数据抓取 / 分析（临时工具，不进仓库）
 # ========================
 scraper.py
 analyzer.py
+offerio_scraper.py
+offerio_full.py
+profile.py
+matcher.py
+recommender.py
+export_tracker.py
 data/
 reports/

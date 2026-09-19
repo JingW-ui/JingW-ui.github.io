@@ -1,0 +1,241 @@
+[
+  {
+    "id": "bytedance_7628618212869998853",
+    "title": "面向复杂软件工程项目的Agentic AI Coding关键技术研究-TRAE",
+    "company": "字节跳动",
+    "city": "杭州",
+    "score": 91.2,
+    "directions": [
+      "AI全栈开发",
+      "医疗算法",
+      "测试开发",
+      "RAG系统"
+    ],
+    "skills": [
+      "Python",
+      "LLM 应用",
+      "Agent 开发",
+      "RAG / 检索增强",
+      "自动化 / Skill",
+      "深度学习",
+      "医学影像",
+      "工程化"
+    ],
+    "majorGate": [
+      "软件工程"
+    ],
+    "salary": "",
+    "publishDate": "2026-04-14",
+    "deadline": "",
+    "applyLink": "https://jobs.bytedance.com/campus/position/7628618212869998853/detail",
+    "resume": "",
+    "stage": "wish"
+  },
+  {
+    "id": "caitong_6a2a6e921d4c30777ae5a7ee",
+    "title": "金融科技研发部-AI开发工程师岗",
+    "company": "财通证券",
+    "city": "杭州",
+    "score": 88.6,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ],
+    "skills": [
+      "Python",
+      "LLM 应用",
+      "Agent 开发",
+      "RAG / 检索增强",
+      "深度学习",
+      "医学影像",
+      "数据处理",
+      "工程化"
+    ],
+    "majorGate": [
+      "计算机相关",
+      "计算机相关专业"
+    ],
+    "salary": "",
+    "publishDate": "2026-06-11",
+    "deadline": "",
+    "applyLink": "https://wecruit.hotjob.cn/SU60613f74bef57c36adc66d0b/pb/posDetail.html?postId=6a2a6e921d4c30777ae5a7ee&postType=campus",
+    "resume": "",
+    "stage": "wish"
+  },
+  {
+    "id": "hisense_e88091fa-d3e0-45e7-8616-86b01d75c310",
+    "title": "信动力T计划-算法工程师（机器人具身智能方向）(J43413)",
+    "company": "海信",
+    "city": "杭州",
+    "score": 87.9,
+    "directions": [
+      "AI全栈开发",
+      "医疗算法"
+    ],
+    "skills": [
+      "Python",
+      "LLM 应用",
+      "Agent 开发",
+      "自动化 / Skill",
+      "深度学习",
+      "计算机视觉",
+      "数据处理",
+      "工程化"
+    ],
+    "majorGate": [
+      "计算机科学"
+    ],
+    "salary": "",
+    "publishDate": "2026-05-11",
+    "deadline": "",
+    "applyLink": "https://jobs.hisense.com/7/detail?jobAdId=e88091fa-d3e0-45e7-8616-86b01d75c310",
+    "resume": "",
+    "stage": "wish"
+  },
+  {
+    "id": "beisen_390838178",
+    "title": "研发工程师",
+    "company": "长飞光纤",
+    "city": "武汉",
+    "score": 85.3,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ],
+    "skills": [
+      "Python",
+      "LLM 应用",
+      "Agent 开发",
+      "RAG / 检索增强",
+      "自动化 / Skill",
+      "深度学习",
+      "数据处理",
+      "工程化"
+    ],
+    "majorGate": [
+      "计算机科学"
+    ],
+    "salary": "",
+    "publishDate": "2026-06-02",
+    "deadline": "",
+    "applyLink": "https://yofc2.zhiye.com/campus/detail?jobAdId=48d523c9-026c-473c-8cfe-c7a88aca3718",
+    "resume": "",
+    "stage": "wish"
+  },
+  {
+    "id": "beisen_390838496",
+    "title": "研发高级工程师",
+    "company": "长飞光纤",
+    "city": "武汉",
+    "score": 85.3,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ],
+    "skills": [
+      "Python",
+      "LLM 应用",
+      "Agent 开发",
+      "RAG / 检索增强",
+      "自动化 / Skill",
+      "深度学习",
+      "数据处理",
+      "工程化"
+    ],
+    "majorGate": [
+      "计算机科学"
+    ],
+    "salary": "",
+    "publishDate": "2026-06-03",
+    "deadline": "",
+    "applyLink": "https://yofc2.zhiye.com/campus/detail?jobAdId=a1ea756b-5ab4-4f0a-80a2-0c2334856533",
+    "resume": "",
+    "stage": "wish"
+  },
+  {
+    "id": "beisen_190837957",
+    "title": "AI工程师（2027届）(J10501)",
+    "company": "杰华特",
+    "city": "杭州",
+    "score": 83.4,
+    "directions": [
+      "RAG系统"
+    ],
+    "skills": [
+      "Python",
+      "LLM 应用",
+      "Agent 开发",
+      "RAG / 检索增强",
+      "自动化 / Skill",
+      "深度学习",
+      "医学影像",
+      "工程化"
+    ],
+    "majorGate": [
+      "计算机科学"
+    ],
+    "salary": "",
+    "publishDate": "2026-07-07",
+    "deadline": "",
+    "applyLink": "https://joulwatt.zhiye.com/campus/detail?jobAdId=883ceb5d-70bc-4614-8f69-f06cfdb31707",
+    "resume": "",
+    "stage": "wish"
+  },
+  {
+    "id": "bytedance_7628936427621927173",
+    "title": "面向大模型与AI Agent的AI云原生基础设施关键技术研究-计算",
+    "company": "字节跳动",
+    "city": "杭州",
+    "score": 82.0,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ],
+    "skills": [
+      "Python",
+      "LLM 应用",
+      "Agent 开发",
+      "RAG / 检索增强",
+      "深度学习",
+      "工程化",
+      "写作与文档",
+      "后端开发"
+    ],
+    "majorGate": [
+      "计算机科学"
+    ],
+    "salary": "",
+    "publishDate": "2026-04-15",
+    "deadline": "",
+    "applyLink": "https://jobs.bytedance.com/campus/position/7628936427621927173/detail",
+    "resume": "",
+    "stage": "wish"
+  },
+  {
+    "id": "ks_12689",
+    "title": "【快Star】大模型应用算法工程师",
+    "company": "快手",
+    "city": "杭州",
+    "score": 79.8,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ],
+    "skills": [
+      "Python",
+      "LLM 应用",
+      "Agent 开发",
+      "RAG / 检索增强",
+      "深度学习",
+      "计算机视觉",
+      "医学影像"
+    ],
+    "majorGate": [],
+    "salary": "",
+    "publishDate": "2026-05-24",
+    "deadline": "",
+    "applyLink": "https://campus.kuaishou.cn/recruit/campus/e/#/campus/job-info/12689",
+    "resume": "",
+    "stage": "wish"
+  }
+]

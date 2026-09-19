@@ -1,0 +1,667 @@
+[
+  {
+    "id": "bytedance_7628618212869998853",
+    "title": "面向复杂软件工程项目的Agentic AI Coding关键技术研究-TRAE",
+    "company": "字节跳动",
+    "city": "杭州",
+    "score": 91.2,
+    "directions": [
+      "AI全栈开发",
+      "医疗算法",
+      "测试开发",
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "caitong_6a2a6e921d4c30777ae5a7ee",
+    "title": "金融科技研发部-AI开发工程师岗",
+    "company": "财通证券",
+    "city": "杭州",
+    "score": 88.6,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "hisense_e88091fa-d3e0-45e7-8616-86b01d75c310",
+    "title": "信动力T计划-算法工程师（机器人具身智能方向）(J43413)",
+    "company": "海信",
+    "city": "杭州",
+    "score": 87.9,
+    "directions": [
+      "AI全栈开发",
+      "医疗算法"
+    ]
+  },
+  {
+    "id": "beisen_390838178",
+    "title": "研发工程师",
+    "company": "长飞光纤",
+    "city": "武汉",
+    "score": 85.3,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "beisen_390838496",
+    "title": "研发高级工程师",
+    "company": "长飞光纤",
+    "city": "武汉",
+    "score": 85.3,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "beisen_190837957",
+    "title": "AI工程师（2027届）(J10501)",
+    "company": "杰华特",
+    "city": "杭州",
+    "score": 83.4,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "bytedance_7628936427621927173",
+    "title": "面向大模型与AI Agent的AI云原生基础设施关键技术研究-计算",
+    "company": "字节跳动",
+    "city": "杭州",
+    "score": 82.0,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "ks_12689",
+    "title": "【快Star】大模型应用算法工程师",
+    "company": "快手",
+    "city": "杭州",
+    "score": 79.8,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "xhs_19699",
+    "title": "【2026校招】智能客服算法工程师",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 78.7,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "xhs_17529",
+    "title": "【REDstar】智能客服算法工程师",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 78.7,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "xhs_19703",
+    "title": "【2026校招】大模型应用算法工程师- rednote国际化",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 78.0,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "xhs_17920",
+    "title": "【REDstar】大模型应用算法工程师- rednote国际化",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 78.0,
+    "directions": [
+      "AI全栈开发",
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "xhs_19708",
+    "title": "【2026校招】NLP/多模态内容理解算法工程师-社区治理",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 77.2,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "beisen_511068673",
+    "title": "AI算法工程师（校招）",
+    "company": "宇树科技",
+    "city": "杭州",
+    "score": 76.8,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "beisen_190842469",
+    "title": "AI研究算法工程师-后训练研究方向(J13375)",
+    "company": "科大讯飞",
+    "city": "武汉",
+    "score": 75.3,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "ks_12752",
+    "title": "【快Star】AIOps自主进化研究员",
+    "company": "快手",
+    "city": "杭州",
+    "score": 75.3,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "moka_enflame_d845364c",
+    "title": "【2027校招】智能运维与Agent研发工程师",
+    "company": "上海燧原科技股份有限公司",
+    "city": "杭州",
+    "score": 75.0,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "bytedance_7628896431759231285",
+    "title": "抖音多业务场景的大模型训练与应用-抖音AI",
+    "company": "字节跳动",
+    "city": "杭州",
+    "score": 74.3,
+    "directions": [
+      "AI全栈开发",
+      "医疗算法"
+    ]
+  },
+  {
+    "id": "ks_10097",
+    "title": "游戏AI算法工程师-LLM",
+    "company": "快手",
+    "city": "杭州",
+    "score": 73.5,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "ks_12784",
+    "title": "【快Star】AI搜索算法工程师",
+    "company": "快手",
+    "city": "杭州",
+    "score": 73.5,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "boe_880100941",
+    "title": "【物联网创新先锋】算法开发研究员（成都）(J52850)",
+    "company": "京东方",
+    "city": "成都",
+    "score": 73.5,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "hexagon_6a278b293d5b657f38be3d68",
+    "title": "27届校招-图像算法工程师",
+    "company": "海克斯康",
+    "city": "武汉",
+    "score": 73.2,
+    "directions": [
+      "医疗算法",
+      "测试开发"
+    ]
+  },
+  {
+    "id": "ks_12760",
+    "title": "【快Star】音视频多模态算法策略研究员",
+    "company": "快手",
+    "city": "杭州",
+    "score": 71.7,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "bytedance_7628527932612397365",
+    "title": "面向国际电商场景的大模型应用-国际电商（杭州）",
+    "company": "字节跳动",
+    "city": "杭州",
+    "score": 71.7,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "moka_enflame_2fae5e00",
+    "title": "【2027校招】软件测试开发工程师",
+    "company": "上海燧原科技股份有限公司",
+    "city": "杭州",
+    "score": 70.2,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "boe_880100940",
+    "title": "【物联网创新先锋】仿真算法研究员（成都）(J52803)",
+    "company": "京东方",
+    "city": "成都",
+    "score": 69.8,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "bytedance_7622889813465221429",
+    "title": "AI搜索算法工程师-Seed大模型人才校招",
+    "company": "字节跳动",
+    "city": "杭州",
+    "score": 69.8,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "moka_enflame_7a9aa5b2",
+    "title": "【2027校招】AI框架/算子开发工程师",
+    "company": "上海燧原科技股份有限公司",
+    "city": "杭州",
+    "score": 68.7,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "xhs_19803",
+    "title": "【2026校招】电商算法工程师-内容理解方向",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 68.7,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "bytedance_7628081802842327349",
+    "title": "抖音多业务场景的大模型训练与应用-抖音直播（北京/上海/深圳/杭州）",
+    "company": "字节跳动",
+    "city": "杭州",
+    "score": 68.7,
+    "directions": [
+      "医疗算法"
+    ]
+  },
+  {
+    "id": "bytedance_7628831790243268869",
+    "title": "基于LLM的软件缺陷检测技术的探索和研究-质量技术",
+    "company": "字节跳动",
+    "city": "杭州",
+    "score": 68.7,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "xhs_16901",
+    "title": "【REDstar】基座大模型算法工程师",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 68.0,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "xhs_17987",
+    "title": "【REDstar】NLP/多模态算法工程师-交易/商业化治理",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 68.0,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "xhs_19704",
+    "title": "【2026校招】基座大模型算法工程师",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 68.0,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "xhs_19700",
+    "title": "【2026校招】NLP/多模态算法工程师-交易/商业化治理",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 68.0,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "sicarrier_303",
+    "title": "AI应用开发工程师",
+    "company": "新凯来",
+    "city": "武汉",
+    "score": 68.0,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "sicarrier_156",
+    "title": "软件开发工程师",
+    "company": "新凯来",
+    "city": "杭州",
+    "score": 67.6,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "beisen_190842474",
+    "title": "AI研究算法工程师-大模型预训练数据研究方向(J13369)",
+    "company": "科大讯飞",
+    "city": "武汉",
+    "score": 66.2,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "xhs_17539",
+    "title": "【REDstar】社区搜索算法工程师",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 66.2,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "xhs_19707",
+    "title": "【2026校招】社区搜索算法工程师",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 66.2,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "ks_12806",
+    "title": "【快Star】搜索大模型算法工程师",
+    "company": "快手",
+    "city": "杭州",
+    "score": 66.2,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "beisen_511174092",
+    "title": "视觉大模型算法工程师",
+    "company": "宇树科技",
+    "city": "杭州",
+    "score": 66.2,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "xhs_20508",
+    "title": "【练习生】大模型 Agentic AIOPS 研发",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 65.8,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "7580210735365474570",
+    "title": "智能制造软件测试开发工程师",
+    "company": "禾赛科技",
+    "city": "杭州",
+    "score": 65.8,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "xhs_19806",
+    "title": "【2026校招】NLP与多模态算法工程师",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 64.3,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "xhs_16619",
+    "title": "【REDstar】NLP与多模态算法工程师",
+    "company": "小红书",
+    "city": "杭州",
+    "score": 64.3,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "ks_10001",
+    "title": "搜索算法工程师",
+    "company": "快手",
+    "city": "杭州",
+    "score": 64.3,
+    "directions": [
+      "RAG系统"
+    ]
+  },
+  {
+    "id": "ks_9923",
+    "title": "大模型推理/训练优化工程师",
+    "company": "快手",
+    "city": "杭州",
+    "score": 64.3,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "hexagon_6a278bb0c7606e0d83b6adff",
+    "title": "27届校招-软件测试工程师",
+    "company": "海克斯康",
+    "city": "武汉",
+    "score": 60.3,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "beisen_621118204",
+    "title": "自动化软件开发工程师(J10565)",
+    "company": "新易盛",
+    "city": "成都",
+    "score": 56.6,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "beisen_190842424",
+    "title": "AI研发工程师(J13366)",
+    "company": "科大讯飞",
+    "city": "武汉",
+    "score": 54.8,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "beisen_390838462",
+    "title": "技术支持工程师",
+    "company": "长飞光纤",
+    "city": "武汉",
+    "score": 54.1,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "beisen_190842318",
+    "title": "测试开发工程师(J13398)",
+    "company": "科大讯飞",
+    "city": "成都",
+    "score": 50.4,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "beisen_390845221",
+    "title": "DDR-IP用例开发工程师 （base武汉-27届校招）(J12725)",
+    "company": "芯动科技",
+    "city": "武汉",
+    "score": 50.4,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "sicarrier_146",
+    "title": "硬件测试工程师",
+    "company": "新凯来",
+    "city": "武汉",
+    "score": 50.4,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "beisen_390844996",
+    "title": "系统测试开发工程师（base武汉-27届校招）(J12721)",
+    "company": "芯动科技",
+    "city": "武汉",
+    "score": 48.6,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "sicarrier_227",
+    "title": "先进材料开发工程师",
+    "company": "新凯来",
+    "city": "武汉",
+    "score": 48.6,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "hisense_ed94710a-73e9-42e2-a51a-ad50eb9ca27f",
+    "title": "信动力T计划-算法工程师(J43442)",
+    "company": "海信",
+    "city": "武汉",
+    "score": 46.0,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "beisen_390838486",
+    "title": "研发工程师（光纤）",
+    "company": "长飞光纤",
+    "city": "武汉",
+    "score": 44.9,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "beisen_390842732",
+    "title": "研发高级工程师（器件）",
+    "company": "长飞光纤",
+    "city": "武汉",
+    "score": 43.1,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "beisen_390842726",
+    "title": "研发工程师（器件）",
+    "company": "长飞光纤",
+    "city": "武汉",
+    "score": 43.1,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "moka_3peakic_da5d7c3c",
+    "title": "（2027届校招）研发测试工程师",
+    "company": "3PEAK",
+    "city": "成都",
+    "score": 41.2,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "beisen_390838476",
+    "title": "研发高级工程师（光纤）",
+    "company": "长飞光纤",
+    "city": "武汉",
+    "score": 38.7,
+    "directions": [
+      "AI全栈开发"
+    ]
+  },
+  {
+    "id": "hotjob_27届校招-软件测试",
+    "title": "27届校招-软件测试工程师",
+    "company": "海克斯康深圳",
+    "city": "武汉",
+    "score": 35.7,
+    "directions": [
+      "测试开发"
+    ]
+  },
+  {
+    "id": "beisen_621118203",
+    "title": "光学设计工程师(J10566)",
+    "company": "新易盛",
+    "city": "成都",
+    "score": 35.7,
+    "directions": [
+      "测试开发"
+    ]
+  }
+]

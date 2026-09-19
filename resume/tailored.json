@@ -308,5 +308,15 @@
     "date": "2026.07",
     "url": "/resume/resume_huawei_itc.html",
     "match": "high"
+  },
+  {
+    "index": "32",
+    "company": "科大讯飞 · 2027 校招",
+    "role": "测试开发工程师",
+    "direction": "测试开发 / 质量与效率",
+    "tags": ["软件测试全流程", "自动化测试", "缺陷跟踪定位", "Agent 评测"],
+    "date": "2026.09",
+    "url": "/resume/resume_iflytek_qa.html",
+    "match": "high"
   }
 ]
