@@ -320,6 +320,83 @@
             border-color: rgba(247, 118, 142, 0.35);
         }
 
+        /* ---------- 招聘季过滤 ---------- */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin: -10px 0 26px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: rise 0.6s ease 0.2s forwards;
+        }
+        .filter-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 550;
+            color: var(--text-soft);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: color 0.25s ease, background 0.25s ease,
+                        border-color 0.25s ease, transform 0.25s ease;
+        }
+        .filter-btn:hover {
+            color: var(--text);
+            border-color: var(--border-hover);
+            background: var(--card-hover);
+            transform: translateY(-1px);
+        }
+        .filter-btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .filter-btn .cnt {
+            font-size: 11px;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-dim);
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 1px 7px;
+            transition: color 0.25s ease, background 0.25s ease;
+        }
+        /* 选中态：秋招用品牌红，暑期实习用主题蓝 */
+        .filter-btn[aria-pressed="true"] {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--border-hover);
+        }
+        .filter-btn[aria-pressed="true"] .cnt {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.12);
+        }
+        .filter-btn[data-season="qz"][aria-pressed="true"] {
+            border-color: rgba(247, 118, 142, 0.55);
+            box-shadow: inset 0 0 0 1px rgba(247, 118, 142, 0.18);
+        }
+        .filter-btn[data-season="qz"][aria-pressed="true"] .cnt {
+            color: #f7768e;
+            background: rgba(247, 118, 142, 0.16);
+        }
+        .filter-btn[data-season="sx"][aria-pressed="true"] {
+            border-color: rgba(110, 168, 254, 0.55);
+            box-shadow: inset 0 0 0 1px rgba(110, 168, 254, 0.18);
+        }
+        .filter-btn[data-season="sx"][aria-pressed="true"] .cnt {
+            color: var(--accent);
+            background: rgba(110, 168, 254, 0.16);
+        }
+        .filter-btn[data-season="all"][aria-pressed="true"] .cnt {
+            color: var(--text-soft);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
         .footer {
             border-top: 1px solid var(--border);
             padding: 40px 0 64px;
@@ -388,7 +465,7 @@
         <p class="tagline">
             每份简历都<strong>针对具体岗位 JD 重新编排</strong>——按职责要求重排板块、用岗位关键词改写措辞、取舍无关经历、强化对口项目。
             点击卡片查看对应 A4 单页简历（浏览器 Ctrl+P 可另存为 PDF）。<br>
-            按招聘季分为 <strong>秋招</strong>（<code>/resume/resume_qz/</code>）与 <strong>暑期实习</strong>（<code>/resume/resume_sx/</code>）两类，卡片左上角标注。
+            按招聘季分为 <strong>秋招</strong>（<code>/resume/resume_qz/</code>）与 <strong>暑期实习</strong>（<code>/resume/resume_sx/</code>）两类，可用下方按钮筛选，默认展示秋招。
         </p>
         <nav class="nav">
             <a href="/resume/">通用简历</a>
@@ -400,8 +477,21 @@
 
     <!-- Section head -->
     <div class="section-head">
-        <div class="section-title">投递档案 <span class="num">/ 32</span></div>
+        <div class="section-title">投递档案 <span class="num" id="secNum">/ 32</span></div>
         <div class="section-note">按目标岗位定向裁剪 · 突出适配性</div>
+    </div>
+
+    <!-- 招聘季过滤（默认秋招） -->
+    <div class="filter-bar" id="filterBar" role="group" aria-label="按招聘季筛选简历">
+        <button type="button" class="filter-btn" data-season="qz" aria-pressed="true">
+            秋招 <span class="cnt" data-cnt="qz">0</span>
+        </button>
+        <button type="button" class="filter-btn" data-season="sx" aria-pressed="false">
+            暑期实习 <span class="cnt" data-cnt="sx">0</span>
+        </button>
+        <button type="button" class="filter-btn" data-season="all" aria-pressed="false">
+            全部 <span class="cnt" data-cnt="all">0</span>
+        </button>
     </div>
 
     <!-- Cards（由 tailored.json 动态渲染） -->
@@ -420,6 +510,16 @@
 (function () {
     var grid = document.getElementById('grid');
     var state = document.getElementById('gridState');
+    var bar = document.getElementById('filterBar');
+    var secNum = document.getElementById('secNum');
+
+    // 招聘季由路径推断：resume_qz/ = 秋招，resume_sx/ = 暑期实习
+    function seasonOf(item) {
+        return (item.url || '').indexOf('/resume_qz/') !== -1 ? 'qz' : 'sx';
+    }
+
+    var ALL = [];
+    var current = 'qz';   // 默认展示秋招
 
     function esc(s) {
         return String(s == null ? '' : s)
@@ -431,8 +531,7 @@
         var delay = (0.18 + i * 0.08).toFixed(2) + 's';
         var match = item.match === 'high'
             ? '<span class="match">高匹配</span>' : '';
-        // 招聘季由路径推断：resume_qz/ = 秋招，resume_sx/ = 暑期实习
-        var season = (item.url || '').indexOf('/resume_qz/') !== -1
+        var season = seasonOf(item) === 'qz'
             ? '<span class="season qz">秋招</span>'
             : '<span class="season">暑期实习</span>';
         var tags = (item.tags || []).map(function (t) {
@@ -457,6 +556,36 @@
         grid.innerHTML = list.map(renderCard).join('');
     }
 
+    function apply(season) {
+        current = season;
+        var list = season === 'all'
+            ? ALL
+            : ALL.filter(function (it) { return seasonOf(it) === season; });
+
+        // 按钮态 + 计数
+        Array.prototype.forEach.call(bar.querySelectorAll('.filter-btn'), function (btn) {
+            btn.setAttribute('aria-pressed', String(btn.getAttribute('data-season') === season));
+        });
+        Array.prototype.forEach.call(bar.querySelectorAll('.cnt'), function (el) {
+            var k = el.getAttribute('data-cnt');
+            el.textContent = k === 'all' ? ALL.length
+                : ALL.filter(function (it) { return seasonOf(it) === k; }).length;
+        });
+
+        secNum.textContent = '/ ' + list.length;
+        if (!list.length) {
+            grid.innerHTML = '<div class="grid-state">该招聘季暂无定制简历</div>';
+            return;
+        }
+        render(list);
+    }
+
+    bar.addEventListener('click', function (e) {
+        var btn = e.target.closest ? e.target.closest('.filter-btn') : null;
+        if (!btn) return;
+        apply(btn.getAttribute('data-season'));
+    });
+
     fetch('/resume/tailored.json?_=' + Date.now())
         .then(function (res) {
             if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -467,7 +596,9 @@
                 grid.innerHTML = '<div class="grid-state">暂无定制简历</div>';
                 return;
             }
-            render(data);
+            ALL = data;
+            var hasQz = ALL.some(function (it) { return seasonOf(it) === 'qz'; });
+            apply(hasQz ? 'qz' : 'all');
         })
         .catch(function () {
             state.textContent = '简历列表加载失败，请直接访问 /resume/ 下的定制简历文件';
