@@ -180,6 +180,7 @@
             color: var(--text);
             overflow: hidden;
             backdrop-filter: blur(6px);
+            cursor: pointer;
             transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
                         border-color 0.4s ease,
                         background 0.4s ease,
@@ -187,6 +188,23 @@
             opacity: 0;
             transform: translateY(22px);
             animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        /* 整卡可点击：透明覆盖链接铺满卡片，位于内容之下 */
+        .card-hit {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: 16px;
+        }
+        .card-hit:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: -3px;
+        }
+        /* 卡片内的交互元素抬到覆盖链接之上，保证能点 */
+        .apply-row,
+        .jd-panel {
+            position: relative;
+            z-index: 2;
         }
         /* hover 光泽扫过 */
         .card::before {
@@ -241,7 +259,6 @@
             flex-wrap: wrap;
             gap: 6px;
             margin-bottom: 18px;
-            flex: 1;
         }
         .tag {
             font-size: 11px;
@@ -397,6 +414,127 @@
             background: rgba(255, 255, 255, 0.12);
         }
 
+        /* ---------- 秋招卡片：投递链接 + 岗位 JD ---------- */
+        .apply-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex: 0 0 auto;
+        }
+        .apply-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #f7768e;
+            background: rgba(247, 118, 142, 0.1);
+            border: 1px solid rgba(247, 118, 142, 0.35);
+            border-radius: 7px;
+            padding: 5px 10px;
+            text-decoration: none;
+            transition: background 0.25s ease, border-color 0.25s ease, gap 0.25s ease;
+        }
+        .apply-link:hover {
+            background: rgba(247, 118, 142, 0.2);
+            border-color: rgba(247, 118, 142, 0.6);
+            gap: 8px;
+            text-decoration: none;
+        }
+        .apply-link .ico {
+            font-size: 11px;
+            line-height: 1;
+        }
+        .job-id {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-variant-numeric: tabular-nums;
+            letter-spacing: 0.3px;
+        }
+        .jd-toggle {
+            margin-left: auto;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 550;
+            color: var(--text-soft);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+        }
+        .jd-toggle:hover {
+            color: var(--text);
+            background: var(--card-hover);
+            border-color: var(--border-hover);
+        }
+        .jd-toggle:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        .jd-toggle .caret {
+            font-size: 9px;
+            transition: transform 0.3s ease;
+        }
+        .jd-toggle[aria-expanded="true"] .caret {
+            transform: rotate(180deg);
+        }
+
+        .jd-panel {
+            display: none;
+            margin-bottom: 12px;
+            padding: 12px 13px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid var(--border);
+            border-left: 2px solid rgba(247, 118, 142, 0.5);
+            border-radius: 0 9px 9px 0;
+        }
+        .jd-panel.open {
+            display: block;
+        }
+        .jd-panel h4 {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            color: var(--text-soft);
+            margin: 0 0 6px;
+        }
+        .jd-panel h4:not(:first-child) {
+            margin-top: 11px;
+        }
+        .jd-panel ul {
+            margin: 0;
+            padding-left: 15px;
+            list-style: disclosure-closed;
+        }
+        .jd-panel li {
+            font-size: 11.5px;
+            line-height: 1.6;
+            color: var(--text-soft);
+            margin-bottom: 4px;
+        }
+        .jd-panel li:last-child {
+            margin-bottom: 0;
+        }
+        .jd-loc {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11.5px;
+            color: var(--text-soft);
+            margin-bottom: 2px;
+        }
+        .jd-loc .pin {
+            color: #f7768e;
+            font-size: 10px;
+        }
+
         .footer {
             border-top: 1px solid var(--border);
             padding: 40px 0 64px;
@@ -465,7 +603,7 @@
         <p class="tagline">
             每份简历都<strong>针对具体岗位 JD 重新编排</strong>——按职责要求重排板块、用岗位关键词改写措辞、取舍无关经历、强化对口项目。
             点击卡片查看对应 A4 单页简历（浏览器 Ctrl+P 可另存为 PDF）。<br>
-            按招聘季分为 <strong>秋招</strong>（<code>/resume/resume_qz/</code>）与 <strong>暑期实习</strong>（<code>/resume/resume_sx/</code>）两类，可用下方按钮筛选，默认展示秋招。
+            按招聘季分为 <strong>秋招</strong>（<code>/resume/resume_qz/</code>）与 <strong>暑期实习</strong>（<code>/resume/resume_sx/</code>）两类，可用下方按钮筛选，默认展示秋招。秋招卡片另附<strong>官方投递链接</strong>与<strong>岗位 JD</strong>（可展开查看职责与要求）。
         </p>
         <nav class="nav">
             <a href="/resume/">通用简历</a>
@@ -529,27 +667,62 @@
 
     function renderCard(item, i) {
         var delay = (0.18 + i * 0.08).toFixed(2) + 's';
+        var isQz = seasonOf(item) === 'qz';
         var match = item.match === 'high'
             ? '<span class="match">高匹配</span>' : '';
-        var season = seasonOf(item) === 'qz'
+        var season = isQz
             ? '<span class="season qz">秋招</span>'
             : '<span class="season">暑期实习</span>';
         var tags = (item.tags || []).map(function (t) {
             return '<span class="tag">' + esc(t) + '</span>';
         }).join('');
+
+        // 秋招卡片才渲染投递链接 + 岗位 JD（实习简历不带这两项）
+        var applyRow = '', jdPanel = '';
+        if (isQz && item.applyLink) {
+            var idTxt = item.jobId
+                ? '<span class="job-id">岗位编号 ' + esc(item.jobId) + '</span>' : '';
+            applyRow = '<div class="apply-row">' +
+                    '<a class="apply-link" href="' + esc(item.applyLink) + '"' +
+                        ' target="_blank" rel="noopener" data-stop="1">' +
+                        '<span class="ico">↗</span>投递链接</a>' +
+                    idTxt +
+                    (item.jd ? '<button type="button" class="jd-toggle" aria-expanded="false" data-stop="1">' +
+                        '岗位 JD <span class="caret">▼</span></button>' : '') +
+                '</div>';
+
+            if (item.jd) {
+                var duty = (item.jd.duty || []).map(function (t) {
+                    return '<li>' + esc(t) + '</li>'; }).join('');
+                var req = (item.jd.req || []).map(function (t) {
+                    return '<li>' + esc(t) + '</li>'; }).join('');
+                var loc = item.location
+                    ? '<div class="jd-loc"><span class="pin">◎</span>工作地点：' + esc(item.location) + '</div>' : '';
+                jdPanel = '<div class="jd-panel">' +
+                        loc +
+                        (duty ? '<h4>岗位职责</h4><ul>' + duty + '</ul>' : '') +
+                        (req ? '<h4>任职要求</h4><ul>' + req + '</ul>' : '') +
+                    '</div>';
+            }
+        }
+
         return '' +
-            '<a class="card" href="' + esc(item.url) + '" target="_blank" rel="noopener" style="animation-delay:' + delay + '">' +
+            '<div class="card" style="animation-delay:' + delay + '">' +
+                '<a class="card-hit" href="' + esc(item.url) + '" target="_blank" rel="noopener"' +
+                    ' aria-label="打开 ' + esc(item.company) + ' ' + esc(item.role) + ' 简历"></a>' +
                 match +
                 '<div class="card-index">' + esc(item.index) + season + '</div>' +
                 '<div class="card-company">' + esc(item.company) + '</div>' +
                 '<div class="card-role">' + esc(item.role) + '</div>' +
                 '<div class="card-direction">' + esc(item.direction) + '</div>' +
                 '<div class="card-tags">' + tags + '</div>' +
+                applyRow +
+                jdPanel +
                 '<div class="card-foot">' +
                     '<span class="card-date">' + esc(item.date) + '</span>' +
                     '<span class="card-open">打开 <span class="arrow">→</span></span>' +
                 '</div>' +
-            '</a>';
+            '</div>';
     }
 
     function render(list) {
@@ -584,6 +757,24 @@
         var btn = e.target.closest ? e.target.closest('.filter-btn') : null;
         if (!btn) return;
         apply(btn.getAttribute('data-season'));
+    });
+
+    // 卡片内嵌套的投递链接 / JD 按钮：阻止冒泡，避免触发卡片本身的跳转
+    grid.addEventListener('click', function (e) {
+        var t = e.target;
+        // 投递链接：让它正常新开标签，但不冒泡到卡片 <a>
+        if (t.closest && t.closest('.apply-link')) {
+            e.stopPropagation();
+            return;
+        }
+        var toggle = t.closest ? t.closest('.jd-toggle') : null;
+        if (!toggle) return;
+        e.preventDefault();
+        e.stopPropagation();
+        var panel = toggle.parentNode.parentNode.querySelector('.jd-panel');
+        if (!panel) return;
+        var open = panel.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(open));
     });
 
     fetch('/resume/tailored.json?_=' + Date.now())
