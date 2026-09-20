@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 米哈游 平台研发-游戏运维工程师</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            font-size: 11px;
+            line-height: 1.2;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            padding: 7mm 11mm;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 5px;
+            padding: 0 0 4px;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 88px;
+            height: 88px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .profile-info {
+            text-align: left;
+        }
+        .name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .target {
+            font-size: 13px;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.45;
+        }
+        .contact-info a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 7px;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            border-left: 4px solid #333;
+            padding-left: 10px;
+        }
+        .summary {
+            font-size: 11px;
+            color: #444;
+            line-height: 1.55;
+        }
+        .summary strong {
+            color: #1a1a1a;
+        }
+        .subsection {
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 3px;
+        }
+        .date {
+            font-size: 10.5px;
+            color: #999;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .tech-line {
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .tech-line em {
+            font-style: normal;
+            color: #2d74bb;
+            font-weight: 500;
+        }
+        ul {
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 1px;
+            font-size: 11px;
+            color: #555;
+            line-height: 1.45;
+            break-inside: avoid;
+        }
+        .skill-line {
+            font-size: 11px;
+            color: #555;
+            line-height: 1.55;
+            margin-bottom: 6px;
+        }
+        .skill-line:last-child {
+            margin-bottom: 0;
+        }
+        .skill-cat {
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-right: 2px;
+        }
+        .skill-hl {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .label-link {
+            display: inline-block;
+            background-color: #f5f5f5;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .label-link:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .github-label-link {
+            display: inline-block;
+            background-color: #1F883D;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .github-label-link:hover {
+            background-color: #176d31;
+        }
+        .hl-red {
+            color: #fd0000;
+            font-weight: 600;
+        }
+        @media print {
+            /* 打印时正文略缩，把内容压进 A4 单页：
+               屏幕上 .page 自带 7mm/11mm 内边距，打印时该内边距归零、
+               只留 @page margin，可用宽度反而变窄，文字重排后变高。
+               这里统一到同一套尺寸，避免出现第二页。 */
+            @page { size: A4; margin: 5mm 10mm; }
+            body {
+                background: #fff;
+                padding: 0;
+                display: block;
+                font-size: 9.8px;
+            }
+            .page {
+                box-shadow: none;
+                width: auto;
+                min-height: auto;
+                padding: 0;
+            }
+            .summary { font-size: 10px; line-height: 1.38; }
+            li { font-size: 10px; line-height: 1.27; margin-bottom: 0; }
+            .skill-line, .tech-line { font-size: 10px; line-height: 1.4; margin-bottom: 1px; }
+            .section { margin-bottom: 3px; }
+            .section-title { font-size: 12px; margin-bottom: 2px; }
+            .subsection { margin-bottom: 1px; padding-bottom: 1px; }
+            .subsection-title { font-size: 11px; }
+            .date { font-size: 9.5px; }
+        }
+        @media (max-width: 820px) {
+            body {
+                padding: 10px;
+            }
+            .page {
+                width: 100%;
+                min-height: auto;
+                padding: 18px 16px;
+            }
+            .profile-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-info {
+                text-align: center;
+            }
+            .name {
+                font-size: 22px;
+            }
+        }
+        html, body, .header, .label-link, .github-label-link, .target, .contact-info a {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        @media print {
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header：个人信息（不写政治面貌） -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：游戏运维工程师 / 平台研发（米哈游）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            电子科技大学（985）硕士，<strong>计算机相关专业</strong>，GPA 3.83/4（前 5%）。<strong>Python 主力开发</strong>，熟悉 Linux 与 Shell 脚本，具备扎实的<strong>计算机网络、操作系统、数据结构与算法</strong>基础。<strong>有真实运维场景落地经验</strong>：在网易互娱实习期间，以 <strong>Agent + Skill</strong> 替代人工逐台操作，落地<strong>远程 PC 批量部署与环境准备</strong>，实现批量并发执行与自动校验，显著压缩环境准备耗时；并自主搭建<strong>评测系统</strong>，以成功率、耗时、成本三指标量化选型。独立主导的开源项目累计获 <span class="hl-red">200+ GitHub Star</span>，日常深度使用 <strong>AI 辅助开发</strong>，具备把重复运维工作沉淀为自动化工具的能力。
+        </div>
+    </div>
+
+    <!-- 教育背景 -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 生命科学与技术学院 · 生物医学工程 · 硕士</div>
+            <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授</div>
+            <div class="tech-line"><em>研究方向：</em>自动化工作流与工具链开发 · 操作系统与并发编程 · 数据结构与算法</div>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 信息工程学院 · 生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ <span class="hl-red">四川省优秀毕业生 · 推免生</span></div>
+            <div class="tech-line"><em>研究方向：</em>计算机网络与协议 · Linux 与 Shell 脚本 · 计算机体系结构</div>
+        </div>
+    </div>
+
+    <!-- 专业技能：流式文本 -->
+    <div class="section">
+        <div class="section-title">专业技能</div>
+        <div class="skill-line">
+            <span class="skill-cat">编程语言：</span><span class="skill-hl">Python</span> · <span class="skill-hl">C/C++</span> · Shell 脚本 · Go（了解）· Java · JavaScript · SQL
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">系统与网络：</span><span class="skill-hl">Linux 常用命令与排查</span> · <span class="skill-hl">TCP/IP、HTTP、DNS 协议</span> · 进程与并发编程 · 操作系统原理 · 计算机体系结构
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">运维与自动化：</span><span class="skill-hl">自动化脚本与工具链开发</span> · <span class="skill-hl">批量部署与环境准备</span> · <span class="skill-hl">监控告警与故障定位</span> · CI/CD 集成 · Git 版本管理 · Docker（了解）
+        </div>
+        <div class="skill-line">
+            <span class="skill-cat">工具与 AI 提效：</span><span class="skill-hl">AI 辅助开发</span> · <span class="skill-hl">LLM / Agent 工具建设</span> · PySide6/Qt · MySQL · 英语六级
+        </div>
+    </div>
+
+    <!-- 实习经历：与运维最相关的前置 -->
+    <div class="section">
+        <div class="section-title">实习经历</div>
+
+        <div class="subsection">
+            <div class="subsection-title">网易互娱 — 游戏测试开发工程师（实习）</div>
+            <div class="date">2026.03 - 2026.08</div>
+            <div class="tech-line"><em>技术栈：</em>Python · LLM · Agent · Skill 开发 · 远程 PC 自动化 · 批量并发调度</div>
+            <ul>
+                <li>面向游戏测试的 <strong>远程 PC 自动化</strong>方向，以 <strong>Agent + Skill</strong> 替代人工逐台操作，落地 <strong>UU 取号</strong>与 <strong>G66 部署</strong>两个真实业务场景，实现<strong>批量并发执行与自动校验</strong>，显著压缩环境准备耗时，提升发布与部署环节的效率与稳定性。</li>
+                <li>针对上述场景自主搭建 <strong>Agent 评测系统</strong>，以<strong>成功率、耗时、成本</strong>三指标量化 agent 与 model 选型；提出「<strong>判世界不判自述</strong>」判题思想，只看操作后世界的真实变化而非模型自述，并设计 L1–L4 能力阶梯题库，业务解耦可复用。</li>
+                <li><strong>项目职责：</strong>业务 Skill 设计与开发、批量部署与环境准备流程打通、评测系统从 0 到 1 搭建（指标定义、判题逻辑、题库设计、结果可视化）。</li>
+                <li><strong>项目成果：</strong>替代人工逐台操作，环境准备耗时显著压缩；评测系统形成可复用的选型依据，业务解耦可在多场景迁移。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">国网宁夏电力有限公司 — AI 算法实习生</div>
+            <div class="date">2023.10 - 2023.12</div>
+            <div class="tech-line"><em>技术栈：</em>Python · YOLO · OpenPose · 无人机图像 · 算法开发与部署</div>
+            <ul>
+                <li>负责算法调研、数据采集与<strong>环境搭建</strong>；开发头盔检测与人体姿势估计算法，实现危险姿势识别与安全预警，在实际作业场景完成验证。</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- 项目经验：优先展示自动化/工具链/监控类 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+
+        <!-- 1. AutoTask — 自动化工具链（最对口） -->
+        <div class="subsection">
+            <div class="subsection-title">
+                AutoTask 智能自动化办公助手 — 桌面自动化工具链开发
+                <a class="github-label-link" href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://qm.qq.com/q/8Bm7ntOXte" target="_blank" rel="noopener">社区 150+ 人</a>
+                <a class="label-link" href="https://www.bilibili.com/video/BV1FzpLzHEWL" target="_blank" rel="noopener">视频 10K+</a>
+            </div>
+            <div class="date">2025.10 - 2026.01</div>
+            <div class="tech-line"><em>技术栈：</em>Python · PySide6 · PyAutoGUI · 批处理与定时调度 · AI 辅助开发</div>
+            <ul>
+                <li>基于 PySide6 + PyAutoGUI 的零代码桌面自动化工具，实现<strong>可视化任务编排</strong>、键鼠模拟与<strong>批处理任务管理</strong>，集成<strong>定时调度</strong>能力，把操作者从重复机械流程中解放出来。</li>
+                <li>独立负责需求分析、架构设计、代码开发、静态检查与测试全流程；持续<strong>看护与重构核心模块</strong>，提升可维护性与可扩展性，采用 AI 辅助开发实践显著提升编码效率。</li>
+                <li><strong>项目职责：</strong>架构师、评审员、细节打磨与迭代、UI 设计与样式优化、测试。</li>
+                <li><strong>项目成果：</strong>开源获 <span class="hl-red">70+ GitHub Star</span>、<span class="hl-red">社区 150+ 人</span>、B站演示视频 10K+ 播放；持续迭代多版本，形成稳定的用户反馈-修复-发布闭环。</li>
+            </ul>
+        </div>
+
+        <!-- 2. 通用目标检测平台 — 批量处理与运行时监控 -->
+        <div class="subsection">
+            <div class="subsection-title">
+                通用目标检测与分割系统平台 — 多输入源批量处理与运行时监控
+                <a class="github-label-link" href="https://github.com/JingW-ui/PI-MAPP/tree/main/project/universal_object_detection_plus" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://qm.qq.com/q/wZRWYGb78I" target="_blank" rel="noopener">社区 50+ 人</a>
+            </div>
+            <div class="date">2025.08 - 2025.10</div>
+            <div class="tech-line"><em>技术栈：</em>Python · PyTorch · YOLOv8~YOLO26 · 多输入源接入 · 模块化架构</div>
+            <ul>
+                <li>负责<strong>平台架构设计</strong>，采用组件化、插件化设计，支持<strong>多输入源</strong>（图片/视频/文件夹/摄像头/实时流）统一接入与权重动态切换，内置 40+ 私有模型权重，可在<strong>毫秒级输出结果</strong>并直观展示检测信息与置信度。</li>
+                <li>完成<strong>模块看护与重构</strong>，优化引擎响应与界面可扩展性；编写集成测试与<strong>问题定界定位</strong>，确保多模块协同稳定运行。</li>
+                <li><strong>项目职责：</strong>架构师、评审员、细节打磨与迭代、UI 设计与样式优化、测试。</li>
+                <li><strong>项目成果：</strong>开源获 <span class="hl-red">110+ GitHub Star</span>、社区 50+ 人、B站演示 20K+ 播放；平台架构已复用到多个衍生项目。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 科研成果与获奖荣誉 -->
+    <div class="section">
+        <div class="section-title">科研成果与获奖荣誉</div>
+        <ul>
+            <li>SCI 论文 2 篇 ｜ 发明专利 1 项 ｜ 软著 <span class="hl-red">×5</span> ｜ 国家励志奖学金 <span class="hl-red">×2</span> ｜ 电子科技大学优秀研究生 ｜ BOE 全球创新挑战赛二等奖 ｜ 湖北省"华为云杯"二等奖 ｜ 学业奖学金一等奖 <span class="hl-red">×2</span></li>
+            <li>第九届全国大学生生物医学工程创新设计竞赛 <span class="hl-red">全国一等奖</span>（2024）· 第八届 <strong>全国二等奖</strong>（2023）· 四川省生物医学工程创新设计大赛 <span class="hl-red">一等奖 ×4</span></li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -496,5 +496,37 @@
         "有软件开发、自动化测试、性能测试项目或实习经验者优先"
       ]
     }
+  },
+  {
+    "index": "33",
+    "company": "米哈游 · 提前批/上海",
+    "role": "平台研发-运维开发工程师",
+    "direction": "平台研发 / DevOps · 基础设施自动化",
+    "tags": [
+      "DevOps",
+      "基础设施自动化",
+      "Python",
+      "网络与并发编程"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_mihoyo_ops.html",
+    "match": "high",
+    "applyLink": "https://jobs.mihoyo.com/?recommendationCode=NDE3&isRecommendation=true#/campus/position/8910",
+    "jobId": "8910",
+    "jobTitle": "【提前批-平台研发】运维开发工程师",
+    "location": "上海",
+    "jd": {
+      "duty": [
+        "作为 DevOps 一员，参与各类基础设施自动化系统的开发",
+        "参与优化开发流程，优化公有云资源管理",
+        "参与基础设施自动化平台的标准制定与文档建设"
+      ],
+      "req": [
+        "2027 届本科及以上，计算机相关专业",
+        "熟悉 Go/Python 中至少一种，有一定开发经验",
+        "熟悉网络编程或并发编程，理解 TCP/IP、HTTP 等协议",
+        "了解计算机体系结构与操作系统，熟练掌握常用数据结构与算法"
+      ]
+    }
   }
 ]
