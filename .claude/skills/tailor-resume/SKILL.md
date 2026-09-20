@@ -7,7 +7,9 @@ description: 根据用户提供的岗位 JD，生成一份高度适配该岗位�
 
 ## 这个技能做什么
 
-用户给出一个岗位 JD，你产出**一份针对该岗位定制的单页 A4 HTML 简历**，放在 `resume/` 目录下，文件名形如 `resume_<公司或岗位>.html`。核心价值是**适配性**：不是把所有经历平铺，而是按 JD 的职责与要求重新编排、取舍、排序、措辞，让 HR 一眼看出"这个人就是为这个岗位来的"。
+用户给出一个岗位 JD，你产出**一份针对该岗位定制的单页 A4 HTML 简历**，放在 `resume/resume_qz/` 目录下（**全部为秋招简历**），文件名形如 `resume_<公司或岗位>.html`。核心价值是**适配性**：不是把所有经历平铺，而是按 JD 的职责与要求重新编排、取舍、排序、措辞，让 HR 一眼看出"这个人就是为这个岗位来的"。
+
+> **目录约定（2026-09 起）**：`resume/resume_qz/` 放**秋招**简历，`resume/resume_sx/` 放**暑期实习**简历（历史遗留，不再新增）。本技能只产出 `resume_qz/` 下的秋招简历。
 
 ## 信息来源（务必遵守）
 
@@ -37,7 +39,11 @@ description: 根据用户提供的岗位 JD，生成一份高度适配该岗位�
 ## 输出规范
 
 - **单个 HTML 文件**，无外部依赖（不引 FontAwesome 等 CDN；图标/emoji 一律不用）。头像走站内相对路径 `/imgs/life_and_others/myavtar.png`。
-- **A4 单页**：用 `.page` 容器（`width: 210mm; min-height: 297mm`），含 `@media print` 打印适配，Ctrl+P 可另存为干净 A4 PDF。完整 CSS 见 `assets/template.html`——**直接复用该文件的 CSS**，不要重新发明样式。
+- **A4 单页**：用 `.page` 容器（`width: 210mm; min-height: 297mm`），含 `@media print` 打印适配，Ctrl+P 可另存为干净 A4 PDF。完整 CSS 见 `assets/template.html`——**直接复用该文件的 CSS**，不要重新发明样式。模板里的 `@page { size: A4; margin: 5mm 10mm }` 与打印时的字号压缩块**必须保留**，原因见下。
+
+  > **单页 A4 的坑（务必理解）**：屏幕上 `.page` 自带 `padding: 7mm 11mm`；打印时该内边距归零、只留 `@page margin`，**可用宽度反而变窄**，文字重排后更高，很容易溢出到第二页。所以模板的 `@media print` 里同时做了两件事：① 给 `body` 设 `font-size: 9.8px` 并逐块收紧字号/行高；② 用 `@page { size: A4 }` 锁定纸张。**不要删掉任何一条**。
+  >
+  > **验证单页的正确方法**：`playwright-cli pdf` 会强制输出 Letter（612×792pt）**且忽略 CSS 的 `@page`**，用它验证会误判成"溢出两页"。要验证必须走 Chrome 的 `page.pdf({ preferCSSPageSize: true })`（经 `playwright-cli run-code`），再用 pymupdf 检查：页数应为 1，尺寸应为 **595×842pt**，正文末尾 y 值应明显小于 842。
 - **风格对齐 cv/index.html**：居中 header（头像 + 信息块）、左侧 4px 黑色色条 `.section-title`、`.subsection` 间浅灰分隔线、`.label-link`（灰）/ `.github-label-link`（绿）两类标签链接。
 - **教育背景必须包含学院与研究方向**：每条教育经历的 `.subsection-title` 必须写"学校 · 学院 · 专业 · 学历"（学院不可省，如"生命科学与技术学院""信息工程学院"，从 cv/resume 或 profile-inventory 取真实学院名）。`.date` 行之后追加一行 `<div class="tech-line"><em>研究方向：</em>方向1 · 方向2 · 方向3</div>`。方向关键词从 JD 职责中提取（如 JD 提"信号处理""医学影像""智能化应用"，就把对应方向写进去），让教育背景直接呼应岗位需求。硕士研究方向偏科研/学术，本科研究方向偏基础/技术。
 - **专业技能用流式文本，不用按钮/标签样式**：去掉 `.skill` `.skill.primary` 的灰底边框按钮感，改用 `.skill-line` + `.skill-cat` + `.skill-hl` 的纯文本流式排版。格式为两行：`<div class="skill-line"><span class="skill-cat">分类名：</span><span class="skill-hl">核心技能1</span> · 技能2 · <span class="skill-hl">核心技能3</span> · ...</div>`。`.skill-cat` 分类标题加粗黑色，`.skill-hl` 核心技能加粗深色突出，其余技能保持灰色常规字重，用 ` · ` 中点分隔。紧凑、省空间、更像传统专业简历。**该板块可按需删除**：当单页空间紧张、或 JD 不强调技能清单、或用户要求精简时，可整块去掉专业技能板块，把空间让给项目/成果——技能关键词已在"个人优势"与项目描述中体现即可。
@@ -52,36 +58,69 @@ description: 根据用户提供的岗位 JD，生成一份高度适配该岗位�
 ## 工作流程
 
 1. Read `cv/index.html` 和 `resume/index.html`，Read `references/profile-inventory.md`。
-2. 与用户确认 JD（如果用户已在消息里给出就直接用；若 JD 模糊，问一句要"公司+岗位名"用于命名文件和求职意向行）。
+2. 与用户确认 JD（如果用户已在消息里给出就直接用；若 JD 模糊，问一句要"公司+岗位名"用于命名文件和求职意向行）。**同时必须拿到该岗位的「投递链接」**——它是卡片墙的必填字段，见第 5 步。
 3. 按"JD 适配方法论"拆解、映射、重排、改写。
-4. Read `assets/template.html`，基于它的 CSS 结构填充定制内容，Write 到 `resume/resume_<公司或岗位>.html`。
-5. **更新简历墙数据源**：把新简历追加进 `resume/tailored.json`（这是卡片墙 `resume/tailored.html` 的数据源，页面会读取它动态渲染卡片，所以这一步**必做**，否则新简历不会出现在墙上）。追加规范见下方"简历墙数据源规范"。
+4. Read `assets/template.html`，基于它的 CSS 结构填充定制内容，Write 到 `resume/resume_qz/resume_<公司或岗位>.html`。
+5. **更新简历墙数据源**：把新简历追加进 `resume/tailored.json`（这是卡片墙 `resume/tailored.html` 的数据源，页面会读取它动态渲染卡片，所以这一步**必做**，否则新简历不会出现在墙上）。追加规范见下方"简历墙数据源规范"，**其中秋招卡片必须带 `applyLink` 与 `jd`**。
 6. 生成后简述：你按 JD 强调了哪几点、前置了哪些板块、删掉了哪些无关内容，让用户快速核对适配方向是否正确。并提示可用浏览器 Ctrl+P 预览 A4。
+
+## 投递链接从哪来（重要）
+
+**不要凭记忆编造投递链接**，必须取自项目里的真实岗位数据：
+
+- 岗位池：`tracker/tracker.pool.json`（含 `id` / `title` / `company` / `city` / `score`）
+- 完整 JD + 投递链接：`data/offerio_by_company_state.json`，按公司名索引，每条含 `applyLink` / `responsibilities` / `requirements` / `detail` / `location`
+
+先用**公司名 + 岗位名**在 `data/offerio_by_company_state.json` 里定位该岗位，取其 `applyLink`。北森系（`*.zhiye.com`）链接形如 `https://<tenant>.zhiye.com/campus/detail?jobAdId=<uuid>`。
+
+拿到链接后**务必实际打开验证能访问**（`playwright-cli goto` 后看页面是否渲染出岗位标题与 JD），确认无误再写入 JSON。若数据源里查不到该岗位的链接，**停下来问用户要**，不要猜一个填进去。
+
+> 注意：数据源里的 `location` 可能与线上页面不一致（岗位开放城市会变）。写卡片时**以线上页面实际显示的城市为准**。
 
 ## 简历墙数据源规范
 
-`resume/tailored.json` 是一个 JSON 数组，每个元素对应一份定制简历的一张卡片。生成新简历后，向数组**末尾追加**一个对象。字段：
+`resume/tailored.json` 是一个 JSON 数组，每个元素对应一份定制简历的一张卡片。生成新简历后，向数组**末尾追加**一个对象。
+
+**秋招卡片（`resume_qz/`，本技能产出的唯一类型）字段**：
 
 ```json
 {
-  "index": "07",
+  "index": "33",
   "company": "公司 · 批次/地点",
   "role": "岗位名称",
   "direction": "方向短语（如 AI Agent / RAG / 算法）",
   "tags": ["标签1", "标签2", "标签3", "标签4"],
-  "date": "YYYY.MM",
-  "url": "/resume/resume_xxx.html",
-  "match": "high" 
+  "date": "2026.09",
+  "url": "/resume/resume_qz/resume_xxx.html",
+  "match": "high",
+  "applyLink": "https://xxx.zhiye.com/campus/detail?jobAdId=<uuid>",
+  "jobId": "J13398",
+  "jobTitle": "测试开发工程师",
+  "location": "合肥 / 武汉 / 西安 / 苏州",
+  "jd": {
+    "duty": ["职责1", "职责2", "职责3", "职责4"],
+    "req": ["要求1", "要求2", "要求3", "要求4"]
+  }
 }
 ```
 
 要点：
-- `index`：两位序号，接续现有最大值 +1（现有最大是 06，新简历就是 07）。同时把 `resume/tailored.html` 里 section 标题硬编码的 `/ 06` 改成实际总数（例如 7 份就改成 `/ 07`）。
-- `url`：站内相对路径，指向第 4 步生成的 html。
+
+- `index`：两位序号，接续现有最大值 +1。**总数不用手动改**——`tailored.html` 的标题计数与筛选按钮徽标都是从 JSON 实时算出来的。
+- `url`：站内相对路径，指向第 4 步生成的 html，**必须在 `/resume/resume_qz/` 下**（卡片墙靠这段路径判定"秋招"并渲染 `applyLink` / `jd`；`/resume/resume_sx/` 的卡片不渲染这两项）。
 - `match`：匹配度。填 `"high"` 显示"高匹配"绿徽章；普通岗位留空字符串 `""`。判断依据：JD 核心要求与你背景高度对口（如 AI Agent 岗 + 你有 NEURA）才算 high，不要滥用。
-- `tags`：3–4 个，用 JD 关键词，与简历里 primary 高亮的技能呼应。
-- 追加时**保持 JSON 合法**（逗号、引号、无尾逗号）。追加后无需改 `tailored.html` 卡片结构——它会 fetch 这个 JSON 渲染。
+- `tags`：3–4 个，用 JD 关键词，与简历里高亮的技能呼应。
+- **`applyLink`（秋招必填）**：官方投递页直链，取自 `data/offerio_by_company_state.json`，并实际打开验证过。卡片上渲染成可点击的「投递链接」按钮，新标签页打开。
+- **`jobId` / `jobTitle` / `location`**：岗位编号、岗位名、工作地点。`jobId` 显示在投递链接旁（如"岗位编号 J13398"），`location` 显示在 JD 面板首行。`jobTitle` 用于对照线上岗位。
+- **`jd`（秋招必填）**：`duty`（岗位职责）与 `req`（任职要求）各 **2–4 条短句**。卡片上是折叠面板，点「岗位 JD」展开，所以**要压缩改写**成适合卡片宽度的短句，不要照搬带「1、2、3、」序号的长原文。职责要覆盖 JD 的核心工作内容，要求要覆盖学历/语言/经验等硬门槛。
+- 追加时**保持 JSON 合法**（逗号、引号、无尾逗号）。追加后无需改 `tailored.html`——它 fetch 这个 JSON 动态渲染，筛选、计数、JD 面板全自动。
 - 若是**重新生成/更新**一份已有简历（同公司同岗），不要新增卡片，而是更新 JSON 里对应那条记录（按 url 或 company 匹配）。
+
+### 卡片墙交互约定（改 `tailored.html` 时须知）
+
+- 卡片是 `<div class="card">` + **覆盖式链接** `<a class="card-hit">`，**不是** `<a class="card">`。原因：卡片内要放「投递链接」和「岗位 JD」按钮，而 `<a>` 里套 `<a>` 是非法 HTML，浏览器会提前闭合外层 `<a>`，把这两个元素挤出卡片。**不要改回 `<a>` 包裹整个卡片。**
+- `.apply-row` / `.jd-panel` 需保持 `position: relative; z-index: 2`，才能盖在覆盖链接之上被点到。
+- 整卡点击（打开简历）与卡内按钮点击（开投递页 / 展开 JD）由 `grid` 上的事件委托区分，不要给卡片加 `onclick`。
 
 
 ## 何时问、何时直接做
