@@ -273,6 +273,20 @@
             margin-right: 5px;
         }
 
+        /* Print：@page margin 为 0 时浏览器自动省略页眉页脚（日期/标题水印），
+           页面留白由 .container 自身 padding 提供 */
+        @media print {
+            @page { size: A4; margin: 0; }
+            body {
+                background: #fff;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             body {
