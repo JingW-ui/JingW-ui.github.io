@@ -237,5 +237,32 @@
     "applyLink": "https://campus.kuaishou.cn/recruit/campus/e/#/campus/job-info/12689",
     "resume": "",
     "stage": "wish"
+  },
+  {
+    "id": "beisen_190842318",
+    "title": "测试开发工程师(J13398)",
+    "company": "科大讯飞",
+    "city": "成都",
+    "score": 50.4,
+    "directions": [
+      "测试开发"
+    ],
+    "skills": [
+      "Python",
+      "Shell",
+      "自动化测试",
+      "Agent 评测",
+      "软件测试全流程",
+      "工程化"
+    ],
+    "majorGate": [
+      "计算机相关"
+    ],
+    "salary": "",
+    "publishDate": "",
+    "deadline": "",
+    "applyLink": "https://iflytek.zhiye.com/campus/detail?jobAdId=bdc6ccf0-1956-4aa1-994d-fe8605e607bf",
+    "resume": "/resume/resume_qz/resume_iflytek_qa.html",
+    "stage": "applied"
   }
 ]
