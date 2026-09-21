@@ -193,16 +193,12 @@
             font-weight: 600;
         }
         @media print {
-            /* 打印时正文略缩，把内容压进 A4 单页：
-               屏幕上 .page 自带 7mm/11mm 内边距，打印时该内边距归零、
-               只留 @page margin，可用宽度反而变窄，文字重排后变高。
-               这里统一到同一套尺寸，避免出现第二页。 */
+            /* 所见即所得：打印沿用屏幕字号，不做压缩，仅去掉页面装饰 */
             @page { size: A4; margin: 5mm 10mm; }
             body {
                 background: #fff;
                 padding: 0;
                 display: block;
-                font-size: 9.8px;
             }
             .page {
                 box-shadow: none;
@@ -210,16 +206,10 @@
                 min-height: auto;
                 padding: 0;
             }
-            .summary { font-size: 10px; line-height: 1.38; }
-            li { font-size: 10px; line-height: 1.27; margin-bottom: 0; }
-            .skill-line, .tech-line { font-size: 10px; line-height: 1.4; margin-bottom: 1px; }
-            .section { margin-bottom: 3px; }
-            .section-title { font-size: 12px; margin-bottom: 2px; }
-            .subsection { margin-bottom: 1px; padding-bottom: 1px; }
-            .subsection-title { font-size: 11px; }
-            .date { font-size: 9.5px; }
         }
-        @media (max-width: 820px) {
+        /* 必须限定 screen：A4 打印视口宽约 794px < 820px，
+           不加 screen 时打印会误触移动端布局，header 变上下排列 */
+        @media screen and (max-width: 820px) {
             body {
                 padding: 10px;
             }
