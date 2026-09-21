@@ -190,9 +190,8 @@
         }
         @media print {
             /* 所见即所得：打印沿用屏幕字号，不做压缩，仅去掉页面装饰。
-               @page margin 为 0 时浏览器自动省略页眉页脚（日期/标题水印），
-               页面留白由 .page 自身 padding（7mm 11mm）提供，与屏幕一致。 */
-            @page { size: A4; margin: 0; }
+               @page 保留 5mm 10mm 页边距；页面留白由 .page 自身 padding 提供 */
+            @page { size: A4; margin: 5mm 10mm; }
             body {
                 background: #fff;
                 padding: 0;
