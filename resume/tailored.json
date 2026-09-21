@@ -872,5 +872,38 @@
         "具备大模型 Agent 开发、RAG 知识库调优经验；逻辑思维与沟通执行力强"
       ]
     }
+  },
+  {
+    "index": "45",
+    "company": "字节跳动 · 2027 届前沿技术校招/杭州",
+    "role": "Agentic AI Coding 关键技术研究-TRAE",
+    "direction": "Agentic AI Coding / LLM Agent",
+    "tags": [
+      "Agentic",
+      "AI Coding",
+      "Agent",
+      "RAG"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_bytedance_trae.html",
+    "match": "high",
+    "applyLink": "https://jobs.bytedance.com/campus/position/7628618212869998853/detail",
+    "jobId": "A134673",
+    "jobTitle": "面向复杂软件工程项目的Agentic AI Coding关键技术研究-TRAE",
+    "location": "杭州",
+    "jd": {
+      "duty": [
+        "研究长序列代码与跨模块上下文建模，提升大模型对复杂软件项目的语义理解",
+        "优化模型微调与强化学习策略，构建高泛化、行业适配的大模型",
+        "集成领域知识库与 RAG，保障生成代码符合行业标准与安全合规",
+        "构建自我进化的 AI Coding 多智能体系统，实现复杂应用端到端全栈开发"
+      ],
+      "req": [
+        "2027 届毕业，博士学位，人工智能/计算机/数学/软件工程相关专业优先",
+        "优秀代码能力与数据结构、算法功底，熟练 C/C++、Python",
+        "熟悉大模型算法，有 NLP、大模型训练、强化学习（RL）经验者优先",
+        "有 NeurIPS/ICML/ICSE/ASE 等国际顶会论文者优先"
+      ]
+    }
   }
 ]
