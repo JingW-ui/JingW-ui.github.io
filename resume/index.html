@@ -329,9 +329,13 @@
 
         /* Print */
         @media print {
-            /* @page margin 为 0 时浏览器自动省略页眉页脚（日期/标题水印）；
-               页面留白改由 .page 自身 padding 提供，布局与屏幕所见一致 */
-            @page { size: A4; margin: 0; }
+            /* 多页打印：分页边距必须由 @page 提供——.page 的 padding 只作用于
+               整个文档的开头/结尾，跨页处会内容贴纸边。@page 上下左右留白后，
+               每一页（含第 1 页页尾、第 2+ 页页眉页尾）都有呼吸感。
+               .page 打印时 padding 归零避免双重边距，屏幕所见与打印一致。
+               注意：margin 非 0 时浏览器默认会打印页眉页脚（日期/标题水印），
+               导出时在打印对话框取消勾选"页眉和页脚"即可。 */
+            @page { size: A4; margin: 18mm 16mm; }
             body {
                 background: #fff;
                 padding: 0;
@@ -340,6 +344,7 @@
                 box-shadow: none;
                 width: auto;
                 min-height: auto;
+                padding: 0;
             }
             .header {
                 box-shadow: none !important;
