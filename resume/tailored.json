@@ -528,5 +528,349 @@
         "了解计算机体系结构与操作系统，熟练掌握常用数据结构与算法"
       ]
     }
+  },
+  {
+    "index": "34",
+    "company": "万宝盛华 · 武汉·光谷东",
+    "role": "后端开发工程师（Python/Java）",
+    "direction": "Python 后端",
+    "tags": [
+      "Python",
+      "Django",
+      "MySQL",
+      "接口开发"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_wanbaoshenghua_backend.html",
+    "match": "",
+    "applyLink": "https://www.zhipin.com/job_detail/eb29f1834a13d0ef0nF62Nm5F1NR.html",
+    "jobId": "eb29f1834a13d0ef0nF62Nm5F1NR",
+    "jobTitle": "高薪急聘后端开发工程师14-16薪",
+    "location": "武汉",
+    "jd": {
+      "duty": [
+        "负责搜索、推荐、NLP 等 Python 领域服务的开发、重构与性能调优",
+        "负责语音中台等引擎封装与人脸/行为识别等模块的 Java 后端开发"
+      ],
+      "req": [
+        "精通 Flask/Django 或 Spring/MyBatis 之一，有多个实际项目经验",
+        "熟悉 MySQL/Redis/ES/MongoDB 等中间件，有高并发可用性设计经验",
+        "有算法基础或搜索推荐 NLP 背景优先"
+      ]
+    }
+  },
+  {
+    "index": "35",
+    "company": "轻度科技 · 武汉·洪山区",
+    "role": "全栈工程师",
+    "direction": "AI 全栈",
+    "tags": [
+      "全栈",
+      "LLM",
+      "RAG",
+      "AI 工具"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_qingdu_fullstack.html",
+    "match": "",
+    "applyLink": "https://www.zhipin.com/job_detail/51591772c11962f40nJ82ti9F1pZ.html",
+    "jobId": "51591772c11962f40nJ82ti9F1pZ",
+    "jobTitle": "全栈工程师",
+    "location": "武汉",
+    "jd": {
+      "duty": [
+        "参与前后端功能模块开发，独立完成需求分析到部署上线全流程",
+        "探索 LLM/AIGC 落地，开发智能问答、RAG、Prompt 工程等 AI 功能",
+        "撰写技术文档，推动 AI 工程化与全栈架构知识积累"
+      ],
+      "req": [
+        "本科及以上计算机相关专业，数据结构/算法/网络基础扎实",
+        "至少一门后端语言（Go/Python/Java）+ 一门前端技术（React/Vue）",
+        "对大模型/AI Agent 有钻研精神，熟练使用 Copilot/Cursor 等 AI 工具",
+        "需线下面试，暂不考虑未毕业同学"
+      ]
+    }
+  },
+  {
+    "index": "36",
+    "company": "瑞达天润 · 成都·青羊区",
+    "role": "全栈开发工程师",
+    "direction": "Web 全栈",
+    "tags": [
+      "Vue",
+      "Python/Java",
+      "MySQL",
+      "Linux"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_ruida_fullstack.html",
+    "match": "",
+    "applyLink": "https://www.zhipin.com/job_detail/7278a9881845afe20nN-3966FVNU.html",
+    "jobId": "7278a9881845afe20nN-3966FVNU",
+    "jobTitle": "全栈开发工程师",
+    "location": "成都",
+    "jd": {
+      "duty": [
+        "负责产品前后端全栈开发：Vue.js 前端 + Python/Java 后端",
+        "参与系统架构设计、数据库设计与 SQL 优化",
+        "负责 Linux 环境部署与线上运维，编写技术/接口文档"
+      ],
+      "req": [
+        "计算机相关专业本科及以上，3 年以上全栈开发经验",
+        "精通 Vue 全家桶（Vuex/Router/Pinia）与 HTML5/CSS3/TS",
+        "至少精通 Python（Django/Flask/FastAPI）或 Java 后端栈"
+      ]
+    }
+  },
+  {
+    "index": "37",
+    "company": "成都大川信安 · 成都·武侯区",
+    "role": "全栈开发工程师（安全产品）",
+    "direction": "Java/Python 全栈",
+    "tags": [
+      "Java",
+      "Spring Boot",
+      "Python",
+      "全栈"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_dachuan_fullstack.html",
+    "match": "",
+    "applyLink": "https://www.zhipin.com/job_detail/8b32f89191d624dd0nN82tu6F1VQ.html",
+    "jobId": "8b32f89191d624dd0nN82tu6F1VQ",
+    "jobTitle": "全栈开发工程师",
+    "location": "成都",
+    "jd": {
+      "duty": [
+        "安全产品全栈研发：Java 后端 + Vue 前端 + Python 桌面端/服务端",
+        "数据库设计优化、Linux 部署与线上问题排查",
+        "参与串口、USB HID、SDK/FFI 等硬件接口对接与软硬件联调"
+      ],
+      "req": [
+        "本科及以上计算机相关专业，1-3 年开发经验",
+        "熟练 Java + Spring Boot/MyBatis，熟练 Python，熟悉 Vue",
+        "熟悉 Linux/MySQL 与 Git/Maven，了解 Redis/MongoDB 与网络安全"
+      ]
+    }
+  },
+  {
+    "index": "38",
+    "company": "上海通向测控 · 武汉·汉阳区",
+    "role": "Python 自动化测试工程师",
+    "direction": "自动化测试平台",
+    "tags": [
+      "自动化测试",
+      "Python",
+      "Django",
+      "YOLO/LLM"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_tongxiang_auto.html",
+    "match": "high",
+    "applyLink": "https://www.zhipin.com/job_detail/c54427151905c0400nF43dW4E1ZZ.html",
+    "jobId": "c54427151905c0400nF43dW4E1ZZ",
+    "jobTitle": "python自动化测试工程师",
+    "location": "武汉",
+    "jd": {
+      "duty": [
+        "负责自动化测试平台后端开发：用例管理、任务调度、报告生成",
+        "对接安卓车机 ADB/UiAutomator2 自动化脚本，设备池管理与批量执行",
+        "接口开发与调试，优化平台执行链路与稳定性"
+      ],
+      "req": [
+        "大专及以上计算机相关专业，1 年以内经验，优秀应届生可投递",
+        "熟练 Python，了解 Django/Flask/FastAPI 任一框架",
+        "熟悉接口开发与 MySQL；有 YOLO/LLM 模型经验更优"
+      ]
+    }
+  },
+  {
+    "index": "39",
+    "company": "H5科技 · 成都",
+    "role": "AI 全栈开发工程师",
+    "direction": "AI 应用全栈",
+    "tags": [
+      "AI 全栈",
+      "RAG",
+      "Agent",
+      "LangChain"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_h5_ai_fullstack.html",
+    "match": "high",
+    "applyLink": "https://www.zhipin.com/job_detail/e520939077c216960nJ-2d25GFpW.html",
+    "jobId": "e520939077c216960nJ-2d25GFpW",
+    "jobTitle": "AI全栈开发工程师",
+    "location": "成都",
+    "jd": {
+      "duty": [
+        "AI 应用全栈开发：智能问答、内容生成、Agent 工作流",
+        "基于 LangGraph/Dify/LangChain 开发可复用 AI 服务 API 与多 Agent 编排",
+        "RAG 数据与 Embedding 检索链路优化；后端 Python/Java，前端 Vue3/React"
+      ],
+      "req": [
+        "计算机/AI 相关专业本科及以上，至少 1 年 AI 应用开发经验",
+        "精通 Python 或 Java，熟悉 FastAPI/Spring Boot 等框架",
+        "熟悉 RAG 全流程、向量数据库、Prompt Engineering 与 Function Calling"
+      ]
+    }
+  },
+  {
+    "index": "40",
+    "company": "外企德科数字 · 成都·郫都区",
+    "role": "Python 后端开发工程师",
+    "direction": "Python 后端",
+    "tags": [
+      "Python",
+      "Django",
+      "MySQL",
+      "Linux"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_fesco_python.html",
+    "match": "",
+    "applyLink": "https://www.zhipin.com/job_detail/93064638d87cb2b90nZ83t-5GVFX.html",
+    "jobId": "93064638d87cb2b90nZ83t-5GVFX",
+    "jobTitle": "python后端开发工程师",
+    "location": "成都",
+    "jd": {
+      "duty": [
+        "参与后端服务需求分析、架构设计与核心代码开发",
+        "使用 Python 完成接口开发、业务逻辑、数据交互与优化",
+        "数据库设计、SQL 优化、缓存设计；配合联调上线与问题排查"
+      ],
+      "req": [
+        "本科及以上理工科相关专业",
+        "扎实 Python 基础，熟悉 Django/Flask/FastAPI",
+        "熟悉 MySQL/Redis/MQ 等中间件、Linux、Git 与 RESTful 规范"
+      ]
+    }
+  },
+  {
+    "index": "41",
+    "company": "红鲤文化 · 武汉·江夏区",
+    "role": "全栈开发工程师（AI 应用方向）",
+    "direction": "AI 应用全栈",
+    "tags": [
+      "全栈",
+      "AI 应用",
+      "MySQL",
+      "AI 编程工具"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_hongli_ai_fullstack.html",
+    "match": "",
+    "applyLink": "https://www.zhipin.com/job_detail/db24a017e8ab18b20nF83tq8FVFQ.html",
+    "jobId": "db24a017e8ab18b20nF83tq8FVFQ",
+    "jobTitle": "全栈开发工程师（AI 应用方向）",
+    "location": "武汉",
+    "jd": {
+      "duty": [
+        "业务系统与 AI 应用相关功能的前后端开发",
+        "模型调用、内容生成、文件处理等 AI 应用基础能力建设",
+        "使用 AI 编程工具提效，负责联调、问题排查与上线迭代"
+      ],
+      "req": [
+        "能独立完成小型 Web/后台系统全栈开发",
+        "熟悉 Vue/React 之一 + Python/FastAPI/Django 之一",
+        "熟悉 MySQL 等数据库；能用 AI 编程工具并调试、修改生成代码"
+      ]
+    }
+  },
+  {
+    "index": "42",
+    "company": "乐政科技 · 成都·武侯区",
+    "role": "全栈开发工程师（AI 方向）",
+    "direction": "AI 全栈",
+    "tags": [
+      "AI 全栈",
+      "RAG",
+      "Agent",
+      "Claude Code"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_lezheng_ai_fullstack.html",
+    "match": "",
+    "applyLink": "https://www.zhipin.com/job_detail/bf78e99cfc2c28760nJ-2ty8F1FY.html",
+    "jobId": "bf78e99cfc2c28760nJ-2ty8F1FY",
+    "jobTitle": "全栈开发工程师（AI方向）",
+    "location": "成都",
+    "jd": {
+      "duty": [
+        "AI 产品全栈开发：前端、后端、数据库及 AI 能力集成",
+        "集成 LLM 搭建 RAG 知识库、向量检索系统与 AI 智能体",
+        "设计自动化处理流、任务调度引擎与质量护栏，Docker/K8s 容器化部署"
+      ],
+      "req": [
+        "本科及以上计算机/AI 相关专业，3-5 年全栈或 AI 开发经验",
+        "精通 Python（FastAPI/Flask/Django）或 Java（Spring Boot）",
+        "熟悉 MySQL/Redis，有 RAG 实际搭建与 Prompt 工程经验",
+        "熟练使用 Cursor、Claude Code 等 AI 工具"
+      ]
+    }
+  },
+  {
+    "index": "43",
+    "company": "零食有鸣 · 成都",
+    "role": "全栈开发工程师（AI 方向）",
+    "direction": "AI 全栈",
+    "tags": [
+      "AI 平台",
+      "Agent",
+      "全栈",
+      "CI/CD"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_lingshi_ai_fullstack.html",
+    "match": "",
+    "applyLink": "https://www.zhipin.com/job_detail/76afea0bd3f169d80nB83dW0FVdV.html",
+    "jobId": "76afea0bd3f169d80nB83dW0FVdV",
+    "jobTitle": "全栈开发工程师（AI方向）",
+    "location": "成都",
+    "jd": {
+      "duty": [
+        "AI 应用平台及业务系统全栈开发：Web 前端、后端服务、API 接口及系统集成",
+        "推动 Agent 调用、知识库接入、工作流编排等 AI 能力工程化落地",
+        "服务端接口设计、核心业务逻辑开发及数据库结构设计"
+      ],
+      "req": [
+        "本科及以上计算机相关专业，2 年以上前后端开发经验",
+        "掌握 Python、Node.js（TypeScript）或 Java 至少一种",
+        "了解 CI/CD、自动化测试、代码规范及 AI Native 开发模式"
+      ]
+    }
+  },
+  {
+    "index": "44",
+    "company": "长飞光纤 · 秋招/武汉",
+    "role": "研发工程师（大模型应用工程师）",
+    "direction": "大模型应用 / Agent · RAG 与知识图谱",
+    "tags": [
+      "大模型应用",
+      "Agent 开发",
+      "RAG 知识库",
+      "知识图谱"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_changfei_llm.html",
+    "match": "high",
+    "applyLink": "https://yofc2.zhiye.com/campus/detail?jobAdId=48d523c9-026c-473c-8cfe-c7a88aca3718",
+    "jobId": "48d523c9-026c-473c-8cfe-c7a88aca3718",
+    "jobTitle": "研发工程师（大模型应用工程师）",
+    "location": "湖北省·武汉市",
+    "jd": {
+      "duty": [
+        "参与大语言模型项目落地调研与需求整理，结合业务场景完成智能体（Agent）开发的可行性分析与架构设计",
+        "搭建企业 RAG 知识库、工业场景知识图谱及训练语料库，负责数据清洗、标注与增强",
+        "负责工业场景下的 Agent、Skill、MCP 等技术开发与落地",
+        "跟踪大模型前沿动态，预研新模型、新技术与新工具并推动应用"
+      ],
+      "req": [
+        "本科及以上，计算机科学 / 数学 / 人工智能 / 数据科学等相关专业（研究生优先）",
+        "了解 PyTorch / TensorFlow 等深度学习框架，具备基础 Python 开发能力",
+        "了解大模型原理、模型微调、提示词工程、RAG 与知识图谱",
+        "具备大模型 Agent 开发、RAG 知识库调优经验；逻辑思维与沟通执行力强"
+      ]
+    }
   }
 ]

@@ -1,18 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<!--
-  A4 定向简历模板 — tailor-resume 技能使用说明：
-  1. 直接复用本文件的全部 CSS，不要重新发明样式。
-  2. 只改 body 内的内容：header 个人信息、各 section 标题与条目。
-  3. 按 JD 适配方法论重排板块顺序、取舍内容、改写措辞。
-  4. 高亮与 JD 最相关的技能标签用 class="skill primary"（灰底黑字加粗，勿用深色填充背景）。
-  5. 不写政治面貌；不用 icon/emoji；不引外部 CDN。
--->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
-    <title>简历 · 岗位 / 公司</title>
+    <title>简历 · 王京 · 全栈开发工程师（瑞达天润）</title>
     <style>
         * {
             margin: 0;
@@ -243,20 +235,20 @@
         @media print {
             .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
         }
+    
+        .hl-red { color: #fd0000; font-weight: 600; }
     </style>
 </head>
 <body>
-
 <div class="page">
-    <!-- Header：个人信息（不写政治面貌） -->
     <div class="header">
         <div class="profile-container">
             <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
             <div class="profile-info">
                 <div class="name">王京</div>
-                <div class="target">求职意向：XX岗位 / XX方向（公司名）</div>
+                <div class="target">求职意向：全栈开发工程师（瑞达天润）</div>
                 <div class="contact-info">
-                    男 · 24岁 · 硕士<br>
+                    男 · 24岁 · 重庆<br>
                     电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
                     GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
                     ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
@@ -264,67 +256,94 @@
             </div>
         </div>
     </div>
-
-    <!-- 个人优势：呼应 JD 核心要求，放量化成果 -->
     <div class="section">
         <div class="section-title">个人优势</div>
-        <div class="summary">
-            一段话讲清"为什么适配该岗位"，用 <strong>加粗</strong> 突出关键词，附量化成果。
-        </div>
+        <div class="summary">硕士在读（GPA <span class="hl-red">前 5%</span>），<strong>双栈全栈</strong>实战：独立完成 <strong>Django + MySQL</strong> 检测系统全栈开发（<span class="hl-red">全国二等奖</span>）；负责 <strong>Spring Boot</strong> 考试系统后端接口与数据库设计（校内上线、<span class="hl-red">数百名学生</span>使用）；Vue / HTML / CSS / JS 前端与 Linux 环境开发均有实际项目，开源工具累计 <span class="hl-red">200+ Star</span>。</div>
     </div>
-
-    <!-- 教育背景（每条经历必须含研究方向） -->
     <div class="section">
         <div class="section-title">教育背景</div>
         <div class="subsection">
-            <div class="subsection-title">电子科技大学（985） · 生物医学工程 · 硕士</div>
-            <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授</div>
-            <div class="tech-line"><em>研究方向：</em>医学影像智能分析 · 神经影像处理 · 医疗 AI 与智能化应用</div>
+            <div class="subsection-title">电子科技大学（985） 电子信息大类-生物医学工程 硕士</div>
+            <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富 · 神经信息教育部重点实验室</div>
+            <div class="tech-line"><em>研究方向：</em>医学影像智能分析 · Web 系统与数据库 · 医疗 AI 应用</div>
         </div>
         <div class="subsection">
-            <div class="subsection-title">西南科技大学 · 生物医学工程 · 本科</div>
-            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ 四川省优秀毕业生 · 推免生</div>
-            <div class="tech-line"><em>研究方向：</em>医学信号处理 · 深度学习与目标检测 · 医学图像处理</div>
+            <div class="subsection-title">西南科技大学 电子信息大类-生物医学工程 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ <span class="hl-red">四川省优秀毕业生</span> · 推免资格</div>
+            <div class="tech-line"><em>研究方向：</em>深度学习与目标检测 · Web 系统开发 · 数据库应用</div>
         </div>
     </div>
-
-    <!-- 专业技能：流式文本两行，不用按钮/标签样式 -->
     <div class="section">
         <div class="section-title">专业技能</div>
-        <div class="skill-line">
-            <span class="skill-cat">分类1（与 JD 最相关）：</span><span class="skill-hl">核心技能1</span> · <span class="skill-hl">核心技能2</span> · 普通技能1 · 普通技能2 · 普通技能3
-        </div>
-        <div class="skill-line">
-            <span class="skill-cat">分类2：</span><span class="skill-hl">核心技能3</span> · <span class="skill-hl">核心技能4</span> · 普通技能4 · 普通技能5 · 普通技能6
-        </div>
+            <div class="skill-line"><span class="skill-cat">后端与数据库：</span><span class="skill-hl">Python（Django）</span> · <span class="skill-hl">Java / Spring Boot</span> · <span class="skill-hl">MySQL 表设计与接口开发</span> · Linux · Git</div>
+            <div class="skill-line"><span class="skill-cat">前端与 AI：</span>Vue · HTML5 / CSS3 / JavaScript · <span class="skill-hl">LLM / RAG 应用开发</span> · PyTorch</div>
     </div>
-
-    <!-- 项目/经历：按 JD 相关度排序，最相关的前置 -->
     <div class="section">
-        <div class="section-title">项目经验</div>
+        <div class="section-title">实习经历</div>
         <div class="subsection">
-            <div class="subsection-title">
-                项目名
-                <a class="github-label-link" href="#" target="_blank" rel="noopener">GitHub</a>
-                <a class="label-link" href="#" target="_blank" rel="noopener">链接</a>
-            </div>
-            <div class="date">时间区间</div>
-            <div class="tech-line"><em>技术栈：</em>...</div>
+            <div class="subsection-title">网易互娱 — 游戏测试开发工程师（实习）</div>
+            <div class="date">2026</div>
+            <div class="tech-line"><em>技术栈：</em>Python · LLM · Agent · Skill 开发 · PC 自动化 · Agent/Model 评测</div>
             <ul>
-                <li>用 JD 关键词原词改写的项目描述。</li>
+                <li>面向游戏测试的<strong>远程 PC 自动化</strong>方向，以 agent + skill 替代人工逐台操作，落地 <strong>UU 取号</strong>与 <strong>G66 部署</strong>两个真实业务场景，实现批量并发执行与自动校验，显著压缩环境准备耗时。</li>
+                <li>针对上述场景自主搭建 <strong>Agent 评测系统</strong>，以成功率、耗时、成本三指标量化 agent 与 model 选型；提出「<strong>判世界不判自述</strong>」判题思想，只看操作后世界的真实变化而非模型自述，并设计 L1–L4 能力阶梯题库，业务解耦可复用。</li>
+                <li><strong>项目职责：</strong>业务 skill 设计与开发、评测系统从 0 到 1 搭建（指标定义、判题逻辑、题库设计、结果可视化）。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">心曜医疗 — 算法工程师实习生</div>
+            <div class="date">2026.03 - 2026.06</div>
+            <div class="tech-line"><em>技术栈：</em>Python · LLM · RAG · 向量数据库 · 医疗知识库</div>
+            <ul>
+                <li>负责医疗领域 <strong>RAG 问答系统开发</strong>，结合专业知识库实现智能问答；设计并优化检索增强生成流程，提升问答准确率与响应速度。</li>
+                <li>开发<strong>服务器管理系统</strong>，成员申请添加公钥即可公网访问服务器，安全快捷<a class="label-link" href="https://fwq.heartshinemedical.com/accounts" target="_blank" rel="noopener">访问入口</a>。</li>
+                <li>搭建<strong>同步看板</strong>，多端同步、实时更新<a class="label-link" href="https://onward.heartshinemedical.com/" target="_blank" rel="noopener">在线看板</a>。</li>
+                <li><strong>项目职责：</strong>RAG 问答系统架构设计、知识库构建与优化、问答算法开发；心电信号分析与房颤检测算法研究提升；服务器管理运维与前后端功能开发——覆盖从算法研究到工程落地部署的完整实习链路。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">国网宁夏电力有限公司 — 算法实习生</div>
+            <div class="date">2023.10 - 2023.12</div>
+            <div class="tech-line"><em>技术栈：</em>Python · YOLO · OpenPose · 无人机图像 · 算法开发与部署</div>
+            <ul>
+                <li>学习配电网不停电作业流程，了解操作规范和安全要点；协助采集和处理图像、视频数据，为算法开发提供支持；操作斗臂车与无人机完成模拟作业并采集数据。</li>
+                <li>调研并实现头盔检测、人体姿势估计等算法；<strong>开发基于 Pose 估计的人体危险姿势检测算法</strong>，实现作业安全风险智能预警。</li>
+                <li><strong>项目职责：</strong>采集数据、模拟作业、调研算法并实现；算法在实际作业场景中完成验证。</li>
             </ul>
         </div>
     </div>
-
-    <!-- 其余板块按需保留/删除：实习经历、科研成果、获奖荣誉等 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+        <div class="subsection">
+            <div class="subsection-title">深度学习项目：结直肠癌智能检测与诊断系统<a class="label-link" href="/imgs/competitions/8.png" target="_blank" rel="noopener">证书</a></div>
+            <div class="date">2023.04 - 2023.07</div>
+            <div class="tech-line"><em>技术栈：</em>YOLOv8 · Django · HTML · CSS · MySQL · Python</div>
+            <ul>
+                <li>基于 YOLOv8 网络设计并训练出一种用于结直肠癌图像检测和诊断的模型，并结合 <strong>Django</strong> 框架、HTML、CSS 语言和 <strong>MySQL</strong> 数据库开发出一款结直肠癌智能检测和诊断系统，以帮助医生进行结直肠癌的早期筛查和诊断。</li>
+                <li><strong>项目职责：</strong>主要负责人，独立完成项目，目标检测模型的训练及测试、数据预处理与增强、页面设计及美化、MySQL 数据库设计、接口开发及测试。</li>
+                <li><strong>项目成果：</strong>全国大学生生物医学工程创新设计竞赛<span class="hl-red">全国二等奖</span> · 四川省一等奖。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">Java 前后端项目：C 语言能力考试系统</div>
+            <div class="date">2022.06 - 2022.11</div>
+            <div class="tech-line"><em>技术栈：</em>Spring Boot · MySQL · Java</div>
+            <ul>
+                <li>实验室项目，基于 <strong>Spring Boot</strong> 和 Vue 的网站开发，主要功能包括教师发布考试题目、设置考试时间、编辑学生成绩、系统自动根据教师的设定分配考试题目、学生可预约考试、教师可查看学生考试情况、教师还可设置模拟考试。</li>
+                <li><strong>项目职责：</strong>MySQL 数据库设计，后端接口开发及测试。</li>
+                <li><strong>项目成果：</strong>已投入<span class="hl-red">学校实际使用</span>（内部项目）。</li>
+            </ul>
+        </div>
+    </div>
     <div class="section">
         <div class="section-title">获奖荣誉</div>
         <ul>
-            <li>仅保留与岗位相关或能体现学习能力的获奖。</li>
+            <li>国家级：全国大学生生物医学工程创新设计竞赛<span class="hl-red">一等奖</span>（2024）· 二等奖（2023）</li>
+            <li>省级：四川省生物医学工程创新设计大赛一等奖 ×4 ｜ <span class="hl-red">四川省优秀毕业生</span></li>
+            <li>奖学金：国家励志奖学金 ×2 · 电子科技大学优秀研究生 · 学业奖学金一等奖</li>
+            <li>科研成果：SCI 论文 3 篇 ｜ 发明专利 1 项 · 软件著作权 <span class="hl-red">5 项</span></li>
         </ul>
     </div>
-
 </div>
-
 </body>
 </html>

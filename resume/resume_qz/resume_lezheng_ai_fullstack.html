@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>简历 · 王京 · 全栈开发工程师 AI 方向（乐政科技）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            font-size: 11px;
+            line-height: 1.2;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            padding: 7mm 11mm;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 9px;
+            padding: 0 0 8px;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 100px;
+            height: 110px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .profile-info {
+            text-align: left;
+        }
+        .name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .target {
+            font-size: 13px;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .contact-info a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 7px;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            border-left: 4px solid #333;
+            padding-left: 10px;
+        }
+        .summary {
+            font-size: 11px;
+            color: #444;
+            line-height: 1.55;
+        }
+        .summary strong {
+            color: #1a1a1a;
+        }
+        .subsection {
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 3px;
+        }
+        .date {
+            font-size: 10.5px;
+            color: #999;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .tech-line {
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .tech-line em {
+            font-style: normal;
+            color: #2d74bb;
+            font-weight: 500;
+        }
+        ul {
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 1px;
+            font-size: 11px;
+            color: #555;
+            line-height: 1.45;
+            break-inside: avoid;
+        }
+        .skill-line {
+            font-size: 11px;
+            color: #555;
+            line-height: 1.55;
+            margin-bottom: 6px;
+        }
+        .skill-line:last-child {
+            margin-bottom: 0;
+        }
+        .skill-cat {
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-right: 2px;
+        }
+        .skill-hl {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .label-link {
+            display: inline-block;
+            background-color: #f5f5f5;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .label-link:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .github-label-link {
+            display: inline-block;
+            background-color: #1F883D;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .github-label-link:hover {
+            background-color: #176d31;
+        }
+        @media print {
+            /* 所见即所得：打印沿用屏幕字号，不做压缩，仅去掉页面装饰。
+               项目经验 ≤2 个时内容天然在 A4 单页内，无需缩小字体。 */
+            @page { size: A4; margin: 5mm 10mm; }
+            body {
+                background: #fff;
+                padding: 0;
+                display: block;
+            }
+            .page {
+                box-shadow: none;
+                width: auto;
+                min-height: auto;
+                padding: 0;
+            }
+        }
+        /* 必须限定 screen：A4 打印视口宽约 794px < 820px，
+           若不加 screen，打印/导出 PDF 时会误触移动端布局，
+           头像与信息变成上下排列。移动端样式只作用于屏幕。 */
+        @media screen and (max-width: 820px) {
+            body {
+                padding: 10px;
+            }
+            .page {
+                width: 100%;
+                min-height: auto;
+                padding: 18px 16px;
+            }
+            .profile-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-info {
+                text-align: center;
+            }
+            .name {
+                font-size: 22px;
+            }
+        }
+        /* print-color-fix */
+        html, body, .header, .label-link, .github-label-link, .target, .contact-info a {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        @media print {
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+        }
+    
+        .hl-red { color: #fd0000; font-weight: 600; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：全栈开发工程师 / AI 方向（乐政科技）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 重庆<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary"><strong>AI 全栈开发经历完整</strong>：主导 <strong>LLM 智能体</strong>系统（<strong>RAG 知识库</strong> + 双知识图谱 + 自动化工作流编排，bioRxiv 已发布），全栈覆盖 <strong>Python(Django) / Java(Spring Boot)</strong> 服务端 + MySQL 数据库 + Web 前端；熟练使用 <strong>Claude Code、Cursor</strong> 进行 AI Native 开发，开源项目累计 <span class="hl-red">200+ Star</span>、用户社群 <span class="hl-red">150+</span>。</div>
+    </div>
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） 电子信息大类-生物医学工程 硕士</div>
+            <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富 · 神经信息教育部重点实验室</div>
+            <div class="tech-line"><em>研究方向：</em>LLM Agent 与医疗 AI · RAG 知识库与智能化应用 · 神经影像智能分析</div>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 电子信息大类-生物医学工程 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ <span class="hl-red">四川省优秀毕业生</span> · 推免资格</div>
+            <div class="tech-line"><em>研究方向：</em>深度学习与目标检测 · Web 系统开发 · 医学图像处理</div>
+        </div>
+    </div>
+    <div class="section">
+        <div class="section-title">专业技能</div>
+            <div class="skill-line"><span class="skill-cat">AI 应用：</span><span class="skill-hl">LLM / Agent 开发（Planning · Tool Use）</span> · <span class="skill-hl">RAG · Function Calling</span> · LangChain（了解）· Prompt 工程 · Claude Code / Cursor</div>
+            <div class="skill-line"><span class="skill-cat">全栈开发：</span><span class="skill-hl">Python（Django）</span> · <span class="skill-hl">MySQL</span> · Java / Spring Boot · Vue · HTML/CSS/JS · Linux · Git</div>
+    </div>
+    <div class="section">
+        <div class="section-title">实习经历</div>
+        <div class="subsection">
+            <div class="subsection-title">网易互娱 — 游戏测试开发工程师（实习）</div>
+            <div class="date">2026</div>
+            <div class="tech-line"><em>技术栈：</em>Python · LLM · Agent · Skill 开发 · PC 自动化 · Agent/Model 评测</div>
+            <ul>
+                <li>面向游戏测试的<strong>远程 PC 自动化</strong>方向，以 agent + skill 替代人工逐台操作，落地 <strong>UU 取号</strong>与 <strong>G66 部署</strong>两个真实业务场景，实现批量并发执行与自动校验，显著压缩环境准备耗时。</li>
+                <li>针对上述场景自主搭建 <strong>Agent 评测系统</strong>，以成功率、耗时、成本三指标量化 agent 与 model 选型；提出「<strong>判世界不判自述</strong>」判题思想，只看操作后世界的真实变化而非模型自述，并设计 L1–L4 能力阶梯题库，业务解耦可复用。</li>
+                <li><strong>项目职责：</strong>业务 skill 设计与开发、评测系统从 0 到 1 搭建（指标定义、判题逻辑、题库设计、结果可视化）。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">心曜医疗 — 算法工程师实习生</div>
+            <div class="date">2026.03 - 2026.06</div>
+            <div class="tech-line"><em>技术栈：</em>Python · LLM · RAG · 向量数据库 · 医疗知识库</div>
+            <ul>
+                <li>负责医疗领域 <strong>RAG 问答系统开发</strong>，结合专业知识库实现智能问答；设计并优化检索增强生成流程，提升问答准确率与响应速度。</li>
+                <li>开发<strong>服务器管理系统</strong>，成员申请添加公钥即可公网访问服务器，安全快捷<a class="label-link" href="https://fwq.heartshinemedical.com/accounts" target="_blank" rel="noopener">访问入口</a>。</li>
+                <li>搭建<strong>同步看板</strong>，多端同步、实时更新<a class="label-link" href="https://onward.heartshinemedical.com/" target="_blank" rel="noopener">在线看板</a>。</li>
+                <li><strong>项目职责：</strong>RAG 问答系统架构设计、知识库构建与优化、问答算法开发；心电信号分析与房颤检测算法研究提升；服务器管理运维与前后端功能开发——覆盖从算法研究到工程落地部署的完整实习链路。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">国网宁夏电力有限公司 — 算法实习生</div>
+            <div class="date">2023.10 - 2023.12</div>
+            <div class="tech-line"><em>技术栈：</em>Python · YOLO · OpenPose · 无人机图像 · 算法开发与部署</div>
+            <ul>
+                <li>学习配电网不停电作业流程，了解操作规范和安全要点；协助采集和处理图像、视频数据，为算法开发提供支持；操作斗臂车与无人机完成模拟作业并采集数据。</li>
+                <li>调研并实现头盔检测、人体姿势估计等算法；<strong>开发基于 Pose 估计的人体危险姿势检测算法</strong>，实现作业安全风险智能预警。</li>
+                <li><strong>项目职责：</strong>采集数据、模拟作业、调研算法并实现；算法在实际作业场景中完成验证。</li>
+            </ul>
+        </div>
+    </div>
+    <div class="section">
+        <div class="section-title">项目经验</div>
+        <div class="subsection">
+            <div class="subsection-title">Agent 应用开发：神经影像分析智能体（NEURA）<a class="github-label-link" href="https://github.com/NeuroScienceLab/NEURA" target="_blank" rel="noopener">GitHub</a><a class="label-link" href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" rel="noopener">论文</a></div>
+            <div class="date">2025.07 - 2026.02</div>
+            <div class="tech-line"><em>技术栈：</em>Python · LLM · Agent · Chain-of-Thought · Toolset · RAG</div>
+            <ul>
+                <li>受认知科学启发、由大语言模型驱动的自主智能体系统，专为神经影像分析打造。通过独特的双知识图谱架构（DiseaseKG 与 ToolKG）动态桥接医学知识与异构软件工具，能够自主理解科研需求、编排并执行复杂的端到端多模态分析工作流，显著降低神经影像处理的技术门槛并解决可复现性难题。</li>
+                <li><strong>项目职责：</strong>负责基于大语言模型的智能体（Agent）系统设计与开发，主导核心认知架构与双知识图谱（DiseaseKG/ToolKG）构建，通过整合异构工具链（如 SPM、FreeSurfer 等）实现复杂工作流的自主编排与端到端自动化。</li>
+                <li><strong>项目成果：</strong>论文已被 <span class="hl-red">bioRxiv 收录</span>，系统已开源。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">深度学习项目：结直肠癌智能检测与诊断系统<a class="label-link" href="/imgs/competitions/8.png" target="_blank" rel="noopener">证书</a></div>
+            <div class="date">2023.04 - 2023.07</div>
+            <div class="tech-line"><em>技术栈：</em>YOLOv8 · Django · HTML · CSS · MySQL · Python</div>
+            <ul>
+                <li>基于 YOLOv8 网络设计并训练出一种用于结直肠癌图像检测和诊断的模型，并结合 <strong>Django</strong> 框架、HTML、CSS 语言和 <strong>MySQL</strong> 数据库开发出一款结直肠癌智能检测和诊断系统，以帮助医生进行结直肠癌的早期筛查和诊断。</li>
+                <li><strong>项目职责：</strong>主要负责人，独立完成项目，目标检测模型的训练及测试、数据预处理与增强、页面设计及美化、MySQL 数据库设计、接口开发及测试。</li>
+                <li><strong>项目成果：</strong>全国大学生生物医学工程创新设计竞赛<span class="hl-red">全国二等奖</span> · 四川省一等奖。</li>
+            </ul>
+        </div>
+    </div>
+    <div class="section">
+        <div class="section-title">获奖荣誉</div>
+        <ul>
+            <li>国家级：全国大学生生物医学工程创新设计竞赛<span class="hl-red">一等奖</span>（2024）· 二等奖（2023）</li>
+            <li>省级：四川省生物医学工程创新设计大赛一等奖 ×4 ｜ <span class="hl-red">四川省优秀毕业生</span></li>
+            <li>奖学金：国家励志奖学金 ×2 · 电子科技大学优秀研究生 · 学业奖学金一等奖</li>
+            <li>科研成果：SCI 论文 3 篇 ｜ 发明专利 1 项 · 软件著作权 <span class="hl-red">5 项</span></li>
+        </ul>
+    </div>
+</div>
+</body>
+</html>
