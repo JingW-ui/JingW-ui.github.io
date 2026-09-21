@@ -190,8 +190,9 @@
         }
         @media print {
             /* 所见即所得：打印沿用屏幕字号，不做压缩，仅去掉页面装饰。
-               项目经验 ≤2 个时内容天然在 A4 单页内，无需缩小字体。 */
-            @page { size: A4; margin: 5mm 10mm; }
+               @page margin 为 0 时浏览器自动省略页眉页脚（日期/标题水印），
+               页面留白由 .page 自身 padding（7mm 11mm）提供，与屏幕一致。 */
+            @page { size: A4; margin: 0; }
             body {
                 background: #fff;
                 padding: 0;
@@ -201,7 +202,6 @@
                 box-shadow: none;
                 width: auto;
                 min-height: auto;
-                padding: 0;
             }
         }
         /* 必须限定 screen：A4 打印视口宽约 794px < 820px，
