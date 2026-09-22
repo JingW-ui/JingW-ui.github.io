@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>分析报告 · 王京</title>
+    <style>
+        :root {
+            --paper: #fbfaf7;
+            --card: #ffffff;
+            --ink: #1c1917;
+            --ink-2: #57534e;
+            --ink-3: #a8a29e;
+            --line: #e7e3dc;
+            --line-2: #f2efe9;
+            --ochre: #9a3412;
+            --ochre-l: #c2410c;
+            --ochre-bg: #fdf3ec;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 60px 20px;
+        }
+        .wrap { width: 100%; max-width: 720px; }
+        .eyebrow {
+            font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
+            color: var(--ochre); font-weight: 600; margin-bottom: 8px;
+        }
+        h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.5px; }
+        .tagline { font-size: 13px; color: var(--ink-2); margin: 10px 0 32px; }
+        .tagline a { color: var(--ochre); text-decoration: none; }
+        .tagline a:hover { text-decoration: underline; }
+        .list { display: flex; flex-direction: column; gap: 12px; }
+        a.card {
+            display: block; background: var(--card); border: 1px solid var(--line);
+            border-radius: 12px; padding: 20px 24px; text-decoration: none;
+            transition: border-color .15s, transform .15s;
+        }
+        a.card:hover { border-color: var(--ochre-l); transform: translateY(-2px); }
+        .card h2 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+        .card p { font-size: 13px; color: var(--ink-2); line-height: 1.6; }
+        .card .meta {
+            display: inline-block; margin-top: 10px; font-size: 11px;
+            color: var(--ochre); background: var(--ochre-bg);
+            border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px;
+        }
+        .footer {
+            margin-top: 36px; font-size: 12px; color: var(--ink-3); line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="eyebrow">Analysis Reports</div>
+    <h1>分析报告</h1>
+    <p class="tagline">
+        基于 BOSS 直聘岗位数据的 JD 关键词与匹配度分析。
+        岗位清单与投递进度见 <a href="/tracker/">投递看板</a>。
+    </p>
+
+    <div class="list">
+        <a class="card" href="application-list.html">
+            <h2>校招投递清单</h2>
+            <p>目标方向的全部候选岗位汇总，含匹配分、城市与投递状态。</p>
+            <span class="meta">岗位清单</span>
+        </a>
+        <a class="card" href="backend-analysis.html">
+            <h2>后端开发 · 分析报告</h2>
+            <p>后端方向 JD 关键词频次、技能要求分布与薪资区间分析。</p>
+            <span class="meta">方向分析</span>
+        </a>
+        <a class="card" href="game-testdev-analysis.html">
+            <h2>游戏测试开发 · 分析报告</h2>
+            <p>游戏测试开发方向 JD 关键词与能力要求拆解。</p>
+            <span class="meta">方向分析</span>
+        </a>
+        <a class="card" href="chengdu-medical-analysis.html">
+            <h2>成都医疗研发岗 · 分析报告</h2>
+            <p>成都地区医疗研发方向岗位的画像与匹配度分析。</p>
+            <span class="meta">方向分析</span>
+        </a>
+    </div>
+
+    <p class="footer">
+        数据来源 offerio.work 校招岗位快照（2026-08）· 匹配分为个人画像打分，非官方评价 ·
+        <a href="/tracker/" style="color:inherit">投递看板</a>
+    </p>
+
+</div>
+</body>
+</html>
