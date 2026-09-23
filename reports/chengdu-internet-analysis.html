@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>成都 互联网大厂 测开/Python全栈 投递地图 · 2027届校招</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #FAF9F6;
+  --ink: #1C1917;
+  --ink-2: #57534E;
+  --ink-3: #A8A29E;
+  --rule: #E5E0D8;
+  --accent: #9A3412;
+  --accent-soft: #C2410C;
+  --muted-bg: #F5F2EC;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: 'Noto Sans SC', -apple-system, 'Microsoft YaHei', sans-serif;
+  font-weight: 400; line-height: 1.7; font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1000px; margin: 0 auto; padding: 64px 32px 96px; }
+
+/* 页头 */
+.masthead { border-bottom: 2px solid var(--ink); padding-bottom: 28px; margin-bottom: 48px; }
+.kicker {
+  font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+}
+h1 {
+  font-family: 'Noto Serif SC', serif; font-weight: 700;
+  font-size: 2.3rem; line-height: 1.25; letter-spacing: -.01em; margin-bottom: 16px;
+}
+.dek { color: var(--ink-2); font-size: .95rem; max-width: 68ch; }
+.byline {
+  margin-top: 22px; display: flex; gap: 28px; flex-wrap: wrap;
+  font-family: 'DM Mono', monospace; font-size: 11.5px; color: var(--ink-3);
+}
+.byline b { color: var(--ink); font-weight: 500; }
+
+/* 章节 */
+section { margin-bottom: 64px; }
+h2 {
+  font-family: 'Noto Serif SC', serif; font-size: 1.4rem; font-weight: 600;
+  padding-bottom: 10px; border-bottom: 1px solid var(--rule); margin-bottom: 8px;
+}
+.sec-note { color: var(--ink-3); font-size: .82rem; margin-bottom: 28px; }
+h3 {
+  font-family: 'Noto Serif SC', serif; font-size: 1.05rem; font-weight: 600;
+  margin: 0 0 4px; color: var(--ink);
+}
+
+/* 工作流步骤 */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.step { background: var(--muted-bg); border-radius: 3px; padding: 20px 22px; }
+.step-n {
+  font-family: 'DM Mono', monospace; font-size: 11px; color: var(--accent);
+  letter-spacing: .12em; margin-bottom: 8px;
+}
+.step-t { font-weight: 600; font-size: .95rem; margin-bottom: 6px; }
+.step p { font-size: .82rem; color: var(--ink-2); }
+.step a, .inline-a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--rule); }
+.step a:hover, .inline-a:hover { border-bottom-color: var(--accent); }
+
+/* 提示块 */
+.note {
+  border-left: 3px solid var(--accent); background: var(--muted-bg);
+  padding: 14px 18px; font-size: .85rem; color: var(--ink-2); border-radius: 0 3px 3px 0;
+  margin-top: 18px;
+}
+.note b { color: var(--ink); }
+
+/* 公司总览表 */
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+th {
+  text-align: left; font-weight: 500; font-size: .72rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-3); padding: 10px 12px;
+  border-bottom: 1px solid var(--ink);
+}
+td { padding: 11px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+td a { color: var(--accent); text-decoration: none; font-family: 'DM Mono', monospace; font-size: .78rem; }
+td a:hover { text-decoration: underline; }
+tr:hover td { background: var(--muted-bg); }
+td .kw { display: block; color: var(--ink-2); font-size: .78rem; }
+
+/* 公司详情卡 */
+.co {
+  background: var(--card, #fff); border: 1px solid var(--rule); border-radius: 4px;
+  padding: 26px 30px; margin-bottom: 18px; background: var(--paper);
+}
+.co:hover { border-color: var(--ink-3); }
+.co-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-bottom: 2px; }
+.co-loc { font-family: 'DM Mono', monospace; font-size: .76rem; color: var(--ink-3); }
+.co-links { margin: 12px 0 14px; display: flex; flex-wrap: wrap; gap: 8px 18px; }
+.co-links a {
+  font-family: 'DM Mono', monospace; font-size: .8rem; color: var(--accent);
+  text-decoration: none; border-bottom: 1px dashed var(--rule); padding-bottom: 1px;
+}
+.co-links a:hover { border-bottom-color: var(--accent); }
+.co-links .lab { color: var(--ink-3); font-size: .74rem; margin-right: 2px; }
+.co p { font-size: .85rem; color: var(--ink-2); margin-bottom: 8px; }
+.co p b { color: var(--ink); font-weight: 500; }
+.co .kw-line { font-size: .8rem; }
+.co .kw-line code {
+  font-family: 'DM Mono', monospace; font-size: .76rem; background: var(--muted-bg);
+  padding: 2px 7px; border-radius: 2px; margin-right: 6px; white-space: nowrap; display: inline-block; margin-bottom: 4px;
+}
+.pill {
+  display: inline-block; font-size: .68rem; padding: 2px 9px; border-radius: 2px;
+  background: var(--muted-bg); color: var(--ink-2); border: 1px solid var(--rule);
+  font-family: 'DM Mono', monospace; letter-spacing: .04em;
+}
+.pill.hot { color: var(--accent); border-color: var(--accent-soft); background: #FDF3EC; }
+.pill.edge { color: #1D6F42; border-color: #BBD8C8; background: #EFF6F1; }
+
+/* 快照登记表 */
+.snap td { font-size: .8rem; }
+.snap td.mono { font-family: 'DM Mono', monospace; font-size: .75rem; }
+.snap .demo td { color: var(--ink-3); font-style: italic; }
+
+footer {
+  border-top: 1px solid var(--rule); padding-top: 24px;
+  font-size: .78rem; color: var(--ink-3); line-height: 2;
+}
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 40px 18px 64px; }
+  h1 { font-size: 1.55rem; }
+  .co { padding: 20px 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="kicker">Apply Map · 2027 届校招</div>
+    <h1>成都 互联网大厂 测开 / Python全栈 投递地图</h1>
+    <p class="dek">
+      8 家目标公司的官方招聘入口、成都据点与筛选路径。大厂官网岗位动态上下架，
+      <b>本页只固定「入口 + 筛选路径」</b>，具体岗位详情链接以官网实时检索为准——锁定岗位后加入
+      <a class="inline-a" href="/tracker/">投递看板</a>，再走定制简历流程。
+    </p>
+    <div class="byline">
+      <span>覆盖公司 <b>8</b> 家</span>
+      <span>方向 <b>测试开发 / Python 全栈</b></span>
+      <span>城市 <b>成都</b></span>
+      <span>更新 <b>2026-09-23</b></span>
+      <span>入口核验 <b>2026-09-23</b></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>怎么用这页</h2>
+    <p class="sec-note">岗位详情链接是易腐品：招满即下架。固定下来的是入口、关键词和节奏。</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">STEP 1 · 每日刷新</div>
+        <div class="step-t">按入口 + 关键词刷官网</div>
+        <p>每天固定 10 分钟：字节、腾讯优先刷（校招批次早、岗位多），其余每两天轮一遍。地点筛「成都」，学历筛「硕士」，区分校招/社招。</p>
+      </div>
+      <div class="step">
+        <div class="step-n">STEP 2 · 入看板</div>
+        <div class="step-t">锁定岗位 → 加入 <a href="/tracker/">tracker 看板</a></div>
+        <p>复制岗位详情链接，看板「+ 添加岗位」手工录入（或从候选池选），阶段停在「想投」，备注里贴 JD 要点。</p>
+      </div>
+      <div class="step">
+        <div class="step-n">STEP 3 · 定制简历</div>
+        <div class="step-t">按 JD 定制 → 投递 → 拖到「已投递」</div>
+        <p>参照 <a href="/resume/tailored.html">岗位定制简历</a> 流程出 resume_qz 定制版，投递后把看板卡片拖到「已投递」并关联简历。</p>
+      </div>
+    </div>
+    <div class="note">
+      <b>不要收藏单个岗位详情页。</b>岗位招满即下线，收藏夹会越攒越多死链；只收藏本页的官方入口，岗位链接一律先进看板再处理。
+    </div>
+  </section>
+
+  <section>
+    <h2>公司总览</h2>
+    <p class="sec-note">入口链接已于 2026-09-23 逐一核验；「批次建议」按校招时间线与岗位量给出。</p>
+    <table>
+      <thead>
+        <tr><th>公司</th><th>校招入口</th><th>成都据点</th><th>检索关键词</th><th>批次</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b>字节跳动</b></td>
+          <td><a href="https://jobs.bytedance.com/campus" target="_blank" rel="noopener">jobs.bytedance.com/campus</a></td>
+          <td>桂溪广场</td>
+          <td>测试开发工程师<span class="kw">研发效能 · Python后端/全栈</span></td>
+          <td><span class="pill hot">第一批</span></td>
+        </tr>
+        <tr>
+          <td><b>腾讯</b></td>
+          <td><a href="https://join.qq.com/" target="_blank" rel="noopener">join.qq.com（首页切换校招/社招）</a></td>
+          <td>天府三街腾讯大厦</td>
+          <td>测试开发工程师<span class="kw">游戏测试开发 · 研效开发</span></td>
+          <td><span class="pill hot">第一批</span></td>
+        </tr>
+        <tr>
+          <td><b>网易</b>（互娱/成都研究院）</td>
+          <td><a href="https://campus.163.com/" target="_blank" rel="noopener">campus.163.com</a></td>
+          <td>网易成都研究院</td>
+          <td>测试开发工程师<span class="kw">Python开发 · 全栈开发</span></td>
+          <td><span class="pill hot">第一批</span></td>
+        </tr>
+        <tr>
+          <td><b>阿里 / 阿里云</b></td>
+          <td><a href="https://campus.alibaba.com/" target="_blank" rel="noopener">campus.alibaba.com</a>（现跳转 talent.alibaba.com）</td>
+          <td>阿里中心</td>
+          <td>测试开发<span class="kw">云原生测试开发 · Python全栈</span></td>
+          <td><span class="pill">校招/社招</span></td>
+        </tr>
+        <tr>
+          <td><b>华为</b></td>
+          <td><a href="https://career.huawei.com/reccampportal/portal5/campus-recruitment.html" target="_blank" rel="noopener">career.huawei.com（校招门户）</a></td>
+          <td>成研所 · 郫都区</td>
+          <td>测试开发工程师<span class="kw">云服务开发 · Python/Go</span></td>
+          <td><span class="pill">校招+社招</span></td>
+        </tr>
+        <tr>
+          <td><b>招银网络科技</b></td>
+          <td><a href="https://cmbnt.cmbchina.com/" target="_blank" rel="noopener">cmbnt.cmbchina.com</a></td>
+          <td>成都</td>
+          <td>测试技术开发工程师<span class="kw">Python自动化</span></td>
+          <td><span class="pill">校招/社招</span></td>
+        </tr>
+        <tr>
+          <td><b>B站</b></td>
+          <td><a href="https://jobs.bilibili.com/" target="_blank" rel="noopener">jobs.bilibili.com</a></td>
+          <td>成都研发中心</td>
+          <td>测试开发<span class="kw">Python后端</span></td>
+          <td><span class="pill">校招</span></td>
+        </tr>
+        <tr>
+          <td><b>百度</b></td>
+          <td><a href="https://talent.baidu.com/" target="_blank" rel="noopener">talent.baidu.com（职位→校园招聘）</a></td>
+          <td>百度智能云成都</td>
+          <td>测试开发<span class="kw">研发效能 · Python</span></td>
+          <td><span class="pill">校招</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>分公司详情</h2>
+    <p class="sec-note">每家给出：入口 → 筛选路径 → 岗位画像 → 简历定制切入点。</p>
+
+    <div class="co">
+      <div class="co-head">
+        <h3>1. 字节跳动</h3>
+        <div><span class="pill hot">优先投递</span> <span class="co-loc">成都 · 桂溪广场</span></div>
+      </div>
+      <div class="co-links">
+        <span><span class="lab">校招</span><a href="https://jobs.bytedance.com/campus" target="_blank" rel="noopener">jobs.bytedance.com/campus</a></span>
+        <span><span class="lab">社招</span><a href="https://jobs.bytedance.com/social" target="_blank" rel="noopener">jobs.bytedance.com/social</a></span>
+      </div>
+      <p class="kw-line"><code>测试开发工程师</code><code>研发效能工程师</code><code>Python后端/全栈</code></p>
+      <p><b>画像：</b>成都有大量自动化测试、平台开发岗位，Python 技术栈为主；测开与研效岗硕士优先。</p>
+      <p><b>简历切入点：</b>接口自动化框架、CI/CD 流水线、效率工具/测试平台开发经历放最前；已有 <a class="inline-a" href="/resume/resume_qz/resume_bytedance_trae.html">TRAE 定制简历</a> 可作底稿，按测开 JD 重排技能区。</p>
+    </div>
+
+    <div class="co">
+      <div class="co-head">
+        <h3>2. 腾讯</h3>
+        <div><span class="pill hot">优先投递</span> <span class="co-loc">成都 · 天府三街</span></div>
+      </div>
+      <div class="co-links">
+        <span><span class="lab">校招/社招</span><a href="https://join.qq.com/" target="_blank" rel="noopener">join.qq.com（首页 Tab 切换）</a></span>
+      </div>
+      <p class="kw-line"><code>测试开发工程师</code><code>游戏测试开发</code><code>研效开发</code></p>
+      <p><b>画像：</b>成都以自动化测试平台开发为主，Python 栈；游戏/云两条线，硕士加分，有 AI 测试开发方向。</p>
+      <p><b>注意：</b>原校招直达页 <code>join.qq.com/campus.html</code> 已 404（2026-09 核验），现从首页进入后切换「校园招聘」。</p>
+      <p><b>简历切入点：</b>游戏测开岗对齐游戏业务 + 自动化平台双关键词；AI 测开岗突出大模型评测 / Agent 评测经历。</p>
+    </div>
+
+    <div class="co">
+      <div class="co-head">
+        <h3>3. 网易（互娱 / 成都研究院）</h3>
+        <div><span class="pill hot">优先投递</span> <span class="pill edge">有实习经历</span> <span class="co-loc">成都 · 网易成都研究院</span></div>
+      </div>
+      <div class="co-links">
+        <span><span class="lab">校招</span><a href="https://campus.163.com/" target="_blank" rel="noopener">campus.163.com</a></span>
+        <span><span class="lab">社招</span><a href="https://career.163.com/social" target="_blank" rel="noopener">career.163.com/social</a></span>
+      </div>
+      <p class="kw-line"><code>测试开发工程师</code><code>Python开发</code><code>全栈开发</code></p>
+      <p><b>画像：</b>互娱有游戏测开、研效平台岗，Python 为主，硕士偏好；成都研究院以平台与工具方向为主。</p>
+      <p><b>简历切入点：</b>网易实习经历是最大差异化项——游戏测试开发实习直接对口互娱测开，<b>优先走内推</b>（实习导师 / 同事），简历以 <a class="inline-a" href="/cv/">通用简历</a> 的网易条目为轴心展开。</p>
+    </div>
+
+    <div class="co">
+      <div class="co-head">
+        <h3>4. 阿里 / 阿里云</h3>
+        <div><span class="pill">校招/社招</span> <span class="co-loc">成都 · 阿里中心</span></div>
+      </div>
+      <div class="co-links">
+        <span><span class="lab">校招</span><a href="https://campus.alibaba.com/" target="_blank" rel="noopener">campus.alibaba.com</a></span>
+        <span><span class="lab">社招</span><a href="https://talent.alibaba.com/" target="_blank" rel="noopener">talent.alibaba.com</a></span>
+      </div>
+      <p class="kw-line"><code>测试开发</code><code>云原生测试开发</code><code>Python全栈</code></p>
+      <p><b>画像：</b>成都以阿里云、淘系部分团队为主，测开偏云平台自动化。</p>
+      <p><b>注意：</b>校招域名 campus.alibaba.com 现会 302 跳转到 talent.alibaba.com（2026-09 核验），站内按「校园招聘」筛选。</p>
+      <p><b>简历切入点：</b>云原生关键词优先——Docker/K8s、云平台自动化测试、稳定性/效能工具链；Web 全栈项目可作第二支柱。</p>
+    </div>
+
+    <div class="co">
+      <div class="co-head">
+        <h3>5. 华为</h3>
+        <div><span class="pill">校招+社招</span> <span class="co-loc">成都 · 成研所（郫都区）</span></div>
+      </div>
+      <div class="co-links">
+        <span><span class="lab">校招</span><a href="https://career.huawei.com/reccampportal/portal5/campus-recruitment.html" target="_blank" rel="noopener">career.huawei.com · 校招门户</a></span>
+        <span><span class="lab">社招</span><a href="https://career.huawei.com/reccampportal/portal5/social-recruitment.html" target="_blank" rel="noopener">career.huawei.com · 社招门户</a></span>
+      </div>
+      <p class="kw-line"><code>测试开发工程师</code><code>云服务开发</code></p>
+      <p><b>画像：</b>成研所云服务相关测开与开发岗，Python/Go 技术栈，硕士优先。</p>
+      <p><b>简历切入点：</b>华为筛简历对「学历 + 校园/竞赛 + 编程基础」权重高，硕士学历如实前置；校招流程含机考，投递前先恢复刷题状态（数据结构 / 字符串 / 动态规划）。已有 <a class="inline-a" href="/resume/resume_sx/resume_huawei_itc.html">华为 ITC 底稿</a>。</p>
+    </div>
+
+    <div class="co">
+      <div class="co-head">
+        <h3>6. 招银网络科技</h3>
+        <div><span class="pill">校招/社招</span> <span class="co-loc">成都</span></div>
+      </div>
+      <div class="co-links">
+        <span><span class="lab">官网</span><a href="https://cmbnt.cmbchina.com/" target="_blank" rel="noopener">cmbnt.cmbchina.com</a></span>
+      </div>
+      <p class="kw-line"><code>测试技术开发工程师</code></p>
+      <p><b>画像：</b>招行系银行科技子公司，测试技术开发岗以 Python 自动化为主，硕士可投；节奏比互联网厂平缓，适合作为并行保底选项。</p>
+      <p><b>简历切入点：</b>自动化测试框架 + 金融业务稳定性表述（数据一致性、回归体系）；银行科技看重工程规范与持久性，弱化跳槽向表述。</p>
+    </div>
+
+    <div class="co">
+      <div class="co-head">
+        <h3>7. B站</h3>
+        <div><span class="pill">校招</span> <span class="co-loc">成都 · 成都研发中心</span></div>
+      </div>
+      <div class="co-links">
+        <span><span class="lab">官网</span><a href="https://jobs.bilibili.com/" target="_blank" rel="noopener">jobs.bilibili.com</a></span>
+      </div>
+      <p class="kw-line"><code>测试开发</code><code>Python后端</code></p>
+      <p><b>画像：</b>成都研发中心承接社区 / 基础平台部分方向，测开与 Python 后端并行检索。</p>
+      <p><b>简历切入点：</b>社区类业务理解（内容、直播、弹幕场景）+ Python 后端工程能力；有游戏测开底稿可快速改写。</p>
+    </div>
+
+    <div class="co">
+      <div class="co-head">
+        <h3>8. 百度</h3>
+        <div><span class="pill">校招</span> <span class="co-loc">成都 · 百度智能云</span></div>
+      </div>
+      <div class="co-links">
+        <span><span class="lab">官网</span><a href="https://talent.baidu.com/" target="_blank" rel="noopener">talent.baidu.com（职位 → 校园招聘）</a></span>
+      </div>
+      <p class="kw-line"><code>测试开发</code><code>研发效能</code><code>Python</code></p>
+      <p><b>画像：</b>成都以百度智能云相关团队为主，测开与研发效能方向检索。</p>
+      <p><b>简历切入点：</b>工具链 / 基础设施类项目优先（效能平台、CI/CD、静态检查），智能云产品测试方向补云服务关键词。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>综合投递平台</h2>
+    <p class="sec-note">官网之外的批量检索渠道，用于交叉验证与发现未上架官网的岗位。</p>
+    <div class="co">
+      <div class="co-head"><h3>牛客网 · 岗位库</h3><span class="co-loc">大厂校招/社招汇总</span></div>
+      <div class="co-links">
+        <span><a href="https://www.nowcoder.com/jobs" target="_blank" rel="noopener">www.nowcoder.com/jobs</a></span>
+      </div>
+      <p>校招岗位聚合与投递日程查询，配合「校招日程」功能追踪各家笔试 / 面试时间线。</p>
+    </div>
+    <div class="co">
+      <div class="co-head"><h3>BOSS直聘 · 网页版</h3><span class="co-loc">社招更合适，可直聊 HR</span></div>
+      <div class="co-links">
+        <span><a href="https://www.zhipin.com/" target="_blank" rel="noopener">www.zhipin.com</a></span>
+      </div>
+      <p>搜索「成都 测试开发 Python 硕士」。本站已有 BOSS 抓取 / 分析工具链（boss-scrape / boss-analyze），抓回来的岗位可直接跑匹配分并入看板。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>投递策略（硕士 · 测开方向）</h2>
+    <p class="sec-note">按「简历重点 → 优先级 → 节奏」三层执行。</p>
+    <div class="co">
+      <h3 style="margin-top:0">简历重点</h3>
+      <p>测开简历的核心卖点是<b>工程化的测试能力</b>，不是功能测试经历：</p>
+      <p>Python · pytest / requests · 接口自动化 · Web 全栈 · CI/CD · 测试平台开发——以上关键词按 JD 权重排序进技能区与项目区；功能测试描述压缩为一行带过。</p>
+    </div>
+    <div class="co">
+      <h3 style="margin-top:0">优先级</h3>
+      <p><b>校招：</b>字节 → 腾讯 → 网易互娱（实习对口 + 内推）→ B站 / 百度；<b>社招 / 日常批：</b>华为云、阿里云、招银网络机会更多、周期更灵活。</p>
+      <p>同一家先投最对口的岗位，官网投递记录互斥或共享时不要铺量——一个方向投一个最优 JD。</p>
+    </div>
+    <div class="co">
+      <h3 style="margin-top:0">节奏</h3>
+      <p>岗位动态上下架：<b>每天 10 分钟刷字节 + 腾讯</b>，其余每两天一轮；每周日把本周看板「已投递」列导出一次，核对回复情况并推进「无响应 7 天」的岗位跟进。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>岗位快照登记（模板）</h2>
+    <p class="sec-note">官网刷到目标岗位后，先在本表追加一行留痕（岗位随时会下架），再进看板走流程。首行为示例格式。</p>
+    <table class="snap">
+      <thead>
+        <tr><th>发现日期</th><th>公司</th><th>岗位</th><th>链接 / 编号</th><th>处理</th></tr>
+      </thead>
+      <tbody>
+        <tr class="demo">
+          <td class="mono">2026-09-23</td>
+          <td>（示例）字节跳动</td>
+          <td>（示例）测试开发工程师-成都</td>
+          <td class="mono">jobs.bytedance.com/campus/position/xxxx</td>
+          <td>已入看板 · 想投</td>
+        </tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    本页为官方入口与投递策略整理，岗位数据动态变化，以各官网实时检索为准；8 家公司入口链接均于 2026-09-23 核验有效。<br>
+    相关：<a href="/tracker/">投递看板</a> · <a href="/resume/tailored.html">岗位定制简历</a> · <a href="/resume/">完整简历清单</a> · <a href="/reports/">分析报告列表</a>
+  </footer>
+
+</div>
+</body>
+</html>
