@@ -290,5 +290,30 @@
     "resume": "/resume/resume_qz/resume_bytedance_ctag_qa.html",
     "note": "状态查看：jobs.bytedance.com/campus/resume/applied",
     "stage": "applied"
+  },
+  {
+    "id": "tencent_1282707439695012864",
+    "title": "PC客户端开发工程师",
+    "company": "腾讯",
+    "city": "",
+    "score": null,
+    "directions": [
+      "客户端开发",
+      "AI应用"
+    ],
+    "skills": [
+      "C/C++",
+      "Python",
+      "PySide6 / Qt",
+      "桌面客户端",
+      "AI 协同开发"
+    ],
+    "majorGate": [],
+    "salary": "",
+    "publishDate": "",
+    "deadline": "",
+    "applyLink": "https://join.qq.com/post_detail.html?postid=1282707439695012864",
+    "resume": "/resume/resume_qz/resume_tencent_pc_client.html",
+    "stage": "applied"
   }
 ]
