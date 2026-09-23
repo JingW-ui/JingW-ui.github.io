@@ -264,5 +264,31 @@
     "applyLink": "https://iflytek.zhiye.com/campus/detail?jobAdId=bdc6ccf0-1956-4aa1-994d-fe8605e607bf",
     "resume": "/resume/resume_qz/resume_iflytek_qa.html",
     "stage": "applied"
+  },
+  {
+    "id": "bytedance_7667559991893936437",
+    "title": "测试开发工程师-中国交易与广告",
+    "company": "字节跳动",
+    "city": "成都",
+    "score": null,
+    "directions": [
+      "测试开发"
+    ],
+    "skills": [
+      "Python",
+      "LLM 应用",
+      "Agent 开发",
+      "自动化测试",
+      "模型评测",
+      "Prompt 工程"
+    ],
+    "majorGate": [],
+    "salary": "",
+    "publishDate": "",
+    "deadline": "",
+    "applyLink": "https://jobs.bytedance.com/campus/position/7667559991893936437/detail",
+    "resume": "/resume/resume_qz/resume_bytedance_ctag_qa.html",
+    "note": "状态查看：jobs.bytedance.com/campus/resume/applied",
+    "stage": "applied"
   }
 ]
