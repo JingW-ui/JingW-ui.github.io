@@ -237,6 +237,18 @@
         }
         @media print {
             .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+            /* 打印时头像与信息强制左右布局：
+               部分浏览器打印视口较窄，flex-wrap 会把头像挤到信息上方堆叠 */
+            .profile-container {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 24px;
+            }
+            .profile-info { text-align: left !important; }
+            .contact-info { word-break: break-word; }
         }
     </style>
 </head>

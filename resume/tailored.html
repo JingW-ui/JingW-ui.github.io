@@ -731,8 +731,13 @@
     function apply(season) {
         current = season;
         var list = season === 'all'
-            ? ALL
+            ? ALL.slice()
             : ALL.filter(function (it) { return seasonOf(it) === season; });
+
+        // 最近做的排最前：JSON 按创建顺序追加（新简历在末尾），渲染时按序号倒排
+        list.sort(function (a, b) {
+            return (parseInt(b.index, 10) || 0) - (parseInt(a.index, 10) || 0);
+        });
 
         // 按钮态 + 计数
         Array.prototype.forEach.call(bar.querySelectorAll('.filter-btn'), function (btn) {
