@@ -258,7 +258,7 @@
             <div class="glass-card nav-section fade-in">
                 <div class="nav-label">求职</div>
                 <a href="/resume/" class="nav-item"><i class="fas fa-file-alt"></i> 简历</a>
-                <a href="/tracker/" class="nav-item"><i class="fas fa-columns"></i> 投递看板</a>
+                <a href="/cv/" class="nav-item"><i class="fas fa-id-card"></i> 精简简历</a>
                 <a href="/carousel/" class="nav-item"><i class="fas fa-trophy"></i> 荣誉</a>
                 <div class="nav-label">项目</div>
                 <a href="/MediScreen-Brain/" class="nav-item"><i class="fas fa-project-diagram"></i> 项目</a>
@@ -296,7 +296,10 @@
             <!-- 欢迎卡片（横向，非对称） -->
             <div class="glass-card welcome-card fade-in d1">
                 <div class="welcome-card-top">
-                    <img src="imgs/life_and_others/myavtar.png" alt="王京" class="welcome-avatar">
+                    <!-- 投递看板的隐藏入口：仅点击头像跳转，不做任何可见提示 -->
+                    <a href="/tracker/" aria-label="投递看板" style="line-height:0;flex-shrink:0;">
+                        <img src="imgs/life_and_others/myavtar.png" alt="王京" class="welcome-avatar" style="cursor:pointer;">
+                    </a>
                     <div class="welcome-text">
                         <div class="welcome-title-row">
                             <h1 class="welcome-title" id="welcomeTitle">你好</h1>
