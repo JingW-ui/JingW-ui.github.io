@@ -38,6 +38,11 @@ package-lock.json
 skills-lock.json
 
 # ========================
+# DSH(本机运行目录:junction 视图,不进仓库;重建跑 tools/sync-dsh-skills.ps1)
+# ========================
+.dsh/
+
+# ========================
 # OS
 # ========================
 .DS_Store
