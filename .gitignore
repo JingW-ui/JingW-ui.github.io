@@ -87,4 +87,4 @@ profile.py
 matcher.py
 recommender.py
 export_tracker.py
-data/
+/data/
