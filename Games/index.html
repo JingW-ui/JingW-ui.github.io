@@ -57,6 +57,29 @@
         @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 33% { transform: translate(30px, -30px) rotate(120deg); } 66% { transform: translate(-20px, 20px) rotate(240deg); } }
         @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.45; } }
 
+        /* 返回主页 */
+        .back-home {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            z-index: 20;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12.5px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 7px 13px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+        .back-home:hover { background: rgba(45, 212, 191, 0.12); border-color: rgba(45, 212, 191, 0.45); color: var(--text-primary); transform: scale(1.03); }
+
         .page-title {
             font-size: 3em;
             font-weight: 700;
@@ -72,13 +95,79 @@
 
         .page-subtitle {
             color: var(--text-secondary);
-            font-size: 1.2em;
+            font-size: 1.05em;
             text-align: center;
-            margin-bottom: 50px;
-            letter-spacing: 2px;
+            margin-bottom: 24px;
+            letter-spacing: 1.5px;
             position: relative;
             z-index: 1;
         }
+        .page-subtitle .ai-note { color: var(--accent-teal); font-weight: 600; }
+
+        /* 工具栏:搜索 + 分类 + 随机 */
+        .toolbar {
+            position: sticky;
+            top: 12px;
+            z-index: 10;
+            width: 100%;
+            max-width: 1400px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: var(--card-bg);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+        }
+        .toolbar-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            min-width: 200px;
+            max-width: 340px;
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(44, 62, 80, 0.10);
+            border-radius: 11px;
+            padding: 7px 12px;
+            transition: var(--transition);
+        }
+        .search-box:focus-within { border-color: rgba(45, 212, 191, 0.5); box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.10); }
+        .search-box svg { width: 14px; height: 14px; fill: none; stroke: var(--text-muted); stroke-width: 2; stroke-linecap: round; flex-shrink: 0; }
+        .search-box input { flex: 1; border: none; outline: none; background: transparent; font-family: inherit; font-size: 13px; color: var(--text-primary); }
+        .search-box input::placeholder { color: var(--text-muted); }
+        .random-btn {
+            background: transparent;
+            border: 1px solid rgba(44, 62, 80, 0.12);
+            color: var(--text-secondary);
+            border-radius: 11px;
+            padding: 7px 15px;
+            font-size: 12.5px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .random-btn:hover { background: rgba(45, 212, 191, 0.10); border-color: rgba(45, 212, 191, 0.45); color: var(--text-primary); }
+        .random-btn:active { transform: scale(0.96); }
+        .cat-tabs { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+        .cat-tab {
+            background: transparent;
+            border: 1px solid rgba(44, 62, 80, 0.12);
+            color: var(--text-secondary);
+            border-radius: 10px;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .cat-tab:hover { background: rgba(45, 212, 191, 0.10); border-color: rgba(45, 212, 191, 0.45); color: var(--text-primary); }
+        .cat-tab.active { background: rgba(45, 212, 191, 0.12); border-color: rgba(45, 212, 191, 0.5); color: var(--text-primary); font-weight: 600; }
+        .cat-tab .cnt { font-size: 10.5px; color: var(--text-muted); margin-left: 5px; font-family: 'Courier New', monospace; }
+        .cat-tab.active .cnt { color: var(--text-secondary); }
 
         .games-container {
             display: grid;
@@ -147,6 +236,35 @@
             opacity: 1;
         }
 
+        /* AI 角标 */
+        .ai-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 2;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #fff;
+            background: linear-gradient(135deg, rgba(45, 212, 191, 0.85), rgba(59, 130, 246, 0.85));
+            backdrop-filter: blur(6px);
+            padding: 2px 8px;
+            border-radius: 9px;
+            pointer-events: none;
+        }
+
+        .empty-tip {
+            display: none;
+            width: 100%;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            padding: 60px 0;
+            position: relative;
+            z-index: 1;
+        }
+        .empty-tip.show { display: block; }
+
         @media (max-width: 1200px) {
             .games-container {
                 grid-template-columns: repeat(3, 1fr);
@@ -155,7 +273,7 @@
 
         @media (max-width: 768px) {
             body {
-                padding: 30px 20px;
+                padding: 30px 16px;
             }
 
             .page-title {
@@ -164,10 +282,12 @@
             }
 
             .page-subtitle {
-                font-size: 1em;
-                margin-bottom: 30px;
-                letter-spacing: 1.5px;
+                font-size: 0.95em;
+                margin-bottom: 20px;
+                letter-spacing: 1px;
             }
+
+            .toolbar { position: static; padding: 10px 12px; }
 
             .games-container {
                 grid-template-columns: repeat(2, 1fr);
@@ -181,7 +301,7 @@
 
         @media (max-width: 480px) {
             body {
-                padding: 20px 15px;
+                padding: 20px 12px;
             }
 
             .page-title {
@@ -190,8 +310,8 @@
             }
 
             .page-subtitle {
-                font-size: 0.9em;
-                margin-bottom: 25px;
+                font-size: 0.85em;
+                margin-bottom: 16px;
                 letter-spacing: 1px;
             }
 
@@ -207,6 +327,8 @@
             .game-image {
                 aspect-ratio: 5 / 3;
             }
+
+            .ai-badge { font-size: 8px; padding: 1px 6px; top: 5px; right: 5px; }
         }
 
         ::-webkit-scrollbar { width: 6px; }
@@ -220,148 +342,226 @@
 <div class="bg-decoration bg-decoration-2"></div>
 <div class="bg-decoration bg-decoration-3"></div>
 
-<h1 class="page-title">🎮 游戏中心</h1>
-<p class="page-subtitle">选择你喜欢的游戏，开始畅玩吧！</p>
+<a class="back-home" href="/">← 返回主页</a>
 
-<div class="games-container">
-    <div class="game-card" data-href="/Games/2024/">
-        <img src="assets/img/2024.webp" alt="像素物语：4048小町" class="game-image">
-        <div class="game-overlay">像素物语：4048小町</div>
+<h1 class="page-title">🎮 游戏中心</h1>
+<p class="page-subtitle">共 31 个游戏 · <span class="ai-note">8 个由 AI 生成</span> · 选择你喜欢的，开始畅玩吧！</p>
+
+<div class="toolbar">
+    <div class="toolbar-row">
+        <div class="search-box">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input id="search" type="text" placeholder="搜索游戏名称…" autocomplete="off">
+        </div>
+        <button class="random-btn" id="random-btn" title="随机跳到一个游戏">随机一下</button>
     </div>
-    <div class="game-card" data-href="/Games/ball">
-        <img src="assets/img/ball.webp" alt="Three.js 无限轨道弹跳球" class="game-image">
-        <div class="game-overlay">无限轨道弹跳球</div>
-    </div>
-    <div class="game-card" data-href="/Games/snake">
-        <img src="assets/img/snake.webp" alt="霓虹贪吃蛇" class="game-image">
-        <div class="game-overlay">霓虹贪吃蛇</div>
-    </div>
-    <div class="game-card" data-href="/Games/dice_3D/">
-        <img src="assets/img/dice_3D.webp" alt="3D炫光骰子" class="game-image">
-        <div class="game-overlay">3D 炫光骰子</div>
-    </div>
-    <div class="game-card" data-href="racing/">
-        <img src="assets/img/racing.webp" alt="3D极速赛车" class="game-image">
-        <div class="game-overlay">3D 极速赛车</div>
-    </div>
-    <div class="game-card" data-href="/Games/muyu/">
-        <img src="assets/img/muyu.webp" alt="赛博木鱼" class="game-image">
-        <div class="game-overlay">赛博木鱼</div>
-    </div>
-    <div class="game-card" data-href="/Games/earth_3D/">
-        <img src="assets/img/earth.webp" alt="3D地球模型" class="game-image">
-        <div class="game-overlay">3D 地球模型</div>
-    </div>
-    <div class="game-card" data-href="/Games/star_drift/">
-        <img src="assets/img/star_drift.webp" alt="星空漂流" class="game-image">
-        <div class="game-overlay">星空漂流</div>
-    </div>
-    <div class="game-card" data-href="/Games/suduku/">
-        <img src="assets/img/suduku.webp" alt="数独挑战" class="game-image">
-        <div class="game-overlay">数独挑战</div>
-    </div>
-    <div class="game-card" data-href="/Games/puke/">
-        <img src="assets/img/puke.webp" alt="扑克牌游戏" class="game-image">
-        <div class="game-overlay">扑克牌游戏</div>
-    </div>
-    <div class="game-card" data-href="/Games/jackrabbit/">
-        <img src="assets/img/jackrabbit.webp" alt="Jackrabbit 跳跃兔子" class="game-image">
-        <div class="game-overlay">Jackrabbit 跳跃兔子</div>
-    </div>
-    <div class="game-card" data-href="/Games/warp_drift/">
-        <img src="assets/img/warp_drift.webp" alt="Warp Drift" class="game-image">
-        <div class="game-overlay">Warp Drift</div>
-    </div>
-    <div class="game-card" data-href="/Games/nerual_branch/">
-        <img src="assets/img/nerual_branch.webp" alt="Neural Branch" class="game-image">
-        <div class="game-overlay">Neural Branch</div>
-    </div>
-    <div class="game-card" data-href="/Games/spider/">
-        <img src="assets/img/spider.webp" alt="交互式蜘蛛" class="game-image">
-        <div class="game-overlay">交互式蜘蛛</div>
-    </div>
-    <div class="game-card" data-href="/Games/morph_workshop/">
-        <img src="assets/img/morph_workshop.webp" alt="形态工坊" class="game-image">
-        <div class="game-overlay">形态工坊</div>
-    </div>
-    <div class="game-card" data-href="/Games/CYBER_CORRIDOR/">
-        <img src="assets/img/CYBER_CORRIDOR.webp" alt="赛博回廊" class="game-image">
-        <div class="game-overlay">赛博回廊</div>
-    </div>
-    <div class="game-card" data-href="/Games/gestura/">
-        <img src="assets/img/gestura.webp" alt="Gesture Particle Sphere" class="game-image">
-        <div class="game-overlay">Gesture Particle Sphere</div>
-    </div>
-    <div class="game-card" data-href="/Games/Footsprout/">
-        <img src="assets/img/Footsprout.webp" alt="枯木逢春" class="game-image">
-        <div class="game-overlay">枯木逢春</div>
-    </div>
-    <div class="game-card" data-href="/Games/piano/">
-        <img src="assets/img/piano.webp" alt="按键钢琴" class="game-image">
-        <div class="game-overlay">按键钢琴</div>
-    </div>
-    <div class="game-card" data-href="/Games/dinosaur/">
-        <img src="assets/img/dinosaur.webp" alt="谷歌恐龙快跑" class="game-image">
-        <div class="game-overlay">谷歌恐龙快跑</div>
-    </div>
-    <div class="game-card" data-href="/Games/bird/">
-        <img src="assets/img/bird.webp" alt="Flappy Bird" class="game-image">
-        <div class="game-overlay">Flappy Bird</div>
-    </div>
-    <div class="game-card" data-href="/Games/ygd/">
-        <img src="assets/img/ygd.webp" alt="一个都不能死" class="game-image">
-        <div class="game-overlay">一个都不能死</div>
-    </div>
-    <div class="game-card" data-href="/Games/qjm/">
-        <img src="assets/img/qjm.webp" alt="切积木" class="game-image">
-        <div class="game-overlay">切积木</div>
-    </div>
-    <div class="game-card" data-href="/Games/mosswing/">
-        <img src="assets/img/mosswing.webp" alt="苔翼飞行" class="game-image">
-        <div class="game-overlay">苔翼飞行</div>
-    </div>
-    <div class="game-card" data-href="/Games/pelecanus/">
-        <img src="assets/img/pelecanus.webp" alt="鹈鹕骑行" class="game-image">
-        <div class="game-overlay">鹈鹕骑行</div>
-    </div>
-    <div class="game-card" data-href="/Games/sea-island/">
-        <img src="assets/img/sea-island.webp" alt="海风之屿" class="game-image">
-        <div class="game-overlay">海风之屿</div>
-    </div>
-    <div class="game-card" data-href="/Games/rainy-store/">
-        <img src="assets/img/rainy-store.webp" alt="雨夜便利店" class="game-image">
-        <div class="game-overlay">雨夜便利店</div>
-    </div>
-    <div class="game-card" data-href="/Games/komorebi/">
-        <img src="assets/img/komorebi.webp" alt="木漏时光" class="game-image">
-        <div class="game-overlay">木漏时光</div>
-    </div>
-    <div class="game-card" data-href="/Games/magic-carpet/">
-        <img src="assets/img/magic-carpet.webp" alt="魔毯法师" class="game-image">
-        <div class="game-overlay">魔毯法师</div>
-    </div>
-    <div class="game-card" data-href="/Games/space-huggers/">
-        <img src="assets/img/space-huggers.webp" alt="太空破坏者" class="game-image">
-        <div class="game-overlay">太空破坏者</div>
-    </div>
-    <div class="game-card" data-href="/Games/operation-ironhold/">
-        <img src="assets/img/operation-ironhold.webp" alt="铁壁行动" class="game-image">
-        <div class="game-overlay">铁壁行动</div>
+    <div class="cat-tabs" id="cat-tabs">
+        <button class="cat-tab active" data-cat="all">全部<span class="cnt">31</span></button>
+        <button class="cat-tab" data-cat="action">动作 · 竞速<span class="cnt">12</span></button>
+        <button class="cat-tab" data-cat="puzzle">益智 · 牌类<span class="cnt">4</span></button>
+        <button class="cat-tab" data-cat="scene">3D 场景 · 氛围<span class="cnt">7</span></button>
+        <button class="cat-tab" data-cat="toy">玩具 · 音乐<span class="cnt">8</span></button>
+        <button class="cat-tab" data-cat="ai">AI 生成<span class="cnt">8</span></button>
     </div>
 </div>
 
-<script>
-    const cards = document.querySelectorAll('.game-card');
+<div class="games-container" id="games-container">
+    <div class="game-card" data-href="/Games/operation-ironhold/" data-cat="action" data-ai="1" data-name="铁壁行动">
+        <span class="ai-badge">AI</span>
+        <img src="assets/img/operation-ironhold.webp" alt="铁壁行动" class="game-image">
+        <div class="game-overlay">铁壁行动</div>
+    </div>
+    <div class="game-card" data-href="/Games/space-huggers/" data-cat="action" data-ai="1" data-name="太空破坏者">
+        <span class="ai-badge">AI</span>
+        <img src="assets/img/space-huggers.webp" alt="太空破坏者" class="game-image">
+        <div class="game-overlay">太空破坏者</div>
+    </div>
+    <div class="game-card" data-href="/Games/magic-carpet/" data-cat="action" data-ai="1" data-name="魔毯法师">
+        <span class="ai-badge">AI</span>
+        <img src="assets/img/magic-carpet.webp" alt="魔毯法师" class="game-image">
+        <div class="game-overlay">魔毯法师</div>
+    </div>
+    <div class="game-card" data-href="/Games/sea-island/" data-cat="scene" data-ai="1" data-name="海风之屿">
+        <span class="ai-badge">AI</span>
+        <img src="assets/img/sea-island.webp" alt="海风之屿" class="game-image">
+        <div class="game-overlay">海风之屿</div>
+    </div>
+    <div class="game-card" data-href="/Games/rainy-store/" data-cat="scene" data-ai="1" data-name="雨夜便利店">
+        <span class="ai-badge">AI</span>
+        <img src="assets/img/rainy-store.webp" alt="雨夜便利店" class="game-image">
+        <div class="game-overlay">雨夜便利店</div>
+    </div>
+    <div class="game-card" data-href="/Games/komorebi/" data-cat="scene" data-ai="1" data-name="木漏时光">
+        <span class="ai-badge">AI</span>
+        <img src="assets/img/komorebi.webp" alt="木漏时光" class="game-image">
+        <div class="game-overlay">木漏时光</div>
+    </div>
+    <div class="game-card" data-href="/Games/pelecanus/" data-cat="scene" data-ai="1" data-name="鹈鹕骑行">
+        <span class="ai-badge">AI</span>
+        <img src="assets/img/pelecanus.webp" alt="鹈鹕骑行" class="game-image">
+        <div class="game-overlay">鹈鹕骑行</div>
+    </div>
+    <div class="game-card" data-href="/Games/mosswing/" data-cat="action" data-ai="1" data-name="苔翼飞行">
+        <span class="ai-badge">AI</span>
+        <img src="assets/img/mosswing.webp" alt="苔翼飞行" class="game-image">
+        <div class="game-overlay">苔翼飞行</div>
+    </div>
+    <div class="game-card" data-href="/Games/qjm/" data-cat="puzzle" data-name="切积木">
+        <img src="assets/img/qjm.webp" alt="切积木" class="game-image">
+        <div class="game-overlay">切积木</div>
+    </div>
+    <div class="game-card" data-href="/Games/ygd/" data-cat="action" data-name="一个都不能死">
+        <img src="assets/img/ygd.webp" alt="一个都不能死" class="game-image">
+        <div class="game-overlay">一个都不能死</div>
+    </div>
+    <div class="game-card" data-href="/Games/piano/" data-cat="toy" data-name="按键钢琴">
+        <img src="assets/img/piano.webp" alt="按键钢琴" class="game-image">
+        <div class="game-overlay">按键钢琴</div>
+    </div>
+    <div class="game-card" data-href="/Games/dinosaur/" data-cat="action" data-name="谷歌恐龙快跑">
+        <img src="assets/img/dinosaur.webp" alt="谷歌恐龙快跑" class="game-image">
+        <div class="game-overlay">谷歌恐龙快跑</div>
+    </div>
+    <div class="game-card" data-href="/Games/bird/" data-cat="action" data-name="Flappy Bird">
+        <img src="assets/img/bird.webp" alt="Flappy Bird" class="game-image">
+        <div class="game-overlay">Flappy Bird</div>
+    </div>
+    <div class="game-card" data-href="/Games/Footsprout/" data-cat="action" data-name="枯木逢春">
+        <img src="assets/img/Footsprout.webp" alt="枯木逢春" class="game-image">
+        <div class="game-overlay">枯木逢春</div>
+    </div>
+    <div class="game-card" data-href="/Games/gestura/" data-cat="toy" data-name="Gesture Particle Sphere">
+        <img src="assets/img/gestura.webp" alt="Gesture Particle Sphere" class="game-image">
+        <div class="game-overlay">Gesture Particle Sphere</div>
+    </div>
+    <div class="game-card" data-href="/Games/CYBER_CORRIDOR/" data-cat="scene" data-name="赛博回廊">
+        <img src="assets/img/CYBER_CORRIDOR.webp" alt="赛博回廊" class="game-image">
+        <div class="game-overlay">赛博回廊</div>
+    </div>
+    <div class="game-card" data-href="/Games/spider/" data-cat="toy" data-name="交互式蜘蛛">
+        <img src="assets/img/spider.webp" alt="交互式蜘蛛" class="game-image">
+        <div class="game-overlay">交互式蜘蛛</div>
+    </div>
+    <div class="game-card" data-href="/Games/nerual_branch/" data-cat="toy" data-name="Neural Branch">
+        <img src="assets/img/nerual_branch.webp" alt="Neural Branch" class="game-image">
+        <div class="game-overlay">Neural Branch</div>
+    </div>
+    <div class="game-card" data-href="/Games/morph_workshop/" data-cat="toy" data-name="形态工坊">
+        <img src="assets/img/morph_workshop.webp" alt="形态工坊" class="game-image">
+        <div class="game-overlay">形态工坊</div>
+    </div>
+    <div class="game-card" data-href="/Games/warp_drift/" data-cat="scene" data-name="星际穿梭">
+        <img src="assets/img/warp_drift.webp" alt="Warp Drift" class="game-image">
+        <div class="game-overlay">Warp Drift</div>
+    </div>
+    <div class="game-card" data-href="/Games/jackrabbit/" data-cat="action" data-name="Jackrabbit 跳跃兔子">
+        <img src="assets/img/jackrabbit.webp" alt="Jackrabbit 跳跃兔子" class="game-image">
+        <div class="game-overlay">Jackrabbit 跳跃兔子</div>
+    </div>
+    <div class="game-card" data-href="/Games/star_drift/" data-cat="action" data-name="深空漂移战机">
+        <img src="assets/img/star_drift.webp" alt="星空漂流" class="game-image">
+        <div class="game-overlay">星空漂流</div>
+    </div>
+    <div class="game-card" data-href="/Games/suduku/" data-cat="puzzle" data-name="数独挑战">
+        <img src="assets/img/suduku.webp" alt="数独挑战" class="game-image">
+        <div class="game-overlay">数独挑战</div>
+    </div>
+    <div class="game-card" data-href="/Games/puke/" data-cat="puzzle" data-name="扑克牌游戏">
+        <img src="assets/img/puke.webp" alt="扑克牌游戏" class="game-image">
+        <div class="game-overlay">扑克牌游戏</div>
+    </div>
+    <div class="game-card" data-href="/Games/earth_3D/" data-cat="scene" data-name="3D 地球模型">
+        <img src="assets/img/earth.webp" alt="3D地球模型" class="game-image">
+        <div class="game-overlay">3D 地球模型</div>
+    </div>
+    <div class="game-card" data-href="/Games/muyu/" data-cat="toy" data-name="赛博木鱼">
+        <img src="assets/img/muyu.webp" alt="赛博木鱼" class="game-image">
+        <div class="game-overlay">赛博木鱼</div>
+    </div>
+    <div class="game-card" data-href="/Games/racing/" data-cat="action" data-name="3D 极速赛车">
+        <img src="assets/img/racing.webp" alt="3D极速赛车" class="game-image">
+        <div class="game-overlay">3D 极速赛车</div>
+    </div>
+    <div class="game-card" data-href="/Games/snake" data-cat="action" data-name="霓虹贪吃蛇">
+        <img src="assets/img/snake.webp" alt="霓虹贪吃蛇" class="game-image">
+        <div class="game-overlay">霓虹贪吃蛇</div>
+    </div>
+    <div class="game-card" data-href="/Games/dice_3D/" data-cat="toy" data-name="3D 炫光骰子">
+        <img src="assets/img/dice_3D.webp" alt="3D炫光骰子" class="game-image">
+        <div class="game-overlay">3D 炫光骰子</div>
+    </div>
+    <div class="game-card" data-href="/Games/ball" data-cat="toy" data-name="无限轨道弹跳球">
+        <img src="assets/img/ball.webp" alt="Three.js 无限轨道弹跳球" class="game-image">
+        <div class="game-overlay">无限轨道弹跳球</div>
+    </div>
+    <div class="game-card" data-href="/Games/2024/" data-cat="puzzle" data-name="像素物语：4048小町">
+        <img src="assets/img/2024.webp" alt="像素物语：4048小町" class="game-image">
+        <div class="game-overlay">像素物语：4048小町</div>
+    </div>
+    <div class="empty-tip" id="empty-tip">没有匹配的游戏，换个关键词试试</div>
+</div>
 
-    // 入场动画
-    cards.forEach((card, i) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            card.style.transition = 'opacity 0.4s ease, transform 0.3s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, i * 60);
+<script>
+    const container = document.getElementById('games-container');
+    const cards = Array.from(container.querySelectorAll('.game-card'));
+    const tabs = document.querySelectorAll('.cat-tab');
+    const searchInput = document.getElementById('search');
+    const emptyTip = document.getElementById('empty-tip');
+    let activeCat = 'all';
+    let query = '';
+
+    // 入场动画（首次 + 每次过滤后重新交错浮现）
+    function animateCards() {
+        const visible = cards.filter(c => c.style.display !== 'none');
+        visible.forEach((card, i) => {
+            card.style.transition = 'none';
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.4s ease, transform 0.3s ease, box-shadow 0.35s ease, backdrop-filter 0.35s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, Math.min(i, 16) * 45);
+        });
+    }
+
+    function applyFilter() {
+        let shown = 0;
+        cards.forEach(card => {
+            const catOk = activeCat === 'all'
+                ? true
+                : (activeCat === 'ai' ? card.dataset.ai === '1' : card.dataset.cat === activeCat);
+            const nameOk = !query || (card.dataset.name || '').toLowerCase().includes(query);
+            const show = catOk && nameOk;
+            card.style.display = show ? '' : 'none';
+            if (show) shown++;
+        });
+        emptyTip.classList.toggle('show', shown === 0);
+        animateCards();
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            activeCat = tab.dataset.cat;
+            applyFilter();
+        });
+    });
+
+    let searchTimer = null;
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+            query = searchInput.value.trim().toLowerCase();
+            applyFilter();
+        }, 150);
+    });
+
+    // 随机一下：从全部游戏里随机跳转
+    document.getElementById('random-btn').addEventListener('click', () => {
+        const pick = cards[Math.floor(Math.random() * cards.length)];
+        window.location.href = pick.dataset.href;
     });
 
     // 点击跳转
@@ -372,6 +572,9 @@
             window.location.href = card.dataset.href;
         });
     });
+
+    // 首屏入场
+    animateCards();
 </script>
 </body>
 </html>

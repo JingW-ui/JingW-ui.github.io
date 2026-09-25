@@ -152,18 +152,25 @@ data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'
 
 ### 3. 在游戏中心主页添加卡片（同步点 1）
 
-在 `Games/index.html` 的 `<div class="games-container">` 内末尾追加卡片：
+在 `Games/index.html` 的 `<div class="games-container">` 内**最上方**（最新优先排序）插入卡片：
 
 ```html
-<div class="game-card" data-href="/Games/{slug}/">
+<div class="game-card" data-href="/Games/{slug}/" data-cat="{分类ID}" data-ai="{0或1}" data-name="{游戏名称}">
+    {AI 生成的游戏加：<span class="ai-badge">AI</span>}
     <img src="assets/img/{图片文件}" alt="{游戏名称}" class="game-image">
     <div class="game-overlay">{游戏名称}</div>
 </div>
 ```
 
 > `data-href` 用绝对路径 `/Games/{slug}/` 与多数卡片一致；`src` 用相对路径 `assets/img/xxx.webp`。
+> `data-cat` 分类 ID：`action`（动作·竞速）/ `puzzle`（益智·牌类）/ `scene`（3D 场景·氛围）/ `toy`（玩具·音乐）。
+> `data-ai="1"` 仅 AI 生成/AI 模型作品需要，同时加 `<span class="ai-badge">AI</span>` 角标。
 
-**统计数字**：游戏主页为响应式网格、**无计数条**，无需改数字。
+**计数同步（重要）**：游戏中心顶部分类 chips 与副标题带统计数字。添加后必须：
+- 对应分类 chip 的 `<span class="cnt">` 数字 +1
+- "全部" chip 计数 +1
+- 副标题 `共 N 个游戏` +1；若 `data-ai="1"`，`8 个由 AI 生成` 的数字也要 +1
+- AI 生成（`data-ai="1"`）的游戏，若上游是第三方作品，部署前先确认许可证允许转载（历史教训：mario_js 代码 MIT 但任天堂素材不可用）
 
 ### 4. 同步个人主页随机游戏池（同步点 2）
 
