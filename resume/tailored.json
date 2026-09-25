@@ -1004,5 +1004,38 @@
         "有相关实习/项目开发经验者优先；熟练使用 AI agent 能力者优先"
       ]
     }
+  },
+  {
+    "index": "49",
+    "company": "快手 · 秋招",
+    "role": "AI 全栈开发",
+    "direction": "AI 编程 / 端到端多端开发",
+    "tags": [
+      "AI 编程",
+      "端到端",
+      "Vibe Coding",
+      "开源"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_kuaishou_ai_fullstack.html",
+    "match": "high",
+    "applyLink": "https://campus.kuaishou.cn/recruit/campus/e/#/campus/job-info/13185",
+    "jobId": "13185",
+    "jobTitle": "AI 全栈开发（岗位名以官网为准）",
+    "location": "",
+    "jd": {
+      "duty": [
+        "借助 AI 编程工具，端到端参与产品功能开发与迭代——覆盖数据层、服务端到 Web 与移动端各层",
+        "深度使用 AI 编程工具提升开发效率，把精力转向架构设计与业务价值实现",
+        "面向真实业务场景：提升核心业务指标、改进系统性能、保障线上稳定性，产出直接运行于生产环境",
+        "在编码、重构、Bug 排查等高频环节把 AI 工具用作常规起点，保持「先复核、再采用」的习惯"
+      ],
+      "req": [
+        "计算机科学、软件工程、人工智能等相关专业优先",
+        "熟悉至少一门编程语言（Java/Go/Python/Kotlin/Swift/TypeScript 等），扎实编程基础与常见数据结构算法",
+        "习惯将 AI 编程工具作为日常编码默认起点，能对 AI 产出做基础复核",
+        "后端/Web 前端/安卓/iOS 任一端有基础与开发实践，愿意拓展其他端；有 AI 项目、开源贡献或实习经历者优先"
+      ]
+    }
   }
 ]
