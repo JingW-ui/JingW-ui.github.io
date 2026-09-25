@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>fwq-portal · GPU 服务器统一入口与运维门户 · 项目文档</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #FAF9F6;
+  --ink: #1C1917;
+  --ink-2: #57534E;
+  --ink-3: #A8A29E;
+  --rule: #E5E0D8;
+  --accent: #9A3412;
+  --accent-soft: #C2410C;
+  --muted-bg: #F5F2EC;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: 'Noto Sans SC', -apple-system, 'Microsoft YaHei', sans-serif;
+  font-weight: 400; line-height: 1.7; font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 960px; margin: 0 auto; padding: 64px 32px 96px; }
+
+.masthead { border-bottom: 2px solid var(--ink); padding-bottom: 28px; margin-bottom: 48px; }
+.kicker {
+  font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+}
+h1 {
+  font-family: 'Noto Serif SC', serif; font-weight: 700;
+  font-size: 2.1rem; line-height: 1.3; letter-spacing: -.01em; margin-bottom: 16px;
+}
+.dek { color: var(--ink-2); font-size: .95rem; max-width: 68ch; }
+.byline {
+  margin-top: 22px; display: flex; gap: 28px; flex-wrap: wrap;
+  font-family: 'DM Mono', monospace; font-size: 11.5px; color: var(--ink-3);
+}
+.byline b { color: var(--ink); font-weight: 500; }
+
+section { margin-bottom: 56px; }
+h2 {
+  font-family: 'Noto Serif SC', serif; font-size: 1.35rem; font-weight: 600;
+  padding-bottom: 10px; border-bottom: 1px solid var(--rule); margin-bottom: 24px;
+}
+.sec-note { color: var(--ink-3); font-size: .82rem; margin-bottom: 24px; }
+p { color: var(--ink-2); font-size: .9rem; margin-bottom: 12px; }
+p b { color: var(--ink); font-weight: 500; }
+
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+th {
+  text-align: left; font-weight: 500; font-size: .72rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-3); padding: 10px 12px;
+  border-bottom: 1px solid var(--ink);
+}
+td { padding: 11px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-2); }
+td:first-child { font-weight: 500; color: var(--ink); white-space: nowrap; }
+tr:hover td { background: var(--muted-bg); }
+td code, p code {
+  font-family: 'DM Mono', monospace; font-size: .78rem; background: var(--muted-bg);
+  padding: 1px 6px; border-radius: 2px; color: var(--ink-2);
+}
+
+.arch {
+  background: var(--muted-bg); border-radius: 4px; padding: 22px 26px;
+  font-family: 'DM Mono', monospace; font-size: .8rem; line-height: 1.9;
+  color: var(--ink-2); overflow-x: auto; white-space: pre;
+}
+.arch b { color: var(--ink); }
+.note {
+  border-left: 3px solid var(--accent); background: var(--muted-bg);
+  padding: 14px 18px; font-size: .85rem; color: var(--ink-2); border-radius: 0 3px 3px 0;
+  margin-top: 18px;
+}
+.note b { color: var(--ink); }
+
+ul.plain { list-style: none; }
+ul.plain li {
+  padding: 10px 0 10px 0; border-bottom: 1px solid var(--rule);
+  font-size: .88rem; color: var(--ink-2);
+}
+ul.plain li b { color: var(--ink); font-weight: 600; }
+ul.plain li:last-child { border-bottom: none; }
+
+footer {
+  border-top: 1px solid var(--rule); padding-top: 24px;
+  font-size: .8rem; color: var(--ink-3); line-height: 2;
+}
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 40px 18px 64px; }
+  h1 { font-size: 1.5rem; }
+  .arch { font-size: .68rem; padding: 16px 14px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="kicker">Project Documentation · Public Edition</div>
+    <h1>fwq-portal — GPU 服务器统一入口 · 运维门户 · AI 网关</h1>
+    <p class="dek">
+      面向内部小团队的 GPU 服务器共享基础设施：把远程 SSH 接入、账号/密钥/审计/监控管理与
+      OpenAI 兼容的 AI 网关收敛进一个轻量门户，同一台公网主机同时托管团队官网与实时看板。
+      本页为公开版技术文档，内部网络地址、端口与部署手册不在公开范围。
+    </p>
+    <div class="byline">
+      <span>角色 <b>独立设计与开发</b></span>
+      <span>状态 <b>已上线运行</b></span>
+      <span>技术栈 <b>Flask · Vue 3 · vLLM · nginx/frp</b></span>
+      <span>文档 <b>2026-09</b></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>项目定位</h2>
+    <p>
+      团队共享一台内网 GPU 服务器，但没有公网 IP，也不能给每个成员开系统账号了事。
+      <b>fwq-portal</b> 用一台公网 ECS 做统一大门：SSH 走 frp 反向隧道（内网侧主动出网，穿透无公网环境），
+      Web 门户负责账号审批、密钥登记、命令审计与监控告警，同时在门户内内置一个
+      <b>OpenAI 兼容的 AI 网关</b>（vLLM 本地推理），成员用门户签发的 Key 就能调用本地大模型。
+    </p>
+    <p>
+      三个入口：<code>Web 门户</code>（<a class="inline" href="https://fwq.heartshinemedical.com/" target="_blank" rel="noopener">fwq.heartshinemedical.com</a>）·
+      <code>SSH</code>（统一域名入口，仅公钥登录）·
+      <code>AI API</code>（OpenAI 兼容 <code>/v1</code>，门户签发 Key）。
+    </p>
+  </section>
+
+  <section>
+    <h2>功能特性</h2>
+    <table>
+      <thead><tr><th>分组</th><th>能力</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>SSH 接入</td>
+          <td>frp 反向隧道统一入口；成员 / 访客 / 管理员分级账号；仅公钥登录（公网密码登录关闭）；多公钥 + 设备别名；成员自助提交公钥 → 管理员审批</td>
+        </tr>
+        <tr>
+          <td>运维门户</td>
+          <td>成员/账号管理（自动同步系统用户组）、SSH 命令审计（auditd auid 归因，su/sudo 提权后仍归因登录人，保留 90 天）、登录日志、操作日志、申请审批、邮件通知</td>
+        </tr>
+        <tr>
+          <td>AI 网关</td>
+          <td>vLLM 本地推理（开源模型，可切换）；门户 AI 对话（SSE 流式）；OpenAI 兼容 <code>/v1</code> 端点给外部 agent；Key 签发与配额管理</td>
+        </tr>
+        <tr>
+          <td>监控</td>
+          <td>链路概览拓扑图（动效）、健康灯带、主机指标、安全态势（Web 扫描 / 蜜罐 / SSH 抗爆破）、告警邮件 + alerts.log（看门狗：隧道掉线 / 磁盘 / 证书 / SSH 红线）</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>技术栈</h2>
+    <table>
+      <thead><tr><th>层</th><th>技术</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>后端</td>
+          <td>Python 3 · Flask ≥3.0 · gunicorn</td>
+          <td>systemd 托管；<b>零数据库</b>——账号/日志全部 JSON 文件 + 原子写（tmp + <code>os.replace</code>）</td>
+        </tr>
+        <tr>
+          <td>前端</td>
+          <td>Vue 3（<code>&lt;script setup&gt;</code>）· vue-router · Vite 5 · @ai-sdk/vue</td>
+          <td>构建产物随服务部署；图表全部<b>自绘 SVG</b>（刻意不引入图表库）；PWA（可添加到主屏幕）</td>
+        </tr>
+        <tr>
+          <td>推理</td>
+          <td>vLLM</td>
+          <td>OpenAI 兼容 API，仅本机监听；门户经 localhost 反代，不占隧道带宽</td>
+        </tr>
+        <tr>
+          <td>网关</td>
+          <td>nginx · frp（frps/frpc）</td>
+          <td>反向代理 + 反向隧道（CGNAT 穿透）；限流 / 蜜罐 / 自动封禁均在 nginx 层</td>
+        </tr>
+        <tr>
+          <td>安全</td>
+          <td>auditd · fail2ban · certbot（Let's Encrypt）</td>
+          <td>SSH 强制命令只读通道，详见<a style="color:var(--accent);text-decoration:none" href="#security">安全设计</a></td>
+        </tr>
+        <tr>
+          <td>采集</td>
+          <td>自研轻量采集器 ×4</td>
+          <td>30s 级自轮询、自轮转，经只读通道回传门户</td>
+        </tr>
+        <tr>
+          <td>运维</td>
+          <td>systemd · scp · cron</td>
+          <td>备份脚本 + 恢复手册（内部文档）</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>架构</h2>
+    <div class="arch"><b>成员浏览器 / SSH 客户端</b>
+   │  HTTPS · SSH（仅公钥）
+   ▼
+<b>公网 ECS</b> —— nginx 统一大门：官网静态 · 门户反代 · 实时看板 · 限流/蜜罐/自动封禁
+   │  frp 反向隧道（内网侧主动出网，穿透无公网环境）
+   ▼
+<b>内网 GPU 服务器</b>（64 核 / 125Gi / 96GB VRAM）
+   · 门户应用（Flask，仅本机监听）
+   · vLLM 推理（仅本机监听）
+   · auditd 命令审计 · 虚拟机 ×2 · 容器 ×2</div>
+    <div class="note">
+      <b>只读通道：</b>门户对云主机的所有读取走专用密钥 + <code>authorized_keys</code> 强制命令
+      （<code>command="cat …",restrict</code>）——只能 cat 指定文件、拿不到 shell，
+      刻意不做"门户直接写云主机"的通道。
+    </div>
+  </section>
+
+  <section id="security">
+    <h2>安全设计</h2>
+    <ul class="plain">
+      <li><b>零数据库：</b>账号/密钥/审计全部 JSON 文件，写入走原子替换；管理员口令仅存哈希。</li>
+      <li><b>凭据不进仓库：</b>私钥/密码/token/邮件授权码只存在于服务器，仓库只入 <code>*.example</code> 模板——本公开文档亦不含任何凭据与地址细节。</li>
+      <li><b>SSH 三道闸：</b>公网密码登录关闭 → 仅公钥 → 公钥须经门户审批/登记；私钥绝不收集。</li>
+      <li><b>只读通道：</b>见上节，门户对云主机零写入。</li>
+      <li><b>命令审计：</b>auditd 按 auid 归因（su/sudo 提权后仍归因登录人），解析进门户「SSH 命令」面板，保留 90 天；管理员自身命令同样在审计内。</li>
+      <li><b>Web 防护：</b>limit_req/limit_conn 限流、蜜罐路径 444 静默断开、扫描特征 444、蜜罐命中自动封禁（nginx 配置写入前 <code>nginx -t</code> 校验失败自动回滚）。</li>
+      <li><b>告警红线：</b>SSH 红线（密码登录成功 / 未登记公钥成功）、隧道掉线、磁盘水位、HTTPS 证书 &lt;14 天——邮件 + alerts.log（6h 节流）。</li>
+    </ul>
+  </section>
+
+  <footer>
+    本页为公开版项目文档：不含内部网络地址、端口、账号命名与部署手册。<br>
+    相关：<a href="https://fwq.heartshinemedical.com/" target="_blank" rel="noopener">在线门户</a> ·
+    <a href="https://onward.heartshinemedical.com/board" target="_blank" rel="noopener">实时看板</a> ·
+    <a href="/resume/resume_qz/resume_kuaishou_ai_fullstack.html">返回简历</a> ·
+    <a href="https://jingw-ui.github.io/">个人主页</a>
+  </footer>
+
+</div>
+</body>
+</html>
