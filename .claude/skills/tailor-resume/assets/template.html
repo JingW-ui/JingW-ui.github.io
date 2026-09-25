@@ -2,11 +2,12 @@
 <html lang="zh-CN">
 <!--
   A4 定向简历模板 — tailor-resume 技能使用说明：
-  1. 直接复用本文件的全部 CSS，不要重新发明样式。
-  2. 只改 body 内的内容：header 个人信息、各 section 标题与条目。
+  1. 直接复用本文件的全部 CSS（.hl-red 已内置），不要重新发明样式。
+  2. 只改 body 内的内容：按各处 FILL 注释逐位填充，生成后删除这些注释。
   3. 按 JD 适配方法论重排板块顺序、取舍内容、改写措辞。
-  4. 高亮与 JD 最相关的技能标签用 class="skill primary"（灰底黑字加粗，勿用深色填充背景）。
-  5. 不写政治面貌；不用 icon/emoji；不引外部 CDN。
+  4. 硬性规则：研究方向只写一条（真实科研域 ∩ JD，禁堆砌）；专业技能最多 2 行、
+     每行 ≤6 项；个人优势 ≤5 句（约 280 字）；不写政治面貌；不用 icon/emoji；不引外部 CDN。
+  5. 打印：沿用屏幕字号直出（@page 5mm 10mm）；打印视口下头部强制左右布局，勿改。
 -->
 <head>
     <meta charset="UTF-8">
@@ -105,6 +106,10 @@
         }
         .summary strong {
             color: #1a1a1a;
+        }
+        .hl-red {
+            color: #fd0000;
+            font-weight: 600;
         }
         .subsection {
             margin-bottom: 5px;
@@ -209,6 +214,7 @@
                 box-shadow: none;
                 width: auto;
                 min-height: auto;
+                padding: 12mm;
             }
         }
         /* 必须限定 screen：A4 打印视口宽约 794px < 820px，
@@ -235,7 +241,7 @@
             }
         }
         /* print-color-fix */
-        html, body, .header, .label-link, .github-label-link, .target, .contact-info a {
+        html, body, .header, .label-link, .github-label-link, .target, .contact-info a, .hl-red {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
@@ -265,6 +271,7 @@
             <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
             <div class="profile-info">
                 <div class="name">王京</div>
+                <!-- FILL: 求职意向 = 岗位名 / 方向（公司名）；通用多投版本去掉公司名与地域 -->
                 <div class="target">求职意向：XX岗位 / XX方向（公司名）</div>
                 <div class="contact-info">
                     男 · 24岁 · 硕士<br>
@@ -276,11 +283,11 @@
         </div>
     </div>
 
-    <!-- 个人优势：呼应 JD 核心要求，放量化成果 -->
+    <!-- 个人优势：≤5 句（约 280 字）；句式 = 身份定场 → 与 JD 对口的核心经历（量化，.hl-red 标红 1-3 处）→ 软性素质佐证 -->
     <div class="section">
         <div class="section-title">个人优势</div>
         <div class="summary">
-            一段话讲清"为什么适配该岗位"，用 <strong>加粗</strong> 突出关键词，附量化成果。
+            一段话讲清"为什么适配该岗位"，用 <strong>加粗</strong> 突出关键词，附量化成果，<span class="hl-red">红字只给最硬的 1-3 处</span>。
         </div>
     </div>
 
@@ -290,23 +297,27 @@
         <div class="subsection">
             <div class="subsection-title">电子科技大学（985） · 生物医学工程 · 硕士</div>
             <div class="date">2024.09 - 至今 ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授</div>
-            <div class="tech-line"><em>研究方向：</em>医学影像智能分析 · 神经影像处理 · 医疗 AI 与智能化应用</div>
+            <!-- FILL: 研究方向只写一条 = 真实科研域 ∩ JD 能力域，优先 JD 原词改写，禁止堆砌 -->
+            <div class="tech-line"><em>研究方向：</em>与 JD 对口的单一研究方向</div>
         </div>
         <div class="subsection">
             <div class="subsection-title">西南科技大学 · 生物医学工程 · 本科</div>
             <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ 四川省优秀毕业生 · 推免生</div>
-            <div class="tech-line"><em>研究方向：</em>医学信号处理 · 深度学习与目标检测 · 医学图像处理</div>
+            <!-- FILL: 同上，本科也只写一条 -->
+            <div class="tech-line"><em>研究方向：</em>与 JD 对口的单一研究方向</div>
         </div>
     </div>
 
-    <!-- 专业技能：流式文本两行，不用按钮/标签样式 -->
+    <!-- 专业技能：最多 2 行（仅页面紧张才压成 1 行），每行 ≤6 项；
+         第 1 行 = 与 JD 最相关的复合能力域（分类名按 JD 命名），第 2 行 = 编程语言与基础；
+         .skill-hl 只标 JD 命中词，其余常规灰字 -->
     <div class="section">
         <div class="section-title">专业技能</div>
         <div class="skill-line">
-            <span class="skill-cat">分类1（与 JD 最相关）：</span><span class="skill-hl">核心技能1</span> · <span class="skill-hl">核心技能2</span> · 普通技能1 · 普通技能2 · 普通技能3
+            <span class="skill-cat">复合域（按 JD 命名）：</span><span class="skill-hl">核心能力 1</span> · <span class="skill-hl">核心能力 2</span> · 能力 3 · 能力 4 · 能力 5 · 能力 6
         </div>
         <div class="skill-line">
-            <span class="skill-cat">分类2：</span><span class="skill-hl">核心技能3</span> · <span class="skill-hl">核心技能4</span> · 普通技能4 · 普通技能5 · 普通技能6
+            <span class="skill-cat">编程与工程：</span><span class="skill-hl">Python</span> · C/C++ · Java · MySQL · Git
         </div>
     </div>
 
