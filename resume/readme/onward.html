@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Onward · 离线优先的项目看板与记录工具 · 项目文档</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #FAF9F6;
+  --ink: #1C1917;
+  --ink-2: #57534E;
+  --ink-3: #A8A29E;
+  --rule: #E5E0D8;
+  --accent: #9A3412;
+  --accent-soft: #C2410C;
+  --muted-bg: #F5F2EC;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: 'Noto Sans SC', -apple-system, 'Microsoft YaHei', sans-serif;
+  font-weight: 400; line-height: 1.7; font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 960px; margin: 0 auto; padding: 64px 32px 96px; }
+
+.masthead { border-bottom: 2px solid var(--ink); padding-bottom: 28px; margin-bottom: 48px; }
+.kicker {
+  font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+}
+h1 {
+  font-family: 'Noto Serif SC', serif; font-weight: 700;
+  font-size: 2.1rem; line-height: 1.3; letter-spacing: -.01em; margin-bottom: 16px;
+}
+.dek { color: var(--ink-2); font-size: .95rem; max-width: 68ch; }
+.byline {
+  margin-top: 22px; display: flex; gap: 28px; flex-wrap: wrap;
+  font-family: 'DM Mono', monospace; font-size: 11.5px; color: var(--ink-3);
+}
+.byline b { color: var(--ink); font-weight: 500; }
+
+section { margin-bottom: 56px; }
+h2 {
+  font-family: 'Noto Serif SC', serif; font-size: 1.35rem; font-weight: 600;
+  padding-bottom: 10px; border-bottom: 1px solid var(--rule); margin-bottom: 24px;
+}
+.sec-note { color: var(--ink-3); font-size: .82rem; margin-bottom: 24px; }
+p { color: var(--ink-2); font-size: .9rem; margin-bottom: 12px; }
+p b { color: var(--ink); font-weight: 500; }
+
+table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+th {
+  text-align: left; font-weight: 500; font-size: .72rem; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-3); padding: 10px 12px;
+  border-bottom: 1px solid var(--ink);
+}
+td { padding: 11px 12px; border-bottom: 1px solid var(--rule); vertical-align: top; color: var(--ink-2); }
+td:first-child { font-weight: 500; color: var(--ink); white-space: nowrap; }
+tr:hover td { background: var(--muted-bg); }
+td code, p code {
+  font-family: 'DM Mono', monospace; font-size: .78rem; background: var(--muted-bg);
+  padding: 1px 6px; border-radius: 2px; color: var(--ink-2);
+}
+
+.note {
+  border-left: 3px solid var(--accent); background: var(--muted-bg);
+  padding: 14px 18px; font-size: .85rem; color: var(--ink-2); border-radius: 0 3px 3px 0;
+  margin-top: 18px;
+}
+.note b { color: var(--ink); }
+
+ul.plain { list-style: none; }
+ul.plain li {
+  padding: 10px 0; border-bottom: 1px solid var(--rule);
+  font-size: .88rem; color: var(--ink-2);
+}
+ul.plain li b { color: var(--ink); font-weight: 600; }
+ul.plain li:last-child { border-bottom: none; }
+
+footer {
+  border-top: 1px solid var(--rule); padding-top: 24px;
+  font-size: .8rem; color: var(--ink-3); line-height: 2;
+}
+footer a { color: var(--accent); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 40px 18px 64px; }
+  h1 { font-size: 1.5rem; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="kicker">Project Documentation · Public Edition</div>
+    <h1>Onward — 离线优先的项目看板与记录工具</h1>
+    <p class="dek">
+      面向团队的 Windows 桌面应用：离线优先的个人工作管理 + 多端云同步的项目看板。
+      桌面端 Tauri 2 + React + TypeScript + SQLite，云端 FastAPI 同步服务 + Web 门户。
+      个人数据只留本机，团队看板实时同步。本页为公开版文档，部署凭据与内部信息不在公开范围。
+    </p>
+    <div class="byline">
+      <span>角色 <b>独立设计与开发</b></span>
+      <span>状态 <b>已上线（v1.1.7）</b></span>
+      <span>技术栈 <b>Tauri 2 · React · TS · SQLite · FastAPI</b></span>
+      <span>文档 <b>2026-09</b></span>
+    </div>
+  </header>
+
+  <section>
+    <h2>项目定位</h2>
+    <p>
+      Onward 把「个人工作」与「团队协作」放在同一个离线优先的应用里：
+      <b>个人工作</b>——计划完成、今日待办、会议日程、快速记录（备忘录 / 工作任务报告 / 流程图），
+      全部数据仅存本机；<b>团队协作</b>——项目看板（任务、里程碑、导入历史）支持桌面端与网页版多端云同步，
+      由自建的 FastAPI 云同步服务与 Web 门户承载。
+    </p>
+    <p>
+      两个入口：<code>Web 看板</code>（<a style="color:var(--accent);text-decoration:none" href="https://onward.heartshinemedical.com/board" target="_blank" rel="noopener">onward.heartshinemedical.com/board</a>）·
+      <code>桌面端</code>（Windows 安装包，门户提供版本化下载）。
+    </p>
+  </section>
+
+  <section>
+    <h2>产品能力</h2>
+    <table>
+      <thead><tr><th>模块</th><th>能力</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>项目看板</td>
+          <td>项目任务、里程碑与导入历史；分区看板视图；多端实时云同步（见下节）</td>
+        </tr>
+        <tr>
+          <td>计划完成</td>
+          <td>目标日期、! / !! / !!! 紧急程度；可拆出今日行动并建立真实关联——待办返回来源计划，计划汇总全部关联行动与完成数量</td>
+        </tr>
+        <tr>
+          <td>今日待办</td>
+          <td>仅添加本地今天的事项；完整图文备注、拖拽与键盘排序；完成 8 秒内可撤销，跨天事项归入「此前未完成」</td>
+        </tr>
+        <tr>
+          <td>会议日程</td>
+          <td>讨论内容 / 待执行清单 / 遗留事项三段记录；开始前 60/30/10 分钟导航红点提醒；结束后归档为会议记录，可继续编辑、搜索、导出；执行项可加入今日待办，完成状态双向同步</td>
+        </tr>
+        <tr>
+          <td>快速记录</td>
+          <td>备忘录 / 工作任务报告 / 流程图三种模板；Tiptap 富文本、本机图片（自动压缩至 2560px）、SVG 节点连线编辑；A4 公司版式 PDF 导出</td>
+        </tr>
+        <tr>
+          <td>每周复盘</td>
+          <td>汇总本周个人产出与专注情况，导出含全部明细的 PDF 周报</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>云同步架构（v1.1.7）</h2>
+    <p>
+      三端组成，各司其职：
+    </p>
+    <table>
+      <thead><tr><th>端</th><th>职责</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>桌面端</td>
+          <td>Tauri 2 应用内置同步引擎——成员输入 token 后自动后台同步看板，无需手动触发</td>
+        </tr>
+        <tr>
+          <td>云端服务</td>
+          <td>FastAPI：看板 GET 拉取 / PUT 推送（乐观锁）、SSE 实时广播、版本清单与安装包下载（token 或 60 秒一次性票据）、token 管理端点、审计日志</td>
+        </tr>
+        <tr>
+          <td>Web 门户</td>
+          <td>React SPA：成员登录查看 / 编辑看板、下载安装包；管理员创建 / 重置 / 停用 / 启用成员 token（支持邮件通知）</td>
+        </tr>
+      </tbody>
+    </table>
+    <ul class="plain" style="margin-top:20px">
+      <li><b>实时性：</b>有人推送看板后，服务端通过 SSE 版本广播通知所有客户端立即拉取；断线错过的事件由最长 5 分钟轮询兜底，多端最终一致。</li>
+      <li><b>合并策略：</b>按 <code>updatedAt</code> 记录级 last-write-wins——不丢数据，冲突以最新修改为准。</li>
+      <li><b>容量边界：</b>看板 20000 个任务上限，单任务 200 条待执行事项。</li>
+      <li><b>token 生命周期：</b>停用 / 删除即刻返回 401，桌面端与网页版同时断开；重新启用后原 token 无需任何配置即恢复。</li>
+      <li><b>隐私边界：</b>个人数据（待办 / 计划 / 会议 / 记录）永不上云，仅项目看板参与同步。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>数据与可靠性</h2>
+    <ul class="plain">
+      <li><b>存储：</b>SQLite 事务 + FULL 同步落盘；数据库路径稳定，升级保留全部历史数据。</li>
+      <li><b>本地版本备份：</b>启动后首次修改先自动备份再保存，此后至少每 30 分钟保留一份；默认保留 20 份（可选 5–50），支持一键备份与完整版本恢复，恢复前强制保护当前数据。</li>
+      <li><b>最近删除：</b>待办、计划与整场会议均可恢复，保留原日期、图文、完成状态与计划关联；保留数量 20–500 可配。</li>
+      <li><b>保存保护：</b>草稿在切换栏目 / 关闭窗口时提示保存；保存失败保留未保存状态并提示重试；原始数据读取失败时不覆盖数据库。</li>
+      <li><b>快速记录容量：</b>记录 5000 条上限；流程图 200 节点 / 400 连线，全套内容遵守 64MB 状态上限。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>工程与质量</h2>
+    <ul class="plain">
+      <li><b>测试矩阵：</b>单元测试（数据规则 / 备份校验 / 排序 / 保存故障恢复）、Playwright 浏览器交互测试、NSIS 安装器隔离卸载测试、真实 EXE 的 WebView2 + SQLite 编辑流程测试、草稿离开与窗口关闭专项、自动填充与重启数据保留、会议待办双向同步、记录图片剪贴板快捷键、备份与恢复专项，以及 Rust 后端 cargo test。</li>
+      <li><b>交付：</b>版本化安装包 + SHA256 校验文件 + 专属卸载程序；GitHub Release 与云端下载页双通道分发，历史版本可回退。</li>
+      <li><b>桌面工程：</b>WebView2 原生标题栏拖动、系统托盘常驻、禁用通用自动填充保护工作数据；八款应用图标由统一 SVG 几何生成前端 PNG 与多尺寸 Windows ICO，发布不可变版本化路径避免缓存冲突。</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>技术栈</h2>
+    <table>
+      <thead><tr><th>层</th><th>技术</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>桌面端</td>
+          <td>Tauri 2 · Rust · React · TypeScript · Vite · SQLite · Tiptap 富文本 · 自绘 SVG 流程图 · NSIS 安装器</td>
+        </tr>
+        <tr>
+          <td>云端</td>
+          <td>FastAPI · SSE 实时广播 · nginx · systemd</td>
+        </tr>
+        <tr>
+          <td>门户</td>
+          <td>React SPA（看板 / 下载 / 管理页）</td>
+        </tr>
+        <tr>
+          <td>质量</td>
+          <td>Vitest · Playwright · NSIS 隔离测试 · cargo test</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    本页为公开版项目文档：不含部署凭据、服务器地址、token 体系与内部路径。<br>
+    相关：<a href="https://onward.heartshinemedical.com/board" target="_blank" rel="noopener">在线看板</a> ·
+    <a href="/resume/readme/fwq-portal.html">服务器门户文档</a> ·
+    <a href="/resume/resume_qz/resume_kuaishou_ai_fullstack.html">返回简历</a> ·
+    <a href="https://jingw-ui.github.io/">个人主页</a>
+  </footer>
+
+</div>
+</body>
+</html>
