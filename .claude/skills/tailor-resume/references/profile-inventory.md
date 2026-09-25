@@ -123,11 +123,12 @@
 
 ### AI Coding 工具
 - **★ Claude Code（CLI）**
-- **★ Cursor**
 - Codex / GitHub Copilot CLI
 - Vibe Coding
 - AI 原生开发 / "先复核再采用"
 - 代码生成 / 跨文件重构 / 自动化测试用例生成
+
+> Cursor 不再出现在简历中（2026-09 定稿，见 SKILL.md 输出规范）；本池已同步移除。
 
 ### 深度学习 / 计算机视觉
 - **★ PyTorch**
