@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>鹈鹕骑行 · 同一提示词 × 12 个大模型 · JingW 游戏中心</title>
+<meta name="description" content="经典测试题的 3D 升级:同一句提示词,12 个大模型各自生成的 Three.js 鹈鹕骑自行车场景,支持单模型切换与双模型并排对比。">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg-gradient-1: #e7f1f0;
+    --bg-gradient-2: #dfe9ec;
+    --bg-gradient-3: #e6edf2;
+    --card-bg: rgba(255, 255, 255, 0.50);
+    --card-bg-strong: rgba(255, 255, 255, 0.68);
+    --card-border: rgba(255, 255, 255, 0.55);
+    --text-primary: #2c3e50;
+    --text-secondary: #5a6c7d;
+    --text-muted: #8e9aaf;
+    --accent-teal: #2dd4bf;
+    --accent-blue: #3b82f6;
+    --shadow-sm: 0 2px 8px rgba(20,40,50,0.05);
+    --shadow-md: 0 6px 24px rgba(20,40,50,0.08);
+    --shadow-lg: 0 12px 40px rgba(20,40,50,0.12);
+    --radius-sm: 14px;
+    --radius-md: 20px;
+    --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    display: flex; flex-direction: column;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(20,40,50,0.12); border-radius: 3px; }
+
+.bg-decoration { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.45; pointer-events: none; z-index: 0; }
+.bg-decoration-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(94,234,212,0.30) 0%, transparent 70%); top: -180px; left: -120px; animation: float 22s ease-in-out infinite; }
+.bg-decoration-2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(125,211,252,0.28) 0%, transparent 70%); bottom: -140px; right: -120px; animation: float 26s ease-in-out infinite reverse; }
+@keyframes float { 0%,100% { transform: translate(0,0) rotate(0deg);} 33% { transform: translate(30px,-30px) rotate(120deg);} 66% { transform: translate(-20px,20px) rotate(240deg);} }
+
+/* ---------- 顶栏 ---------- */
+.topbar {
+    position: relative; z-index: 5;
+    margin: 12px 14px 10px; padding: 10px 16px;
+    background: var(--card-bg);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+}
+@supports not (backdrop-filter: blur(24px)) { .topbar { background: rgba(255,255,255,0.88); } }
+.top-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 9px; margin-right: auto; }
+.brand h1 { font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+.brand .sub { font-size: 11px; color: var(--text-muted); }
+.top-link { font-size: 12px; color: var(--text-secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 10px; border: 1px solid rgba(44,62,80,0.12); transition: var(--transition); }
+.top-link:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); color: var(--text-primary); }
+.mode-switch { display: flex; border: 1px solid rgba(44,62,80,0.12); border-radius: 10px; overflow: hidden; }
+.mode-btn { background: transparent; border: none; color: var(--text-secondary); font-family: inherit; font-size: 12px; padding: 6px 13px; cursor: pointer; transition: var(--transition); }
+.mode-btn.active { background: rgba(45,212,191,0.12); color: var(--text-primary); font-weight: 600; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+.chip { background: transparent; border: 1px solid rgba(44,62,80,0.12); color: var(--text-secondary); border-radius: 10px; padding: 4px 11px; font-size: 11.5px; font-family: inherit; cursor: pointer; transition: var(--transition); }
+.chip:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); color: var(--text-primary); }
+.chip.active { background: rgba(45,212,191,0.12); border-color: rgba(45,212,191,0.5); color: var(--text-primary); font-weight: 600; }
+.chip .tag-noai { display: none; }
+
+/* ---------- 舞台 ---------- */
+.stage-wrap { flex: 1; position: relative; z-index: 1; margin: 0 14px 12px; min-height: 0; display: flex; }
+.stage { flex: 1; display: grid; gap: 10px; min-height: 0; }
+.stage.single { grid-template-columns: 1fr; }
+.stage.compare { grid-template-columns: 1fr 1fr; }
+.pane { position: relative; display: flex; flex-direction: column; min-height: 0;
+    background: var(--card-bg);
+    backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden; }
+.pane-head { display: flex; align-items: center; gap: 8px; padding: 7px 10px; }
+.pane-slot { font-size: 10px; font-family: 'Courier New', monospace; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; }
+.pane select { flex: 1; font-family: inherit; font-size: 12px; color: var(--text-primary); background: rgba(255,255,255,0.55); border: 1px solid rgba(44,62,80,0.12); border-radius: 9px; padding: 5px 8px; outline: none; cursor: pointer; transition: var(--transition); }
+.pane select:hover { border-color: rgba(45,212,191,0.45); }
+.pane iframe { flex: 1; width: 100%; border: 0; background: #eef3f2; opacity: 0; transition: opacity 0.35s ease; }
+.pane iframe.loaded { opacity: 1; }
+.pane .loading { position: absolute; inset: 34px 0 0 0; display: flex; align-items: center; justify-content: center; gap: 9px; color: var(--text-muted); font-size: 12.5px; background: rgba(238,243,242,0.85); z-index: 2; transition: opacity 0.3s; pointer-events: none; }
+.pane .loading i { animation: spin 1.1s linear infinite; }
+.pane .loading.off { opacity: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.foot { position: relative; z-index: 1; text-align: center; font-size: 10.5px; color: var(--text-muted); line-height: 1.8; padding: 0 16px 12px; }
+.foot a { color: var(--text-secondary); text-decoration: none; }
+.foot a:hover { color: var(--accent-blue); }
+
+@media (max-width: 860px) {
+    .stage.compare { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    .topbar { margin: 10px 10px 8px; padding: 8px 12px; }
+    .stage-wrap { margin: 0 10px 8px; }
+    .brand .sub { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="bg-decoration bg-decoration-1"></div>
+<div class="bg-decoration bg-decoration-2"></div>
+
+<header class="topbar">
+    <div class="top-row">
+        <div class="brand">
+            <h1>鹈鹕骑行</h1>
+            <span class="sub">同一句提示词 × 12 个大模型的 Three.js 答卷</span>
+        </div>
+        <div class="mode-switch" role="tablist">
+            <button class="mode-btn active" id="mode-single" data-mode="single">单模型</button>
+            <button class="mode-btn" id="mode-compare" data-mode="compare">双模对比</button>
+        </div>
+        <a class="top-link" href="img/pelicans-riding-comparison.png" target="_blank" rel="noopener"><i class="fa-regular fa-image"></i> 全景对比图</a>
+        <a class="top-link" id="btn-fs" href="javascript:void(0)"><i class="fa-solid fa-expand"></i> 全屏</a>
+        <a class="top-link" href="/Games/"><i class="fa-solid fa-arrow-left"></i> 游戏中心</a>
+    </div>
+    <div class="chips" id="chips"></div>
+</header>
+
+<div class="stage-wrap">
+    <div class="stage single" id="stage">
+        <div class="pane" id="pane-a">
+            <div class="pane-head"><span class="pane-slot">A</span></div>
+            <div class="loading" id="load-a"><i class="fa-solid fa-circle-notch"></i> 正在加载场景…</div>
+            <iframe id="frame-a" title="模型 A 场景" allow="fullscreen"></iframe>
+        </div>
+    </div>
+</div>
+
+<footer class="foot">
+    作品由各大模型对同一提示词独立生成,原样收录、不排名 · 来源
+    <a href="https://github.com/niaonao/pelecanus" target="_blank" rel="noopener">niaonao/pelecanus</a>
+    · Apache License 2.0 · 与相关模型厂商无隶属或背书关系 ·
+    部分作品需联网加载 three.js CDN,默认展示的 GPT-6 Astra 为全自包含版本
+</footer>
+
+<script>
+(function () {
+    'use strict';
+    var MODELS = [
+        { name: 'Claude Sonnet 5',        file: 'Claude-Sonnet-5.html' },
+        { name: 'DeepSeek V4.1 Flash',    file: 'DeepSeek-V4.1-Flash.html' },
+        { name: 'Gemini 3.1 Pro Preview', file: 'Gemini-3.1-Pro-Preview.html' },
+        { name: 'Gemini 3.6 Flash',       file: 'Gemini-3.6-Flash.html' },
+        { name: 'Gemini 3.8 Flash',       file: 'Gemini-3.8-Flash.html' },
+        { name: 'GLM 5.3',                file: 'GLM-5.3.html' },
+        { name: 'GLM 5.3 Flash',          file: 'GLM-5.3-Flash.html' },
+        { name: 'GPT-5.6 Luna',           file: 'GPT-5.6-Luna.html' },
+        { name: 'GPT-5.6 Sol',            file: 'GPT-5.6-Sol.html' },
+        { name: 'GPT-6 Astra',            file: 'GPT-6-Astra.html' },
+        { name: 'Kimi K3',                file: 'Kimi-K3.html' },
+        { name: 'Qwen 3.8 Max',           file: 'Qwen-3.8-Max.html' }
+    ];
+    var byFile = {};
+    MODELS.forEach(function (m) { byFile[m.file] = m; });
+    var DEFAULT_A = 'GPT-6-Astra.html';
+    var DEFAULT_B = 'Claude-Sonnet-5.html';
+
+    var mode = 'single';
+    var selA = DEFAULT_A, selB = DEFAULT_B;
+    var $chips = document.getElementById('chips');
+    var $stage = document.getElementById('stage');
+    var $paneA = document.getElementById('pane-a');
+    var $frameA = document.getElementById('frame-a');
+    var $loadA = document.getElementById('load-a');
+    var $paneB = null, $frameB = null, $loadB = null, $selectB = null;
+
+    function url(file) { return 'models/' + file; }
+    function findFile(name) {
+        for (var i = 0; i < MODELS.length; i++) if (MODELS[i].name === name) return MODELS[i].file;
+        return null;
+    }
+
+    // ---------- chips(单模型模式) ----------
+    function buildChips() {
+        var html = '';
+        MODELS.forEach(function (m) {
+            html += '<button class="chip' + (m.file === selA ? ' active' : '') + '" data-file="' + m.file + '">' + m.name + '</button>';
+        });
+        $chips.innerHTML = html;
+    }
+    $chips.addEventListener('click', function (e) {
+        var chip = e.target.closest('.chip');
+        if (!chip) return;
+        selA = chip.getAttribute('data-file');
+        $chips.querySelectorAll('.chip').forEach(function (c) {
+            c.classList.toggle('active', c.getAttribute('data-file') === selA);
+        });
+        if (mode === 'single') { loadA(selA); }
+        else { $selectB && ($selectB.value = selA) && loadB(selA); }
+        syncUrl();
+    });
+
+    // ---------- 加载 ----------
+    function bindFrame(frame, loading) {
+        frame.addEventListener('load', function () {
+            frame.classList.add('loaded');
+            loading.classList.add('off');
+        });
+    }
+    function loadA(file) {
+        $loadA.classList.remove('off');
+        $frameA.classList.remove('loaded');
+        $frameA.src = url(file);
+        syncUrl();
+    }
+    function loadB(file) {
+        if (!$frameB) return;
+        $loadB.classList.remove('off');
+        $frameB.classList.remove('loaded');
+        $frameB.src = url(file);
+        syncUrl();
+    }
+
+    // ---------- 对比模式 ----------
+    function ensurePaneB() {
+        if ($paneB) return;
+        $paneB = document.createElement('div');
+        $paneB.className = 'pane';
+        $paneB.innerHTML =
+            '<div class="pane-head"><span class="pane-slot">B</span>' +
+            '<select id="select-b" aria-label="选择模型 B">' +
+            MODELS.map(function (m) { return '<option value="' + m.file + '">' + m.name + '</option>'; }).join('') +
+            '</select></div>' +
+            '<div class="loading" id="load-b"><i class="fa-solid fa-circle-notch"></i> 正在加载场景…</div>' +
+            '<iframe id="frame-b" title="模型 B 场景" allow="fullscreen"></iframe>';
+        $stage.appendChild($paneB);
+        $selectB = $paneB.querySelector('#select-b');
+        $frameB = $paneB.querySelector('#frame-b');
+        $loadB = $paneB.querySelector('#load-b');
+        $selectB.value = selB;
+        $selectB.addEventListener('change', function () { selB = $selectB.value; loadB(selB); });
+        bindFrame($frameB, $loadB);
+    }
+    function setMode(next) {
+        mode = next;
+        document.getElementById('mode-single').classList.toggle('active', mode === 'single');
+        document.getElementById('mode-compare').classList.toggle('active', mode === 'compare');
+        if (mode === 'compare') {
+            $stage.classList.remove('single');
+            $stage.classList.add('compare');
+            ensurePaneB();
+            // A 槽也升级为带下拉的头部
+            if (!$paneA.querySelector('select')) {
+                var head = $paneA.querySelector('.pane-head');
+                var sel = document.createElement('select');
+                sel.id = 'select-a';
+                sel.setAttribute('aria-label', '选择模型 A');
+                sel.innerHTML = MODELS.map(function (m) { return '<option value="' + m.file + '">' + m.name + '</option>'; }).join('');
+                sel.value = selA;
+                sel.addEventListener('change', function () { selA = sel.value; loadA(selA); });
+                head.appendChild(sel);
+                $chips.style.display = 'none';
+            }
+            loadB(selB);
+        } else {
+            $stage.classList.add('single');
+            $stage.classList.remove('compare');
+            if ($paneB) { $paneB.remove(); $paneB = $frameB = $loadB = $selectB = null; }
+            var sa = $paneA.querySelector('#select-a');
+            if (sa) { sa.remove(); $chips.style.display = ''; }
+        }
+        syncUrl();
+    }
+    document.getElementById('mode-single').addEventListener('click', function () { setMode('single'); });
+    document.getElementById('mode-compare').addEventListener('click', function () { setMode('compare'); });
+
+    // ---------- 全屏 ----------
+    document.getElementById('btn-fs').addEventListener('click', function () {
+        if (document.fullscreenElement) { document.exitFullscreen(); }
+        else if ($stage.requestFullscreen) { $stage.requestFullscreen(); }
+    });
+
+    // ---------- URL 同步(?m=模型名&cmp=对比模型名) ----------
+    function syncUrl() {
+        var p = new URLSearchParams();
+        p.set('m', (byFile[selA] || {}).name || selA);
+        if (mode === 'compare') p.set('cmp', (byFile[selB] || {}).name || selB);
+        history.replaceState(null, '', location.pathname + '?' + p.toString());
+    }
+    (function init() {
+        var q = new URLSearchParams(location.search);
+        var m = findFile(q.get('m')), cmp = findFile(q.get('cmp'));
+        if (m) selA = m;
+        if (cmp) { selB = cmp; setMode('compare'); }
+        buildChips();
+        bindFrame($frameA, $loadA);
+        loadA(selA);
+    })();
+})();
+</script>
+</body>
+</html>
