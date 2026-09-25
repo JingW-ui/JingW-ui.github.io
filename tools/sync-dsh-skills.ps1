@@ -22,7 +22,7 @@ $ErrorActionPreference = 'Stop'
 $repo    = Split-Path $PSScriptRoot -Parent
 $srcRoot = Join-Path $repo '.claude\skills'
 $dstRoot = Join-Path $repo '.dsh\skills'
-$default = @('tailor-resume', 'proposal-review', 'glassmorphism-design-system')
+$default = @('tailor-resume', 'proposal-review', 'glassmorphism-design-system', 'add-tool-to-homepage')
 
 function Get-Junctions {
     if (-not (Test-Path $dstRoot)) { return @() }
