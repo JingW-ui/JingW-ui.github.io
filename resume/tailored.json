@@ -1063,5 +1063,34 @@
         "扎实的计算机基础知识，较强的逻辑理解和学习能力"
       ]
     }
+  },
+  {
+    "index": "51",
+    "company": "中电云计算技术有限公司 · 秋招",
+    "role": "AI Coding 开发工程师",
+    "direction": "Coding Agent / 评测体系",
+    "tags": ["Coding Agent", "评测体系", "MCP 工具链", "RAG 检索"],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_ceccloud_aicoding.html",
+    "match": "high",
+    "applyLink": "https://app.mokahr.com/campus-recruitment/cestc/102244#/job/08ce3df1-292c-424a-91d5-42f4b0161d0f",
+    "jobId": "08ce3df1",
+    "jobTitle": "AI Coding 开发工程师",
+    "location": "武汉",
+    "jd": {
+      "duty": [
+        "参与 Coding Agent 核心推理与行动循环：任务拆解、上下文管理、代码生成、可观测、数据飞轮",
+        "工具链集成：静态分析器、LSP、Git 操作、命令行终端、浏览器自动化及第三方 API",
+        "研发代码库索引与检索策略（AST、调用图、向量数据库混合检索）",
+        "构建自动化评估基准（HumanEval、SWE-bench 类），持续评测驱动模型与策略迭代",
+        "将 Agent 能力封装为 CLI 工具、IDE 插件（VSCode/JetBrains）或 Web 交互界面"
+      ],
+      "req": [
+        "硕士、博士应届毕业生，计算机、人工智能、软件工程等相关专业",
+        "熟练掌握 Java/Python/Go/C++ 至少一种，熟悉 SQL 及 MySQL/Oracle 等数据库",
+        "参与过产品开发项目，有相关实习经历优先",
+        "英语通过 CET-4"
+      ]
+    }
   }
 ]
