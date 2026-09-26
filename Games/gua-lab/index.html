@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f1f2ff"><meta name="description" content="让水果像果冻一样挤压、变形和融合。切换流动性，搅动果池，合成你的大西瓜。">
+<title>瓜体实验室 · 半流体西瓜游戏</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath d='M5 12a20 20 0 0040 0Z' fill='%2379ad77'/%3E%3Cpath d='M9 12a16 16 0 0032 0Z' fill='%23ff8792'/%3E%3Cpath d='M18 19l2 3m9-3l-2 3m-3 5v2' stroke='%23292b46' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>:root{--bg:#f1f2ff;--ink:#292b46;--muted:#777493;--purple:#7563cf;--line:#d9d5f0;--coral:#ff838c;font-family:'Avenir Next','PingFang SC','Microsoft YaHei',sans-serif;color:var(--ink);background:var(--bg);font-synthesis:none}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 50% 45%,#fafaff 0,#f3f2ff 53%,#eeefff 100%);min-height:100svh}button,a{-webkit-tap-highlight-color:transparent}button{font-family:inherit;font-size:15px;color:inherit;cursor:pointer}button:disabled{cursor:not-allowed;opacity:.5}button:focus-visible,a:focus-visible,canvas:focus-visible{outline:3px solid #8873db;outline-offset:5px}button{transition:background .16s,transform .16s,box-shadow .16s}button:active{transform:translateY(1px)}.symbols{position:absolute;width:0;height:0;overflow:hidden}.app{max-width:1504px;margin:auto;padding:0 48px 18px}header{height:118px;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);white-space:nowrap}.brand>span:nth-child(2){font-family:'Kaiti SC','STKaiti','KaiTi',serif;font-size:34px;font-weight:800;letter-spacing:1px}.brand small{font-size:12px;color:var(--purple);font-weight:500;line-height:1.3;margin-left:2px}.brand-melon{width:48px;height:48px;transform:rotate(-38deg);display:block}.brand-melon svg{width:100%;height:100%}.tagline{font-size:16px;color:#6e639e;letter-spacing:5px;margin-right:40px}nav{display:flex;gap:22px}.icon-button{background:none;border:0;padding:3px;color:#68618e;display:grid;justify-items:center;gap:5px;font-size:11px}.icon-button svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}.icon-button:hover{color:var(--purple)}.icon-button[aria-pressed=true]{color:var(--purple)}#sound[aria-pressed=false] svg{opacity:.45}main{display:grid;grid-template-columns:minmax(210px,270px) minmax(340px,1fr) minmax(240px,290px);gap:36px;align-items:center}.intro{align-self:center;padding-bottom:12px}h1{font-family:'Kaiti SC','STKaiti','KaiTi',serif;font-size:clamp(42px,4.25vw,64px);font-weight:900;letter-spacing:-2px;line-height:1.35;margin:0}.squiggle{display:block;color:#a594e6;font-family:serif;font-size:64px;line-height:.45;margin:12px 0 25px;letter-spacing:-10px;height:13px;overflow:hidden;width:77px}.intro-copy{font-size:17px;line-height:1.9;margin:0 0 28px}.scores{display:grid;gap:12px}.score-row{display:flex;align-items:center;gap:10px;padding:13px 17px;border:1px solid var(--line);border-radius:15px;background:#ffffff40;font-size:15px}.score-row svg{width:22px;height:22px;stroke:#a6a1b9;stroke-width:1.6;fill:#dedbe9;stroke-linejoin:round}.score-row .crown{stroke:#e9b24f;fill:#fbd792}.score-row strong{font-size:26px;color:#7160b8;font-weight:600;margin-left:auto;letter-spacing:-1px}.next{border:1.5px dashed var(--line);border-radius:15px;text-align:center;margin-top:18px;padding:12px 0 7px;font-size:15px;min-height:123px}.next canvas{display:block;width:76px;height:76px;margin:6px auto 0}.game-area{position:relative;min-width:0;justify-self:center;width:100%;max-width:568px}.aim-tip{border:1px solid #bbaeea;background:linear-gradient(#faf9ff,#eae6ff);border-radius:30px;width:max-content;max-width:100%;padding:8px 22px;font-size:15px;color:#7160b8;margin:0 auto 3px;position:relative;z-index:1}.canvas-wrap{position:relative}#game{width:100%;aspect-ratio:5/6;display:block;touch-action:none;cursor:crosshair;outline-offset:-3px}#loading{position:absolute;left:0;right:0;top:45%;text-align:center;color:var(--muted)}#loading[hidden]{display:none}#toast{position:absolute;top:45%;width:100%;text-align:center;pointer-events:none;color:var(--purple);font-size:22px;font-weight:600;opacity:0;transition:opacity .2s}#toast.visible{opacity:1}.physics{align-self:center;padding-bottom:20px}.physics h2{font-family:'Kaiti SC','STKaiti','KaiTi',serif;font-size:25px;font-weight:800;text-align:center;margin:0 0 22px}.modes{display:flex;border:1.5px solid #cfc7ee;border-radius:15px;padding:3px;background:#f7f6ff80}.modes button{flex:1;padding:10px 1px;border:0;border-radius:11px;background:none;font-size:16px;white-space:nowrap}.modes button[aria-pressed=true]{background:linear-gradient(#9e86ef,#7563ce);color:white;box-shadow:0 1px 4px #7462bf45,inset 0 1px 1px #c7baff;font-weight:600}#mode-desc{text-align:center;font-size:14px;color:#69617f;margin:15px 0 30px;min-height:20px}.stir{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;border:1px solid #8975d4;border-radius:18px;background:linear-gradient(170deg,#a18bed,#7762d1);box-shadow:inset 0 2px 2px #ffffff61,0 4px 8px #9480d824;padding:15px;color:white;font-size:22px;font-weight:600}.stir:hover{box-shadow:inset 0 2px 2px #ffffff61,0 5px 12px #9480d844}.stir svg{width:27px;height:27px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}.energy-cost{font-size:14px;color:#7160a2;text-align:center;margin:12px 0 22px}.energy-row{display:flex;align-items:center;gap:12px;padding:15px 16px;border:1px solid var(--line);border-radius:15px;background:#ffffff40;font-size:13px;white-space:nowrap}.energy-row span{font-size:11px;color:#827595}.energy-row b{font-weight:600;color:#4d4667}progress{flex:1;width:50px;height:11px;appearance:none;border:0;border-radius:20px;overflow:hidden;background:#e8e7e8}progress::-webkit-progress-bar{background:#e4e6da;border-radius:20px}progress::-webkit-progress-value{background:linear-gradient(#c9e99a,#abd476);border:1px solid #9fcb6d;border-radius:20px}progress::-moz-progress-bar{background:#b9dc83}.rules{border:1.5px dashed var(--line);border-radius:17px;padding:13px 16px;margin-top:31px}.rules p{display:flex;align-items:center;gap:15px;font-size:14px;line-height:1.7;margin:12px 0}.rules svg{width:40px;height:32px;fill:none;stroke:#8b81ae;stroke-width:1.4;flex:none}.rule-bubbles{display:flex;gap:5px;width:40px;flex:none}.rule-bubbles i{width:17px;height:22px;border:1.5px solid #8b81ae;border-radius:45% 50% 40% 45%;transform:rotate(-12deg);position:relative}.rule-bubbles i:after{content:'··';position:absolute;top:-7px;left:2px;font-size:21px;color:#8b81ae}.rule-bubbles i+i{transform:rotate(18deg)}.rule-line{width:40px;border-top:3px dashed var(--coral);flex:none}.evolution{border:1px solid var(--line);border-radius:18px;margin:20px 0 13px;padding:11px 23px;display:flex;align-items:center;gap:22px;background:#ffffff2b}.evolution h2{font-family:'Kaiti SC','STKaiti','KaiTi',serif;font-size:22px;margin:0;white-space:nowrap}.evolution .squiggle{font-size:44px;height:10px;width:63px;margin:8px 0 0}.evolution>div{display:flex;flex:1;align-items:center;justify-content:space-around;min-width:0}.fruit-step{position:relative;display:flex;align-items:center;justify-content:center;flex:1}.fruit-step canvas{width:clamp(33px,5.1vw,73px);height:clamp(33px,5.1vw,73px);display:block;transition:filter .3s,transform .3s}.fruit-step:last-child canvas{transform:scale(1.16)}.fruit-step svg{width:15px;height:15px;position:absolute;right:-7px;stroke:#9b90b7;stroke-width:1.8;fill:none}.fruit-step.new canvas{animation:unlock .6s}.mobile-tilt{display:none}footer{display:flex;justify-content:center;align-items:center;gap:28px;font-size:12px;color:#827596;min-height:26px}footer>span{display:flex;align-items:center;gap:7px}kbd{font:inherit;display:inline-flex;align-items:center;justify-content:center;border:1px solid #bdb3d9;border-radius:4px;padding:1px 6px;min-width:23px;color:#7664a5;background:#ffffff40}dialog{border:1px solid var(--line);border-radius:26px;background:#f7f6ff;color:var(--ink);padding:30px;max-width:min(430px,calc(100vw - 32px));text-align:center;box-shadow:0 28px 100px #39304f33}dialog::backdrop{background:#44385944;backdrop-filter:blur(6px)}dialog h2{font-family:'Kaiti SC','STKaiti','KaiTi',serif;font-size:31px;margin:8px 0 15px}#dialog-body{font-size:15px;line-height:1.9;color:#746586;margin-bottom:22px}#dialog-body strong{font-size:44px;color:var(--purple);display:block;margin:10px 0}#dialog-body p{margin:10px 0}.text-button{border:0;background:none;color:var(--muted);padding:17px 15px 0;font-size:13px}#dialog-close[hidden]{display:none}.dialog-melon{width:82px;height:82px;margin:auto;background-size:300% 300%;background-position:100% 100%;background-image:url(assets/atlas.webp)}@keyframes unlock{50%{transform:scale(1.25)}}@media(min-width:1101px) and (max-height:930px){header{height:94px}.game-area{max-width:calc((100svh - 224px)*.8333)}main{gap:27px}h1{font-size:51px}.intro-copy{font-size:15px;margin-bottom:20px}.score-row{padding:10px 14px}.next{min-height:101px;padding:8px}.next canvas{width:60px;height:60px}.physics h2{margin-bottom:15px}.rules{margin-top:23px}.rules p{font-size:12px}.evolution{margin-top:13px;padding-top:8px;padding-bottom:8px}.evolution canvas{width:56px;height:56px}.tagline{font-size:14px;letter-spacing:3px}}@media(max-width:1100px){.app{padding:0 26px 15px}header{height:95px}.brand>span:nth-child(2){font-size:29px}.tagline{display:none}main{grid-template-columns:200px minmax(300px,1fr);gap:25px}.physics{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;column-gap:30px;align-items:center;padding:0 15px}.physics h2{display:none}.modes{grid-column:1}#mode-desc{grid-column:1;margin:12px 0}.stir{grid-column:2;grid-row:1;font-size:19px;padding:12px}.energy-cost{display:none}.energy-row{grid-column:2;grid-row:2;padding:8px 14px}.rules{display:none}.game-area{max-width:500px}h1{font-size:43px}.intro-copy{font-size:13px}.score-row{font-size:12px;padding:12px}.evolution{padding:12px;gap:12px}.evolution h2{font-size:18px}.evolution canvas{width:52px;height:52px}.key-help{display:none!important}}@media(max-width:640px){.app{padding:0 16px 14px}header{height:74px;gap:10px}.brand{gap:7px}.brand>span:nth-child(2){font-size:25px;letter-spacing:0}.brand small{display:none}.brand-melon{width:33px;height:33px}nav{gap:14px}.icon-button{font-size:9px;gap:3px}.icon-button svg{width:21px;height:21px}main{display:flex;flex-direction:column;gap:0}.intro{width:100%;padding:0;display:flex;align-items:center;gap:10px}.intro h1,.intro>.squiggle,.intro-copy{display:none}.scores{display:flex;flex:1;gap:8px}.score-row{flex:1;border-radius:12px;font-size:10px;padding:8px;gap:5px}.score-row svg{width:15px;height:15px}.score-row strong{font-size:21px}.next{margin:0;border:0;padding:0;min-height:0;display:flex;flex-direction:column;gap:1px;font-size:9px;min-width:44px}.next canvas{margin:0;width:35px;height:35px}.game-area{width:min(100%,360px);margin-top:12px;max-width:100%}.aim-tip{font-size:11px;padding:5px 17px}#game{max-height:calc(100svh - 275px);min-height:330px;object-fit:contain;aspect-ratio:5/6}.canvas-wrap{width:100%;aspect-ratio:5/6;max-height:calc(100svh - 275px);min-height:330px}.mobile-tilt{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:#9990ae;margin:0 8px 12px}.mobile-tilt button{border:1px solid #d5ceeb;border-radius:16px;background:#fff4;font-size:10px;padding:5px 12px;touch-action:none}.physics{display:grid;width:100%;padding:0;gap:7px 12px;grid-template-columns:1.15fr 1fr}.modes{padding:2px;border-radius:12px}.modes button{font-size:12px;padding:9px 1px;border-radius:8px}.stir{border-radius:13px;font-size:15px;padding:9px;gap:8px}.stir svg{width:22px;height:22px}#mode-desc{font-size:10px;margin:3px 0}.energy-row{padding:3px 8px;font-size:10px;border:none;background:none;gap:6px}.energy-row span{font-size:9px}.evolution{margin-top:14px;border-radius:13px;padding:8px;gap:8px}.evolution h2{font-family:inherit;font-size:9px;writing-mode:vertical-rl;font-weight:500}.evolution .squiggle{display:none}.evolution canvas{width:30px;height:30px}.fruit-step svg{width:8px;height:8px;right:-4px}footer{font-size:9px;gap:12px}footer>span{gap:4px}footer>span:nth-child(2){display:none}kbd{min-width:16px;padding:0 4px}.dialog-melon{width:65px;height:65px}}@media(prefers-reduced-motion:reduce){button,.fruit-step canvas,#toast{transition:none}.fruit-step.new canvas{animation:none}}
+
+.squiggle{height:14px;margin:10px 0 23px;overflow:visible}.squiggle svg{display:block;width:77px;height:14px;fill:none;stroke:#a594e6;stroke-width:3;stroke-linecap:round}.evolution .squiggle svg{width:60px;height:12px}
+
+h1{font-size:clamp(42px,3.6vw,54px);white-space:nowrap}#game.pointer-focused:focus-visible{outline:none}
+</style>
+</head>
+<body>
+<svg class="symbols" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9a3 3 0 015.6 1.3c-.8 1.5-2.8 1.6-2.8 3.7m0 3h.01"/></symbol>
+<symbol id="i-sound" viewBox="0 0 24 24"><path d="M11 4L6 8H3v8h3l5 4V4zm4 4a6 6 0 010 8m3-11a10 10 0 010 14"/></symbol>
+<symbol id="i-reset" viewBox="0 0 24 24"><path d="M20 9a8 8 0 10-1 8M20 4v5h-5"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+<symbol id="i-stir" viewBox="0 0 24 24"><path d="M9 8c-7-2-9 8-3 10 3 1 5-1 6-4m2-5c6 4 11-2 7-6-3-3-7-1-7 3m0 8c-1 7 8 10 10 4" transform="translate(-1 1) scale(.95)"/><circle cx="12" cy="11" r="1"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></symbol>
+<symbol id="i-crown" viewBox="0 0 24 24"><path d="m3 7 4 3 5-6 5 6 4-3-2 11H5Z"/></symbol>
+</defs></svg>
+<div class="app">
+<header>
+<a class="brand" href="./" aria-label="瓜体实验室首页"><span class="brand-melon"><svg viewBox="0 0 48 48"><path d="M4 10a21 21 0 0042 0Z" fill="#90b786"/><path d="M7 10a18 18 0 0036 0Z" fill="#eff5d8"/><path d="M10 10a15 15 0 0030 0Z" fill="#ff8d99"/><path d="m18 17 1 3m12-3-1 3m-5 5v2" stroke="#292b46" stroke-width="2" stroke-linecap="round"/></svg></span><span>瓜体实验室</span><small>MELON<br>LAB</small></a>
+<span class="tagline">半流体合成游戏</span>
+<nav aria-label="游戏控制"><button id="help" class="icon-button" aria-label="帮助"><svg><use href="#i-help"/></svg><span>帮助</span></button><button id="sound" class="icon-button" aria-label="声音" aria-pressed="false"><svg><use href="#i-sound"/></svg><span>声音</span></button><button id="pause" class="icon-button" aria-label="暂停"><svg><use href="#i-pause"/></svg><span>暂停</span></button><button id="restart" class="icon-button" aria-label="重开"><svg><use href="#i-reset"/></svg><span>重开</span></button></nav>
+</header>
+<main>
+<section class="intro" aria-label="游戏分数">
+<h1>让西瓜，<br>流动起来。</h1><span class="squiggle" aria-hidden="true"><svg viewBox="0 0 80 14"><path d="M2 10C8 0 12 0 19 7S29 14 36 7 47 0 54 7 65 14 78 5"/></svg></span>
+<p class="intro-copy">一点重力，一点弹性。<br>碰在一起，变成大西瓜。</p>
+<div class="scores"><div class="score-row"><svg class="crown"><use href="#i-crown"/></svg><span>当前分数</span><strong id="score">0</strong></div><div class="score-row"><svg><use href="#i-star"/></svg><span>最佳分数</span><strong id="best">0</strong></div></div>
+<div class="next"><span>下一颗</span><canvas id="next-fruit" width="144" height="144" aria-label="下一颗水果：葡萄"></canvas></div>
+</section>
+<section class="game-area" aria-label="半流体果池">
+<div class="aim-tip" id="aim-tip">移动瞄准 · 点击投放</div>
+<div class="canvas-wrap"><canvas id="game" width="1000" height="1200" tabindex="0" role="application" aria-label="水果投放区。左右方向键瞄准，回车投放，A D 倾斜，空格搅动，P 暂停。"></canvas><div id="loading">果冻正在凝结…</div><div id="toast" role="status" aria-live="polite"></div></div>
+<div class="mobile-tilt"><button id="tilt-left" aria-label="向左倾斜">向左倾斜</button><span>按住倾斜</span><button id="tilt-right" aria-label="向右倾斜">向右倾斜</button></div>
+</section>
+<aside class="physics">
+<h2>改变一点物理</h2>
+<div class="modes" role="group" aria-label="水果流动性"><button data-mode="jelly" aria-pressed="false">果冻</button><button data-mode="fluid" aria-pressed="true">半流体</button><button data-mode="juice" aria-pressed="false">果汁</button></div>
+<p id="mode-desc">柔软变形，缓缓流动</p>
+<button class="stir" id="stir"><svg><use href="#i-stir"/></svg>搅动果池</button><p class="energy-cost">消耗 30 能量</p>
+<div class="energy-row"><label for="energy">能量</label><progress id="energy" max="100" value="100">100</progress><span><b id="energy-value">100</b> / 100</span></div>
+<div class="rules"><p><span class="rule-bubbles" aria-hidden="true"><i></i><i></i></span>同类相遇，融合升级</p><p><svg aria-hidden="true"><use href="#i-stir"/></svg>挤压变形，填满缝隙</p><p><span class="rule-line" aria-hidden="true"></span>别让水果越过虚线</p></div>
+</aside>
+</main>
+<section class="evolution" aria-label="合成路线"><h2>合成路线<span class="squiggle" aria-hidden="true"><svg viewBox="0 0 80 14"><path d="M2 10C8 0 12 0 19 7S29 14 36 7 47 0 54 7 65 14 78 5"/></svg></span></h2><div id="fruit-route"></div></section>
+<footer><span>鼠标 / 触屏投放</span><span><kbd>A</kbd> <kbd>D</kbd> 倾斜</span><span><kbd>空格</kbd> 搅动</span><span class="key-help"><kbd>←</kbd><kbd>→</kbd> 瞄准 · <kbd>Enter</kbd> 投放</span></footer>
+</div>
+<dialog id="dialog" aria-labelledby="dialog-title"><div class="dialog-melon" aria-hidden="true"></div><h2 id="dialog-title"></h2><div id="dialog-body"></div><button id="dialog-action" class="stir"></button><button id="dialog-close" class="text-button">返回游戏</button></dialog>
+<script>(()=>{
+const {World,TYPES,MODES,BOUNDS}=(()=>{
+const TYPES = [
+  {name:'葡萄',r:18,color:'#9164d9'}, {name:'樱桃',r:24,color:'#ef5275'},
+  {name:'柑橘',r:31,color:'#ffad3e'}, {name:'柠檬',r:39,color:'#f4cf4e'},
+  {name:'奇异果',r:49,color:'#a9ce67'}, {name:'蜜桃',r:60,color:'#f4a9a4'},
+  {name:'甜柿',r:73,color:'#f38b43'}, {name:'蜜瓜',r:87,color:'#b5d692'},
+  {name:'西瓜',r:104,color:'#68ab77'}
+];
+const MODES = {
+  jelly:{edge:.9,bend:.55,shape:.055,damping:.997,pressure:.85,label:'Q 弹果冻，碰撞后轻轻回弹'},
+  fluid:{edge:.7,bend:.24,shape:.017,damping:.992,pressure:.8,label:'柔软变形，缓缓流动'},
+  juice:{edge:.44,bend:.12,shape:.007,damping:.978,pressure:.72,label:'更低张力，摊开后填进缝隙'}
+};
+const N=18, TAU=Math.PI*2;
+const BOUNDS={left:25,right:475,bottom:580,line:120};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function center(body){let x=0,y=0;for(const p of body.p){x+=p.x;y+=p.y;}body.x=x/N;body.y=y/N;}
+function distance(a,b,length,k){let dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||.001;const c=(d-length)/d*.5*k;dx*=c;dy*=c;a.x+=dx;a.y+=dy;b.x-=dx;b.y-=dy;}
+function areaOf(p){let a=0;for(let i=0;i<N;i++){const q=p[(i+1)%N];a+=p[i].x*q.y-q.x*p[i].y;}return a*.5;}
+function pressure(body,k){const p=body.p,gradient=[];let norm=0;for(let i=0;i<N;i++){const before=p[(i+N-1)%N],after=p[(i+1)%N];const gx=(after.y-before.y)*.5,gy=(before.x-after.x)*.5;gradient.push([gx,gy]);norm+=gx*gx+gy*gy;}const delta=clamp((body.area-areaOf(p))/(norm||1),-.16,.16)*k;for(let i=0;i<N;i++){p[i].x+=gradient[i][0]*delta;p[i].y+=gradient[i][1]*delta;}}
+function overlap(a,b){
+  let depth=Infinity,nx=0,ny=0;
+  for(const body of [a,b])for(let i=0;i<N;i++){
+    const p=body.p[i],q=body.p[(i+1)%N],len=Math.hypot(q.x-p.x,q.y-p.y)||1;
+    let x=(q.y-p.y)/len,y=(p.x-q.x)/len;
+    let amin=Infinity,amax=-Infinity,bmin=Infinity,bmax=-Infinity;
+    for(const v of a.p){const d=v.x*x+v.y*y;amin=Math.min(amin,d);amax=Math.max(amax,d);}
+    for(const v of b.p){const d=v.x*x+v.y*y;bmin=Math.min(bmin,d);bmax=Math.max(bmax,d);}
+    const d=Math.min(amax-bmin,bmax-amin);if(d < -1.2)return null;
+    if(d<depth){if((b.x-a.x)*x+(b.y-a.y)*y<0){x=-x;y=-y;}depth=d;nx=x;ny=y;}
+  }
+  return {depth:Math.max(0,depth),nx,ny};
+}
+class World{
+  constructor(onMerge=()=>{}){this.bodies=[];this.time=0;this.nextId=1;this.mode='fluid';this.tilt=0;this.onMerge=onMerge;}
+  add(type,x,y,vx=0,vy=0){const r=TYPES[type].r;const p=Array.from({length:N},(_,i)=>{const angle=TAU*i/N,px=x+Math.cos(angle)*r,py=y+Math.sin(angle)*r;return{x:px,y:py,px:px-vx/120,py:py-vy/120};});const body={id:this.nextId++,type,r,p,x,y,age:0,area:areaOf(p),danger:0};this.bodies.push(body);return body;}
+  reset(seed=true){this.bodies=[];this.time=0;this.tilt=0;if(seed){this.add(4,91,BOUNDS.bottom-50);this.add(3,191,BOUNDS.bottom-40);this.add(5,305,BOUNDS.bottom-61);this.add(2,413,BOUNDS.bottom-32);this.add(1,255,BOUNDS.bottom-137);}}
+  stir(){for(const b of this.bodies)for(const p of b.p){const vx=(b.x-250)*-1.5+(b.y-430)*1.9;const vy=-250-(Math.random()*100);p.px=p.x-vx/120;p.py=p.y-vy/120;}}
+  step(dt=1/120){
+    const mode=MODES[this.mode];this.time+=dt;
+    for(const b of this.bodies){b.age+=dt;for(const p of b.p){const vx=clamp((p.x-p.px)*mode.damping,-5,5),vy=clamp((p.y-p.py)*mode.damping,-5,5);p.px=p.x;p.py=p.y;p.x+=vx+this.tilt*760*dt*dt;p.y+=vy+980*dt*dt;}}
+    const locked=new Set(),merges=[];
+    for(let iteration=0;iteration<6;iteration++){
+      for(const b of this.bodies){
+        const edge=2*b.r*Math.sin(Math.PI/N),bend=2*b.r*Math.sin(2*Math.PI/N);
+        for(let i=0;i<N;i++){distance(b.p[i],b.p[(i+1)%N],edge,mode.edge);distance(b.p[i],b.p[(i+2)%N],bend,mode.bend);if(i<N/2)distance(b.p[i],b.p[(i+N/2)%N],b.r*2,mode.shape);}
+        pressure(b,mode.pressure);center(b);
+      }
+      for(let i=0;i<this.bodies.length;i++)for(let j=i+1;j<this.bodies.length;j++){
+        const a=this.bodies[i],b=this.bodies[j];if(Math.hypot(b.x-a.x,b.y-a.y)>(a.r+b.r)*1.5)continue;
+        const hit=overlap(a,b);if(!hit)continue;
+        if(a.type===b.type&&!locked.has(a.id)&&!locked.has(b.id)){
+          locked.add(a.id);locked.add(b.id);merges.push([a,b]);
+        }
+        const wa=b.area/(a.area+b.area),wb=1-wa;
+        for(const [body,sign,weight]of[[a,-1,wa],[b,1,wb]])for(const p of body.p){
+          const contact=clamp(-sign*((p.x-body.x)*hit.nx+(p.y-body.y)*hit.ny)/body.r,0,1);
+          const push=hit.depth*weight*(.4+.6*contact)*.94;
+          p.x+=sign*hit.nx*push;p.y+=sign*hit.ny*push;
+        }
+      }
+      for(const b of this.bodies)for(const p of b.p){
+        if(p.x<BOUNDS.left){p.x=BOUNDS.left;p.px=p.x+(p.x-p.px)*.08;}
+        if(p.x>BOUNDS.right){p.x=BOUNDS.right;p.px=p.x+(p.x-p.px)*.08;}
+        if(p.y>BOUNDS.bottom){p.y=BOUNDS.bottom;p.py=p.y;p.px+=(p.x-p.px)*.025;}
+      }
+    }
+    if(merges.length){this.bodies=this.bodies.filter(b=>!locked.has(b.id));for(const[a,b]of merges){const type=a.type+1,x=(a.x+b.x)/2,y=(a.y+b.y)/2;if(type<TYPES.length){const r=TYPES[type].r;this.add(type,clamp(x,BOUNDS.left+r,BOUNDS.right-r),Math.min(y,BOUNDS.bottom-r));}this.onMerge({type:Math.min(type,8),x,y,points:2**(type+1),cleared:type>=TYPES.length});}}
+    for(const b of this.bodies){center(b);const highest=Math.min(...b.p.map(p=>p.y));b.danger=b.age>1.8&&highest<BOUNDS.line?b.danger+dt:Math.max(0,b.danger-dt*2);}
+  }
+}
+
+return {World,TYPES,MODES,BOUNDS};})();
+const $=id=>document.getElementById(id),canvas=$('game'),ctx=canvas.getContext('2d');
+const W=500,H=600,N=18,TAU=Math.PI*2,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let score=0,best=0,energy=100,aim=250,current=0,next=0,cooldown=0,paused=false,ended=false,muted=true,audio,loaded=false,hasWon=false,toastUntil=0,heldTilt=0,combo=0,lastMerge=-10;
+let effects=[],ripples=[],sprites=[],last=0,accumulator=0,uiClock=0;
+const keys=new Set(),dialog=$('dialog');
+try{best=Math.max(0,Number(localStorage.getItem('melon-lab-best'))||0);}catch{}
+$('best').textContent=best;
+function tone(frequency=420,length=.09){if(muted)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume().catch(()=>{});const oscillator=audio.createOscillator(),gain=audio.createGain();oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency,audio.currentTime);oscillator.frequency.exponentialRampToValueAtTime(frequency*.55,audio.currentTime+length);gain.gain.setValueAtTime(.11,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+length);oscillator.connect(gain).connect(audio.destination);oscillator.start();oscillator.stop(audio.currentTime+length);}catch{}}
+function toast(text){$('toast').textContent=text;$('toast').classList.add('visible');toastUntil=performance.now()+1800;}
+function syncUI(){ $('score').textContent=score;$('best').textContent=best;$('energy').value=energy;$('energy-value').textContent=Math.floor(energy);$('stir').disabled=energy<30||ended||paused;$('game').dataset.fruits=world.bodies.length;$('game').dataset.phase=ended?'ended':paused?'paused':'playing';}
+function showDialog(title,body,button,action,closable=true){paused=true;keys.clear();heldTilt=0;$('dialog-title').textContent=title;$('dialog-body').innerHTML=body;$('dialog-action').textContent=button;$('dialog-action').onclick=()=>{dialog.close();action();};$('dialog-close').hidden=!closable;if(!dialog.open)dialog.showModal();syncUI();}
+function resume(){paused=false;$('pause').querySelector('span').textContent='暂停';$('pause').setAttribute('aria-label','暂停');syncUI();}
+function finish(){if(ended)return;ended=true;showDialog('果池满了，休息一下',`这一次的合成分数<strong>${score}</strong><p>试试切换流动性，给大水果腾出一点空间。</p>`,'再来一池',reset,false);}
+const world=new World(event=>{
+  combo=world.time-lastMerge<1.2?combo+1:1;lastMerge=world.time;const bonus=event.points*Math.min(combo,4);score+=bonus;energy=Math.min(100,energy+8);
+  if(score>best){best=score;try{localStorage.setItem('melon-lab-best',String(best));}catch{}}
+  effects.push({x:event.x,y:event.y,text:`+${bonus}${combo>1?' · '+combo+' 连融':''}`,life:1.2});ripples.push({x:event.x,y:event.y,life:.6,r:TYPES[event.type].r,color:TYPES[event.type].color});tone(330+event.type*80,.16);
+  const step=document.querySelector(`[data-fruit="${event.type}"]`);if(step){step.classList.remove('new');void step.offsetWidth;step.classList.add('new');}
+  if(event.type===8&&!hasWon){hasWon=true;queueMicrotask(()=>{if(ended)return;showDialog('一颗会流动的大西瓜！',`你把柔软的水果，融成了夏天。<strong>${score}</strong><p>继续合成两颗西瓜，可以释放大片空间。</p>`,'继续实验',resume);});}
+  syncUI();
+});
+function reset(){world.reset();world.mode=document.querySelector('[data-mode][aria-pressed=true]').dataset.mode;score=0;energy=100;current=0;next=0;cooldown=0;aim=250;ended=false;hasWon=false;paused=false;effects=[];ripples=[];combo=0;lastMerge=-10;keys.clear();heldTilt=0;if(dialog.open)dialog.close();updateNext();resume();$('aim-tip').textContent='移动瞄准 · 点击投放';}
+function pickFruit(){return Math.floor(Math.random()**1.65*4);}
+function drop(){if(!loaded||paused||ended||world.time<cooldown)return;const r=TYPES[current].r;aim=Math.max(BOUNDS.left+r+3,Math.min(BOUNDS.right-r-3,aim));world.add(current,aim,65,world.tilt*20,70);current=next;next=pickFruit();cooldown=world.time+.42;updateNext();tone(240,.06);syncUI();}
+function stir(){if(!loaded||paused||ended||energy<30)return;energy-=30;world.stir();ripples.push({x:250,y:430,life:1,r:130,color:'#9b85db'});tone(150,.3);toast('轻轻搅一搅，好事会相遇。');syncUI();}
+function updateNext(){if(!loaded)return;const c=$('next-fruit').getContext('2d');c.clearRect(0,0,144,144);c.drawImage(sprites[next],8,8,128,128);$('next-fruit').setAttribute('aria-label',`下一颗水果：${TYPES[next].name}`);}
+function glassPath(){ctx.beginPath();ctx.moveTo(31,49);ctx.lineTo(19,49);ctx.quadraticCurveTo(14,49,14,59);ctx.lineTo(14,548);ctx.quadraticCurveTo(14,590,55,590);ctx.lineTo(445,590);ctx.quadraticCurveTo(486,590,486,548);ctx.lineTo(486,59);ctx.quadraticCurveTo(486,49,469,49);}
+function drawGlass(front=false){
+  if(!front){const fill=ctx.createLinearGradient(0,70,0,588);fill.addColorStop(0,'#ffffff08');fill.addColorStop(.85,'#d5c9ff09');fill.addColorStop(1,'#b2a0db30');ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(20,50,460,534,[4,4,34,34]);ctx.fill();return;}
+  ctx.save();glassPath();ctx.lineJoin='round';ctx.lineCap='round';ctx.shadowBlur=9;ctx.shadowColor='#80719b2d';ctx.shadowOffsetY=6;ctx.strokeStyle='#b1a6d6';ctx.lineWidth=10;ctx.stroke();ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.strokeStyle='#ece8ff';ctx.lineWidth=6.5;ctx.stroke();ctx.strokeStyle='#ffffffc9';ctx.lineWidth=2;ctx.stroke();ctx.restore();
+  ctx.save();ctx.font='9px "Avenir Next",sans-serif';ctx.textAlign='left';ctx.fillStyle='#a297b8';ctx.lineWidth=1;ctx.strokeStyle='#b9abd180';for(let y=170;y<560;y+=50){ctx.beginPath();ctx.moveTo(29,y);ctx.lineTo(35,y);ctx.stroke();ctx.fillText(String(600-y),38,y+3);}ctx.restore();
+}
+function pathBody(body){const p=body.p;ctx.beginPath();ctx.moveTo((p[N-1].x+p[0].x)/2,(p[N-1].y+p[0].y)/2);for(let i=0;i<N;i++){const q=p[(i+1)%N];ctx.quadraticCurveTo(p[i].x,p[i].y,(p[i].x+q.x)/2,(p[i].y+q.y)/2);}ctx.closePath();}
+function triangle(image,source,dest){
+  const [s0,s1,s2]=source,[d0,d1,d2]=dest;
+  const sx1=s1.x-s0.x,sy1=s1.y-s0.y,sx2=s2.x-s0.x,sy2=s2.y-s0.y,det=sx1*sy2-sx2*sy1;
+  if(Math.abs(det)<.001)return;
+  const dx1=d1.x-d0.x,dy1=d1.y-d0.y,dx2=d2.x-d0.x,dy2=d2.y-d0.y;
+  const a=(dx1*sy2-dx2*sy1)/det,b=(dy1*sy2-dy2*sy1)/det,c=(dx2*sx1-dx1*sx2)/det,d=(dy2*sx1-dy1*sx2)/det;
+  ctx.save();ctx.beginPath();for(let i=0;i<3;i++){const p=dest[i],x=p.x+(p.x-(d0.x+d1.x+d2.x)/3)*.012,y=p.y+(p.y-(d0.y+d1.y+d2.y)/3)*.012;if(i)ctx.lineTo(x,y);else ctx.moveTo(x,y);}ctx.closePath();ctx.clip();ctx.transform(a,b,c,d,d0.x-a*s0.x-c*s0.y,d0.y-b*s0.x-d*s0.y);ctx.drawImage(image,0,0);ctx.restore();
+}
+const sourceRim=Array.from({length:N},(_,i)=>({x:128+Math.cos(TAU*i/N)*128,y:128+Math.sin(TAU*i/N)*128}));
+function drawBody(body){
+  ctx.save();pathBody(body);ctx.shadowColor=TYPES[body.type].color+'40';ctx.shadowBlur=9;ctx.shadowOffsetY=3;ctx.fillStyle=TYPES[body.type].color+'42';ctx.fill();ctx.shadowBlur=0;ctx.shadowOffsetY=0;ctx.clip();
+  for(let i=0;i<N;i++)triangle(sprites[body.type],[{x:128,y:128},sourceRim[i],sourceRim[(i+1)%N]],[{x:body.x,y:body.y},body.p[i],body.p[(i+1)%N]]);
+  ctx.restore();
+}
+function render(){
+  ctx.setTransform(canvas.width/W,0,0,canvas.height/H,0,0);ctx.clearRect(0,0,W,H);drawGlass();
+  const danger=Math.max(0,...world.bodies.map(b=>b.danger));ctx.save();ctx.setLineDash([8,8]);ctx.lineCap='round';ctx.strokeStyle=danger>0?'#ed637d':'#ff8b98';ctx.lineWidth=danger>0?2.5:1.8;ctx.beginPath();ctx.moveTo(26,BOUNDS.line);ctx.lineTo(474,BOUNDS.line);ctx.stroke();ctx.restore();
+  if(loaded){for(const body of world.bodies)drawBody(body);if(!paused&&!ended){const r=TYPES[current].r,x=Math.max(BOUNDS.left+r+3,Math.min(BOUNDS.right-r-3,aim));ctx.save();ctx.setLineDash([4,8]);ctx.strokeStyle='#a99ac780';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x,65+r+10);ctx.lineTo(x,570);ctx.stroke();ctx.globalAlpha=world.time<cooldown?.3:.85;ctx.drawImage(sprites[current],x-r,65-r,r*2,r*2);ctx.restore();}}
+  drawGlass(true);
+  for(const e of ripples){ctx.save();ctx.strokeStyle=e.color;ctx.globalAlpha=e.life*.3;ctx.lineWidth=1.3;ctx.beginPath();ctx.ellipse(e.x,e.y,e.r*(2-e.life),e.r*(2-e.life)*.65,0,0,TAU);ctx.stroke();ctx.restore();}
+  for(const e of effects){ctx.save();ctx.globalAlpha=Math.min(1,e.life*2);ctx.font='600 21px "Avenir Next","PingFang SC",sans-serif';ctx.textAlign='center';ctx.fillStyle='#7563af';ctx.strokeStyle='#f7f3ff';ctx.lineWidth=4;ctx.strokeText(e.text,e.x,e.y);ctx.fillText(e.text,e.x,e.y);ctx.restore();}
+  if(danger>0){ctx.save();ctx.font='600 13px "PingFang SC",sans-serif';ctx.textAlign='center';ctx.fillStyle='#d95970';ctx.fillText(`快满了！${Math.max(1,Math.ceil(3-danger))} 秒`,250,104);ctx.restore();}
+}
+function frame(now){const dt=Math.min((now-last)/1000||0, .065);last=now;if(loaded&&!paused&&!ended&&!document.hidden){accumulator+=dt;world.tilt=heldTilt||(keys.has('a')?-1:0)+(keys.has('d')?1:0);if(keys.has('arrowleft'))aim-=250*dt;if(keys.has('arrowright'))aim+=250*dt;aim=Math.max(45,Math.min(455,aim));while(accumulator>=1/120){world.step(1/120);accumulator-=1/120;}energy=Math.min(100,energy+dt*2.3);for(const e of effects){e.life-=dt;e.y-=dt*27;}effects=effects.filter(e=>e.life>0);for(const e of ripples)e.life-=dt;ripples=ripples.filter(e=>e.life>0);if(world.bodies.some(b=>b.danger>=3))finish();}else accumulator=0;uiClock+=dt;if(uiClock>.1){uiClock=0;syncUI();}if(now>toastUntil)$('toast').classList.remove('visible');render();requestAnimationFrame(frame);}
+function pointerAim(event){const rect=canvas.getBoundingClientRect();const contentWidth=Math.min(rect.width,rect.height*W/H);const left=rect.left+(rect.width-contentWidth)/2;aim=(event.clientX-left)*W/contentWidth;}
+let pointer=null;
+canvas.addEventListener('pointerdown',e=>{e.preventDefault();if(pointer!==null)return;pointer=e.pointerId;canvas.setPointerCapture(e.pointerId);canvas.classList.add('pointer-focused');canvas.focus({preventScroll:true});pointerAim(e);});
+canvas.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'||pointer===e.pointerId)pointerAim(e);});
+canvas.addEventListener('pointerup',e=>{if(pointer!==e.pointerId)return;pointerAim(e);pointer=null;drop();});canvas.addEventListener('pointercancel',()=>pointer=null);
+for(const[id,direction]of[['tilt-left',-1],['tilt-right',1]]){const button=$(id);button.addEventListener('pointerdown',e=>{e.preventDefault();button.setPointerCapture(e.pointerId);heldTilt=direction;});for(const name of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(name,()=>heldTilt=0);}
+document.addEventListener('keydown',e=>{if(dialog.open)return;canvas.classList.remove('pointer-focused');const key=e.key.toLowerCase();if(['arrowleft','arrowright','a','d'].includes(key)){e.preventDefault();keys.add(key);}if((key===' '||key==='enter')&&!e.repeat&&!['BUTTON','A'].includes(document.activeElement.tagName)){e.preventDefault();key===' '?stir():drop();}if(key==='p'&&!e.repeat)$('pause').click();});
+document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>{keys.clear();heldTilt=0;pointer=null;});document.addEventListener('visibilitychange',()=>{keys.clear();heldTilt=0;last=performance.now();});
+document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>{world.mode=button.dataset.mode;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));$('mode-desc').textContent=MODES[world.mode].label;tone(250,.05);}));
+$('stir').addEventListener('click',stir);
+$('sound').addEventListener('click',()=>{muted=!muted;$('sound').setAttribute('aria-pressed',String(!muted));$('sound').querySelector('span').textContent=muted?'静音':'声音';tone();});
+$('pause').addEventListener('click',()=>{if(ended)return;showDialog('让果冻歇一会儿','水果和时间都停在这里。','继续游戏',resume);});
+$('restart').addEventListener('click',()=>{if(score===0){reset();return;}showDialog('开始一池新的水果？','本局分数将清零，最佳分数会保留。','重新开始',reset);});
+$('help').addEventListener('click',()=>showDialog('一点物理，一点好运','<p>移动鼠标瞄准，点击投放。手机上拖动瞄准，松手投放。</p><p>同类水果碰到一起就会融合。切换「果冻 / 半流体 / 果汁」，感受不同弹性与流动性。</p><p>按 A / D 倾斜果池，按空格搅动。搅动消耗 30 能量；合成与等待可恢复。</p><p>水果稳定越过虚线 3 秒，本局结束。合出西瓜后可以继续挑战。</p>','开始实验',resume));
+$('dialog-close').addEventListener('click',()=>{dialog.close();resume();});dialog.addEventListener('cancel',e=>{if(ended){e.preventDefault();return;}resume();});
+function resize(){const ratio=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(W*ratio);canvas.height=Math.round(H*ratio);}
+resize();window.addEventListener('resize',resize);
+const atlas=new Image();atlas.onload=()=>{const cell=atlas.width/3;for(let i=0;i<9;i++){const sprite=document.createElement('canvas');sprite.width=256;sprite.height=256;sprite.getContext('2d').drawImage(atlas,i%3*cell,Math.floor(i/3)*cell,cell,cell,0,0,256,256);sprites.push(sprite);const step=document.createElement('span');step.className='fruit-step';step.dataset.fruit=i;step.title=TYPES[i].name;const preview=document.createElement('canvas');preview.width=144;preview.height=144;preview.setAttribute('role','img');preview.setAttribute('aria-label',TYPES[i].name);preview.getContext('2d').drawImage(sprite,6,6,132,132);step.append(preview);if(i<8)step.insertAdjacentHTML('beforeend','<svg aria-hidden="true"><use href="#i-chevron"/></svg>');$('fruit-route').append(step);}loaded=true;$('loading').hidden=true;reset();};atlas.onerror=()=>{$('loading').textContent='水果素材加载失败，请刷新重试。';};atlas.src='assets/atlas.webp';
+requestAnimationFrame(frame);
+
+})();</script>
+</body></html>
