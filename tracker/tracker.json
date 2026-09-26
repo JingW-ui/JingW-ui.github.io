@@ -342,5 +342,30 @@
     "resume": "/resume/resume_qz/resume_bilibili_qa.html",
     "note": "测评已发（牛客，30 天有效）；美团校招同一时间仅 1 个流程进行中，第一志愿优先考虑",
     "stage": "test"
+  },
+  {
+    "id": "moka_jingwei_abf77cfc",
+    "title": "AI 工程师",
+    "company": "经纬恒润",
+    "city": "成都",
+    "score": null,
+    "directions": [
+      "AI应用",
+      "RAG系统"
+    ],
+    "skills": [
+      "Python",
+      "Agent 开发",
+      "RAG",
+      "MCP"
+    ],
+    "majorGate": [],
+    "salary": "",
+    "publishDate": "",
+    "deadline": "",
+    "applyLink": "https://app.mokahr.com/campus-recruitment/jingweihengrun/172235?locale=zh-CN#/job/abf77cfc-a647-4e8d-a44a-572bae6b3f87",
+    "resume": "/resume/resume_qz/resume_jingwei_ai.html",
+    "note": "已投递（Moka 官方渠道），意向城市成都",
+    "stage": "applied"
   }
 ]
