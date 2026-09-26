@@ -309,11 +309,8 @@
             <div class="date">2026.07 - 2026.09</div>
             <div class="tech-line"><em>技术栈：</em>Python · LLM · Agent · Skill 开发 · PC 自动化 · Agent/Model 评测</div>
             <ul>
-                <li>面向游戏测试的<strong>远程 PC 自动化</strong>方向，以 agent + skill 替代人工逐台操作，落地 <strong>UU 取号</strong>与 <strong>G66 部署</strong>两个真实业务场景，实现批量并发执行与自动校验；灵活覆盖运行环境检查、安装状态确认、桌面界面可见性判断等分支流程。</li>
-                <li><strong>量化落地效果：</strong>10 台设备的 UU 取号从人工 2 小时以上压缩到 <span class="hl-red">10 分钟</span>、单台成本 <span class="hl-red">1 元以内</span>；100GB 级 G66 游戏环境（下载、打补丁、替换引擎、启动验证）通过自动判断目标机状态与内网分发，从 3 小时压缩到 <span class="hl-red">30 分钟</span>左右。</li>
-                <li>针对上述场景自主搭建 <strong>Agent 评测系统</strong>，以成功率、耗时、成本三指标量化 agent 与 model 选型；提出「<strong>判世界不判自述</strong>」判题思想，只看操作后世界的真实变化而非模型自述，并设计 L1–L4 能力阶梯题库，业务解耦可复用。</li>
-                <li><strong>评测过程量化与可视化：</strong>支持多 agent × 多模型 × 多设备批量并发、同一套题目横向对齐；参考 DeepSeek harness 轨迹实现搭建评测看板，提供结论推荐、多模型矩阵对比、单会话耗时拆解与逐次工具调用追溯——如 glm-5.3-flash 全程 5.4 分钟 vs deepseek-v4-pro 2.1 分钟的轨迹对比，直接定位「慢在哪、干了什么」。</li>
-                <li><strong>项目职责：</strong>业务 skill 设计与开发、评测系统从 0 到 1 搭建（指标定义、判题逻辑、题库设计、结果可视化）。</li>
+                <li><strong>远程 PC 自动化落地：</strong>以 agent + skill 替代人工逐台操作，落地 <strong>UU 取号</strong>与 <strong>G66 部署</strong>两个真实业务场景，实现批量并发执行与分支流程自动校验——10 台设备取号从人工 2 小时以上压缩到 <span class="hl-red">10 分钟</span>，100GB 级游戏环境部署（下载、打补丁、启动验证）从 3 小时压缩到 <span class="hl-red">30 分钟</span>。</li>
+                <li><strong>Agent 评测系统（0 → 1）：</strong>以成功率、耗时、成本三指标量化 agent 与 model 选型，提出「<strong>判世界不判自述</strong>」判题思想，支持多 agent × 多模型 × 多设备批量并发横向对齐与轨迹可视化，题库业务解耦可复用。</li>
             </ul>
         </div>
     </div>
