@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
     <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
     <title>投递看板 · 王京</title>
     <style>
@@ -426,6 +427,95 @@
         .footer a { color: var(--ochre); text-decoration: none; }
         .footer a:hover { text-decoration: underline; }
 
+        /* ---------- 进展时间线 ---------- */
+        .jc-tl {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--ink-2);
+            background: var(--line-2);
+            border-radius: 6px;
+            padding: 4px 8px;
+            margin-bottom: 7px;
+        }
+        .jc-tl b { font-weight: 600; color: var(--ink); white-space: nowrap; }
+        .jc-tl .ago {
+            margin-left: auto;
+            color: var(--ink-3);
+            font-family: var(--mono);
+            font-size: 10.5px;
+            white-space: nowrap;
+        }
+        .jc-tl.stale { background: var(--amber-bg); }
+        .jc-tl.stale .ago { color: var(--amber); font-weight: 600; }
+        .jc-tl.win { background: var(--green-bg); }
+        .jc-tl.win b, .jc-tl.win .ago { color: var(--green); }
+        .chip.offer { background: var(--green-bg); color: var(--green); font-weight: 650; }
+        .chip.rej, .chip.stop { background: #f0ede8; color: var(--ink-3); }
+
+        .tl { margin: 2px 0 10px; }
+        .tl-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12.5px;
+            padding: 6px 2px 6px 14px;
+            border-left: 2px solid var(--line);
+            margin-left: 5px;
+            position: relative;
+        }
+        .tl-row .tl-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--ochre-l);
+            flex-shrink: 0;
+            position: absolute;
+            left: -5px;
+        }
+        .tl-row.offer .tl-dot { background: var(--green); }
+        .tl-row.rej .tl-dot, .tl-row.stop .tl-dot { background: var(--ink-3); }
+        .tl-row .tl-date {
+            font-family: var(--mono);
+            font-size: 11.5px;
+            color: var(--ink-3);
+            width: 80px;
+            flex-shrink: 0;
+        }
+        .tl-row b { font-weight: 600; }
+        .tl-row:last-child b { color: var(--ochre); }
+        .tl-row.offer b { color: var(--green); }
+        .tl-row .tl-del {
+            margin-left: auto;
+            border: none;
+            background: none;
+            color: var(--ink-3);
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            padding: 0 6px;
+        }
+        .tl-row .tl-del:hover { color: #b91c1c; }
+        .tl-add { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 4px; }
+        .tl-add select, .tl-add input[type=date] {
+            font-family: inherit;
+            font-size: 12.5px;
+            padding: 6px 9px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            background: #fff;
+            color: var(--ink);
+            outline: none;
+        }
+        .tl-add select:focus, .tl-add input[type=date]:focus { border-color: var(--ochre-l); }
+        .tl-add input[type=date] { width: 142px; }
+        .tl-clear { margin-top: 10px; }
+        .stage-now { font-size: 13px; padding: 7px 10px; background: var(--line-2); border-radius: 7px; }
+        .stage-now b { font-weight: 700; }
+        .stage-now small { color: var(--ink-3); margin-left: 8px; font-size: 11px; }
+        .stat.good b { color: var(--green); }
+
         @media (max-width: 1180px) {
             .board {
                 grid-template-columns: none;
@@ -459,8 +549,9 @@
             <div class="eyebrow">Application Tracker</div>
             <h1 class="name">投递看板</h1>
             <p class="tagline">
-                2027 届校招的投递进度。<strong>拖动卡片换列</strong>，点击卡片看详情、改备注或打开官方投递页。
-                阶段与备注存在这台设备的浏览器里（localStorage），岗位本身来自仓库内的 <code>tracker.json</code>。
+                2027 届校招的投递进度。<strong>拖动卡片换列</strong>自动记录进展日期，点击卡片看完整时间线（投递 → 笔试 → 各轮面试 → Offer / 结束）。
+                阶段、备注与进展时间线都存在这台设备的浏览器里（localStorage），<strong>不同步到公开仓库</strong>；换设备用导出 / 导入。
+                岗位本身来自仓库内的 <code>tracker.json</code>。
             </p>
         </div>
         <nav class="nav">
@@ -491,6 +582,8 @@
         </select>
         <button class="btn primary" id="addBtn">+ 添加岗位</button>
         <button class="btn" id="exportBtn">导出进度</button>
+        <button class="btn" id="importBtn">导入进度</button>
+        <input type="file" id="importFile" accept="application/json,.json" hidden>
         <span class="count" id="count"></span>
     </div>
 
@@ -555,7 +648,73 @@ function saveState() {
     }
 }
 
-function stageOf(j) { return (ST[j.id] && ST[j.id].stage) || j.stage || 'wish'; }
+/* ---------- 进展时间线 ---------- */
+
+// 事件枚举：卡片列由最后一条事件推导（单一数据源，不会和列状态打架）
+const EVENTS = {
+    applied: {label: '投递',      stage: 'applied'},
+    test:    {label: '笔试/测评', stage: 'test'},
+    i1:      {label: '一面',      stage: 'interview'},
+    i2:      {label: '二面',      stage: 'interview'},
+    i3:      {label: '三面/HR面', stage: 'interview'},
+    offer:   {label: 'Offer',    stage: 'closed', sub: 'offer'},
+    rej:     {label: '挂了',      stage: 'closed', sub: 'rej'},
+    stop:    {label: '放弃',      stage: 'closed', sub: 'stop'}
+};
+const EVENT_ORDER = ['applied', 'test', 'i1', 'i2', 'i3', 'offer', 'rej', 'stop'];
+// 「下一步」建议：默认选中项跟着最近事件走
+const NEXT_EVENT = {applied: 'test', test: 'i1', i1: 'i2', i2: 'i3', i3: 'offer'};
+
+function todayStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function timelineOf(j) {
+    const s = ST[j.id];
+    return (s && Array.isArray(s.timeline)) ? s.timeline : [];
+}
+
+function lastEvent(j) {
+    const tl = timelineOf(j);
+    return tl.length ? tl[tl.length - 1] : null;
+}
+
+function stageOf(j) {
+    const le = lastEvent(j);
+    if (le && EVENTS[le.e]) return EVENTS[le.e].stage;
+    return (ST[j.id] && ST[j.id].stage) || j.stage || 'wish';
+}
+
+// 已结束列的三种子状态：offer / rej / stop（没有时间线时为 null）
+function closedSub(j) {
+    const le = lastEvent(j);
+    return (le && EVENTS[le.e] && EVENTS[le.e].sub) ? EVENTS[le.e].sub : null;
+}
+
+function stageLabelOf(j) {
+    const key = stageOf(j);
+    const s = STAGES.find(x => x.key === key);
+    return s ? s.label : key;
+}
+
+// 时间线非空时阶段由事件推导；推不出（数据异常）时退回原逻辑
+function pushEvent(id, e, d) {
+    const ev = EVENTS[e];
+    if (!ev || !d) return;
+    const cur = ST[id] || {};
+    const tl = Array.isArray(cur.timeline) ? cur.timeline.slice() : [];
+    if (tl.length && tl[tl.length - 1].e === e) tl[tl.length - 1] = {e: e, d: d}; // 同事件重记 → 改日期
+    else tl.push({e: e, d: d});
+    ST[id] = Object.assign({}, cur, {timeline: tl, done: todayStr()});
+    if (saveState()) toast('已记录：' + ev.label + ' · ' + d);
+}
+
+function daysAgo(d) {
+    const t = new Date(d + 'T00:00:00');
+    if (isNaN(t)) return null;
+    return Math.round((new Date(todayStr() + 'T00:00:00') - t) / 86400000);
+}
 function noteOf(j) {
     const s = ST[j.id];
     return (s && s.note !== undefined) ? s.note : (j.note || '');
@@ -623,6 +782,20 @@ function cardHtml(j, i) {
         ? '<span class="jc-score">—</span>'
         : `<span class="jc-score">${Math.round(j.score)}</span>`;
 
+    // 已结束列的三种结果角标
+    const sub = closedSub(j);
+    const subChip = sub ? `<span class="chip ${sub}">${esc(EVENTS[sub].label)}</span>` : '';
+
+    // 最近事件 + 距今天数（拖到「已结束」前的活跃阶段超过 7 天变琥珀色提醒）
+    let recent = '';
+    const le = lastEvent(j);
+    if (le && EVENTS[le.e]) {
+        const days = daysAgo(le.d);
+        const ago = days === null ? '' : (days <= 0 ? '今天' : days + ' 天前');
+        const cls = EVENTS[le.e].sub === 'offer' ? ' win' : ((EVENTS[le.e].stage !== 'closed' && days > 7) ? ' stale' : '');
+        recent = `<div class="jc-tl${cls}"><b>${esc(EVENTS[le.e].label)}</b><span>${esc((le.d || '').slice(5))}</span><span class="ago">${ago}</span></div>`;
+    }
+
     return `
     <div class="jc" draggable="true" data-i="${i}" data-id="${esc(j.id)}">
         <div class="jc-top">
@@ -631,11 +804,13 @@ function cardHtml(j, i) {
         </div>
         <div class="jc-title">${esc(j.title)}</div>
         <div class="jc-meta">
+            ${subChip}
             ${j.city ? `<span class="chip city">${esc(j.city)}</span>` : ''}
             ${dirs.map(d => `<span class="chip dir">${esc(d)}</span>`).join('')}
             ${(j.majorGate || []).length ? `<span class="chip warn" title="${esc(j.majorGate.join(' / '))}">专业存疑</span>` : ''}
             ${j.manual ? `<span class="chip manual">手工</span>` : ''}
         </div>
+        ${recent}
         ${note ? `<div class="jc-note">${esc(note)}</div>` : ''}
         <div class="jc-foot">
             ${resumeOf(j) ? `<a href="${esc(resumeOf(j))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">简历</a>` : ''}
@@ -674,6 +849,7 @@ function renderStats() {
     const byStage = {};
     STAGES.forEach(s => byStage[s.key] = JOBS.filter(j => stageOf(j) === s.key).length);
     const active = byStage.applied + byStage.test + byStage.interview;
+    const offer = JOBS.filter(j => closedSub(j) === 'offer').length;
     let soon = 0;
     JOBS.forEach(j => {
         if (!j.deadline || !['wish', 'applied'].includes(stageOf(j))) return;
@@ -686,8 +862,9 @@ function renderStats() {
         <div class="stat"><b>${JOBS.length}</b><span>意向岗位</span></div>
         <div class="stat hot"><b>${active}</b><span>进行中</span></div>
         <div class="stat"><b>${byStage.interview}</b><span>面试中</span></div>
-        <div class="stat"><b>${soon}</b><span>两周内截止</span></div>
-        <div class="stat"><b>${JOBS.filter(j => (j.majorGate || []).length).length}</b><span>专业存疑</span></div>`;
+        <div class="stat${offer ? ' good' : ''}"><b>${offer}</b><span>Offer</span></div>
+        <div class="stat"><b>${byStage.closed}</b><span>已完结</span></div>
+        <div class="stat"><b>${soon}</b><span>两周内截止</span></div>`;
 }
 
 /* ---------- 拖拽 ---------- */
@@ -724,9 +901,36 @@ function bindDnD() {
 function setStage(id, stage) {
     const j = JOBS.find(x => x.id === id);
     if (!j) return;
-    if (stageOf(j) === stage) return;
-    ST[id] = Object.assign({}, ST[id], {stage: stage, done: new Date().toISOString().slice(0, 10)});
-    saveState();
+    const tl = timelineOf(j);
+
+    if (stage === 'wish') {
+        if (tl.length) { toast('已有进展记录，回「想投」请在详情里清空时间线'); return; }
+        if (stageOf(j) === stage) return;
+        ST[id] = Object.assign({}, ST[id], {stage: stage, done: todayStr()});
+        saveState();
+        render();
+        return;
+    }
+
+    if (stage === 'closed') {
+        if (tl.length) { openJob(id); toast('请在时间线里标记 Offer / 挂了 / 放弃'); return; }
+        if (stageOf(j) === stage) return;
+        ST[id] = Object.assign({}, ST[id], {stage: stage, done: todayStr()});
+        saveState();
+        render();
+        return;
+    }
+
+    // applied / test / interview → 写时间线事件，阶段随之推导
+    let e;
+    if (stage === 'applied') e = 'applied';
+    else if (stage === 'test') e = 'test';
+    else {
+        const rounds = tl.map(x => x.e).filter(x => ['i1', 'i2', 'i3'].includes(x));
+        const last = rounds[rounds.length - 1];
+        e = !last ? 'i1' : {i1: 'i2', i2: 'i3', i3: 'i3'}[last];
+    }
+    pushEvent(id, e, todayStr());
     render();
 }
 
@@ -737,9 +941,46 @@ function openJob(id) {
     if (!j) return;
     const mbox = document.getElementById('mbox');
     const st = stageOf(j);
+    const tl = timelineOf(j);
 
     const stageOpts = STAGES.map(s =>
         `<option value="${s.key}"${stageOf(j) === s.key ? ' selected' : ''}>${esc(s.label)}</option>`).join('');
+
+    // 有时间线时阶段由事件推导，下拉换成只读展示，避免两套状态打架
+    const stageField = tl.length
+        ? `<div class="field">
+                <label>当前阶段</label>
+                <div class="stage-now"><b>${esc(stageLabelOf(j))}</b><small>由时间线推导，在下方增删事件即可更新</small></div>
+            </div>`
+        : `<div class="field">
+                <label>当前阶段</label>
+                <select id="mStage">${stageOpts}</select>
+            </div>`;
+
+    const le = lastEvent(j);
+    const sug = NEXT_EVENT[le ? le.e : 'applied'] || 'applied';
+    const eventOpts = EVENT_ORDER.map(e =>
+        `<option value="${e}"${e === sug ? ' selected' : ''}>${esc(EVENTS[e].label)}</option>`).join('');
+    const tlRows = tl.map((ev, i) => {
+        const E = EVENTS[ev.e] || {label: ev.e};
+        return `<div class="tl-row ${esc(ev.e)}">
+                <span class="tl-dot"></span>
+                <span class="tl-date">${esc(ev.d)}</span>
+                <b>${esc(E.label)}</b>
+                <button class="tl-del" title="删除这条" onclick="delEvent('${esc(j.id)}',${i})">×</button>
+            </div>`;
+    }).join('');
+    const timelineSec = `
+        <div class="msec"><h3>进展时间线</h3>
+            ${tl.length ? `<div class="tl">${tlRows}</div>`
+                        : '<p style="margin:0 0 8px">还没有记录。哪天投的、笔试、各轮面试、Offer 或结束，随手记一笔。</p>'}
+            <div class="tl-add">
+                <select id="tlE">${eventOpts}</select>
+                <input type="date" id="tlD" value="${todayStr()}">
+                <button class="btn" onclick="addEvent('${esc(j.id)}')">记录</button>
+            </div>
+            ${tl.length ? `<button class="btn danger tl-clear" onclick="clearTimeline('${esc(j.id)}')">清空时间线</button>` : ''}
+        </div>`;
 
     const resp = (j.responsibilities || []).length
         ? `<div class="msec"><h3>岗位职责</h3><ul>${j.responsibilities.map(r => `<li>${esc(r)}</li>`).join('')}</ul></div>` : '';
@@ -766,20 +1007,19 @@ function openJob(id) {
 
         <div class="msec"><h3>投递状态</h3>
             <div class="row2">
-                <div class="field">
-                    <label>当前阶段</label>
-                    <select id="mStage">${stageOpts}</select>
-                </div>
+                ${stageField}
                 <div class="field">
                     <label>关联简历</label>
                     <input id="mResume" value="${esc(resumeOf(j))}" placeholder="/resume/resume_xxx.html">
                 </div>
             </div>
             <div class="field">
-                <label>备注（笔试时间、面试轮次、HR 联系…）</label>
+                <label>备注（HR 联系、地点、薪酬…）</label>
                 <textarea id="mNote" rows="3">${esc(noteOf(j))}</textarea>
             </div>
         </div>
+
+        ${timelineSec}
 
         ${exp}${gate}${resp}${req}${detail}
 
@@ -802,13 +1042,52 @@ function closeModal() {
 function saveModal(id) {
     const j = JOBS.find(x => x.id === id);
     if (!j) return;
-    ST[id] = Object.assign({}, ST[id], {
-        stage: document.getElementById('mStage').value,
+    const patch = {
         note: document.getElementById('mNote').value.trim(),
         resume: document.getElementById('mResume').value.trim(),
-        done: new Date().toISOString().slice(0, 10)
-    });
+        done: todayStr()
+    };
+    const sel = document.getElementById('mStage');   // 有时间线时不存在，阶段由事件推导
+    if (sel) patch.stage = sel.value;
+    ST[id] = Object.assign({}, ST[id], patch);
     if (saveState()) toast('已保存');
+    closeModal();
+    render();
+}
+
+/* ---------- 时间线操作 ---------- */
+
+function addEvent(id) {
+    const e = document.getElementById('tlE').value;
+    const d = document.getElementById('tlD').value || todayStr();
+    pushEvent(id, e, d);
+    render();
+    openJob(id);   // 重绘弹窗内容
+}
+
+function delEvent(id, i) {
+    const cur = ST[id] || {};
+    const tl = Array.isArray(cur.timeline) ? cur.timeline.slice() : [];
+    if (!tl[i]) return;
+    tl.splice(i, 1);
+    const patch = Object.assign({}, cur, {timeline: tl, done: todayStr()});
+    if (!tl.length) {
+        delete patch.timeline;
+        delete patch.stage;   // 记录清零 → 阶段回到 tracker.json 默认
+    }
+    ST[id] = patch;
+    if (saveState()) toast('已删除');
+    render();
+    openJob(id);
+}
+
+function clearTimeline(id) {
+    if (!confirm('清空该岗位的全部进展记录？阶段会回到「想投」。')) return;
+    const patch = Object.assign({}, ST[id]);
+    delete patch.timeline;
+    delete patch.stage;
+    ST[id] = patch;
+    if (saveState()) toast('已清空');
     closeModal();
     render();
 }
@@ -934,13 +1213,15 @@ function exportProgress() {
         const stage = stageOf(j);
         const note = noteOf(j);
         const resume = resumeOf(j);
-        if (stage !== (j.stage || 'wish') || note || resume || s.done) {
+        const tl = Array.isArray(s.timeline) ? s.timeline : [];
+        if (stage !== (j.stage || 'wish') || note || resume || s.done || tl.length) {
             out.progress[j.id] = {
                 company: j.company,
                 title: j.title,
                 stage: stage,
                 note: note || '',
                 resume: resume,
+                timeline: tl,
                 updated: s.done || ''
             };
         }
@@ -954,6 +1235,42 @@ function exportProgress() {
     a.click();
     URL.revokeObjectURL(a.href);
     toast('已导出进度文件');
+}
+
+/* ---------- 导入 ---------- */
+
+// 与导出配对：合并进度到本机 localStorage；旧格式（无 timeline）兼容
+function importProgress(file) {
+    const r = new FileReader();
+    r.onload = () => {
+        try {
+            const data = JSON.parse(r.result);
+            const prog = data.progress || {};
+            let n = 0;
+            Object.keys(prog).forEach(id => {
+                const p = prog[id] || {};
+                const next = Object.assign({}, ST[id] || {});
+                if (p.stage) next.stage = p.stage;
+                if (p.note !== undefined) next.note = p.note;
+                if (p.resume !== undefined) next.resume = p.resume;
+                if (Array.isArray(p.timeline) && p.timeline.length) next.timeline = p.timeline;
+                ST[id] = next;
+                n++;
+            });
+            let m = 0;
+            (data.manualJobs || []).forEach(j => {
+                if (!j.id || JOBS.some(x => x.id === j.id)) return;
+                JOBS.push(j);
+                m++;
+            });
+            if (saveState()) toast('已导入 ' + n + ' 个岗位进度' + (m ? '，新增 ' + m + ' 个手工岗位' : ''));
+            fillFilters();
+            render();
+        } catch (e) {
+            toast('导入失败：文件格式不对');
+        }
+    };
+    r.readAsText(file);
 }
 
 /* ---------- 启动 ---------- */
@@ -975,6 +1292,12 @@ window.addEventListener('DOMContentLoaded', () => {
         document.getElementById(id).addEventListener('input', render));
     document.getElementById('addBtn').addEventListener('click', openAdd);
     document.getElementById('exportBtn').addEventListener('click', exportProgress);
+    document.getElementById('importBtn').addEventListener('click', () =>
+        document.getElementById('importFile').click());
+    document.getElementById('importFile').addEventListener('change', function () {
+        if (this.files && this.files[0]) importProgress(this.files[0]);
+        this.value = '';
+    });
 
     Promise.all([
         fetch('/tracker/tracker.json?_=' + Date.now()).then(r => {
