@@ -1037,5 +1037,31 @@
         "后端/Web 前端/安卓/iOS 任一端有基础与开发实践，愿意拓展其他端；有 AI 项目、开源贡献或实习经历者优先"
       ]
     }
+  },
+  {
+    "index": "50",
+    "company": "经纬恒润 · 秋招",
+    "role": "AI 工程师",
+    "direction": "AI Agent / RAG",
+    "tags": ["AI Agent", "RAG", "MCP", "Python"],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_jingwei_ai.html",
+    "match": "high",
+    "applyLink": "https://www.shushuqiuzhi.com/position/402892",
+    "jobId": "402892",
+    "jobTitle": "AI 工程师（汽车电子工程咨询）",
+    "location": "",
+    "jd": {
+      "duty": [
+        "负责整车 OS AI 大模型需求实现",
+        "结合实际产品和业务需求，参与 AI Agent 设计、开发、优化和升级",
+        "编写清晰、规范的技术文档：设计文档、开发文档、测试文档等"
+      ],
+      "req": [
+        "本科及以上学历，掌握 Python 开发，熟悉 Python 主流开发框架",
+        "了解大模型相关技术：Agent、RAG、MCP 等，有开发和落地经验者优先",
+        "扎实的计算机基础知识，较强的逻辑理解和学习能力"
+      ]
+    }
   }
 ]
