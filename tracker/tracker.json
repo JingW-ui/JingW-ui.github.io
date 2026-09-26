@@ -367,5 +367,34 @@
     "resume": "/resume/resume_qz/resume_jingwei_ai.html",
     "note": "已投递（Moka 官方渠道），意向城市成都",
     "stage": "applied"
+  },
+  {
+    "id": "moka_cestc_08ce3df1",
+    "title": "AI Coding 开发工程师",
+    "company": "中电云计算",
+    "city": "武汉",
+    "score": null,
+    "directions": [
+      "AI应用",
+      "RAG系统"
+    ],
+    "skills": [
+      "Python",
+      "Agent 开发",
+      "RAG",
+      "MCP"
+    ],
+    "majorGate": [
+      "计算机",
+      "人工智能",
+      "软件工程"
+    ],
+    "salary": "",
+    "publishDate": "",
+    "deadline": "",
+    "applyLink": "https://app.mokahr.com/campus-recruitment/cestc/102244#/job/08ce3df1-292c-424a-91d5-42f4b0161d0f",
+    "resume": "/resume/resume_qz/resume_ceccloud_aicoding.html",
+    "note": "已投递（Moka 官方渠道），base 武汉",
+    "stage": "applied"
   }
 ]
