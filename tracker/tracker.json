@@ -316,5 +316,31 @@
     "resume": "/resume/resume_qz/resume_tencent_pc_client.html",
     "note": "已完成测评，等待结果与面试安排",
     "stage": "test"
+  },
+  {
+    "id": "meituan_4697267462",
+    "title": "测试开发工程师",
+    "company": "美团",
+    "city": "深圳",
+    "score": null,
+    "directions": [
+      "测试开发"
+    ],
+    "skills": [
+      "Python",
+      "Java",
+      "C/C++",
+      "Shell",
+      "自动化测试",
+      "质量保障"
+    ],
+    "majorGate": [],
+    "salary": "",
+    "publishDate": "",
+    "deadline": "",
+    "applyLink": "https://zhaopin.meituan.com/web/position/detail?jobUnionId=4697267462&jobShareType=1&highlightType=campus",
+    "resume": "/resume/resume_qz/resume_bilibili_qa.html",
+    "note": "校招投递：最多 3 个职位，但同一时间仅 1 个流程进行中，第一志愿优先考虑",
+    "stage": "applied"
   }
 ]
