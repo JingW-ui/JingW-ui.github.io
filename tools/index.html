@@ -239,10 +239,10 @@
         }
 
         /* 分类区块 */
-        /* 区块面板：半透白包裹框（无 backdrop-filter，滚动零性能负担） */
+        /* 区块面板：亮色包裹框（无 backdrop-filter，滚动零性能负担） */
         .category-section,
         .featured-section {
-            background: rgba(255, 255, 255, 0.30);
+            background: rgba(255, 255, 255, 0.50);
             border: 1px solid var(--border);
             border-radius: 20px;
             padding: 14px 16px 16px;
@@ -286,15 +286,13 @@
             gap: 10px;
         }
 
-        /* 紧凑横排小卡片：小图标 + 工具名 */
+        /* 紧凑横排小卡片：雾灰素面 chip，hover 才点亮 */
         .tool-card {
-            background: var(--card);
-            backdrop-filter: blur(18px) saturate(140%);
-            -webkit-backdrop-filter: blur(18px) saturate(140%);
+            background: rgba(148, 163, 184, 0.10);
             border-radius: 14px;
             padding: 8px 10px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
+            border: 1px solid transparent;
+            box-shadow: none;
             transition: background 0.25s ease,
                         border-color 0.25s ease,
                         box-shadow 0.25s ease,
@@ -360,13 +358,11 @@
         }
 
         .featured-card {
-            background: var(--card);
-            backdrop-filter: blur(18px) saturate(140%);
-            -webkit-backdrop-filter: blur(18px) saturate(140%);
+            background: rgba(148, 163, 184, 0.10);
             border-radius: 16px;
             padding: 14px 8px 12px;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow-sm);
+            border: 1px solid transparent;
+            box-shadow: none;
             transition: background 0.25s ease,
                         border-color 0.25s ease,
                         box-shadow 0.25s ease,
