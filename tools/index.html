@@ -158,7 +158,6 @@
 
         .search-box {
             width: 100%;
-            max-width: 500px;
             padding: 10px 18px;
             border: 1px solid var(--border);
             border-radius: 16px;
@@ -175,139 +174,97 @@
             box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.18);
         }
 
-        /* 分类标签 */
-        .category-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-            opacity: 0;
-            transform: translateY(14px);
-            animation: rise 0.45s ease 0.14s forwards;
-        }
-
-        .category-tab {
-            padding: 8px 16px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.75rem;
+        /* 搜索空状态 */
+        .empty-state {
+            display: none;
+            text-align: center;
+            padding: 3.5rem 0 2rem;
             color: var(--text-dim);
-            transition: var(--transition);
-            user-select: none;
-            backdrop-filter: blur(6px);
+            font-size: 0.85rem;
         }
 
-        .category-tab:hover {
-            background: var(--card-hover);
-            border-color: var(--border-hover);
+        /* 分类区块 */
+        .category-section {
+            margin-bottom: 1.6rem;
+        }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
             color: var(--text);
+            margin-bottom: 0.7rem;
+            padding-left: 11px;
+            position: relative;
+            letter-spacing: 0.5px;
         }
 
-        .category-tab.active {
-            background: rgba(45, 212, 191, 0.15);
-            color: var(--accent);
-            border-color: rgba(45, 212, 191, 0.35);
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 15px;
+            border-radius: 2px;
+            background: linear-gradient(180deg, var(--accent), var(--accent-2));
+        }
+
+        .section-count {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            margin-left: 8px;
         }
 
         /* 工具网格 */
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 12px;
-            padding: 0;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
         }
 
+        /* 紧凑横排小卡片：小图标 + 工具名 */
         .tool-card {
             background: var(--card);
-            backdrop-filter: blur(24px) saturate(140%);
-            -webkit-backdrop-filter: blur(24px) saturate(140%);
-            border-radius: var(--radius-md);
-            padding: 0;
+            backdrop-filter: blur(18px) saturate(140%);
+            -webkit-backdrop-filter: blur(18px) saturate(140%);
+            border-radius: 14px;
+            padding: 9px 12px;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow-md);
-            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                        box-shadow 0.35s ease,
-                        backdrop-filter 0.35s ease,
-                        background 0.35s ease,
-                        border-color 0.35s ease;
-            position: relative;
-            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: background 0.25s ease,
+                        border-color 0.25s ease,
+                        box-shadow 0.25s ease,
+                        transform 0.25s ease;
             display: flex;
-            flex-direction: column;
-            min-height: 85px;
+            align-items: center;
+            gap: 10px;
+            min-height: 54px;
             cursor: pointer;
             text-decoration: none;
             opacity: 0;
-            transform: translateY(16px);
+            transform: translateY(14px);
             animation: rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        /* hover 光泽扫过 */
-        .tool-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.55) 48%, transparent 66%);
-            transform: translateX(-120%);
-            transition: transform 0.7s ease;
-            pointer-events: none;
-            z-index: 2;
         }
 
         .tool-card:hover {
             background: var(--card-hover);
             border-color: var(--border-hover);
-            box-shadow: 0 16px 48px rgba(20, 40, 50, 0.16),
-                        0 0 0 1px rgba(255, 255, 255, 0.5) inset;
-            transform: perspective(800px) rotateX(2deg) rotateY(-2deg)
-                       translateY(-4px) scale(1.015);
-            backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
-            -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
-        }
-
-        .tool-card:hover::before {
-            transform: translateX(120%);
-        }
-
-        .tool-label {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            padding: 3px 8px;
-            background: rgba(45, 212, 191, 0.12);
-            border: 1px solid rgba(45, 212, 191, 0.25);
-            border-radius: 12px;
-            font-size: 0.6rem;
-            color: var(--accent);
-            z-index: 3;
-            line-height: 1.2;
-            font-weight: 600;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-        }
-
-        .tool-card-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 12px 12px 0 12px;
-            margin-bottom: 0;
-            padding-right: 60px;
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
         .tool-icon {
-            width: 36px;
-            height: 36px;
-            min-width: 36px;
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
             background: linear-gradient(135deg, #d9efef, #c4e3e8);
-            border-radius: 10px;
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
+            font-size: 15px;
             border: 1px solid var(--border);
             overflow: hidden;
             box-shadow: var(--shadow-sm);
@@ -319,26 +276,15 @@
             object-fit: cover;
         }
 
-        .tool-content {
-            flex: 1;
-            min-width: 0;
-        }
-
         .tool-name {
-            font-size: 0.85rem;
-            font-weight: 650;
+            font-size: 0.8rem;
+            font-weight: 600;
             color: var(--text);
-            margin-bottom: 3px;
             line-height: 1.3;
             letter-spacing: -0.2px;
-        }
-
-        .tool-description {
-            color: var(--text-soft);
-            font-size: 0.68rem;
-            line-height: 1.4;
-            margin-bottom: 0;
-            padding-bottom: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
 
@@ -480,16 +426,14 @@
                 border-radius: 12px;
             }
 
-            /* 分类标签紧凑布局 */
-            .category-tabs {
-                gap: 5px;
-                margin-bottom: 0.6rem;
+            /* 分类区块紧凑化 */
+            .category-section {
+                margin-bottom: 1.1rem;
             }
 
-            .category-tab {
-                padding: 5px 10px;
-                font-size: 0.62rem;
-                border-radius: 14px;
+            .section-title {
+                font-size: 0.85rem;
+                margin-bottom: 0.55rem;
             }
 
             /* 工具网格 - 每行两个卡片 */
@@ -500,41 +444,22 @@
 
             /* 工具卡片紧凑化 */
             .tool-card {
-                min-height: 70px;
-                border-radius: 14px;
-            }
-
-            .tool-label {
-                top: 5px;
-                right: 5px;
-                padding: 2px 5px;
-                font-size: 0.5rem;
-                border-radius: 8px;
-            }
-
-            .tool-card-header {
-                padding: 8px 8px 0 8px;
-                padding-right: 48px;
+                min-height: 46px;
+                padding: 7px 9px;
+                border-radius: 12px;
                 gap: 7px;
             }
 
             .tool-icon {
-                width: 28px;
-                height: 28px;
-                min-width: 28px;
-                font-size: 13px;
+                width: 26px;
+                height: 26px;
+                min-width: 26px;
+                font-size: 12px;
                 border-radius: 7px;
             }
 
             .tool-name {
-                font-size: 0.7rem;
-                margin-bottom: 1px;
-            }
-
-            .tool-description {
-                font-size: 0.56rem;
-                line-height: 1.3;
-                padding-bottom: 6px;
+                font-size: 0.68rem;
             }
 
             /* 页脚 */
@@ -562,15 +487,12 @@
             .subtitle { font-size: 0.65rem; }
             .stats-banner { font-size: 0.56rem; padding: 0.2rem 0.55rem; }
             .search-box { padding: 6px 10px; font-size: 0.68rem; border-radius: 10px; }
-            .category-tabs { gap: 4px; margin-bottom: 0.5rem; }
-            .category-tab { padding: 4px 8px; font-size: 0.56rem; border-radius: 12px; }
+            .category-section { margin-bottom: 0.9rem; }
+            .section-title { font-size: 0.78rem; margin-bottom: 0.45rem; }
             .tools-grid { gap: 5px; }
-            .tool-card { min-height: 60px; border-radius: 12px; }
-            .tool-label { top: 4px; right: 4px; padding: 1px 4px; font-size: 0.45rem; }
-            .tool-card-header { padding: 6px 6px 0 6px; padding-right: 40px; gap: 5px; }
-            .tool-icon { width: 24px; height: 24px; min-width: 24px; font-size: 11px; border-radius: 6px; }
+            .tool-card { min-height: 42px; padding: 6px 8px; border-radius: 10px; gap: 6px; }
+            .tool-icon { width: 22px; height: 22px; min-width: 22px; font-size: 10px; border-radius: 6px; }
             .tool-name { font-size: 0.62rem; }
-            .tool-description { font-size: 0.5rem; line-height: 1.25; padding-bottom: 5px; }
             .footer { font-size: 0.55rem; padding: 14px 0 10px; margin-top: 18px; }
             .visit-stats { font-size: 0.52rem; padding: 4px 8px; }
         }
@@ -582,13 +504,9 @@
             .subtitle { font-size: 0.6rem; }
             .stats-banner { font-size: 0.52rem; }
             .search-box { padding: 5px 8px; font-size: 0.62rem; }
-            .category-tab { padding: 3px 6px; font-size: 0.5rem; }
-            .tool-card { min-height: 54px; border-radius: 10px; }
-            .tool-card-header { padding: 5px 5px 0 5px; padding-right: 36px; gap: 4px; }
-            .tool-icon { width: 22px; height: 22px; min-width: 22px; font-size: 10px; }
+            .tool-card { min-height: 40px; padding: 5px 7px; border-radius: 9px; gap: 5px; }
+            .tool-icon { width: 20px; height: 20px; min-width: 20px; font-size: 9px; border-radius: 5px; }
             .tool-name { font-size: 0.58rem; }
-            .tool-description { font-size: 0.46rem; }
-            .tool-label { font-size: 0.42rem; padding: 1px 3px; }
         }
 
         /* 尊重减少动效偏好 */
@@ -597,7 +515,7 @@
                 animation: none !important;
                 transition: none !important;
             }
-            .tool-card, .title-section, .search-container, .category-tabs, .footer {
+            .tool-card, .title-section, .search-container, .category-section, .footer {
                 opacity: 1 !important;
                 transform: none !important;
             }
@@ -659,861 +577,329 @@
             <input type="text" class="search-box" id="searchBox" placeholder="搜索工具名称或描述...">
         </div>
 
-        <!-- 分类标签 -->
-        <div class="category-tabs">
-            <div class="category-tab active" data-category="all">全部</div>
-            <div class="category-tab" data-category="image">图片类</div>
-            <div class="category-tab" data-category="text">字符类</div>
-            <div class="category-tab" data-category="time">时间类</div>
-            <div class="category-tab" data-category="calc">计算进制类</div>
-            <div class="category-tab" data-category="info">信息类</div>
-            <div class="category-tab" data-category="other">其他实用工具</div>
-        </div>
-
-        <!-- 工具网格 -->
-        <div class="tools-grid" id="toolsGrid">
-            <!-- 笔记工具 -->
-            <a href="/tools/biji/" class="tool-card" data-category="other" data-name="笔记工具" data-desc="便捷的在线笔记应用，支持文本编辑和保存功能">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/logo/biji.webp" alt="笔记工具"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">笔记工具</h3>
-                        <p class="tool-description">便捷的在线笔记应用，支持文本编辑和保存功能</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 图标创建工具 -->
-            <a href="/tools/create_icon/" class="tool-card" data-category="image" data-name="图标创建" data-desc="在线创建和自定义图标，支持多种格式导出">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+        <!-- 工具分类区块 -->
+        <section class="category-section" data-category="image">
+            <h2 class="section-title">图片工具<span class="section-count">14</span></h2>
+            <div class="tools-grid">
+                <a href="/tools/create_icon/" class="tool-card" data-name="图标创建" data-desc="在线创建和自定义图标，支持多种格式导出" title="在线创建和自定义图标，支持多种格式导出">
                     <div class="tool-icon"><img src="/tools/assets/logo/create_icon.webp" alt="图标创建"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">图标创建</h3>
-                        <p class="tool-description">在线创建和自定义图标，支持多种格式导出</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 图片转图标工具 -->
-            <a href="/tools/img2icon/" class="tool-card" data-category="image" data-name="图片转图标" data-desc="将普通图片转换为图标格式，支持批量处理">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">图标创建</h3>
+                </a>
+                <a href="/tools/img2icon/" class="tool-card" data-name="图片转图标" data-desc="将普通图片转换为图标格式，支持批量处理" title="将普通图片转换为图标格式，支持批量处理">
                     <div class="tool-icon"><img src="/tools/assets/logo/img2icon.webp" alt="图片转图标"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">图片转图标</h3>
-                        <p class="tool-description">将普通图片转换为图标格式，支持批量处理</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 图片转PDF工具 -->
-            <a href="/tools/img2pdf/" class="tool-card" data-category="image" data-name="图片转PDF" data-desc="将图片文件转换为PDF文档，保持高质量输出">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">图片转图标</h3>
+                </a>
+                <a href="/tools/img2pdf/" class="tool-card" data-name="图片转PDF" data-desc="将图片文件转换为PDF文档，保持高质量输出" title="将图片文件转换为PDF文档，保持高质量输出">
                     <div class="tool-icon"><img src="/tools/assets/logo/img2pdf.webp" alt="图片转PDF"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">图片转PDF</h3>
-                        <p class="tool-description">将图片文件转换为PDF文档，保持高质量输出</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 硬币抛掷工具 -->
-            <a href="/tools/coin/" class="tool-card" data-category="other" data-name="硬币抛掷" data-desc="在线抛硬币决策工具，支持自定义硬币贴图">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/logo/coin.webp" alt="硬币抛掷"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">硬币抛掷</h3>
-                        <p class="tool-description">在线抛硬币决策工具，支持自定义硬币贴图</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 弹幕工具 -->
-            <a href="/tools/danmu/" class="tool-card" data-category="other" data-name="显示弹幕" data-desc="创建和生成视频弹幕效果，支持多种样式和动画">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/logo/danmu.webp" alt="显示弹幕"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">显示弹幕</h3>
-                        <p class="tool-description">创建和生成视频弹幕效果，支持多种样式和动画</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 01 JSON 格式化 -->
-            <a href="/tools/01-json-formatter/" class="tool-card" data-category="text" data-name="JSON 格式化" data-desc="JSON 格式化、校验、压缩，支持转换为 CSV 和 XML">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (0).webp" alt="JSON 格式化"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">JSON 格式化</h3>
-                        <p class="tool-description">JSON 格式化、校验、压缩，支持转换为 CSV 和 XML</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 02 URL 编解码 -->
-            <a href="/tools/02-url-encoder/" class="tool-card" data-category="text" data-name="URL 编解码" data-desc="URL 编码、解码、参数解析与拼接的一站式工具">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (1).webp" alt="URL 编解码"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">URL 编解码</h3>
-                        <p class="tool-description">URL 编码、解码、参数解析与拼接的一站式工具</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 03 Base64 编解码 -->
-            <a href="/tools/03-base64-codec/" class="tool-card" data-category="text" data-name="Base64 编解码" data-desc="文本和图片的 Base64 编解码，支持批量处理">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (2).webp" alt="Base64 编解码"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">Base64 编解码</h3>
-                        <p class="tool-description">文本和图片的 Base64 编解码，支持批量处理</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 04 Markdown 编辑器 -->
-            <a href="/tools/04-markdown-editor/" class="tool-card" data-category="text" data-name="Markdown 编辑器" data-desc="实时预览的 Markdown 编辑器，支持导出 HTML">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (3).webp" alt="Markdown 编辑器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">Markdown 编辑器</h3>
-                        <p class="tool-description">实时预览的 Markdown 编辑器，支持导出 HTML</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 05 文本对比 -->
-            <a href="/tools/05-text-diff/" class="tool-card" data-category="text" data-name="文本对比" data-desc="对比两段文本的差异，高亮显示不同之处">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (4).webp" alt="文本对比"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">文本对比</h3>
-                        <p class="tool-description">对比两段文本的差异，高亮显示不同之处</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 06 文本大小写转换 -->
-            <a href="/tools/06-text-case-converter/" class="tool-card" data-category="text" data-name="文本大小写转换" data-desc="英文文本大小写转换，支持多种格式">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (5).webp" alt="文本大小写转换"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">文本大小写转换</h3>
-                        <p class="tool-description">英文文本大小写转换，支持多种格式</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 07 正则表达式测试 -->
-            <a href="/tools/07-regex-tester/" class="tool-card" data-category="text" data-name="正则表达式测试" data-desc="在线测试正则表达式，实时显示匹配结果">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (6).webp" alt="正则表达式测试"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">正则表达式测试</h3>
-                        <p class="tool-description">在线测试正则表达式，实时显示匹配结果</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 08 字数统计 -->
-            <a href="/tools/08-word-counter/" class="tool-card" data-category="text" data-name="字数统计" data-desc="统计文本的字符数、单词数、行数等信息">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (7).webp" alt="字数统计"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">字数统计</h3>
-                        <p class="tool-description">统计文本的字符数、单词数、行数等信息</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 09 拼音转换 -->
-            <a href="/tools/09-pinyin-converter/" class="tool-card" data-category="text" data-name="拼音转换" data-desc="中文转拼音，支持多种拼音格式">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (8).webp" alt="拼音转换"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">拼音转换</h3>
-                        <p class="tool-description">中文转拼音，支持多种拼音格式</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 10 代码格式化 -->
-            <a href="/tools/10-code-formatter/" class="tool-card" data-category="text" data-name="代码格式化" data-desc="格式化 HTML、CSS、JavaScript 等代码">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (9).webp" alt="代码格式化"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">代码格式化</h3>
-                        <p class="tool-description">格式化 HTML、CSS、JavaScript 等代码</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 11 加密解密工具 -->
-            <a href="/tools/11-crypto-tool/" class="tool-card" data-category="text" data-name="加密解密工具" data-desc="MD5、SHA、AES 等常用加密算法">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (10).webp" alt="加密解密工具"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">加密解密工具</h3>
-                        <p class="tool-description">MD5、SHA、AES 等常用加密算法</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 12 文本清理 -->
-            <a href="/tools/12-text-cleaner/" class="tool-card" data-category="text" data-name="文本清理" data-desc="清理文本中的多余空格、换行和特殊字符">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (11).webp" alt="文本清理"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">文本清理</h3>
-                        <p class="tool-description">清理文本中的多余空格、换行和特殊字符</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 13 词频统计 -->
-            <a href="/tools/13-word-frequency/" class="tool-card" data-category="text" data-name="词频统计" data-desc="统计文本中各词汇出现的频率">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (12).webp" alt="词频统计"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">词频统计</h3>
-                        <p class="tool-description">统计文本中各词汇出现的频率</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 14 编码转换 -->
-            <a href="/tools/14-encoding-converter/" class="tool-card" data-category="text" data-name="编码转换" data-desc="UTF-8、GBK、ASCII 等字符编码转换">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (13).webp" alt="编码转换"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">编码转换</h3>
-                        <p class="tool-description">UTF-8、GBK、ASCII 等字符编码转换</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 15 时间戳转换 -->
-            <a href="/tools/15-timestamp-converter/" class="tool-card" data-category="time" data-name="时间戳转换" data-desc="Unix 时间戳与日期时间互相转换">
-                <span class="tool-label">时间类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (14).webp" alt="时间戳转换"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">时间戳转换</h3>
-                        <p class="tool-description">Unix 时间戳与日期时间互相转换</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 16 农历日历 -->
-            <a href="/tools/16-lunar-calendar/" class="tool-card" data-category="time" data-name="农历日历" data-desc="公历农历互转，查询节气和节日">
-                <span class="tool-label">时间类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (15).webp" alt="农历日历"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">农历日历</h3>
-                        <p class="tool-description">公历农历互转，查询节气和节日</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 17 倒计时器 -->
-            <a href="/tools/17-countdown-timer/" class="tool-card" data-category="time" data-name="倒计时器" data-desc="设置目标时间，实时显示倒计时">
-                <span class="tool-label">时间类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (16).webp" alt="倒计时器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">倒计时器</h3>
-                        <p class="tool-description">设置目标时间，实时显示倒计时</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 18 日期差计算器 -->
-            <a href="/tools/18-date-diff-calculator/" class="tool-card" data-category="time" data-name="日期差计算器" data-desc="计算两个日期之间的天数差">
-                <span class="tool-label">时间类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (17).webp" alt="日期差计算器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">日期差计算器</h3>
-                        <p class="tool-description">计算两个日期之间的天数差</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 19 图片压缩 -->
-            <a href="/tools/19-image-compressor/" class="tool-card" data-category="image" data-name="图片压缩" data-desc="压缩图片文件大小，保持画质">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">图片转PDF</h3>
+                </a>
+                <a href="/tools/19-image-compressor/" class="tool-card" data-name="图片压缩" data-desc="压缩图片文件大小，保持画质" title="压缩图片文件大小，保持画质">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (18).webp" alt="图片压缩"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">图片压缩</h3>
-                        <p class="tool-description">压缩图片文件大小，保持画质</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 20 图片裁剪 -->
-            <a href="/tools/20-image-cropper/" class="tool-card" data-category="image" data-name="图片裁剪" data-desc="在线裁剪图片，支持自定义尺寸">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">图片压缩</h3>
+                </a>
+                <a href="/tools/20-image-cropper/" class="tool-card" data-name="图片裁剪" data-desc="在线裁剪图片，支持自定义尺寸" title="在线裁剪图片，支持自定义尺寸">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (19).webp" alt="图片裁剪"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">图片裁剪</h3>
-                        <p class="tool-description">在线裁剪图片，支持自定义尺寸</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 21 图片转 Base64 -->
-            <a href="/tools/21-image-to-base64/" class="tool-card" data-category="image" data-name="图片转 Base64" data-desc="将图片转换为 Base64 编码字符串">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">图片裁剪</h3>
+                </a>
+                <a href="/tools/21-image-to-base64/" class="tool-card" data-name="图片转 Base64" data-desc="将图片转换为 Base64 编码字符串" title="将图片转换为 Base64 编码字符串">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (20).webp" alt="图片转 Base64"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">图片转 Base64</h3>
-                        <p class="tool-description">将图片转换为 Base64 编码字符串</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 22 颜色选择器 -->
-            <a href="/tools/22-color-picker/" class="tool-card" data-category="image" data-name="颜色选择器" data-desc="选取颜色，获取 HEX、RGB、HSL 值">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">图片转 Base64</h3>
+                </a>
+                <a href="/tools/22-color-picker/" class="tool-card" data-name="颜色选择器" data-desc="选取颜色，获取 HEX、RGB、HSL 值" title="选取颜色，获取 HEX、RGB、HSL 值">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (21).webp" alt="颜色选择器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">颜色选择器</h3>
-                        <p class="tool-description">选取颜色，获取 HEX、RGB、HSL 值</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 23 图片拼接 -->
-            <a href="/tools/23-image-stitcher/" class="tool-card" data-category="image" data-name="图片拼接" data-desc="将多张图片拼接成一张长图">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">颜色选择器</h3>
+                </a>
+                <a href="/tools/23-image-stitcher/" class="tool-card" data-name="图片拼接" data-desc="将多张图片拼接成一张长图" title="将多张图片拼接成一张长图">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (22).webp" alt="图片拼接"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">图片拼接</h3>
-                        <p class="tool-description">将多张图片拼接成一张长图</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 24 背景移除 -->
-            <a href="/tools/24-bg-remover/" class="tool-card" data-category="image" data-name="背景移除" data-desc="智能移除图片背景，生成透明背景">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">图片拼接</h3>
+                </a>
+                <a href="/tools/24-bg-remover/" class="tool-card" data-name="背景移除" data-desc="智能移除图片背景，生成透明背景" title="智能移除图片背景，生成透明背景">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (23).webp" alt="背景移除"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">背景移除</h3>
-                        <p class="tool-description">智能移除图片背景，生成透明背景</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 25 图片滤镜 -->
-            <a href="/tools/25-image-filter/" class="tool-card" data-category="image" data-name="图片滤镜" data-desc="为图片添加各种滤镜效果">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">背景移除</h3>
+                </a>
+                <a href="/tools/25-image-filter/" class="tool-card" data-name="图片滤镜" data-desc="为图片添加各种滤镜效果" title="为图片添加各种滤镜效果">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (24).webp" alt="图片滤镜"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">图片滤镜</h3>
-                        <p class="tool-description">为图片添加各种滤镜效果</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 26 二维码工具 -->
-            <a href="/tools/26-qrcode-tool/" class="tool-card" data-category="image" data-name="二维码工具" data-desc="生成和识别二维码，支持自定义样式">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">图片滤镜</h3>
+                </a>
+                <a href="/tools/26-qrcode-tool/" class="tool-card" data-name="二维码工具" data-desc="生成和识别二维码，支持自定义样式" title="生成和识别二维码，支持自定义样式">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (25).webp" alt="二维码工具"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">二维码工具</h3>
-                        <p class="tool-description">生成和识别二维码，支持自定义样式</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 27 进制转换 -->
-            <a href="/tools/27-base-converter/" class="tool-card" data-category="calc" data-name="进制转换" data-desc="二进制、八进制、十进制、十六进制互转">
-                <span class="tool-label">计算进制类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (26).webp" alt="进制转换"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">进制转换</h3>
-                        <p class="tool-description">二进制、八进制、十进制、十六进制互转</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 28 科学计算器 -->
-            <a href="/tools/28-scientific-calculator/" class="tool-card" data-category="calc" data-name="科学计算器" data-desc="支持三角函数、对数等科学计算">
-                <span class="tool-label">计算进制类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (27).webp" alt="科学计算器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">科学计算器</h3>
-                        <p class="tool-description">支持三角函数、对数等科学计算</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 29 单位换算 -->
-            <a href="/tools/29-unit-converter/" class="tool-card" data-category="calc" data-name="单位换算" data-desc="长度、重量、温度等常用单位换算">
-                <span class="tool-label">计算进制类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (28).webp" alt="单位换算"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">单位换算</h3>
-                        <p class="tool-description">长度、重量、温度等常用单位换算</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 30 BMI 计算器 -->
-            <a href="/tools/30-bmi-calculator/" class="tool-card" data-category="calc" data-name="BMI 计算器" data-desc="根据身高体重计算 BMI 指数">
-                <span class="tool-label">计算进制类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (29).webp" alt="BMI 计算器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">BMI 计算器</h3>
-                        <p class="tool-description">根据身高体重计算 BMI 指数</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 31 贷款计算器 -->
-            <a href="/tools/31-loan-calculator/" class="tool-card" data-category="calc" data-name="贷款计算器" data-desc="计算等额本息和等额本金还款方式">
-                <span class="tool-label">计算进制类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (30).webp" alt="贷款计算器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">贷款计算器</h3>
-                        <p class="tool-description">计算等额本息和等额本金还款方式</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 实时毫秒薪计时器 -->
-            <a href="/tools/gz/" class="tool-card" data-category="calc" data-name="实时毫秒薪计时器" data-desc="按工作制毫秒级实时计算秒薪与今日/本月累计收入">
-                <span class="tool-label">计算进制类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2'%3E%3Cpath d='M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z'/%3E%3C/svg%3E" alt="实时毫秒薪计时器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">实时毫秒薪计时器</h3>
-                        <p class="tool-description">按工作制毫秒级实时计算秒薪与今日/本月累计收入</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 32 随机数生成器 -->
-            <a href="/tools/32-random-generator/" class="tool-card" data-category="other" data-name="随机数生成器" data-desc="生成指定范围的随机数或随机字符串">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (31).webp" alt="随机数生成器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">随机数生成器</h3>
-                        <p class="tool-description">生成指定范围的随机数或随机字符串</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 33 密码生成器 -->
-            <a href="/tools/33-password-generator/" class="tool-card" data-category="other" data-name="密码生成器" data-desc="生成高强度随机密码，可自定义规则">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (32).webp" alt="密码生成器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">密码生成器</h3>
-                        <p class="tool-description">生成高强度随机密码，可自定义规则</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 34 文件预览器 -->
-            <a href="/tools/34-file-previewer/" class="tool-card" data-category="other" data-name="文件预览器" data-desc="在线预览图片、PDF、文本等文件">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (33).webp" alt="文件预览器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">文件预览器</h3>
-                        <p class="tool-description">在线预览图片、PDF、文本等文件</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 35 待办清单 -->
-            <a href="/tools/35-todo-list/" class="tool-card" data-category="other" data-name="待办清单" data-desc="简洁的待办事项管理工具">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (34).webp" alt="待办清单"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">待办清单</h3>
-                        <p class="tool-description">简洁的待办事项管理工具</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 36 屏幕尺子 -->
-            <a href="/tools/36-screen-ruler/" class="tool-card" data-category="other" data-name="屏幕尺子" data-desc="在屏幕上测量像素距离">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (35).webp" alt="屏幕尺子"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">屏幕尺子</h3>
-                        <p class="tool-description">在屏幕上测量像素距离</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 37 文件哈希校验 -->
-            <a href="/tools/37-file-hash-checker/" class="tool-card" data-category="other" data-name="文件哈希校验" data-desc="计算文件的 MD5、SHA1、SHA256 哈希值">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (36).webp" alt="文件哈希校验"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">文件哈希校验</h3>
-                        <p class="tool-description">计算文件的 MD5、SHA1、SHA256 哈希值</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 38 画板 -->
-            <a href="/tools/38-drawing-board/" class="tool-card" data-category="image" data-name="画板" data-desc="在线绘图工具，支持多种画笔和颜色">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">二维码工具</h3>
+                </a>
+                <a href="/tools/38-drawing-board/" class="tool-card" data-name="画板" data-desc="在线绘图工具，支持多种画笔和颜色" title="在线绘图工具，支持多种画笔和颜色">
                     <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (37).webp" alt="画板"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">画板</h3>
-                        <p class="tool-description">在线绘图工具，支持多种画笔和颜色</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 39 Unicode 工具 -->
-            <a href="/tools/39-unicode-tool/" class="tool-card" data-category="text" data-name="Unicode 工具" data-desc="字符与 Unicode 编码互相转换">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (38).webp" alt="Unicode 工具"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">Unicode 工具</h3>
-                        <p class="tool-description">字符与 Unicode 编码互相转换</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 40 Lorem 生成器 -->
-            <a href="/tools/40-lorem-generator/" class="tool-card" data-category="text" data-name="Lorem 生成器" data-desc="生成占位文本，支持段落和单词数量自定义">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (39).webp" alt="Lorem 生成器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">Lorem 生成器</h3>
-                        <p class="tool-description">生成占位文本，支持段落和单词数量自定义</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 41 上课抽签器 -->
-            <a href="/tools/lucky_draw/" class="tool-card" data-category="other" data-name="上课抽签器" data-desc="像素风课堂点名工具，支持Excel导入和隐蔽数据管理">
-                <span class="tool-label">其他</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/logo/lucky_draw.webp" alt="上课抽签器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">上课抽签器</h3>
-                        <p class="tool-description">像素风课堂点名工具，支持Excel导入和隐蔽数据管理</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 42 脚本工坊 -->
-            <a href="/tools/script_forge/" class="tool-card" data-category="other" data-name="脚本工坊" data-desc="在线脚本编辑和管理工具">
-                <span class="tool-label">其他</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/logo/script_forge.webp" alt="脚本工坊"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">脚本工坊</h3>
-                        <p class="tool-description">在线脚本编辑和管理工具</p>
-                    </div>
-                </div>
-            </a>
-            <a href="/tools/thrending/" class="tool-card" data-category="info" data-name="github热门榜单" data-desc="github热门榜单">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e36d6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='23 6 13.5 15.5 8.5 10.5 1 18'%3E%3C/polyline%3E%3Cpolyline points='17 6 23 6 23 12'%3E%3C/polyline%3E%3C/svg%3E" alt="GitHub热门榜单"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">GitHub热门榜单</h3>
-                        <p class="tool-description">快速访问GitHub热门榜单，支持日榜、周榜、月榜，可根据不同语言筛选</p>
-                    </div>
-                </div>
-            </a>
-            <a href="/tools/hot-dashboard/" class="tool-card" data-category="info" data-name="60s信息流" data-desc="60s聚合信息流看板">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7' rx='1'%3E%3C/rect%3E%3Crect x='14' y='3' width='7' height='7' rx='1'%3E%3C/rect%3E%3Crect x='3' y='14' width='7' height='7' rx='1'%3E%3C/rect%3E%3Crect x='14' y='14' width='7' height='7' rx='1'%3E%3C/rect%3E%3C/svg%3E" alt="60s信息流"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">60s 信息流</h3>
-                        <p class="tool-description">聚合微博、B站、抖音、知乎等多平台热搜榜单，一站式获取热点信息</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 学科评估数据面板 -->
-            <a href="/tools/academic_rank/" class="tool-card" data-category="info" data-name="学科评估数据面板" data-desc="第四轮学科评估结果可视化，高校学科实力洞察">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 10v6M2 10l10-5 10 5-10 5z'/%3E%3Cpath d='M6 12v5c3 3 9 3 12 0v-5'/%3E%3C/svg%3E" alt="学科评估数据面板"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">学科评估数据面板</h3>
-                        <p class="tool-description">第四轮学科评估结果可视化，460所高校94个学科，等级分布、地区格局、高校实力多维洞察</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 虎扑评分数据面板 -->
-            <a href="/tools/hupu/" class="tool-card" data-category="info" data-name="虎扑评分数据面板" data-desc="虎扑JRs评分数据可视化，图鉴式人物榜单">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f97316' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z'/%3E%3C/svg%3E" alt="虎扑评分数据面板"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">虎扑评分数据面板</h3>
-                        <p class="tool-description">虎扑JRs真实评分可视化，60个条目图鉴式人物榜单，评分分布、分类构成、人气热度多维洞察</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 每天60秒 -->
-            <a href="/tools/60s/" class="tool-card" data-category="info" data-name="每天60秒" data-desc="每天60秒看世界，聚合热榜、天气、实用数据">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/60s/favicon.png" alt="每天60秒"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">每天60秒</h3>
-                        <p class="tool-description">每天60秒看世界，聚合热榜、天气和实用数据</p>
-                    </div>
-                </div>
-            </a>
-            <!-- 神经影像工具知识图谱 -->
-            <a href="/tools/kg/" class="tool-card" data-category="info" data-name="神经影像工具知识图谱" data-desc="神经影像分析工具知识图谱可视化面板">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='5' r='2.5'/%3E%3Ccircle cx='5' cy='14' r='2.5'/%3E%3Ccircle cx='19' cy='14' r='2.5'/%3E%3Ccircle cx='12' cy='19' r='2.5'/%3E%3Cline x1='12' y1='7.5' x2='6.5' y2='12.5'/%3E%3Cline x1='12' y1='7.5' x2='17.5' y2='12.5'/%3E%3Cline x1='7' y1='15' x2='10.5' y2='17.5'/%3E%3Cline x1='17' y1='15' x2='13.5' y2='17.5'/%3E%3C/svg%3E" alt="神经影像工具知识图谱"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">神经影像工具知识图谱</h3>
-                        <p class="tool-description">神经影像分析工具知识图谱可视化面板，按处理流程梳理常用软件工具</p>
-                    </div>
-                </div>
-            </a>
-
-            <a href="/tools/glb_viewer_meshy/" class="tool-card" data-category="other" data-name="3D模型查看器" data-desc="3D模型查看器">
-                <span class="tool-label">其他</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="/tools/assets/logo/glb_viewer_meshy.webp" alt="3D模型查看器"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">3D模型查看器</h3>
-                        <p class="tool-description">一个简单的3D模型查看器，支持GLB格式的模型加载和展示</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 万花筒绘图 -->
-            <a href="/tools/wanhuatong/" class="tool-card" data-category="image" data-name="万花筒绘图" data-desc="8重对称万花筒绘图，按住鼠标绘制绚丽对称图案">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">画板</h3>
+                </a>
+                <a href="/tools/wanhuatong/" class="tool-card" data-name="万花筒绘图" data-desc="8重对称万花筒绘图，按住鼠标绘制绚丽对称图案，支持清空与保存" title="8重对称万花筒绘图，按住鼠标绘制绚丽对称图案，支持清空与保存">
                     <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239d7cff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4'/%3E%3C/svg%3E" alt="万花筒绘图"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">万花筒绘图</h3>
-                        <p class="tool-description">8重对称万花筒绘图，按住鼠标绘制绚丽对称图案，支持清空与保存</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- GPT Image 提示词画廊 -->
-            <a href="/tools/gpt-image-gallery/" class="tool-card" data-category="image" data-name="GPT Image 提示词画廊" data-desc="541 个 AI 生图案例，大图与完整提示词对照，一键复制">
-                <span class="tool-label">图片类</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">万花筒绘图</h3>
+                </a>
+                <a href="/tools/gpt-image-gallery/" class="tool-card" data-name="GPT Image 提示词画廊" data-desc="541 个 AI 生图案例，大图与完整提示词对照浏览，支持分类筛选、搜索与一键复制提示词" title="541 个 AI 生图案例，大图与完整提示词对照浏览，支持分类筛选、搜索与一键复制提示词">
                     <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='3'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='M21 15l-4.5-4.5L7 20'/%3E%3C/svg%3E" alt="GPT Image 提示词画廊"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">GPT Image 提示词画廊</h3>
-                        <p class="tool-description">541 个 AI 生图案例，大图与完整提示词对照浏览，支持分类筛选、搜索与一键复制提示词</p>
-                    </div>
-                </div>
-            </a>
+                    <h3 class="tool-name">GPT Image 提示词画廊</h3>
+                </a>
+            </div>
+        </section>
 
-            <!-- 反应速度测试 -->
-            <a href="/tools/speed/" class="tool-card" data-category="other" data-name="反应速度测试" data-desc="测试你的反应速度，变绿瞬间点击记录毫秒级反应时间">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e8c47a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 2L3 14h7l-1 8 10-12h-7l1-8z'/%3E%3C/svg%3E" alt="反应速度测试"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">反应速度测试</h3>
-                        <p class="tool-description">测试你的反应速度，变绿瞬间点击记录毫秒级反应时间</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 深呼吸放松辅助 -->
-            <a href="/tools/breathe/" class="tool-card" data-category="other" data-name="深呼吸放松" data-desc="引导式呼吸节律动画，缓解焦虑与压力，放松身心">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-7-4.5-9.5-9C1 9 3 5 6.5 5c2 0 3.5 1 5.5 3 2-2 3.5-3 5.5-3C21 5 23 9 21.5 12 19 16.5 12 21 12 21z'/%3E%3C/svg%3E" alt="深呼吸放松"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">深呼吸放松</h3>
-                        <p class="tool-description">引导式呼吸节律动画，缓解焦虑与压力，放松身心</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 世界时钟墙 -->
-            <a href="/tools/clock/" class="tool-card" data-category="time" data-name="世界时钟墙" data-desc="多城市时区实时时钟，一眼掌握全球各地时间">
-                <span class="tool-label">时间类</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c9a227' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3Cpath d='M3 12h2M19 12h2M12 3v2M12 19v2'/%3E%3C/svg%3E" alt="世界时钟墙"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">世界时钟墙</h3>
-                        <p class="tool-description">多城市时区实时时钟，一眼掌握全球各地时间</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 手机 OS 数据仪表盘 -->
-            <a href="/tools/os_kg/" class="tool-card" data-category="info" data-name="手机 OS 数据仪表盘" data-desc="手机操作系统知识图谱与市场份额可视化，覆盖 OS 占比、品牌出货、区域对比">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235470c6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.21 15.89A10 10 0 1 1 8 2.83'/%3E%3Cpath d='M22 12A10 10 0 0 0 12 2v10z'/%3E%3C/svg%3E" alt="手机 OS 数据仪表盘"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">手机 OS 数据仪表盘</h3>
-                        <p class="tool-description">手机操作系统知识图谱与市场份额可视化，覆盖 OS 占比、品牌出货、区域对比</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- Repo Radar 仓库嗅探 -->
-            <a href="/tools/repo-radar/" class="tool-card" data-category="info" data-name="Repo Radar" data-desc="粘贴文本自动嗅探 GitHub 仓库，shields.io 徽章展示，一键复制嵌入代码">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f81f7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='12' r='6'/%3E%3Ccircle cx='12' cy='12' r='2'/%3E%3Cline x1='12' y1='2' x2='12' y2='6'/%3E%3Cline x1='12' y1='18' x2='12' y2='22'/%3E%3Cline x1='2' y1='12' x2='6' y2='12'/%3E%3Cline x1='18' y1='12' x2='22' y2='12'/%3E%3C/svg%3E" alt="Repo Radar"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">Repo Radar</h3>
-                        <p class="tool-description">粘贴文本自动嗅探 GitHub 仓库，shields.io 徽章展示，一键复制嵌入代码</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 心血管疾病知识图谱 -->
-            <a href="/tools/h_kg/" class="tool-card" data-category="info" data-name="心血管疾病知识图谱" data-desc="心血管疾病领域知识图谱可视化，展示疾病、症状、治疗等信息关联">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ee6666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E" alt="心血管疾病知识图谱"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">心血管疾病知识图谱</h3>
-                        <p class="tool-description">心血管疾病领域知识图谱可视化，展示疾病、症状、治疗等信息关联</p>
-                    </div>
-                </div>
-            </a>
-
-            <!-- 游戏行业知识图谱 -->
-            <a href="/tools/game_kg/" class="tool-card" data-category="info" data-name="游戏行业知识图谱" data-desc="游戏厂商、热门游戏、引擎、类型、平台等实体关系可视化，聚焦网易游戏生态">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23238636' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='5' r='2.5'/%3E%3Ccircle cx='5' cy='19' r='2.5'/%3E%3Ccircle cx='19' cy='19' r='2.5'/%3E%3Cline x1='12' y1='7.5' x2='5' y2='16.5'/%3E%3Cline x1='12' y1='7.5' x2='19' y2='16.5'/%3E%3Cline x1='7.5' y1='19' x2='16.5' y2='19'/%3E%3C/svg%3E" alt="游戏行业知识图谱"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">游戏行业知识图谱</h3>
-                        <p class="tool-description">游戏厂商、热门游戏、引擎、类型、平台等实体关系可视化，聚焦网易游戏生态</p>
-                    </div>
-                </div>
-            </a>
-            <!-- 追剧资源导航 -->
-            <a href="/tools/zhuiju-nav/" class="tool-card" data-category="info" data-name="追剧资源导航" data-desc="免费无广告追剧资源聚合导航，分类/搜索/评分/风险一目了然">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f472b6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='3'/%3E%3Cpath d='M10 9l5 3-5 3z'/%3E%3C/svg%3E" alt="追剧资源导航"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">追剧资源导航</h3>
-                        <p class="tool-description">免费无广告追剧资源聚合导航，分类/搜索/评分/风险一目了然</p>
-                    </div>
-                </div>
-            </a>
-            <!-- 世界实时监控 -->
-            <a href="/tools/world-monitor/" class="tool-card" data-category="info" data-name="世界实时监控" data-desc="实时地震与全球自然事件监控地图">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18'/%3E%3Cpath d='M12 3a13.5 13.5 0 0 1 3.5 9A13.5 13.5 0 0 1 12 21a13.5 13.5 0 0 1-3.5-9 13.5 13.5 0 0 1 3.5-9z'/%3E%3C/svg%3E" alt="世界实时监控"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">世界实时监控</h3>
-                        <p class="tool-description">实时地震与全球自然事件监控地图</p>
-                    </div>
-                </div>
-            </a>
-            <!-- 健身动作数据库 -->
-            <a href="/tools/exercise-db/" class="tool-card" data-category="info" data-name="健身动作数据库" data-desc="1324个健身动作检索，按部位/器械/肌群筛选">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6.5 6.5 11 11'/%3E%3Cpath d='m21 21-1-1'/%3E%3Cpath d='m3 3 1 1'/%3E%3Cpath d='m18 22 4-4'/%3E%3Cpath d='m2 6 4-4'/%3E%3Cpath d='m3 10 7-7'/%3E%3Cpath d='m14 21 7-7'/%3E%3C/svg%3E" alt="健身动作数据库"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">健身动作数据库</h3>
-                        <p class="tool-description">1324个健身动作检索，按部位/器械/肌群筛选</p>
-                    </div>
-                </div>
-            </a>
-            <!-- 思维导图 -->
-            <a href="/tools/mindmap/" class="tool-card" data-category="info" data-name="思维导图" data-desc="Markdown一键生成交互式思维导图，支持导出PNG/SVG">
-                <span class="tool-label">信息</span>
-                <div class="tool-card-header">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='5' r='2'/%3E%3Ccircle cx='5' cy='19' r='2'/%3E%3Ccircle cx='19' cy='19' r='2'/%3E%3Cpath d='M12 7v4'/%3E%3Cpath d='M10.5 11 6 17'/%3E%3Cpath d='M13.5 11 18 17'/%3E%3C/svg%3E" alt="思维导图"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">思维导图</h3>
-                        <p class="tool-description">Markdown一键生成交互式思维导图，支持导出PNG/SVG</p>
-                    </div>
-                </div>
-            </a>
-            <!-- 正则可视化 -->
-            <a href="/tools/regex-visualizer/" class="tool-card" data-category="text" data-name="正则可视化" data-desc="正则表达式铁路图可视化，直观理解匹配逻辑">
-                <span class="tool-label">字符类</span>
-                <div class="tool-card-header">
+        <section class="category-section" data-category="text">
+            <h2 class="section-title">字符处理<span class="section-count">17</span></h2>
+            <div class="tools-grid">
+                <a href="/tools/01-json-formatter/" class="tool-card" data-name="JSON 格式化" data-desc="JSON 格式化、校验、压缩，支持转换为 CSV 和 XML" title="JSON 格式化、校验、压缩，支持转换为 CSV 和 XML">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (0).webp" alt="JSON 格式化"></div>
+                    <h3 class="tool-name">JSON 格式化</h3>
+                </a>
+                <a href="/tools/02-url-encoder/" class="tool-card" data-name="URL 编解码" data-desc="URL 编码、解码、参数解析与拼接的一站式工具" title="URL 编码、解码、参数解析与拼接的一站式工具">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (1).webp" alt="URL 编解码"></div>
+                    <h3 class="tool-name">URL 编解码</h3>
+                </a>
+                <a href="/tools/03-base64-codec/" class="tool-card" data-name="Base64 编解码" data-desc="文本和图片的 Base64 编解码，支持批量处理" title="文本和图片的 Base64 编解码，支持批量处理">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (2).webp" alt="Base64 编解码"></div>
+                    <h3 class="tool-name">Base64 编解码</h3>
+                </a>
+                <a href="/tools/04-markdown-editor/" class="tool-card" data-name="Markdown 编辑器" data-desc="实时预览的 Markdown 编辑器，支持导出 HTML" title="实时预览的 Markdown 编辑器，支持导出 HTML">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (3).webp" alt="Markdown 编辑器"></div>
+                    <h3 class="tool-name">Markdown 编辑器</h3>
+                </a>
+                <a href="/tools/05-text-diff/" class="tool-card" data-name="文本对比" data-desc="对比两段文本的差异，高亮显示不同之处" title="对比两段文本的差异，高亮显示不同之处">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (4).webp" alt="文本对比"></div>
+                    <h3 class="tool-name">文本对比</h3>
+                </a>
+                <a href="/tools/06-text-case-converter/" class="tool-card" data-name="文本大小写转换" data-desc="英文文本大小写转换，支持多种格式" title="英文文本大小写转换，支持多种格式">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (5).webp" alt="文本大小写转换"></div>
+                    <h3 class="tool-name">文本大小写转换</h3>
+                </a>
+                <a href="/tools/07-regex-tester/" class="tool-card" data-name="正则表达式测试" data-desc="在线测试正则表达式，实时显示匹配结果" title="在线测试正则表达式，实时显示匹配结果">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (6).webp" alt="正则表达式测试"></div>
+                    <h3 class="tool-name">正则表达式测试</h3>
+                </a>
+                <a href="/tools/08-word-counter/" class="tool-card" data-name="字数统计" data-desc="统计文本的字符数、单词数、行数等信息" title="统计文本的字符数、单词数、行数等信息">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (7).webp" alt="字数统计"></div>
+                    <h3 class="tool-name">字数统计</h3>
+                </a>
+                <a href="/tools/09-pinyin-converter/" class="tool-card" data-name="拼音转换" data-desc="中文转拼音，支持多种拼音格式" title="中文转拼音，支持多种拼音格式">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (8).webp" alt="拼音转换"></div>
+                    <h3 class="tool-name">拼音转换</h3>
+                </a>
+                <a href="/tools/10-code-formatter/" class="tool-card" data-name="代码格式化" data-desc="格式化 HTML、CSS、JavaScript 等代码" title="格式化 HTML、CSS、JavaScript 等代码">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (9).webp" alt="代码格式化"></div>
+                    <h3 class="tool-name">代码格式化</h3>
+                </a>
+                <a href="/tools/11-crypto-tool/" class="tool-card" data-name="加密解密工具" data-desc="MD5、SHA、AES 等常用加密算法" title="MD5、SHA、AES 等常用加密算法">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (10).webp" alt="加密解密工具"></div>
+                    <h3 class="tool-name">加密解密工具</h3>
+                </a>
+                <a href="/tools/12-text-cleaner/" class="tool-card" data-name="文本清理" data-desc="清理文本中的多余空格、换行和特殊字符" title="清理文本中的多余空格、换行和特殊字符">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (11).webp" alt="文本清理"></div>
+                    <h3 class="tool-name">文本清理</h3>
+                </a>
+                <a href="/tools/13-word-frequency/" class="tool-card" data-name="词频统计" data-desc="统计文本中各词汇出现的频率" title="统计文本中各词汇出现的频率">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (12).webp" alt="词频统计"></div>
+                    <h3 class="tool-name">词频统计</h3>
+                </a>
+                <a href="/tools/14-encoding-converter/" class="tool-card" data-name="编码转换" data-desc="UTF-8、GBK、ASCII 等字符编码转换" title="UTF-8、GBK、ASCII 等字符编码转换">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (13).webp" alt="编码转换"></div>
+                    <h3 class="tool-name">编码转换</h3>
+                </a>
+                <a href="/tools/39-unicode-tool/" class="tool-card" data-name="Unicode 工具" data-desc="字符与 Unicode 编码互相转换" title="字符与 Unicode 编码互相转换">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (38).webp" alt="Unicode 工具"></div>
+                    <h3 class="tool-name">Unicode 工具</h3>
+                </a>
+                <a href="/tools/40-lorem-generator/" class="tool-card" data-name="Lorem 生成器" data-desc="生成占位文本，支持段落和单词数量自定义" title="生成占位文本，支持段落和单词数量自定义">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (39).webp" alt="Lorem 生成器"></div>
+                    <h3 class="tool-name">Lorem 生成器</h3>
+                </a>
+                <a href="/tools/regex-visualizer/" class="tool-card" data-name="正则可视化" data-desc="正则表达式铁路图可视化，直观理解匹配逻辑" title="正则表达式铁路图可视化，直观理解匹配逻辑">
                     <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M12 4v16'/%3E%3Cpath d='M5.6 8l12.8 8'/%3E%3Cpath d='M18.4 8 5.6 16'/%3E%3C/svg%3E" alt="正则可视化"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">正则可视化</h3>
-                        <p class="tool-description">正则表达式铁路图可视化，直观理解匹配逻辑</p>
-                    </div>
-                </div>
-            </a>
-            <!-- PDF工具 -->
-            <a href="/tools/pdf-tools/" class="tool-card" data-category="other" data-name="PDF工具" data-desc="PDF合并/提取页面/旋转，本地处理不上传">
-                <span class="tool-label">其他实用工具</span>
-                <div class="tool-card-header">
+                    <h3 class="tool-name">正则可视化</h3>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-section" data-category="time">
+            <h2 class="section-title">时间与日期<span class="section-count">5</span></h2>
+            <div class="tools-grid">
+                <a href="/tools/15-timestamp-converter/" class="tool-card" data-name="时间戳转换" data-desc="Unix 时间戳与日期时间互相转换" title="Unix 时间戳与日期时间互相转换">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (14).webp" alt="时间戳转换"></div>
+                    <h3 class="tool-name">时间戳转换</h3>
+                </a>
+                <a href="/tools/16-lunar-calendar/" class="tool-card" data-name="农历日历" data-desc="公历农历互转，查询节气和节日" title="公历农历互转，查询节气和节日">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (15).webp" alt="农历日历"></div>
+                    <h3 class="tool-name">农历日历</h3>
+                </a>
+                <a href="/tools/17-countdown-timer/" class="tool-card" data-name="倒计时器" data-desc="设置目标时间，实时显示倒计时" title="设置目标时间，实时显示倒计时">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (16).webp" alt="倒计时器"></div>
+                    <h3 class="tool-name">倒计时器</h3>
+                </a>
+                <a href="/tools/18-date-diff-calculator/" class="tool-card" data-name="日期差计算器" data-desc="计算两个日期之间的天数差" title="计算两个日期之间的天数差">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (17).webp" alt="日期差计算器"></div>
+                    <h3 class="tool-name">日期差计算器</h3>
+                </a>
+                <a href="/tools/clock/" class="tool-card" data-name="世界时钟墙" data-desc="多城市时区实时时钟，一眼掌握全球各地时间" title="多城市时区实时时钟，一眼掌握全球各地时间">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c9a227' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3 2'/%3E%3Cpath d='M3 12h2M19 12h2M12 3v2M12 19v2'/%3E%3C/svg%3E" alt="世界时钟墙"></div>
+                    <h3 class="tool-name">世界时钟墙</h3>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-section" data-category="calc">
+            <h2 class="section-title">计算与换算<span class="section-count">6</span></h2>
+            <div class="tools-grid">
+                <a href="/tools/27-base-converter/" class="tool-card" data-name="进制转换" data-desc="二进制、八进制、十进制、十六进制互转" title="二进制、八进制、十进制、十六进制互转">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (26).webp" alt="进制转换"></div>
+                    <h3 class="tool-name">进制转换</h3>
+                </a>
+                <a href="/tools/28-scientific-calculator/" class="tool-card" data-name="科学计算器" data-desc="支持三角函数、对数等科学计算" title="支持三角函数、对数等科学计算">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (27).webp" alt="科学计算器"></div>
+                    <h3 class="tool-name">科学计算器</h3>
+                </a>
+                <a href="/tools/29-unit-converter/" class="tool-card" data-name="单位换算" data-desc="长度、重量、温度等常用单位换算" title="长度、重量、温度等常用单位换算">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (28).webp" alt="单位换算"></div>
+                    <h3 class="tool-name">单位换算</h3>
+                </a>
+                <a href="/tools/30-bmi-calculator/" class="tool-card" data-name="BMI 计算器" data-desc="根据身高体重计算 BMI 指数" title="根据身高体重计算 BMI 指数">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (29).webp" alt="BMI 计算器"></div>
+                    <h3 class="tool-name">BMI 计算器</h3>
+                </a>
+                <a href="/tools/31-loan-calculator/" class="tool-card" data-name="贷款计算器" data-desc="计算等额本息和等额本金还款方式" title="计算等额本息和等额本金还款方式">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (30).webp" alt="贷款计算器"></div>
+                    <h3 class="tool-name">贷款计算器</h3>
+                </a>
+                <a href="/tools/gz/" class="tool-card" data-name="实时毫秒薪计时器" data-desc="按工作制毫秒级实时计算秒薪与今日/本月累计收入" title="按工作制毫秒级实时计算秒薪与今日/本月累计收入">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2'%3E%3Cpath d='M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z'/%3E%3C/svg%3E" alt="实时毫秒薪计时器"></div>
+                    <h3 class="tool-name">实时毫秒薪计时器</h3>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-section" data-category="info">
+            <h2 class="section-title">信息聚合<span class="section-count">14</span></h2>
+            <div class="tools-grid">
+                <a href="/tools/thrending/" class="tool-card" data-name="GitHub热门榜单" data-desc="快速访问GitHub热门榜单，支持日榜、周榜、月榜，可根据不同语言筛选" title="快速访问GitHub热门榜单，支持日榜、周榜、月榜，可根据不同语言筛选">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e36d6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='23 6 13.5 15.5 8.5 10.5 1 18'%3E%3C/polyline%3E%3Cpolyline points='17 6 23 6 23 12'%3E%3C/polyline%3E%3C/svg%3E" alt="GitHub热门榜单"></div>
+                    <h3 class="tool-name">GitHub热门榜单</h3>
+                </a>
+                <a href="/tools/hot-dashboard/" class="tool-card" data-name="60s 信息流" data-desc="聚合微博、B站、抖音、知乎等多平台热搜榜单，一站式获取热点信息" title="聚合微博、B站、抖音、知乎等多平台热搜榜单，一站式获取热点信息">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7' rx='1'%3E%3C/rect%3E%3Crect x='14' y='3' width='7' height='7' rx='1'%3E%3C/rect%3E%3Crect x='3' y='14' width='7' height='7' rx='1'%3E%3C/rect%3E%3Crect x='14' y='14' width='7' height='7' rx='1'%3E%3C/rect%3E%3C/svg%3E" alt="60s 信息流"></div>
+                    <h3 class="tool-name">60s 信息流</h3>
+                </a>
+                <a href="/tools/academic_rank/" class="tool-card" data-name="学科评估数据面板" data-desc="第四轮学科评估结果可视化，460所高校94个学科，等级分布、地区格局、高校实力多维洞察" title="第四轮学科评估结果可视化，460所高校94个学科，等级分布、地区格局、高校实力多维洞察">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 10v6M2 10l10-5 10 5-10 5z'/%3E%3Cpath d='M6 12v5c3 3 9 3 12 0v-5'/%3E%3C/svg%3E" alt="学科评估数据面板"></div>
+                    <h3 class="tool-name">学科评估数据面板</h3>
+                </a>
+                <a href="/tools/hupu/" class="tool-card" data-name="虎扑评分数据面板" data-desc="虎扑JRs真实评分可视化，60个条目图鉴式人物榜单，评分分布、分类构成、人气热度多维洞察" title="虎扑JRs真实评分可视化，60个条目图鉴式人物榜单，评分分布、分类构成、人气热度多维洞察">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f97316' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z'/%3E%3C/svg%3E" alt="虎扑评分数据面板"></div>
+                    <h3 class="tool-name">虎扑评分数据面板</h3>
+                </a>
+                <a href="/tools/60s/" class="tool-card" data-name="每天60秒" data-desc="每天60秒看世界，聚合热榜、天气和实用数据" title="每天60秒看世界，聚合热榜、天气和实用数据">
+                    <div class="tool-icon"><img src="/tools/60s/favicon.png" alt="每天60秒"></div>
+                    <h3 class="tool-name">每天60秒</h3>
+                </a>
+                <a href="/tools/kg/" class="tool-card" data-name="神经影像工具知识图谱" data-desc="神经影像分析工具知识图谱可视化面板，按处理流程梳理常用软件工具" title="神经影像分析工具知识图谱可视化面板，按处理流程梳理常用软件工具">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='5' r='2.5'/%3E%3Ccircle cx='5' cy='14' r='2.5'/%3E%3Ccircle cx='19' cy='14' r='2.5'/%3E%3Ccircle cx='12' cy='19' r='2.5'/%3E%3Cline x1='12' y1='7.5' x2='6.5' y2='12.5'/%3E%3Cline x1='12' y1='7.5' x2='17.5' y2='12.5'/%3E%3Cline x1='7' y1='15' x2='10.5' y2='17.5'/%3E%3Cline x1='17' y1='15' x2='13.5' y2='17.5'/%3E%3C/svg%3E" alt="神经影像工具知识图谱"></div>
+                    <h3 class="tool-name">神经影像工具知识图谱</h3>
+                </a>
+                <a href="/tools/os_kg/" class="tool-card" data-name="手机 OS 数据仪表盘" data-desc="手机操作系统知识图谱与市场份额可视化，覆盖 OS 占比、品牌出货、区域对比" title="手机操作系统知识图谱与市场份额可视化，覆盖 OS 占比、品牌出货、区域对比">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235470c6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.21 15.89A10 10 0 1 1 8 2.83'/%3E%3Cpath d='M22 12A10 10 0 0 0 12 2v10z'/%3E%3C/svg%3E" alt="手机 OS 数据仪表盘"></div>
+                    <h3 class="tool-name">手机 OS 数据仪表盘</h3>
+                </a>
+                <a href="/tools/repo-radar/" class="tool-card" data-name="Repo Radar" data-desc="粘贴文本自动嗅探 GitHub 仓库，shields.io 徽章展示，一键复制嵌入代码" title="粘贴文本自动嗅探 GitHub 仓库，shields.io 徽章展示，一键复制嵌入代码">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f81f7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='12' r='6'/%3E%3Ccircle cx='12' cy='12' r='2'/%3E%3Cline x1='12' y1='2' x2='12' y2='6'/%3E%3Cline x1='12' y1='18' x2='12' y2='22'/%3E%3Cline x1='2' y1='12' x2='6' y2='12'/%3E%3Cline x1='18' y1='12' x2='22' y2='12'/%3E%3C/svg%3E" alt="Repo Radar"></div>
+                    <h3 class="tool-name">Repo Radar</h3>
+                </a>
+                <a href="/tools/h_kg/" class="tool-card" data-name="心血管疾病知识图谱" data-desc="心血管疾病领域知识图谱可视化，展示疾病、症状、治疗等信息关联" title="心血管疾病领域知识图谱可视化，展示疾病、症状、治疗等信息关联">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ee6666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E" alt="心血管疾病知识图谱"></div>
+                    <h3 class="tool-name">心血管疾病知识图谱</h3>
+                </a>
+                <a href="/tools/game_kg/" class="tool-card" data-name="游戏行业知识图谱" data-desc="游戏厂商、热门游戏、引擎、类型、平台等实体关系可视化，聚焦网易游戏生态" title="游戏厂商、热门游戏、引擎、类型、平台等实体关系可视化，聚焦网易游戏生态">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23238636' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='5' r='2.5'/%3E%3Ccircle cx='5' cy='19' r='2.5'/%3E%3Ccircle cx='19' cy='19' r='2.5'/%3E%3Cline x1='12' y1='7.5' x2='5' y2='16.5'/%3E%3Cline x1='12' y1='7.5' x2='19' y2='16.5'/%3E%3Cline x1='7.5' y1='19' x2='16.5' y2='19'/%3E%3C/svg%3E" alt="游戏行业知识图谱"></div>
+                    <h3 class="tool-name">游戏行业知识图谱</h3>
+                </a>
+                <a href="/tools/zhuiju-nav/" class="tool-card" data-name="追剧资源导航" data-desc="免费无广告追剧资源聚合导航，分类/搜索/评分/风险一目了然" title="免费无广告追剧资源聚合导航，分类/搜索/评分/风险一目了然">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f472b6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='3'/%3E%3Cpath d='M10 9l5 3-5 3z'/%3E%3C/svg%3E" alt="追剧资源导航"></div>
+                    <h3 class="tool-name">追剧资源导航</h3>
+                </a>
+                <a href="/tools/world-monitor/" class="tool-card" data-name="世界实时监控" data-desc="实时地震与全球自然事件监控地图" title="实时地震与全球自然事件监控地图">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18'/%3E%3Cpath d='M12 3a13.5 13.5 0 0 1 3.5 9A13.5 13.5 0 0 1 12 21a13.5 13.5 0 0 1-3.5-9 13.5 13.5 0 0 1 3.5-9z'/%3E%3C/svg%3E" alt="世界实时监控"></div>
+                    <h3 class="tool-name">世界实时监控</h3>
+                </a>
+                <a href="/tools/exercise-db/" class="tool-card" data-name="健身动作数据库" data-desc="1324个健身动作检索，按部位/器械/肌群筛选" title="1324个健身动作检索，按部位/器械/肌群筛选">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6.5 6.5 11 11'/%3E%3Cpath d='m21 21-1-1'/%3E%3Cpath d='m3 3 1 1'/%3E%3Cpath d='m18 22 4-4'/%3E%3Cpath d='m2 6 4-4'/%3E%3Cpath d='m3 10 7-7'/%3E%3Cpath d='m14 21 7-7'/%3E%3C/svg%3E" alt="健身动作数据库"></div>
+                    <h3 class="tool-name">健身动作数据库</h3>
+                </a>
+                <a href="/tools/mindmap/" class="tool-card" data-name="思维导图" data-desc="Markdown一键生成交互式思维导图，支持导出PNG/SVG" title="Markdown一键生成交互式思维导图，支持导出PNG/SVG">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='12' cy='5' r='2'/%3E%3Ccircle cx='5' cy='19' r='2'/%3E%3Ccircle cx='19' cy='19' r='2'/%3E%3Cpath d='M12 7v4'/%3E%3Cpath d='M10.5 11 6 17'/%3E%3Cpath d='M13.5 11 18 17'/%3E%3C/svg%3E" alt="思维导图"></div>
+                    <h3 class="tool-name">思维导图</h3>
+                </a>
+            </div>
+        </section>
+
+        <section class="category-section" data-category="other">
+            <h2 class="section-title">实用杂项<span class="section-count">15</span></h2>
+            <div class="tools-grid">
+                <a href="/tools/biji/" class="tool-card" data-name="笔记工具" data-desc="便捷的在线笔记应用，支持文本编辑和保存功能" title="便捷的在线笔记应用，支持文本编辑和保存功能">
+                    <div class="tool-icon"><img src="/tools/assets/logo/biji.webp" alt="笔记工具"></div>
+                    <h3 class="tool-name">笔记工具</h3>
+                </a>
+                <a href="/tools/coin/" class="tool-card" data-name="硬币抛掷" data-desc="在线抛硬币决策工具，支持自定义硬币贴图" title="在线抛硬币决策工具，支持自定义硬币贴图">
+                    <div class="tool-icon"><img src="/tools/assets/logo/coin.webp" alt="硬币抛掷"></div>
+                    <h3 class="tool-name">硬币抛掷</h3>
+                </a>
+                <a href="/tools/danmu/" class="tool-card" data-name="显示弹幕" data-desc="创建和生成视频弹幕效果，支持多种样式和动画" title="创建和生成视频弹幕效果，支持多种样式和动画">
+                    <div class="tool-icon"><img src="/tools/assets/logo/danmu.webp" alt="显示弹幕"></div>
+                    <h3 class="tool-name">显示弹幕</h3>
+                </a>
+                <a href="/tools/32-random-generator/" class="tool-card" data-name="随机数生成器" data-desc="生成指定范围的随机数或随机字符串" title="生成指定范围的随机数或随机字符串">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (31).webp" alt="随机数生成器"></div>
+                    <h3 class="tool-name">随机数生成器</h3>
+                </a>
+                <a href="/tools/33-password-generator/" class="tool-card" data-name="密码生成器" data-desc="生成高强度随机密码，可自定义规则" title="生成高强度随机密码，可自定义规则">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (32).webp" alt="密码生成器"></div>
+                    <h3 class="tool-name">密码生成器</h3>
+                </a>
+                <a href="/tools/34-file-previewer/" class="tool-card" data-name="文件预览器" data-desc="在线预览图片、PDF、文本等文件" title="在线预览图片、PDF、文本等文件">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (33).webp" alt="文件预览器"></div>
+                    <h3 class="tool-name">文件预览器</h3>
+                </a>
+                <a href="/tools/35-todo-list/" class="tool-card" data-name="待办清单" data-desc="简洁的待办事项管理工具" title="简洁的待办事项管理工具">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (34).webp" alt="待办清单"></div>
+                    <h3 class="tool-name">待办清单</h3>
+                </a>
+                <a href="/tools/36-screen-ruler/" class="tool-card" data-name="屏幕尺子" data-desc="在屏幕上测量像素距离" title="在屏幕上测量像素距离">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (35).webp" alt="屏幕尺子"></div>
+                    <h3 class="tool-name">屏幕尺子</h3>
+                </a>
+                <a href="/tools/37-file-hash-checker/" class="tool-card" data-name="文件哈希校验" data-desc="计算文件的 MD5、SHA1、SHA256 哈希值" title="计算文件的 MD5、SHA1、SHA256 哈希值">
+                    <div class="tool-icon"><img src="/tools/assets/tool_40_icon/图片生成数量 (36).webp" alt="文件哈希校验"></div>
+                    <h3 class="tool-name">文件哈希校验</h3>
+                </a>
+                <a href="/tools/lucky_draw/" class="tool-card" data-name="上课抽签器" data-desc="像素风课堂点名工具，支持Excel导入和隐蔽数据管理" title="像素风课堂点名工具，支持Excel导入和隐蔽数据管理">
+                    <div class="tool-icon"><img src="/tools/assets/logo/lucky_draw.webp" alt="上课抽签器"></div>
+                    <h3 class="tool-name">上课抽签器</h3>
+                </a>
+                <a href="/tools/script_forge/" class="tool-card" data-name="脚本工坊" data-desc="在线脚本编辑和管理工具" title="在线脚本编辑和管理工具">
+                    <div class="tool-icon"><img src="/tools/assets/logo/script_forge.webp" alt="脚本工坊"></div>
+                    <h3 class="tool-name">脚本工坊</h3>
+                </a>
+                <a href="/tools/glb_viewer_meshy/" class="tool-card" data-name="3D模型查看器" data-desc="一个简单的3D模型查看器，支持GLB格式的模型加载和展示" title="一个简单的3D模型查看器，支持GLB格式的模型加载和展示">
+                    <div class="tool-icon"><img src="/tools/assets/logo/glb_viewer_meshy.webp" alt="3D模型查看器"></div>
+                    <h3 class="tool-name">3D模型查看器</h3>
+                </a>
+                <a href="/tools/speed/" class="tool-card" data-name="反应速度测试" data-desc="测试你的反应速度，变绿瞬间点击记录毫秒级反应时间" title="测试你的反应速度，变绿瞬间点击记录毫秒级反应时间">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e8c47a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M13 2L3 14h7l-1 8 10-12h-7l1-8z'/%3E%3C/svg%3E" alt="反应速度测试"></div>
+                    <h3 class="tool-name">反应速度测试</h3>
+                </a>
+                <a href="/tools/breathe/" class="tool-card" data-name="深呼吸放松" data-desc="引导式呼吸节律动画，缓解焦虑与压力，放松身心" title="引导式呼吸节律动画，缓解焦虑与压力，放松身心">
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-7-4.5-9.5-9C1 9 3 5 6.5 5c2 0 3.5 1 5.5 3 2-2 3.5-3 5.5-3C21 5 23 9 21.5 12 19 16.5 12 21 12 21z'/%3E%3C/svg%3E" alt="深呼吸放松"></div>
+                    <h3 class="tool-name">深呼吸放松</h3>
+                </a>
+                <a href="/tools/pdf-tools/" class="tool-card" data-name="PDF工具" data-desc="PDF合并/提取页面/旋转，本地处理不上传" title="PDF合并/提取页面/旋转，本地处理不上传">
                     <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cpath d='M9 13h6M9 17h4'/%3E%3C/svg%3E" alt="PDF工具"></div>
-                    <div class="tool-content">
-                        <h3 class="tool-name">PDF工具</h3>
-                        <p class="tool-description">PDF合并/提取页面/旋转，本地处理不上传</p>
-                    </div>
-                </div>
-            </a>
-        </div>
+                    <h3 class="tool-name">PDF工具</h3>
+                </a>
+            </div>
+        </section>
 
-
+        <!-- 搜索空状态 -->
+        <div class="empty-state" id="emptyState">未找到匹配的工具，换个关键词试试</div>
 
         <!-- 页脚 -->
         <div class="footer">
@@ -1666,19 +1052,6 @@
                     const rect = searchBox.getBoundingClientRect();
                     this.pageElements.push({
                         type: 'search',
-                        x: rect.left,
-                        y: rect.top,
-                        width: rect.width,
-                        height: rect.height
-                    });
-                }
-
-                // 分类标签
-                const categoryTabs = document.querySelector('.category-tabs');
-                if (categoryTabs) {
-                    const rect = categoryTabs.getBoundingClientRect();
-                    this.pageElements.push({
-                        type: 'tabs',
                         x: rect.left,
                         y: rect.top,
                         width: rect.width,
@@ -2232,11 +1605,8 @@
             new MontageAnimation();
         });
 
-        // 搜索和分类过滤功能
+        // 搜索过滤功能
         const searchBox = document.getElementById('searchBox');
-        const categoryTabs = document.querySelectorAll('.category-tab');
-        const toolCards = document.querySelectorAll('.tool-card');
-        let currentCategory = 'all';
         let currentSearch = '';
 
         // 搜索功能
@@ -2245,41 +1615,35 @@
             filterTools();
         });
 
-        // 分类标签点击事件
-        categoryTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // 移除所有active类
-                categoryTabs.forEach(t => t.classList.remove('active'));
-                // 添加active类到当前标签
-                tab.classList.add('active');
-                // 更新当前分类
-                currentCategory = tab.dataset.category;
-                filterTools();
-            });
-        });
-
-        // 过滤工具函数
+        // 过滤工具函数：按名称/描述匹配，隐藏无结果的区块
         function filterTools() {
-            toolCards.forEach(card => {
-                const category = card.dataset.category;
-                const name = card.dataset.name.toLowerCase();
-                const desc = card.dataset.desc.toLowerCase();
-                
-                // 检查分类匹配
-                const categoryMatch = currentCategory === 'all' || category === currentCategory;
-                
-                // 检查搜索匹配
-                const searchMatch = !currentSearch || 
-                    name.includes(currentSearch) || 
-                    desc.includes(currentSearch);
-                
-                // 显示或隐藏卡片
-                if (categoryMatch && searchMatch) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
+            let visibleTotal = 0;
+            document.querySelectorAll('.category-section').forEach(section => {
+                let visible = 0;
+                section.querySelectorAll('.tool-card').forEach(card => {
+                    const name = (card.dataset.name || '').toLowerCase();
+                    const desc = (card.dataset.desc || '').toLowerCase();
+
+                    // 检查搜索匹配
+                    const match = !currentSearch ||
+                        name.includes(currentSearch) ||
+                        desc.includes(currentSearch);
+
+                    // 显示或隐藏卡片
+                    card.style.display = match ? 'flex' : 'none';
+                    if (match) visible++;
+                });
+
+                // 隐藏无匹配结果的区块
+                section.style.display = visible ? '' : 'none';
+                visibleTotal += visible;
             });
+
+            // 全部无匹配时显示空状态
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) {
+                emptyState.style.display = visibleTotal ? 'none' : 'block';
+            }
         }
     </script>
 </body>
