@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSSU 计算机科学自学路径 · 进度追踪</title>
+<meta name="description" content="OSSU computer-science 课程表的本地进度追踪工具:三态标记、分区进度条、剩余工作量估算。进度仅保存在本浏览器。">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg-gradient-1: #e7f1f0;
+    --bg-gradient-2: #dfe9ec;
+    --bg-gradient-3: #e6edf2;
+    --card-bg: rgba(255, 255, 255, 0.50);
+    --card-bg-strong: rgba(255, 255, 255, 0.68);
+    --card-border: rgba(255, 255, 255, 0.55);
+    --text-primary: #2c3e50;
+    --text-secondary: #5a6c7d;
+    --text-muted: #8e9aaf;
+    --accent-teal: #2dd4bf;
+    --accent-blue: #3b82f6;
+    --accent-pink: #f472b6;
+    --shadow-sm: 0 2px 8px rgba(20,40,50,0.05);
+    --shadow-md: 0 6px 24px rgba(20,40,50,0.08);
+    --shadow-lg: 0 12px 40px rgba(20,40,50,0.12);
+    --radius-sm: 14px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+    color: var(--text-primary);
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+    background-attachment: fixed;
+    font-size: 13.5px;
+    line-height: 1.6;
+}
+a { color: var(--accent-blue); text-decoration: none; transition: var(--transition); }
+a:hover { opacity: 0.8; }
+
+/* ---------- 背景光斑 ---------- */
+.bg-decoration { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.45; pointer-events: none; z-index: 0; }
+.bg-decoration-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(94,234,212,0.30) 0%, transparent 70%); top: -180px; left: -120px; animation: float 22s ease-in-out infinite; }
+.bg-decoration-2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(125,211,252,0.28) 0%, transparent 70%); bottom: -140px; right: -120px; animation: float 26s ease-in-out infinite reverse; }
+.bg-decoration-3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%); top: 48%; left: 52%; transform: translate(-50%, -50%); animation: pulse 16s ease-in-out infinite; }
+@keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    33% { transform: translate(30px, -30px) rotate(120deg); }
+    66% { transform: translate(-20px, 20px) rotate(240deg); }
+}
+@keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.45; }
+}
+
+/* ---------- 玻璃卡片 ---------- */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, backdrop-filter 0.35s ease;
+    overflow: hidden;
+}
+.glass-card:hover {
+    box-shadow: 0 16px 48px rgba(20,40,50,0.16), 0 0 0 1px rgba(255,255,255,0.5) inset;
+    transform: perspective(800px) rotateX(1deg) rotateY(-1deg) translateY(-3px) scale(1.006);
+    backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
+    -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
+}
+@supports not (backdrop-filter: blur(24px)) {
+    .glass-card { background: rgba(255, 255, 255, 0.85); }
+}
+
+/* ---------- 页面骨架 ---------- */
+.page { max-width: 1060px; margin: 0 auto; padding: 48px 20px 28px; position: relative; z-index: 1; }
+
+/* ---------- 头部卡片 ---------- */
+.head-card { padding: 26px 30px 22px; margin-bottom: 18px; }
+.head-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+.head-title-wrap { display: flex; flex-direction: column; gap: 2px; }
+.crumb { font-size: 11.5px; color: var(--text-muted); margin-bottom: 4px; }
+.crumb a { color: var(--text-secondary); }
+.head-title { font-size: 24px; font-weight: 700; letter-spacing: 0.5px; }
+.head-sub { font-size: 12.5px; color: var(--text-secondary); }
+.head-links { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* 功能按钮:低存在感 */
+.action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent;
+    border: 1px solid rgba(44,62,80,0.12);
+    color: var(--text-secondary);
+    border-radius: 10px;
+    padding: 7px 14px;
+    font-size: 12px;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    transition: var(--transition);
+}
+.action-btn:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); color: var(--text-primary); }
+
+/* 统计块 */
+.stats-row { display: flex; gap: 10px; margin: 18px 0 14px; flex-wrap: wrap; }
+.stat {
+    text-align: center; padding: 7px 12px; border-radius: 10px;
+    background: rgba(255,255,255,0.5);
+    transition: var(--transition);
+    min-width: 86px;
+}
+.stat:hover { transform: scale(1.04); background: rgba(255,255,255,0.72); }
+.stat .stat-value {
+    font-family: 'Courier New', monospace; font-size: 17px; font-weight: 800;
+    background: linear-gradient(135deg, #3b82f6, #2dd4bf);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2; cursor: default;
+}
+.stat .stat-label { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+
+.progress-track {
+    display: block; height: 10px; border-radius: 6px;
+    background: rgba(255,255,255,0.55);
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(20,40,50,0.06);
+}
+.progress-track.big { height: 14px; }
+.progress-fill {
+    display: block; height: 100%; width: 0; border-radius: 6px;
+    background: linear-gradient(90deg, #3b82f6, #2dd4bf);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.eta-line { font-size: 11.5px; color: var(--text-muted); margin-top: 8px; }
+.head-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+.legend { margin-left: auto; display: flex; gap: 14px; font-size: 11.5px; color: var(--text-secondary); flex-wrap: wrap; }
+.legend i { margin-right: 4px; color: var(--text-muted); }
+.legend .lg-doing i { color: var(--accent-blue); }
+.legend .lg-done i { color: var(--accent-teal); }
+
+/* ---------- 分区块 ---------- */
+.sec-block { margin-bottom: 16px; }
+.sec-head {
+    display: flex; align-items: center; gap: 14px;
+    width: 100%; padding: 16px 20px;
+    background: transparent; border: none; cursor: pointer;
+    font-family: inherit; text-align: left;
+    transition: var(--transition);
+}
+.sec-head:hover { background: rgba(255,255,255,0.5); }
+.sec-icon {
+    width: 38px; height: 38px; border-radius: 11px; flex-shrink: 0;
+    background: linear-gradient(135deg, #d9efef, #c4e3e8);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--text-primary);
+}
+.sec-titles { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.sec-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); }
+.sec-desc { font-size: 11.5px; color: var(--text-muted); }
+.sec-count { font-family: 'Courier New', monospace; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); white-space: nowrap; }
+.sec-head .progress-track { width: 120px; flex-shrink: 0; }
+.chev { color: var(--text-muted); font-size: 12px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); flex-shrink: 0; }
+.sec-block.collapsed .chev { transform: rotate(-90deg); }
+
+.sec-body { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.34s cubic-bezier(0.4, 0, 0.2, 1); }
+.sec-block.collapsed .sec-body { grid-template-rows: 0fr; }
+.sec-inner { min-height: 0; overflow: hidden; padding: 0 14px 10px; }
+.sec-block.collapsed .sec-inner { padding-bottom: 0; }
+
+.sec-intro { font-size: 12px; color: var(--text-secondary); padding: 6px 6px 2px; }
+.topics { padding: 8px 6px 6px; }
+.topic-tag {
+    display: inline-block; font-size: 10.5px; color: var(--text-secondary);
+    background: rgba(45,212,191,0.10); padding: 2px 9px; border-radius: 10px;
+    margin: 0 4px 4px 0;
+}
+
+/* 课程行 */
+.course { display: flex; gap: 12px; padding: 10px 8px; border-radius: 12px; transition: var(--transition); align-items: flex-start; }
+.course + .course { border-top: 1px dashed rgba(44,62,80,0.07); }
+.course:hover { background: rgba(255,255,255,0.55); }
+.st-btn {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+    border: 1px solid rgba(44,62,80,0.14); background: transparent;
+    color: var(--text-muted); cursor: pointer; font-size: 12.5px;
+    display: flex; align-items: center; justify-content: center;
+    transition: var(--transition);
+}
+.st-btn:hover { border-color: rgba(45,212,191,0.5); color: var(--text-secondary); background: rgba(45,212,191,0.08); }
+.course.st-doing .st-btn { color: var(--accent-blue); border-color: rgba(59,130,246,0.45); background: rgba(59,130,246,0.08); }
+.course.st-done .st-btn { color: #fff; border-color: transparent; background: linear-gradient(135deg, #3b82f6, #2dd4bf); }
+.c-main { min-width: 0; flex: 1; }
+.c-line { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.c-name { color: var(--text-primary); font-weight: 600; font-size: 13.5px; }
+.c-name:hover { color: var(--accent-blue); }
+.course.st-done .c-name { color: var(--text-muted); text-decoration: line-through; text-decoration-color: rgba(45,212,191,0.55); text-decoration-thickness: 1.5px; }
+.chip {
+    font-size: 10.5px; padding: 2px 8px; border-radius: 10px;
+    background: rgba(255,255,255,0.6); color: var(--text-secondary); white-space: nowrap;
+}
+.chip.choose { color: var(--accent-pink); background: rgba(244,114,182,0.10); font-weight: 600; }
+a.chip:hover { background: rgba(59,130,246,0.10); color: var(--accent-blue); }
+.c-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 3px; line-height: 1.8; }
+.c-sub a { color: var(--text-secondary); border-bottom: 1px dotted rgba(90,108,125,0.4); }
+.c-sub a:hover { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+.c-sub .lab { color: var(--text-muted); }
+.c-sub .dot { margin: 0 6px; color: rgba(142,154,175,0.5); }
+.name-star { color: var(--accent-pink); font-weight: 700; margin-left: 2px; }
+.foot-note { font-size: 11px; color: var(--text-muted); padding: 2px 8px 6px; }
+
+/* 前置要求 prose */
+.prereq-list { list-style: none; padding: 6px 6px 8px; }
+.prereq-list li { font-size: 12.5px; color: var(--text-secondary); margin-bottom: 7px; padding-left: 14px; position: relative; }
+.prereq-list li::before { content: ''; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent-teal); }
+
+/* 分组容器内的子分区 */
+.group-body { padding: 2px 14px 12px; }
+.sub-block { margin: 0 0 12px; background: rgba(255,255,255,0.42); border: 1px solid rgba(255,255,255,0.55); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
+.sub-block:last-child { margin-bottom: 2px; }
+.sub-block .sec-head { padding: 12px 14px; }
+.sub-block .sec-icon { width: 32px; height: 32px; font-size: 13px; border-radius: 9px; }
+.sub-block .sec-title { font-size: 13px; }
+.sub-block .sec-inner { padding: 0 10px 6px; }
+
+/* 错误兜底 */
+.error-card { padding: 30px; text-align: center; color: var(--text-secondary); }
+
+/* ---------- 页脚 ---------- */
+.foot-card { padding: 18px 26px; font-size: 11.5px; color: var(--text-muted); line-height: 1.9; }
+.foot-card a { color: var(--text-secondary); border-bottom: 1px dotted rgba(90,108,125,0.4); }
+.foot-card a:hover { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(20,40,50,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(20,40,50,0.22); }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 768px) {
+    .page { padding: 36px 14px 18px; }
+    .head-card { padding: 20px 18px 18px; }
+    .head-title { font-size: 20px; }
+    .stat { min-width: 72px; padding: 6px 8px; }
+    .stat .stat-value { font-size: 15px; }
+    .legend { margin-left: 0; width: 100%; }
+    .sec-head { padding: 13px 14px; gap: 10px; }
+    .sec-head .progress-track { display: none; }
+    .sec-inner { padding: 0 8px 8px; }
+    .c-sub { font-size: 11px; }
+}
+@media (max-width: 420px) {
+    .head-links { width: 100%; }
+    .stats-row { gap: 6px; }
+    .stat { min-width: 64px; }
+    .chip { display: none; }
+    a.chip { display: inline-block; }
+}
+</style>
+</head>
+<body>
+<div class="bg-decoration bg-decoration-1"></div>
+<div class="bg-decoration bg-decoration-2"></div>
+<div class="bg-decoration bg-decoration-3"></div>
+
+<div class="page">
+    <header class="glass-card head-card">
+        <div class="head-top">
+            <div class="head-title-wrap">
+                <span class="crumb"><a href="../">← 工具箱</a> / OSSU CS</span>
+                <h1 class="head-title">OSSU 计算机科学 自学路径</h1>
+                <span class="head-sub">Open Source Society University · 免费自学 CS 本科级课程表 · 非官方本地进度追踪</span>
+            </div>
+            <div class="head-links">
+                <a class="action-btn" href="https://cs.ossu.dev" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>官方课程表</a>
+                <a class="action-btn" href="https://github.com/ossu/computer-science" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i>GitHub 仓库</a>
+            </div>
+        </div>
+        <div class="stats-row">
+            <div class="stat"><div class="stat-value" id="stTotal">0%</div><div class="stat-label">总进度</div></div>
+            <div class="stat"><div class="stat-value" id="stDone">0</div><div class="stat-label">已完成</div></div>
+            <div class="stat"><div class="stat-value" id="stDoing">0</div><div class="stat-label">进行中</div></div>
+            <div class="stat"><div class="stat-value" id="stRemain" title="">-</div><div class="stat-label">剩余学时</div></div>
+            <div class="stat"><div class="stat-value" id="stCore" title="">-</div><div class="stat-label">必修剩余</div></div>
+        </div>
+        <div class="progress-track big"><span class="progress-fill" id="barTotal"></span></div>
+        <p class="eta-line" id="etaLine">加载课程数据…</p>
+        <div class="head-actions">
+            <button class="action-btn" id="btnExpand">全部展开</button>
+            <button class="action-btn" id="btnCollapse">全部收起</button>
+            <button class="action-btn" id="btnReset">重置进度</button>
+            <span class="legend">
+                <span class="legend-item"><i class="fa-regular fa-circle"></i>未开始</span>
+                <span class="legend-item lg-doing"><i class="fa-solid fa-circle-half-stroke"></i>进行中</span>
+                <span class="legend-item lg-done"><i class="fa-solid fa-circle-check"></i>已完成</span>
+            </span>
+        </div>
+    </header>
+
+    <main id="curriculum">
+        <div class="glass-card error-card"><p>正在加载课程数据…若停留在此,请确认 data.js 已由 sync.ps1 生成。</p></div>
+    </main>
+
+    <footer class="glass-card foot-card">
+        <p>课程内容版权归 <a href="https://github.com/ossu/computer-science" target="_blank" rel="noopener">ossu/computer-science</a> 所有(MIT License),本页为非官方本地进度工具,课程信息以 <a href="https://cs.ossu.dev" target="_blank" rel="noopener">OSSU 官方站</a> 为准。课程多为 Coursera / edX / MIT OCW 等境外平台,部分需要注册账号或科学访问。</p>
+        <p>数据快照 <span id="snapDate">-</span> · 由 sync.ps1 自动解析自上游 README · 学习进度仅保存在此浏览器的 localStorage,不会上传,清除浏览器数据会丢失进度。</p>
+    </footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    var LS_KEY = 'ossu-cs:progress:v1';
+    var root = document.getElementById('curriculum');
+
+    if (!window.OSSU_DATA || !window.OSSU_DATA.sections) {
+        root.innerHTML = '<div class="glass-card error-card"><p>数据未生成:请先在本目录运行 <code>sync.ps1</code> 生成 data.js。</p></div>';
+        return;
+    }
+    var DATA = window.OSSU_DATA;
+    document.getElementById('snapDate').textContent = DATA.snapshot;
+
+    /* 页面侧呈现元数据:中文名 / 图标 / 一句话说明(重跑 sync 不会覆盖) */
+    var META = {
+        'prerequisites':                  { zh: '前置要求',   icon: 'fa-clipboard-list',      desc: '开始前检查:主要需要高中数学底子' },
+        'intro-cs':                       { zh: '入门体验',   icon: 'fa-seedling',            desc: '一门课试试水,学完还想要更多就继续' },
+        'core-cs':                        { zh: '核心必修',   icon: 'fa-layer-group',         desc: '对应本科前三年的必修课,官方建议自上而下按顺序修' },
+        'core-programming':               { zh: '核心编程',   icon: 'fa-code',                desc: '程序设计方法、面向对象、软件架构' },
+        'core-math':                      { zh: '核心数学',   icon: 'fa-square-root-variable',desc: '微积分 + 离散数学,算法课的地基' },
+        'cs-tools':                       { zh: 'CS 工具',    icon: 'fa-terminal',            desc: 'Shell、Git、vim 等工程师生存技能' },
+        'core-systems':                   { zh: '核心系统',   icon: 'fa-microchip',           desc: '从 Nand2Tetris 到操作系统与计算机网络' },
+        'core-theory':                    { zh: '核心理论',   icon: 'fa-diagram-project',     desc: '算法设计与分析(斯坦福两部曲)' },
+        'core-security':                  { zh: '核心安全',   icon: 'fa-shield-halved',       desc: '安全基础与安全编程,末组两门二选一' },
+        'core-applications':              { zh: '核心应用',   icon: 'fa-cubes',               desc: '数据库、机器学习、图形学、软件工程' },
+        'core-ethics':                    { zh: '核心伦理',   icon: 'fa-scale-balanced',      desc: '技术伦理、知识产权与数据隐私' },
+        'advanced-cs':                    { zh: '高阶选修',   icon: 'fa-graduation-cap',      desc: '修完核心后按兴趣方向选修,不必全修' },
+        'advanced-programming':           { zh: '高阶编程',   icon: 'fa-gears',               desc: '并行计算、编译器、调试与测试' },
+        'advanced-systems':               { zh: '高阶系统',   icon: 'fa-server',              desc: 'MIT 计算结构三部曲' },
+        'advanced-theory':                { zh: '高阶理论',   icon: 'fa-infinity',            desc: '可计算性、计算几何、算法博弈论' },
+        'advanced-information-security':  { zh: '高阶信息安全', icon: 'fa-user-shield',       desc: '从 Web 安全到安全开发全流程' },
+        'advanced-math':                  { zh: '高阶数学',   icon: 'fa-superscript',         desc: '线代、数值方法、形式逻辑、概率论' },
+        'final-project':                  { zh: '毕业项目',   icon: 'fa-rocket',              desc: '选一个方向做成系列项目,验证所学' }
+    };
+    /* 必修范围 = 入门 + 全部核心子分区(用于"必修剩余"估算) */
+    var REQUIRED = {};
+    ['intro-cs','core-programming','core-math','cs-tools','core-systems','core-theory','core-security','core-applications','core-ethics']
+        .forEach(function (id) { REQUIRED[id] = true; });
+
+    /* ---------------- 状态存取 ---------------- */
+    var progress = {};
+    try {
+        var raw = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+        if (raw && typeof raw === 'object') { progress = raw; }
+    } catch (e) { progress = {}; }
+
+    function stateOf(key) { return progress[key] || 'todo'; }
+    function persist() {
+        try { localStorage.setItem(LS_KEY, JSON.stringify(progress)); } catch (e) { /* 隐私模式等场景静默降级 */ }
+    }
+
+    /* ---------------- 工具 ---------------- */
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (m) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+        });
+    }
+    function segHtml(segs) {
+        if (!segs || !segs.length) { return ''; }
+        return segs.map(function (g) {
+            if (g.t === 'link') { return '<a href="' + esc(g.url) + '" target="_blank" rel="noopener">' + esc(g.text) + '</a>'; }
+            return esc(g.text);
+        }).join('');
+    }
+    function altLabel(l) {
+        var m = /^alternative\s*(\d*)$/.exec(l || '');
+        if (m) { return m[1] ? '备选 ' + m[1] : '备选'; }
+        return l;
+    }
+    function discLabel(l) {
+        if (l === 'chat') { return '讨论区'; }
+        var m = /^part\s*(\d+)$/.exec(l || '');
+        if (m) { return '讨论组 ' + m[1]; }
+        return l;
+    }
+    function stIcon(st) {
+        if (st === 'done') { return '<i class="fa-solid fa-check"></i>'; }
+        if (st === 'doing') { return '<i class="fa-solid fa-circle-half-stroke"></i>'; }
+        return '<i class="fa-regular fa-circle"></i>';
+    }
+    function fmtH(h) {
+        if (!h) { return '0'; }
+        return h >= 1000 ? (Math.round(h / 100) / 10) + 'k' : String(Math.round(h));
+    }
+
+    /* ---------------- 渲染 ---------------- */
+    var byParent = {};
+    DATA.sections.forEach(function (s) {
+        var p = s.parent || '';
+        (byParent[p] = byParent[p] || []).push(s);
+    });
+    var secById = {};
+    DATA.sections.forEach(function (s) { secById[s.id] = s; });
+
+    function courseHtml(c) {
+        var st = stateOf(c.url);
+        var chips = '';
+        if (c.duration) { chips += '<span class="chip">' + esc(c.duration) + '</span>'; }
+        if (c.effort) { chips += '<span class="chip">' + esc(c.effort) + '</span>'; }
+        if (c.chooseOne) { chips += '<span class="chip choose">二选一</span>'; }
+        (c.alts || []).forEach(function (a) {
+            if (a && a.url) { chips += '<a class="chip" href="' + esc(a.url) + '" target="_blank" rel="noopener">' + esc(altLabel(a.label)) + '</a>'; }
+        });
+        var sub = [];
+        if (c.prereq && c.prereq.length) { sub.push('<span class="lab">前置:</span>' + segHtml(c.prereq)); }
+        if (c.note && c.note.length) { sub.push('<span class="lab">备注:</span>' + segHtml(c.note)); }
+        var disc = (c.discussion || []).filter(function (d) { return d && d.url; }).map(function (d) {
+            return '<a href="' + esc(d.url) + '" target="_blank" rel="noopener"><i class="fa-solid fa-comments"></i> ' + esc(discLabel(d.label)) + '</a>';
+        }).join(' ');
+        if (disc) { sub.push(disc); }
+
+        return '<div class="course st-' + st + '" data-key="' + esc(c.url) + '">'
+            + '<button class="st-btn" data-key="' + esc(c.url) + '" title="点击切换:未开始 → 进行中 → 已完成" aria-label="切换课程状态">' + stIcon(st) + '</button>'
+            + '<div class="c-main"><div class="c-line">'
+            + '<a class="c-name" href="' + esc(c.url) + '" target="_blank" rel="noopener">' + esc(c.name) + (c.footnote ? '<span class="name-star">*</span>' : '') + '</a>'
+            + chips + '</div>'
+            + (sub.length ? '<div class="c-sub">' + sub.join('<span class="dot">·</span>') + '</div>' : '')
+            + '</div></div>';
+    }
+
+    function secHeadHtml(sec, countable) {
+        var m = META[sec.id] || {};
+        var icon = m.icon || 'fa-bookmark';
+        var zh = m.zh ? ' · ' + esc(m.zh) : '';
+        var desc = m.desc ? '<span class="sec-desc">' + esc(m.desc) + '</span>' : '';
+        var right = countable
+            ? '<span class="sec-count" data-count>0/' + sec.courses.length + '</span>'
+              + '<span class="progress-track"><span class="progress-fill" data-fill></span></span>'
+            : '';
+        return '<button class="sec-head" data-sec="' + esc(sec.id) + '" aria-expanded="true">'
+            + '<span class="sec-icon"><i class="fa-solid ' + icon + '"></i></span>'
+            + '<span class="sec-titles"><span class="sec-title">' + esc(sec.title) + zh + '</span>' + desc + '</span>'
+            + right
+            + '<i class="fa-solid fa-chevron-down chev"></i></button>';
+    }
+
+    function secBodyHtml(sec) {
+        var inner = '';
+        if (sec.kind === 'prose') {
+            inner += '<ul class="prereq-list">'
+                + (sec.bullets || []).map(function (b) { return '<li>' + segHtml(b) + '</li>'; }).join('')
+                + '</ul>';
+        } else {
+            if (sec.intro) { inner += '<p class="sec-intro">' + esc(sec.intro) + '</p>'; }
+            if (sec.topics && sec.topics.length) {
+                inner += '<div class="topics">' + sec.topics.map(function (t) { return '<span class="topic-tag">' + esc(t) + '</span>'; }).join('') + '</div>';
+            }
+            inner += (sec.courses || []).map(courseHtml).join('');
+            if (sec.footnote) { inner += '<p class="foot-note">* ' + esc(sec.footnote) + '</p>'; }
+        }
+        return '<div class="sec-body"><div class="sec-inner">' + inner + '</div></div>';
+    }
+
+    function render() {
+        var html = [];
+        DATA.sections.forEach(function (sec) {
+            if (sec.parent) { return; }
+            if (sec.kind === 'group') {
+                var kids = byParent[sec.id] || [];
+                html.push('<section class="glass-card sec-block" data-group="' + esc(sec.id) + '" id="sec-' + esc(sec.id) + '">'
+                    + secHeadHtml(sec, true)
+                    + '<div class="sec-body"><div class="sec-inner group-body">'
+                    + kids.map(function (k) {
+                        return '<section class="sub-block sec-block" data-sec="' + esc(k.id) + '" id="sec-' + esc(k.id) + '">'
+                            + secHeadHtml(k, true) + secBodyHtml(k) + '</section>';
+                    }).join('')
+                    + '</div></div></section>');
+            } else {
+                html.push('<section class="glass-card sec-block" data-sec="' + esc(sec.id) + '" id="sec-' + esc(sec.id) + '">'
+                    + secHeadHtml(sec, sec.kind === 'courses') + secBodyHtml(sec) + '</section>');
+            }
+        });
+        root.innerHTML = html.join('');
+    }
+
+    /* ---------------- 统计 ---------------- */
+    function recompute() {
+        var done = 0, doing = 0, total = 0, remAll = 0, remCore = 0;
+
+        DATA.sections.forEach(function (s) {
+            if (s.kind !== 'courses') { return; }
+            var block = document.getElementById('sec-' + s.id);
+            var d = 0;
+            s.courses.forEach(function (c) {
+                total++;
+                var st = stateOf(c.url);
+                if (st === 'done') { done++; d++; }
+                else if (st === 'doing') { doing++; }
+                if (st !== 'done' && c.weeks && c.hpw) {
+                    var h = c.weeks * c.hpw;
+                    remAll += h;
+                    if (REQUIRED[s.id]) { remCore += h; }
+                }
+            });
+            if (block) {
+                var n = s.courses.length;
+                var cnt = block.querySelector('[data-count]');
+                if (cnt) { cnt.textContent = d + '/' + n; }
+                var fill = block.querySelector('[data-fill]');
+                if (fill) { fill.style.width = (n ? Math.round(d / n * 100) : 0) + '%'; }
+            }
+        });
+
+        /* 分组聚合(核心/高阶) */
+        document.querySelectorAll('[data-group]').forEach(function (g) {
+            var kids = byParent[g.getAttribute('data-group')] || [];
+            var d = 0, n = 0;
+            kids.forEach(function (k) {
+                n += k.courses.length;
+                k.courses.forEach(function (c) { if (stateOf(c.url) === 'done') { d++; } });
+            });
+            var cnt = g.querySelector('[data-count]');
+            if (cnt) { cnt.textContent = d + '/' + n; }
+            var fill = g.querySelector('[data-fill]');
+            if (fill) { fill.style.width = (n ? Math.round(d / n * 100) : 0) + '%'; }
+        });
+
+        var pct = total ? Math.round(done / total * 100) : 0;
+        document.getElementById('stTotal').textContent = pct + '%';
+        document.getElementById('stDone').textContent = done;
+        document.getElementById('stDoing').textContent = doing;
+        document.getElementById('stRemain').textContent = fmtH(remAll);
+        document.getElementById('stCore').textContent = fmtH(remCore);
+        document.getElementById('stRemain').title = '剩余约 ' + Math.round(remAll) + ' 学时(按课程周数 × 每周学时中位值估算)';
+        document.getElementById('stCore').title = '必修(入门+核心)剩余约 ' + Math.round(remCore) + ' 学时';
+        document.getElementById('barTotal').style.width = pct + '%';
+        document.getElementById('etaLine').textContent = remCore > 0
+            ? '课程数据共 ' + total + ' 门 · 估算依据上游标注的周数与每周学时 · 按每周 10 学时投入,必修部分约还需 ' + Math.ceil(remCore / 10) + ' 周'
+            : '必修部分已全部完成——是时候选定 Advanced 方向或启动 Final Project 了';
+    }
+
+    /* ---------------- 交互 ---------------- */
+    var ORDER = { todo: 'doing', doing: 'done', done: 'todo' };
+
+    function setRowState(row, st) {
+        row.classList.remove('st-todo', 'st-doing', 'st-done');
+        row.classList.add('st-' + st);
+        var btn = row.querySelector('.st-btn');
+        if (btn) { btn.innerHTML = stIcon(st); }
+    }
+
+    root.addEventListener('click', function (e) {
+        var btn = e.target.closest('.st-btn');
+        if (btn) {
+            var key = btn.getAttribute('data-key');
+            var next = ORDER[stateOf(key)] || 'todo';
+            if (next === 'todo') { delete progress[key]; } else { progress[key] = next; }
+            persist();
+            setRowState(btn.closest('.course'), next);
+            recompute();
+            return;
+        }
+        var head = e.target.closest('.sec-head');
+        if (head) {
+            var blk = head.closest('.sec-block');
+            var collapsed = blk.classList.toggle('collapsed');
+            head.setAttribute('aria-expanded', String(!collapsed));
+        }
+    });
+
+    document.getElementById('btnExpand').addEventListener('click', function () {
+        document.querySelectorAll('.sec-block').forEach(function (b) {
+            b.classList.remove('collapsed');
+            var h = b.querySelector('.sec-head');
+            if (h) { h.setAttribute('aria-expanded', 'true'); }
+        });
+    });
+    document.getElementById('btnCollapse').addEventListener('click', function () {
+        document.querySelectorAll('.sec-block').forEach(function (b) {
+            b.classList.add('collapsed');
+            var h = b.querySelector('.sec-head');
+            if (h) { h.setAttribute('aria-expanded', 'false'); }
+        });
+    });
+    document.getElementById('btnReset').addEventListener('click', function () {
+        if (!confirm('确定要清空全部本地学习进度吗?此操作不可恢复。')) { return; }
+        progress = {};
+        persist();
+        document.querySelectorAll('.course').forEach(function (r) { setRowState(r, 'todo'); });
+        recompute();
+    });
+
+    /* ---------------- 启动 ---------------- */
+    render();
+    recompute();
+})();
+</script>
+</body>
+</html>
