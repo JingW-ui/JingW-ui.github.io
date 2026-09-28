@@ -87,6 +87,16 @@
   }
   .badge-style-pill:hover{border-color:var(--green);color:var(--green)}
 
+  .date-input{
+    padding:6px 12px;border-radius:100px;
+    font-size:0.8rem;font-weight:500;
+    border:1.5px solid var(--border);background:var(--bg);color:var(--text-secondary);
+    outline:none;transition:all 0.25s ease;font-family:inherit;
+    color-scheme:light;
+  }
+  .date-input:hover,.date-input:focus{border-color:var(--green)}
+  .date-input.active{border-color:var(--green);color:var(--green)}
+
   .divider{
     width:1px;height:24px;background:var(--border);margin:0 4px;
   }
@@ -200,6 +210,13 @@
     transition:opacity 0.15s;cursor:pointer;
   }
   .repo-badges img:hover{opacity:0.75}
+  .sh-link{
+    background:var(--bg);color:var(--text-tertiary);border:1px solid var(--border);
+    border-radius:5px;padding:3px 9px;font-size:0.72rem;cursor:pointer;
+    transition:all 0.2s;white-space:nowrap;font-weight:500;
+    text-decoration:none;display:inline-block;
+  }
+  .sh-link:hover{color:var(--green);border-color:var(--green)}
   .embed-btn{
     background:var(--bg);color:var(--text-tertiary);border:1px solid var(--border);
     border-radius:5px;padding:3px 9px;font-size:0.72rem;cursor:pointer;
@@ -209,12 +226,73 @@
   .embed-btn:hover{color:var(--green);border-color:var(--green)}
   .embed-btn.copied{color:var(--green);border-color:var(--green);background:var(--green-bg)}
 
+  /* ---- History panel ---- */
+  .hist-head{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:10px;flex-wrap:wrap;margin-bottom:14px;
+  }
+  .hist-title{font-size:0.92rem;font-weight:700;color:var(--text-secondary)}
+  .hist-clear{
+    background:var(--bg);color:var(--text-tertiary);border:1px solid var(--border);
+    border-radius:5px;padding:3px 10px;font-size:0.72rem;cursor:pointer;
+    transition:all 0.2s;font-weight:500;
+  }
+  .hist-clear:hover{color:var(--red);border-color:var(--red)}
+  details.hist-item{
+    background:var(--bg);border:1px solid var(--border);
+    border-radius:10px;padding:12px 16px;
+  }
+  details.hist-item + details.hist-item{margin-top:8px}
+  details.hist-item summary{
+    cursor:pointer;list-style:none;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    font-size:0.85rem;color:var(--text-secondary);
+  }
+  details.hist-item summary::-webkit-details-marker{display:none}
+  details.hist-item[open]{border-color:var(--green-border);background:var(--card-hover)}
+  .hist-tag{
+    font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:12px;
+    background:var(--green-bg);color:var(--green);white-space:nowrap;
+  }
+  .hist-lang{
+    font-size:0.72rem;color:var(--text-tertiary);white-space:nowrap;
+  }
+  .hist-time{
+    font-variant-numeric:tabular-nums;white-space:nowrap;
+  }
+  .hist-top1{
+    color:var(--text);font-weight:600;word-break:break-all;
+  }
+  .hist-list{
+    list-style:none;margin-top:10px;
+  }
+  .hist-row{
+    display:flex;align-items:baseline;gap:10px;
+    font-size:0.8rem;color:var(--text-secondary);
+    padding:5px 2px;border-top:1px dashed var(--border);
+  }
+  .hist-row:first-child{border-top:none}
+  .hist-rank{
+    color:var(--green);font-weight:700;min-width:22px;text-align:right;
+    font-variant-numeric:tabular-nums;flex-shrink:0;
+  }
+  .hist-name{
+    color:var(--text);font-weight:500;word-break:break-all;
+  }
+  .hist-name:hover{color:var(--green)}
+  .hist-name .slash{color:var(--text-tertiary);font-weight:300}
+  .hist-stars{
+    margin-left:auto;color:var(--text-tertiary);
+    font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0;
+  }
+
   /* ---- Empty ---- */
   .empty-state{
     text-align:center;padding:80px 24px;
     color:var(--text-tertiary);
   }
   .empty-state p{font-size:1.1rem;margin-top:8px}
+  .empty-state .empty-sub{font-size:0.82rem;margin-top:6px}
 
   /* ---- Footer stats ---- */
   .stats-bar{
@@ -245,6 +323,7 @@
     .control-label{font-size:0.72rem}
     .pill{padding:5px 11px;font-size:0.76rem;border-radius:80px}
     .badge-style-pill{padding:4px 9px;font-size:0.7rem}
+    .date-input{padding:4px 9px;font-size:0.7rem}
     .divider{display:none}
 
     .stats-bar{gap:18px;margin-bottom:28px;padding:0 16px}
@@ -265,7 +344,12 @@
 
     .repo-badges{gap:4px 6px;margin-top:10px;padding-top:10px}
     .repo-badges img{height:17px}
+    .sh-link{padding:2px 7px;font-size:0.65rem;border-radius:4px}
     .embed-btn{padding:2px 7px;font-size:0.65rem;border-radius:4px}
+
+    .hist-item{padding:10px 12px}
+    .hist-row{font-size:0.74rem;gap:6px}
+    .hist-top1{font-size:0.78rem}
 
     .empty-state{padding:50px 16px}
     .empty-state p{font-size:0.95rem}
@@ -277,6 +361,7 @@
     .controls{gap:6px;margin-top:20px}
     .pill{padding:4px 9px;font-size:0.7rem}
     .badge-style-pill{padding:3px 7px;font-size:0.65rem}
+    .date-input{padding:3px 7px;font-size:0.65rem}
     .stats-bar{gap:12px}
     .stat-value{font-size:1rem}
     .stat-label{font-size:0.62rem}
@@ -288,7 +373,7 @@
     .meta-item{font-size:0.68rem}
     .assess-badge{font-size:0.6rem;padding:2px 6px}
     .repo-badges img{height:15px}
-    .embed-btn{font-size:0.6rem;padding:2px 5px}
+    .sh-link,.embed-btn{font-size:0.6rem;padding:2px 5px}
   }
 
   /* scrollbar */
@@ -335,7 +420,7 @@
 
 <header class="header">
   <h1>GitHub <span>Trending</span></h1>
-  <p class="subtitle">Fresh &amp; rising repositories on GitHub · powered by GitHub Search API</p>
+  <p class="subtitle">Fresh &amp; rising repositories · GitHub Search API · 总榜 / 日期回看 / 本地足迹</p>
 </header>
 
 <div class="stats-bar" id="statsBar">
@@ -358,10 +443,21 @@
 <div class="controls">
   <div class="control-group">
     <span class="control-label">Period</span>
-    <button class="pill since-pill active" data-since="daily">Daily</button>
-    <button class="pill since-pill" data-since="weekly">Weekly</button>
-    <button class="pill since-pill" data-since="monthly">Monthly</button>
+    <button class="pill view-pill active" data-view="daily">Daily</button>
+    <button class="pill view-pill" data-view="weekly">Weekly</button>
+    <button class="pill view-pill" data-view="monthly">Monthly</button>
+    <button class="pill view-pill" data-view="all">All-Time</button>
   </div>
+  <div class="divider"></div>
+  <div class="control-group">
+    <span class="control-label">回看</span>
+    <button class="pill look-pill" data-offset="-1">昨天</button>
+    <button class="pill look-pill" data-offset="-2">前天</button>
+    <button class="pill look-pill" data-offset="-7">7 天前</button>
+    <input type="date" class="date-input" id="datePick" title="回看任意一天创建的新仓库(按 UTC 创建日期)" aria-label="选择回看日期">
+  </div>
+  <div class="divider"></div>
+  <button class="pill" id="histBtn" title="本浏览器保存的历史浏览足迹">🕘 足迹</button>
   <div class="divider"></div>
   <div class="control-group">
     <span class="control-label">Language</span>
@@ -391,21 +487,52 @@
 <script>
 (function(){
   var SEARCH_API = "https://api.github.com/search/repositories";
-  var currentSince = "daily";
+  var PERIOD_VIEWS = ["daily", "weekly", "monthly", "all"];
+  var WINDOW_DAYS = { daily: 1, weekly: 7, monthly: 30 };
+
+  // ---- localStorage:榜单缓存(10 分钟 TTL)+ 访客浏览足迹 ----
+  var CACHE_PREFIX = "thrending:c1:";
+  var CACHE_TTL = 10 * 60 * 1000;
+  var HIST_KEY = "thrending:h1";
+  var HIST_MAX = 60;
+  var HIST_DEDUPE_MS = 30 * 60 * 1000;
+
+  var currentView = "daily";   // daily | weekly | monthly | all | "YYYY-MM-DD"(回看)
   var currentLang = "";
-  var cachedData = {};
+  var currentBadge = "social";
+  var currentItems = null;     // 最近一次成功渲染的榜单
   var lastFetchAt = null;
+  var fromCache = false;
   var refreshNonce = "";
   var loading = false;
-
-  // ---- 时间窗口：Daily/Weekly/Monthly → 最近 N 天创建的仓库 ----
-  var WINDOW_DAYS = { daily: 1, weekly: 7, monthly: 30 };
+  var historyMode = false;
 
   // ---- 请求超时：避免上游卡死时无限转圈 ----
   function fetchWithTimeout(url, ms) {
     var ctrl = new AbortController();
     var timer = setTimeout(function() { ctrl.abort(); }, ms || 15000);
     return fetch(url, { signal: ctrl.signal }).finally(function() { clearTimeout(timer); });
+  }
+
+  // ---- localStorage 安全封装(隐私模式等场景降级为无缓存) ----
+  function lsGet(key) {
+    try {
+      var raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  function lsSet(key, val) {
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+  }
+  function clearLocalCache() {
+    try {
+      var kill = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k && k.indexOf(CACHE_PREFIX) === 0) kill.push(k);
+      }
+      kill.forEach(function(k) { localStorage.removeItem(k); });
+    } catch (e) {}
   }
 
   // 支持的全部语言 [slug, 显示名],按显示名字母序;含特殊字符的 slug(c++/c#/f#)在 fetchData 中统一编码
@@ -439,6 +566,7 @@
   LANGS.forEach(function(item) { LANG_NAME[item[0]] = item[1]; });
 
   var repoListEl = document.getElementById("repoList");
+  var statBarEl = document.getElementById("statsBar");
   var statTotal = document.getElementById("statTotal");
   var statStars = document.getElementById("statStars");
   var statLangs = document.getElementById("statLangs");
@@ -446,6 +574,24 @@
   var langSel = document.getElementById("langSel");
   var updatedAtEl = document.getElementById("updatedAt");
   var refreshBtn = document.getElementById("refreshBtn");
+  var histBtn = document.getElementById("histBtn");
+  var datePick = document.getElementById("datePick");
+
+  // ---- 视图工具 ----
+  function isDayView(v) { return /^\d{4}-\d{2}-\d{2}$/.test(String(v)); }
+  function dayStr(offsetDays) {
+    return new Date(Date.now() + offsetDays * 86400000).toISOString().slice(0, 10);
+  }
+  function viewLabel(v) {
+    if (v === "all") return "All-Time 星数总榜";
+    if (isDayView(v)) return "回看 " + v + " 创建的新仓库(UTC)";
+    return ({ daily: "Daily 近 1 天", weekly: "Weekly 近 7 天", monthly: "Monthly 近 30 天" })[v] || v;
+  }
+  function viewShort(v) {
+    if (v === "all") return "All-Time";
+    if (isDayView(v)) return "回看 " + v.slice(5);
+    return v.charAt(0).toUpperCase() + v.slice(1);
+  }
 
   // ---- Language color helper ----
   function langClass(lang) {
@@ -474,11 +620,6 @@
     if (stars >= 1000)  return { cls: "a-good", txt: "Worth Learning", tip: "Star >= 1k" };
     if (stars >= 100)   return { cls: "a-fair", txt: "Niche but Useful", tip: "Star >= 100" };
     return { cls: "a-cold", txt: "Emerging", tip: "Star < 100" };
-  }
-
-  // ---- Cache key：内存缓存即可，数据为实时查询 ----
-  function cacheKey(since, lang) {
-    return since + ":" + (lang || "all");
   }
 
   // ---- 数字解析：兼容 "7,626"、"+1,616" 与裸 number ----
@@ -513,23 +654,39 @@
     });
   }
 
-  // ---- 仓库"年龄"：替代原 stars today 展示 ----
+  // ---- 仓库"年龄"：全时间榜/回看榜下仓库较老,支持月/年单位 ----
   function fmtAge(iso) {
     if (!iso) return "";
     var h = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
     if (h < 1) return "just now";
-    if (h < 24) return h + "h old";
-    return Math.floor(h / 24) + "d old";
+    if (h < 48) return h + "h old";
+    var d = Math.floor(h / 24);
+    if (d < 60) return d + "d old";
+    if (d < 365) return Math.round(d / 30) + "mo old";
+    var y = (d / 365).toFixed(1).replace(/\.0$/, "");
+    return y + "y old";
   }
 
-  // ---- Fetch data（GitHub Search API：最近 N 天创建，按 star 数降序）----
-  async function fetchData(since, lang) {
-    var key = cacheKey(since, lang);
-    if (cachedData[key]) return cachedData[key];
+  // ---- Fetch data（每种视图一次请求,per_page=25,按星数降序）----
+  // daily/weekly/monthly → 最近 N 天创建;all → stars:>1 全站总榜;日期 → created:DAY..DAY 回看
+  async function fetchData(view, lang) {
+    var key = CACHE_PREFIX + view + ":" + (lang || "all");
+    var hit = lsGet(key);
+    if (hit && hit.t && Array.isArray(hit.items) && Date.now() - hit.t < CACHE_TTL) {
+      lastFetchAt = new Date(hit.t);
+      fromCache = true;
+      return hit.items;
+    }
 
-    var days = WINDOW_DAYS[since] || 1;
-    var startDate = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
-    var q = "created:>" + startDate;
+    var q;
+    if (view === "all") {
+      q = "stars:>1";
+    } else if (isDayView(view)) {
+      q = "created:" + view + ".." + view;
+    } else {
+      var days = WINDOW_DAYS[view] || 1;
+      q = "created:>" + new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+    }
     if (lang) q += ' language:"' + (LANG_NAME[lang] || lang) + '"';
 
     var url = SEARCH_API + "?q=" + encodeURIComponent(q) + "&sort=stars&order=desc&per_page=25";
@@ -546,7 +703,8 @@
     var json = await res.json();
     var items = normalize(json);
     lastFetchAt = new Date();
-    cachedData[key] = items;
+    fromCache = false;
+    lsSet(key, { t: Date.now(), items: items });
     return items;
   }
 
@@ -608,11 +766,12 @@
 
   // ---- Render cards ----
   function renderCards(repos) {
+    if (statBarEl) statBarEl.style.display = "";
     repoListEl.innerHTML = "";
 
     if (!repos.length) {
       var emptyMsg = currentLang
-        ? "该语言在此时间窗口内暂无结果，可切换 Weekly/Monthly 试试"
+        ? "该筛选条件下暂无结果，可换个时间窗口或语言试试"
         : "No repositories found for this filter.";
       repoListEl.innerHTML = '<div class="empty-state"><p>' + escHtml(emptyMsg) + '</p></div>';
       updateStats([]);
@@ -663,6 +822,7 @@
         '</div>' +
         '<div class="repo-badges">' +
           badgesHtml +
+          '<a class="sh-link" href="https://star-history.com/#' + repo.username + '/' + repo.reponame + '&Timeline" target="_blank" rel="noopener" title="星数增长曲线 · star-history.com">📈 star history</a>' +
           '<button class="embed-btn" data-user="' + escHtml(repo.username) + '" data-repo="' + escHtml(repo.reponame) + '" title="Copy Markdown embed code">Copy Embed</button>' +
         '</div>';
 
@@ -696,15 +856,95 @@
     statLangs.textContent = langs.size;
   }
 
+  // ---- 访客浏览足迹:每次成功拉取记一条(仅存本浏览器) ----
+  function readHistory() {
+    var h = lsGet(HIST_KEY);
+    return Array.isArray(h) ? h : [];
+  }
+  function recordHistory(view, lang, items) {
+    if (!items || !items.length) return;
+    var hist = readHistory();
+    var compact = items.slice(0, 25).map(function(r) {
+      return [r.username, r.reponame, r.stars, r.language || ""];
+    });
+    var entry = { t: Date.now(), v: view, l: lang || "", items: compact };
+    if (hist.length && hist[0].v === view && (hist[0].l || "") === (lang || "") &&
+        Date.now() - hist[0].t < HIST_DEDUPE_MS) {
+      hist[0] = entry; // 同一视图 30 分钟内重复浏览 → 覆盖
+    } else {
+      hist.unshift(entry);
+    }
+    hist = hist.slice(0, HIST_MAX);
+    lsSet(HIST_KEY, hist);
+    updateHistBtn(hist.length);
+  }
+  function updateHistBtn(n) {
+    if (histBtn) histBtn.textContent = "🕘 足迹" + (n ? " (" + n + ")" : "");
+  }
+
+  function renderHistory() {
+    var hist = readHistory();
+    if (statBarEl) statBarEl.style.display = "none";
+    if (!hist.length) {
+      repoListEl.innerHTML =
+        '<div class="empty-state"><p>暂无足迹</p>' +
+        '<p class="empty-sub">每次成功加载榜单都会自动记录一条，仅保存在此浏览器，不会上传。</p></div>';
+      return;
+    }
+    var html = '<div class="hist-head">' +
+      '<span class="hist-title">本地浏览足迹 · 最近 ' + hist.length + ' 次（仅保存在此浏览器）</span>' +
+      '<button class="hist-clear" id="clearHistBtn">清空</button></div>';
+    hist.forEach(function(en, idx) {
+      var rows = "";
+      (en.items || []).forEach(function(it, i) {
+        rows += '<li class="hist-row">' +
+          '<span class="hist-rank">' + (i + 1) + '</span>' +
+          '<a class="hist-name" href="https://github.com/' + escHtml(it[0]) + '/' + escHtml(it[1]) + '" target="_blank" rel="noopener">' +
+            escHtml(it[0]) + '<span class="slash">/</span>' + escHtml(it[1]) + '</a>' +
+          (it[3] ? '<span class="hist-lang">' + escHtml(it[3]) + '</span>' : '') +
+          '<span class="hist-stars">★ ' + fmtNum(it[2]) + '</span>' +
+        '</li>';
+      });
+      var top1 = (en.items && en.items[0]) || ["?", "?", 0, ""];
+      html += '<details class="hist-item"' + (idx === 0 ? " open" : "") + '><summary>' +
+        '<span class="hist-tag">' + escHtml(viewShort(en.v)) + '</span>' +
+        (en.l ? '<span class="hist-lang">' + escHtml(LANG_NAME[en.l] || en.l) + '</span>' : '') +
+        '<span class="hist-time">' + new Date(en.t).toLocaleString("zh-CN", { hour12: false }) + '</span>' +
+        '<span class="hist-top1">Top1 ' + escHtml(top1[0]) + '/' + escHtml(top1[1]) + ' ★' + fmtNum(top1[2]) + '</span>' +
+        '</summary><ol class="hist-list">' + rows + '</ol></details>';
+    });
+    repoListEl.innerHTML = html;
+  }
+
+  function renderHistUpdatedAt() {
+    if (!updatedAtEl) return;
+    updatedAtEl.textContent = "本地浏览足迹 · 仅保存在此浏览器 · 共 " + readHistory().length + " 条";
+  }
+
+  function exitHistory() {
+    historyMode = false;
+    if (histBtn) histBtn.classList.remove("active");
+    if (currentItems) {
+      renderCards(currentItems);
+      renderUpdatedAt();
+    } else {
+      loadAndRender(false);
+    }
+  }
+
   // ---- Load and render ----
   async function loadAndRender(animate) {
     if (loading) return;
     loading = true;
+    historyMode = false;
+    if (histBtn) histBtn.classList.remove("active");
+    if (statBarEl) statBarEl.style.display = "";
 
     repoListEl.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div></div>';
 
     try {
-      var repos = await fetchData(currentSince, currentLang);
+      var repos = await fetchData(currentView, currentLang);
+      currentItems = repos;
 
       if (animate) {
         repoListEl.classList.add("transitioning");
@@ -713,8 +953,10 @@
       }
 
       renderCards(repos);
+      recordHistory(currentView, currentLang, repos);
       renderUpdatedAt();
     } catch (err) {
+      currentItems = null;
       var msg = (err && err.rateLimited)
         ? "GitHub API 限流中（未认证 10 次/分钟），请约 1 分钟后再试。"
         : "Failed to load trending data. Please try again.";
@@ -726,52 +968,125 @@
 
   function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 
-  // ---- 展示数据获取时间（实时接口，即取即新）----
+  // ---- 展示数据获取时间与当前视图口径 ----
   function renderUpdatedAt() {
     if (!updatedAtEl) return;
     var t = lastFetchAt || new Date();
     updatedAtEl.textContent = "数据获取于 " +
       t.toLocaleString("zh-CN", { hour12: false }) +
-      " · GitHub Search API 实时";
+      " · " + viewLabel(currentView) +
+      (fromCache ? " · 缓存" : "") +
+      " · GitHub Search API";
   }
 
-  // ---- Event: since pills ----
-  document.querySelectorAll(".since-pill").forEach(function(btn) {
+  // ---- URL 深链:view/lang/badge 写回地址栏,刷新/分享不丢状态 ----
+  function syncUrl() {
+    try {
+      var p = new URLSearchParams();
+      p.set("view", currentView);
+      if (currentLang) p.set("lang", currentLang);
+      if (currentBadge && currentBadge !== "social") p.set("badge", currentBadge);
+      var qs = p.toString();
+      history.replaceState(null, "", location.pathname + (qs ? "?" + qs : ""));
+    } catch (e) {}
+  }
+
+  // ---- 控件状态与 currentView 同步 ----
+  function syncControls() {
+    document.querySelectorAll(".view-pill").forEach(function(b) {
+      b.classList.toggle("active", b.dataset.view === currentView);
+    });
+    document.querySelectorAll(".look-pill").forEach(function(b) {
+      b.classList.toggle("active", isDayView(currentView) &&
+        dayStr(parseInt(b.dataset.offset, 10)) === currentView);
+    });
+    if (datePick) {
+      datePick.classList.toggle("active", isDayView(currentView));
+      datePick.value = isDayView(currentView) ? currentView : "";
+    }
+    if (langSel) langSel.value = currentLang;
+    if (badgeStyleSel) badgeStyleSel.value = currentBadge;
+  }
+
+  function setView(v) {
+    if (v === currentView) { syncControls(); return; }
+    currentView = v;
+    historyMode = false;
+    syncControls();
+    syncUrl();
+    loadAndRender(true);
+  }
+
+  // ---- Event: view pills (Period + All-Time) ----
+  document.querySelectorAll(".view-pill").forEach(function(btn) {
+    btn.addEventListener("click", function() { setView(btn.dataset.view); });
+  });
+
+  // ---- Event: lookback preset pills ----
+  document.querySelectorAll(".look-pill").forEach(function(btn) {
     btn.addEventListener("click", function() {
-      var since = btn.dataset.since;
-      if (since === currentSince) return;
-      document.querySelectorAll(".since-pill").forEach(function(b) { b.classList.remove("active"); });
-      btn.classList.add("active");
-      currentSince = since;
-      loadAndRender(true);
+      setView(dayStr(parseInt(btn.dataset.offset, 10)));
     });
   });
+
+  // ---- Event: date picker ----
+  if (datePick) {
+    datePick.max = dayStr(0);
+    datePick.addEventListener("change", function() {
+      var v = datePick.value;
+      if (isDayView(v)) setView(v);
+    });
+  }
 
   // ---- Event: language select ----
   langSel.addEventListener("change", function() {
     var lang = langSel.value;
     if (lang === currentLang) return;
     currentLang = lang;
+    syncUrl();
     loadAndRender(true);
   });
 
   // ---- Event: badge style change (re-render without refetch) ----
   badgeStyleSel.addEventListener("change", function() {
-    var key = cacheKey(currentSince, currentLang);
-    if (cachedData[key]) {
-      renderCards(cachedData[key]);
+    currentBadge = badgeStyleSel.value;
+    syncUrl();
+    if (currentItems) {
+      renderCards(currentItems);
     }
   });
 
   // ---- Event: manual refresh (clear caches + refetch) ----
   refreshBtn.addEventListener("click", function() {
     refreshNonce = "_" + Date.now();
-    cachedData = {};
+    clearLocalCache();
     loadAndRender(true);
   });
 
-  // ---- Event: copy embed (delegated) ----
+  // ---- Event: history toggle ----
+  if (histBtn) {
+    histBtn.addEventListener("click", function() {
+      historyMode = !historyMode;
+      histBtn.classList.toggle("active", historyMode);
+      if (historyMode) {
+        renderHistory();
+        renderHistUpdatedAt();
+      } else {
+        exitHistory();
+      }
+    });
+  }
+
+  // ---- Event: copy embed / clear history (delegated) ----
   repoListEl.addEventListener("click", function(e) {
+    var clearBtn = e.target.closest("#clearHistBtn");
+    if (clearBtn) {
+      try { localStorage.removeItem(HIST_KEY); } catch (err) {}
+      updateHistBtn(0);
+      renderHistory();
+      renderHistUpdatedAt();
+      return;
+    }
     var btn = e.target.closest(".embed-btn");
     if (!btn) return;
     e.stopPropagation();
@@ -802,6 +1117,21 @@
     });
     langSel.appendChild(langFrag);
   }
+
+  // ---- 从 URL 恢复状态(深链/刷新保持) ----
+  (function initState() {
+    var sp;
+    try { sp = new URLSearchParams(location.search); } catch (e) { sp = new URLSearchParams(); }
+    var v = sp.get("view");
+    if (v && (PERIOD_VIEWS.indexOf(v) !== -1 || isDayView(v))) currentView = v;
+    var l = sp.get("lang");
+    if (l && LANG_NAME[l]) currentLang = l;
+    var b = sp.get("badge");
+    if (b) currentBadge = b;
+  })();
+
+  syncControls();
+  updateHistBtn(readHistory().length);
 
   // ---- Initial load ----
   loadAndRender(false);
