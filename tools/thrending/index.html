@@ -335,7 +335,7 @@
 
 <header class="header">
   <h1>GitHub <span>Trending</span></h1>
-  <p class="subtitle">Discover what the community is building</p>
+  <p class="subtitle">Fresh &amp; rising repositories on GitHub · powered by GitHub Search API</p>
 </header>
 
 <div class="stats-bar" id="statsBar">
@@ -345,7 +345,7 @@
   </div>
   <div class="stat-item">
     <div class="stat-value" id="statStars">--</div>
-    <div class="stat-label">total stars gained</div>
+    <div class="stat-label">total stars</div>
   </div>
   <div class="stat-item">
     <div class="stat-value" id="statLangs">--</div>
@@ -390,23 +390,16 @@
 
 <script>
 (function(){
-  var DATA_HOST = "https://cdn.jsdelivr.net/gh/isboyjc/github-trending-api/data";
+  var SEARCH_API = "https://api.github.com/search/repositories";
   var currentSince = "daily";
   var currentLang = "";
   var cachedData = {};
-  var lastPubDate = "";
+  var lastFetchAt = null;
   var refreshNonce = "";
   var loading = false;
 
-  // ---- 本地日期 YYYY-MM-DD：用于每日缓存穿透（源接口浏览器缓存 7 天）----
-  function today() {
-    var d = new Date();
-    var m = String(d.getMonth() + 1);
-    var day = String(d.getDate());
-    if (m.length < 2) m = "0" + m;
-    if (day.length < 2) day = "0" + day;
-    return d.getFullYear() + "-" + m + "-" + day;
-  }
+  // ---- 时间窗口：Daily/Weekly/Monthly → 最近 N 天创建的仓库 ----
+  var WINDOW_DAYS = { daily: 1, weekly: 7, monthly: 30 };
 
   // ---- 请求超时：避免上游卡死时无限转圈 ----
   function fetchWithTimeout(url, ms) {
@@ -440,6 +433,10 @@
     ["typescript", "TypeScript"], ["vala", "Vala"], ["vim-script", "Vim Script"],
     ["vue", "Vue"], ["webassembly", "WebAssembly"], ["zig", "Zig"]
   ];
+
+  // slug → GitHub 语言名（Search API 的 language: 限定符用语言名，加引号最稳）
+  var LANG_NAME = {};
+  LANGS.forEach(function(item) { LANG_NAME[item[0]] = item[1]; });
 
   var repoListEl = document.getElementById("repoList");
   var statTotal = document.getElementById("statTotal");
@@ -479,9 +476,9 @@
     return { cls: "a-cold", txt: "Emerging", tip: "Star < 100" };
   }
 
-  // ---- Cache key：带上日期，内存缓存每天自动失效 ----
+  // ---- Cache key：内存缓存即可，数据为实时查询 ----
   function cacheKey(since, lang) {
-    return today() + "|" + since + ":" + (lang || "all");
+    return since + ":" + (lang || "all");
   }
 
   // ---- 数字解析：兼容 "7,626"、"+1,616" 与裸 number ----
@@ -492,58 +489,63 @@
     return isNaN(n) ? 0 : n;
   }
 
-  // ---- 数据归一化：把 isboyjc 源格式映射为页面渲染所需形状 ----
+  // ---- 数据归一化：GitHub Search API → 页面渲染所需形状 ----
   function normalize(json) {
-    var items = Array.isArray(json) ? json
-              : (json && Array.isArray(json.items)) ? json.items
-              : (json && Array.isArray(json.data)) ? json.data
-              : [];
+    var items = (json && Array.isArray(json.items)) ? json.items : [];
 
     return items.map(function(it, i) {
-      var username, reponame;
-      var m = /^https?:\/\/github\.com\/([^/]+)\/([^/?#]+)/.exec(it.url || "");
-      if (m) {
-        username = m[1];
-        reponame = m[2];
-      } else {
-        var t = String(it.title || "owner/repo").split("/");
-        username = t[0] || "unknown";
-        reponame = t.slice(1).join("/") || "repo";
-      }
+      var full = String(it.full_name || "unknown/repo").split("/");
+      var username = full[0] || "unknown";
+      var reponame = full.slice(1).join("/") || "repo";
       return {
         rank: i + 1,
         username: username,
         reponame: reponame,
-        url: it.url || ("https://github.com/" + encodeURIComponent(username) + "/" + encodeURIComponent(reponame)),
+        url: it.html_url || ("https://github.com/" + encodeURIComponent(username) + "/" + encodeURIComponent(reponame)),
         description: it.description || "",
         language: it.language || "",
-        languageColor: it.languageColor || null,
-        stars: parseNum(it.stars),
-        forks: parseNum(it.forks),
-        starsToday: parseNum(it.addStars)
+        languageColor: null,
+        stars: parseNum(it.stargazers_count),
+        forks: parseNum(it.forks_count),
+        starsToday: 0,
+        createdAt: it.created_at || ""
       };
     });
   }
 
-  // ---- Fetch data ----
+  // ---- 仓库"年龄"：替代原 stars today 展示 ----
+  function fmtAge(iso) {
+    if (!iso) return "";
+    var h = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000);
+    if (h < 1) return "just now";
+    if (h < 24) return h + "h old";
+    return Math.floor(h / 24) + "d old";
+  }
+
+  // ---- Fetch data（GitHub Search API：最近 N 天创建，按 star 数降序）----
   async function fetchData(since, lang) {
     var key = cacheKey(since, lang);
     if (cachedData[key]) return cachedData[key];
 
-    var slug = (lang || "all").toLowerCase();
-    var url = DATA_HOST + "/" + since + "/" + encodeURIComponent(slug) + ".json?v=" + today();
+    var days = WINDOW_DAYS[since] || 1;
+    var startDate = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
+    var q = "created:>" + startDate;
+    if (lang) q += ' language:"' + (LANG_NAME[lang] || lang) + '"';
+
+    var url = SEARCH_API + "?q=" + encodeURIComponent(q) + "&sort=stars&order=desc&per_page=25";
     if (refreshNonce) url += "&_=" + refreshNonce;
 
     var res = await fetchWithTimeout(url);
-    if (res.status === 404) {
-      cachedData[key] = [];
-      return [];
+    if (res.status === 403 || res.status === 429) {
+      var e = new Error("rate limited");
+      e.rateLimited = true;
+      throw e;
     }
-    if (!res.ok) throw new Error("API error");
+    if (!res.ok) throw new Error("API error " + res.status);
 
     var json = await res.json();
     var items = normalize(json);
-    lastPubDate = (json && json.pubDate) || "";
+    lastFetchAt = new Date();
     cachedData[key] = items;
     return items;
   }
@@ -610,8 +612,8 @@
 
     if (!repos.length) {
       var emptyMsg = currentLang
-        ? "该语言暂无趋势数据（上游可能未收录）"
-        : "No trending repositories found for this filter.";
+        ? "该语言在此时间窗口内暂无结果，可切换 Weekly/Monthly 试试"
+        : "No repositories found for this filter.";
       repoListEl.innerHTML = '<div class="empty-state"><p>' + escHtml(emptyMsg) + '</p></div>';
       updateStats([]);
       return;
@@ -636,12 +638,6 @@
         ? '<span class="meta-item lang-dot">' + langColorHtml + " " + escHtml(repo.language) + "</span>"
         : "";
 
-      var starsTodayLabel = {
-        daily: "stars today",
-        weekly: "stars this week",
-        monthly: "stars this month"
-      }[currentSince] || "stars today";
-
       var a = assess(repo.stars || 0);
       var badgesHtml = buildBadges(repo.username, repo.reponame);
       var repoUrl = "https://github.com/" + encodeURIComponent(repo.username) + "/" + encodeURIComponent(repo.reponame);
@@ -663,7 +659,7 @@
           langHtml +
           '<span class="meta-item">' + fmtNum(repo.stars) + ' stars</span>' +
           '<span class="meta-item">' + fmtNum(repo.forks) + ' forks</span>' +
-          '<span class="meta-item"><span class="stars-today">+' + fmtNum(Math.max(0, repo.starsToday || 0)) + '</span> ' + starsTodayLabel + '</span>' +
+          '<span class="meta-item"><span class="stars-today">' + escHtml(fmtAge(repo.createdAt)) + '</span></span>' +
         '</div>' +
         '<div class="repo-badges">' +
           badgesHtml +
@@ -694,8 +690,8 @@
       return;
     }
     statTotal.textContent = repos.length;
-    var totalGained = repos.reduce(function(s, r) { return s + (r.starsToday || 0); }, 0);
-    statStars.textContent = fmtNum(totalGained);
+    var totalStars = repos.reduce(function(s, r) { return s + (r.stars || 0); }, 0);
+    statStars.textContent = fmtNum(totalStars);
     var langs = new Set(repos.map(function(r) { return r.language; }).filter(Boolean));
     statLangs.textContent = langs.size;
   }
@@ -719,7 +715,10 @@
       renderCards(repos);
       renderUpdatedAt();
     } catch (err) {
-      repoListEl.innerHTML = '<div class="empty-state"><p>Failed to load trending data. Please try again.</p></div>';
+      var msg = (err && err.rateLimited)
+        ? "GitHub API 限流中（未认证 10 次/分钟），请约 1 分钟后再试。"
+        : "Failed to load trending data. Please try again.";
+      repoListEl.innerHTML = '<div class="empty-state"><p>' + escHtml(msg) + '</p></div>';
     }
 
     loading = false;
@@ -727,12 +726,13 @@
 
   function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 
-  // ---- 展示数据更新时间 ----
+  // ---- 展示数据获取时间（实时接口，即取即新）----
   function renderUpdatedAt() {
     if (!updatedAtEl) return;
-    updatedAtEl.textContent = lastPubDate
-      ? "数据更新于 " + new Date(lastPubDate).toLocaleString("zh-CN", { hour12: false })
-      : "";
+    var t = lastFetchAt || new Date();
+    updatedAtEl.textContent = "数据获取于 " +
+      t.toLocaleString("zh-CN", { hour12: false }) +
+      " · GitHub Search API 实时";
   }
 
   // ---- Event: since pills ----
