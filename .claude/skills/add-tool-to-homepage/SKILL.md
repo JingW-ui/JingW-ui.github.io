@@ -12,7 +12,7 @@ description: 将新的工具或游戏注册到对应主页（tools/index.html �
 仓库中有三处维护「工具/游戏清单」，添加任何新条目时**必须全部同步**，否则个人主页的随机推荐位会出现死链或漏推：
 
 1. **集合页索引卡片** —— `tools/index.html`（工具）或 `Games/index.html`（游戏）
-2. **统计数字** —— `tools/index.html` 顶部的 `📦 共创见 N 个实用工具`（仅工具需要改，游戏页无计数）
+2. **统计数字** —— `tools/index.html` 顶部的 `📦 共创建 N 个实用工具` **加**所属分区的 `section-count`（仅工具需要改；游戏页是 chips 计数，见游戏流程）
 3. **个人主页随机池** —— `index.html` 中的 `TOOLS` 数组（工具）或 `GAMES` 数组（游戏）
 
 **每次添加操作都必须同时更新这三处，缺一不可。完成后必须立即提交并推送到远程仓库。**
@@ -40,20 +40,17 @@ description: 将新的工具或游戏注册到对应主页（tools/index.html �
 
 ### 2. 确认分类
 
-读取 `tools/index.html` 中的 `<div class="category-tabs">`，确认分类标签是否存在。
+`tools/index.html` 用**分区（section）**组织卡片：每个分类是一个 `<section class="category-section" data-category="{分类ID}">`，内含标题 `<h2 class="section-title">{分类名称}<span class="section-count">N</span></h2>` 和 `<div class="tools-grid">`（所有卡片都放在这里）。先确认目标分类的 section 是否存在。
 
-**现有分类**：
-- `image` - 图片类
-- `text` - 字符类
-- `time` - 时间类
-- `calc` - 计算进制类
-- `info` - 信息类
-- `other` - 其他实用工具
+**现有分类**（ID → 分区标题；卡片数随注册变化，以文件为准）：
+- `image` - 图片工具
+- `text` - 字符处理
+- `time` - 时间与日期
+- `calc` - 计算与换算
+- `info` - 信息聚合
+- `other` - 实用杂项
 
-**如果需要新分类**：在 `</div>` 前插入新标签：
-```html
-<div class="category-tab" data-category="新分类ID">新分类名称</div>
-```
+**如果需要新分类**：在最后一个 `</section>` 后照现有结构新建一个 `category-section`，同时在搜索区 `<div class="quick-filter" id="quickFilter">` 里补一个 `<button type="button" class="qf-chip" data-cat="新分类ID">新分类名称</button>`，并在 `index.html` 的 `ICONS`、`TAGS` 映射表里各补一条。
 
 ### 3. 准备图标
 
@@ -81,37 +78,38 @@ data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'
 
 ### 4. 在工具箱主页添加卡片（同步点 1）
 
-在 `tools/index.html` 的 `<div class="tools-grid">` 内，按分类找到合适位置，插入卡片：
+在 `tools/index.html` 目标分类的 `<section class="category-section" data-category="{分类ID}">` 内、`<div class="tools-grid">` 中同类卡片之后插入：
 
 ```html
-<!-- {工具名称} -->
-<a href="/tools/{slug}/" class="tool-card" data-category="{分类ID}" data-name="{工具名称}" data-desc="{工具描述}">
-    <span class="tool-label">{分类名称}</span>
-    <div class="tool-card-header">
-        <div class="tool-icon"><img src="{图标URL}" alt="{工具名称}"></div>
-        <div class="tool-content">
-            <h3 class="tool-name">{工具名称}</h3>
-            <p class="tool-description">{工具描述}</p>
-        </div>
-    </div>
+<a href="/tools/{slug}/" class="tool-card" data-name="{工具名称}" data-desc="{工具描述}" title="{工具描述}">
+    <div class="tool-icon"><img src="{图标URL}" alt="{工具名称}"></div>
+    <h3 class="tool-name">{工具名称}</h3>
 </a>
 ```
 
-> 注意：`tools/index.html` 卡片的 `tool-label` 是 `<span>` 且置于 `tool-card-header` 之前，与早期文档示例不同，以现有文件实际结构为准。
+> 注意：实际结构里卡片**没有** `data-category` 属性（分类靠外层 section 分组），也没有 `tool-label` / `tool-card-header` / `tool-content` 包裹层和描述段落——描述只存在于 `data-desc`（搜索用）和 `title`（悬停提示）两个属性中。以现有文件实际结构为准。
 
-**插入位置**：同类卡片之后，保持分类内工具的逻辑顺序。
+**插入位置**：同一 section 的 `tools-grid` 内同类卡片之后，保持分类内工具的逻辑顺序。
 
 ### 5. 更新统计数字（同步点 2，仅工具）
 
-更新 `tools/index.html` 顶部 `stats-banner` 中的计数：
+两处计数都要 +1：
+
+1. 所属分区标题里的计数：
+
+```html
+<h2 class="section-title">信息聚合<span class="section-count">15</span></h2>  <!-- 15 → 16 -->
+```
+
+2. 顶部 `stats-banner` 总数：
 
 ```html
 <div class="stats-banner">
-    📦 共创见 {N} 个实用工具
+    📦 共创建 74 个实用工具
 </div>
 ```
 
-`N` = `tools/index.html` 中 `.tool-card` 的实际总数。**统计数与实际卡片数必须一致**，添加后数一遍核对。
+**两个数字必须与实际卡片数一致**：添加后数一遍 `.tool-card` 总数（应等于 banner 数字）和该分区内的卡片数（应等于 section-count）。
 
 ### 6. 同步个人主页随机工具池（同步点 3）
 
@@ -121,12 +119,14 @@ data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'
 ['{slug}','{工具名称}','{工具描述}','{分类ID}'],
 ```
 
+> 原最后一行通常没有尾逗号，追加前记得先给上一行补上 `,`。
+
 **数组元素格式**：`[slug, name, desc, category]`，分类 ID 取值与工具箱主页一致（`text` / `image` / `time` / `calc` / `other` / `info`）。
 
 **字段对应规则**：
 - `slug` = 工具目录名（不带末尾 `/`），用于拼 `/tools/{slug}/`
 - `name` / `desc` = 与工具箱卡片一致（可适当精简描述以适应推荐位）
-- `category` = 工具箱卡片的 `data-category`
+- `category` = 工具所属 `category-section` 的 `data-category`（卡片本身没有该属性）
 
 `ICONS` 和 `TAGS` 映射表已覆盖全部现有分类，无需改动；若新增了全新分类 ID，需同步在 `ICONS` 和 `TAGS` 对象里补一条。
 
@@ -233,21 +233,14 @@ git push origin main
 1. 读取 `tools/world_clock/index.html` 的 `<title>` → 名称「世界时钟墙」
 2. 确认 `time` 分类已存在
 3. 用默认 SVG 图标
-4. **同步点 1**：在 `tools/index.html` 同类卡片后插入：
+4. **同步点 1**：在 `tools/index.html` 的 `time` 分区（`<section class="category-section" data-category="time">`）内、同类卡片后插入：
 ```html
-<!-- 世界时钟墙 -->
-<a href="/tools/world_clock/" class="tool-card" data-category="time" data-name="世界时钟墙" data-desc="多城市时区实时时钟，一眼掌握全球各地时间">
-    <span class="tool-label">时间类</span>
-    <div class="tool-card-header">
-        <div class="tool-icon"><img src="data:image/svg+xml,..." alt="世界时钟墙"></div>
-        <div class="tool-content">
-            <h3 class="tool-name">世界时钟墙</h3>
-            <p class="tool-description">多城市时区实时时钟，一眼掌握全球各地时间</p>
-        </div>
-    </div>
+<a href="/tools/world_clock/" class="tool-card" data-name="世界时钟墙" data-desc="多城市时区实时时钟，一眼掌握全球各地时间" title="多城市时区实时时钟，一眼掌握全球各地时间">
+    <div class="tool-icon"><img src="data:image/svg+xml,..." alt="世界时钟墙"></div>
+    <h3 class="tool-name">世界时钟墙</h3>
 </a>
 ```
-5. **同步点 2**：`📦 共创见 58 个实用工具` → `59 个`（数一遍实际卡片数核对）
+5. **同步点 2**：`time` 分区的 `section-count` +1，`📦 共创建 58 个实用工具` → `59 个`（数一遍实际卡片数核对）
 6. **同步点 3**：在 `index.html` 的 `TOOLS` 数组末尾追加：
 ```javascript
 ['world_clock','世界时钟墙','多城市时区实时时钟，一眼掌握全球各地时间','time']
@@ -297,7 +290,7 @@ git push origin main
 - 图标/缩略图优先使用 webp，工具放 `/tools/assets/logo/`，游戏放 `Games/assets/img/`
 - 临时可用内联 SVG data URI，后续替换为正式图片
 - `tools/index.html` 的 `data-name` 和 `data-desc` 用于搜索功能，确保准确
-- 工具分类名称和 ID 要对应（如 `info` → `信息`，`time` → `时间类`）
+- 工具分类名称和 ID 要对应（如 `info` → `信息聚合`，`time` → `时间与日期`，见「现有分类」清单）
 - 工具路径末尾要有 `/`（卡片 `href`）；但 `index.html` 的 `TOOLS` 数组里 slug **不带** `/`，`GAMES` 数组里 slug **带** `/`，注意区分
 - 完成后简短列出三处改动，便于核对一致性
 - **注册完成后必须立即 `git commit` + `git push origin main`**，只推 Gitee（origin），不推 GitHub（github remote，用户已设置 Gitee→GitHub 镜像自动同步）
