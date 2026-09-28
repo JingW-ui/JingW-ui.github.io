@@ -156,22 +156,77 @@
             animation: rise 0.45s ease 0.08s forwards;
         }
 
-        .search-box {
+        /* 搜索栏（输入 + 分类快筛） */
+        .search-bar {
             width: 100%;
-            padding: 10px 18px;
-            border: 1px solid var(--border);
-            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 8px 5px 0;
             background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            backdrop-filter: blur(6px);
+            transition: var(--transition);
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.18);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
             color: var(--text);
             font-size: 0.85rem;
             transition: var(--transition);
-            backdrop-filter: blur(6px);
         }
 
         .search-box:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.18);
+        }
+
+        .search-box::placeholder {
+            color: var(--text-dim);
+        }
+
+        .quick-filter {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            padding-left: 10px;
+            border-left: 1px solid var(--border);
+        }
+
+        .qf-chip {
+            padding: 5px 10px;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 0.68rem;
+            font-family: inherit;
+            line-height: 1.2;
+            cursor: pointer;
+            user-select: none;
+            transition: var(--transition);
+        }
+
+        .qf-chip:hover {
+            background: rgba(255, 255, 255, 0.45);
+            color: var(--text);
+        }
+
+        .qf-chip.active {
+            background: rgba(45, 212, 191, 0.15);
+            border-color: rgba(45, 212, 191, 0.35);
+            color: var(--accent);
+            font-weight: 600;
         }
 
         /* 搜索空状态 */
@@ -498,15 +553,43 @@
                 border-radius: 12px;
             }
 
-            /* 搜索框 */
+            /* 搜索框 + 分类快筛 */
             .search-container {
                 margin-bottom: 0.7rem;
             }
 
+            .search-bar {
+                flex-wrap: wrap;
+                padding: 3px 8px;
+                border-radius: 14px;
+                gap: 0 6px;
+            }
+
             .search-box {
-                padding: 7px 14px;
+                flex: 1 1 100%;
+                padding: 8px 10px;
                 font-size: 0.75rem;
-                border-radius: 12px;
+            }
+
+            .quick-filter {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid var(--border);
+                padding-left: 0;
+                padding-top: 5px;
+                padding-bottom: 2px;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .quick-filter::-webkit-scrollbar {
+                display: none;
+            }
+
+            .qf-chip {
+                flex: 0 0 auto;
+                padding: 4px 9px;
+                font-size: 0.62rem;
             }
 
             /* 分类区块紧凑化 */
@@ -685,9 +768,20 @@
             </div>
         </div>
 
-        <!-- 搜索框 -->
+        <!-- 搜索框 + 分类快筛 -->
         <div class="search-container">
-            <input type="text" class="search-box" id="searchBox" placeholder="搜索工具名称或描述...">
+            <div class="search-bar">
+                <input type="text" class="search-box" id="searchBox" placeholder="搜索工具名称或描述...">
+                <div class="quick-filter" id="quickFilter">
+                    <button type="button" class="qf-chip active" data-cat="all">全部</button>
+                    <button type="button" class="qf-chip" data-cat="image">图片</button>
+                    <button type="button" class="qf-chip" data-cat="text">字符</button>
+                    <button type="button" class="qf-chip" data-cat="time">时间</button>
+                    <button type="button" class="qf-chip" data-cat="calc">计算</button>
+                    <button type="button" class="qf-chip" data-cat="info">信息</button>
+                    <button type="button" class="qf-chip" data-cat="other">杂项</button>
+                </div>
+            </div>
         </div>
 
         <!-- 推荐工具 -->
@@ -1756,7 +1850,9 @@
 
         // 搜索过滤功能
         const searchBox = document.getElementById('searchBox');
+        const quickFilter = document.getElementById('quickFilter');
         let currentSearch = '';
+        let currentCategory = 'all';
 
         // 搜索功能
         searchBox.addEventListener('input', (e) => {
@@ -1764,32 +1860,45 @@
             filterTools();
         });
 
-        // 过滤工具函数：按名称/描述匹配，隐藏无结果的区块
+        // 分类快筛：单选 toggle，与搜索词 AND 组合
+        quickFilter.addEventListener('click', (e) => {
+            const chip = e.target.closest('.qf-chip');
+            if (!chip) return;
+            quickFilter.querySelectorAll('.qf-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentCategory = chip.dataset.cat;
+            filterTools();
+        });
+
+        // 过滤工具函数：按分类 + 名称/描述匹配，隐藏无结果的区块
         function filterTools() {
-            // 搜索时隐藏推荐区，清空搜索后恢复
+            // 搜索或分类筛选时隐藏推荐区，回到「全部 + 无关键词」后恢复
             const featured = document.getElementById('featuredSection');
-            if (featured) featured.style.display = currentSearch ? 'none' : '';
+            if (featured) featured.style.display = (currentSearch || currentCategory !== 'all') ? 'none' : '';
 
             let visibleTotal = 0;
             document.querySelectorAll('.category-section').forEach(section => {
+                // 检查分类匹配
+                const catMatch = currentCategory === 'all' || section.dataset.category === currentCategory;
                 let visible = 0;
                 section.querySelectorAll('.tool-card').forEach(card => {
                     const name = (card.dataset.name || '').toLowerCase();
                     const desc = (card.dataset.desc || '').toLowerCase();
 
                     // 检查搜索匹配
-                    const match = !currentSearch ||
+                    const searchMatch = !currentSearch ||
                         name.includes(currentSearch) ||
                         desc.includes(currentSearch);
+                    const match = catMatch && searchMatch;
 
                     // 显示或隐藏卡片
                     card.style.display = match ? 'flex' : 'none';
                     if (match) visible++;
                 });
 
-                // 隐藏无匹配结果的区块
-                section.style.display = visible ? '' : 'none';
-                visibleTotal += visible;
+                // 隐藏无匹配结果的区块（含分类不匹配的区块）
+                section.style.display = (catMatch && visible) ? '' : 'none';
+                if (catMatch) visibleTotal += visible;
             });
 
             // 全部无匹配时显示空状态
