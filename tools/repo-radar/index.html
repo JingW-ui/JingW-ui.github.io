@@ -191,6 +191,19 @@ textarea:focus { border-color: var(--blue); }
 }
 .embed-btn:hover { color: var(--text); border-color: var(--blue); }
 .embed-btn.copied { color: var(--green-b); border-color: var(--green-b); }
+.ext-link {
+  background: var(--card-2); color: var(--muted); border: 1px solid var(--border);
+  border-radius: 5px; padding: 3px 9px; font-size: .72rem; text-decoration: none;
+  white-space: nowrap; transition: color .15s, border-color .15s;
+}
+.ext-link:hover { color: var(--blue); border-color: var(--blue); }
+.fi-links { display: inline-flex; gap: 3px; flex-shrink: 0; }
+.fi-links a {
+  font-size: .62rem; color: var(--muted); text-decoration: none;
+  border: 1px solid var(--border); border-radius: 3px; padding: 1px 4px;
+  transition: color .12s, border-color .12s;
+}
+.fi-links a:hover { color: var(--blue); border-color: var(--blue); }
 .style-sel {
   background: var(--card-2); color: var(--text); border: 1px solid var(--border);
   border-radius: 6px; padding: 5px 8px; font: inherit; font-size: .8rem; outline: none;
@@ -232,6 +245,8 @@ footer a { color: var(--muted); }
   .repo-badges { gap: 3px 5px; margin-top: 6px; padding-top: 6px; }
   .repo-badges img { height: 14px; }
   .embed-btn { padding: 2px 5px; font-size: .56rem; border-radius: 3px; }
+  .ext-link { padding: 2px 5px; font-size: .56rem; border-radius: 3px; }
+  .fi-links a { font-size: .56rem; padding: 1px 3px; }
   footer { font-size: .56rem; margin-top: 14px; }
       .token-inp { font-size: .6rem; padding: 3px 6px; min-width: 0; }
       .max-sel { font-size: .6rem; padding: 2px 4px; }
@@ -269,6 +284,8 @@ footer a { color: var(--muted); }
   .lang-dot { width: 5px; height: 5px; }
   .repo-badges img { height: 12px; }
   .embed-btn { font-size: .5rem; padding: 1px 4px; }
+  .ext-link { font-size: .5rem; padding: 1px 4px; }
+  .fi-links a { font-size: .5rem; padding: 1px 2px; }
   footer { font-size: .5rem; }
       .token-inp { font-size: .5rem; padding: 2px 4px; min-width: 0; }
       .max-sel { font-size: .5rem; padding: 1px 3px; }
@@ -343,6 +360,7 @@ footer a { color: var(--muted); }
 
     <footer>
       <p>Repo Radar - GitHub 仓库嗅探与分析工具</p>
+      <p style="margin-top:2px">卡片外链视图由 <a href="https://gitdiagram.com" target="_blank" rel="noopener">GitDiagram</a> · <a href="https://gitingest.com" target="_blank" rel="noopener">Gitingest</a> · <a href="https://deepwiki.com" target="_blank" rel="noopener">DeepWiki</a> 提供</p>
     </footer>
   </main>
 </div>
@@ -659,6 +677,7 @@ footer a { color: var(--muted); }
       return '<div class="fav-item" data-owner="' + escapeHtml(f.owner) + '" data-repo="' + escapeHtml(f.repo) + '">' +
         '<span class="fi-text">' + escapeHtml(f.full) + '</span>' +
         '<span class="fi-sub">' + escapeHtml(sub) + '</span>' +
+        buildFavLinks(f.owner, f.repo) +
         '<button class="fav-item-rm" data-owner="' + escapeHtml(f.owner) + '" data-repo="' + escapeHtml(f.repo) + '" title="取消收藏">×</button>' +
       '</div>';
     }).join("");
@@ -1135,6 +1154,32 @@ footer a { color: var(--muted); }
     }).join(" ");
   }
 
+  // ---- External deep-links (pure public URL concatenation, no credentials) ----
+  // GitDiagram: interactive architecture diagram; Gitingest: LLM-ready full-text digest;
+  // DeepWiki: auto-generated wiki walkthrough. All open in a new tab — failures of these
+  // third-party services stay in that tab and never degrade repo-radar itself.
+  function extLinkDefs() {
+    return [
+      { host: "gitdiagram.com", label: "图结构", tip: "GitDiagram 交互式架构图", short: "图" },
+      { host: "gitingest.com", label: "AI 全文", tip: "Gitingest 仓库全文（可投喂 LLM）", short: "文" },
+      { host: "deepwiki.com", label: "Wiki", tip: "DeepWiki 自动讲解", short: "W" }
+    ];
+  }
+
+  function buildExtLinks(owner, repo) {
+    var enc = encodeURIComponent(owner) + "/" + encodeURIComponent(repo);
+    return extLinkDefs().map(function (d) {
+      return '<a class="ext-link" href="https://' + d.host + '/' + enc + '" target="_blank" rel="noopener" title="' + d.tip + '">' + d.label + '</a>';
+    }).join("");
+  }
+
+  function buildFavLinks(owner, repo) {
+    var enc = encodeURIComponent(owner) + "/" + encodeURIComponent(repo);
+    return '<span class="fi-links">' + extLinkDefs().map(function (d) {
+      return '<a href="https://' + d.host + '/' + enc + '" target="_blank" rel="noopener" title="' + d.tip + '">' + d.short + '</a>';
+    }).join("") + '</span>';
+  }
+
   function renderLiteRepo(item) {
     var href = "https://github.com/" + item.owner + "/" + item.repo;
     var badgesHtml = buildBadges(item.owner, item.repo);
@@ -1154,6 +1199,7 @@ footer a { color: var(--muted); }
       '<div class="repo-badges" style="margin-top:8px;padding-top:0;border-top:none">' +
         badgesHtml +
         '<button class="embed-btn" data-owner="' + escapeHtml(item.owner) + '" data-repo="' + escapeHtml(item.repo) + '" title="复制 Markdown 嵌入代码">复制 Embed</button>' +
+        buildExtLinks(item.owner, item.repo) +
       '</div>' +
     '</div>';
   }
@@ -1202,6 +1248,7 @@ footer a { color: var(--muted); }
       '<div class="repo-badges">' +
         badgesHtml +
         '<button class="embed-btn" data-owner="' + escapeHtml(item.owner) + '" data-repo="' + escapeHtml(item.repo) + '" title="复制 Markdown 嵌入代码">复制 Embed</button>' +
+        buildExtLinks(item.owner, item.repo) +
       '</div>' +
     '</div>';
   }
@@ -1314,6 +1361,8 @@ footer a { color: var(--muted); }
         renderResults();
         return;
       }
+      // External deep-links (图/文/W) open in a new tab — never re-run analyze()
+      if (e.target.closest(".fi-links")) return;
       var item = e.target.closest(".fav-item");
       if (!item) return;
       input.value = "https://github.com/" + item.getAttribute("data-owner") + "/" + item.getAttribute("data-repo");
