@@ -1,4 +1,4 @@
-# 《高性价比人生指南》镜像同步脚本
+﻿# 《地球Online入门指南》镜像同步脚本（上游原书名：高性价比人生指南）
 # 兼容 Windows PowerShell 5.1 与 PowerShell 7+
 # 上游: https://github.com/eternity4719/HowToLiveBetter （Unlicense，公有领域）
 # 做的事：
@@ -9,7 +9,9 @@
 #      b. 剥离侧栏广告位
 #      c. robots 改 noindex（镜像不与源站抢搜索排名）
 #      d. 页脚追加镜像快照说明
-#   3. 汇报文件数与体积
+#      e. 展示名本地化：《高性价比人生指南》→《地球Online入门指南》（署名靠源仓库链接保留）
+#   3. README.md 同样应用展示名本地化
+#   4. 汇报文件数与体积
 # 用法: pwsh -File tools/life-better/sync.ps1
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'
@@ -56,10 +58,14 @@ $patched = [regex]::Replace($patched, '^<!doctype html>',
   "<!doctype html>`n<!-- 镜像自 eternity4719/HowToLiveBetter（Unlicense 公有领域）。本地补丁：剥 GA/广告、noindex。更新：pwsh -File sync.ps1 -->",
   'IgnoreCase')
 
+# e. 展示名本地化（Unlicense 公有领域；上游署名由页脚"源仓库"链接与文件头镜像注释保留）
+$patched = $patched.Replace('高性价比人生指南', '地球Online入门指南')
+
 $warn = @()
 if ($patched -match 'googletagmanager|G-NTPGXCLMP6') { $warn += 'GA 未剥净' }
 if ($patched -match 'mcyyy')                   { $warn += '广告未剥净' }
 if ($patched -notmatch 'noindex')              { $warn += 'noindex 未生效' }
+if ($patched -match '高性价比人生指南')         { $warn += '展示名未改净' }
 if ($warn.Count) { Write-Warning "补丁校验: $($warn -join '；')" }
 else { Write-Host '补丁校验: GA 已剥 / 广告已剥 / noindex 已生效' }
 
@@ -70,6 +76,9 @@ Write-Host ("index.html  {0,8:N0} bytes（补丁后）" -f (Get-Item $indexPath)
 $r1 = Save-File 'README.md' (Join-Path $Root 'README.md')
 Write-Host ("README.md   {0,8:N0} bytes" -f $r1)
 $readme = [System.IO.File]::ReadAllText((Join-Path $Root 'README.md'), $Utf8)
+# README 同步展示名本地化（book/docs 链接均为相对路径，不受影响）
+$readme = $readme.Replace('高性价比人生指南', '地球Online入门指南')
+[System.IO.File]::WriteAllText((Join-Path $Root 'README.md'), $readme, $Utf8)
 
 # ---------- 3. book/*.md 与顶层 docs/*.md（清单来自 README 链接） ----------
 $bookFiles = [regex]::Matches($readme, '\((book/[^)]+\.md)\)') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique
