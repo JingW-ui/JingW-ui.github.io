@@ -396,5 +396,30 @@
     "resume": "/resume/resume_qz/resume_ceccloud_aicoding.html",
     "note": "已投递（Moka 官方渠道），base 武汉",
     "stage": "applied"
+  },
+  {
+    "id": "mihoyo_9197",
+    "title": "UI蓝图工程师",
+    "company": "米哈游",
+    "city": "上海",
+    "score": null,
+    "directions": [
+      "UI蓝图",
+      "界面落地与交互"
+    ],
+    "skills": [
+      "界面搭建",
+      "控件化与资源复用",
+      "交互体验",
+      "AI 自动化测试"
+    ],
+    "majorGate": [],
+    "salary": "",
+    "publishDate": "",
+    "deadline": "",
+    "applyLink": "https://jobs.mihoyo.com/?recommendationCode=NDE3&isRecommendation=true#/campus/position/9197",
+    "resume": "/resume/resume_qz/resume_mihoyo_uiblueprint.html",
+    "note": "已投递（米哈游官网，岗位 9197，邀请通道）",
+    "stage": "applied"
   }
 ]
