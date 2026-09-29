@@ -43,7 +43,14 @@
             --radius-sm: 14px;
             --radius-md: 20px;
             --radius-lg: 28px;
-            --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+            /* motion tokens（阶梯来源：motion-web motion-tokens.md，B3 闸门：≥3 档时长 + ≥3 条曲线） */
+            --m-instant: 90ms; --m-fast: 180ms; --m-std: 300ms; --m-medium: 480ms; --m-slow: 720ms;
+            --e-std: cubic-bezier(0.4, 0, 0.2, 1);
+            --e-out-expo: cubic-bezier(0.16, 1, 0.3, 1);      /* 揭示默认：快进软着陆 */
+            --e-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);  /* 俏皮 hover：轻微过冲 */
+            --e-out-circ: cubic-bezier(0, 0.55, 0.45, 1);     /* 机械利落：旋转确认 */
+            --spring-press: linear(0, 0.34 7%, 0.78 18%, 1.04 28%, 1.01 44%, 1); /* 按压回弹 */
+            --transition: all var(--m-fast) var(--e-out-expo);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -57,25 +64,30 @@
             overflow-x: hidden;
         }
 
-        .bg-decoration { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.45; pointer-events: none; z-index: 0; }
-        .bg-decoration-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(94,234,212,0.30) 0%, transparent 70%); top: -180px; left: -120px; animation: float 22s ease-in-out infinite; }
-        .bg-decoration-2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(125,211,252,0.28) 0%, transparent 70%); bottom: -140px; right: -120px; animation: float 26s ease-in-out infinite reverse; }
-        .bg-decoration-3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%); top: 48%; left: 52%; transform: translate(-50%, -50%); animation: pulse 16s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 33% { transform: translate(30px, -30px) rotate(120deg); } 66% { transform: translate(-20px, 20px) rotate(240deg); } }
-        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.45; } }
+        /* 背景场：静态 CSS 光斑兜底（no-JS / 加载前），canvas 接管后同构图 + 指针可搅动微尘 */
+        body::before { content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(circle 300px at 12% 8%, rgba(94,234,212,0.30), transparent 70%),
+                radial-gradient(circle 260px at 88% 90%, rgba(125,211,252,0.28), transparent 70%),
+                radial-gradient(circle 210px at 52% 50%, rgba(45,212,191,0.15), transparent 70%); }
+        #bgField { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
 
         .main-container { max-width: 1380px; margin: 0 auto; padding: 24px 20px 24px; display: grid; grid-template-columns: 248px 1fr 312px; gap: 20px; position: relative; z-index: 1; min-height: 100vh; align-content: center; }
 
-        .glass-card { background: var(--card-bg); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border: 1px solid var(--card-border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.35s ease, backdrop-filter 0.35s ease; overflow: hidden; }
-        .glass-card:hover { box-shadow: 0 16px 48px rgba(20,40,50,0.16), 0 0 0 1px rgba(255,255,255,0.5) inset; transform: perspective(800px) rotateX(2deg) rotateY(-2deg) translateY(-4px) scale(1.015); backdrop-filter: blur(32px) saturate(180%) brightness(1.05); -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(1.05); }
+        /* 玻璃卡：hover = 材质响应（指针镜面高光 + 阴影加深），不再统一抬升（B1 闸门）；
+           backdrop-filter 不参与过渡（合成层大忌），入场/离场只走 opacity 一条通道 */
+        .glass-card { position: relative; background: var(--card-bg); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%); border: 1px solid var(--card-border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); transition: box-shadow var(--m-std) var(--e-std); overflow: hidden; }
+        .glass-card::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(240px circle at var(--mx, 32%) var(--my, -12%), rgba(255,255,255,0.6), rgba(255,255,255,0.14) 46%, transparent 72%); mix-blend-mode: soft-light; opacity: 0; transition: opacity var(--m-fast) var(--e-std); }
+        .glass-card:hover { box-shadow: 0 16px 48px rgba(20,40,50,0.15), 0 0 0 1px rgba(255,255,255,0.6) inset; }
+        .glass-card:hover::before { opacity: 1; }
 
         /* 左侧导航 */
         .sidebar-left { position: sticky; top: 24px; height: fit-content; display: flex; flex-direction: column; gap: 16px; }
         .nav-section { padding: 16px; }
         .nav-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 0 12px; margin-bottom: 6px; }
         .nav-label:not(:first-child) { margin-top: 14px; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 9px 14px; border-radius: var(--radius-sm); color: var(--text-secondary); text-decoration: none; font-size: 13.5px; font-weight: 500; transition: var(--transition); margin-bottom: 1px; }
-        .nav-item:hover { background: rgba(255,255,255,0.6); color: var(--text-primary); transform: scale(1.02); }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 9px 14px; border-radius: var(--radius-sm); color: var(--text-secondary); text-decoration: none; font-size: 13.5px; font-weight: 500; transition: background var(--m-fast) var(--e-std), color var(--m-fast) var(--e-std), transform var(--m-fast) var(--e-out-expo); margin-bottom: 1px; }
+        .nav-item:hover { background: rgba(255,255,255,0.6); color: var(--text-primary); transform: translateX(3px); }
         .nav-item i { width: 18px; text-align: center; opacity: 0.7; font-size: 14px; }
         .nav-item:hover i { opacity: 1; color: var(--accent-teal); }
 
@@ -131,10 +143,16 @@
         .recommend-card { padding: 20px 24px; }
         .recommend-header { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 13px; display: flex; align-items: center; justify-content: space-between; }
         .recommend-header .title { display: flex; align-items: center; gap: 8px; }
-        .reroll-btn { font-size: 11.5px; color: var(--accent-teal); background: rgba(45,212,191,0.12); border: none; padding: 5px 12px; border-radius: 16px; cursor: pointer; transition: var(--transition); font-weight: 500; }
+        .reroll-btn { font-size: 11.5px; color: var(--accent-teal); background: rgba(45,212,191,0.12); border: none; padding: 5px 12px; border-radius: 16px; cursor: pointer; transition: background var(--m-fast) var(--e-std), transform var(--m-fast) var(--e-out-back); font-weight: 500; }
         .reroll-btn:hover { background: rgba(45,212,191,0.22); transform: scale(1.06); }
-        .recommend-item { display: flex; gap: 14px; padding: 13px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.28); text-decoration: none; transition: var(--transition); align-items: flex-start; }
-        .recommend-item:hover { background: rgba(255,255,255,0.78); transform: scale(1.02); }
+        .reroll-btn:active { transform: scale(0.92); transition-duration: var(--m-instant); }
+        .reroll-btn .spin-once { display: inline-block; animation: spinOnce var(--m-medium) var(--e-out-circ); }
+        @keyframes spinOnce { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .recommend-item { display: flex; gap: 14px; padding: 13px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.28); text-decoration: none; transition: background var(--m-fast) var(--e-std), transform var(--m-fast) var(--e-out-expo); align-items: flex-start; }
+        .recommend-item:hover { background: rgba(255,255,255,0.78); transform: translateY(-2px); }
+        .recommend-item:active { transform: translateY(0) scale(0.985); transition-duration: var(--m-instant); }
+        .swap-pop { animation: swapPop var(--m-std) var(--e-out-expo); }
+        @keyframes swapPop { from { opacity: 0; transform: translateY(7px); filter: blur(3px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
         .recommend-icon { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #d9efef, #c4e3e8); display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
         .recommend-thumb { width: 42px; height: 42px; border-radius: 12px; object-fit: cover; flex-shrink: 0; background: linear-gradient(135deg, #d9efef, #c4e3e8); }
         .recommend-content { flex: 1; min-width: 0; }
@@ -173,7 +191,7 @@
         .calendar-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
         .calendar-day-label { font-size: 10.5px; color: var(--text-muted); padding: 5px; font-weight: 500; }
-        .calendar-day { font-size: 12.5px; padding: 7px 3px; border-radius: 8px; cursor: pointer; transition: var(--transition); color: var(--text-secondary); }
+        .calendar-day { font-size: 12.5px; padding: 7px 3px; border-radius: 8px; cursor: pointer; transition: background var(--m-fast) var(--e-std), transform var(--m-fast) var(--e-out-back); color: var(--text-secondary); }
         .calendar-day:hover { background: rgba(94,234,212,0.18); transform: scale(1.12); }
         .calendar-day.today { background: linear-gradient(135deg, #5eead4, #38bdf8); color: white; font-weight: 600; box-shadow: 0 2px 8px rgba(45,212,191,0.35); }
         .calendar-day.other-month { color: var(--text-muted); opacity: 0.45; }
@@ -181,9 +199,10 @@
         .contact-widget { padding: 16px 18px; }
         .contact-title { font-size: 11.5px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 11px; }
         .contact-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .contact-btn { display: flex; align-items: center; justify-content: center; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.5); text-decoration: none; transition: var(--transition); border: 1px solid var(--card-border); }
+        .contact-btn { display: flex; align-items: center; justify-content: center; height: 38px; border-radius: 10px; background: rgba(255,255,255,0.5); text-decoration: none; transition: transform var(--m-fast) var(--e-out-back), box-shadow var(--m-fast) var(--e-std); border: 1px solid var(--card-border); }
         .contact-btn i { font-size: 16px; }
         .contact-btn:hover { transform: scale(1.1); box-shadow: var(--shadow-sm); }
+        .contact-btn:active { transform: scale(0.9); transition-timing-function: var(--spring-press); transition-duration: var(--m-instant); }
         .contact-btn i.c-email { color: #DB4437; }
         .contact-btn i.c-github { color: #1a1a2e; }
         .contact-btn i.c-bili { color: #fb7299; }
@@ -242,20 +261,30 @@
         ::-webkit-scrollbar-thumb { background: rgba(20,40,50,0.12); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(20,40,50,0.22); }
 
-        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-        .d1 { animation-delay: 0.08s; } .d2 { animation-delay: 0.16s; } .d3 { animation-delay: 0.24s; } .d4 { animation-delay: 0.32s; }
+        /* 入场编排（B2 治理：告别全体 fade-up，按列位分化四种到达方式，同一拍 stagger 波） */
+        .fade-in { opacity: 0; animation: cardIn var(--m-slow) var(--e-out-expo) forwards; }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(18px); filter: blur(6px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+        .enter-hero { animation-name: cardInHero; }
+        @keyframes cardInHero { from { opacity: 0; transform: translateY(14px) scale(0.965); filter: blur(8px); } to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); } }
+        .enter-left { animation-name: cardInLeft; }
+        @keyframes cardInLeft { from { opacity: 0; transform: translateX(-22px); filter: blur(5px); } to { opacity: 1; transform: translateX(0); filter: blur(0); } }
+        .enter-right { animation-name: cardInRight; }
+        @keyframes cardInRight { from { opacity: 0; transform: translateX(22px); filter: blur(5px); } to { opacity: 1; transform: translateX(0); filter: blur(0); } }
+        .d1 { animation-delay: 0.06s; } .d2 { animation-delay: 0.15s; } .d3 { animation-delay: 0.24s; } .d4 { animation-delay: 0.33s; }
+
+        /* B8 闸门：reduced-motion 下所有动效瞬时完成、静帧即完整页面；canvas 由 JS 侧同步停帧 */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+        }
     </style>
 </head>
 <body>
-    <div class="bg-decoration bg-decoration-1"></div>
-    <div class="bg-decoration bg-decoration-2"></div>
-    <div class="bg-decoration bg-decoration-3"></div>
+    <canvas id="bgField" aria-hidden="true"></canvas>
 
     <div class="main-container">
         <!-- 左侧导航（无头像，避免与中间重复） -->
         <aside class="sidebar-left">
-            <div class="glass-card nav-section fade-in">
+            <div class="glass-card nav-section fade-in enter-left">
                 <div class="nav-label">求职</div>
                 <a href="/resume/" class="nav-item"><i class="fas fa-file-alt"></i> 简历</a>
                 <a href="/cv/" class="nav-item"><i class="fas fa-id-card"></i> 精简简历</a>
@@ -272,7 +301,7 @@
             </div>
 
             <!-- 随机工具 -->
-            <div class="glass-card sidebar-tool-card fade-in d2">
+            <div class="glass-card sidebar-tool-card fade-in enter-left d2">
                 <div class="recommend-header">
                     <span class="title">🧰 工具推荐</span>
                     <button class="reroll-btn" id="rerollBtn"><i class="fas fa-sync-alt"></i> 换</button>
@@ -294,7 +323,7 @@
         <!-- 中间内容 -->
         <main class="content-area" id="mainContent">
             <!-- 欢迎卡片（横向，非对称） -->
-            <div class="glass-card welcome-card fade-in d1">
+            <div class="glass-card welcome-card fade-in enter-hero d1">
                 <div class="welcome-card-top">
                     <!-- 投递看板的隐藏入口：仅点击头像跳转，不做任何可见提示 -->
                     <a href="/tracker/" aria-label="投递看板" style="line-height:0;flex-shrink:0;">
@@ -361,19 +390,19 @@
 
         <!-- 右侧小部件 -->
         <aside class="sidebar-right">
-            <div class="glass-card clock-widget fade-in d1">
+            <div class="glass-card clock-widget fade-in enter-right d1">
                 <div class="clock-display"><span id="hours" class="clock-segment">00</span><span class="clock-separator">:</span><span id="minutes" class="clock-segment">00</span></div>
                 <div class="clock-date" id="clockDate">--</div>
             </div>
 
-            <div class="glass-card calendar-widget fade-in d2">
+            <div class="glass-card calendar-widget fade-in enter-right d2">
                 <div class="calendar-header">
                     <span class="calendar-title" id="calendarTitle">--</span>
                 </div>
                 <div class="calendar-grid" id="calendarGrid"></div>
             </div>
 
-            <div class="glass-card contact-widget fade-in d3">
+            <div class="glass-card contact-widget fade-in enter-right d3">
                 <div class="contact-title">联系方式</div>
                 <div class="contact-grid">
                     <a href="mailto:2642144249@qq.com" class="contact-btn" title="邮箱"><i class="fas fa-envelope c-email"></i></a>
@@ -386,7 +415,7 @@
             </div>
 
             <!-- 随机游戏 -->
-            <div class="glass-card recommend-card fade-in d4">
+            <div class="glass-card recommend-card fade-in enter-right d4">
                 <div class="recommend-header">
                     <span class="title">🎮 游戏推荐</span>
                     <button class="reroll-btn" id="rerollGameBtn"><i class="fas fa-sync-alt"></i> 换</button>
@@ -679,6 +708,7 @@
             document.getElementById('recName').textContent = name;
             document.getElementById('recDesc').textContent = desc;
             document.getElementById('recTag').textContent = TAGS[cat] || '工具';
+            if (window.__popSwap) window.__popSwap(document.getElementById('recommendItem'));
         }
         pickTool();
         document.getElementById('rerollBtn').addEventListener('click', pickTool);
@@ -728,6 +758,7 @@
             document.getElementById('gameImg').src = '/Games/assets/img/' + img;
             document.getElementById('gameName').textContent = name;
             document.getElementById('gameDesc').textContent = desc;
+            if (window.__popSwap) window.__popSwap(document.getElementById('recommendGame'));
         }
         pickGame();
         document.getElementById('rerollGameBtn').addEventListener('click', pickGame);
@@ -797,6 +828,150 @@
             new ResizeObserver(sync).observe(main);
             window.addEventListener('resize', sync);
             sync();
+        })();
+
+        /* ── 玻璃微尘环境场（ambient 弧型签名件）─────────────────────────────
+           机制来自页面自身材质语言：原 CSS 光斑 → 可被指针搅动的玻璃微尘。
+           遵循 motion-web 手感规范：
+           §7.1 帧率无关跟随 1-exp(-k·dt)；§6 异频呼吸（0.5–1.2Hz，永不齐步）；
+           §7.3 指针推挤写进「目标」再过滤，单量单滤波单目标；§1 dt 钳制 1/30。 */
+        (function() {
+            const canvas = document.getElementById('bgField');
+            if (!canvas || !canvas.getContext) return;
+            const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const ctx = canvas.getContext('2d');
+            const PALETTE = [[94,234,212],[125,211,252],[255,255,255]];
+            const R = 130;            // 指针影响半径
+            const PUSH = 46;          // 目标最大推挤位移
+            let W = 0, H = 0, dust = [], glows = [], raf = 0, last = 0;
+            const pointer = { x: -9999, y: -9999, active: false };
+
+            function sprite(c, r, a) {   // 预渲染柔光贴图：每帧只做 drawImage（合成层友好）
+                const s = document.createElement('canvas');
+                s.width = s.height = Math.ceil(r * 2);
+                const g = s.getContext('2d');
+                const gr = g.createRadialGradient(r, r, 0, r, r, r);
+                gr.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${a})`);
+                gr.addColorStop(1, `rgba(${c[0]},${c[1]},${c[2]},0)`);
+                g.fillStyle = gr; g.fillRect(0, 0, s.width, s.height);
+                return s;
+            }
+
+            function seed() {
+                DPR = Math.min(window.devicePixelRatio || 1, 2);
+                W = window.innerWidth; H = window.innerHeight;
+                canvas.width = W * DPR; canvas.height = H * DPR;
+                canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+                ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+                // 三团大光斑：接管原 .bg-decoration 的构图位置，静态贴图 + 极慢漂移
+                const M = Math.max(W, H);
+                glows = [
+                    { x: W*0.12, y: H*0.10, r: M*0.34, c: PALETTE[0], a: 0.34, ph: 0.0,  sx: 0.050, sy: 0.038, amp: 30 },
+                    { x: W*0.88, y: H*0.88, r: M*0.30, c: PALETTE[1], a: 0.32, ph: 2.1,  sx: 0.042, sy: 0.055, amp: 26 },
+                    { x: W*0.52, y: H*0.48, r: M*0.24, c: PALETTE[0], a: 0.17, ph: 4.4,  sx: 0.033, sy: 0.045, amp: 22 }
+                ];
+                glows.forEach(g => { g.spr = sprite(g.c, g.r, g.a); });
+                const n = Math.round(Math.min(56, Math.max(30, W * H / 26000)));
+                dust = [];
+                for (let i = 0; i < n; i++) {
+                    const x = Math.random() * W, y = Math.random() * H;
+                    dust.push({
+                        x, y, hx: x, hy: y,
+                        r: 1.2 + Math.random() * 2.4,
+                        spr: sprite(PALETTE[(Math.random()*3)|0], 12, 1),
+                        ax: 14 + Math.random() * 30,           // 呼吸半径
+                        fx: 0.5 + Math.random() * 0.7,         // §6 异频
+                        fy: 0.5 + Math.random() * 0.7,
+                        ph: Math.random() * Math.PI * 2,
+                        k: 0.35 + Math.random() * 0.5,         // §7.1 紧度
+                        tw: 0.22 + Math.random() * 0.4         // 闪烁基线透明度
+                    });
+                }
+            }
+            let DPR = 1;
+
+            function step(t, dt) {
+                ctx.clearRect(0, 0, W, H);
+                for (const g of glows) {
+                    const dx = Math.sin(t * g.sx + g.ph) * g.amp;
+                    const dy = Math.cos(t * g.sy + g.ph) * g.amp * 0.8;
+                    ctx.drawImage(g.spr, g.x + dx - g.r, g.y + dy - g.r);
+                }
+                for (const p of dust) {
+                    // 目标 = home + 异频呼吸；指针推挤直接写进目标（§7.3）
+                    let tx = p.hx + Math.sin(t * p.fx + p.ph) * p.ax;
+                    let ty = p.hy + Math.cos(t * p.fy + p.ph * 1.7) * p.ax;
+                    if (pointer.active) {
+                        const ddx = tx - pointer.x, ddy = ty - pointer.y;
+                        const d2 = ddx * ddx + ddy * ddy;
+                        if (d2 < R * R && d2 > 0.01) {
+                            const d = Math.sqrt(d2), f = (1 - d / R) * PUSH;
+                            tx += (ddx / d) * f; ty += (ddy / d) * f;
+                        }
+                    }
+                    const a = 1 - Math.exp(-p.k * dt);   // §7.1
+                    p.x += (tx - p.x) * a;
+                    p.y += (ty - p.y) * a;
+                    ctx.globalAlpha = p.tw * (0.55 + 0.45 * Math.sin(t * 0.9 + p.ph * 2.3));
+                    const s = p.r * 6;
+                    ctx.drawImage(p.spr, p.x - s/2, p.y - s/2, s, s);
+                }
+                ctx.globalAlpha = 1;
+            }
+
+            function frame(now) {
+                raf = requestAnimationFrame(frame);
+                const dt = Math.min((now - last) / 1000, 1/30) || 0.016;  // §1 钳制
+                last = now;
+                step(now / 1000, dt);
+            }
+
+            window.addEventListener('pointermove', e => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.active = true; }, { passive: true });
+            document.addEventListener('pointerleave', () => { pointer.active = false; pointer.x = -9999; pointer.y = -9999; });
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) { cancelAnimationFrame(raf); raf = 0; }
+                else if (!raf && !REDUCED) { last = performance.now(); raf = requestAnimationFrame(frame); }
+            });
+            window.addEventListener('resize', seed);
+            seed();
+            if (REDUCED) { step(0.001, 0.016); }   // B8：静帧构图书完整，只是不动
+            else { last = performance.now(); raf = requestAnimationFrame(frame); }
+        })();
+
+        /* ── 玻璃卡镜面高光：--mx/--my 跟随指针（rAF 节流，一次 getBoundingClientRect）── */
+        (function() {
+            let queued = 0, px = 0, py = 0, card = null;
+            document.addEventListener('pointermove', function(e) {
+                card = e.target && e.target.closest ? e.target.closest('.glass-card') : null;
+                if (!card) return;
+                px = e.clientX; py = e.clientY;
+                if (!queued) queued = requestAnimationFrame(apply);
+            }, { passive: true });
+            function apply() {
+                queued = 0;
+                if (!card) return;
+                const r = card.getBoundingClientRect();
+                card.style.setProperty('--mx', (px - r.left) + 'px');
+                card.style.setProperty('--my', (py - r.top) + 'px');
+            }
+        })();
+
+        /* ── 换一批微交互：图标旋转确认（e-out-circ）+ 内容 swapPop 入场 ── */
+        (function() {
+            const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            window.__popSwap = function(el) {
+                if (REDUCED || !el) return;
+                el.classList.remove('swap-pop'); void el.offsetWidth; el.classList.add('swap-pop');
+            };
+            function spin(btn) {
+                if (REDUCED) return;
+                const i = btn.querySelector('i');
+                if (!i) return;
+                i.classList.remove('spin-once'); void i.offsetWidth; i.classList.add('spin-once');
+            }
+            const b1 = document.getElementById('rerollBtn'), b2 = document.getElementById('rerollGameBtn');
+            if (b1) b1.addEventListener('click', () => spin(b1));
+            if (b2) b2.addEventListener('click', () => spin(b2));
         })();
     </script>
 </body>
