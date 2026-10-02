@@ -1,0 +1,44 @@
+跳一跳（jump-jump）开发文档
+================================
+
+一、简介
+3D 立方跳一跳。按住屏幕/鼠标蓄力，松手起跳，落到下一个方块上；落在中心附近得分高，
+连续落在中心有连击加成，落空即游戏结束。支持桌面（鼠标）与移动端（触屏）。
+
+二、技术栈
+- Three.js r98（build/three.min.js，完全本地化，无 CDN 依赖）
+- Tween.js（js/tween.min.js）负责起跳/下落/压扁补间
+- WebGL.js 检测浏览器 WebGL 可用性，不支持时给出提示
+
+三、目录结构
+jump-jump/
+├── index.html      游戏主体（场景、逻辑、样式单文件）
+├── build/          three.min.js
+├── js/             WebGL.js、tween.min.js
+├── source/         贴图素材（头部、方块贴面、阴影等 30 张 png）
+└── 开发文档.txt    本文件
+
+四、本地运行
+在仓库根目录执行 `python -m http.server 8080`，浏览器访问
+http://localhost:8080/Games/jump-jump/
+注意：直接双击 index.html 会被 file:// 协议拦截贴图加载，必须走 HTTP。
+
+五、本次优化清单
+1. 体积精简：6.5MB → 0.97MB
+   - three.js 换为同版本 three.min.js（1.1MB → 543KB）
+   - 剔除 17 个未使用的控件/加载器、三份冗余构建、演示 gif、回放页与编辑器页
+2. 修复三处缺失资源（原文件引用了不存在的文件）：
+   - source/replay.png（结算页重开按钮图）缺失 → 改为样式化「重新开始」按钮
+   - source/num.ttf（计分数字字体）缺失 → 移除 @font-face，计分改用系统粗体
+   - source/head1.png（玩家头顶球冠贴图）缺失 → 按头部贴图主色 RGB(62,60,82) 生成纯色补丁
+3. 移动端适配：补充 viewport meta；画布由固定 600px 高改为 100vh 全屏
+4. 窗口自适应：原 onWindowResize 未注册监听且高度不参与重算 → 接入 window resize
+   事件，宽高正交相机同步 updateProjectionMatrix
+5. 去噪：移除 FPS 统计浮层（Stats.js）、无效的 jquery 死引用；保留右键菜单禁用
+6. 中文化：页面标题、lang=zh-CN、结算页按钮均为中文
+
+六、玩法与手感参数（调参入口）
+- 蓄力：mousedown/touchstart 触发 beStronger()，时长决定跳跃距离
+- 起跳：mouseup/touchend 触发跳跃补间，TWEEN 链为 downTween 系列
+- 方块生成：creatcube10~24 系列随机抽取，间隔 buildDistance 随分数递增
+- 得分与连击：更新 #point（局内）与 #pointtotal（结算）
