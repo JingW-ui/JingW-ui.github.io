@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>抖音高赞雷达</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+    --bg-gradient-1:#e7f1f0;
+    --bg-gradient-2:#dfe9ec;
+    --bg-gradient-3:#e6edf2;
+    --card-bg:rgba(255,255,255,0.50);
+    --card-bg-strong:rgba(255,255,255,0.68);
+    --card-border:rgba(255,255,255,0.55);
+    --text-primary:#2c3e50;
+    --text-secondary:#5a6c7d;
+    --text-muted:#8e9aaf;
+    --accent-teal:#2dd4bf;
+    --accent-blue:#3b82f6;
+    --accent-pink:#f472b6;
+    --shadow-sm:0 2px 8px rgba(20,40,50,0.05);
+    --shadow-md:0 6px 24px rgba(20,40,50,0.08);
+    --shadow-lg:0 12px 40px rgba(20,40,50,0.12);
+    --radius-sm:14px;
+    --radius-md:20px;
+    --radius-lg:28px;
+    --transition:all 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+html{scroll-behavior:smooth}
+body{
+    font-family:'Noto Sans SC',-apple-system,BlinkMacSystemFont,'Microsoft YaHei',sans-serif;
+    background:linear-gradient(135deg,var(--bg-gradient-1) 0%,var(--bg-gradient-2) 50%,var(--bg-gradient-3) 100%);
+    background-attachment:fixed;
+    color:var(--text-primary);
+    line-height:1.6;min-height:100vh;overflow-x:hidden;
+}
+.bg-decoration{position:fixed;border-radius:50%;filter:blur(90px);opacity:0.45;pointer-events:none;z-index:0}
+.bg-decoration-1{width:560px;height:560px;background:radial-gradient(circle,rgba(94,234,212,0.30) 0%,transparent 70%);top:-180px;left:-120px;animation:float 22s ease-in-out infinite}
+.bg-decoration-2{width:480px;height:480px;background:radial-gradient(circle,rgba(125,211,252,0.28) 0%,transparent 70%);bottom:-140px;right:-120px;animation:float 26s ease-in-out infinite reverse}
+.bg-decoration-3{width:380px;height:380px;background:radial-gradient(circle,rgba(45,212,191,0.18) 0%,transparent 70%);top:48%;left:52%;transform:translate(-50%,-50%);animation:pulse 16s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translate(0,0) rotate(0deg)}33%{transform:translate(30px,-30px) rotate(120deg)}66%{transform:translate(-20px,20px) rotate(240deg)}}
+@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.3}50%{transform:translate(-50%,-50%) scale(1.2);opacity:0.45}}
+@keyframes rise{to{opacity:1;transform:translateY(0)}}
+
+.glass-card{
+    background:var(--card-bg);
+    backdrop-filter:blur(24px) saturate(140%);
+    -webkit-backdrop-filter:blur(24px) saturate(140%);
+    border:1px solid var(--card-border);
+    border-radius:var(--radius-md);
+    box-shadow:var(--shadow-md);
+    transition:transform 0.35s cubic-bezier(0.4,0,0.2,1),box-shadow 0.35s ease,backdrop-filter 0.35s ease;
+    overflow:hidden;
+}
+@supports not (backdrop-filter:blur(24px)){
+    .glass-card{background:rgba(255,255,255,0.85)}
+}
+
+.page{max-width:880px;margin:0 auto;padding:56px 20px 40px;position:relative;z-index:1}
+
+/* ---- 头部 ---- */
+.head{padding:34px 34px 26px;text-align:center;opacity:0;transform:translateY(-24px);animation:rise 0.7s cubic-bezier(0.16,1,0.3,1) 0.05s forwards}
+.head-badge{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:3px 12px;border-radius:12px;
+    background:linear-gradient(135deg,rgba(45,212,191,0.15),rgba(59,130,246,0.15));
+    font-size:11px;font-weight:600;color:var(--text-secondary);white-space:nowrap;
+}
+.head-badge i{color:var(--accent-teal)}
+.head h1{font-size:clamp(1.9rem,4.5vw,2.6rem);font-weight:700;letter-spacing:-0.02em;margin:10px 0 6px}
+.head h1 span{background:linear-gradient(135deg,#3b82f6,#2dd4bf);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.head .sub{font-size:13.5px;color:var(--text-secondary);max-width:560px;margin:0 auto}
+.head-stats{display:flex;justify-content:center;gap:12px;margin-top:20px;flex-wrap:wrap}
+.hstat{
+    text-align:center;padding:7px 16px;border-radius:10px;
+    background:rgba(255,255,255,0.5);transition:var(--transition);min-width:88px;
+}
+.hstat:hover{transform:scale(1.04);background:rgba(255,255,255,0.72)}
+.hstat .v{font-family:'Courier New',monospace;font-size:17px;font-weight:800;
+    background:linear-gradient(135deg,#3b82f6,#2dd4bf);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1.3}
+.hstat .l{font-size:9.5px;color:var(--text-muted);margin-top:1px}
+
+/* ---- 控制区 ---- */
+.controls{margin-top:18px;padding:16px 20px;opacity:0;transform:translateY(-16px);animation:rise 0.6s cubic-bezier(0.16,1,0.3,1) 0.18s forwards}
+.search-box{display:flex;align-items:center;gap:9px;padding:8px 14px;border-radius:12px;background:rgba(255,255,255,0.55);border:1px solid rgba(44,62,80,0.08);transition:var(--transition)}
+.search-box:focus-within{border-color:rgba(45,212,191,0.45);background:rgba(255,255,255,0.75)}
+.search-box i{color:var(--text-muted);font-size:13px}
+.search-box input{flex:1;border:none;outline:none;background:transparent;font-family:inherit;font-size:13.5px;color:var(--text-primary)}
+.search-box input::placeholder{color:var(--text-muted)}
+.sorts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.sorts .lbl{font-size:11.5px;color:var(--text-muted);font-weight:600;margin-right:2px}
+.pill{
+    padding:5px 14px;border-radius:100px;font-size:12.5px;font-weight:500;
+    cursor:pointer;user-select:none;transition:var(--transition);
+    background:transparent;border:1px solid rgba(44,62,80,0.12);color:var(--text-secondary);
+}
+.pill:hover{background:rgba(45,212,191,0.10);border-color:rgba(45,212,191,0.45);color:var(--text-primary)}
+.pill.active{background:rgba(45,212,191,0.12);border-color:rgba(45,212,191,0.45);color:var(--text-primary);font-weight:700}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.count-line{margin-top:12px;font-size:11.5px;color:var(--text-muted);text-align:right}
+
+/* ---- 列表 ---- */
+.list{margin-top:18px;display:flex;flex-direction:column;gap:12px}
+.v-card{
+    display:flex;align-items:center;gap:16px;padding:16px 20px;
+    opacity:0;transform:translateY(14px);animation:rise 0.45s ease forwards;
+}
+.v-card:hover{
+    box-shadow:0 16px 48px rgba(20,40,50,0.16),0 0 0 1px rgba(255,255,255,0.5) inset;
+    transform:translateY(-3px) scale(1.008);
+    backdrop-filter:blur(32px) saturate(180%) brightness(1.05);
+    -webkit-backdrop-filter:blur(32px) saturate(180%) brightness(1.05);
+}
+.rank{
+    font-family:'Courier New',monospace;font-size:19px;font-weight:800;color:var(--text-muted);
+    width:36px;text-align:center;flex-shrink:0;
+}
+.v-card.top .rank{background:linear-gradient(135deg,#3b82f6,#2dd4bf);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.v-main{flex:1;min-width:0}
+.v-title{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.5;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all}
+.v-meta{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center;margin-top:5px;font-size:11.5px;color:var(--text-muted)}
+.v-meta .author{color:var(--text-secondary);font-weight:500}
+.v-meta .kchip{color:var(--accent-teal);background:rgba(45,212,191,0.12);padding:1px 8px;border-radius:9px;font-weight:600}
+.v-stats{display:flex;gap:13px;flex-shrink:0;align-items:center}
+.stat{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary);font-family:'Courier New',monospace;font-weight:700;min-width:52px}
+.stat i{font-size:11px;opacity:0.75}
+.stat.digg{color:var(--accent-pink)}
+.stat.digg i{opacity:0.9}
+.v-side{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0}
+.action-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    background:transparent;border:1px solid rgba(44,62,80,0.12);color:var(--text-secondary);
+    border-radius:10px;padding:6px 13px;font-size:12px;font-weight:500;
+    text-decoration:none;font-family:inherit;transition:var(--transition);cursor:pointer;white-space:nowrap;
+}
+.action-btn:hover{background:rgba(45,212,191,0.10);border-color:rgba(45,212,191,0.45);color:var(--text-primary)}
+.action-btn i{font-size:10.5px}
+
+/* ---- 状态 / 底部 ---- */
+.msg-box{margin-top:18px;padding:26px;text-align:center;color:var(--text-secondary);font-size:13px}
+.msg-box i{font-size:22px;color:var(--text-muted);display:block;margin-bottom:10px}
+.spin{width:26px;height:26px;border-radius:50%;border:3px solid rgba(44,62,80,0.1);border-top-color:var(--accent-teal);animation:spin 0.7s linear infinite;margin:0 auto 10px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.foot{margin-top:26px;padding:16px 22px;font-size:11px;color:var(--text-muted);line-height:1.8;text-align:center}
+.foot a{color:var(--text-secondary);text-decoration:none;font-weight:500}
+.foot a:hover{color:var(--accent-teal)}
+
+@media (max-width:640px){
+    .page{padding:40px 14px 28px}
+    .head{padding:26px 20px 20px}
+    .v-card{flex-wrap:wrap;gap:10px;padding:14px 16px}
+    .v-stats{width:100%;justify-content:flex-start;gap:16px}
+    .v-side{flex-direction:row;width:100%;justify-content:flex-end}
+    .head-stats{gap:8px}
+    .hstat{min-width:74px;padding:6px 10px}
+}
+</style>
+</head>
+<body>
+<div class="bg-decoration bg-decoration-1"></div>
+<div class="bg-decoration bg-decoration-2"></div>
+<div class="bg-decoration bg-decoration-3"></div>
+
+<main class="page">
+    <header class="head glass-card">
+        <div class="head-badge"><i class="fa-brands fa-tiktok"></i> 快照数据 · 本地采集</div>
+        <h1>抖音<span>高赞</span>雷达</h1>
+        <p class="sub">关键词搜索结果按点赞排序的快照浏览。数据来自本地 DouK-Downloader 采集的抖音公开搜索结果，点击「打开原视频」可跳转查看。</p>
+        <div class="head-stats">
+            <div class="hstat"><div class="v" id="st-count">–</div><div class="l">视频总数</div></div>
+            <div class="hstat"><div class="v" id="st-kw">–</div><div class="l">关键词</div></div>
+            <div class="hstat"><div class="v" id="st-max">–</div><div class="l">最高点赞</div></div>
+            <div class="hstat"><div class="v" id="st-time">–</div><div class="l">快照更新</div></div>
+        </div>
+    </header>
+
+    <section class="controls glass-card">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="q" type="text" placeholder="搜索标题 / 作者…" autocomplete="off">
+        </div>
+        <div class="sorts" id="sorts"><span class="lbl">排序</span></div>
+        <div class="chips" id="chips"><span class="lbl">关键词</span></div>
+        <div class="count-line" id="count-line"></div>
+    </section>
+
+    <section class="list" id="list"></section>
+    <div class="msg-box glass-card" id="loading"><div class="spin"></div>正在加载快照数据…</div>
+    <div class="msg-box glass-card" id="empty" hidden><i class="fa-regular fa-face-meh"></i>没有匹配的视频，换个关键词试试</div>
+    <div class="msg-box glass-card" id="error" hidden><i class="fa-solid fa-triangle-exclamation"></i>数据加载失败。本页通过 HTTP 访问时可用；本地预览请先在目录里运行 <code>python -m http.server</code></div>
+
+    <footer class="foot glass-card">
+        数据说明：本页数据为本地工具 DouK-Downloader 采集的抖音公开搜索结果快照，按快照时间静态更新，仅供学习交流；
+        视频及内容版权归原作者所有，如有侵权即删。本页面不采集任何访客信息。<br>
+        <a href="/tools/"><i class="fa-solid fa-arrow-left"></i> 返回工具箱</a>
+    </footer>
+</main>
+
+<script>
+(function(){
+    "use strict";
+    var DATA = null;
+    var state = { q: "", kw: "全部", sort: "d" };
+    var SORTS = [["d","点赞"],["c","评论"],["f","收藏"],["s","转发"],["dt","发布时间"]];
+    var $ = function(id){ return document.getElementById(id); };
+
+    function esc(s){
+        return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+            return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+        });
+    }
+    function fmtWan(n){
+        if (n == null || isNaN(n)) return "–";
+        if (n >= 1000000){ var a = n/10000; return (a % 1 === 0 ? a : a.toFixed(0)) + "万"; }
+        if (n >= 10000){ var b = n/10000; return (b % 1 === 0 ? b : b.toFixed(1)) + "万"; }
+        return String(n);
+    }
+    function fmtDur(sec){
+        sec = Math.max(0, parseInt(sec, 10) || 0);
+        var m = Math.floor(sec/60), r = sec % 60;
+        return m + ":" + (r < 10 ? "0" + r : r);
+    }
+
+    function buildSorts(){
+        var box = $("sorts");
+        SORTS.forEach(function(p){
+            var b = document.createElement("button");
+            b.className = "pill" + (p[0] === state.sort ? " active" : "");
+            b.textContent = p[1];
+            b.dataset.k = p[0];
+            b.addEventListener("click", function(){
+                state.sort = p[0];
+                box.querySelectorAll(".pill").forEach(function(x){ x.classList.toggle("active", x.dataset.k === p[0]); });
+                render();
+            });
+            box.appendChild(b);
+        });
+    }
+    function buildChips(){
+        var box = $("chips");
+        var ks = [];
+        DATA.items.forEach(function(i){ if (ks.indexOf(i.k) < 0) ks.push(i.k); });
+        ["全部"].concat(ks).forEach(function(k){
+            var b = document.createElement("button");
+            b.className = "pill" + (k === state.kw ? " active" : "");
+            b.textContent = k;
+            b.dataset.k = k;
+            b.addEventListener("click", function(){
+                state.kw = k;
+                box.querySelectorAll(".pill").forEach(function(x){ x.classList.toggle("active", x.dataset.k === k); });
+                render();
+            });
+            box.appendChild(b);
+        });
+    }
+
+    function filtered(){
+        var q = state.q.trim().toLowerCase();
+        var arr = DATA.items.filter(function(i){
+            if (state.kw !== "全部" && i.k !== state.kw) return false;
+            if (q && (i.t + " " + i.a).toLowerCase().indexOf(q) < 0) return false;
+            return true;
+        });
+        arr.sort(function(a, b){
+            if (state.sort === "dt") return (a.dt < b.dt) ? 1 : (a.dt > b.dt ? -1 : 0);
+            return (b[state.sort] || 0) - (a[state.sort] || 0);
+        });
+        return arr;
+    }
+
+    function cardHTML(i, idx){
+        var top = idx < 3 ? " top" : "";
+        return '<article class="v-card glass-card' + top + '" style="animation-delay:' + Math.min(idx*40,400) + 'ms">'
+            + '<div class="rank">' + (idx+1) + '</div>'
+            + '<div class="v-main">'
+            +   '<h3 class="v-title">' + esc(i.t || "(无标题)") + '</h3>'
+            +   '<div class="v-meta">'
+            +     '<span class="author">@' + esc(i.a || "未知作者") + '</span>'
+            +     '<span>' + esc(i.dt || "") + '</span>'
+            +     '<span>' + fmtDur(i.du) + '</span>'
+            +     (i.k ? '<span class="kchip">#' + esc(i.k) + '</span>' : '')
+            +   '</div>'
+            + '</div>'
+            + '<div class="v-stats">'
+            +   '<span class="stat digg" title="点赞"><i class="fa-solid fa-heart"></i>' + fmtWan(i.d) + '</span>'
+            +   '<span class="stat" title="评论"><i class="fa-regular fa-comment"></i>' + fmtWan(i.c) + '</span>'
+            +   '<span class="stat" title="收藏"><i class="fa-regular fa-star"></i>' + fmtWan(i.f) + '</span>'
+            +   '<span class="stat" title="转发"><i class="fa-solid fa-share-nodes"></i>' + fmtWan(i.s) + '</span>'
+            + '</div>'
+            + '<div class="v-side">'
+            +   '<a class="action-btn" href="' + esc(i.u) + '" target="_blank" rel="noopener noreferrer">打开原视频 <i class="fa-solid fa-arrow-up-right-from-square"></i></a>'
+            + '</div>'
+            + '</article>';
+    }
+
+    function render(){
+        if (!DATA) return;
+        var arr = filtered();
+        $("count-line").textContent = "共 " + arr.length + " 条（快照合计 " + DATA.count + " 条）";
+        $("list").innerHTML = arr.map(cardHTML).join("");
+        $("empty").hidden = arr.length > 0;
+    }
+
+    function init(d){
+        if (!d || !Array.isArray(d.items) || d.items.length === 0){ showError(); return; }
+        DATA = d;
+        var max = 0;
+        d.items.forEach(function(i){ if (i.d > max) max = i.d; });
+        var kws = []; d.items.forEach(function(i){ if (kws.indexOf(i.k) < 0) kws.push(i.k); });
+        $("st-count").textContent = String(d.count);
+        $("st-kw").textContent = String(kws.length);
+        $("st-max").textContent = fmtWan(max);
+        $("st-time").textContent = d.updated || "–";
+        buildSorts();
+        buildChips();
+        $("q").addEventListener("input", function(){ state.q = this.value; render(); });
+        $("loading").hidden = true;
+        render();
+    }
+    function showError(){
+        $("loading").hidden = true;
+        $("error").hidden = false;
+    }
+
+    fetch("data.json")
+        .then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(init)
+        .catch(showError);
+})();
+</script>
+</body>
+</html>
