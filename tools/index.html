@@ -967,7 +967,7 @@
         </section>
 
         <section class="category-section" data-category="info">
-            <h2 class="section-title">信息聚合<span class="section-count">18</span></h2>
+            <h2 class="section-title">信息聚合<span class="section-count">20</span></h2>
             <div class="tools-grid">
                 <a href="/tools/thrending/" class="tool-card" data-name="GitHub热门榜单" data-desc="快速访问GitHub热门榜单，支持日榜、周榜、月榜，可根据不同语言筛选" title="快速访问GitHub热门榜单，支持日榜、周榜、月榜，可根据不同语言筛选">
                     <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e36d6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='23 6 13.5 15.5 8.5 10.5 1 18'%3E%3C/polyline%3E%3Cpolyline points='17 6 23 6 23 12'%3E%3C/polyline%3E%3C/svg%3E" alt="GitHub热门榜单"></div>
@@ -1045,7 +1045,7 @@
         </section>
 
         <section class="category-section" data-category="other">
-            <h2 class="section-title">实用杂项<span class="section-count">15</span></h2>
+            <h2 class="section-title">实用杂项<span class="section-count">16</span></h2>
             <div class="tools-grid">
                 <a href="/tools/biji/" class="tool-card" data-name="笔记工具" data-desc="便捷的在线笔记应用，支持文本编辑和保存功能" title="便捷的在线笔记应用，支持文本编辑和保存功能">
                     <div class="tool-icon"><img src="/tools/assets/logo/biji.webp" alt="笔记工具"></div>
@@ -1148,6 +1148,64 @@
     </div>
 
     <script>
+        /* ============================================================
+           外链收录清单（仅站长维护，访客无感）
+           - 卡片 DOM 与本地工具完全同构，按 category 注入对应区块
+           - 新增外链：数组加一行；下架：删掉或注释该行
+           - 固定新标签打开 + rel="noopener noreferrer nofollow"
+           - 顶部「共创建 N 个实用工具」仅统计自研，外链不改动该数
+           ============================================================ */
+        const EXTERNAL_LINKS = [
+            {
+                url: 'https://anatomy.vijeron.com/',
+                name: '3D 人体解剖图鉴',
+                desc: '3D 交互人体解剖学习图鉴，器官标本可旋转、剖面与 X 光观察，覆盖八大系统、术语表与引导课程',
+                category: 'info',
+                icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f43f5e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'/%3E%3C/svg%3E"
+            },
+            {
+                url: 'https://lkssite.vip/',
+                name: 'LKs 网站推荐合集',
+                desc: 'B站 UP 主 LKs 的网站推荐合集，十二期精选站点按实用、学习、工具、娱乐等标签检索',
+                category: 'info',
+                icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2'/%3E%3C/svg%3E"
+            },
+            {
+                url: 'https://www.cyhaoka.vip/',
+                name: '电脑开荒网',
+                desc: '找工具不迷路的电脑装机导航站，系统必备、常用软件、专业工具等分类收录，支持热搜与站内搜索',
+                category: 'other',
+                icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='3' width='20' height='14' rx='2'/%3E%3Cline x1='8' y1='21' x2='16' y2='21'/%3E%3Cline x1='12' y1='17' x2='12' y2='21'/%3E%3C/svg%3E"
+            }
+        ];
+
+        // 将外链卡片注入对应分类区块（DOM 结构与本地工具卡片一致，搜索/筛选自动覆盖）
+        (function renderExternalLinks() {
+            EXTERNAL_LINKS.forEach(item => {
+                const grid = document.querySelector(`.category-section[data-category="${item.category}"] .tools-grid`);
+                if (!grid) return;
+                const a = document.createElement('a');
+                a.href = item.url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer nofollow';
+                a.className = 'tool-card';
+                a.dataset.name = item.name;
+                a.dataset.desc = item.desc;
+                a.title = item.desc;
+                const icon = document.createElement('div');
+                icon.className = 'tool-icon';
+                const img = document.createElement('img');
+                img.src = item.icon;
+                img.alt = item.name;
+                icon.appendChild(img);
+                const name = document.createElement('h3');
+                name.className = 'tool-name';
+                name.textContent = item.name;
+                a.append(icon, name);
+                grid.appendChild(a);
+            });
+        })();
+
         // 给卡片添加交错动画延迟
         document.addEventListener('DOMContentLoaded', () => {
             const cards = document.querySelectorAll('.tool-card');
