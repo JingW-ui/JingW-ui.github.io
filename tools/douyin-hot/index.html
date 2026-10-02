@@ -249,6 +249,9 @@
     <div class="control-group" id="sorts">
         <span class="control-label">排序</span>
     </div>
+    <div class="control-group" id="mins">
+        <span class="control-label">点赞门槛</span>
+    </div>
     <div class="control-group" id="chips">
         <span class="control-label">关键词</span>
     </div>
@@ -276,7 +279,7 @@
 <div class="stats-bar">
     <div class="stat-item"><div class="stat-value" id="st-count">–</div><div class="stat-label">视频总数</div></div>
     <div class="stat-item"><div class="stat-value" id="st-kw">–</div><div class="stat-label">关键词</div></div>
-    <div class="stat-item"><div class="stat-value" id="st-max">–</div><div class="stat-label">最高点赞</div></div>
+    <div class="stat-item"><div class="stat-value" id="st-max">–</div><div class="stat-label">快照内最高点赞</div></div>
     <div class="stat-item"><div class="stat-value" id="st-time" style="font-size:1.05rem;padding-top:8px">–</div><div class="stat-label">快照更新</div></div>
 </div>
 <p class="updated-at">
@@ -288,8 +291,10 @@
 (function(){
     "use strict";
     var DATA = null;
-    var state = { q: "", kw: "全部", sort: "d" };
+    var state = { q: "", kw: "乒乓球", sort: "d", min: 0 };
     var SORTS = [["d","点赞"],["c","评论"],["f","收藏"],["s","转发"],["dt","发布时间"]];
+    var MINS = [[0,"全部"],[100000,"10万+"],[500000,"50万+"],[1000000,"100万+"]];
+    var GROUPS = [["乒乓球", ["乒乓球","乒乓球集锦","乒乓球比赛"]]];
     var $ = function(id){ return document.getElementById(id); };
 
     function esc(s){
@@ -324,11 +329,39 @@
             box.appendChild(b);
         });
     }
+    function buildMins(){
+        var box = $("mins");
+        MINS.forEach(function(p){
+            var b = document.createElement("button");
+            b.className = "pill" + (p[0] === state.min ? " active" : "");
+            b.textContent = p[1];
+            b.dataset.k = String(p[0]);
+            b.addEventListener("click", function(){
+                state.min = p[0];
+                box.querySelectorAll(".pill").forEach(function(x){ x.classList.toggle("active", x.dataset.k === String(p[0])); });
+                render();
+            });
+            box.appendChild(b);
+        });
+    }
+    function chipMatch(i){
+        if (state.kw === "全部") return true;
+        for (var g = 0; g < GROUPS.length; g++){
+            if (GROUPS[g][0] === state.kw && GROUPS[g][1].indexOf(i.k) >= 0) return true;
+        }
+        return i.k === state.kw;
+    }
     function buildChips(){
         var box = $("chips");
         var ks = [];
         DATA.items.forEach(function(i){ if (ks.indexOf(i.k) < 0) ks.push(i.k); });
-        ["全部"].concat(ks).forEach(function(k){
+        var grouped = [];
+        GROUPS.forEach(function(g){ grouped = grouped.concat(g[1]); });
+        var labels = ["全部"].concat(
+            GROUPS.map(function(g){ return g[0]; }),
+            ks.filter(function(k){ return grouped.indexOf(k) < 0; })
+        );
+        labels.forEach(function(k){
             var b = document.createElement("button");
             b.className = "pill" + (k === state.kw ? " active" : "");
             b.textContent = k;
@@ -345,7 +378,8 @@
     function filtered(){
         var q = state.q.trim().toLowerCase();
         var arr = DATA.items.filter(function(i){
-            if (state.kw !== "全部" && i.k !== state.kw) return false;
+            if (!chipMatch(i)) return false;
+            if (i.d < state.min) return false;
             if (q && (i.t + " " + i.a).toLowerCase().indexOf(q) < 0) return false;
             return true;
         });
@@ -409,6 +443,7 @@
         $("st-max").textContent = fmtWan(max);
         $("st-time").textContent = d.updated || "–";
         buildSorts();
+        buildMins();
         buildChips();
         $("q").addEventListener("input", function(){ state.q = this.value; render(); });
         $("loading").hidden = true;
