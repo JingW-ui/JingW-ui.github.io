@@ -6,200 +6,283 @@
 <meta name="robots" content="noindex">
 <title>抖音高赞雷达</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-:root{
-    --bg-gradient-1:#e7f1f0;
-    --bg-gradient-2:#dfe9ec;
-    --bg-gradient-3:#e6edf2;
-    --card-bg:rgba(255,255,255,0.50);
-    --card-bg-strong:rgba(255,255,255,0.68);
-    --card-border:rgba(255,255,255,0.55);
-    --text-primary:#2c3e50;
-    --text-secondary:#5a6c7d;
-    --text-muted:#8e9aaf;
-    --accent-teal:#2dd4bf;
-    --accent-blue:#3b82f6;
-    --accent-pink:#f472b6;
-    --shadow-sm:0 2px 8px rgba(20,40,50,0.05);
-    --shadow-md:0 6px 24px rgba(20,40,50,0.08);
-    --shadow-lg:0 12px 40px rgba(20,40,50,0.12);
-    --radius-sm:14px;
-    --radius-md:20px;
-    --radius-lg:28px;
-    --transition:all 0.28s cubic-bezier(0.4,0,0.2,1);
-}
-html{scroll-behavior:smooth}
-body{
-    font-family:'Noto Sans SC',-apple-system,BlinkMacSystemFont,'Microsoft YaHei',sans-serif;
-    background:linear-gradient(135deg,var(--bg-gradient-1) 0%,var(--bg-gradient-2) 50%,var(--bg-gradient-3) 100%);
-    background-attachment:fixed;
-    color:var(--text-primary);
-    line-height:1.6;min-height:100vh;overflow-x:hidden;
-}
-.bg-decoration{position:fixed;border-radius:50%;filter:blur(90px);opacity:0.45;pointer-events:none;z-index:0}
-.bg-decoration-1{width:560px;height:560px;background:radial-gradient(circle,rgba(94,234,212,0.30) 0%,transparent 70%);top:-180px;left:-120px;animation:float 22s ease-in-out infinite}
-.bg-decoration-2{width:480px;height:480px;background:radial-gradient(circle,rgba(125,211,252,0.28) 0%,transparent 70%);bottom:-140px;right:-120px;animation:float 26s ease-in-out infinite reverse}
-.bg-decoration-3{width:380px;height:380px;background:radial-gradient(circle,rgba(45,212,191,0.18) 0%,transparent 70%);top:48%;left:52%;transform:translate(-50%,-50%);animation:pulse 16s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translate(0,0) rotate(0deg)}33%{transform:translate(30px,-30px) rotate(120deg)}66%{transform:translate(-20px,20px) rotate(240deg)}}
-@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.3}50%{transform:translate(-50%,-50%) scale(1.2);opacity:0.45}}
-@keyframes rise{to{opacity:1;transform:translateY(0)}}
+  *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    /* 结构沿用 tools/thrending/ 设计令牌；accent 换成抖音品牌红 */
+    --red:#fe2c55;
+    --red-light:#ff6684;
+    --red-bg:rgba(254,44,85,0.08);
+    --red-border:rgba(254,44,85,0.2);
+    --card-hover:rgba(254,44,85,0.04);
+    --bg:#ffffff;
+    --text:#111111;
+    --text-secondary:#57606a;
+    --text-tertiary:#8b949e;
+    --border:#d0d7de;
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md:0 3px 12px rgba(0,0,0,0.06);
+    --green:#238636;--green-bg:rgba(35,134,54,0.08);--green-border:rgba(35,134,54,0.2);
+    --blue:#0969da;--blue-bg:rgba(9,105,218,0.08);--blue-border:rgba(9,105,218,0.2);
+    --purple:#8250df;--purple-bg:rgba(130,80,226,0.08);--purple-border:rgba(130,80,226,0.2);
+    --yellow:#9a6700;--yellow-bg:rgba(154,103,0,0.08);--yellow-border:rgba(154,103,0,0.2);
+  }
+  html{scroll-behavior:smooth}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);
+    line-height:1.5;min-height:100vh;
+    overflow-x:hidden;
+  }
 
-.glass-card{
-    background:var(--card-bg);
-    backdrop-filter:blur(24px) saturate(140%);
-    -webkit-backdrop-filter:blur(24px) saturate(140%);
-    border:1px solid var(--card-border);
-    border-radius:var(--radius-md);
+  /* ---- Header ---- */
+  .header{
+    text-align:center;
+    padding:72px 24px 0;
+    opacity:0;transform:translateY(-30px);
+    animation:headerIn 0.8s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
+  }
+  @keyframes headerIn{to{opacity:1;transform:translateY(0)}}
+  .header h1{
+    font-size:clamp(2.2rem,5vw,3.6rem);
+    font-weight:800;letter-spacing:-0.03em;
+    color:var(--text);
+    margin-bottom:6px;
+  }
+  .header h1 span{color:var(--red)}
+  .header .subtitle{
+    font-size:1.05rem;color:var(--text-secondary);font-weight:400;
+    opacity:0;animation:fadeUp 0.6s ease 0.4s forwards;
+  }
+  .snapshot-badge{
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:0.72rem;font-weight:600;padding:3px 10px;border-radius:20px;
+    background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);
+    margin-bottom:12px;
+    opacity:0;animation:fadeUp 0.5s ease 0.25s forwards;
+  }
+
+  /* ---- Controls ---- */
+  .controls{
+    max-width:960px;margin:40px auto 0;padding:0 24px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:14px;
+    opacity:0;animation:fadeUp 0.6s ease 0.55s forwards;
+  }
+  .control-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .control-label{
+    font-size:0.82rem;font-weight:600;color:var(--text-tertiary);
+    text-transform:uppercase;letter-spacing:0.06em;
+    margin-right:4px;white-space:nowrap;
+  }
+  .pill{
+    padding:6px 16px;border-radius:100px;
+    font-size:0.85rem;font-weight:500;
+    cursor:pointer;transition:all 0.25s ease;
+    border:1.5px solid var(--border);background:var(--bg);color:var(--text-secondary);
+    user-select:none;
+  }
+  .pill:hover{border-color:var(--red);color:var(--red)}
+  .pill.active{
+    background:var(--red);color:#fff;border-color:var(--red);
+    box-shadow:0 2px 8px rgba(254,44,85,0.25);
+  }
+  .text-input{
+    padding:6px 14px;border-radius:100px;
+    font-size:0.82rem;font-weight:500;
+    border:1.5px solid var(--border);background:var(--bg);color:var(--text-secondary);
+    outline:none;transition:all 0.25s ease;font-family:inherit;
+    min-width:190px;
+  }
+  .text-input::placeholder{color:var(--text-tertiary)}
+  .text-input:hover,.text-input:focus{border-color:var(--red)}
+  .count-line{
+    max-width:960px;margin:14px auto 0;padding:0 24px;text-align:right;
+    font-size:0.78rem;color:var(--text-tertiary);
+    opacity:0;animation:fadeUp 0.5s ease 0.6s forwards;
+  }
+
+  /* ---- Cards ---- */
+  .container{
+    max-width:960px;margin:18px auto 40px;padding:0 24px;
+  }
+  .repo-list{display:flex;flex-direction:column;gap:2px}
+  .repo-card{
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:18px 22px;
+    transition:all 0.25s ease;
+    position:relative;
+    opacity:0;transform:translateY(20px);
+  }
+  .repo-card.visible{animation:cardIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards}
+  .repo-card:hover{
+    border-color:var(--red-border);
+    background:var(--card-hover);
     box-shadow:var(--shadow-md);
-    transition:transform 0.35s cubic-bezier(0.4,0,0.2,1),box-shadow 0.35s ease,backdrop-filter 0.35s ease;
-    overflow:hidden;
-}
-@supports not (backdrop-filter:blur(24px)){
-    .glass-card{background:rgba(255,255,255,0.85)}
-}
+  }
+  @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
 
-.page{max-width:880px;margin:0 auto;padding:56px 20px 40px;position:relative;z-index:1}
+  .repo-top{display:flex;align-items:flex-start;gap:16px}
+  .repo-rank{
+    font-size:1.5rem;font-weight:800;color:var(--red);
+    min-width:36px;text-align:right;line-height:1.2;
+    font-variant-numeric:tabular-nums;flex-shrink:0;
+  }
+  .v-cover{
+    width:92px;min-height:122px;border-radius:8px;overflow:hidden;
+    background:var(--red-bg);flex-shrink:0;display:block;
+  }
+  .v-cover.noimg{display:none}
+  .v-cover img{width:100%;height:100%;object-fit:cover;display:block}
+  .repo-info{flex:1;min-width:0}
+  .repo-name{
+    font-size:1.02rem;font-weight:700;color:var(--text);
+    text-decoration:none;
+    transition:color 0.2s;
+    word-break:break-all;
+    display:inline;
+    cursor:pointer;
+  }
+  .repo-name:hover{color:var(--red)}
+  .repo-meta{
+    display:flex;align-items:center;gap:14px;
+    margin-top:9px;flex-wrap:wrap;
+  }
+  .meta-item{
+    font-size:0.8rem;color:var(--text-tertiary);
+    display:flex;align-items:center;gap:4px;
+    font-variant-numeric:tabular-nums;
+  }
+  .meta-item i{font-size:0.74rem}
+  .meta-item .author{color:var(--text-secondary);font-weight:500}
+  .meta-item .stars-today{color:var(--red);font-weight:600}
+  .kchip{
+    font-size:0.7rem;font-weight:600;padding:2px 9px;border-radius:12px;
+    background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border);
+    white-space:nowrap;
+  }
+  .sh-link{
+    background:var(--bg);color:var(--text-tertiary);border:1px solid var(--border);
+    border-radius:5px;padding:3px 10px;font-size:0.74rem;cursor:pointer;
+    transition:all 0.2s;white-space:nowrap;font-weight:500;
+    text-decoration:none;display:inline-flex;align-items:center;gap:5px;
+    margin-left:auto;
+  }
+  .sh-link:hover{color:var(--red);border-color:var(--red)}
 
-/* ---- 头部 ---- */
-.head{padding:34px 34px 26px;text-align:center;opacity:0;transform:translateY(-24px);animation:rise 0.7s cubic-bezier(0.16,1,0.3,1) 0.05s forwards}
-.head-badge{
-    display:inline-flex;align-items:center;gap:6px;
-    padding:3px 12px;border-radius:12px;
-    background:linear-gradient(135deg,rgba(45,212,191,0.15),rgba(59,130,246,0.15));
-    font-size:11px;font-weight:600;color:var(--text-secondary);white-space:nowrap;
-}
-.head-badge i{color:var(--accent-teal)}
-.head h1{font-size:clamp(1.9rem,4.5vw,2.6rem);font-weight:700;letter-spacing:-0.02em;margin:10px 0 6px}
-.head h1 span{background:linear-gradient(135deg,#3b82f6,#2dd4bf);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.head .sub{font-size:13.5px;color:var(--text-secondary);max-width:560px;margin:0 auto}
-.head-stats{display:flex;justify-content:center;gap:12px;margin-top:20px;flex-wrap:wrap}
-.hstat{
-    text-align:center;padding:7px 16px;border-radius:10px;
-    background:rgba(255,255,255,0.5);transition:var(--transition);min-width:88px;
-}
-.hstat:hover{transform:scale(1.04);background:rgba(255,255,255,0.72)}
-.hstat .v{font-family:'Courier New',monospace;font-size:17px;font-weight:800;
-    background:linear-gradient(135deg,#3b82f6,#2dd4bf);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1.3}
-.hstat .l{font-size:9.5px;color:var(--text-muted);margin-top:1px}
+  /* ---- Loading / Empty / Error ---- */
+  .state-box{
+    max-width:960px;margin:30px auto;padding:60px 24px;
+    text-align:center;color:var(--text-tertiary);
+    border:1px dashed var(--border);border-radius:12px;
+  }
+  .state-box p{font-size:1rem;margin-top:10px}
+  .state-box .state-sub{font-size:0.82rem;margin-top:6px}
+  .state-box i.big{font-size:1.8rem}
+  .loading-spinner{
+    width:30px;height:30px;border-radius:50%;
+    border:3px solid var(--border);border-top-color:var(--red);
+    animation:spin 0.7s linear infinite;margin:0 auto;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ---- 控制区 ---- */
-.controls{margin-top:18px;padding:16px 20px;opacity:0;transform:translateY(-16px);animation:rise 0.6s cubic-bezier(0.16,1,0.3,1) 0.18s forwards}
-.search-box{display:flex;align-items:center;gap:9px;padding:8px 14px;border-radius:12px;background:rgba(255,255,255,0.55);border:1px solid rgba(44,62,80,0.08);transition:var(--transition)}
-.search-box:focus-within{border-color:rgba(45,212,191,0.45);background:rgba(255,255,255,0.75)}
-.search-box i{color:var(--text-muted);font-size:13px}
-.search-box input{flex:1;border:none;outline:none;background:transparent;font-family:inherit;font-size:13.5px;color:var(--text-primary)}
-.search-box input::placeholder{color:var(--text-muted)}
-.sorts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
-.sorts .lbl{font-size:11.5px;color:var(--text-muted);font-weight:600;margin-right:2px}
-.pill{
-    padding:5px 14px;border-radius:100px;font-size:12.5px;font-weight:500;
-    cursor:pointer;user-select:none;transition:var(--transition);
-    background:transparent;border:1px solid rgba(44,62,80,0.12);color:var(--text-secondary);
-}
-.pill:hover{background:rgba(45,212,191,0.10);border-color:rgba(45,212,191,0.45);color:var(--text-primary)}
-.pill.active{background:rgba(45,212,191,0.12);border-color:rgba(45,212,191,0.45);color:var(--text-primary);font-weight:700}
-.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
-.count-line{margin-top:12px;font-size:11.5px;color:var(--text-muted);text-align:right}
+  /* ---- Footer stats ---- */
+  .stats-bar{
+    max-width:960px;margin:0 auto 12px;padding:0 24px;
+    display:flex;justify-content:center;gap:32px;flex-wrap:wrap;
+    opacity:0;animation:fadeUp 0.5s ease 0.7s forwards;
+  }
+  .stat-item{text-align:center}
+  .stat-value{font-size:1.5rem;font-weight:800;color:var(--red);font-variant-numeric:tabular-nums}
+  .stat-label{font-size:0.78rem;color:var(--text-tertiary);margin-top:2px}
 
-/* ---- 列表 ---- */
-.list{margin-top:18px;display:flex;flex-direction:column;gap:12px}
-.v-card{
-    display:flex;align-items:center;gap:16px;padding:16px 20px;
-    opacity:0;transform:translateY(14px);animation:rise 0.45s ease forwards;
-}
-.v-card:hover{
-    box-shadow:0 16px 48px rgba(20,40,50,0.16),0 0 0 1px rgba(255,255,255,0.5) inset;
-    transform:translateY(-3px) scale(1.008);
-    backdrop-filter:blur(32px) saturate(180%) brightness(1.05);
-    -webkit-backdrop-filter:blur(32px) saturate(180%) brightness(1.05);
-}
-.rank{
-    font-family:'Courier New',monospace;font-size:19px;font-weight:800;color:var(--text-muted);
-    width:36px;text-align:center;flex-shrink:0;
-}
-.v-card.top .rank{background:linear-gradient(135deg,#3b82f6,#2dd4bf);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
-.v-main{flex:1;min-width:0}
-.v-title{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.5;
-    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all}
-.v-meta{display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center;margin-top:5px;font-size:11.5px;color:var(--text-muted)}
-.v-meta .author{color:var(--text-secondary);font-weight:500}
-.v-meta .kchip{color:var(--accent-teal);background:rgba(45,212,191,0.12);padding:1px 8px;border-radius:9px;font-weight:600}
-.v-stats{display:flex;gap:13px;flex-shrink:0;align-items:center}
-.stat{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary);font-family:'Courier New',monospace;font-weight:700;min-width:52px}
-.stat i{font-size:11px;opacity:0.75}
-.stat.digg{color:var(--accent-pink)}
-.stat.digg i{opacity:0.9}
-.v-side{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0}
-.action-btn{
-    display:inline-flex;align-items:center;gap:6px;
-    background:transparent;border:1px solid rgba(44,62,80,0.12);color:var(--text-secondary);
-    border-radius:10px;padding:6px 13px;font-size:12px;font-weight:500;
-    text-decoration:none;font-family:inherit;transition:var(--transition);cursor:pointer;white-space:nowrap;
-}
-.action-btn:hover{background:rgba(45,212,191,0.10);border-color:rgba(45,212,191,0.45);color:var(--text-primary)}
-.action-btn i{font-size:10.5px}
+  .updated-at{
+    max-width:960px;margin:16px auto 44px;padding:0 24px;
+    text-align:center;font-size:0.78rem;color:var(--text-tertiary);line-height:1.9;
+    opacity:0;animation:fadeUp 0.5s ease 0.75s forwards;
+  }
+  .updated-at a{color:var(--text-secondary);font-weight:500;text-decoration:none}
+  .updated-at a:hover{color:var(--red)}
 
-/* ---- 状态 / 底部 ---- */
-.msg-box{margin-top:18px;padding:26px;text-align:center;color:var(--text-secondary);font-size:13px}
-.msg-box i{font-size:22px;color:var(--text-muted);display:block;margin-bottom:10px}
-.spin{width:26px;height:26px;border-radius:50%;border:3px solid rgba(44,62,80,0.1);border-top-color:var(--accent-teal);animation:spin 0.7s linear infinite;margin:0 auto 10px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.foot{margin-top:26px;padding:16px 22px;font-size:11px;color:var(--text-muted);line-height:1.8;text-align:center}
-.foot a{color:var(--text-secondary);text-decoration:none;font-weight:500}
-.foot a:hover{color:var(--accent-teal)}
+  /* ---- Utility ---- */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-@media (max-width:640px){
-    .page{padding:40px 14px 28px}
-    .head{padding:26px 20px 20px}
-    .v-card{flex-wrap:wrap;gap:10px;padding:14px 16px}
-    .v-stats{width:100%;justify-content:flex-start;gap:16px}
-    .v-side{flex-direction:row;width:100%;justify-content:flex-end}
-    .head-stats{gap:8px}
-    .hstat{min-width:74px;padding:6px 10px}
-}
+  /* ---- Responsive ---- */
+  @media(max-width:640px){
+    .header{padding-top:40px}
+    .header h1{font-size:clamp(1.6rem,5vw,2.4rem)}
+    .header .subtitle{font-size:0.88rem}
+    .controls{gap:8px;margin-top:28px;padding:0 16px}
+    .control-label{font-size:0.72rem}
+    .pill{padding:5px 11px;font-size:0.76rem;border-radius:80px}
+    .text-input{padding:5px 12px;font-size:0.78rem;min-width:130px;flex:1}
+    .count-line{padding:0 16px}
+    .container{padding:0 12px;margin-top:16px}
+    .repo-card{padding:13px 13px}
+    .repo-top{gap:11px}
+    .repo-rank{font-size:1.15rem;min-width:24px}
+    .v-cover{width:70px;min-height:94px}
+    .repo-name{font-size:0.9rem}
+    .repo-meta{gap:9px;margin-top:7px}
+    .meta-item{font-size:0.73rem;gap:3px}
+    .stats-bar{gap:18px;padding:0 16px}
+    .stat-value{font-size:1.15rem}
+    .stat-label{font-size:0.68rem}
+    .state-box{margin:20px 12px;padding:44px 16px}
+  }
 </style>
 </head>
 <body>
-<div class="bg-decoration bg-decoration-1"></div>
-<div class="bg-decoration bg-decoration-2"></div>
-<div class="bg-decoration bg-decoration-3"></div>
 
-<main class="page">
-    <header class="head glass-card">
-        <div class="head-badge"><i class="fa-brands fa-tiktok"></i> 快照数据 · 本地采集</div>
-        <h1>抖音<span>高赞</span>雷达</h1>
-        <p class="sub">关键词搜索结果按点赞排序的快照浏览。数据来自本地 DouK-Downloader 采集的抖音公开搜索结果，点击「打开原视频」可跳转查看。</p>
-        <div class="head-stats">
-            <div class="hstat"><div class="v" id="st-count">–</div><div class="l">视频总数</div></div>
-            <div class="hstat"><div class="v" id="st-kw">–</div><div class="l">关键词</div></div>
-            <div class="hstat"><div class="v" id="st-max">–</div><div class="l">最高点赞</div></div>
-            <div class="hstat"><div class="v" id="st-time">–</div><div class="l">快照更新</div></div>
-        </div>
-    </header>
+<div class="header">
+    <div class="snapshot-badge"><i class="fa-brands fa-tiktok"></i> 快照数据 · 本地采集</div>
+    <h1>抖音<span>高赞</span>雷达</h1>
+    <p class="subtitle">关键词搜索结果按点赞排序的快照浏览 · 数据来自本地 DouK-Downloader 采集，点击封面或标题可跳转原视频</p>
+</div>
 
-    <section class="controls glass-card">
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input id="q" type="text" placeholder="搜索标题 / 作者…" autocomplete="off">
-        </div>
-        <div class="sorts" id="sorts"><span class="lbl">排序</span></div>
-        <div class="chips" id="chips"><span class="lbl">关键词</span></div>
-        <div class="count-line" id="count-line"></div>
-    </section>
+<div class="controls">
+    <div class="control-group">
+        <span class="control-label">搜索</span>
+        <input class="text-input" id="q" type="text" placeholder="标题 / 作者…" autocomplete="off">
+    </div>
+    <div class="control-group" id="sorts">
+        <span class="control-label">排序</span>
+    </div>
+    <div class="control-group" id="chips">
+        <span class="control-label">关键词</span>
+    </div>
+</div>
+<div class="count-line" id="count-line" hidden></div>
 
-    <section class="list" id="list"></section>
-    <div class="msg-box glass-card" id="loading"><div class="spin"></div>正在加载快照数据…</div>
-    <div class="msg-box glass-card" id="empty" hidden><i class="fa-regular fa-face-meh"></i>没有匹配的视频，换个关键词试试</div>
-    <div class="msg-box glass-card" id="error" hidden><i class="fa-solid fa-triangle-exclamation"></i>数据加载失败。本页通过 HTTP 访问时可用；本地预览请先在目录里运行 <code>python -m http.server</code></div>
+<div class="container">
+    <div class="repo-list" id="list"></div>
+</div>
+<div class="state-box" id="loading" style="border:none">
+    <div class="loading-spinner"></div>
+    <p>正在加载快照数据…</p>
+</div>
+<div class="state-box" id="empty" hidden>
+    <i class="fa-regular fa-face-meh big"></i>
+    <p>没有匹配的视频</p>
+    <p class="state-sub">换个关键词或筛选项试试</p>
+</div>
+<div class="state-box" id="error" hidden>
+    <i class="fa-solid fa-triangle-exclamation big"></i>
+    <p>数据加载失败</p>
+    <p class="state-sub">本页需通过 HTTP 访问；本地预览请先在目录里运行 python -m http.server</p>
+</div>
 
-    <footer class="foot glass-card">
-        数据说明：本页数据为本地工具 DouK-Downloader 采集的抖音公开搜索结果快照，按快照时间静态更新，仅供学习交流；
-        视频及内容版权归原作者所有，如有侵权即删。本页面不采集任何访客信息。<br>
-        <a href="/tools/"><i class="fa-solid fa-arrow-left"></i> 返回工具箱</a>
-    </footer>
-</main>
+<div class="stats-bar">
+    <div class="stat-item"><div class="stat-value" id="st-count">–</div><div class="stat-label">视频总数</div></div>
+    <div class="stat-item"><div class="stat-value" id="st-kw">–</div><div class="stat-label">关键词</div></div>
+    <div class="stat-item"><div class="stat-value" id="st-max">–</div><div class="stat-label">最高点赞</div></div>
+    <div class="stat-item"><div class="stat-value" id="st-time" style="font-size:1.05rem;padding-top:8px">–</div><div class="stat-label">快照更新</div></div>
+</div>
+<p class="updated-at">
+    数据为本地工具 DouK-Downloader 采集的抖音公开搜索结果快照，按快照时间静态更新，仅供学习交流；视频及内容版权归原作者所有，如有侵权即删。本页面不采集任何访客信息。<br>
+    <a href="/tools/"><i class="fa-solid fa-arrow-left"></i> 返回工具箱</a>
+</p>
 
 <script>
 (function(){
@@ -274,26 +357,30 @@ body{
     }
 
     function cardHTML(i, idx){
-        var top = idx < 3 ? " top" : "";
-        return '<article class="v-card glass-card' + top + '" style="animation-delay:' + Math.min(idx*40,400) + 'ms">'
-            + '<div class="rank">' + (idx+1) + '</div>'
-            + '<div class="v-main">'
-            +   '<h3 class="v-title">' + esc(i.t || "(无标题)") + '</h3>'
-            +   '<div class="v-meta">'
-            +     '<span class="author">@' + esc(i.a || "未知作者") + '</span>'
-            +     '<span>' + esc(i.dt || "") + '</span>'
-            +     '<span>' + fmtDur(i.du) + '</span>'
-            +     (i.k ? '<span class="kchip">#' + esc(i.k) + '</span>' : '')
+        var cover = i.cv
+            ? '<a class="v-cover" href="' + esc(i.u) + '" target="_blank" rel="noopener noreferrer">'
+              + '<img src="' + esc(i.cv) + '" loading="lazy" alt="" onerror="this.parentNode.classList.add(\'noimg\')"></a>'
+            : '<a class="v-cover noimg" href="' + esc(i.u) + '" target="_blank" rel="noopener noreferrer"></a>';
+        return '<article class="repo-card" style="animation-delay:' + Math.min(idx*35,500) + 'ms">'
+            + '<div class="repo-top">'
+            +   '<div class="repo-rank">' + (idx+1) + '</div>'
+            +   cover
+            +   '<div class="repo-info">'
+            +     '<a class="repo-name" href="' + esc(i.u) + '" target="_blank" rel="noopener noreferrer">' + esc(i.t || "(无标题)") + '</a>'
+            +     '<div class="repo-meta">'
+            +       (i.k ? '<span class="kchip">#' + esc(i.k) + '</span>' : '')
+            +       '<span class="meta-item"><span class="author">@' + esc(i.a || "未知作者") + '</span></span>'
+            +       '<span class="meta-item"><i class="fa-regular fa-calendar"></i>' + esc(i.dt || "") + '</span>'
+            +       '<span class="meta-item"><i class="fa-regular fa-clock"></i>' + fmtDur(i.du) + '</span>'
+            +     '</div>'
+            +     '<div class="repo-meta">'
+            +       '<span class="meta-item"><i class="fa-solid fa-heart"></i><span class="stars-today">' + fmtWan(i.d) + '</span></span>'
+            +       '<span class="meta-item"><i class="fa-regular fa-comment"></i>' + fmtWan(i.c) + '</span>'
+            +       '<span class="meta-item"><i class="fa-regular fa-star"></i>' + fmtWan(i.f) + '</span>'
+            +       '<span class="meta-item"><i class="fa-solid fa-share-nodes"></i>' + fmtWan(i.s) + '</span>'
+            +       '<a class="sh-link" href="' + esc(i.u) + '" target="_blank" rel="noopener noreferrer">打开原视频 <i class="fa-solid fa-arrow-up-right-from-square"></i></a>'
+            +     '</div>'
             +   '</div>'
-            + '</div>'
-            + '<div class="v-stats">'
-            +   '<span class="stat digg" title="点赞"><i class="fa-solid fa-heart"></i>' + fmtWan(i.d) + '</span>'
-            +   '<span class="stat" title="评论"><i class="fa-regular fa-comment"></i>' + fmtWan(i.c) + '</span>'
-            +   '<span class="stat" title="收藏"><i class="fa-regular fa-star"></i>' + fmtWan(i.f) + '</span>'
-            +   '<span class="stat" title="转发"><i class="fa-solid fa-share-nodes"></i>' + fmtWan(i.s) + '</span>'
-            + '</div>'
-            + '<div class="v-side">'
-            +   '<a class="action-btn" href="' + esc(i.u) + '" target="_blank" rel="noopener noreferrer">打开原视频 <i class="fa-solid fa-arrow-up-right-from-square"></i></a>'
             + '</div>'
             + '</article>';
     }
@@ -301,8 +388,13 @@ body{
     function render(){
         if (!DATA) return;
         var arr = filtered();
-        $("count-line").textContent = "共 " + arr.length + " 条（快照合计 " + DATA.count + " 条）";
-        $("list").innerHTML = arr.map(cardHTML).join("");
+        $("count-line").textContent = "匹配 " + arr.length + " 条（快照合计 " + DATA.count + " 条）";
+        $("count-line").hidden = false;
+        var list = $("list");
+        list.innerHTML = arr.map(cardHTML).join("");
+        // 逐卡触发入场动画
+        var cards = list.querySelectorAll(".repo-card");
+        for (var k = 0; k < cards.length; k++) cards[k].classList.add("visible");
         $("empty").hidden = arr.length > 0;
     }
 
