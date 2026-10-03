@@ -7,7 +7,7 @@
     <title>工具箱 - Tools Collection</title>
     <style>
         :root {
-            /* 纸面清单主题：纯白底 / 黑字 / 灰阶层级 / teal 唯一点缀色 */
+            /* 纸面清单主题：纯白底 / 黑字 / 灰阶层级 / 无彩色强调 */
             --bg: #ffffff;
 
             /* 灰阶层级（替代原透明度+模糊体系） */
@@ -28,10 +28,10 @@
             --text-dim: #999999;
 
             /* 强调色：teal 仅用于 active 态 / 链接 / 竖条等小面积点缀 */
-            --accent: #0d9488;        /* teal-600：白底小字可读 */
-            --accent-2: #0d9488;
-            --accent-green: #0d9488;
-            --accent-raw: #2dd4bf;    /* 原始 teal：非文字点缀（竖条/selection） */
+            --accent: #111111;        /* 黑色强调：与 GitHub 图标同调 */
+            --accent-2: #111111;
+            --accent-green: #111111;
+            --accent-raw: #111111;    /* 原始强调：非文字点缀（竖条/selection） */
 
             /* 阴影：极简方向基本弃用，仅 montage/弹层保留一档 */
             --shadow-sm: none;
@@ -69,7 +69,7 @@
             overflow-x: hidden;
         }
 
-        ::selection { background: rgba(45, 212, 191, 0.22); }
+        ::selection { background: rgba(17, 17, 17, 0.12); }
 
         :focus-visible { outline: 2px solid var(--accent-raw); outline-offset: 2px; border-radius: 4px; }
 
@@ -197,8 +197,8 @@
         }
 
         .qf-chip.active {
-            background: rgba(45, 212, 191, 0.10);
-            border-color: rgba(13, 148, 136, 0.45);
+            background: rgba(17, 17, 17, 0.05);
+            border-color: #111111;
             color: var(--accent);
             font-weight: 600;
         }
@@ -755,7 +755,7 @@
                     <span class="featured-name">仓库分析</span>
                 </a>
                 <a href="/tools/breathe/" class="featured-card" title="深呼吸放松">
-                    <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-7-4.5-9.5-9C1 9 3 5 6.5 5c2 0 3.5 1 5.5 3 2-2 3.5-3 5.5-3C21 5 23 9 21.5 12 19 16.5 12 21 12 21z'/%3E%3C/svg%3E" alt="深呼吸放松"></div>
+                    <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-7-4.5-9.5-9C1 9 3 5 6.5 5c2 0 3.5 1 5.5 3 2-2 3.5-3 5.5-3C21 5 23 9 21.5 12 19 16.5 12 21 12 21z'/%3E%3C/svg%3E" alt="深呼吸放松"></div>
                     <span class="featured-name">深呼吸放松</span>
                 </a>
                 <a href="/tools/zhuiju-nav/" class="featured-card" title="追剧资源导航">
@@ -826,7 +826,7 @@
                     <h3 class="tool-name">万花筒绘图</h3>
                 </a>
                 <a href="/tools/gpt-image-gallery/" class="tool-card" data-name="GPT Image 提示词画廊" data-desc="541 个 AI 生图案例，大图与完整提示词对照浏览，支持分类筛选、搜索与一键复制提示词" title="541 个 AI 生图案例，大图与完整提示词对照浏览，支持分类筛选、搜索与一键复制提示词">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='3'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='M21 15l-4.5-4.5L7 20'/%3E%3C/svg%3E" alt="GPT Image 提示词画廊"></div>
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='3'/%3E%3Ccircle cx='9' cy='9' r='2'/%3E%3Cpath d='M21 15l-4.5-4.5L7 20'/%3E%3C/svg%3E" alt="GPT Image 提示词画廊"></div>
                     <h3 class="tool-name">GPT Image 提示词画廊</h3>
                 </a>
                 <a href="/tools/handraw-style/" class="tool-card" data-name="手绘风格编号画廊" data-desc="279 种手绘风格 + 122 种排版图型 + 36 主题色编号化，报编号生成中英双语 AI 生图提示词" title="手绘风格提示词库镜像（yang0/handraw-style，MIT）：279 种手绘风格 + 122 种排版图型 + 36 主题色编号化，报编号生成中英双语 AI 生图提示词">
@@ -978,7 +978,7 @@
                     <h3 class="tool-name">60s 信息流</h3>
                 </a>
                 <a href="/tools/academic_rank/" class="tool-card" data-name="学科评估数据面板" data-desc="第四轮学科评估结果可视化，460所高校94个学科，等级分布、地区格局、高校实力多维洞察" title="第四轮学科评估结果可视化，460所高校94个学科，等级分布、地区格局、高校实力多维洞察">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 10v6M2 10l10-5 10 5-10 5z'/%3E%3Cpath d='M6 12v5c3 3 9 3 12 0v-5'/%3E%3C/svg%3E" alt="学科评估数据面板"></div>
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 10v6M2 10l10-5 10 5-10 5z'/%3E%3Cpath d='M6 12v5c3 3 9 3 12 0v-5'/%3E%3C/svg%3E" alt="学科评估数据面板"></div>
                     <h3 class="tool-name">学科评估数据面板</h3>
                 </a>
                 <a href="/tools/hupu/" class="tool-card" data-name="虎扑评分数据面板" data-desc="虎扑JRs真实评分可视化，60个条目图鉴式人物榜单，评分分布、分类构成、人气热度多维洞察" title="虎扑JRs真实评分可视化，60个条目图鉴式人物榜单，评分分布、分类构成、人气热度多维洞察">
@@ -1014,7 +1014,7 @@
                     <h3 class="tool-name">追剧资源导航</h3>
                 </a>
                 <a href="/tools/world-monitor/" class="tool-card" data-name="世界实时监控" data-desc="实时地震与全球自然事件监控地图" title="实时地震与全球自然事件监控地图">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18'/%3E%3Cpath d='M12 3a13.5 13.5 0 0 1 3.5 9A13.5 13.5 0 0 1 12 21a13.5 13.5 0 0 1-3.5-9 13.5 13.5 0 0 1 3.5-9z'/%3E%3C/svg%3E" alt="世界实时监控"></div>
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M3 12h18'/%3E%3Cpath d='M12 3a13.5 13.5 0 0 1 3.5 9A13.5 13.5 0 0 1 12 21a13.5 13.5 0 0 1-3.5-9 13.5 13.5 0 0 1 3.5-9z'/%3E%3C/svg%3E" alt="世界实时监控"></div>
                     <h3 class="tool-name">世界实时监控</h3>
                 </a>
                 <a href="/tools/exercise-db/" class="tool-card" data-name="练点啥呢？" data-desc="1324个健身动作检索，按部位/器械/肌群筛选" title="1324个健身动作检索，按部位/器械/肌群筛选">
@@ -1100,7 +1100,7 @@
                     <h3 class="tool-name">反应速度测试</h3>
                 </a>
                 <a href="/tools/breathe/" class="tool-card" data-name="深呼吸放松" data-desc="引导式呼吸节律动画，缓解焦虑与压力，放松身心" title="引导式呼吸节律动画，缓解焦虑与压力，放松身心">
-                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232dd4bf' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-7-4.5-9.5-9C1 9 3 5 6.5 5c2 0 3.5 1 5.5 3 2-2 3.5-3 5.5-3C21 5 23 9 21.5 12 19 16.5 12 21 12 21z'/%3E%3C/svg%3E" alt="深呼吸放松"></div>
+                    <div class="tool-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111111' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s-7-4.5-9.5-9C1 9 3 5 6.5 5c2 0 3.5 1 5.5 3 2-2 3.5-3 5.5-3C21 5 23 9 21.5 12 19 16.5 12 21 12 21z'/%3E%3C/svg%3E" alt="深呼吸放松"></div>
                     <h3 class="tool-name">深呼吸放松</h3>
                 </a>
                 <a href="/tools/pdf-tools/" class="tool-card" data-name="PDF工具" data-desc="PDF合并/提取页面/旋转，本地处理不上传" title="PDF合并/提取页面/旋转，本地处理不上传">
