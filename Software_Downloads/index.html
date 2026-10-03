@@ -331,6 +331,24 @@
             line-height: 1.2;
         }
 
+        /* 图标+名称+版本：真实下载链接（JS 失效时仍可下载） */
+        .featured-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 7px;
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* pill 行：仓库 / QQ 各自独立链接 */
+        .featured-pills {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+        }
+
         /* 软件网格：两列清单行卡片 */
         .software-grid {
             display: grid;
@@ -850,24 +868,37 @@
         <section class="featured-section" id="featuredSection">
             <h2 class="section-title">推荐下载</h2>
             <div class="featured-grid">
-                <a href="https://github.com/JingW-ui/AutoTask-UI-/releases/download/auto_Task2.0.8/auto_Task2.0.8.exe" download class="featured-card" title="自动化任务工具：强大的自动化任务管理工具，智能执行各类任务">
-                    <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23238636' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='16' rx='2'/%3E%3Crect x='9' y='9' width='6' height='6'/%3E%3Cline x1='9' y1='1' x2='9' y2='4'/%3E%3Cline x1='15' y1='1' x2='15' y2='4'/%3E%3Cline x1='9' y1='20' x2='9' y2='23'/%3E%3Cline x1='15' y1='20' x2='15' y2='23'/%3E%3Cline x1='20' y1='9' x2='23' y2='9'/%3E%3Cline x1='20' y1='14' x2='23' y2='14'/%3E%3Cline x1='1' y1='9' x2='4' y2='9'/%3E%3Cline x1='1' y1='14' x2='4' y2='14'/%3E%3C/svg%3E" alt="自动化任务工具"></div>
-                    <span class="featured-name">自动化任务工具</span>
-                    <span class="featured-meta">v2.0.8 · Windows</span>
-                    <span class="repo-pill" title="开源仓库 JingW-ui/AutoTask-UI-"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>AutoTask-UI-<img src="https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></span>
-                </a>
-                <a href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/MediScreen-Brain/MediScreen-Brain_1.0.3.exe" download class="featured-card" title="MediScreen-Brain：零配置脑肿瘤检测系统，双击即可使用">
-                    <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e36d6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='22 12 18 12 15 21 9 3 6 12 2 12'/%3E%3C/svg%3E" alt="MediScreen-Brain"></div>
-                    <span class="featured-name">MediScreen-Brain</span>
-                    <span class="featured-meta">v1.0.3 · Windows</span>
-                    <span class="repo-pill" title="开源仓库 JingW-ui/MediScreen-Brain"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>MediScreen-Brain</span>
-                </a>
-                <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/subject_ranking/subject_ranking_1.0.0.exe" download class="featured-card" title="学科排名可视化系统：基于Python的交互式学科排名系统">
-                    <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d9488' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='6' y1='20' x2='6' y2='14'/%3E%3Cline x1='12' y1='20' x2='12' y2='8'/%3E%3Cline x1='18' y1='20' x2='18' y2='4'/%3E%3Cline x1='3' y1='20' x2='21' y2='20'/%3E%3C/svg%3E" alt="学科排名可视化系统"></div>
-                    <span class="featured-name">学科排名可视化系统</span>
-                    <span class="featured-meta">v1.0.0 · Windows</span>
-                    <span class="repo-pill" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></span>
-                </a>
+                <div class="featured-card" data-href="https://github.com/JingW-ui/AutoTask-UI-/releases/download/auto_Task2.0.8/auto_Task2.0.8.exe" title="自动化任务工具：强大的自动化任务管理工具，智能执行各类任务">
+                    <a class="featured-link" href="https://github.com/JingW-ui/AutoTask-UI-/releases/download/auto_Task2.0.8/auto_Task2.0.8.exe" download title="下载 自动化任务工具 v2.0.8">
+                        <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23238636' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='16' rx='2'/%3E%3Crect x='9' y='9' width='6' height='6'/%3E%3Cline x1='9' y1='1' x2='9' y2='4'/%3E%3Cline x1='15' y1='1' x2='15' y2='4'/%3E%3Cline x1='9' y1='20' x2='9' y2='23'/%3E%3Cline x1='15' y1='20' x2='15' y2='23'/%3E%3Cline x1='20' y1='9' x2='23' y2='9'/%3E%3Cline x1='20' y1='14' x2='23' y2='14'/%3E%3Cline x1='1' y1='9' x2='4' y2='9'/%3E%3Cline x1='1' y1='14' x2='4' y2='14'/%3E%3C/svg%3E" alt="自动化任务工具"></div>
+                        <span class="featured-name">自动化任务工具</span>
+                        <span class="featured-meta">v2.0.8 · Windows</span>
+                    </a>
+                    <div class="featured-pills">
+                        <a class="repo-pill" href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/AutoTask-UI-"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>AutoTask-UI-<img src="https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                        <a class="qq-link" href="https://qm.qq.com/q/J38INOhJyk" target="_blank" rel="noopener noreferrer" title="QQ 交流群 · 150+ 人（2026-10）"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>QQ</title><path d="M21.395 15.035a40 40 0 0 0-.803-2.264l-1.079-2.695c.001-.032.014-.562.014-.836C19.526 4.632 17.351 0 12 0S4.474 4.632 4.474 9.241c0 .274.013.804.014.836l-1.08 2.695a39 39 0 0 0-.802 2.264c-1.021 3.283-.69 4.643-.438 4.673.54.065 2.103-2.472 2.103-2.472 0 1.469.756 3.387 2.394 4.771-.612.188-1.363.479-1.845.835-.434.32-.379.646-.301.778.343.578 5.883.369 7.482.189 1.6.18 7.14.389 7.483-.189.078-.132.132-.458-.301-.778-.483-.356-1.233-.646-1.846-.836 1.637-1.384 2.393-3.302 2.393-4.771 0 0 1.563 2.537 2.103 2.472.251-.03.581-1.39-.438-4.673"/></svg>150+人</a>
+                    </div>
+                </div>
+                <div class="featured-card" data-href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/MediScreen-Brain/MediScreen-Brain_1.0.3.exe" title="MediScreen-Brain：零配置脑肿瘤检测系统，双击即可使用">
+                    <a class="featured-link" href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/MediScreen-Brain/MediScreen-Brain_1.0.3.exe" download title="下载 MediScreen-Brain v1.0.3">
+                        <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e36d6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='22 12 18 12 15 21 9 3 6 12 2 12'/%3E%3C/svg%3E" alt="MediScreen-Brain"></div>
+                        <span class="featured-name">MediScreen-Brain</span>
+                        <span class="featured-meta">v1.0.3 · Windows</span>
+                    </a>
+                    <div class="featured-pills">
+                        <a class="repo-pill" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/MediScreen-Brain"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>MediScreen-Brain</a>
+                    </div>
+                </div>
+                <div class="featured-card" data-href="https://github.com/JingW-ui/PI-MAPP/releases/download/subject_ranking/subject_ranking_1.0.0.exe" title="学科排名可视化系统：基于Python的交互式学科排名系统">
+                    <a class="featured-link" href="https://github.com/JingW-ui/PI-MAPP/releases/download/subject_ranking/subject_ranking_1.0.0.exe" download title="下载 学科排名可视化系统 v1.0.0">
+                        <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d9488' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='6' y1='20' x2='6' y2='14'/%3E%3Cline x1='12' y1='20' x2='12' y2='8'/%3E%3Cline x1='18' y1='20' x2='18' y2='4'/%3E%3Cline x1='3' y1='20' x2='21' y2='20'/%3E%3C/svg%3E" alt="学科排名可视化系统"></div>
+                        <span class="featured-name">学科排名可视化系统</span>
+                        <span class="featured-meta">v1.0.0 · Windows</span>
+                    </a>
+                    <div class="featured-pills">
+                        <a class="repo-pill" href="https://github.com/JingW-ui/PI-MAPP" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -1131,6 +1162,14 @@
             // 推荐卡先于普通卡入场
             document.querySelectorAll('.featured-card').forEach((card, index) => {
                 card.style.animationDelay = (0.1 + index * 0.05).toFixed(2) + 's';
+            });
+        });
+
+        // 推荐卡整卡点击 = 下载（卡内真实链接除外）
+        document.querySelectorAll('.featured-card[data-href]').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('a')) return;
+                window.location.href = card.dataset.href;
             });
         });
 
