@@ -88,3 +88,9 @@ matcher.py
 recommender.py
 export_tracker.py
 /data/
+
+# ========================
+# 个人资料（不入仓库）
+# ========================
+/references/
+/陈华富的资料
