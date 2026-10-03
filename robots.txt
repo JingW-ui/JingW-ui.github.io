@@ -1,3 +1,11 @@
+# JingW-ui.github.io — 个人公益静态站
+# 对所有爬虫开放：搜索引擎爬虫、AI 联网检索爬虫（OAI-SearchBot / Claude-SearchBot /
+# PerplexityBot / Bytespider 等）与 AI 训练爬虫（GPTBot / ClaudeBot / Google-Extended /
+# CCBot 等）均不设限，欢迎抓取与引用。
+# 仅 /ppt/ 为内部课件目录，不对外。
+
 User-agent: *
 Allow: /
 Disallow: /ppt/
+
+Sitemap: https://jingw-ui.github.io/sitemap.xml

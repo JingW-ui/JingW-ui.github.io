@@ -12,6 +12,8 @@
 - [🎥 项目演示](https://jingw-ui.github.io/videos/) - 视频展示核心项目
 - [🖼️ 获奖展示](https://jingw-ui.github.io/carousel/) - 竞赛证书与作品图片
 - [🎮 游戏中心](https://jingw-ui.github.io/Games/) - 个人开发的小游戏
+- [🧰 在线工具箱](https://jingw-ui.github.io/tools/) - 76 个免费在线工具，浏览器直接用
+- [📦 软件下载](https://jingw-ui.github.io/softwares/) - 11 款 Windows 免费软件（含开源仓库）
 - [🛠️ 技能库](https://jingw-ui.github.io/skills/) - AI Agent Skills集合
 - [🎬 演示文稿](https://jingw-ui.github.io/ppt/) - 求职面试幻灯片
 - [💻 GitHub](https://github.com/JingW-ui) - 开源代码仓库

@@ -1,0 +1,135 @@
+# JingW-ui — 免费在线工具、Windows 软件与网页小游戏
+
+> 纯静态个人公益站，无需注册、无后端、浏览器直接使用。含 76 个在线工具、11 款 Windows 免费软件（GitHub Releases 下载）、36 款网页小游戏。
+
+## 在线工具（共 76 个，浏览器直接运行）
+- [工具箱总览](https://jingw-ui.github.io/tools/): 76 个在线工具汇总页，支持搜索与分类快筛，覆盖文本处理、编解码、图片处理、计算器、生成器、知识图谱等
+- [图标创建](https://jingw-ui.github.io/tools/create_icon/): 在线创建和自定义图标，支持多种格式导出
+- [图片转图标](https://jingw-ui.github.io/tools/img2icon/): 将普通图片转换为图标格式，支持批量处理
+- [图片转PDF](https://jingw-ui.github.io/tools/img2pdf/): 将图片文件转换为PDF文档，保持高质量输出
+- [图片压缩](https://jingw-ui.github.io/tools/19-image-compressor/): 压缩图片文件大小，保持画质
+- [图片裁剪](https://jingw-ui.github.io/tools/20-image-cropper/): 在线裁剪图片，支持自定义尺寸
+- [图片转 Base64](https://jingw-ui.github.io/tools/21-image-to-base64/): 将图片转换为 Base64 编码字符串
+- [颜色选择器](https://jingw-ui.github.io/tools/22-color-picker/): 选取颜色，获取 HEX、RGB、HSL 值
+- [图片拼接](https://jingw-ui.github.io/tools/23-image-stitcher/): 将多张图片拼接成一张长图
+- [背景移除](https://jingw-ui.github.io/tools/24-bg-remover/): 智能移除图片背景，生成透明背景
+- [图片滤镜](https://jingw-ui.github.io/tools/25-image-filter/): 为图片添加各种滤镜效果
+- [二维码工具](https://jingw-ui.github.io/tools/26-qrcode-tool/): 生成和识别二维码，支持自定义样式
+- [画板](https://jingw-ui.github.io/tools/38-drawing-board/): 在线绘图工具，支持多种画笔和颜色
+- [万花筒绘图](https://jingw-ui.github.io/tools/wanhuatong/): 8重对称万花筒绘图，按住鼠标绘制绚丽对称图案，支持清空与保存
+- [GPT Image 提示词画廊](https://jingw-ui.github.io/tools/gpt-image-gallery/): 541 个 AI 生图案例，大图与完整提示词对照浏览，支持分类筛选、搜索与一键复制提示词
+- [手绘风格编号画廊](https://jingw-ui.github.io/tools/handraw-style/): 279 种手绘风格 + 122 种排版图型 + 36 主题色编号化，报编号生成中英双语 AI 生图提示词
+- [JSON 格式化](https://jingw-ui.github.io/tools/01-json-formatter/): JSON 格式化、校验、压缩，支持转换为 CSV 和 XML
+- [URL 编解码](https://jingw-ui.github.io/tools/02-url-encoder/): URL 编码、解码、参数解析与拼接的一站式工具
+- [Base64 编解码](https://jingw-ui.github.io/tools/03-base64-codec/): 文本和图片的 Base64 编解码，支持批量处理
+- [Markdown 编辑器](https://jingw-ui.github.io/tools/04-markdown-editor/): 实时预览的 Markdown 编辑器，支持导出 HTML
+- [文本对比](https://jingw-ui.github.io/tools/05-text-diff/): 对比两段文本的差异，高亮显示不同之处
+- [文本大小写转换](https://jingw-ui.github.io/tools/06-text-case-converter/): 英文文本大小写转换，支持多种格式
+- [正则表达式测试](https://jingw-ui.github.io/tools/07-regex-tester/): 在线测试正则表达式，实时显示匹配结果
+- [字数统计](https://jingw-ui.github.io/tools/08-word-counter/): 统计文本的字符数、单词数、行数等信息
+- [拼音转换](https://jingw-ui.github.io/tools/09-pinyin-converter/): 中文转拼音，支持多种拼音格式
+- [代码格式化](https://jingw-ui.github.io/tools/10-code-formatter/): 格式化 HTML、CSS、JavaScript 等代码
+- [加密解密工具](https://jingw-ui.github.io/tools/11-crypto-tool/): MD5、SHA、AES 等常用加密算法
+- [文本清理](https://jingw-ui.github.io/tools/12-text-cleaner/): 清理文本中的多余空格、换行和特殊字符
+- [词频统计](https://jingw-ui.github.io/tools/13-word-frequency/): 统计文本中各词汇出现的频率
+- [编码转换](https://jingw-ui.github.io/tools/14-encoding-converter/): UTF-8、GBK、ASCII 等字符编码转换
+- [Unicode 工具](https://jingw-ui.github.io/tools/39-unicode-tool/): 字符与 Unicode 编码互相转换
+- [Lorem 生成器](https://jingw-ui.github.io/tools/40-lorem-generator/): 生成占位文本，支持段落和单词数量自定义
+- [正则可视化](https://jingw-ui.github.io/tools/regex-visualizer/): 正则表达式铁路图可视化，直观理解匹配逻辑
+- [时间戳转换](https://jingw-ui.github.io/tools/15-timestamp-converter/): Unix 时间戳与日期时间互相转换
+- [农历日历](https://jingw-ui.github.io/tools/16-lunar-calendar/): 公历农历互转，查询节气和节日
+- [倒计时器](https://jingw-ui.github.io/tools/17-countdown-timer/): 设置目标时间，实时显示倒计时
+- [日期差计算器](https://jingw-ui.github.io/tools/18-date-diff-calculator/): 计算两个日期之间的天数差
+- [世界时钟墙](https://jingw-ui.github.io/tools/clock/): 多城市时区实时时钟，一眼掌握全球各地时间
+- [进制转换](https://jingw-ui.github.io/tools/27-base-converter/): 二进制、八进制、十进制、十六进制互转
+- [科学计算器](https://jingw-ui.github.io/tools/28-scientific-calculator/): 支持三角函数、对数等科学计算
+- [单位换算](https://jingw-ui.github.io/tools/29-unit-converter/): 长度、重量、温度等常用单位换算
+- [BMI 计算器](https://jingw-ui.github.io/tools/30-bmi-calculator/): 根据身高体重计算 BMI 指数
+- [贷款计算器](https://jingw-ui.github.io/tools/31-loan-calculator/): 计算等额本息和等额本金还款方式
+- [实时毫秒薪计时器](https://jingw-ui.github.io/tools/gz/): 按工作制毫秒级实时计算秒薪与今日/本月累计收入
+- [GitHub热门榜单](https://jingw-ui.github.io/tools/thrending/): 快速访问GitHub热门榜单，支持日榜、周榜、月榜，可根据不同语言筛选
+- [60s 信息流](https://jingw-ui.github.io/tools/hot-dashboard/): 聚合微博、B站、抖音、知乎等多平台热搜榜单，一站式获取热点信息
+- [学科评估数据面板](https://jingw-ui.github.io/tools/academic_rank/): 第四轮学科评估结果可视化，460所高校94个学科，等级分布、地区格局、高校实力多维洞察
+- [虎扑评分数据面板](https://jingw-ui.github.io/tools/hupu/): 虎扑JRs真实评分可视化，60个条目图鉴式人物榜单，评分分布、分类构成、人气热度多维洞察
+- [每天60秒](https://jingw-ui.github.io/tools/60s/): 每天60秒看世界，聚合热榜、天气和实用数据
+- [神经影像工具知识图谱](https://jingw-ui.github.io/tools/kg/): 神经影像分析工具知识图谱可视化面板，按处理流程梳理常用软件工具
+- [手机 OS 数据仪表盘](https://jingw-ui.github.io/tools/os_kg/): 手机操作系统知识图谱与市场份额可视化，覆盖 OS 占比、品牌出货、区域对比
+- [仓库分析](https://jingw-ui.github.io/tools/repo-radar/): 粘贴文本自动嗅探 GitHub 仓库，shields.io 徽章展示，一键复制嵌入代码
+- [心血管疾病知识图谱](https://jingw-ui.github.io/tools/h_kg/): 心血管疾病领域知识图谱可视化，展示疾病、症状、治疗等信息关联
+- [游戏行业知识图谱](https://jingw-ui.github.io/tools/game_kg/): 游戏厂商、热门游戏、引擎、类型、平台等实体关系可视化，聚焦网易游戏生态
+- [追剧资源导航](https://jingw-ui.github.io/tools/zhuiju-nav/): 免费无广告追剧资源聚合导航，分类/搜索/评分/风险一目了然
+- [世界实时监控](https://jingw-ui.github.io/tools/world-monitor/): 实时地震与全球自然事件监控地图
+- [练点啥呢？](https://jingw-ui.github.io/tools/exercise-db/): 1324个健身动作检索，按部位/器械/肌群筛选
+- [思维导图](https://jingw-ui.github.io/tools/mindmap/): Markdown一键生成交互式思维导图，支持导出PNG/SVG
+- [地球Online入门指南](https://jingw-ui.github.io/tools/life-better/): 循证生活手册，600+条建议按性价比排序，可按成本、收益、证据等级筛选
+- [OSSU 自学路径](https://jingw-ui.github.io/tools/ossu-cs/): OSSU 计算机科学课程表本地进度追踪：63门课三态标记、分区进度条、剩余学时估算，进度保存在本浏览器
+- [顶会主图画廊](https://jingw-ui.github.io/tools/paperfig/): 六大顶会 3516 张论文主图灵感画廊：搜索筛选、等级角标、灯箱浏览
+- [抖音高赞雷达](https://jingw-ui.github.io/tools/douyin-hot/): 抖音关键词搜索高赞视频快照浏览，按点赞/评论/收藏排序筛选，可跳转原视频
+- [笔记工具](https://jingw-ui.github.io/tools/biji/): 便捷的在线笔记应用，支持文本编辑和保存功能
+- [硬币抛掷](https://jingw-ui.github.io/tools/coin/): 在线抛硬币决策工具，支持自定义硬币贴图
+- [显示弹幕](https://jingw-ui.github.io/tools/danmu/): 创建和生成视频弹幕效果，支持多种样式和动画
+- [随机数生成器](https://jingw-ui.github.io/tools/32-random-generator/): 生成指定范围的随机数或随机字符串
+- [密码生成器](https://jingw-ui.github.io/tools/33-password-generator/): 生成高强度随机密码，可自定义规则
+- [文件预览器](https://jingw-ui.github.io/tools/34-file-previewer/): 在线预览图片、PDF、文本等文件
+- [待办清单](https://jingw-ui.github.io/tools/35-todo-list/): 简洁的待办事项管理工具
+- [屏幕尺子](https://jingw-ui.github.io/tools/36-screen-ruler/): 在屏幕上测量像素距离
+- [文件哈希校验](https://jingw-ui.github.io/tools/37-file-hash-checker/): 计算文件的 MD5、SHA1、SHA256 哈希值
+- [上课抽签器](https://jingw-ui.github.io/tools/lucky_draw/): 像素风课堂点名工具，支持Excel导入和隐蔽数据管理
+- [脚本工坊](https://jingw-ui.github.io/tools/script_forge/): 在线脚本编辑和管理工具
+- [3D模型查看器](https://jingw-ui.github.io/tools/glb_viewer_meshy/): 一个简单的3D模型查看器，支持GLB格式的模型加载和展示
+- [反应速度测试](https://jingw-ui.github.io/tools/speed/): 测试你的反应速度，变绿瞬间点击记录毫秒级反应时间
+- [深呼吸放松](https://jingw-ui.github.io/tools/breathe/): 引导式呼吸节律动画，缓解焦虑与压力，放松身心
+- [PDF工具](https://jingw-ui.github.io/tools/pdf-tools/): PDF合并/提取页面/旋转，本地处理不上传
+
+## Windows 免费软件（共 11 款，GitHub Releases 下载）
+- [软件下载中心](https://jingw-ui.github.io/softwares/): 11 款 Windows 软件的汇总与下载页
+- [图片转GIF工具](https://jingw-ui.github.io/softwares/): 简单易用的图片转换工具，快速将图片转换为GIF格式（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/img2gif1.0.0.0/img2gif.exe）
+- [图片布局管理工具](https://jingw-ui.github.io/softwares/): 专业的图片布局管理工具，轻松组织和排列多张图片（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/PicLayouter%E5%9B%BE%E7%89%87%E5%B8%83%E5%B1%80%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/PicLayouter.exe）
+- [图片转PDF工具](https://jingw-ui.github.io/softwares/): 快速将图片转换为PDF文档，支持批量处理和自定义设置（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/img2pdf/img2pdf.exe）
+- [自动提交工具](https://jingw-ui.github.io/softwares/): 自动化任务提交工具，提升工作效率，简化重复性操作流程（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/auto_Submit/auto_Submit_1.1.4.exe）
+- [自动化任务工具](https://jingw-ui.github.io/softwares/): 强大的自动化任务管理工具，智能执行各类任务（下载: https://github.com/JingW-ui/AutoTask-UI-/releases/download/auto_Task2.0.8/auto_Task2.0.8.exe）
+- [通用目标检测系统](https://jingw-ui.github.io/softwares/): 基于深度学习的通用目标检测系统，支持多种物体识别与定位（下载: https://pan.quark.cn/s/e41abe2b6ff6）
+- [MediScreen-Brain](https://jingw-ui.github.io/softwares/): 零配置脑肿瘤检测系统 - 双击即可使用，无需安装依赖（下载: https://github.com/JingW-ui/MediScreen-Brain/releases/download/MediScreen-Brain/MediScreen-Brain_1.0.3.exe）
+- [DCM2NII_Converter](https://jingw-ui.github.io/softwares/): DICOM转NIfTI格式转换与筛查工具 - 支持自动质量筛查的医学影像转换（下载: https://github.com/JingW-ui/MediScreen-Brain/releases/download/dcm2nii_ui/DCM2NII_Converter1.0.1.exe）
+- [学科排名可视化系统](https://jingw-ui.github.io/softwares/): 基于Python的交互式学科排名系统，支持5570条学科排名记录的动态筛选、搜索与可视化（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/subject_ranking/subject_ranking_1.0.0.exe）
+- [抖音爬虫工具](https://jingw-ui.github.io/softwares/): 高效的抖音视频数据采集工具，支持批量下载（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/DouyinCrawler2.1/DouyinCrawler2.1.exe）
+- [VIP追剧神器](https://jingw-ui.github.io/softwares/): 便捷的影视资源获取工具，让追剧更轻松（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/VIP%E8%BF%BD%E5%89%A7%E7%A5%9E%E5%99%A8/VIP.exe）
+
+## 网页小游戏（共 36 款，浏览器直接玩）
+- [游戏中心](https://jingw-ui.github.io/Games/): 36 款网页游戏汇总页
+- [跳一跳](https://jingw-ui.github.io/Games/jump-jump/): action 类网页游戏
+- [饵食大逃亡](https://jingw-ui.github.io/Games/bait-fish/): action 类网页游戏
+- [人生重开模拟器](https://jingw-ui.github.io/Games/remake/): puzzle 类网页游戏
+- [卡丁车大乱斗](https://jingw-ui.github.io/Games/smash-karts/): action 类网页游戏
+- [瓜体实验室](https://jingw-ui.github.io/Games/gua-lab/): puzzle 类网页游戏
+- [铁壁行动](https://jingw-ui.github.io/Games/operation-ironhold/): action 类网页游戏
+- [太空破坏者](https://jingw-ui.github.io/Games/space-huggers/): action 类网页游戏
+- [魔毯法师](https://jingw-ui.github.io/Games/magic-carpet/): action 类网页游戏
+- [海风之屿](https://jingw-ui.github.io/Games/sea-island/): scene 类网页游戏
+- [雨夜便利店](https://jingw-ui.github.io/Games/rainy-store/): scene 类网页游戏
+- [木漏时光](https://jingw-ui.github.io/Games/komorebi/): scene 类网页游戏
+- [鹈鹕骑行](https://jingw-ui.github.io/Games/pelecanus/): scene 类网页游戏
+- [苔翼飞行](https://jingw-ui.github.io/Games/mosswing/): action 类网页游戏
+- [切积木](https://jingw-ui.github.io/Games/qjm/): puzzle 类网页游戏
+- [一个都不能死](https://jingw-ui.github.io/Games/ygd/): action 类网页游戏
+- [按键钢琴](https://jingw-ui.github.io/Games/piano/): toy 类网页游戏
+- [谷歌恐龙快跑](https://jingw-ui.github.io/Games/dinosaur/): action 类网页游戏
+- [Flappy Bird](https://jingw-ui.github.io/Games/bird/): action 类网页游戏
+- [枯木逢春](https://jingw-ui.github.io/Games/Footsprout/): action 类网页游戏
+- [Gesture Particle Sphere](https://jingw-ui.github.io/Games/gestura/): toy 类网页游戏
+- [赛博回廊](https://jingw-ui.github.io/Games/CYBER_CORRIDOR/): scene 类网页游戏
+- [交互式蜘蛛](https://jingw-ui.github.io/Games/spider/): toy 类网页游戏
+- [Neural Branch](https://jingw-ui.github.io/Games/nerual_branch/): toy 类网页游戏
+- [形态工坊](https://jingw-ui.github.io/Games/morph_workshop/): toy 类网页游戏
+- [星际穿梭](https://jingw-ui.github.io/Games/warp_drift/): scene 类网页游戏
+- [Jackrabbit 跳跃兔子](https://jingw-ui.github.io/Games/jackrabbit/): action 类网页游戏
+- [深空漂移战机](https://jingw-ui.github.io/Games/star_drift/): action 类网页游戏
+- [数独挑战](https://jingw-ui.github.io/Games/suduku/): puzzle 类网页游戏
+- [扑克牌游戏](https://jingw-ui.github.io/Games/puke/): puzzle 类网页游戏
+- [3D 地球模型](https://jingw-ui.github.io/Games/earth_3D/): scene 类网页游戏
+- [赛博木鱼](https://jingw-ui.github.io/Games/muyu/): toy 类网页游戏
+- [3D 极速赛车](https://jingw-ui.github.io/Games/racing/): action 类网页游戏
+- [霓虹贪吃蛇](https://jingw-ui.github.io/Games/snake): action 类网页游戏
+- [3D 炫光骰子](https://jingw-ui.github.io/Games/dice_3D/): toy 类网页游戏
+- [无限轨道弹跳球](https://jingw-ui.github.io/Games/ball): toy 类网页游戏
+- [像素物语：4048小町](https://jingw-ui.github.io/Games/2024/): puzzle 类网页游戏
