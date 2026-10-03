@@ -22,7 +22,7 @@
 |------|------|
 | GitHub Stars | ![PI-MAPP](https://img.shields.io/github/stars/JingW-ui/PI-MAPP?style=flat-square&label=PI-MAPP) ![AutoTask-UI-](https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-?style=flat-square&label=AutoTask-UI-) |
 | 软件下载量（Releases） | ![PI-MAPP](https://img.shields.io/github/downloads/JingW-ui/PI-MAPP/total?style=flat-square&label=PI-MAPP) ![AutoTask-UI-](https://img.shields.io/github/downloads/JingW-ui/AutoTask-UI-/total?style=flat-square&label=AutoTask-UI-) ![MediScreen-Brain](https://img.shields.io/github/downloads/JingW-ui/MediScreen-Brain/total?style=flat-square&label=MediScreen-Brain) |
-| B 站播放 | **9.6w+**（截至 2026-10-03：微机原理复习 6.9w · AutoTask 演示 1.4w · 目标检测演示 1.3w） |
+| B 站播放 | **30w+**（[微机原理期末复习合集](https://www.bilibili.com/video/BV1Sd4y1J7k5/) 22.7w · AutoTask 演示 1.4w · 目标检测演示 1.3w，截至 2026-10-03） |
 
 ## 技术栈
 

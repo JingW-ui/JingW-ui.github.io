@@ -22,7 +22,7 @@
 |--------|------|
 | GitHub Stars | ![PI-MAPP](https://img.shields.io/github/stars/JingW-ui/PI-MAPP?style=flat-square&label=PI-MAPP) ![AutoTask-UI-](https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-?style=flat-square&label=AutoTask-UI-) |
 | Software Downloads (Releases) | ![PI-MAPP](https://img.shields.io/github/downloads/JingW-ui/PI-MAPP/total?style=flat-square&label=PI-MAPP) ![AutoTask-UI-](https://img.shields.io/github/downloads/JingW-ui/AutoTask-UI-/total?style=flat-square&label=AutoTask-UI-) ![MediScreen-Brain](https://img.shields.io/github/downloads/JingW-ui/MediScreen-Brain/total?style=flat-square&label=MediScreen-Brain) |
-| Bilibili views | **96k+** (as of 2026-10-03: Microcomputer Principles review 69k · AutoTask demo 14k · Object detection demo 13k) |
+| Bilibili views | **300k+** ([Microcomputer Principles review series](https://www.bilibili.com/video/BV1Sd4y1J7k5/) 227k · AutoTask demo 14k · Object detection demo 13k, as of 2026-10-03) |
 
 ## Tech Stack
 
