@@ -1,26 +1,38 @@
 ---
 name: add-tool-to-homepage
-description: 将新的工具或游戏注册到对应主页（tools/index.html 或 Games/index.html），并同步更新个人主页 index.html 的随机推荐池。当用户创建了新工具页面、新游戏页面、想把子项目添加到主页、需要注册新条目到工具箱或游戏中心索引时触发。适用于：添加新工具卡片、添加新游戏卡片、为新工具/游戏创建索引入口、更新分类、把新做的页面纳入索引等场景。即使用户没有明确说"添加到主页"，只要涉及到把新做的工具或游戏页面挂到对应集合页，都应该使用此技能。
+description: 将新的工具、游戏或软件注册到对应主页（tools/index.html、Games/index.html 或 softwares/index.html），并同步更新个人主页 index.html 的随机推荐池与 GEO 清单（sitemap.xml、llms.txt、llms-full.txt）。当用户创建了新工具页面、新游戏页面、新软件下载条目、想把子项目添加到主页、需要注册新条目到工具箱/游戏中心/软件下载索引时触发。适用于：添加新工具卡片、添加新游戏卡片、添加新软件卡片、为新工具/游戏/软件创建索引入口、更新分类、把新做的页面纳入索引等场景。即使用户没有明确说"添加到主页"，只要涉及到把新做的工具或游戏页面挂到对应集合页，都应该使用此技能。
 ---
 
 # 添加工具 / 游戏到主页
 
-将新的工具子项目注册到 `tools/index.html` 工具箱主页，或新的游戏注册到 `Games/index.html` 游戏中心主页，**并同步更新个人主页 `index.html` 的随机推荐池**。
+将新的工具子项目注册到 `tools/index.html` 工具箱主页、新的游戏注册到 `Games/index.html` 游戏中心主页、新的 Windows 软件注册到 `softwares/index.html` 软件下载中心，**并同步更新个人主页 `index.html` 的随机推荐池与 GEO 清单（sitemap.xml / llms.txt / llms-full.txt）**。
 
-## 核心原则：三处同步 + 自动推送
+## 核心原则：六处同步 + 自动推送
 
-仓库中有三处维护「工具/游戏清单」，添加任何新条目时**必须全部同步**，否则个人主页的随机推荐位会出现死链或漏推：
+仓库中有六处维护「工具/游戏/软件清单」，添加任何新条目时**必须全部同步**，否则主页随机推荐位会出现死链或漏推，搜索引擎与 AI 爬虫也发现不了新页面：
 
-1. **集合页索引卡片** —— `tools/index.html`（工具）或 `Games/index.html`（游戏）
-2. **统计数字** —— `tools/index.html` 顶部的 `📦 共创建 N 个实用工具` **加**所属分区的 `section-count`（仅工具需要改；游戏页是 chips 计数，见游戏流程）
-3. **个人主页随机池** —— `index.html` 中的 `TOOLS` 数组（工具）或 `GAMES` 数组（游戏）
+1. **集合页索引卡片** —— `tools/index.html`（工具）/ `Games/index.html`（游戏）/ `softwares/index.html`（软件）
+2. **统计数字** —— 工具页 `📦 共创建 N 个实用工具` + 所属分区 `section-count`；游戏页分类 chips 计数与副标题；软件页 `共 N 款 Windows 软件` + 分区 `section-count`
+3. **个人主页随机池** —— `index.html` 中的 `TOOLS` 数组（工具）或 `GAMES` 数组（游戏；软件不进随机池）
+4. **sitemap.xml** —— 新页面 URL + 所属 hub 的 lastmod（同步点 4-6 由脚本一键完成）
+5. **llms.txt** —— 对应分区追加条目行（同步点 4-6 由脚本一键完成）
+6. **llms-full.txt** —— 追加详情块并刷新生成日期（同步点 4-6 由脚本一键完成）
 
-**每次添加操作都必须同时更新这三处，缺一不可。完成后必须立即提交并推送到远程仓库。**
+**同步点 4-6 不要手工编辑**。卡片改完后，在仓库根目录运行一条命令重生成三个清单：
+
+```bash
+node .claude/skills/add-tool-to-homepage/scripts/regen-geo.mjs
+```
+
+脚本以三个 hub 页的卡片为唯一事实源，自动增删条目、精确继承 lastmod（已存在页面不虚改日期），并输出增删摘要供核对。
+
+**每次添加操作都必须同时更新以上同步点，缺一不可。完成后必须立即提交并推送到远程仓库。**
 
 ## 判断类型
 
 - 工具页面位于 `tools/` 下 → 走【工具流程】
 - 游戏页面位于 `Games/` 下 → 走【游戏流程】
+- 软件下载条目 → 走【软件注册流程】
 
 ---
 
@@ -130,6 +142,16 @@ data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'
 
 `ICONS` 和 `TAGS` 映射表已覆盖全部现有分类，无需改动；若新增了全新分类 ID，需同步在 `ICONS` 和 `TAGS` 对象里补一条。
 
+### 7. GEO 清单重生成（同步点 4-6）
+
+在仓库根目录运行：
+
+```bash
+node .claude/skills/add-tool-to-homepage/scripts/regen-geo.mjs
+```
+
+核对输出摘要：sitemap.xml 新增 `/tools/{slug}/` 且 hub lastmod 刷新；llms.txt 工具分区与 llms-full.txt 各新增条目。脚本幂等，重复运行无害。
+
 ---
 
 ## 游戏流程
@@ -186,6 +208,78 @@ data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'
 - `desc` = 一句话游戏介绍，风格对齐现有条目（如「经典贪吃蛇的霓虹赛博风格重制」）
 - `img` = 仅文件名（如 `snake.webp`），代码会自动拼 `/Games/assets/img/` 前缀
 
+### 5. GEO 清单重生成（同步点 4-6）
+
+同工具流程：仓库根目录运行 `node .claude/skills/add-tool-to-homepage/scripts/regen-geo.mjs`，核对 sitemap.xml 新增 `/Games/{slug}/`、llms.txt 游戏分区新增一行。
+
+---
+
+## 软件注册流程
+
+向 `softwares/index.html` 软件下载中心添加新的 Windows 软件条目。
+
+### 1. 收集软件信息
+
+| 信息 | 说明 | 示例 |
+|------|------|------|
+| 软件名称 | 卡片标题 | `自动化任务工具` |
+| 描述 | 一句话功能介绍（同时是 GEO 清单的描述来源） | `强大的自动化任务管理工具，智能执行各类任务` |
+| 下载链接 | GitHub Releases exe 直链或网盘链接 | `https://github.com/JingW-ui/AutoTask-UI-/releases/download/...` |
+| 版本号 | 按钮文案用；无版本则只写「立即下载」 | `v2.0.8` |
+| 仓库链接 | 开源仓库主页，有则必填 | `https://github.com/JingW-ui/AutoTask-UI-` |
+| 所属分类 | `image`（图像）/ `auto`（自动化）/ `ai`（AI·医学影像）/ `data`（数据·影视） | `auto` |
+| QQ 群 | 加群短链 + 当前人数（手工维护，tooltip 标注更新月份） | 可选 |
+
+### 2. 添加清单卡片（同步点 1）
+
+在目标分类 `<section class="category-section" data-category="{cat}">` 的 `.software-grid` 末尾插入卡片。卡片是 `div` 容器（内含下载/仓库/QQ 多个链接，**绝不能用 `<a>` 包裹整卡**——链接嵌套不合法）：
+
+```html
+<div class="software-card" data-name="{名称}" data-desc="{描述}" title="{描述}">
+    <div class="software-icon"><img src="{图标}" alt="{名称}"></div>
+    <div class="software-main">
+        <div class="sw-head">
+            <h3 class="software-name">{名称}</h3>
+        </div>
+        <p class="software-desc">{描述}</p>
+        <div class="sw-meta">
+            <a class="repo-pill" href="{仓库链接}" target="_blank" rel="noopener noreferrer" title="开源仓库 {owner}/{repo}">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">{GitHub 图标 path}</svg>{repo 名}
+                <img src="https://img.shields.io/github/stars/{owner}/{repo}.svg?style=flat-square&label=%E2%98%85&labelColor=ffffff&color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'">
+            </a>
+        </div>
+    </div>
+    <a href="{下载链接}" download class="download-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        立即下载 {版本号}
+    </a>
+</div>
+```
+
+要点：
+- 星数徽章按需添加；仓库星数较少时可先不放（参照 MediScreen-Brain 的做法），并在卡内留 HTML 注释说明恢复方式
+- 有 QQ 群的卡在 `.sw-head` 里加 `<a class="qq-link" href="{加群短链}" target="_blank" rel="noopener noreferrer" title="QQ 交流群 · {N}+ 人（YYYY-MM）"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>QQ</title><path d="{Simple Icons QQ path}"/></svg>{N}+人</a>`；人数是手工数据，同步时记得更新 tooltip 月份
+- 网盘下载改用外链图标 + `target="_blank" rel="noopener noreferrer"`
+- GitHub 图标 / QQ path / 下载图标直接从现有卡片复制，保持全页一致
+
+### 3. 推荐区（可选，同步点 2）
+
+重点软件可同时加入顶部 `<div class="featured-grid">` 推荐区（保持 3 张以内）。推荐卡是 `<div class="featured-card" data-href="{下载链接}">`：
+
+- 内部 `.featured-link`（**真实** `<a download>`，包住 icon/名称/版本——JS 失效时仍可下载）
+- `.featured-pills` 里放 repo-pill 与 qq-link 独立链接（有则放）
+- 整卡点击由页面 JS 补齐（点击卡内链接除外）
+
+### 4. 统计与手工数据（同步点 3）
+
+- 顶部 banner：`📦 共 11 款 Windows 软件` → N+1
+- 所属分区 `section-count` +1
+- QQ 群人数变化时手动更新 pill 文本与 tooltip 月份
+
+### 5. GEO 清单重生成（同步点 4-6）
+
+同工具流程：仓库根目录运行 `node .claude/skills/add-tool-to-homepage/scripts/regen-geo.mjs`，脚本会把新软件写入 sitemap.xml（hub lastmod 刷新）、llms.txt 与 llms-full.txt 的软件分区。
+
 ---
 
 ## 完成：提交并推送到远程仓库
@@ -195,12 +289,13 @@ data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'
 ### 工具注册提交模板
 
 ```bash
-git add index.html tools/index.html
+git add index.html tools/index.html sitemap.xml llms.txt llms-full.txt
 
 git commit -m "feat(tools): 将{工具名称}注册到工具箱主页和随机推荐池
 
 - tools/index.html: 新增 {slug} 工具卡片（{分类名称}），统计数 {N-1}→{N}
 - index.html: TOOLS 数组追加 {slug} 条目
+- sitemap.xml/llms.txt/llms-full.txt: GEO 清单同步（regen-geo.mjs）
 
 Co-Authored-By: Claude <noreply@anthropic.com>"
 
@@ -210,19 +305,35 @@ git push origin main
 ### 游戏注册提交模板
 
 ```bash
-git add index.html Games/index.html
+git add index.html Games/index.html sitemap.xml llms.txt llms-full.txt
 
 git commit -m "feat(games): 将{游戏名称}注册到游戏中心主页和随机推荐池
 
 - Games/index.html: 新增 {slug} 游戏卡片
 - index.html: GAMES 数组追加 {slug} 条目
+- sitemap.xml/llms.txt/llms-full.txt: GEO 清单同步（regen-geo.mjs）
 
 Co-Authored-By: Claude <noreply@anthropic.com>"
 
 git push origin main
 ```
 
-> **注意**：如果工作区还有其他未暂存的改动（如工具/游戏自身的页面文件），也应一并 `git add` 加入本次提交，保持一次注册操作对应一个完整提交。
+### 软件注册提交模板
+
+```bash
+git add softwares/index.html sitemap.xml llms.txt llms-full.txt
+
+git commit -m "feat(softwares): 将{软件名称}添加到软件下载中心
+
+- softwares/index.html: 新增 {软件名称} 卡片（{分类名称}），总款数 {N-1}→{N}
+- sitemap.xml/llms.txt/llms-full.txt: GEO 清单同步（regen-geo.mjs）
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+git push origin main
+```
+
+> **注意**：如果工作区还有其他未暂存的改动（如工具/游戏/软件自身的页面文件），也应一并 `git add` 加入本次提交，保持一次注册操作对应一个完整提交。
 
 ---
 
@@ -268,10 +379,10 @@ git push origin main
 
 ## 修改 / 删除已有条目
 
-如需修改或删除现有工具/游戏，**三处都要同步**：
+如需修改或删除现有工具/游戏/软件，**六处都要同步**：
 
-- **修改**：分别改 `tools/index.html` 或 `Games/index.html` 的卡片、`index.html` 数组中对应行；工具还要核对统计数字。
-- **删除**：删除集合页卡片 → 删除 `index.html` 数组对应行 → 工具需更新统计数字（减 1）→ 用 `git rm` 删除工具/游戏目录。
+- **修改**：分别改 `tools/index.html`、`Games/index.html` 或 `softwares/index.html` 的卡片、`index.html` 数组中对应行（软件无随机池条目）；工具/软件还要核对统计数字。
+- **删除**：删除集合页卡片 → 删除 `index.html` 数组对应行（软件无）→ 更新统计数字（减 1）→ 用 `git rm` 删除工具/游戏目录 → **运行 regen-geo.mjs**（自动从 sitemap 与 llms 系列清理该条目，防止孤儿 URL）。
 - 定位技巧：在 `index.html` 数组里搜索 `slug`（工具不带 `/`，游戏带 `/`）；在集合页搜索 `data-name=` 或 `data-href=`。
 
 ### 合并重复工具的判断原则
@@ -289,8 +400,9 @@ git push origin main
 
 - 图标/缩略图优先使用 webp，工具放 `/tools/assets/logo/`，游戏放 `Games/assets/img/`
 - 临时可用内联 SVG data URI，后续替换为正式图片
-- `tools/index.html` 的 `data-name` 和 `data-desc` 用于搜索功能，确保准确
+- `tools/index.html` 的 `data-name` 和 `data-desc` 用于搜索功能，**同时是 GEO 清单的描述来源**，确保准确
 - 工具分类名称和 ID 要对应（如 `info` → `信息聚合`，`time` → `时间与日期`，见「现有分类」清单）
 - 工具路径末尾要有 `/`（卡片 `href`）；但 `index.html` 的 `TOOLS` 数组里 slug **不带** `/`，`GAMES` 数组里 slug **带** `/`，注意区分
-- 完成后简短列出三处改动，便于核对一致性
+- 完成后简短列出各处改动，便于核对一致性
+- `sitemap.xml` / `llms.txt` / `llms-full.txt` 由 `regen-geo.mjs` 生成，**不要手工编辑**（`robots.txt` 是手写文件，不归脚本管）
 - **注册完成后必须立即 `git commit` + `git push origin main`**，只推 Gitee（origin），不推 GitHub（github remote，用户已设置 Gitee→GitHub 镜像自动同步）
