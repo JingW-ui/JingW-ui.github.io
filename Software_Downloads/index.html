@@ -4,71 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
-    <title>Downloads</title>
+    <title>软件下载 - Software Hub</title>
     <style>
         :root {
-            --bg-gradient-1: #e7f1f0;
-            --bg-gradient-2: #dfe9ec;
-            --bg-gradient-3: #e6edf2;
-            --bg-primary: #eef3f4;
-            --bg-secondary: rgba(255, 255, 255, 0.55);
-            --bg-hover: rgba(255, 255, 255, 0.78);
-            --bg-card: rgba(255, 255, 255, 0.50);
-            --accent-primary: #2dd4bf;
-            --accent-secondary: #3b82f6;
-            --text-primary: #2c3e50;
-            --text-secondary: #5a6c7d;
-            --text-muted: #8e9aaf;
-            --border-color: rgba(255, 255, 255, 0.55);
-            --shadow-card: 0 6px 24px rgba(20, 40, 50, 0.08);
-            --shadow-hover: 0 16px 48px rgba(20, 40, 50, 0.16);
-            --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+            /* 纸面清单主题（与 /tools/ 同源）：纯白底 / 黑字 / 灰阶层级 / teal 唯一点缀色 */
+            --bg: #ffffff;
 
-        /* 暗黑主题 */
-        [data-theme="dark"] {
-            --bg-gradient-1: #14181c;
-            --bg-gradient-2: #1a1f24;
-            --bg-gradient-3: #14181c;
-            --bg-primary: #14181c;
-            --bg-secondary: rgba(255, 255, 255, 0.08);
-            --bg-hover: rgba(255, 255, 255, 0.14);
-            --bg-card: rgba(40, 50, 60, 0.45);
-            --accent-primary: #2dd4bf;
-            --accent-secondary: #7dd3fc;
-            --text-primary: #e8eef2;
-            --text-secondary: #aab4bf;
-            --text-muted: #7a8590;
-            --border-color: rgba(255, 255, 255, 0.10);
-            --shadow-card: 0 6px 24px rgba(0, 0, 0, 0.35);
-            --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.5);
+            --chip: #f5f5f5;          /* 卡片默认浅灰 */
+            --chip-hover: #ffffff;    /* hover 反转为白 + 黑边浮现 */
+            --line: #e5e5e5;          /* 分隔线 */
+            --line-strong: #111111;   /* hover 黑边 */
+
+            --text: #111111;
+            --text-soft: #555555;
+            --text-dim: #999999;
+
+            --accent: #0d9488;        /* teal-600：白底小字可读 */
+            --accent-2: #0d9488;
+            --accent-green: #0d9488;
+            --accent-raw: #2dd4bf;    /* 原始 teal：非文字点缀（竖条/selection） */
+
+            --shadow-sm: none;
+            --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-lg: none;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+
+            --transition: all 0.2s ease;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'WenQuanYi Micro Hei', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
-            background-attachment: fixed;
-            color: var(--text-primary);
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
             min-height: 100vh;
-            padding: 40px 20px 20px;
+            padding: 30px 20px 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            position: relative;
             overflow-x: hidden;
         }
 
-        /* 背景光斑装饰 */
-        .bg-decoration { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.4; pointer-events: none; z-index: 0; }
-        .bg-decoration-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(94,234,212,0.30) 0%, transparent 70%); top: -180px; left: -120px; animation: float 22s ease-in-out infinite; }
-        .bg-decoration-2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(125,211,252,0.28) 0%, transparent 70%); bottom: -140px; right: -120px; animation: float 26s ease-in-out infinite reverse; }
-        .bg-decoration-3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%); top: 48%; left: 52%; transform: translate(-50%, -50%); animation: pulse 16s ease-in-out infinite; }
-        [data-theme="dark"] .bg-decoration { opacity: 0.25; }
-        @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 33% { transform: translate(30px, -30px) rotate(120deg); } 66% { transform: translate(-20px, 20px) rotate(240deg); } }
-        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.45; } }
+        ::selection { background: rgba(45, 212, 191, 0.22); }
+
+        :focus-visible { outline: 2px solid var(--accent-raw); outline-offset: 2px; border-radius: 4px; }
 
         .container {
             max-width: 1200px;
@@ -80,211 +72,419 @@
         /* 标题区域 */
         .title-section {
             text-align: center;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(18px);
+            animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.02s forwards;
         }
 
         h1 {
             font-size: 1.5rem;
             margin-bottom: 0.3rem;
             line-height: 1.2;
-            color: var(--text-primary);
+            color: var(--text);
         }
 
         .highlight {
+            color: var(--text);
             display: block;
             font-size: 1.7rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #3b82f6, #2dd4bf);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            letter-spacing: -0.5px;
         }
 
         .subtitle {
             font-size: 0.85rem;
-            color: var(--text-secondary);
+            color: var(--text-soft);
             margin-bottom: 0.5rem;
         }
 
         .stats-banner {
-            background: var(--bg-secondary);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            color: var(--text-secondary);
-            padding: 0.25rem 0.8rem;
+            background-color: transparent;
+            color: var(--text-dim);
+            padding: 0.35rem 1rem;
             border-radius: 999px;
             font-size: 0.75rem;
             display: inline-flex;
             align-items: center;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--line);
             margin-top: 0.3rem;
         }
 
-        /* 软件网格 */
-        .software-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 8px;
-            padding: 0;
+        .hint-line {
+            margin-top: 0.45rem;
+            font-size: 0.7rem;
+            color: var(--text-dim);
         }
 
-        .software-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(20px) saturate(140%);
-            -webkit-backdrop-filter: blur(20px) saturate(140%);
-            border-radius: 16px;
-            padding: 0;
-            border: 1px solid var(--border-color);
+        .hint-os {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .hint-line a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .hint-line a:hover {
+            text-decoration: underline;
+        }
+
+        /* 搜索框 + 分类快筛 */
+        .search-container {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(14px);
+            animation: rise 0.45s ease 0.08s forwards;
+        }
+
+        .search-bar {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 8px 5px 0;
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
             transition: var(--transition);
+        }
+
+        .search-bar:focus-within {
+            border-color: var(--line-strong);
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 0;
+            padding: 10px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 0.85rem;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .search-box:focus {
+            outline: none;
+        }
+
+        .search-box::placeholder {
+            color: var(--text-dim);
+        }
+
+        .quick-filter {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+            padding-left: 10px;
+            border-left: 1px solid var(--line);
+        }
+
+        .qf-chip {
+            padding: 5px 10px;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 0.68rem;
+            font-family: inherit;
+            line-height: 1.2;
+            cursor: pointer;
+            user-select: none;
+            transition: var(--transition);
+        }
+
+        .qf-chip:hover {
+            background: var(--chip);
+            color: var(--text);
+        }
+
+        .qf-chip.active {
+            background: rgba(45, 212, 191, 0.10);
+            border-color: rgba(13, 148, 136, 0.45);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* 搜索空状态 */
+        .empty-state {
+            display: none;
+            text-align: center;
+            padding: 3.5rem 0 2rem;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        /* 分区：纸面清单——拆掉包裹框，仅靠标题 + 1px 顶线 + 留白分区 */
+        .category-section,
+        .featured-section {
+            background: none;
+            border: none;
+            border-top: 1px solid var(--line);
+            border-radius: 0;
+            padding: 16px 0 8px;
+            box-shadow: none;
+            margin-bottom: 1.4rem;
+        }
+
+        .featured-section { border-top: none; padding-top: 4px; }
+
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.6rem;
+            padding-left: 11px;
             position: relative;
-            overflow: hidden;
+            letter-spacing: 0.3px;
+        }
+
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 14px;
+            border-radius: 1px;
+            background: var(--accent-raw);
+        }
+
+        .section-count {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-dim);
+            margin-left: 8px;
+        }
+
+        /* 推荐下载：大图标竖排卡 */
+        .featured-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .featured-card {
+            background: var(--bg);
+            border-radius: var(--radius-md);
+            padding: 16px 8px 14px;
+            border: 1px solid var(--line);
+            box-shadow: none;
+            transition: border-color 0.2s ease,
+                        background 0.2s ease;
             display: flex;
             flex-direction: column;
-            min-height: 120px;
-            box-shadow: var(--shadow-card);
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+            text-decoration: none;
+            animation: rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
         }
 
-        .software-card:hover {
-            border-color: rgba(45, 212, 191, 0.4);
-            transform: perspective(800px) rotateX(1.5deg) rotateY(-1.5deg) translateY(-3px) scale(1.015);
-            box-shadow: var(--shadow-hover);
-            backdrop-filter: blur(28px) saturate(170%);
-            -webkit-backdrop-filter: blur(28px) saturate(170%);
+        .featured-card:hover {
+            background: var(--bg);
+            border-color: var(--line-strong);
         }
 
-        .software-card-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            padding: 8px 8px 0 8px;
-            margin-bottom: 36px;
-        }
-
-        .software-icon {
-            width: 32px;
-            height: 32px;
-            min-width: 32px;
-            background: var(--bg-secondary);
-            border-radius: 4px;
+        .featured-icon {
+            width: 64px;
+            height: 64px;
+            background: transparent;
+            border-radius: var(--radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            border: 1px solid var(--border-color);
+            border: none;
+            box-shadow: none;
+            overflow: hidden;
+            transition: none;
         }
 
-        .software-content {
+        .featured-icon img {
+            width: 42px;
+            height: 42px;
+            object-fit: contain;
+        }
+
+        .featured-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.3;
+            text-align: center;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .featured-meta {
+            font-size: 0.66rem;
+            color: var(--text-dim);
+            line-height: 1.2;
+        }
+
+        /* 软件网格：两列清单行卡片 */
+        .software-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .software-card {
+            background: var(--chip);
+            border-radius: var(--radius-sm);
+            padding: 10px 12px;
+            border: 1px solid transparent;
+            box-shadow: none;
+            transition: background 0.2s ease,
+                        border-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 62px;
+            animation: rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+        }
+
+        .software-card:hover {
+            background: var(--chip-hover);
+            border-color: var(--line-strong);
+        }
+
+        .software-icon {
+            width: 30px;
+            height: 30px;
+            min-width: 30px;
+            background: #ececec;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            border: none;
+            overflow: hidden;
+            box-shadow: none;
+            transition: none;
+        }
+
+        .software-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .software-main {
             flex: 1;
             min-width: 0;
         }
 
-        .software-name {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 3px;
-            line-height: 1.3;
-        }
-
-        .software-description {
-            color: var(--text-secondary);
-            font-size: 0.7rem;
-            line-height: 1.35;
-            margin-bottom: 0;
-            padding-bottom: 8px;
-        }
-
-        .download-btn {
+        .sw-head {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 5px;
-            width: auto;
-            padding: 6px 10px;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            text-decoration: none;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            transition: var(--transition);
-            border: 1px solid var(--border-color);
-            cursor: pointer;
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
+            gap: 6px;
+            min-width: 0;
         }
 
-        .download-btn:hover {
-            background: var(--accent-primary);
-            color: #fff;
-            border-color: var(--accent-primary);
+        .software-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text);
+            line-height: 1.3;
+            letter-spacing: -0.2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .download-icon {
-            font-size: 0.85rem;
-        }
-
-        /* QQ链接特殊样式 */
+        /* QQ 交流群入口：小圆形按钮 */
         .qq-link {
-            font-size: 14px;
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
             text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 50%;
+            line-height: 1;
             transition: var(--transition);
-            display: inline-block;
         }
 
         .qq-link:hover {
-            opacity: 0.7;
+            background: var(--bg);
+            border-color: var(--line-strong);
         }
 
-        .qq-header {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            margin-bottom: 4px;
+        .software-desc {
+            color: var(--text-soft);
+            font-size: 0.72rem;
+            line-height: 1.4;
+            margin-top: 2px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        /* 主题切换按钮 - 底部固定 */
-        .theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 32px;
-            height: 32px;
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
+        /* 下载按钮：白底细线 pill，hover 黑边 */
+        .download-btn {
+            flex-shrink: 0;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            opacity: 0.6;
+            gap: 5px;
+            padding: 7px 13px;
+            background: var(--bg);
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            font-family: inherit;
             transition: var(--transition);
-            z-index: 1000;
-            box-shadow: var(--shadow-card);
+            border: 1px solid var(--line);
+            cursor: pointer;
+            white-space: nowrap;
         }
 
-        .theme-toggle:hover {
-            opacity: 1;
-            transform: scale(1.15);
-            box-shadow: var(--shadow-hover);
+        .download-btn:hover {
+            border-color: var(--line-strong);
+            background: var(--bg);
+        }
+
+        .download-btn:active {
+            transform: scale(0.97);
+        }
+
+        .download-btn svg {
+            width: 13px;
+            height: 13px;
+            flex-shrink: 0;
         }
 
         /* 页脚样式 */
         .footer {
             text-align: center;
-            padding: 20px 0 10px;
-            margin-top: 30px;
-            border-top: 1px solid var(--border-color);
-            color: var(--text-muted);
+            padding: 30px 0 20px;
+            margin-top: 40px;
+            border-top: 1px solid var(--line);
+            color: var(--text-dim);
             font-size: 0.75rem;
+            opacity: 0;
+            animation: rise 0.45s ease 0.3s forwards;
         }
 
         .footer a {
-            color: var(--accent-primary);
+            color: var(--accent);
             text-decoration: none;
             transition: var(--transition);
             display: inline-flex;
@@ -293,7 +493,8 @@
         }
 
         .footer a:hover {
-            opacity: 0.7;
+            opacity: 0.8;
+            text-decoration: underline;
         }
 
         .github-icon {
@@ -302,317 +503,487 @@
             vertical-align: middle;
         }
 
-        /* 访问量统计 - 左下角固定 */
+        /* 动画关键帧 */
+        @keyframes rise {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 访问量统计 - 左下角固定：白底细线 */
         .visit-stats {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 6px 10px;
-            font-size: 0.65rem;
-            color: var(--text-muted);
+            background: var(--bg);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            padding: 8px 14px;
+            font-size: 0.68rem;
+            color: var(--text-dim);
             z-index: 999;
-            box-shadow: var(--shadow-card);
-            opacity: 0.5;
+            opacity: 0.7;
             transition: var(--transition);
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .visit-stats:hover {
-            opacity: 0.9;
+            opacity: 1;
+            border-color: var(--line-strong);
         }
 
         .visit-stats-item {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .visit-count {
-            color: var(--accent-secondary);
-            font-weight: 500;
+            color: var(--accent);
+            font-weight: 600;
         }
 
         /* 响应式设计 */
         @media (max-width: 768px) {
             body {
-                padding: 30px 15px 20px;
+                padding: 22px 12px 16px;
             }
 
             h1 {
-                font-size: 1.4rem;
+                font-size: 1.15rem;
             }
 
             .highlight {
-                font-size: 1.6rem;
+                font-size: 1.3rem;
             }
 
+            .subtitle {
+                font-size: 0.72rem;
+                margin-bottom: 0.35rem;
+            }
+
+            .stats-banner {
+                font-size: 0.62rem;
+                padding: 0.25rem 0.7rem;
+                border-radius: 12px;
+            }
+
+            .search-container {
+                margin-bottom: 0.7rem;
+            }
+
+            .search-bar {
+                flex-wrap: wrap;
+                padding: 3px 8px;
+                border-radius: 14px;
+                gap: 0 6px;
+            }
+
+            .search-box {
+                flex: 1 1 100%;
+                padding: 8px 10px;
+                font-size: 0.75rem;
+            }
+
+            .quick-filter {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid var(--line);
+                padding-left: 0;
+                padding-top: 5px;
+                padding-bottom: 2px;
+                overflow-x: auto;
+                scrollbar-width: none;
+            }
+
+            .quick-filter::-webkit-scrollbar {
+                display: none;
+            }
+
+            .qf-chip {
+                flex: 0 0 auto;
+                padding: 4px 9px;
+                font-size: 0.62rem;
+            }
+
+            .category-section,
+            .featured-section {
+                margin-bottom: 1.1rem;
+                padding: 12px 0 6px;
+            }
+
+            .section-title {
+                font-size: 0.85rem;
+                margin-bottom: 0.5rem;
+            }
+
+            /* 软件网格：单列 */
             .software-grid {
                 grid-template-columns: 1fr;
+                gap: 7px;
+            }
+
+            .software-card {
+                min-height: 56px;
+                padding: 8px 10px;
                 gap: 8px;
             }
 
-            .software-card-header {
-                padding: 6px 6px 0 6px;
+            .software-icon {
+                width: 26px;
+                height: 26px;
+                min-width: 26px;
+                font-size: 12px;
+            }
+
+            .software-name {
+                font-size: 0.74rem;
+            }
+
+            .software-desc {
+                font-size: 0.68rem;
+            }
+
+            .download-btn {
+                padding: 6px 11px;
+                font-size: 0.68rem;
+            }
+
+            /* 推荐下载紧凑化 */
+            .featured-grid {
+                gap: 7px;
+            }
+
+            .featured-card {
+                padding: 12px 6px 10px;
+                border-radius: 14px;
+                gap: 6px;
+            }
+
+            .featured-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: 13px;
+            }
+
+            .featured-icon img {
+                width: 34px;
+                height: 34px;
+            }
+
+            .featured-name {
+                font-size: 0.68rem;
+            }
+
+            .featured-meta {
+                font-size: 0.6rem;
+            }
+
+            .footer {
+                font-size: 0.62rem;
+                padding: 20px 0 14px;
+                margin-top: 24px;
+            }
+
+            .visit-stats {
+                font-size: 0.58rem;
+                padding: 5px 10px;
+                border-radius: 8px;
+                bottom: 12px;
+                left: 12px;
             }
         }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(20,40,50,0.12); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(20,40,50,0.22); }
+        /* 小屏手机 */
+        @media (max-width: 480px) {
+            body { padding: 16px 8px 12px; }
+            h1 { font-size: 1rem; }
+            .highlight { font-size: 1.15rem; }
+            .subtitle { font-size: 0.65rem; }
+            .stats-banner { font-size: 0.56rem; padding: 0.2rem 0.55rem; }
+            .search-box { padding: 6px 10px; font-size: 0.68rem; border-radius: 10px; }
+            .category-section,
+            .featured-section { margin-bottom: 0.9rem; padding: 10px 0 6px; }
+            .section-title { font-size: 0.78rem; margin-bottom: 0.45rem; }
+            .software-grid { gap: 5px; }
+            .software-card { min-height: 50px; padding: 6px 8px; border-radius: 10px; gap: 6px; }
+            .software-icon { width: 22px; height: 22px; min-width: 22px; font-size: 10px; border-radius: 6px; }
+            .software-name { font-size: 0.68rem; }
+            .software-desc { font-size: 0.62rem; }
+            .download-btn { padding: 5px 9px; font-size: 0.62rem; }
+            .download-btn svg { width: 11px; height: 11px; }
+            .qq-link { width: 18px; height: 18px; font-size: 10px; }
+            .featured-icon { width: 46px; height: 46px; border-radius: 11px; }
+            .featured-icon img { width: 30px; height: 30px; }
+            .featured-name { font-size: 0.62rem; }
+            .featured-meta { font-size: 0.56rem; }
+            .footer { font-size: 0.55rem; padding: 14px 0 10px; margin-top: 18px; }
+            .visit-stats { font-size: 0.52rem; padding: 4px 8px; }
+        }
+
+        /* 超小屏 */
+        @media (max-width: 380px) {
+            h1 { font-size: 0.92rem; }
+            .highlight { font-size: 1.05rem; }
+            .subtitle { font-size: 0.6rem; }
+            .stats-banner { font-size: 0.52rem; }
+            .search-box { padding: 5px 8px; font-size: 0.62rem; }
+            .software-card { min-height: 46px; padding: 5px 7px; border-radius: 9px; gap: 5px; }
+            .software-icon { width: 20px; height: 20px; min-width: 20px; font-size: 9px; border-radius: 5px; }
+            .software-name { font-size: 0.62rem; }
+        }
+
+        /* 尊重减少动效偏好 */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+            .software-card, .featured-card, .title-section, .search-container, .footer {
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="bg-decoration bg-decoration-1"></div>
-    <div class="bg-decoration bg-decoration-2"></div>
-    <div class="bg-decoration bg-decoration-3"></div>
-
     <div class="container">
+        <!-- 标题区域 -->
         <div class="title-section">
-            <h1>📦 软件下载中心<span class="highlight">Software Hub</span></h1>
+            <h1><span class="highlight">软件下载</span>Software Hub</h1>
             <p class="subtitle">精选实用工具，提升工作效率</p>
-            <div class="stats-banner">持续更新中 · 永久免费</div>
-            <div style="margin-top: 0.4rem; font-size: 0.7rem; color: var(--text-muted);">
-                💡 提示：目前仅提供 <span style="color: #e74c3c; font-weight: 600;">Windows</span> 版本，其他系统请参考<a href="https://github.com/JingW-ui?tab=repositories" target="_blank" style="color: var(--accent-primary); text-decoration: none;">源码运行</a>
+            <div class="stats-banner">📦 共 11 款 Windows 软件 · 持续更新中 · 永久免费</div>
+            <div class="hint-line">💡 目前仅提供 <span class="hint-os">Windows</span> 版本，其他系统请参考<a href="https://github.com/JingW-ui?tab=repositories" target="_blank" rel="noopener noreferrer">源码运行</a></div>
+        </div>
+
+        <!-- 搜索框 + 分类快筛 -->
+        <div class="search-container">
+            <div class="search-bar">
+                <input type="text" class="search-box" id="searchBox" placeholder="搜索软件名称或描述...">
+                <div class="quick-filter" id="quickFilter">
+                    <button type="button" class="qf-chip active" data-cat="all">全部</button>
+                    <button type="button" class="qf-chip" data-cat="image">图像</button>
+                    <button type="button" class="qf-chip" data-cat="auto">自动化</button>
+                    <button type="button" class="qf-chip" data-cat="ai">AI影像</button>
+                    <button type="button" class="qf-chip" data-cat="data">数据影视</button>
+                </div>
             </div>
         </div>
 
-        <div class="software-grid">
-            <!-- subject_ranking -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">📊</div>
-                    <div class="software-content">
-                        <div class="software-name">学科排名可视化系统</div>
-                        <div class="software-description">
-                            基于Python的交互式学科排名系统，支持5570条学科排名记录的动态筛选、搜索与可视化
-                        </div>
-                    </div>
-                </div>
-                <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/subject_ranking/subject_ranking_1.0.0.exe"
-                   class="download-btn"
-                   download>
-                    <span class="download-icon"></span>
-                    立即下载 v1.0.0
+        <!-- 推荐下载 -->
+        <section class="featured-section" id="featuredSection">
+            <h2 class="section-title">推荐下载</h2>
+            <div class="featured-grid">
+                <a href="https://github.com/JingW-ui/AutoTask-UI-/releases/download/auto_Task2.0.8/auto_Task2.0.8.exe" download class="featured-card" title="自动化任务工具：强大的自动化任务管理工具，智能执行各类任务">
+                    <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23238636' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='16' rx='2'/%3E%3Crect x='9' y='9' width='6' height='6'/%3E%3Cline x1='9' y1='1' x2='9' y2='4'/%3E%3Cline x1='15' y1='1' x2='15' y2='4'/%3E%3Cline x1='9' y1='20' x2='9' y2='23'/%3E%3Cline x1='15' y1='20' x2='15' y2='23'/%3E%3Cline x1='20' y1='9' x2='23' y2='9'/%3E%3Cline x1='20' y1='14' x2='23' y2='14'/%3E%3Cline x1='1' y1='9' x2='4' y2='9'/%3E%3Cline x1='1' y1='14' x2='4' y2='14'/%3E%3C/svg%3E" alt="自动化任务工具"></div>
+                    <span class="featured-name">自动化任务工具</span>
+                    <span class="featured-meta">v2.0.8 · Windows</span>
+                </a>
+                <a href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/MediScreen-Brain/MediScreen-Brain_1.0.3.exe" download class="featured-card" title="MediScreen-Brain：零配置脑肿瘤检测系统，双击即可使用">
+                    <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e36d6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='22 12 18 12 15 21 9 3 6 12 2 12'/%3E%3C/svg%3E" alt="MediScreen-Brain"></div>
+                    <span class="featured-name">MediScreen-Brain</span>
+                    <span class="featured-meta">v1.0.3 · Windows</span>
+                </a>
+                <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/subject_ranking/subject_ranking_1.0.0.exe" download class="featured-card" title="学科排名可视化系统：基于Python的交互式学科排名系统">
+                    <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d9488' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='6' y1='20' x2='6' y2='14'/%3E%3Cline x1='12' y1='20' x2='12' y2='8'/%3E%3Cline x1='18' y1='20' x2='18' y2='4'/%3E%3Cline x1='3' y1='20' x2='21' y2='20'/%3E%3C/svg%3E" alt="学科排名可视化系统"></div>
+                    <span class="featured-name">学科排名可视化系统</span>
+                    <span class="featured-meta">v1.0.0 · Windows</span>
                 </a>
             </div>
+        </section>
 
-            <!-- auto_Submit -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">🤖</div>
-                    <div class="software-content">
-                        <div class="software-name">自动提交工具</div>
-                        <div class="software-description">
-                            自动化任务提交工具，提升工作效率，简化重复性操作流程
+        <!-- 图像处理 -->
+        <section class="category-section" data-category="image">
+            <h2 class="section-title">图像处理<span class="section-count">3</span></h2>
+            <div class="software-grid">
+                <div class="software-card" data-name="图片转GIF工具" data-desc="简单易用的图片转换工具，快速将图片转换为GIF格式" title="简单易用的图片转换工具，快速将图片转换为GIF格式">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f59e0b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpath d='m21 15-5-5L5 21'/%3E%3C/svg%3E" alt="图片转GIF工具"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">图片转GIF工具</h3>
                         </div>
+                        <p class="software-desc">简单易用的图片转换工具，快速将图片转换为GIF格式</p>
                     </div>
+                    <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/img2gif1.0.0.0/img2gif.exe" download class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        立即下载 v1.0.0
+                    </a>
                 </div>
-                <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/auto_Submit/auto_Submit_1.1.4.exe"
-                   class="download-btn"
-                   download>
-                    <span class="download-icon"></span>
-                    立即下载 v1.1.4
-                </a>
-            </div>
 
-            <!-- img2gif -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">🎨</div>
-                    <div class="software-content">
-                        <div class="software-name">图片转GIF工具</div>
-                        <div class="software-description">
-                            简单易用的图片转换工具，快速将图片转换为GIF格式
+                <div class="software-card" data-name="图片布局管理工具" data-desc="专业的图片布局管理工具，轻松组织和排列多张图片" title="专业的图片布局管理工具，轻松组织和排列多张图片">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='7' height='7' rx='1'/%3E%3Crect x='14' y='3' width='7' height='7' rx='1'/%3E%3Crect x='3' y='14' width='7' height='7' rx='1'/%3E%3Crect x='14' y='14' width='7' height='7' rx='1'/%3E%3C/svg%3E" alt="图片布局管理工具"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">图片布局管理工具</h3>
                         </div>
+                        <p class="software-desc">专业的图片布局管理工具，轻松组织和排列多张图片</p>
                     </div>
+                    <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/PicLayouter%E5%9B%BE%E7%89%87%E5%B8%83%E5%B1%80%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/PicLayouter.exe" download class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        立即下载
+                    </a>
                 </div>
-                <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/img2gif1.0.0.0/img2gif.exe"
-                   class="download-btn"
-                   download>
-                    <span class="download-icon"></span>
-                    立即下载 v1.0.0
-                </a>
-            </div>
 
-            <!-- PicLayouter -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">🖼️</div>
-                    <div class="software-content">
-                        <div class="software-name">图片布局管理工具</div>
-                        <div class="software-description">
-                            专业的图片布局管理工具，轻松组织和排列多张图片
+                <div class="software-card" data-name="图片转PDF工具" data-desc="快速将图片转换为PDF文档，支持批量处理和自定义设置" title="快速将图片转换为PDF文档，支持批量处理和自定义设置">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f43f5e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3C/svg%3E" alt="图片转PDF工具"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">图片转PDF工具</h3>
                         </div>
+                        <p class="software-desc">快速将图片转换为PDF文档，支持批量处理和自定义设置</p>
                     </div>
+                    <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/img2pdf/img2pdf.exe" download class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        立即下载
+                    </a>
                 </div>
-                <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/PicLayouter%E5%9B%BE%E7%89%87%E5%B8%83%E5%B1%80%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/PicLayouter.exe"
-                   class="download-btn"
-                   download>
-                    <span class="download-icon"></span>
-                    立即下载
-                </a>
             </div>
+        </section>
 
-            <!-- 通用目标检测系统 -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">🎯</div>
-                    <div class="software-content">
-                        <div class="qq-header">
-                            <div class="software-name" style="margin-bottom: 0;">通用目标检测系统</div>
-                            <a href="https://qm.qq.com/q/aTPre4jHqw"
-                               target="_blank"
-                               class="qq-link"
-                               title="加入QQ交流群">
-                                🐧
-                            </a>
+        <!-- 自动化 -->
+        <section class="category-section" data-category="auto">
+            <h2 class="section-title">自动化<span class="section-count">2</span></h2>
+            <div class="software-grid">
+                <div class="software-card" data-name="自动提交工具" data-desc="自动化任务提交工具，提升工作效率，简化重复性操作流程" title="自动化任务提交工具，提升工作效率，简化重复性操作流程">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m22 2-7 20-4-9-9-4Z'/%3E%3Cpath d='M22 2 11 13'/%3E%3C/svg%3E" alt="自动提交工具"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">自动提交工具</h3>
                         </div>
-                        <div class="software-description">
-                            基于深度学习的通用目标检测系统，支持多种物体识别与定位
-                        </div>
+                        <p class="software-desc">自动化任务提交工具，提升工作效率，简化重复性操作流程</p>
                     </div>
+                    <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/auto_Submit/auto_Submit_1.1.4.exe" download class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        立即下载 v1.1.4
+                    </a>
                 </div>
-                <a href="https://pan.quark.cn/s/e41abe2b6ff6"
-                   class="download-btn"
-                   target="_blank">
-                    <span class="download-icon">☁️</span>
-                    夸克网盘下载
-                </a>
-            </div>
 
-            <!-- img2pdf -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">📄</div>
-                    <div class="software-content">
-                        <div class="software-name">图片转PDF工具</div>
-                        <div class="software-description">
-                            快速将图片转换为PDF文档，支持批量处理和自定义设置
+                <div class="software-card" data-name="自动化任务工具" data-desc="强大的自动化任务管理工具，智能执行各类任务" title="强大的自动化任务管理工具，智能执行各类任务">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23238636' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='16' rx='2'/%3E%3Crect x='9' y='9' width='6' height='6'/%3E%3Cline x1='9' y1='1' x2='9' y2='4'/%3E%3Cline x1='15' y1='1' x2='15' y2='4'/%3E%3Cline x1='9' y1='20' x2='9' y2='23'/%3E%3Cline x1='15' y1='20' x2='15' y2='23'/%3E%3Cline x1='20' y1='9' x2='23' y2='9'/%3E%3Cline x1='20' y1='14' x2='23' y2='14'/%3E%3Cline x1='1' y1='9' x2='4' y2='9'/%3E%3Cline x1='1' y1='14' x2='4' y2='14'/%3E%3C/svg%3E" alt="自动化任务工具"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">自动化任务工具</h3>
+                            <a href="https://qm.qq.com/q/J38INOhJyk" target="_blank" rel="noopener noreferrer" class="qq-link" title="加入QQ交流群">🐧</a>
                         </div>
+                        <p class="software-desc">强大的自动化任务管理工具，智能执行各类任务</p>
                     </div>
+                    <a href="https://github.com/JingW-ui/AutoTask-UI-/releases/download/auto_Task2.0.8/auto_Task2.0.8.exe" download class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        立即下载 v2.0.8
+                    </a>
                 </div>
-                <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/img2pdf/img2pdf.exe"
-                   class="download-btn"
-                   download>
-                    <span class="download-icon"></span>
-                    立即下载
-                </a>
             </div>
+        </section>
 
-            <!-- VIP追剧神器 -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">🎬</div>
-                    <div class="software-content">
-                        <div class="software-name">VIP追剧神器</div>
-                        <div class="software-description">
-                            便捷的影视资源获取工具，让追剧更轻松
+        <!-- AI·医学影像 -->
+        <section class="category-section" data-category="ai">
+            <h2 class="section-title">AI·医学影像<span class="section-count">3</span></h2>
+            <div class="software-grid">
+                <div class="software-card" data-name="通用目标检测系统" data-desc="基于深度学习的通用目标检测系统，支持多种物体识别与定位" title="基于深度学习的通用目标检测系统，支持多种物体识别与定位">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef4444' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Ccircle cx='12' cy='12' r='3'/%3E%3Cline x1='12' y1='2' x2='12' y2='5'/%3E%3Cline x1='12' y1='19' x2='12' y2='22'/%3E%3Cline x1='2' y1='12' x2='5' y2='12'/%3E%3Cline x1='19' y1='12' x2='22' y2='12'/%3E%3C/svg%3E" alt="通用目标检测系统"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">通用目标检测系统</h3>
+                            <a href="https://qm.qq.com/q/aTPre4jHqw" target="_blank" rel="noopener noreferrer" class="qq-link" title="加入QQ交流群">🐧</a>
                         </div>
+                        <p class="software-desc">基于深度学习的通用目标检测系统，支持多种物体识别与定位</p>
                     </div>
+                    <a href="https://pan.quark.cn/s/e41abe2b6ff6" target="_blank" rel="noopener noreferrer" class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        夸克网盘下载
+                    </a>
                 </div>
-                <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/VIP%E8%BF%BD%E5%89%A7%E7%A5%9E%E5%99%A8/VIP.exe"
-                   class="download-btn"
-                   download>
-                    <span class="download-icon"></span>
-                    立即下载
-                </a>
-            </div>
 
-            <!-- DouyinCrawler -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">📱</div>
-                    <div class="software-content">
-                        <div class="software-name">抖音爬虫工具</div>
-                        <div class="software-description">
-                            高效的抖音视频数据采集工具，支持批量下载
+                <div class="software-card" data-name="MediScreen-Brain" data-desc="零配置脑肿瘤检测系统 - 双击即可使用，无需安装依赖" title="零配置脑肿瘤检测系统 - 双击即可使用，无需安装依赖">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e36d6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='22 12 18 12 15 21 9 3 6 12 2 12'/%3E%3C/svg%3E" alt="MediScreen-Brain"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">MediScreen-Brain</h3>
                         </div>
+                        <p class="software-desc">零配置脑肿瘤检测系统 - 双击即可使用，无需安装依赖</p>
                     </div>
+                    <a href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/MediScreen-Brain/MediScreen-Brain_1.0.3.exe" download class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        立即下载 v1.0.3
+                    </a>
                 </div>
-                <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/DouyinCrawler2.1/DouyinCrawler2.1.exe"
-                   class="download-btn"
-                   download>
-                    <span class="download-icon"></span>
-                    立即下载 v2.1
-                </a>
-            </div>
 
-            <!-- AutoTask -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">⚙️</div>
-                    <div class="software-content">
-                        <div class="qq-header">
-                            <div class="software-name" style="margin-bottom: 0;">自动化任务工具</div>
-                            <a href="https://qm.qq.com/q/J38INOhJyk"
-                               target="_blank"
-                               class="qq-link"
-                               title="加入QQ交流群">
-                                🐧
-                            </a>
+                <div class="software-card" data-name="DCM2NII_Converter" data-desc="DICOM转NIfTI格式转换与筛查工具 - 支持自动质量筛查的医学影像转换" title="DICOM转NIfTI格式转换与筛查工具 - 支持自动质量筛查的医学影像转换">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f81f7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='23 4 23 10 17 10'/%3E%3Cpolyline points='1 20 1 14 7 14'/%3E%3Cpath d='M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15'/%3E%3C/svg%3E" alt="DCM2NII_Converter"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">DCM2NII_Converter</h3>
                         </div>
-                        <div class="software-description">
-                            强大的自动化任务管理工具，智能执行各类任务
-                        </div>
+                        <p class="software-desc">DICOM转NIfTI格式转换与筛查工具 - 支持自动质量筛查的医学影像转换</p>
                     </div>
+                    <a href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/dcm2nii_ui/DCM2NII_Converter1.0.1.exe" download class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        立即下载 v1.0.1
+                    </a>
                 </div>
-                <a href="https://github.com/JingW-ui/AutoTask-UI-/releases/download/auto_Task2.0.8/auto_Task2.0.8.exe"
-                   class="download-btn"
-                   download>
-                    <span class="download-icon"></span>
-                    立即下载 v2.0.8
-                </a>
             </div>
+        </section>
 
-            <!-- MediScreen-Brain -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">🧠</div>
-                    <div class="software-content">
-                        <div class="software-name">MediScreen-Brain</div>
-                        <div class="software-description">
-                            零配置脑肿瘤检测系统 - 双击即可使用,无需安装依赖
+        <!-- 数据·影视 -->
+        <section class="category-section" data-category="data">
+            <h2 class="section-title">数据·影视<span class="section-count">3</span></h2>
+            <div class="software-grid">
+                <div class="software-card" data-name="学科排名可视化系统" data-desc="基于Python的交互式学科排名系统，支持5570条学科排名记录的动态筛选、搜索与可视化" title="基于Python的交互式学科排名系统，支持5570条学科排名记录的动态筛选、搜索与可视化">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d9488' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='6' y1='20' x2='6' y2='14'/%3E%3Cline x1='12' y1='20' x2='12' y2='8'/%3E%3Cline x1='18' y1='20' x2='18' y2='4'/%3E%3Cline x1='3' y1='20' x2='21' y2='20'/%3E%3C/svg%3E" alt="学科排名可视化系统"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">学科排名可视化系统</h3>
                         </div>
+                        <p class="software-desc">基于Python的交互式学科排名系统，支持5570条学科排名记录的动态筛选、搜索与可视化</p>
                     </div>
+                    <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/subject_ranking/subject_ranking_1.0.0.exe" download class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        立即下载 v1.0.0
+                    </a>
                 </div>
-                <a href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/MediScreen-Brain/MediScreen-Brain_1.0.3.exe"
-                   class="download-btn"
-                   download>
-                    <span class="download-icon"></span>
-                    立即下载 v1.0.3
-                </a>
-            </div>
-            
-            <!-- DCM2NII_Converter -->
-            <div class="software-card">
-                <div class="software-card-header">
-                    <div class="software-icon">🔄</div>
-                    <div class="software-content">
-                        <div class="software-name">DCM2NII_Converter</div>
-                        <div class="software-description">
-                            DICOM转NIfTI格式转换与筛查工具 - 支持自动质量筛查的医学影像转换
+
+                <div class="software-card" data-name="抖音爬虫工具" data-desc="高效的抖音视频数据采集工具，支持批量下载" title="高效的抖音视频数据采集工具，支持批量下载">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E" alt="抖音爬虫工具"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">抖音爬虫工具</h3>
                         </div>
+                        <p class="software-desc">高效的抖音视频数据采集工具，支持批量下载</p>
                     </div>
+                    <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/DouyinCrawler2.1/DouyinCrawler2.1.exe" download class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        立即下载 v2.1
+                    </a>
                 </div>
-                <a href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/dcm2nii_ui/DCM2NII_Converter1.0.1.exe"
-                   class="download-btn"
-                   download>
-                    <span class="download-icon"></span>
-                    立即下载 v1.0.1
-                </a>
+
+                <div class="software-card" data-name="VIP追剧神器" data-desc="便捷的影视资源获取工具，让追剧更轻松" title="便捷的影视资源获取工具，让追剧更轻松">
+                    <div class="software-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f472b6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='2' y='4' width='20' height='16' rx='3'/%3E%3Cpath d='m10 9 5 3-5 3z'/%3E%3C/svg%3E" alt="VIP追剧神器"></div>
+                    <div class="software-main">
+                        <div class="sw-head">
+                            <h3 class="software-name">VIP追剧神器</h3>
+                        </div>
+                        <p class="software-desc">便捷的影视资源获取工具，让追剧更轻松</p>
+                    </div>
+                    <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/VIP%E8%BF%BD%E5%89%A7%E7%A5%9E%E5%99%A8/VIP.exe" download class="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        立即下载
+                    </a>
+                </div>
             </div>
-        </div>
+        </section>
+
+        <!-- 搜索空状态 -->
+        <div class="empty-state" id="emptyState">未找到匹配的软件，换个关键词试试</div>
 
         <!-- 页脚 -->
         <div class="footer">
             <p>
-                <a href="https://github.com/JingW-ui" target="_blank" title="GitHub">
+                <a href="https://github.com/JingW-ui" target="_blank" rel="noopener noreferrer" title="GitHub">
                     <svg class="github-icon" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                     </svg>
@@ -621,9 +992,6 @@
             </p>
         </div>
     </div>
-
-    <!-- 主题切换按钮 -->
-    <button class="theme-toggle" id="themeToggle" title="切换主题">🌓</button>
 
     <!-- 访问量统计 -->
     <div class="visit-stats" id="visitStats">
@@ -644,31 +1012,19 @@
     </div>
 
     <script>
-        // 主题切换功能
-        const themeToggle = document.getElementById('themeToggle');
-        const html = document.documentElement;
-        
-        // 检查本地存储的主题偏好
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            html.setAttribute('data-theme', savedTheme);
-            updateThemeIcon(savedTheme);
-        }
-        
-        // 切换主题
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
+        // 给卡片添加交错动画延迟
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.software-card');
+            cards.forEach((card, index) => {
+                const delay = (0.18 + index * 0.015).toFixed(3) + 's';
+                card.style.animationDelay = delay;
+            });
+
+            // 推荐卡先于普通卡入场
+            document.querySelectorAll('.featured-card').forEach((card, index) => {
+                card.style.animationDelay = (0.1 + index * 0.05).toFixed(2) + 's';
+            });
         });
-        
-        // 更新图标
-        function updateThemeIcon(theme) {
-            themeToggle.textContent = theme === 'dark' ? '☀️' : '🌓';
-        }
 
         function initVisitStats() {
             const s = document.createElement('script');
@@ -679,7 +1035,7 @@
             };
             document.body.appendChild(s);
         }
-        
+
         function _t(d) {
             const n = new Date();
             const k = n.getFullYear() * 10000 + (n.getMonth() + 1) * 100 + n.getDate();
@@ -691,11 +1047,11 @@
             }
             return Math.abs(h);
         }
-        
+
         function _b() {
             return 15000 + (_t('dl') % 10000);
         }
-        
+
         function updateVisitDisplay() {
             const t = document.getElementById('todayVisits');
             const v = document.getElementById('totalVisits');
@@ -708,7 +1064,68 @@
             }
         }
 
+        // 初始化访问量统计
         initVisitStats();
+
+        // 搜索过滤功能
+        const searchBox = document.getElementById('searchBox');
+        const quickFilter = document.getElementById('quickFilter');
+        let currentSearch = '';
+        let currentCategory = 'all';
+
+        // 搜索功能
+        searchBox.addEventListener('input', (e) => {
+            currentSearch = e.target.value.toLowerCase();
+            filterSoftware();
+        });
+
+        // 分类快筛：单选 toggle，与搜索词 AND 组合
+        quickFilter.addEventListener('click', (e) => {
+            const chip = e.target.closest('.qf-chip');
+            if (!chip) return;
+            quickFilter.querySelectorAll('.qf-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentCategory = chip.dataset.cat;
+            filterSoftware();
+        });
+
+        // 过滤函数：按分类 + 名称/描述匹配，隐藏无结果的区块
+        function filterSoftware() {
+            // 搜索或分类筛选时隐藏推荐区，回到「全部 + 无关键词」后恢复
+            const featured = document.getElementById('featuredSection');
+            if (featured) featured.style.display = (currentSearch || currentCategory !== 'all') ? 'none' : '';
+
+            let visibleTotal = 0;
+            document.querySelectorAll('.category-section').forEach(section => {
+                // 检查分类匹配
+                const catMatch = currentCategory === 'all' || section.dataset.category === currentCategory;
+                let visible = 0;
+                section.querySelectorAll('.software-card').forEach(card => {
+                    const name = (card.dataset.name || '').toLowerCase();
+                    const desc = (card.dataset.desc || '').toLowerCase();
+
+                    // 检查搜索匹配
+                    const searchMatch = !currentSearch ||
+                        name.includes(currentSearch) ||
+                        desc.includes(currentSearch);
+                    const match = catMatch && searchMatch;
+
+                    // 显示或隐藏卡片
+                    card.style.display = match ? 'flex' : 'none';
+                    if (match) visible++;
+                });
+
+                // 隐藏无匹配结果的区块（含分类不匹配的区块）
+                section.style.display = (catMatch && visible) ? '' : 'none';
+                if (catMatch) visibleTotal += visible;
+            });
+
+            // 全部无匹配时显示空状态
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) {
+                emptyState.style.display = visibleTotal ? 'none' : 'block';
+            }
+        }
     </script>
 </body>
 </html>
