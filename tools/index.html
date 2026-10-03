@@ -1067,26 +1067,23 @@
         <div class="empty-state" id="emptyState">未找到匹配的工具，换个关键词试试</div>
     </div>
 
-    <!-- 访问量统计 -->
+    <!-- 本站访问统计（VerCount 真实累计：PV/UV） -->
     <div class="visit-stats" id="visitStats">
         <div class="visit-stats-item">
-            <span>今日:</span>
-            <span class="visit-count" id="todayVisits">-</span>
+            <span>本站访问:</span>
+            <span class="visit-count" id="vercount_value_site_pv">—</span>
         </div>
         <div class="visit-stats-item">
-            <span>总计:</span>
-            <span class="visit-count" id="totalVisits">-</span>
+            <span>本站访客:</span>
+            <span class="visit-count" id="vercount_value_site_uv">—</span>
         </div>
     </div>
 
     <!-- 蒙太奇动画画布（背景层） -->
     <canvas id="montageCanvas"></canvas>
 
-    <!-- 不蒜子统计脚本（隐藏） -->
-    <div style="display: none;">
-        <span id="busuanzi_value_site_pv"></span>
-        <span id="busuanzi_value_site_uv"></span>
-    </div>
+    <!-- VerCount 计数脚本（不蒜子继任者，CN 镜像） -->
+    <script defer src="https://cn.vercount.one/js"></script>
 
     <script>
         /* ============================================================
@@ -1161,46 +1158,9 @@
             });
         });
 
-        function initVisitStats() {
-            const s = document.createElement('script');
-            s.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
-            s.async = true;
-            s.onload = function() {
-                setTimeout(() => { updateVisitDisplay(); }, 1000);
-            };
-            document.body.appendChild(s);
-        }
+        // 蒙太奇动画系统 - 与页面元素交互
         
-        function _t(d) {
-            const n = new Date();
-            const k = n.getFullYear() * 10000 + (n.getMonth() + 1) * 100 + n.getDate();
-            let h = 0;
-            const x = `vc_${k}_${d}`;
-            for (let i = 0; i < x.length; i++) {
-                h = ((h << 5) - h) + x.charCodeAt(i);
-                h = h & h;
-            }
-            return Math.abs(h);
-        }
-        
-        function _b() {
-            return 15000 + (_t('tl') % 10000);
-        }
-        
-        function updateVisitDisplay() {
-            const t = document.getElementById('todayVisits');
-            const v = document.getElementById('totalVisits');
-            const p = document.getElementById('busuanzi_value_site_pv');
-            if (t && v) {
-                const a = parseInt(p?.textContent) || 0;
-                t.textContent = Math.max(a, Math.floor(a * 2.3));
-                const f = a + _b();
-                v.textContent = f.toLocaleString();
-            }
-        }
 
-        // 初始化访问量统计
-        initVisitStats();
 
         // 蒙太奇动画系统 - 与页面元素交互
         class MontageAnimation {
