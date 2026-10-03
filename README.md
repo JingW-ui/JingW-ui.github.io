@@ -1,117 +1,59 @@
-# 👋 王京 (Wang Jing)
+[English](./README.en.md) | 中文
 
-**生物医学工程硕士**  
-📍 成都 ｜ 🏠 重庆  
-📱 177-0237-6984 ｜ 📮 [2642144249@qq.com](mailto:2642144249@qq.com)
+# JingW-ui.github.io
 
----
+> 纯静态个人站点：76 个在线工具、11 款 Windows 软件、36 个网页小游戏，全部免费、无广告、无构建，由 GitHub Pages 托管。
 
-## 🎯 快速导航
+**在线访问**：<https://jingw-ui.github.io>
 
-- [📄 个人简历](https://jingw-ui.github.io/resume/) - 详细履历与技能
-- [🎥 项目演示](https://jingw-ui.github.io/videos/) - 视频展示核心项目
-- [🖼️ 获奖展示](https://jingw-ui.github.io/carousel/) - 竞赛证书与作品图片
-- [🎮 游戏中心](https://jingw-ui.github.io/Games/) - 个人开发的小游戏
-- [🧰 在线工具箱](https://jingw-ui.github.io/tools/) - 76 个免费在线工具，浏览器直接用
-- [📦 软件下载](https://jingw-ui.github.io/softwares/) - 11 款 Windows 免费软件（含开源仓库）
-- [🛠️ 技能库](https://jingw-ui.github.io/skills/) - AI Agent Skills集合
-- [🎬 演示文稿](https://jingw-ui.github.io/ppt/) - 求职面试幻灯片
-- [💻 GitHub](https://github.com/JingW-ui) - 开源代码仓库
+## 项目组成
 
----
+| 模块 | 规模 | 说明 | 技术栈 |
+|------|------|------|--------|
+| [在线工具箱](https://jingw-ui.github.io/tools/) | 76 个 | 浏览器直接使用的实用小工具：图片处理、格式转换、文本与开发辅助等，免安装、免注册 | 原生 HTML / CSS / JS |
+| [软件下载](https://jingw-ui.github.io/softwares/) | 11 款 | Windows 桌面软件发布页：软件介绍、源码仓库与 Release 下载 | Python（PySide6 / PyTorch / YOLOv8） |
+| [游戏中心](https://jingw-ui.github.io/Games/) | 36 个 | 原创网页小游戏：休闲、益智、动作，打开即玩 | Canvas / 原生 JS |
+| [个人主页](https://jingw-ui.github.io/) | — | 全站导航与各模块随机推荐入口 | 原生 HTML / CSS / JS |
+| [简历 / 演示 / 获奖 / 幻灯片](https://jingw-ui.github.io/resume/) | 4 个模块 | resume、videos、carousel、ppt 四组静态页面 | HTML / CSS |
 
-## 🎓 教育背景
+## 数据成果
 
-| 时间 | 学校 | 专业 | 成绩 |
-|------|------|------|------|
-| 2024.09 – 至今 | **[电子科技大学](https://www.uestc.edu.cn)** (985) | 生物医学工程 硕士 | GPA **3.83/4** (前5%) |
-| 2020.09 – 2024.06 | **西南科技大学** | 生物医学工程 本科 | GPA **4.15/5** (前2%, 四川省优秀毕业生) |
+| 指标 | 数据 |
+|------|------|
+| GitHub Stars | ![PI-MAPP](https://img.shields.io/github/stars/JingW-ui/PI-MAPP?style=flat-square&label=PI-MAPP) ![AutoTask-UI-](https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-?style=flat-square&label=AutoTask-UI-) |
+| 软件下载量（Releases） | ![PI-MAPP](https://img.shields.io/github/downloads/JingW-ui/PI-MAPP/total?style=flat-square&label=PI-MAPP) ![AutoTask-UI-](https://img.shields.io/github/downloads/JingW-ui/AutoTask-UI-/total?style=flat-square&label=AutoTask-UI-) ![MediScreen-Brain](https://img.shields.io/github/downloads/JingW-ui/MediScreen-Brain/total?style=flat-square&label=MediScreen-Brain) |
+| B 站播放 | **9.6w+**（截至 2026-10-03：微机原理复习 6.9w · AutoTask 演示 1.4w · 目标检测演示 1.3w） |
 
----
+## 技术栈
 
-## 💼 实习经历
+**本站页面**：![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black) ![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white) ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css&logoColor=white)（原生实现，无框架、无构建）
 
-### 国网宁夏电力有限公司 | 计算机视觉实习生
-`2023.09 – 2023.12`
+**发布软件**：![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white) ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white) ![Qt](https://img.shields.io/badge/Qt-41CD52?style=flat-square&logo=qt&logoColor=black)（GUI 基于 PySide6，视觉模型基于 YOLOv8 / PyTorch）
 
-- 采集 2k+ 带电作业图像,完成数据清洗与标注
-- 基于 YOLOv8+OpenPose 实现头盔佩戴 & 危险姿态识别,mAP@0.5 提升 **7.3%**
-- 撰写《配网不停电作业 AI 行为管控白皮书》被采纳为内部培训材料
+**工程**：![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white) GitHub Pages 自动部署
 
----
+## 目录结构
 
-## 🚀 核心项目
+```
+JingW-ui.github.io/
+├── index.html                              # 个人主页：全站导航 + 随机推荐
+├── tools/                                  # 76 个在线工具（每个工具一个子目录）
+├── softwares/                              # 11 款 Windows 软件的下载索引
+├── Games/                                  # 36 个网页小游戏（每个游戏一个子目录）
+├── resume/  cv/  videos/  carousel/  ppt/  # 简历 / 求职视频 / 获奖画廊 / 幻灯片
+├── skills/                                 # AI Agent Skills
+├── imgs/  resources/                       # 图片与公共资源
+└── sitemap.xml  llms.txt  llms-full.txt  robots.txt   # SEO/GEO：站点地图 + AI 爬虫清单
+```
 
-### 🔬 科研与医疗AI
+交互式结构图：[gitdiagram.com/jingw-ui/jingw-ui.github.io](https://gitdiagram.com/jingw-ui/jingw-ui.github.io)
 
-| 项目 | 技术栈 | 成果 | 链接 |
-|------|--------|------|------|
-| **[NEURA神经影像智能体](https://github.com/NeuroScienceLab/NEURA)** | Agent, LLM, RAG | SCI论文在审 | [biorxiv](https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf) |
-| **[MediScreen-Brain脑肿瘤检测](https://github.com/JingW-ui/MediScreen-Brain)** | YOLO, PyTorch | SCI论文在审 | [Home](https://jingw-ui.github.io/MediScreen-Brain/) |
-| **[海马体自动分割系统](https://jingw-ui.github.io/videos/)** | nnU-Net, 3D Slicer | Dice=0.9554, **国一等奖** | [视频](https://jingw-ui.github.io/videos/) · [证书](https://jingw-ui.github.io/imgs/competitions/9.png) |
-| **[结直肠癌智能检测](https://jingw-ui.github.io/carousel/)** | YOLOv8, Django, MySQL | **全国二等奖/省一等奖** | [排序证明](https://jingw-ui.github.io/carousel/) · [证书](https://jingw-ui.github.io/imgs/competitions/8.png) |
-| **[摔倒行为识别系统](https://jingw-ui.github.io/carousel/)** | YOLO-Pose, OpenPose, Transformer | **四川省一等奖** | [证书](https://jingw-ui.github.io/imgs/competitions/3.png) |
+## 部署
 
-### 💻 应用开发
-
-| 项目 | 技术栈 | Star/用户 | 链接 |
-|------|--------|-----------|------|
-| **[AutoTask自动化办公](https://github.com/JingW-ui/AutoTask-UI-)** | PySide6, PyAutoGUI | 70+ Stars, 150+用户 | [B站](https://www.bilibili.com/video/BV1FzpLzHEWL) · [下载](https://github.com/JingW-ui/AutoTask-UI-/releases) |
-| **[通用目标检测系统](https://github.com/JingW-ui/PI-MAPP/tree/main/project/universal_object_detection_plus)** | YOLOv8-v26, PyTorch | 100+ Stars, 50+用户 | [B站](https://www.bilibili.com/video/BV1dQedz9EKn) · [下载](https://github.com/JingW-ui/PI-MAPP/releases/tag/UniversalObjectDetection) |
-| **[C语言考试系统](https://jingw-ui.github.io/resume/)** | Spring Boot, Vue, MySQL | 校内已上线使用 | [详情](https://jingw-ui.github.io/resume/) |
-
-### 🎓 教育内容
-
-- **[微机原理期末复习](https://www.bilibili.com/video/BV1Sd4y1J7k5/)** - B站播放量 **20w+**, 收藏 **4000+**
+- 纯静态 HTML，push 到 `main` 后 GitHub Pages 自动发布，无构建步骤。
+- `robots.txt` 显式放行 AI 与模型训练爬虫；`llms.txt` / `llms-full.txt` 提供面向大模型的站点索引。
+- AI 快速阅读本仓库：[gitingest.com/JingW-ui/JingW-ui.github.io](https://gitingest.com/JingW-ui/JingW-ui.github.io)
 
 ---
 
-## 🏆 荣誉奖项
-
-### 专利与软著
-- 📜 专利 **2项**: MRI海马体3D智能分析诊断平台等
-- 💿 软著 **4项**: 结直肠息肉检测、摔倒行为识别、批量图像处理、脑肿瘤检测系统
-
-### 竞赛获奖 (部分)
-- 🥇 第九届全国大学生生物医学工程创新设计竞赛 **一等奖** (2024)
-- 🥈 第八届全国大学生生物医学工程创新设计竞赛 **二等奖** (2023)
-- 🥇 第五/四/三届四川省生物医学工程创新设计大赛 **一等奖** ×4 (2023-2025)
-- 🥈 第十届BOE全球创新挑战赛 **二等奖** (2025)
-- 🥈 华为云杯昇腾云血液图像处理大赛 **二等奖** (2025)
-- 🏅 CSIG图像图形技术挑战赛 **第八名** (2025)
-
-> [查看全部获奖经历 →](https://jingw-ui.github.io/resume/#%E8%8E%B7%E5%A5%96%E7%BB%8F%E5%8E%86)
-
----
-
-## 🛠️ 技术栈
-
-**编程语言**: ![Python](https://img.shields.io/badge/-Python-3776AB?style=flat-square&logo=python&logoColor=white) ![Java](https://img.shields.io/badge/-Java-007396?style=flat-square&logo=java&logoColor=white) ![C/C++](https://img.shields.io/badge/-C/C++-00599C?style=flat-square&logo=c&logoColor=white)
-
-**深度学习**: ![PyTorch](https://img.shields.io/badge/-PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white) ![YOLO](https://img.shields.io/badge/-YOLO-00FFFF?style=flat-square) ![nnU-Net](https://img.shields.io/badge/-nnU--Net-000000?style=flat-square)
-
-**框架工具**: ![SpringBoot](https://img.shields.io/badge/-Spring%20Boot-6DB33F?style=flat-square&logo=springboot&logoColor=white) ![Vue](https://img.shields.io/badge/-Vue-4FC08D?style=flat-square&logo=vue.js&logoColor=white) ![MySQL](https://img.shields.io/badge/-MySQL-4479A1?style=flat-square&logo=mysql&logoColor=white) ![Git](https://img.shields.io/badge/-Git-F05032?style=flat-square&logo=git&logoColor=white)
-
-**其他**: Agent开发 · LLM应用 · PySide6 · Django · 3D Slicer · OpenPose · Transformer
-
----
-
-## 🌱 个人生活
-
-- 📸 **佳能摄影师**: 累计拍摄 100+ 组客片,独立完成策划/布光/后期
-- 💪 **健身博主**: 抖音 **5k+** 粉丝,累计获赞 **10w+** ([@京\|自律版](https://www.douyin.com/user/MS4wLjABAAAAgTtnMEWyl9SeEZpMYAJgzY1zEu7sZ5Z2AkwLiN8tags))
-- 🎧 **英语六级**: 可流畅阅读前沿论文 & 技术文档
-- 📺 **B站UP主**: [主页](https://space.bilibili.com/521967044) - 分享技术与学习经验
-
----
-
-## 📊 GitHub Stats
-
-![Stats](https://github-readme-stats-sigma-five.vercel.app/api?username=JingW-ui&show_icons=true&theme=radical&hide_border=true&include_all_commits=true)
-
----
-
-> **"保持好奇,保持谦逊,保持代码整洁。"**  
-> —— 王京 ⛅
-
-[⬆ 返回顶部](#-王京-wang-jing)
+作者背景（教育、竞赛、实习经历）见[在线简历](https://jingw-ui.github.io/resume/)。
