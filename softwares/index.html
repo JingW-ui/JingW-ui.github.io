@@ -466,11 +466,13 @@
         .sw-meta {
             display: flex;
             align-items: center;
+            gap: 5px;
             margin-top: 5px;
             min-width: 0;
         }
 
-        .repo-pill {
+        .repo-pill,
+        .site-pill {
             display: inline-flex;
             align-items: center;
             gap: 4px;
@@ -488,11 +490,21 @@
             white-space: nowrap;
         }
 
-        .repo-pill svg {
+        .repo-pill svg,
+        .site-pill svg {
             width: 11px;
             height: 11px;
             flex-shrink: 0;
             fill: currentColor;
+        }
+
+        .site-pill svg {
+            fill: none;
+            stroke: currentColor;
+        }
+
+        .site-pill {
+            color: var(--accent);
         }
 
         .repo-pill img {
@@ -501,7 +513,8 @@
             display: block;
         }
 
-        .repo-pill:hover {
+        .repo-pill:hover,
+        .site-pill:hover {
             border-color: var(--line-strong);
             color: var(--text);
         }
@@ -730,7 +743,8 @@
                 font-size: 0.58rem;
             }
 
-            .repo-pill {
+            .repo-pill,
+            .site-pill {
                 font-size: 0.6rem;
             }
 
@@ -804,8 +818,10 @@
             .qq-link { height: 16px; padding: 0 5px; font-size: 0.56rem; }
             .qq-link svg { width: 9px; height: 9px; }
             .sw-meta { margin-top: 4px; }
-            .repo-pill { padding: 2px 6px 2px 5px; font-size: 0.56rem; }
-            .repo-pill svg { width: 9px; height: 9px; }
+            .repo-pill,
+            .site-pill { padding: 2px 6px 2px 5px; font-size: 0.56rem; }
+            .repo-pill svg,
+            .site-pill svg { width: 9px; height: 9px; }
             .repo-pill img { height: 11px; }
             .featured-icon { width: 46px; height: 46px; border-radius: 11px; }
             .featured-icon img { width: 30px; height: 30px; }
@@ -887,6 +903,7 @@
                     </a>
                     <div class="featured-pills">
                         <a class="repo-pill" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/MediScreen-Brain"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>MediScreen-Brain</a>
+                        <a class="site-pill" href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" rel="noopener noreferrer" title="官方网站"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>官网</a>
                     </div>
                 </div>
                 <div class="featured-card" data-href="https://github.com/JingW-ui/PI-MAPP/releases/download/subject_ranking/subject_ranking_1.0.0.exe" title="学科排名可视化系统：基于Python的交互式学科排名系统">
@@ -1032,6 +1049,7 @@
                         <!-- MediScreen-Brain 星数暂不展示；恢复方式：在 repo-pill 内补回 <img src="https://img.shields.io/github/stars/JingW-ui/MediScreen-Brain.svg?style=flat-square&label=%E2%98%85&labelColor=ffffff&color=ffffff"> -->
                         <div class="sw-meta">
                             <a class="repo-pill" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/MediScreen-Brain"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>MediScreen-Brain</a>
+                            <a class="site-pill" href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" rel="noopener noreferrer" title="官方网站"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>官网</a>
                         </div>
                     </div>
                     <a href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/MediScreen-Brain/MediScreen-Brain_1.0.3.exe" download class="download-btn">
