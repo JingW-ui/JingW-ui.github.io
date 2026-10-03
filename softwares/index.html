@@ -599,7 +599,7 @@
             }
         }
 
-        /* 访问量统计 - 左下角固定：白底细线 */
+        /* 累计下载量 - 左下角固定：白底细线，取数失败保持隐藏 */
         .visit-stats {
             position: fixed;
             bottom: 20px;
@@ -613,18 +613,25 @@
             z-index: 999;
             opacity: 0.7;
             transition: var(--transition);
-            line-height: 1.6;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 显式规则：author 的 display:flex 会覆盖 UA 对 [hidden] 的隐藏 */
+        .visit-stats[hidden] {
+            display: none;
+        }
+
+        .visit-stats svg {
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
         }
 
         .visit-stats:hover {
             opacity: 1;
             border-color: var(--line-strong);
-        }
-
-        .visit-stats-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .visit-count {
@@ -1150,22 +1157,11 @@
         </div>
     </div>
 
-    <!-- 访问量统计 -->
-    <div class="visit-stats" id="visitStats">
-        <div class="visit-stats-item">
-            <span>今日:</span>
-            <span class="visit-count" id="todayVisits">-</span>
-        </div>
-        <div class="visit-stats-item">
-            <span>总计:</span>
-            <span class="visit-count" id="totalVisits">-</span>
-        </div>
-    </div>
-
-    <!-- 不蒜子统计脚本（隐藏） -->
-    <div style="display: none;">
-        <span id="busuanzi_value_site_pv"></span>
-        <span id="busuanzi_value_site_uv"></span>
+    <!-- 累计下载量（GitHub Releases 真实数据，shields.io 代取并缓存） -->
+    <div class="visit-stats" id="downloadStats" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span>累计下载</span>
+        <span class="visit-count" id="totalDownloads">—</span>
     </div>
 
     <script>
@@ -1191,46 +1187,26 @@
             });
         });
 
-        function initVisitStats() {
-            const s = document.createElement('script');
-            s.src = 'https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js';
-            s.async = true;
-            s.onload = function() {
-                setTimeout(() => { updateVisitDisplay(); }, 1000);
-            };
-            document.body.appendChild(s);
-        }
-
-        function _t(d) {
-            const n = new Date();
-            const k = n.getFullYear() * 10000 + (n.getMonth() + 1) * 100 + n.getDate();
-            let h = 0;
-            const x = `vc_${k}_${d}`;
-            for (let i = 0; i < x.length; i++) {
-                h = ((h << 5) - h) + x.charCodeAt(i);
-                h = h & h;
+        // 累计下载量：GitHub Releases 资产计数求和（shields.io 代取，服务端缓存约 5~60 分钟）
+        // 三个仓库全部取到才显示，任一失败整个 pill 静默隐藏
+        (async () => {
+            const repos = ['PI-MAPP', 'AutoTask-UI-', 'MediScreen-Brain'];
+            try {
+                const results = await Promise.all(repos.map(r =>
+                    fetch(`https://img.shields.io/github/downloads/JingW-ui/${r}/total.json`)
+                        .then(res => { if (!res.ok) throw new Error(res.status); return res.json(); })
+                ));
+                const total = results.reduce((sum, d) => sum + (parseInt(d.value, 10) || 0), 0);
+                const box = document.getElementById('downloadStats');
+                const num = document.getElementById('totalDownloads');
+                if (box && num) {
+                    num.textContent = total.toLocaleString();
+                    box.hidden = false;
+                }
+            } catch (err) {
+                // 取数失败：保持 hidden，页面不显示不完整或错误的数字
             }
-            return Math.abs(h);
-        }
-
-        function _b() {
-            return 15000 + (_t('dl') % 10000);
-        }
-
-        function updateVisitDisplay() {
-            const t = document.getElementById('todayVisits');
-            const v = document.getElementById('totalVisits');
-            const p = document.getElementById('busuanzi_value_site_pv');
-            if (t && v) {
-                const a = parseInt(p?.textContent) || 0;
-                t.textContent = Math.max(a, Math.floor(a * 2.3));
-                const f = a + _b();
-                v.textContent = f.toLocaleString();
-            }
-        }
-
-        // 初始化访问量统计
-        initVisitStats();
+        })();
 
         // 搜索过滤功能
         const searchBox = document.getElementById('searchBox');
