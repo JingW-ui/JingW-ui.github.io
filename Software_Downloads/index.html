@@ -403,25 +403,34 @@
             white-space: nowrap;
         }
 
-        /* QQ 交流群入口：小圆形按钮 */
+        /* QQ 交流群入口：小 pill，含群人数（手动维护） */
         .qq-link {
             flex-shrink: 0;
-            width: 20px;
-            height: 20px;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            text-decoration: none;
+            gap: 3px;
+            height: 18px;
+            padding: 0 6px 0 5px;
             border: 1px solid transparent;
-            border-radius: 50%;
+            border-radius: 999px;
+            font-size: 0.62rem;
+            color: var(--text-dim);
+            text-decoration: none;
             line-height: 1;
             transition: var(--transition);
+        }
+
+        .qq-link svg {
+            width: 11px;
+            height: 11px;
+            flex-shrink: 0;
+            fill: currentColor;
         }
 
         .qq-link:hover {
             background: var(--bg);
             border-color: var(--line-strong);
+            color: var(--text);
         }
 
         .software-desc {
@@ -433,6 +442,50 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+
+        /* 元数据行：开源仓库 pill */
+        .sw-meta {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            min-width: 0;
+        }
+
+        .repo-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            max-width: 100%;
+            padding: 2px 8px 2px 6px;
+            background: var(--bg);
+            color: var(--text-soft);
+            text-decoration: none;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            font-size: 0.64rem;
+            line-height: 1.4;
+            transition: var(--transition);
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .repo-pill svg {
+            width: 11px;
+            height: 11px;
+            flex-shrink: 0;
+            fill: currentColor;
+        }
+
+        .repo-pill img {
+            height: 14px;
+            flex-shrink: 0;
+            display: block;
+        }
+
+        .repo-pill:hover {
+            border-color: var(--line-strong);
+            color: var(--text);
         }
 
         /* 下载按钮：白底细线 pill，hover 黑边 */
@@ -654,6 +707,19 @@
                 font-size: 0.68rem;
             }
 
+            .qq-link {
+                height: 17px;
+                font-size: 0.58rem;
+            }
+
+            .repo-pill {
+                font-size: 0.6rem;
+            }
+
+            .repo-pill img {
+                height: 13px;
+            }
+
             /* 推荐下载紧凑化 */
             .featured-grid {
                 gap: 7px;
@@ -717,7 +783,12 @@
             .software-desc { font-size: 0.62rem; }
             .download-btn { padding: 5px 9px; font-size: 0.62rem; }
             .download-btn svg { width: 11px; height: 11px; }
-            .qq-link { width: 18px; height: 18px; font-size: 10px; }
+            .qq-link { height: 16px; padding: 0 5px; font-size: 0.56rem; }
+            .qq-link svg { width: 9px; height: 9px; }
+            .sw-meta { margin-top: 4px; }
+            .repo-pill { padding: 2px 6px 2px 5px; font-size: 0.56rem; }
+            .repo-pill svg { width: 9px; height: 9px; }
+            .repo-pill img { height: 11px; }
             .featured-icon { width: 46px; height: 46px; border-radius: 11px; }
             .featured-icon img { width: 30px; height: 30px; }
             .featured-name { font-size: 0.62rem; }
@@ -783,16 +854,19 @@
                     <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23238636' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='4' width='16' height='16' rx='2'/%3E%3Crect x='9' y='9' width='6' height='6'/%3E%3Cline x1='9' y1='1' x2='9' y2='4'/%3E%3Cline x1='15' y1='1' x2='15' y2='4'/%3E%3Cline x1='9' y1='20' x2='9' y2='23'/%3E%3Cline x1='15' y1='20' x2='15' y2='23'/%3E%3Cline x1='20' y1='9' x2='23' y2='9'/%3E%3Cline x1='20' y1='14' x2='23' y2='14'/%3E%3Cline x1='1' y1='9' x2='4' y2='9'/%3E%3Cline x1='1' y1='14' x2='4' y2='14'/%3E%3C/svg%3E" alt="自动化任务工具"></div>
                     <span class="featured-name">自动化任务工具</span>
                     <span class="featured-meta">v2.0.8 · Windows</span>
+                    <span class="repo-pill" title="开源仓库 JingW-ui/AutoTask-UI-"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>AutoTask-UI-<img src="https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></span>
                 </a>
                 <a href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/MediScreen-Brain/MediScreen-Brain_1.0.3.exe" download class="featured-card" title="MediScreen-Brain：零配置脑肿瘤检测系统，双击即可使用">
                     <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e36d6e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='22 12 18 12 15 21 9 3 6 12 2 12'/%3E%3C/svg%3E" alt="MediScreen-Brain"></div>
                     <span class="featured-name">MediScreen-Brain</span>
                     <span class="featured-meta">v1.0.3 · Windows</span>
+                    <span class="repo-pill" title="开源仓库 JingW-ui/MediScreen-Brain"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>MediScreen-Brain</span>
                 </a>
                 <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/subject_ranking/subject_ranking_1.0.0.exe" download class="featured-card" title="学科排名可视化系统：基于Python的交互式学科排名系统">
                     <div class="featured-icon"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d9488' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cline x1='6' y1='20' x2='6' y2='14'/%3E%3Cline x1='12' y1='20' x2='12' y2='8'/%3E%3Cline x1='18' y1='20' x2='18' y2='4'/%3E%3Cline x1='3' y1='20' x2='21' y2='20'/%3E%3C/svg%3E" alt="学科排名可视化系统"></div>
                     <span class="featured-name">学科排名可视化系统</span>
                     <span class="featured-meta">v1.0.0 · Windows</span>
+                    <span class="repo-pill" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></span>
                 </a>
             </div>
         </section>
@@ -808,6 +882,9 @@
                             <h3 class="software-name">图片转GIF工具</h3>
                         </div>
                         <p class="software-desc">简单易用的图片转换工具，快速将图片转换为GIF格式</p>
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/PI-MAPP" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                        </div>
                     </div>
                     <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/img2gif1.0.0.0/img2gif.exe" download class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -822,6 +899,9 @@
                             <h3 class="software-name">图片布局管理工具</h3>
                         </div>
                         <p class="software-desc">专业的图片布局管理工具，轻松组织和排列多张图片</p>
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/PI-MAPP" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                        </div>
                     </div>
                     <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/PicLayouter%E5%9B%BE%E7%89%87%E5%B8%83%E5%B1%80%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7/PicLayouter.exe" download class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -836,6 +916,9 @@
                             <h3 class="software-name">图片转PDF工具</h3>
                         </div>
                         <p class="software-desc">快速将图片转换为PDF文档，支持批量处理和自定义设置</p>
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/PI-MAPP" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                        </div>
                     </div>
                     <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/img2pdf/img2pdf.exe" download class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -856,6 +939,9 @@
                             <h3 class="software-name">自动提交工具</h3>
                         </div>
                         <p class="software-desc">自动化任务提交工具，提升工作效率，简化重复性操作流程</p>
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/PI-MAPP" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                        </div>
                     </div>
                     <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/auto_Submit/auto_Submit_1.1.4.exe" download class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -868,9 +954,12 @@
                     <div class="software-main">
                         <div class="sw-head">
                             <h3 class="software-name">自动化任务工具</h3>
-                            <a href="https://qm.qq.com/q/J38INOhJyk" target="_blank" rel="noopener noreferrer" class="qq-link" title="加入QQ交流群">🐧</a>
+                            <a href="https://qm.qq.com/q/J38INOhJyk" target="_blank" rel="noopener noreferrer" class="qq-link" title="QQ 交流群 · 150+ 人（2026-10）"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>QQ</title><path d="M21.395 15.035a40 40 0 0 0-.803-2.264l-1.079-2.695c.001-.032.014-.562.014-.836C19.526 4.632 17.351 0 12 0S4.474 4.632 4.474 9.241c0 .274.013.804.014.836l-1.08 2.695a39 39 0 0 0-.802 2.264c-1.021 3.283-.69 4.643-.438 4.673.54.065 2.103-2.472 2.103-2.472 0 1.469.756 3.387 2.394 4.771-.612.188-1.363.479-1.845.835-.434.32-.379.646-.301.778.343.578 5.883.369 7.482.189 1.6.18 7.14.389 7.483-.189.078-.132.132-.458-.301-.778-.483-.356-1.233-.646-1.846-.836 1.637-1.384 2.393-3.302 2.393-4.771 0 0 1.563 2.537 2.103 2.472.251-.03.581-1.39-.438-4.673"/></svg>150+人</a>
                         </div>
                         <p class="software-desc">强大的自动化任务管理工具，智能执行各类任务</p>
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/AutoTask-UI-" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/AutoTask-UI-"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>AutoTask-UI-<img src="https://img.shields.io/github/stars/JingW-ui/AutoTask-UI-.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                        </div>
                     </div>
                     <a href="https://github.com/JingW-ui/AutoTask-UI-/releases/download/auto_Task2.0.8/auto_Task2.0.8.exe" download class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -889,9 +978,12 @@
                     <div class="software-main">
                         <div class="sw-head">
                             <h3 class="software-name">通用目标检测系统</h3>
-                            <a href="https://qm.qq.com/q/aTPre4jHqw" target="_blank" rel="noopener noreferrer" class="qq-link" title="加入QQ交流群">🐧</a>
+                            <a href="https://qm.qq.com/q/aTPre4jHqw" target="_blank" rel="noopener noreferrer" class="qq-link" title="QQ 交流群 · 50+ 人（2026-10）"><svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><title>QQ</title><path d="M21.395 15.035a40 40 0 0 0-.803-2.264l-1.079-2.695c.001-.032.014-.562.014-.836C19.526 4.632 17.351 0 12 0S4.474 4.632 4.474 9.241c0 .274.013.804.014.836l-1.08 2.695a39 39 0 0 0-.802 2.264c-1.021 3.283-.69 4.643-.438 4.673.54.065 2.103-2.472 2.103-2.472 0 1.469.756 3.387 2.394 4.771-.612.188-1.363.479-1.845.835-.434.32-.379.646-.301.778.343.578 5.883.369 7.482.189 1.6.18 7.14.389 7.483-.189.078-.132.132-.458-.301-.778-.483-.356-1.233-.646-1.846-.836 1.637-1.384 2.393-3.302 2.393-4.771 0 0 1.563 2.537 2.103 2.472.251-.03.581-1.39-.438-4.673"/></svg>50+人</a>
                         </div>
                         <p class="software-desc">基于深度学习的通用目标检测系统，支持多种物体识别与定位</p>
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/PI-MAPP" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                        </div>
                     </div>
                     <a href="https://pan.quark.cn/s/e41abe2b6ff6" target="_blank" rel="noopener noreferrer" class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
@@ -906,6 +998,10 @@
                             <h3 class="software-name">MediScreen-Brain</h3>
                         </div>
                         <p class="software-desc">零配置脑肿瘤检测系统 - 双击即可使用，无需安装依赖</p>
+                        <!-- MediScreen-Brain 星数暂不展示；恢复方式：在 repo-pill 内补回 <img src="https://img.shields.io/github/stars/JingW-ui/MediScreen-Brain.svg?style=flat-square&label=%E2%98%85&labelColor=ffffff&color=ffffff"> -->
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/MediScreen-Brain"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>MediScreen-Brain</a>
+                        </div>
                     </div>
                     <a href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/MediScreen-Brain/MediScreen-Brain_1.0.3.exe" download class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -920,6 +1016,9 @@
                             <h3 class="software-name">DCM2NII_Converter</h3>
                         </div>
                         <p class="software-desc">DICOM转NIfTI格式转换与筛查工具 - 支持自动质量筛查的医学影像转换</p>
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/MediScreen-Brain"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>MediScreen-Brain</a>
+                        </div>
                     </div>
                     <a href="https://github.com/JingW-ui/MediScreen-Brain/releases/download/dcm2nii_ui/DCM2NII_Converter1.0.1.exe" download class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -940,6 +1039,9 @@
                             <h3 class="software-name">学科排名可视化系统</h3>
                         </div>
                         <p class="software-desc">基于Python的交互式学科排名系统，支持5570条学科排名记录的动态筛选、搜索与可视化</p>
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/PI-MAPP" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                        </div>
                     </div>
                     <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/subject_ranking/subject_ranking_1.0.0.exe" download class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -954,6 +1056,9 @@
                             <h3 class="software-name">抖音爬虫工具</h3>
                         </div>
                         <p class="software-desc">高效的抖音视频数据采集工具，支持批量下载</p>
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/PI-MAPP" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                        </div>
                     </div>
                     <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/DouyinCrawler2.1/DouyinCrawler2.1.exe" download class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -968,6 +1073,9 @@
                             <h3 class="software-name">VIP追剧神器</h3>
                         </div>
                         <p class="software-desc">便捷的影视资源获取工具，让追剧更轻松</p>
+                        <div class="sw-meta">
+                            <a class="repo-pill" href="https://github.com/JingW-ui/PI-MAPP" target="_blank" rel="noopener noreferrer" title="开源仓库 JingW-ui/PI-MAPP"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>PI-MAPP<img src="https://img.shields.io/github/stars/JingW-ui/PI-MAPP.svg?style=flat-square&amp;label=%E2%98%85&amp;labelColor=ffffff&amp;color=ffffff" alt="stars" loading="lazy" onerror="this.style.display='none'"></a>
+                        </div>
                     </div>
                     <a href="https://github.com/JingW-ui/PI-MAPP/releases/download/VIP%E8%BF%BD%E5%89%A7%E7%A5%9E%E5%99%A8/VIP.exe" download class="download-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
