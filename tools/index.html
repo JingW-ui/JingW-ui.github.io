@@ -634,7 +634,7 @@
                 transform: none !important;
             }
         }
-        /* 仓库入口（页面右上角）：白底细线，hover 黑边 */
+        /* 仓库入口（页面右上角）：无框纯黑 octocat */
         .repo-actions {
             position: absolute;
             top: 22px;
@@ -649,14 +649,13 @@
             display: grid;
             place-items: center;
             border-radius: var(--radius-sm);
-            background: var(--bg);
-            border: 1px solid var(--line);
+            background: transparent;
             box-shadow: none;
-            color: var(--text-soft);
+            color: var(--text);
             transition: var(--transition);
         }
-        .repo-btn:hover { background: var(--chip-hover); border-color: var(--line-strong); color: var(--text); }
-        .repo-btn svg { width: 17px; height: 17px; fill: currentColor; }
+        .repo-btn:hover { opacity: 0.65; }
+        .repo-btn svg { width: 22px; height: 22px; fill: currentColor; }
     </style>
 </head>
 <body>
