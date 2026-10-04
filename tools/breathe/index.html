@@ -157,7 +157,7 @@
             text-indent: 0.3rem;
             margin-bottom: 0.4rem;
             color: var(--text);
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, color 0.6s ease;
         }
 
         #timer {
@@ -166,6 +166,13 @@
             font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
             color: var(--text-soft);
             opacity: 0.9;
+            transition: color 0.6s ease;
+        }
+
+        /* 运行中：白字浮于绿圈之上（停止后回落深色，避免小圈阶段出圈隐形） */
+        body.running #status,
+        body.running #timer {
+            color: #ffffff;
         }
 
         /* 底部控制按钮 */
@@ -287,6 +294,7 @@
 
         function startBreathing() {
             isRunning = true;
+            document.body.classList.add('running');
             startBtn.textContent = '停止';
             startBtn.classList.add('running');
             currentPhaseIndex = 0;
@@ -295,6 +303,7 @@
 
         function stopBreathing() {
             isRunning = false;
+            document.body.classList.remove('running');
             startBtn.textContent = '开始练习';
             startBtn.classList.remove('running');
             clearTimeout(stateInterval);
