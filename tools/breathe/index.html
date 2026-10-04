@@ -160,6 +160,11 @@
             transition: opacity 0.3s, color 0.6s ease;
         }
 
+        /* 静止态不显示状态字，倒计时独占居中 */
+        #status:empty {
+            display: none;
+        }
+
         #timer {
             font-size: 2.8rem;
             font-weight: 300;
@@ -229,7 +234,7 @@
         <div class="guide-circle"></div>
         <div class="breathing-circle" id="circle"></div>
         <div class="text-overlay">
-            <span id="status">准备开始</span>
+            <span id="status"></span>
             <span id="timer">-</span>
         </div>
     </div>
@@ -312,7 +317,7 @@
         }
 
         function resetUI() {
-            statusText.textContent = '准备开始';
+            statusText.textContent = '';
             timerText.textContent = '-';
             circle.style.transition = 'all 1s ease-in-out';
             circle.style.transform = 'scale(1)';
