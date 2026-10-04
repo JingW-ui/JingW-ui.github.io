@@ -115,87 +115,6 @@
         .src-badge:hover { opacity: 1; background: rgba(20, 40, 50, 0.6); transform: scale(1.08); }
         .src-badge svg { width: 14px; height: 14px; fill: currentColor; }
 
-        /* one-shot 标签（Claude Opus 5.5 一句话实测三作，左上角） */
-        .os-badge {
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            z-index: 2;
-            border: 1px solid rgba(190, 140, 255, 0.35);
-            border-radius: 999px;
-            padding: 3px 9px;
-            background: rgba(138, 43, 226, 0.28);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            color: #f3e8ff;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.4px;
-            line-height: 1.4;
-            font-family: inherit;
-            cursor: pointer;
-            transition: background 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
-        }
-        .os-badge:hover {
-            background: rgba(138, 43, 226, 0.45);
-            border-color: rgba(190, 140, 255, 0.6);
-            transform: scale(1.05);
-        }
-
-        /* one-shot 门户提示面板（挂 body，fixed 定位，不受卡片 overflow:hidden 裁剪） */
-        .os-tip {
-            position: fixed;
-            z-index: 999;
-            max-width: 340px;
-            padding: 13px 14px 11px;
-            border-radius: 12px;
-            background: rgba(16, 24, 34, 0.92);
-            backdrop-filter: blur(16px) saturate(140%);
-            -webkit-backdrop-filter: blur(16px) saturate(140%);
-            border: 1px solid rgba(190, 140, 255, 0.3);
-            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
-            color: #e8edf4;
-            font-size: 12.5px;
-            line-height: 1.55;
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-            transition: opacity 0.15s ease;
-        }
-        .os-tip.show { opacity: 1; visibility: visible; pointer-events: auto; }
-        .os-head { font-weight: 700; color: #d8b4fe; letter-spacing: 0.5px; margin-bottom: 7px; }
-        .os-row { display: flex; gap: 8px; margin-bottom: 2px; }
-        .os-row span { color: #8b98a9; min-width: 44px; }
-        .os-row b { color: #fff; font-weight: 600; }
-        .os-label {
-            margin: 8px 0 5px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            color: #8b98a9;
-            font-size: 11.5px;
-            letter-spacing: 0.5px;
-        }
-        .os-quote {
-            margin: 0 0 8px;
-            padding: 7px 10px;
-            border-left: 3px solid rgba(138, 43, 226, 0.55);
-            background: rgba(138, 43, 226, 0.10);
-            border-radius: 0 8px 8px 0;
-            white-space: pre-line;
-        }
-        .os-src {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding-top: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            color: #9ecbff;
-            font-size: 12px;
-            text-decoration: none;
-        }
-        .os-src:hover { color: #c3e0ff; text-decoration: underline; }
-        .os-src svg { width: 13px; height: 13px; fill: currentColor; flex: none; }
-
         .page-subtitle {
             color: var(--text-secondary);
             font-size: 1.05em;
@@ -616,6 +535,8 @@
     <div class="empty-tip" id="empty-tip">没有匹配的游戏，换个关键词试试</div>
 </div>
 
+<script src="assets/one-shot.js" defer></script>
+
 <script>
     const container = document.getElementById('games-container');
     const cards = Array.from(container.querySelectorAll('.game-card'));
@@ -642,99 +563,6 @@
         a.addEventListener('click', e => e.stopPropagation());
         card.appendChild(a);
     });
-
-    // 三张 Claude Opus 5.5「一句话 one-shot」实测卡：左上角标签 + 门户提示面板
-    // 提示词原文照录上游 README（riba2534/claude-opus-5-5-demo），一字未改
-    const ONE_SHOT_REPO = 'riba2534/claude-opus-5-5-demo';
-    const ONE_SHOT = {
-        'pelican-bike': { prompt: '生成一个鹈鹕骑自行车的 3D 页面，尽可能把你所有的能力全部都用上. 然后上传到 CDN 上, 把访问链接给我' },
-        'cf-transport-ship': { prompt: '尽可能真实的还原穿越火线中的运输船地图，我需要一个真实的枪战游戏，生成一个3d页面，尽可能发挥你的所有能力\n做完之后上传到 CDN 上 把链接发给我' },
-        'qq-speed': { prompt: '尽可能真实地还原 QQ 飞车中的游戏地图。我需要一个真实的 QQ 飞车游戏，包括游戏的各种键位以及漂移玩法,生成一个3D 页面，尽可能发挥你的所有能力。\n做完之后上传到 CDN 上 把链接发给我' }
-    };
-    const osTip = document.createElement('div');
-    osTip.className = 'os-tip';
-    osTip.setAttribute('role', 'tooltip');
-    document.body.appendChild(osTip);
-    let osCurBadge = null, osShowTimer = null, osHideTimer = null;
-    const osSlugOf = c => (c.dataset.href || '').replace(/^\/?Games\//, '').replace(/\/+$/, '');
-
-    function osRender(card) {
-        const cfg = ONE_SHOT[osSlugOf(card)];
-        osTip.innerHTML =
-            '<div class="os-head">⚡ ONE-SHOT · 一句话完整生成</div>' +
-            '<div class="os-row"><span>agent</span><b>Claude Code CLI</b></div>' +
-            '<div class="os-row"><span>model</span><b>Claude Opus 5.5</b></div>' +
-            '<div class="os-label">提示词原文 · 一字未改</div>' +
-            '<blockquote class="os-quote"></blockquote>' +
-            '<a class="os-src" href="https://github.com/' + ONE_SHOT_REPO + '" target="_blank" rel="noopener noreferrer">' + GH_ICON + '源: ' + ONE_SHOT_REPO + '</a>';
-        osTip.querySelector('.os-quote').textContent = cfg.prompt;
-    }
-
-    function osPlace(badge) {
-        const r = badge.getBoundingClientRect();
-        const w = Math.min(340, window.innerWidth - 24);
-        let left = Math.min(Math.max(r.left, 12), window.innerWidth - 12 - w);
-        osTip.style.width = w + 'px';
-        osTip.style.left = left + 'px';
-        osTip.classList.add('show');                 // 先可见才能量高度
-        let top = r.bottom + 8;
-        if (top + osTip.offsetHeight > window.innerHeight - 12) top = r.top - osTip.offsetHeight - 8;
-        osTip.style.top = Math.max(top, 12) + 'px';
-    }
-
-    function osHideNow() {
-        clearTimeout(osShowTimer);
-        clearTimeout(osHideTimer);
-        osTip.classList.remove('show');
-        if (osCurBadge) osCurBadge.setAttribute('aria-expanded', 'false');
-        osCurBadge = null;
-    }
-    const osHideSoon = () => { clearTimeout(osShowTimer); clearTimeout(osHideTimer); osHideTimer = setTimeout(osHideNow, 90); };
-    const osShow = (badge, card) => {
-        if (osCurBadge === badge) return;
-        clearTimeout(osHideTimer);
-        clearTimeout(osShowTimer);
-        osShowTimer = setTimeout(() => {
-            osRender(card);
-            osCurBadge = badge;
-            badge.setAttribute('aria-expanded', 'true');
-            osPlace(badge);
-        }, 150);
-    };
-
-    Object.keys(ONE_SHOT).forEach(slug => {
-        const card = cards.find(c => osSlugOf(c) === slug);
-        if (!card) return;
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'os-badge';
-        b.textContent = '⚡ one-shot';
-        b.setAttribute('aria-haspopup', 'dialog');
-        b.setAttribute('aria-expanded', 'false');
-        b.setAttribute('aria-label', 'one-shot 实测：agent Claude Code CLI，model Claude Opus 5.5，一句提示词完整生成');
-        b.addEventListener('mouseenter', () => osShow(b, card));
-        b.addEventListener('mouseleave', osHideSoon);
-        b.addEventListener('focus', () => osShow(b, card));
-        b.addEventListener('blur', osHideSoon);
-        b.addEventListener('click', e => {
-            e.stopPropagation();                      // 防触发卡片跳转（触屏主路径）
-            if (osCurBadge === b && osTip.classList.contains('show')) { osHideNow(); return; }
-            clearTimeout(osShowTimer);
-            clearTimeout(osHideTimer);
-            osRender(card);
-            osCurBadge = b;
-            b.setAttribute('aria-expanded', 'true');
-            osPlace(b);
-        });
-        card.appendChild(b);
-    });
-
-    osTip.addEventListener('mouseenter', () => clearTimeout(osHideTimer));  // 移入面板可点源仓库链接
-    osTip.addEventListener('mouseleave', osHideSoon);
-    document.addEventListener('click', e => { if (osCurBadge && !osTip.contains(e.target)) osHideNow(); });
-    window.addEventListener('scroll', osHideNow, true);
-    window.addEventListener('resize', osHideNow);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') osHideNow(); });
 
     // 入场动画（首次 + 每次过滤后重新交错浮现）
     function animateCards() {
