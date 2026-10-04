@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url><loc>https://jingw-ui.github.io/tools/</loc><lastmod>2026-10-03</lastmod></url>
-    <url><loc>https://jingw-ui.github.io/softwares/</loc><lastmod>2026-10-03</lastmod></url>
-    <url><loc>https://jingw-ui.github.io/Games/</loc><lastmod>2026-10-03</lastmod></url>
+    <url><loc>https://jingw-ui.github.io/tools/</loc><lastmod>2026-10-04</lastmod></url>
+    <url><loc>https://jingw-ui.github.io/softwares/</loc><lastmod>2026-10-04</lastmod></url>
+    <url><loc>https://jingw-ui.github.io/Games/</loc><lastmod>2026-10-04</lastmod></url>
     <url><loc>https://jingw-ui.github.io/tools/01-json-formatter/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/tools/02-url-encoder/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/tools/03-base64-codec/</loc><lastmod>2026-10-03</lastmod></url>
@@ -85,6 +85,7 @@
     <url><loc>https://jingw-ui.github.io/Games/bait-fish/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/ball/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/bird/</loc><lastmod>2026-10-03</lastmod></url>
+    <url><loc>https://jingw-ui.github.io/Games/cf-transport-ship/</loc><lastmod>2026-10-04</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/dice_3D/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/dinosaur/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/earth_3D/</loc><lastmod>2026-10-03</lastmod></url>
@@ -100,9 +101,11 @@
     <url><loc>https://jingw-ui.github.io/Games/nerual_branch/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/operation-ironhold/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/pelecanus/</loc><lastmod>2026-10-03</lastmod></url>
+    <url><loc>https://jingw-ui.github.io/Games/pelican-bike/</loc><lastmod>2026-10-04</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/piano/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/puke/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/qjm/</loc><lastmod>2026-10-03</lastmod></url>
+    <url><loc>https://jingw-ui.github.io/Games/qq-speed/</loc><lastmod>2026-10-04</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/racing/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/rainy-store/</loc><lastmod>2026-10-03</lastmod></url>
     <url><loc>https://jingw-ui.github.io/Games/remake/</loc><lastmod>2026-10-03</lastmod></url>

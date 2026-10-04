@@ -1,6 +1,6 @@
 # JingW-ui — 免费在线工具、Windows 软件与网页小游戏
 
-> 纯静态个人公益站，无需注册、无后端、浏览器直接使用。含 76 个在线工具、11 款 Windows 免费软件（GitHub Releases 下载）、36 款网页小游戏。
+> 纯静态个人公益站，无需注册、无后端、浏览器直接使用。含 76 个在线工具、11 款 Windows 免费软件（GitHub Releases 下载）、39 款网页小游戏。
 
 ## 在线工具（共 76 个，浏览器直接运行）
 - [工具箱总览](https://jingw-ui.github.io/tools/): 76 个在线工具汇总页，支持搜索与分类快筛，覆盖文本处理、编解码、图片处理、计算器、生成器、知识图谱等
@@ -95,8 +95,11 @@
 - [抖音爬虫工具](https://jingw-ui.github.io/softwares/): 高效的抖音视频数据采集工具，支持批量下载（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/DouyinCrawler2.1/DouyinCrawler2.1.exe）
 - [VIP追剧神器](https://jingw-ui.github.io/softwares/): 便捷的影视资源获取工具，让追剧更轻松（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/VIP%E8%BF%BD%E5%89%A7%E7%A5%9E%E5%99%A8/VIP.exe）
 
-## 网页小游戏（共 36 款，浏览器直接玩）
-- [游戏中心](https://jingw-ui.github.io/Games/): 36 款网页游戏汇总页
+## 网页小游戏（共 39 款，浏览器直接玩）
+- [游戏中心](https://jingw-ui.github.io/Games/): 39 款网页游戏汇总页
+- [鹈鹕骑单车](https://jingw-ui.github.io/Games/pelican-bike/): action 类网页游戏
+- [运输船 3D](https://jingw-ui.github.io/Games/cf-transport-ship/): action 类网页游戏
+- [飞车 3D](https://jingw-ui.github.io/Games/qq-speed/): action 类网页游戏
 - [跳一跳](https://jingw-ui.github.io/Games/jump-jump/): action 类网页游戏
 - [饵食大逃亡](https://jingw-ui.github.io/Games/bait-fish/): action 类网页游戏
 - [人生重开模拟器](https://jingw-ui.github.io/Games/remake/): puzzle 类网页游戏

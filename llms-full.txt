@@ -1,6 +1,6 @@
 # JingW-ui 站点全量内容（供 AI 检索引用）
 
-> 站点: https://jingw-ui.github.io · 生成日期: 2026-10-03 · 纯静态站点，所有工具/游戏浏览器直接运行，软件为 Windows exe（GitHub Releases 下载）。
+> 站点: https://jingw-ui.github.io · 生成日期: 2026-10-04 · 纯静态站点，所有工具/游戏浏览器直接运行，软件为 Windows exe（GitHub Releases 下载）。
 
 ## 一、在线工具箱（76 个）
 入口: https://jingw-ui.github.io/tools/
@@ -367,8 +367,17 @@ URL: https://jingw-ui.github.io/tools/pdf-tools/
 下载: https://github.com/JingW-ui/PI-MAPP/releases/download/VIP%E8%BF%BD%E5%89%A7%E7%A5%9E%E5%99%A8/VIP.exe
 开源仓库: https://github.com/JingW-ui/PI-MAPP
 
-## 三、网页小游戏（36 款）
+## 三、网页小游戏（39 款）
 入口: https://jingw-ui.github.io/Games/
+
+### 鹈鹕骑单车
+类型: action · URL: https://jingw-ui.github.io/Games/pelican-bike/
+
+### 运输船 3D
+类型: action · URL: https://jingw-ui.github.io/Games/cf-transport-ship/
+
+### 飞车 3D
+类型: action · URL: https://jingw-ui.github.io/Games/qq-speed/
 
 ### 跳一跳
 类型: action · URL: https://jingw-ui.github.io/Games/jump-jump/
