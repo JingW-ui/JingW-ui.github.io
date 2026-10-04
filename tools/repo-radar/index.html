@@ -360,7 +360,7 @@ footer a { color: var(--muted); }
 
     <footer>
       <p>Repo Radar - GitHub 仓库嗅探与分析工具</p>
-      <p style="margin-top:2px">卡片外链视图由 <a href="https://gitdiagram.com" target="_blank" rel="noopener">GitDiagram</a> · <a href="https://gitingest.com" target="_blank" rel="noopener">Gitingest</a> · <a href="https://deepwiki.com" target="_blank" rel="noopener">DeepWiki</a> 提供</p>
+      <p style="margin-top:2px">卡片外链视图由 <a href="https://gitdiagram.com" target="_blank" rel="noopener">GitDiagram</a> · <a href="https://gitingest.com" target="_blank" rel="noopener">Gitingest</a> · <a href="https://deepwiki.com" target="_blank" rel="noopener">DeepWiki</a> · <a href="https://github1s.com" target="_blank" rel="noopener">GitHub1s</a> 提供</p>
     </footer>
   </main>
 </div>
@@ -1156,13 +1156,15 @@ footer a { color: var(--muted); }
 
   // ---- External deep-links (pure public URL concatenation, no credentials) ----
   // GitDiagram: interactive architecture diagram; Gitingest: LLM-ready full-text digest;
-  // DeepWiki: auto-generated wiki walkthrough. All open in a new tab — failures of these
-  // third-party services stay in that tab and never degrade repo-radar itself.
+  // DeepWiki: auto-generated wiki walkthrough; GitHub1s: login-free browser VS Code.
+  // All open in a new tab — failures of these third-party services stay in that tab
+  // and never degrade repo-radar itself.
   function extLinkDefs() {
     return [
       { host: "gitdiagram.com", label: "图结构", tip: "GitDiagram 交互式架构图", short: "图" },
       { host: "gitingest.com", label: "AI 全文", tip: "Gitingest 仓库全文（可投喂 LLM）", short: "文" },
-      { host: "deepwiki.com", label: "Wiki", tip: "DeepWiki 自动讲解", short: "W" }
+      { host: "deepwiki.com", label: "Wiki", tip: "DeepWiki 自动讲解", short: "W" },
+      { host: "github1s.com", label: "VSCode", tip: "GitHub1s 浏览器 VS Code 读源码（免登录）", short: "V" }
     ];
   }
 
