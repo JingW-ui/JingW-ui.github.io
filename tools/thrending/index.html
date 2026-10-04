@@ -226,6 +226,23 @@
   .embed-btn:hover{color:var(--green);border-color:var(--green)}
   .embed-btn.copied{color:var(--green);border-color:var(--green);background:var(--green-bg)}
 
+  /* ---- Repo tools row (AI 读仓库:域名替换直达第三方工具) ---- */
+  .repo-tools{
+    display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;
+    margin-top:10px;
+  }
+  .tools-label{
+    font-size:0.7rem;font-weight:600;color:var(--text-tertiary);
+    letter-spacing:0.02em;margin-right:2px;flex-shrink:0;
+  }
+  .tool-link{
+    background:var(--bg);color:var(--text-secondary);border:1px solid var(--border);
+    border-radius:5px;padding:3px 9px;font-size:0.72rem;cursor:pointer;
+    transition:all 0.2s;white-space:nowrap;font-weight:500;
+    text-decoration:none;display:inline-block;
+  }
+  .tool-link:hover{color:var(--green);border-color:var(--green);background:var(--green-bg)}
+
   /* ---- History panel ---- */
   .hist-head{
     display:flex;align-items:center;justify-content:space-between;
@@ -347,6 +364,10 @@
     .sh-link{padding:2px 7px;font-size:0.65rem;border-radius:4px}
     .embed-btn{padding:2px 7px;font-size:0.65rem;border-radius:4px}
 
+    .repo-tools{gap:4px 6px;margin-top:9px}
+    .tools-label{font-size:0.65rem}
+    .tool-link{padding:2px 7px;font-size:0.65rem;border-radius:4px}
+
     .hist-item{padding:10px 12px}
     .hist-row{font-size:0.74rem;gap:6px}
     .hist-top1{font-size:0.78rem}
@@ -374,6 +395,7 @@
     .assess-badge{font-size:0.6rem;padding:2px 6px}
     .repo-badges img{height:15px}
     .sh-link,.embed-btn{font-size:0.6rem;padding:2px 5px}
+    .tool-link{font-size:0.6rem;padding:2px 5px}
   }
 
   /* scrollbar */
@@ -743,6 +765,26 @@
     return html;
   }
 
+  // ---- AI 读仓库工具行:github.com → 工具域名 + owner/repo,一处配置全站生效 ----
+  // 名单经 2026-10 HTTP 探活;gitreverse.dev / githubls.com 域名不存在已剔除,GitHub1s 为免登录版浏览器 VS Code
+  var REPO_TOOLS = [
+    { label: "架构图",   title: "GitDiagram · AI 生成交互式项目架构图",       base: "https://gitdiagram.com/" },
+    { label: "AI讲解",   title: "DeepWiki · AI 生成项目 Wiki 与对话问答",     base: "https://deepwiki.com/" },
+    { label: "源码解读", title: "Zread · AI 深度解读仓库源码与目录结构",       base: "https://zread.ai/" },
+    { label: "打包喂AI", title: "Gitingest · 仓库打包为单个 LLM 可读文本",    base: "https://gitingest.com/" },
+    { label: "VSCode",   title: "GitHub1s · 浏览器 VS Code 读源码(免登录)",   base: "https://github1s.com/" },
+    { label: "在线运行", title: "StackBlitz · 在线 IDE 运行项目(适合 web 项目)", base: "https://stackblitz.com/github/" }
+  ];
+  function buildRepoTools(username, reponame) {
+    var enc = encodeURIComponent(username) + "/" + encodeURIComponent(reponame);
+    var html = '<span class="tools-label">AI 读仓库</span>';
+    for (var i = 0; i < REPO_TOOLS.length; i++) {
+      var t = REPO_TOOLS[i];
+      html += '<a class="tool-link" href="' + t.base + enc + '" target="_blank" rel="noopener" title="' + t.title + '">' + t.label + '</a>';
+    }
+    return html;
+  }
+
   // ---- Build embed markdown ----
   function buildEmbedMarkdown(username, reponame) {
     var enc = encodeURIComponent(username) + "/" + encodeURIComponent(reponame);
@@ -824,6 +866,9 @@
           badgesHtml +
           '<a class="sh-link" href="https://star-history.com/#' + repo.username + '/' + repo.reponame + '&Timeline" target="_blank" rel="noopener" title="星数增长曲线 · star-history.com">📈 star history</a>' +
           '<button class="embed-btn" data-user="' + escHtml(repo.username) + '" data-repo="' + escHtml(repo.reponame) + '" title="Copy Markdown embed code">Copy Embed</button>' +
+        '</div>' +
+        '<div class="repo-tools">' +
+          buildRepoTools(repo.username, repo.reponame) +
         '</div>';
 
       frag.appendChild(card);
