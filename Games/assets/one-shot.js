@@ -11,31 +11,29 @@
     'use strict';
 
     var CSS = [
-        '/* one-shot 标签（左上角，紫调玻璃，镜像 src-badge 体系） */',
+        '/* one-shot 标签（左上角，灰调玻璃，与 src-badge 同色系，低存在感） */',
         '.os-badge {',
         '    position: absolute;',
         '    top: 8px;',
         '    left: 8px;',
         '    z-index: 2;',
-        '    border: 1px solid rgba(190, 140, 255, 0.35);',
         '    border-radius: 999px;',
         '    padding: 3px 9px;',
-        '    background: rgba(138, 43, 226, 0.28);',
+        '    background: rgba(20, 40, 50, 0.35);',
         '    backdrop-filter: blur(6px);',
         '    -webkit-backdrop-filter: blur(6px);',
-        '    color: #f3e8ff;',
+        '    color: rgba(255, 255, 255, 0.78);',
         '    font-size: 11px;',
         '    font-weight: 600;',
         '    letter-spacing: 0.4px;',
         '    line-height: 1.4;',
         '    font-family: inherit;',
         '    cursor: pointer;',
-        '    transition: background 0.25s ease, transform 0.25s ease, border-color 0.25s ease;',
+        '    transition: background 0.25s ease, color 0.25s ease;',
         '}',
         '.os-badge:hover {',
-        '    background: rgba(138, 43, 226, 0.45);',
-        '    border-color: rgba(190, 140, 255, 0.6);',
-        '    transform: scale(1.05);',
+        '    background: rgba(20, 40, 50, 0.55);',
+        '    color: #fff;',
         '}',
         '/* one-shot 门户提示面板（fixed 挂 body，不受卡片 overflow:hidden 裁剪） */',
         '.os-tip {',
@@ -168,7 +166,7 @@
             var b = document.createElement('button');
             b.type = 'button';
             b.className = 'os-badge';
-            b.textContent = '⚡ one-shot';
+            b.textContent = 'one-shot';
             b.setAttribute('aria-haspopup', 'dialog');
             b.setAttribute('aria-expanded', 'false');
             b.setAttribute('aria-label', 'one-shot 实测：agent Claude Code CLI，model Claude Opus 5.5，一句提示词完整生成');
