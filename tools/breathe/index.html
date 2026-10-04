@@ -3,14 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>深呼吸放松辅助</title>
+    <meta name="description" content="引导式呼吸节律动画工具，支持盒式呼吸 4-4-4-4 与 4-7-8 助眠法，跟随绿色渐变圆圈的节奏完成吸气、屏息与呼气，缓解焦虑、放松身心，浏览器直接使用。">
+    <link rel="icon" type="image/png" href="/imgs/logo/github_logo.png">
+    <title>深呼吸放松 - 引导式呼吸节律动画 | JingW-ui</title>
     <style>
         :root {
-            --bg-color-1: #0f172a;
-            --bg-color-2: #1e1b4b;
-            --circle-inhale: rgba(45, 212, 191, 0.4);  /* 翡翠绿 - 吸气 */
-            --circle-hold: rgba(59, 130, 246, 0.4);    /* 经典蓝 - 呼气 */
-            --circle-exhale: rgba(139, 92, 246, 0.4);  /* 极光紫 - 屏息 */
+            /* 纸面基调（与 tools 主页同源） */
+            --bg: #ffffff;
+            --chip: #f5f5f5;
+            --line: #e5e5e5;
+            --line-strong: #111111;
+            --text: #111111;
+            --text-soft: #555555;
+            --text-dim: #999999;
+            /* 绿色明度阶梯：吸气浅 → 屏息中 → 呼气深 */
+            --green-1: #34d399;
+            --green-2: #10b981;
+            --green-3: #059669;
         }
 
         * {
@@ -21,14 +30,14 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: radial-gradient(circle at center, var(--bg-color-2), var(--bg-color-1));
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            color: #f8fafc;
+            color: var(--text);
             overflow: hidden;
             padding: 2rem;
         }
@@ -41,37 +50,49 @@
         }
 
         h1 {
-            font-size: 1.8rem;
-            font-weight: 300;
-            letter-spacing: 0.2rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 0.35rem;
+            text-indent: 0.35rem;
+            margin-bottom: 0.4rem;
+            color: var(--text);
+        }
+
+        .page-hint {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            letter-spacing: 0.05rem;
+            margin-bottom: 1.2rem;
         }
 
         .modes {
-            display: flex;
-            gap: 0.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 0.3rem;
-            border-radius: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: inline-flex;
+            background: var(--chip);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 3px;
         }
 
         .mode-btn {
             background: transparent;
             border: none;
-            color: #94a3b8;
-            padding: 0.5rem 1.2rem;
-            border-radius: 20px;
+            color: var(--text-soft);
+            padding: 0.45rem 1.2rem;
+            border-radius: 7px;
             cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn:hover {
+            color: var(--text);
         }
 
         .mode-btn.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: #ffffff;
+            color: var(--text);
+            font-weight: 500;
+            box-shadow: inset 0 0 0 1px var(--line-strong);
         }
 
         /* 呼吸主容器 */
@@ -90,7 +111,7 @@
             position: absolute;
             width: 280px;
             height: 280px;
-            border: 1px dashed rgba(255, 255, 255, 0.15);
+            border: 1px dashed var(--line);
             border-radius: 50%;
             pointer-events: none;
         }
@@ -101,10 +122,20 @@
             width: 140px;
             height: 140px;
             border-radius: 50%;
-            background: var(--circle-hold);
-            box-shadow: 0 0 50px rgba(59, 130, 246, 0.3);
+            background: var(--green-2);
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.25);
             transform: scale(1);
             transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 1s ease, box-shadow 1s ease;
+        }
+
+        /* 圆面高光：固定的绿色渐变质感，不随阶段变色打断过渡 */
+        .breathing-circle::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 62%);
+            pointer-events: none;
         }
 
         /* 中心文本 */
@@ -120,17 +151,20 @@
         }
 
         #status {
-            font-size: 2rem;
-            font-weight: 400;
-            letter-spacing: 0.1rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 0.3rem;
+            text-indent: 0.3rem;
+            margin-bottom: 0.4rem;
+            color: var(--text);
             transition: opacity 0.3s;
         }
 
         #timer {
-            font-size: 3rem;
-            font-weight: 200;
-            font-family: monospace, sans-serif;
+            font-size: 2.8rem;
+            font-weight: 300;
+            font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            color: var(--text-soft);
             opacity: 0.9;
         }
 
@@ -141,22 +175,20 @@
         }
 
         .control-btn {
-            background: rgba(255, 255, 255, 0.9);
-            color: #0f172a;
+            background: var(--green-2);
+            color: #ffffff;
             border: none;
-            padding: 1rem 3rem;
-            font-size: 1.1rem;
-            font-weight: 500;
+            padding: 0.9rem 3.2rem;
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: 0.15rem;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .control-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
-            background: #ffffff;
+            background: var(--green-3);
         }
 
         .control-btn:active {
@@ -164,9 +196,14 @@
         }
 
         .control-btn.running {
-            background: rgba(255, 255, 255, 0.1);
-            color: #f8fafc;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--line-strong);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mode-btn,
+            .control-btn {
+                transition: none;
+            }
         }
     </style>
 </head>
@@ -174,9 +211,10 @@
 
     <header>
         <h1>静心呼吸</h1>
+        <p class="page-hint">跟随圆圈胀缩的节奏 · 吸气 — 屏息 — 呼气</p>
         <div class="modes">
-            <button class="mode-btn active" onclick="switchMode('box')">盒子呼吸法 (4-4-4-4)</button>
-            <button class="mode-btn" onclick="switchMode('relax')">4-7-8 助眠法</button>
+            <button class="mode-btn active" onclick="switchMode('box', this)">盒子呼吸法 (4-4-4-4)</button>
+            <button class="mode-btn" onclick="switchMode('relax', this)">4-7-8 助眠法</button>
         </div>
     </header>
 
@@ -205,30 +243,37 @@
         let stateInterval = null;
         let timerInterval = null;
 
+        // 绿色明度阶梯（全页唯一颜色来源，改动只动这里）
+        const PHASE_COLORS = {
+            inhale: { color: '#34d399', glow: '0 0 50px rgba(52, 211, 153, 0.35)' },
+            hold:   { color: '#10b981', glow: '0 0 50px rgba(16, 185, 129, 0.35)' },
+            exhale: { color: '#059669', glow: '0 0 50px rgba(5, 150, 105, 0.35)' }
+        };
+
         // 呼吸模式配置
         const modes = {
             box: [
-                { name: '吸气', duration: 4, scale: 2, color: 'rgba(45, 212, 191, 0.5)', glow: '0 0 60px rgba(45, 212, 191, 0.6)' },
-                { name: '屏息', duration: 4, scale: 2, color: 'rgba(59, 130, 246, 0.5)', glow: '0 0 60px rgba(59, 130, 246, 0.6)' },
-                { name: '呼气', duration: 4, scale: 1, color: 'rgba(139, 92, 246, 0.5)', glow: '0 0 60px rgba(139, 92, 246, 0.6)' },
-                { name: '屏息', duration: 4, scale: 1, color: 'rgba(59, 130, 246, 0.5)', glow: '0 0 60px rgba(59, 130, 246, 0.6)' }
+                { name: '吸气', duration: 4, scale: 2, ...PHASE_COLORS.inhale },
+                { name: '屏息', duration: 4, scale: 2, ...PHASE_COLORS.hold },
+                { name: '呼气', duration: 4, scale: 1, ...PHASE_COLORS.exhale },
+                { name: '屏息', duration: 4, scale: 1, ...PHASE_COLORS.hold }
             ],
             relax: [
-                { name: '吸气', duration: 4, scale: 2, color: 'rgba(45, 212, 191, 0.5)', glow: '0 0 60px rgba(45, 212, 191, 0.6)' },
-                { name: '屏息', duration: 7, scale: 2, color: 'rgba(59, 130, 246, 0.5)', glow: '0 0 60px rgba(59, 130, 246, 0.6)' },
-                { name: '呼气', duration: 8, scale: 1, color: 'rgba(139, 92, 246, 0.5)', glow: '0 0 60px rgba(139, 92, 246, 0.6)' }
+                { name: '吸气', duration: 4, scale: 2, ...PHASE_COLORS.inhale },
+                { name: '屏息', duration: 7, scale: 2, ...PHASE_COLORS.hold },
+                { name: '呼气', duration: 8, scale: 1, ...PHASE_COLORS.exhale }
             ]
         };
 
         let currentMode = 'box';
 
-        function switchMode(mode) {
+        function switchMode(mode, btn) {
             if (isRunning) {
                 stopBreathing();
             }
             currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             resetUI();
         }
 
@@ -262,8 +307,8 @@
             timerText.textContent = '-';
             circle.style.transition = 'all 1s ease-in-out';
             circle.style.transform = 'scale(1)';
-            circle.style.backgroundColor = 'rgba(59, 130, 246, 0.4)';
-            circle.style.boxShadow = '0 0 50px rgba(59, 130, 246, 0.3)';
+            circle.style.backgroundColor = PHASE_COLORS.hold.color;
+            circle.style.boxShadow = PHASE_COLORS.hold.glow;
         }
 
         function runPhase() {
