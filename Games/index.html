@@ -71,7 +71,7 @@
             z-index: 1;
         }
 
-        /* 仓库入口（页面右上角）：与 tools/ 同款，无框 octocat 常态灰 hover 深 */
+        /* 仓库入口：玻璃底座 chip；吸顶时 fixed 图标淡出，桌面端由 dock 内图标接管 */
         .repo-actions {
             position: fixed;
             top: 22px;
@@ -79,20 +79,29 @@
             z-index: 15;
             display: flex;
             gap: 8px;
+            transition: opacity 0.25s ease;
         }
+        body.toolbar-stuck .repo-actions { opacity: 0; pointer-events: none; }
         .repo-btn {
             width: 38px;
             height: 38px;
             display: grid;
             place-items: center;
             border-radius: var(--radius-sm, 11px);
-            background: transparent;
-            box-shadow: none;
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(44, 62, 80, 0.10);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 2px 8px rgba(20, 40, 50, 0.06);
             color: var(--text-secondary);
             transition: var(--transition);
         }
-        .repo-btn:hover { color: var(--text-primary); }
-        .repo-btn svg { width: 22px; height: 22px; fill: currentColor; }
+        .repo-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.78);
+            border-color: rgba(44, 62, 80, 0.18);
+        }
+        .repo-btn svg { width: 20px; height: 20px; fill: currentColor; }
 
         /* 卡片源码角标 */
         .src-badge {
@@ -191,6 +200,12 @@
         }
         .random-btn:hover { background: rgba(45, 212, 191, 0.10); border-color: rgba(45, 212, 191, 0.45); color: var(--text-primary); }
         .random-btn:active { transform: scale(0.96); }
+        /* 吸顶时 GitHub 入口收进 dock，与随机按钮成组（仅桌面端显示） */
+        .repo-btn-dock { display: none; margin-left: auto; flex-shrink: 0; }
+        @media (min-width: 769px) {
+            .toolbar.stuck .repo-btn-dock { display: grid; }
+            .toolbar.stuck .random-btn { margin-left: 0; }
+        }
         .cat-tabs { display: flex; flex-wrap: wrap; gap: 7px; }
         .cat-tab {
             background: transparent;
@@ -391,6 +406,9 @@
         <button class="cat-tab" data-cat="scene">3D 场景 · 氛围<span class="cnt">7</span></button>
         <button class="cat-tab" data-cat="toy">玩具 · 音乐<span class="cnt">8</span></button>
     </div>
+    <a class="repo-btn repo-btn-dock" href="https://github.com/JingW-ui/JingW-ui.github.io" target="_blank" rel="noopener noreferrer" title="查看本站源码" aria-label="查看本站源码">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+    </a>
     <button class="random-btn" id="random-btn" title="随机跳到一个游戏">随机一下</button>
 </div>
 
@@ -568,7 +586,9 @@
     const toolbarSentinel = document.getElementById('toolbar-sentinel');
     if (toolbar && toolbarSentinel && 'IntersectionObserver' in window) {
         new IntersectionObserver(([entry]) => {
-            toolbar.classList.toggle('stuck', !entry.isIntersecting && entry.boundingClientRect.top < 0);
+            const stuck = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+            toolbar.classList.toggle('stuck', stuck);
+            document.body.classList.toggle('toolbar-stuck', stuck);
         }).observe(toolbarSentinel);
     }
     const REPO_TREE = 'https://github.com/JingW-ui/JingW-ui.github.io/tree/main/Games/';
