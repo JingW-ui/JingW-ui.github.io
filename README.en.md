@@ -9,14 +9,10 @@
 ## ✨ Screenshots
 
 <table>
-  <tr>
-    <td width="50%" align="center"><a href="https://jingw-ui.github.io/"><img src="docs/readme/home.webp" alt="Home" width="100%"></a><br><b>Home</b> · Site-wide navigation + random picks</td>
-    <td width="50%" align="center"><a href="https://jingw-ui.github.io/tools/"><img src="docs/readme/tools.webp" alt="Online Toolbox" width="100%"></a><br><b>Online Toolbox</b> · 76 ready-to-use tools</td>
-  </tr>
-  <tr>
-    <td width="50%" align="center"><a href="https://jingw-ui.github.io/Games/"><img src="docs/readme/games.webp" alt="Game Center" width="100%"></a><br><b>Game Center</b> · 39 original games</td>
-    <td width="50%" align="center"><a href="https://jingw-ui.github.io/softwares/"><img src="docs/readme/softwares.webp" alt="Software Downloads" width="100%"></a><br><b>Software Downloads</b> · 11 Windows apps</td>
-  </tr>
+  <tr><td align="center"><a href="https://jingw-ui.github.io/"><img src="docs/readme/home.webp" alt="Home" width="100%"></a><br><b>Home</b> · Site-wide navigation + random picks</td></tr>
+  <tr><td align="center"><a href="https://jingw-ui.github.io/tools/"><img src="docs/readme/tools.webp" alt="Online Toolbox" width="100%"></a><br><b>Online Toolbox</b> · 76 ready-to-use tools</td></tr>
+  <tr><td align="center"><a href="https://jingw-ui.github.io/Games/"><img src="docs/readme/games.webp" alt="Game Center" width="100%"></a><br><b>Game Center</b> · 39 browser games</td></tr>
+  <tr><td align="center"><a href="https://jingw-ui.github.io/softwares/"><img src="docs/readme/softwares.webp" alt="Software Downloads" width="100%"></a><br><b>Software Downloads</b> · 11 Windows apps</td></tr>
 </table>
 
 ## What's Inside
@@ -25,7 +21,7 @@
 |--------|-------|-------------|-------|
 | [Online Toolbox](https://jingw-ui.github.io/tools/) | 76 | Ready-to-use browser tools: image processing, format conversion, text & dev utilities. No install, no sign-up. | Vanilla HTML / CSS / JS |
 | [Software Downloads](https://jingw-ui.github.io/softwares/) | 11 | Release pages for Windows desktop apps: introductions, source repos, and downloadable releases | Python (PySide6 / PyTorch / YOLOv8) |
-| [Game Center](https://jingw-ui.github.io/Games/) | 39 | Original browser games: casual, puzzle, action — just open and play | Canvas / vanilla JS |
+| [Game Center](https://jingw-ui.github.io/Games/) | 39 | Browser games: casual, puzzle, action — just open and play | Canvas / vanilla JS |
 | [Home](https://jingw-ui.github.io/) | — | Site-wide navigation with randomized recommendations | Vanilla HTML / CSS / JS |
 | [Resume / Videos / Awards / Slides](https://jingw-ui.github.io/resume/) | 4 sections | Static pages: resume, videos, carousel, ppt | HTML / CSS |
 
@@ -71,7 +67,7 @@ Interactive diagram: [gitdiagram.com/jingw-ui/jingw-ui.github.io](https://gitdia
 
 The root [LICENSE](LICENSE) is **MIT** and covers **only original work** in this repo. Third-party content and personal content are excluded — each directory keeps its own LICENSE / page notice:
 
-- ✅ **MIT applies**: the home page, original tools under `tools/`, original games under `Games/`, and the glassmorphism design system — free to use and adapt; keep the copyright notice.
+- ✅ **MIT applies**: the home page, original tools under `tools/`, original games under `Games/` (included third-party games excluded — see below), and the glassmorphism design system — free to use and adapt; keep the copyright notice.
 - 🔎 **Third-party content**: keeps its original license or inclusion notice, e.g. `Games/remake` (MIT mirror), `Games/operation-ironhold` (MIT), `tools/handraw-style` (MIT mirror), `tools/60s` (React/MIT), embedded three.js (MIT). `Games/smash-karts`, `Games/magic-carpet`, and `Games/bait-fish` have no upstream open-source license — included for learning only and removed upon request.
 - 🚫 **Not open-sourced**: personal resume, job-hunting records, and photos under `cv/`, `resume/`, `videos/`, `carousel/`, `ppt/`, `reports/`, `resources/`, `tracker/`, `imgs/` — browsable online but not licensed; no redistribution, scraping, or model-training use.
 
