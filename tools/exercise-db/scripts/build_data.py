@@ -2,7 +2,10 @@
 """
 exercise-db 数据裁剪脚本
 来源:https://github.com/hasaneyldrm/exercises-dataset (数据 MIT)
-生成:assets/data/exercises.js —— 仅保留核心字段 + 中文/英文指令,并规则翻译出中文名称 name_zh
+生成两个文件:
+  assets/data/exercises.js       —— 核心字段(检索/筛选/周训计划),首屏加载
+  assets/data/exercise-steps.js  —— 中英分步教程(ES module,灯箱按需加载)
+并规则翻译出中文名称 name_zh
 
 用法:
   python build_data.py                    # 默认从 jsdelivr CDN 下载
@@ -15,6 +18,7 @@ import urllib.request
 
 SOURCE = os.environ.get('SOURCE', 'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/data/exercises.json')
 OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'data', 'exercises.js')
+OUT_STEPS = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets', 'data', 'exercise-steps.js')
 
 # ---------------------------------------------------------------
 # 动作名称 英→中 规则翻译词表(短语按"词数多者优先"贪心匹配)
@@ -209,18 +213,30 @@ def main():
             'steps': {'zh': steps.get('zh', []), 'en': steps.get('en', [])},
             'image': r.get('image'),
             'gif': r.get('gif_url'),
-            'attr': r.get('attribution'),
         })
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    body = json.dumps(out, ensure_ascii=False, separators=(',', ':'))
+
+    # 核心数据(不含 steps/attr):检索、筛选、周训计划所需,首屏加载
+    core = []
+    steps_map = {}
+    for e in out:
+        core.append({k: e[k] for k in
+                     ('id', 'name', 'name_zh', 'body_part', 'equipment', 'target',
+                      'muscle_group', 'secondary_muscles', 'image', 'gif')})
+        steps_map[e['id']] = e['steps']
     with open(OUT, 'w', encoding='utf-8') as f:
-        f.write('window.EXERCISES = ' + body + ';\n')
+        f.write('window.EXERCISES = ' + json.dumps(core, ensure_ascii=False, separators=(',', ':')) + ';\n')
+    # 分步教程:ES module,灯箱首次打开时动态 import
+    with open(OUT_STEPS, 'w', encoding='utf-8') as f:
+        f.write('/* 分步教程数据(按需加载):动作 id -> { zh:[], en:[] }。由 scripts/build_data.py 生成,勿手改。 */\n')
+        f.write('export default ' + json.dumps(steps_map, ensure_ascii=False, separators=(',', ':')) + ';\n')
 
     # 统计翻译覆盖率
     total = len(out)
     pure_zh = sum(1 for x in out if not re.search(r'[a-zA-Z]', x['name_zh']))
     has_zh = sum(1 for x in out if x['name_zh'] != x['name'])
     print('生成 %s (%d 条, %.2f MB)' % (OUT, total, os.path.getsize(OUT) / 1024 / 1024))
+    print('生成 %s (%.2f MB)' % (OUT_STEPS, os.path.getsize(OUT_STEPS) / 1024 / 1024))
     print('翻译覆盖率: 有翻译变化 %d/%d, 全中文 %d/%d' % (has_zh, total, pure_zh, total))
 
 

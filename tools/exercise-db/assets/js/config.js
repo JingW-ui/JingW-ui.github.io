@@ -5,10 +5,10 @@
    ============================================================ */
 
 /* 媒体 CDN 基址(数据里的 image/gif 为相对路径)。
-   jsdelivr 在国内部分网络下可能慢/不稳,提供多节点按序 fallback。 */
+   fastly 节点国内通常更稳,列为首选;失败时按序 fallback。 */
 export const MEDIA_HOSTS = [
-  'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/',
   'https://fastly.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/',
+  'https://cdn.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/',
   'https://gcore.jsdelivr.net/gh/hasaneyldrm/exercises-dataset@main/',
 ];
 export const MEDIA_BASE = MEDIA_HOSTS[0];

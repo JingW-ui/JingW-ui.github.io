@@ -254,6 +254,7 @@ function openLightbox(ex) {
   $('lightbox').hidden = false;
   document.body.style.overflow = 'hidden';
   bindGif(ex, $('lightboxGif'), $('lightboxLoading'), () => lightboxReqId === ex.id);
+  renderLightboxSteps(ex);
 }
 
 function closeLightbox() {
@@ -263,6 +264,61 @@ function closeLightbox() {
   const g = $('lightboxGif');
   g.onload = null; g.onerror = null;
   g.removeAttribute('src');
+  $('lightboxSteps').hidden = true;
+  $('lightboxStepsList').innerHTML = '';
+}
+
+/* ---------------- 分步教程(按需加载) ----------------
+   步骤数据拆分在 ../data/exercise-steps.js(约 1.1MB),首屏不加载;
+   灯箱打开时动态 import,页面空闲时预取,首次点击即秒出。 */
+
+let stepsPromise = null;
+
+function ensureSteps(bust) {
+  if (!stepsPromise) {
+    stepsPromise = import('../data/exercise-steps.js' + (bust ? '?r=' + Date.now() : ''))
+      .then(m => m.default)
+      .catch(e => { stepsPromise = null; throw e; }); // 失败置空,允许重试
+  }
+  return stepsPromise;
+}
+
+function renderLightboxSteps(ex, bust) {
+  const box = $('lightboxSteps');
+  const list = $('lightboxStepsList');
+  $('lightboxStepsTitle').textContent = state.lang === 'zh' ? '分步教程' : 'Instructions';
+  box.hidden = false;
+  list.innerHTML = '';
+  const loading = document.createElement('li');
+  loading.className = 'steps-empty';
+  loading.textContent = state.lang === 'zh' ? '加载分步教程…' : 'Loading instructions…';
+  list.appendChild(loading);
+  ensureSteps(bust).then(steps => {
+    if (lightboxReqId !== ex.id) return; // 灯箱已切换/关闭
+    const s = steps[ex.id] || {};
+    const arr = state.lang === 'zh' ? (s.zh || s.en || []) : (s.en || s.zh || []);
+    list.innerHTML = '';
+    if (!arr.length) {
+      const li = document.createElement('li');
+      li.className = 'steps-empty';
+      li.textContent = state.lang === 'zh' ? '暂无分步教程' : 'No instructions available';
+      list.appendChild(li);
+      return;
+    }
+    arr.forEach(t => {
+      const li = document.createElement('li');
+      li.textContent = t;
+      list.appendChild(li);
+    });
+  }).catch(() => {
+    if (lightboxReqId !== ex.id) return;
+    list.innerHTML = '';
+    const li = document.createElement('li');
+    li.className = 'steps-empty steps-error';
+    li.textContent = state.lang === 'zh' ? '分步教程加载失败,点击重试' : 'Failed to load instructions, tap to retry';
+    li.addEventListener('click', () => { stepsPromise = null; renderLightboxSteps(ex, true); });
+    list.appendChild(li);
+  });
 }
 
 /* ---------------- 周训计划 ---------------- */
@@ -505,6 +561,11 @@ function applyLang() {
   renderSelects();
   if (galleryRendered) render();
   renderPlan();
+  // 灯箱开着时切换语言:重渲染步骤
+  if (!$('lightbox').hidden && lightboxReqId) {
+    const ex = state.all.find(x => x.id === lightboxReqId);
+    if (ex) renderLightboxSteps(ex);
+  }
 }
 
 /* 视图切换:动作库 / 周训计划 / 月训打卡 */
@@ -734,8 +795,20 @@ function init() {
   startActivityTracking();
   renderCheckin();
 
+  // 空闲时预取分步教程,首次点开灯箱秒出
+  const idle = window.requestIdleCallback || (fn => setTimeout(fn, 4000));
+  idle(() => { ensureSteps().catch(() => {}); }, { timeout: 10000 });
+
   // 语言按钮初始态
   applyLang();
 }
 
 init();
+
+/* Service Worker:壳层与数据 stale-while-revalidate,二次访问秒开 + 离线可用。
+   GIF/缩略图不进缓存(体积大),交给浏览器 HTTP 缓存与 CDN fallback。 */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
