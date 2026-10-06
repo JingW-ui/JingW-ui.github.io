@@ -591,7 +591,7 @@
             }
         }
 
-        /* 累计下载量 - 左下角固定：白底细线，取数失败保持隐藏 */
+        /* 累计下载量 + 全站访问统计 - 左下角固定：白底细线，任一数据源就绪才显示 */
         .visit-stats {
             position: fixed;
             bottom: 20px;
@@ -607,6 +607,9 @@
             transition: var(--transition);
             display: flex;
             align-items: center;
+            flex-wrap: wrap;
+            row-gap: 2px;
+            max-width: min(92vw, 460px);
             gap: 6px;
         }
 
@@ -618,6 +621,20 @@
         .visit-stats svg {
             width: 12px;
             height: 12px;
+            flex-shrink: 0;
+        }
+
+        /* 数据组透传：组内元素直接参与角标的 flex 排布，隐藏时整组消失 */
+        .visit-stats .stat-group {
+            display: contents;
+        }
+
+        /* VerCount 与下载量两组数据的竖分隔线 */
+        .visit-stats .visit-sep {
+            width: 1px;
+            height: 12px;
+            background: var(--line);
+            margin: 0 2px;
             flex-shrink: 0;
         }
 
@@ -1139,11 +1156,21 @@
         <div class="empty-state" id="emptyState">未找到匹配的软件，换个关键词试试</div>
     </div>
 
-    <!-- 累计下载量（GitHub Releases 真实数据，shields.io 代取并缓存） -->
+    <!-- 累计下载量（GitHub Releases 真实数据，shields.io 代取并缓存）+ 全站访问统计（VerCount CN 镜像）
+         共用一个角标：任一数据源就绪即显示，失败的一组自动隐藏 -->
     <div class="visit-stats" id="downloadStats" hidden>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        <span>累计下载</span>
-        <span class="visit-count" id="totalDownloads">—</span>
+        <span class="stat-group" id="dlGroup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>累计下载</span>
+            <span class="visit-count" id="totalDownloads">—</span>
+        </span>
+        <span class="visit-sep" id="statSep" aria-hidden="true" hidden></span>
+        <span class="stat-group" id="vcGroup">
+            <span>本站访问:</span>
+            <span class="visit-count" id="vercount_value_site_pv">—</span>
+            <span>本站访客:</span>
+            <span class="visit-count" id="vercount_value_site_uv">—</span>
+        </span>
     </div>
 
     <script>
@@ -1169,8 +1196,21 @@
             });
         });
 
+        // 左下角角标：累计下载 + 全站访问两组数据源共用，任一就绪即显示，失败的一组自动隐藏
+        const statChip = document.getElementById('downloadStats');
+        const dlGroup = document.getElementById('dlGroup');
+        const vcGroup = document.getElementById('vcGroup');
+        const statSep = document.getElementById('statSep');
+        const statState = { dl: false, vc: false };
+        function refreshStatChip() {
+            if (!statChip) return;
+            if (dlGroup) dlGroup.style.display = statState.dl ? '' : 'none';
+            if (vcGroup) vcGroup.style.display = statState.vc ? '' : 'none';
+            if (statSep) statSep.hidden = !(statState.dl && statState.vc);
+            statChip.hidden = !(statState.dl || statState.vc);
+        }
+
         // 累计下载量：GitHub Releases 资产计数求和（shields.io 代取，服务端缓存约 5~60 分钟）
-        // 三个仓库全部取到才显示，任一失败整个 pill 静默隐藏
         (async () => {
             const repos = ['PI-MAPP', 'AutoTask-UI-', 'MediScreen-Brain'];
             try {
@@ -1179,15 +1219,26 @@
                         .then(res => { if (!res.ok) throw new Error(res.status); return res.json(); })
                 ));
                 const total = results.reduce((sum, d) => sum + (parseInt(d.value, 10) || 0), 0);
-                const box = document.getElementById('downloadStats');
                 const num = document.getElementById('totalDownloads');
-                if (box && num) {
-                    num.textContent = total.toLocaleString();
-                    box.hidden = false;
-                }
+                if (num) num.textContent = total.toLocaleString();
+                statState.dl = true;
             } catch (err) {
-                // 取数失败：保持 hidden，页面不显示不完整或错误的数字
+                // 取数失败：仅隐藏下载组，不影响 VerCount 组
             }
+            refreshStatChip();
+        })();
+
+        // 全站访问统计（VerCount）：计数回填即亮；10s 未回填视为失败，维持隐藏
+        (() => {
+            const pv = document.getElementById('vercount_value_site_pv');
+            if (!pv) return;
+            const filled = () => pv.textContent && pv.textContent.trim() !== '—';
+            if (filled()) { statState.vc = true; refreshStatChip(); return; }
+            const mo = new MutationObserver(() => {
+                if (filled()) { statState.vc = true; refreshStatChip(); mo.disconnect(); }
+            });
+            mo.observe(pv, { childList: true, characterData: true, subtree: true });
+            setTimeout(() => { mo.disconnect(); refreshStatChip(); }, 10000);
         })();
 
         // 搜索过滤功能
@@ -1250,5 +1301,8 @@
             }
         }
     </script>
+
+    <!-- VerCount 计数脚本（不蒜子继任者，CN 镜像）：与 tools/主页/Games 同款全站计数 -->
+    <script defer src="https://cn.vercount.one/js"></script>
 </body>
 </html>

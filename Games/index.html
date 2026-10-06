@@ -82,6 +82,28 @@
             transition: opacity 0.25s ease;
         }
         body.toolbar-stuck .repo-actions { opacity: 0; pointer-events: none; }
+
+        /* 全站访问统计（VerCount CN 镜像）：左下角玻璃角标，与 tools/softwares/主页同款 */
+        .visit-stats {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-sm, 11px);
+            padding: 8px 14px;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+            z-index: 15;
+            opacity: 0.7;
+            transition: var(--transition);
+            line-height: 1.6;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .visit-stats:hover { opacity: 1; border-color: var(--text-muted); }
+        .visit-stats-item { display: flex; align-items: center; gap: 6px; }
+        .visit-count { color: var(--accent-teal); font-weight: 600; }
         .repo-btn {
             width: 38px;
             height: 38px;
@@ -676,5 +698,18 @@
     // 首屏入场
     animateCards();
 </script>
+
+<!-- 本站访问统计（VerCount CN 镜像）：与 tools/softwares/主页同款左下角标 -->
+<div class="visit-stats" id="visitStats">
+    <div class="visit-stats-item">
+        <span>本站访问:</span>
+        <span class="visit-count" id="vercount_value_site_pv">—</span>
+    </div>
+    <div class="visit-stats-item">
+        <span>本站访客:</span>
+        <span class="visit-count" id="vercount_value_site_uv">—</span>
+    </div>
+</div>
+<script defer src="https://cn.vercount.one/js"></script>
 </body>
 </html>
