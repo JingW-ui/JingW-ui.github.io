@@ -32,13 +32,13 @@
 
 <!-- 视图切换 -->
 <nav class="view-tabs glass" id="viewTabs">
-  <button class="view-tab active" data-view="gallery">💪 动作库</button>
-  <button class="view-tab" data-view="plan">📅 周训计划</button>
+  <button class="view-tab active" data-view="plan">📅 周训计划</button>
+  <button class="view-tab" data-view="gallery">💪 动作库</button>
   <button class="view-tab" data-view="checkin">✅ 月训打卡</button>
 </nav>
 
 <!-- 动作库视图 -->
-<div id="galleryView">
+<div id="galleryView" hidden>
   <!-- 筛选栏 -->
   <section class="filters glass">
     <div class="filter-row">
@@ -68,8 +68,8 @@
   <main class="grid" id="grid"></main>
 </div>
 
-<!-- 周训计划视图 -->
-<div class="plan-view" id="planView" hidden>
+<!-- 周训计划视图(默认) -->
+<div class="plan-view" id="planView">
   <section class="plan-toolbar glass">
     <div class="plan-toolbar-row">
       <label class="filter-label" for="planTemplate">模板</label>
@@ -107,7 +107,7 @@
       <span><i class="dot none"></i>未打卡</span>
     </div>
   </section>
-  <div class="plan-hint">在前台且有操作时自动累计今日活跃时长,达标即打卡;挂机或切后台不计。数据保存在浏览器(localStorage)。</div>
+  <div class="plan-hint">页面处于前台时自动累计今日活跃时长,达标即打卡;切后台或锁屏不计。数据保存在浏览器(localStorage)。</div>
 </div>
 
 <!-- 右下角动图预览卡:悬停动作卡片时异步加载并播放 GIF -->

@@ -1,7 +1,6 @@
 /* ============================================================
    练点啥呢？ - 应用逻辑
-   纯画廊浏览:搜索 + 部位/器械/肌群筛选 + 分页
-   卡片为静态展示,不可点击
+   三个视图:周训计划(默认) / 动作库(检索+筛选+分页) / 月训打卡
    ============================================================ */
 
 import { MEDIA_BASE, MEDIA_HOSTS, BODY_PARTS, EQUIPMENT, MUSCLES } from './config.js';
@@ -93,7 +92,10 @@ function resetPage() { state.page = 1; }
 
 /* ---------------- 渲染画廊 ---------------- */
 
+let galleryRendered = false; // 默认视图是周训计划,画廊首次切入时才渲染(加快首屏)
+
 function render() {
+  galleryRendered = true;
   const list = filtered();
   $('count').textContent = list.length;
   $('emptyHint').hidden = list.length > 0;
@@ -383,10 +385,12 @@ function savePlan() {
 function renderPlan() {
   const grid = $('planGrid');
   grid.innerHTML = '';
+  const todayIdx = (new Date().getDay() + 6) % 7; // 周一=0
   plan.days.forEach((day, i) => {
     const rest = day.target === 'rest';
+    const isToday = i === todayIdx;
     const card = document.createElement('div');
-    card.className = 'plan-day' + (rest ? ' rest' : '');
+    card.className = 'plan-day' + (rest ? ' rest' : '') + (isToday ? ' today' : '');
     card.dataset.day = i;
 
     const head = document.createElement('div');
@@ -394,6 +398,13 @@ function renderPlan() {
     const name = document.createElement('span');
     name.className = 'plan-day-name';
     name.textContent = DAY_NAMES[state.lang][i];
+    head.append(name);
+    if (isToday) {
+      const badge = document.createElement('span');
+      badge.className = 'plan-day-badge';
+      badge.textContent = state.lang === 'zh' ? '今天' : 'Today';
+      head.append(badge);
+    }
     const sel = document.createElement('select');
     sel.className = 'filter-select plan-day-target';
     sel.innerHTML = Object.entries(TARGETS).map(([k, v]) => `<option value="${k}">${targetLabel(k)}</option>`).join('');
@@ -413,7 +424,7 @@ function renderPlan() {
       savePlan();
       renderPlan();
     });
-    head.append(name, sel, resh);
+    head.append(sel, resh);
     card.appendChild(head);
 
     const list = document.createElement('ul');
@@ -477,13 +488,22 @@ function bindPlanUI() {
   });
 }
 
+/* 今天卡片滚动定位:不在视口内时滚到可见(移动端单列场景),已在视口则不动 */
+function focusToday() {
+  if ($('planView').hidden) return;
+  const el = document.querySelector('.plan-day.today');
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  if (r.top < 0 || r.bottom > window.innerHeight) el.scrollIntoView({ block: 'nearest' });
+}
+
 /* 语言切换:重绘所有按语言变化的界面 */
 function applyLang() {
   const btn = $('langToggle');
   if (btn) btn.textContent = state.lang === 'zh' ? '中文' : 'EN';
   renderPartChips();
   renderSelects();
-  render();
+  if (galleryRendered) render();
   renderPlan();
 }
 
@@ -496,24 +516,23 @@ function bindViewTabs() {
     $('galleryView').hidden = btn.dataset.view !== 'gallery';
     $('planView').hidden = btn.dataset.view !== 'plan';
     $('checkinView').hidden = btn.dataset.view !== 'checkin';
-    if (btn.dataset.view === 'plan') renderPlan();
+    if (btn.dataset.view === 'gallery' && !galleryRendered) render();
+    if (btn.dataset.view === 'plan') { renderPlan(); focusToday(); }
     if (btn.dataset.view === 'checkin') renderCheckin();
   });
 }
 
 /* ---------------- 月训打卡 ----------------
-   前台 + 近 30s 内有操作 → 每秒计为今日活跃;达到阈值自动打卡(每天一次)。
-   挂机(超 30s 无操作)或切后台不计;数据存 localStorage。 */
+   页面处于前台(可见)即每秒计为今日活跃;达到阈值自动打卡(每天一次)。
+   切后台/锁屏不计;数据存 localStorage。 */
 
 const CHECKIN_KEY = 'exercise_db_checkin';
-const IDLE_MS = 30000;
 
 const checkin = {
   threshold: 1200, // 秒(默认 20 分钟)
   days: {},         // 'YYYY-MM-DD' -> { sec, checked, ts }
   today: '',
   secToday: 0,
-  lastActivity: 0,
   tickCount: 0,
 };
 
@@ -534,16 +553,13 @@ function loadCheckin() {
   checkin.today = checkinTodayKey();
   if (!checkin.days[checkin.today]) checkin.days[checkin.today] = { sec: 0, checked: false, ts: 0 };
   checkin.secToday = checkin.days[checkin.today].sec;
-  checkin.lastActivity = Date.now();
 }
 
 function saveCheckin() {
   try { localStorage.setItem(CHECKIN_KEY, JSON.stringify({ threshold: checkin.threshold, days: checkin.days })); } catch (e) { /* ignore */ }
 }
 
-function markActivity() { checkin.lastActivity = Date.now(); }
-
-/* 每秒 tick:前台且有操作 → 累计活跃秒;达标 → 打卡;定期落盘 */
+/* 每秒 tick:页面可见 → 累计活跃秒;达标 → 打卡;定期落盘 */
 function checkinTick() {
   const now = Date.now();
   const key = checkinTodayKey();
@@ -553,7 +569,7 @@ function checkinTick() {
     checkin.secToday = checkin.days[key].sec;
   }
   const rec = checkin.days[key];
-  if (document.visibilityState === 'visible' && now - checkin.lastActivity < IDLE_MS) {
+  if (document.visibilityState === 'visible') {
     rec.sec++;
     checkin.secToday = rec.sec;
     if (!rec.checked && rec.sec >= checkin.threshold) {
@@ -569,16 +585,8 @@ function checkinTick() {
 }
 
 function startActivityTracking() {
-  const throttledMove = (() => {
-    let last = 0;
-    return () => { const n = Date.now(); if (n - last >= 500) { last = n; checkin.lastActivity = n; } };
-  })();
-  ['pointermove', 'mousedown', 'touchstart', 'keydown', 'scroll'].forEach(ev =>
-    window.addEventListener(ev, ev === 'pointermove' ? throttledMove : markActivity, { passive: true })
-  );
   window.addEventListener('pagehide', saveCheckin);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') saveCheckin(); });
-  checkin.lastActivity = Date.now();
   setInterval(checkinTick, 1000);
 }
 
@@ -710,14 +718,14 @@ function init() {
   renderPartChips();
   renderSelects();
   bindUI();
-  render();
 
-  // 周训计划
+  // 周训计划(默认视图)
   loadPlan();
   renderPlanControls();
   bindPlanUI();
   bindViewTabs();
   renderPlan();
+  focusToday();
 
   // 月训打卡
   loadCheckin();
