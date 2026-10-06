@@ -20,8 +20,9 @@ permissions:
   id-token: write
 
 # 同一时刻仅一个部署；新提交入队即取消旧构建（用户核心诉求）
+# 组名用 pages-deploy：与已停用内链遗留的僵尸运行（占着 pages 组）隔离，避免新部署被永久卡 waiting
 concurrency:
-  group: "pages"
+  group: "pages-deploy"
   cancel-in-progress: true
 
 jobs:
