@@ -427,7 +427,6 @@ function loadPlan() {
   plan.days = buildPlan(plan.template, plan.count);
 }
 
-let savedTimer = null;
 /* 今天动作的 GIF 预取:复用灯箱的加载器(去重 + 多节点 fallback),
    每个动图约 0.1MB 且 CDN 缓存 7 天,空闲串行预取后训练时点击秒开。 */
 let gifPrefetchTimer = null;

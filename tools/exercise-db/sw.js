@@ -8,7 +8,7 @@
    旧缓存会在 activate 阶段整体清除。
    ============================================================ */
 
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = 'exercise-db-' + VERSION;
 const PRECACHE = [
   './',
