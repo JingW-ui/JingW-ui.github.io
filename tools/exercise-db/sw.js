@@ -8,7 +8,7 @@
    旧缓存会在 activate 阶段整体清除。
    ============================================================ */
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = 'exercise-db-' + VERSION;
 const PRECACHE = [
   './',
@@ -39,7 +39,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   // 非 GET(表单等)与跨域 CDN 媒体直接放行
   if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
-  // 同源资源:stale-while-revalidate
+  // 同源资源:stale-while-revalidate;存储不可用时(隐私模式等)直连网络,绝不拦截失败
   e.respondWith(
     caches.open(CACHE).then(async cache => {
       const cached = await cache.match(e.request);
@@ -48,6 +48,6 @@ self.addEventListener('fetch', e => {
         return res;
       }).catch(() => cached); // 断网且有缓存时回退缓存
       return cached || fetchPromise;
-    })
+    }).catch(() => fetch(e.request))
   );
 });

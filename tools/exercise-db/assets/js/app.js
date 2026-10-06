@@ -822,7 +822,27 @@ function init() {
   applyLang();
 }
 
-init();
+/* 启动守卫:确保数据就绪后才 init。
+   数据脚本因任何原因未就绪(加载顺序异常/网络抖动)时轮询等待,
+   超时则给出可见错误——绝不把页面卡死在无绑定的空壳上。 */
+function boot(attempt) {
+  if (window.EXERCISES && window.EXERCISES.length) {
+    state.all = window.EXERCISES;
+    init();
+    return;
+  }
+  if (attempt >= 60) { // ~6 秒
+    const msg = '<div class="plan-hint">⚠️ 数据加载失败,请刷新重试</div>';
+    const pg = $('planGrid');
+    if (pg) pg.innerHTML = msg;
+    const g = $('grid');
+    if (g) g.innerHTML = '<div class="result-hint">数据加载失败,请刷新重试</div>';
+    return;
+  }
+  setTimeout(() => boot(attempt + 1), 100);
+}
+
+boot(0);
 
 /* Service Worker:壳层与数据 stale-while-revalidate,二次访问秒开 + 离线可用。
    GIF/缩略图不进缓存(体积大),交给浏览器 HTTP 缓存与 CDN fallback。 */
