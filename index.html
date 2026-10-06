@@ -120,7 +120,7 @@
         .visit-n {
             position: absolute;
             top: 0;                     /* 卡片上边缘内侧顶格 */
-            left: 132px;                /* 头像右缘（30+88=118px）再让 14px，落在左上角区域靠右 */
+            left: 30px;                 /* 与头像左缘对齐（卡片内边距 30px），贴顶靠左 */
             min-width: 30px;
             padding: 0 8px;
             border-radius: 999px;
@@ -297,7 +297,7 @@
             .welcome-card { padding: 20px 18px; flex-wrap: wrap; }
             .welcome-card-top { flex-direction: column; gap: 14px; }
             .welcome-avatar { width: 72px; height: 72px; }
-            .visit-n { left: 98px; }    /* 移动端头像 72px + 内边距 18px = 右缘 90px，再让 8px */
+            .visit-n { left: 18px; }    /* 移动端与头像左缘对齐（内边距 18px） */
             .welcome-title { font-size: 21px; }
             .welcome-stats { width: 100%; grid-template-columns: repeat(3, 1fr); gap: 6px; }
             .welcome-stat { min-width: 0; padding: 6px 4px; }
