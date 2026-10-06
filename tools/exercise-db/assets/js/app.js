@@ -428,6 +428,22 @@ function loadPlan() {
 }
 
 let savedTimer = null;
+/* 今天动作的 GIF 预取:复用灯箱的加载器(去重 + 多节点 fallback),
+   每个动图约 0.1MB 且 CDN 缓存 7 天,空闲串行预取后训练时点击秒开。 */
+let gifPrefetchTimer = null;
+function prefetchTodayGifs() {
+  if (navigator.connection && navigator.connection.saveData) return; // 尊重浏览器省流模式
+  const today = plan.days[(new Date().getDay() + 6) % 7];
+  if (!today || today.target === 'rest' || !today.exIds.length) return;
+  const list = today.exIds
+    .map(id => state.all.find(x => x.id === id))
+    .filter(ex => ex && !gifState.has(ex.id)); // 已在加载/已加载的跳过
+  let i = 0;
+  const next = () => { if (i >= list.length) return; ensureGif(list[i++], () => setTimeout(next, 300)); };
+  next();
+}
+
+let savedTimer = null;
 function savePlan() {
   try {
     localStorage.setItem(PLAN_KEY, JSON.stringify(plan));
@@ -508,6 +524,9 @@ function renderPlan() {
     card.appendChild(list);
     grid.appendChild(card);
   });
+  // 今日 GIF 预取:防抖避免换一批连点时重复触发(已加载的会被过滤)
+  clearTimeout(gifPrefetchTimer);
+  gifPrefetchTimer = setTimeout(prefetchTodayGifs, 2000);
 }
 
 function renderPlanControls() {
