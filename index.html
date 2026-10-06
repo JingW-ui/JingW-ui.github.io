@@ -115,13 +115,12 @@
         .welcome-stat .stat-value { font-family: 'Courier New', monospace; font-size: 17px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
         .welcome-stat .stat-label { font-size: 9.5px; color: var(--text-muted); margin-top: 1px; }
 
-        /* 全站访问量（VerCount）：贴卡片上边缘顶格、相对头像右错 28px 的纯数字小徽章
+        /* 全站访问量（VerCount）：锚定 welcome-card 本体——贴上边缘内侧顶格、头像右侧一点的位置
            回填成功才浮现（visibility 双保险），hover 弹出玻璃气泡彩蛋 */
         .visit-n {
             position: absolute;
-            top: -26px;                 /* 卡片内边距 26px：顶格贴上边缘内侧，头像上方留出约 10px 呼吸空隙 */
-            left: calc(50% + 28px);     /* 相对头像中心右错 28px，与头像拉开水平距离 */
-            transform: translateX(-50%);
+            top: 0;                     /* 卡片上边缘内侧顶格 */
+            left: 132px;                /* 头像右缘（30+88=118px）再让 14px，落在左上角区域靠右 */
             min-width: 30px;
             padding: 0 8px;
             border-radius: 999px;
@@ -298,7 +297,7 @@
             .welcome-card { padding: 20px 18px; flex-wrap: wrap; }
             .welcome-card-top { flex-direction: column; gap: 14px; }
             .welcome-avatar { width: 72px; height: 72px; }
-            .visit-n { top: -20px; }    /* 移动端卡片内边距 20px：同样顶格贴上边缘内侧 */
+            .visit-n { left: 98px; }    /* 移动端头像 72px + 内边距 18px = 右缘 90px，再让 8px */
             .welcome-title { font-size: 21px; }
             .welcome-stats { width: 100%; grid-template-columns: repeat(3, 1fr); gap: 6px; }
             .welcome-stat { min-width: 0; padding: 6px 4px; }
@@ -381,10 +380,11 @@
             <div class="glass-card welcome-card fade-in enter-hero d1">
                 <div class="welcome-card-top">
                     <!-- 投递看板的隐藏入口：仅点击头像跳转，不做任何可见提示 -->
-                    <a href="/tracker/" aria-label="投递看板" style="line-height:0;flex-shrink:0;position:relative;">
+                    <a href="/tracker/" aria-label="投递看板" style="line-height:0;flex-shrink:0;">
                         <img src="imgs/life_and_others/myavtar.png" alt="王京" class="welcome-avatar" style="cursor:pointer;">
-                        <span class="visit-n" id="vercount_value_site_pv" data-n="" aria-label="全站访问量">—</span>
                     </a>
+                    <!-- 全站访问量徽章：锚定卡片本体左上角区域（贴顶、头像右侧），点击不再误入投递看板 -->
+                    <span class="visit-n" id="vercount_value_site_pv" data-n="" aria-label="全站访问量">—</span>
                     <div class="welcome-text">
                         <div class="welcome-title-row">
                             <h1 class="welcome-title" id="welcomeTitle">你好</h1>
