@@ -1,0 +1,47 @@
+# GitHub Pages 部署（Source: GitHub Actions 模式专用）
+#
+# 前置条件：仓库 Settings → Pages → Build and deployment → Source 切到
+# "GitHub Actions" 后，本工作流的部署步骤才生效；未切换前 push 触发的
+# 运行会在 deploy 步骤报错（红叉无害，不影响站点）。
+#
+# 与旧的分支部署（GitHub 内部 pages build and deployment）的区别：
+# 1. 快速连推时，concurrency 会取消进行中/排队的过期构建，只部署最新提交；
+# 2. 纯产物上传，跳过分支模式对全仓库的 Jekyll 处理，配合 .nojekyll 大幅提速。
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同一时刻仅一个部署；新提交入队即取消旧构建（用户核心诉求）
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
