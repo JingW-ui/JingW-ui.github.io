@@ -115,6 +115,59 @@
         .welcome-stat .stat-value { font-family: 'Courier New', monospace; font-size: 17px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
         .welcome-stat .stat-label { font-size: 9.5px; color: var(--text-muted); margin-top: 1px; }
 
+        /* 全站访问量（VerCount）：头像上方、贴卡片上边缘内侧的纯数字小徽章
+           回填成功才浮现（visibility 双保险），hover 弹出玻璃气泡彩蛋 */
+        .visit-n {
+            position: absolute;
+            top: -22px;                 /* 头像锚点向上 22px = 卡片内边距 26px 时距上边缘内侧 4px */
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 30px;
+            padding: 1px 8px;
+            border-radius: 999px;
+            background: var(--card-bg-strong);
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            font-weight: 800;
+            line-height: 1.5;
+            color: var(--text-muted);
+            text-align: center;
+            white-space: nowrap;
+            z-index: 3;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity var(--m-std) var(--e-std), color var(--m-fast) var(--e-std), border-color var(--m-fast) var(--e-std);
+        }
+        .visit-n.on { visibility: visible; opacity: 1; }
+        .visit-n:hover { color: var(--accent-teal); border-color: var(--accent-teal); }
+        .visit-n::after {
+            content: '欢迎，您是第 ' attr(data-n) ' 位光临本站的吴彦祖/迪丽热巴';
+            position: absolute;
+            top: calc(100% + 7px);
+            left: 0;                    /* 玻璃卡 overflow:hidden，气泡向右展开避免被左边缘裁切 */
+            transform: translateY(-4px);
+            padding: 7px 14px;
+            border-radius: var(--radius-sm);
+            background: var(--card-bg-strong);
+            border: 1px solid var(--card-border);
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            font-family: 'Noto Sans SC', -apple-system, 'Microsoft YaHei', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--m-fast) var(--e-std), transform var(--m-fast) var(--e-out-expo);
+            z-index: 5;
+        }
+        .visit-n:hover::after { opacity: 1; transform: translateY(0); }
+
         .content-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
         .section-card { padding: 22px 24px; }
         .mao-quote { position: absolute; top: 16px; right: 20px; max-width: 420px; font-size: 12px; color: var(--text-muted); line-height: 1.6; text-align: right; font-style: italic; opacity: 0.7; }
@@ -218,28 +271,6 @@
         .alt-page-link { opacity: 0.2; transition: opacity 0.3s; font-size: 0.7rem; color: var(--text-muted); text-decoration: none; position: fixed; bottom: 8px; right: 12px; z-index: 50; }
         .alt-page-link:hover { opacity: 0.7; }
 
-        /* 全站访问统计（VerCount CN 镜像）：左下角玻璃角标，与 tools/Games/softwares 索引页同款 */
-        .visit-stats {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--card-bg-strong);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-sm);
-            padding: 8px 14px;
-            font-size: 0.68rem;
-            color: var(--text-muted);
-            z-index: 50;
-            opacity: 0.7;
-            transition: var(--transition);
-            line-height: 1.6;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-        }
-        .visit-stats:hover { opacity: 1; border-color: var(--text-muted); }
-        .visit-stats-item { display: flex; align-items: center; gap: 6px; }
-        .visit-count { color: var(--accent-teal); font-weight: 600; }
-
         /* 平板及以下：导航横向 + 右侧组件回流显示（不再隐藏） */
         @media (max-width: 1200px) {
             .main-container { grid-template-columns: 1fr; padding-top: 16px; }
@@ -267,6 +298,7 @@
             .welcome-card { padding: 20px 18px; flex-wrap: wrap; }
             .welcome-card-top { flex-direction: column; gap: 14px; }
             .welcome-avatar { width: 72px; height: 72px; }
+            .visit-n { top: -16px; }    /* 移动端卡片内边距 20px：同样保持距上边缘内侧 4px */
             .welcome-title { font-size: 21px; }
             .welcome-stats { width: 100%; grid-template-columns: repeat(3, 1fr); gap: 6px; }
             .welcome-stat { min-width: 0; padding: 6px 4px; }
@@ -349,8 +381,9 @@
             <div class="glass-card welcome-card fade-in enter-hero d1">
                 <div class="welcome-card-top">
                     <!-- 投递看板的隐藏入口：仅点击头像跳转，不做任何可见提示 -->
-                    <a href="/tracker/" aria-label="投递看板" style="line-height:0;flex-shrink:0;">
+                    <a href="/tracker/" aria-label="投递看板" style="line-height:0;flex-shrink:0;position:relative;">
                         <img src="imgs/life_and_others/myavtar.png" alt="王京" class="welcome-avatar" style="cursor:pointer;">
+                        <span class="visit-n" id="vercount_value_site_pv" data-n="" aria-label="全站访问量">—</span>
                     </a>
                     <div class="welcome-text">
                         <div class="welcome-title-row">
@@ -1003,19 +1036,24 @@
             if (b1) b1.addEventListener('click', () => spin(b1));
             if (b2) b2.addEventListener('click', () => spin(b2));
         })();
+
+        /* ── 全站访问量徽章：VerCount 回填后浮现并写入 data-n 供 hover 气泡展示；10s 未回填静默放弃 ── */
+        (function() {
+            const el = document.getElementById('vercount_value_site_pv');
+            if (!el) return;
+            const fill = () => {
+                const t = (el.textContent || '').trim();
+                if (t && t !== '—') { el.dataset.n = t; el.classList.add('on'); return true; }
+                return false;
+            };
+            if (fill()) return;
+            const mo = new MutationObserver(() => { if (fill()) mo.disconnect(); });
+            mo.observe(el, { childList: true, characterData: true, subtree: true });
+            setTimeout(() => mo.disconnect(), 10000);
+        })();
     </script>
 
-    <!-- 全站访问统计（VerCount CN 镜像）：与 tools/Games/softwares 索引页同款左下角标 -->
-    <div class="visit-stats" id="visitStats">
-        <div class="visit-stats-item">
-            <span>本站访问:</span>
-            <span class="visit-count" id="vercount_value_site_pv">—</span>
-        </div>
-        <div class="visit-stats-item">
-            <span>本站访客:</span>
-            <span class="visit-count" id="vercount_value_site_uv">—</span>
-        </div>
-    </div>
+    <!-- VerCount 计数脚本（CN 镜像）：数字回填至 welcome-card 头像上方小徽章 -->
     <script defer src="https://cn.vercount.one/js"></script>
 </body>
 </html>
