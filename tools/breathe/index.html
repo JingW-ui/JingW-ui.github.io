@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="引导式呼吸节律动画工具，支持盒式呼吸 4-4-4-4 与 4-7-8 助眠法，跟随绿色渐变圆圈的节奏完成吸气、屏息与呼气，缓解焦虑、放松身心，浏览器直接使用。">
+    <meta name="description" content="引导式呼吸节律动画工具，支持盒式呼吸 4-4-4-4 与 4-7-8 助眠法，跟随绿色渐变圆圈的节奏完成吸气、屏息与呼气，缓解焦虑、放松身心，支持深色模式与屏幕常亮，浏览器直接使用。">
     <link rel="icon" type="image/png" href="/imgs/logo/github_logo.png">
     <title>深呼吸放松 - 引导式呼吸节律动画 | JingW-ui</title>
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0e1412" media="(prefers-color-scheme: dark)">
+    <script>(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark')}catch(e){}})();</script>
     <style>
         :root {
             /* 纸面基调（与 tools 主页同源） */
@@ -20,6 +23,17 @@
             --green-1: #34d399;
             --green-2: #10b981;
             --green-3: #059669;
+        }
+
+        /* 深色：夜里床上跟练场景，低亮度绿意炭底（跟随系统，可手动切换） */
+        html.dark {
+            --bg: #0e1412;
+            --chip: #18201c;
+            --line: #2a342f;
+            --line-strong: #e2e8e4;
+            --text: #e8ede9;
+            --text-soft: #9faba4;
+            --text-dim: #67736c;
         }
 
         * {
@@ -40,6 +54,7 @@
             color: var(--text);
             overflow: hidden;
             padding: 2rem;
+            transition: background-color 0.35s ease;
         }
 
         /* 顶部标题与模式切换 */
@@ -95,36 +110,69 @@
             box-shadow: inset 0 0 0 1px var(--line-strong);
         }
 
-        /* 呼吸主容器 */
+        html.dark .mode-btn.active {
+            background: #242e28;
+            box-shadow: inset 0 0 0 1px #4a564f;
+        }
+
+        /* 右上角主题切换 */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: 2.3rem;
+            height: 2.3rem;
+            border-radius: 50%;
+            background: var(--chip);
+            border: 1px solid var(--line);
+            color: var(--text-soft);
+            font-size: 0.95rem;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .theme-toggle:hover {
+            color: var(--text);
+            border-color: var(--line-strong);
+        }
+
+        /* 呼吸主容器：宽度同时受视口宽高约束，杜绝小屏偏心与竖向裁切 */
         .breathing-container {
+            --size: max(200px, min(320px, calc(100vw - 2.5rem), calc(100vh - 320px)));
             position: relative;
-            width: 320px;
-            height: 320px;
+            width: var(--size);
+            height: var(--size);
             display: flex;
             justify-content: center;
             align-items: center;
             margin: auto;
         }
 
-        /* 背景静态参考圈 */
+        /* 背景静态参考圈（容器 87.5%） */
         .guide-circle {
             position: absolute;
-            width: 280px;
-            height: 280px;
+            width: 87.5%;
+            height: 87.5%;
             border: 1px dashed var(--line);
             border-radius: 50%;
             pointer-events: none;
         }
 
-        /* 动态缩放的呼吸圈 */
+        /* 动态缩放的呼吸圈（容器 43.75%，scale(2) 时正好贴齐参考圈） */
         .breathing-circle {
             position: absolute;
-            width: 140px;
-            height: 140px;
+            width: 43.75%;
+            height: 43.75%;
             border-radius: 50%;
             background: var(--green-2);
             box-shadow: 0 0 50px rgba(16, 185, 129, 0.25);
             transform: scale(1);
+            will-change: transform;
             transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), background-color 1s ease, box-shadow 1s ease;
         }
 
@@ -169,6 +217,7 @@
             font-size: 2.8rem;
             font-weight: 300;
             font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+            font-variant-numeric: tabular-nums;
             color: var(--text-soft);
             opacity: 0.9;
             transition: color 0.6s ease;
@@ -184,6 +233,15 @@
         footer {
             margin-bottom: 2rem;
             z-index: 10;
+            text-align: center;
+        }
+
+        .session-info {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            letter-spacing: 0.08rem;
+            margin-bottom: 0.9rem;
+            font-variant-numeric: tabular-nums;
         }
 
         .control-btn {
@@ -209,20 +267,69 @@
 
         .control-btn.running {
             background: var(--line-strong);
+            color: #ffffff;
+        }
+
+        html.dark .control-btn.running {
+            background: #e2e8e4;
+            color: #10231b;
+        }
+
+        /* 小屏适配：宽度 ≤420px 收紧留白与字号 */
+        @media (max-width: 420px) {
+            body {
+                padding: 1.2rem 1rem;
+            }
+
+            h1 {
+                font-size: 1.35rem;
+                letter-spacing: 0.25rem;
+                text-indent: 0.25rem;
+            }
+
+            .page-hint {
+                margin-bottom: 0.9rem;
+            }
+
+            .mode-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            #status {
+                font-size: 1.5rem;
+            }
+
+            #timer {
+                font-size: 2.3rem;
+            }
+
+            .control-btn {
+                padding: 0.8rem 2.6rem;
+            }
         }
 
         @media (prefers-reduced-motion: reduce) {
             .mode-btn,
-            .control-btn {
+            .control-btn,
+            .theme-toggle,
+            body {
                 transition: none;
+            }
+
+            /* 呼吸圈缩放交由 JS 判定后直接禁用过渡，只保留文字倒计时 */
+            .breathing-circle {
+                transition: none !important;
             }
         }
     </style>
 </head>
 <body>
 
+    <button class="theme-toggle" id="themeToggle" aria-label="切换深色模式">🌙</button>
+
     <header>
-        <h1>静心呼吸</h1>
+        <h1>深呼吸放松</h1>
         <p class="page-hint">跟随圆圈胀缩的节奏 · 吸气 — 屏息 — 呼气</p>
         <div class="modes">
             <button class="mode-btn active" onclick="switchMode('box', this)">盒子呼吸法 (4-4-4-4)</button>
@@ -234,12 +341,13 @@
         <div class="guide-circle"></div>
         <div class="breathing-circle" id="circle"></div>
         <div class="text-overlay">
-            <span id="status"></span>
-            <span id="timer">-</span>
+            <span id="status" aria-live="polite"></span>
+            <span id="timer" aria-hidden="true">-</span>
         </div>
     </div>
 
     <footer>
+        <p class="session-info" id="sessionInfo">准备就绪 · 开始后自动计轮</p>
         <button class="control-btn" id="startBtn" onclick="toggleBreathing()">开始练习</button>
     </footer>
 
@@ -248,12 +356,24 @@
         const statusText = document.getElementById('status');
         const timerText = document.getElementById('timer');
         const startBtn = document.getElementById('startBtn');
+        const sessionInfo = document.getElementById('sessionInfo');
+        const themeToggle = document.getElementById('themeToggle');
+        const rootEl = document.documentElement;
 
-        let isRunning = false;
-        let currentPhaseIndex = 0;
-        let countdown = 0;
-        let stateInterval = null;
-        let timerInterval = null;
+        const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // —— 主题切换（与 life-better 同款约定：localStorage.theme + html.dark）——
+        function applyTheme(dark) {
+            rootEl.classList.toggle('dark', dark);
+            themeToggle.textContent = dark ? '☀️' : '🌙';
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const dark = !rootEl.classList.contains('dark');
+            try { localStorage.setItem('theme', dark ? 'dark' : 'light'); } catch (e) { /* 隐私模式忽略 */ }
+            applyTheme(dark);
+        });
+        applyTheme(rootEl.classList.contains('dark'));
 
         // 绿色明度阶梯（全页唯一颜色来源，改动只动这里）
         const PHASE_COLORS = {
@@ -297,69 +417,143 @@
             }
         }
 
+        // —— 运行状态：时间锚定（以 performance.now() 起点推算相位），
+        //    切后台/锁屏回来按真实时间对齐，不逐秒累计、永不漂移 ——
+        let isRunning = false;
+        let sessionStart = 0;   // 本次练习起点
+        let cycle = [];         // 当前模式一个完整轮的相位表（含累计边界 end）
+        let cycleLength = 0;    // 一个完整轮的总秒数
+        let rafId = null;
+        let shownStep = -1;     // 上一次渲染的绝对步序（轮数 × 相位数 + 相位下标）
+        let wakeLock = null;
+
+        function buildCycle() {
+            cycle = [];
+            let acc = 0;
+            for (const p of modes[currentMode]) {
+                acc += p.duration;
+                cycle.push({ ...p, end: acc });
+            }
+            cycleLength = acc;
+        }
+
         function startBreathing() {
             isRunning = true;
             document.body.classList.add('running');
             startBtn.textContent = '停止';
             startBtn.classList.add('running');
-            currentPhaseIndex = 0;
-            runPhase();
+            buildCycle();
+            sessionStart = performance.now();
+            shownStep = -1;
+            requestWakeLock();
+            rafId = requestAnimationFrame(tick);
         }
 
         function stopBreathing() {
             isRunning = false;
+            cancelAnimationFrame(rafId);
             document.body.classList.remove('running');
             startBtn.textContent = '开始练习';
             startBtn.classList.remove('running');
-            clearTimeout(stateInterval);
-            clearInterval(timerInterval);
             resetUI();
+            releaseWakeLock();
         }
 
         function resetUI() {
             statusText.textContent = '';
             timerText.textContent = '-';
-            circle.style.transition = 'all 1s ease-in-out';
+            sessionInfo.textContent = '准备就绪 · 开始后自动计轮';
+            if (!reducedMotion) {
+                circle.style.transition = 'all 1s ease-in-out';
+            }
             circle.style.transform = 'scale(1)';
             circle.style.backgroundColor = PHASE_COLORS.hold.color;
             circle.style.boxShadow = PHASE_COLORS.hold.glow;
         }
 
-        function runPhase() {
+        function tick(now) {
             if (!isRunning) return;
 
-            const phases = modes[currentMode];
-            const phase = phases[currentPhaseIndex];
+            const t = (now - sessionStart) / 1000;
+            const step = Math.floor(t / cycleLength);          // 已完成的完整轮数
+            const offset = t - step * cycleLength;             // 本轮内偏移
+            let idx = cycle.findIndex(p => offset < p.end);
+            if (idx < 0) idx = cycle.length - 1;
+            const phase = cycle[idx];
+            const phaseStart = idx ? cycle[idx - 1].end : 0;
+            const phaseElapsed = offset - phaseStart;
+            const absStep = step * cycle.length + idx;
 
-            // 更新文字与时间
+            // 相位切换渲染（只在步序变化时动 DOM）
+            if (absStep !== shownStep) {
+                const jumped = shownStep >= 0 && absStep !== shownStep + 1; // 后台节流后跨步跳变
+                shownStep = absStep;
+                renderPhase(phase, phase.duration - phaseElapsed, jumped);
+            }
+
+            // 倒计时数字（仅在数字变化时写入）
+            const remain = Math.max(1, Math.ceil(phase.duration - phaseElapsed));
+            if (timerText.textContent !== String(remain)) {
+                timerText.textContent = remain;
+            }
+
+            // 轮数 + 已练时长
+            const m = Math.floor(t / 60);
+            const s = Math.floor(t % 60);
+            const info = `第 ${step + 1} 轮 · 已练 ${m}:${String(s).padStart(2, '0')}`;
+            if (sessionInfo.textContent !== info) {
+                sessionInfo.textContent = info;
+            }
+
+            rafId = requestAnimationFrame(tick);
+        }
+
+        // remainSec = 本相位剩余秒数：过渡时长与之对齐，保证恰好在边界落定
+        function renderPhase(phase, remainSec, jumped) {
             statusText.textContent = phase.name;
-            countdown = phase.duration;
-            timerText.textContent = countdown;
+            timerText.textContent = phase.duration;
 
-            // 应用平滑过渡动画（过渡时间正好等于当前阶段持续时间）
-            circle.style.transition = `transform ${phase.duration}s cubic-bezier(0.37, 0, 0.63, 1), background-color ${phase.duration}s ease-in-out, box-shadow ${phase.duration}s ease-in-out`;
+            if (jumped || reducedMotion || remainSec <= 0) {
+                // 跨步跳变 / 减弱动效：直接吸附到当前相位的目标状态
+                circle.style.transition = 'none';
+                circle.style.transform = `scale(${phase.scale})`;
+                circle.style.backgroundColor = phase.color;
+                circle.style.boxShadow = phase.glow;
+                void circle.offsetWidth; // 强制回流，随后恢复过渡能力
+                circle.style.transition = '';
+                return;
+            }
+
+            circle.style.transition = `transform ${remainSec}s cubic-bezier(0.37, 0, 0.63, 1), background-color ${remainSec}s ease-in-out, box-shadow ${remainSec}s ease-in-out`;
             circle.style.transform = `scale(${phase.scale})`;
             circle.style.backgroundColor = phase.color;
             circle.style.boxShadow = phase.glow;
-
-            // 秒表倒计时
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                countdown--;
-                if (countdown > 0) {
-                    timerText.textContent = countdown;
-                } else {
-                    clearInterval(timerInterval);
-                }
-            }, 1000);
-
-            // 阶段切换
-            clearTimeout(stateInterval);
-            stateInterval = setTimeout(() => {
-                currentPhaseIndex = (currentPhaseIndex + 1) % phases.length;
-                runPhase();
-            }, phase.duration * 1000);
         }
+
+        // —— 屏幕常亮：跟练期间保持唤醒，熄屏跟练不中断 ——
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (e) {
+                wakeLock = null; // 不支持或被系统拒绝时静默降级
+            }
+        }
+
+        function releaseWakeLock() {
+            try { wakeLock && wakeLock.release(); } catch (e) { /* 已释放 */ }
+            wakeLock = null;
+        }
+
+        // 页面隐藏时系统会自动释放锁，回可见时若仍在练习则补拿并续上渲染循环
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && isRunning) {
+                cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(tick);
+                requestWakeLock();
+            }
+        });
     </script>
 </body>
 </html>
