@@ -774,6 +774,7 @@ footer a:hover { color: var(--green); }
 
   function fmtNum(n) {
     if (n == null) return "-";
+    if (n >= 1000000) return (n / 1000000).toFixed(n >= 10000000 ? 0 : 1).replace(/\.0$/, "") + "M";
     if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1).replace(/\.0$/, "") + "k";
     return String(n);
   }
@@ -1003,6 +1004,9 @@ footer a:hover { color: var(--green); }
     // ---- Phase 2: Lazy-load languages for repos that got main data ----
     loadLanguagesLazy(phase1Fetched, controller.signal, token);
 
+    // ---- Phase 3: Lazy-load release download totals (lowest priority, quota-guarded) ----
+    loadReleasesLazy(phase1Fetched, controller.signal, token);
+
     // Save to search history if we got any actual data
     var hasData = phase1Fetched.some(function (f) { return f.res && f.res.repo; });
     if (hasData) saveHistory(text, list.length);
@@ -1043,6 +1047,60 @@ footer a:hover { color: var(--green); }
       statusEl.innerHTML = "<span>分析完成 / " + fetched.length + " 个仓库 (语言数据已补全 " + done + " 个)</span>";
       renderResults();
     }
+  }
+
+  // Lazily load release download totals (Phase 3, lowest priority).
+  // One request per repo: /releases?per_page=100 — summing assets[].download_count
+  // gives the exact cumulative total for repos with ≤100 releases; exactly-100
+  // results set `capped` so the card tooltip can disclose the cutoff.
+  // Quota guard: stop the whole phase once remaining quota ≤5 — releases are the
+  // most expendable metric, and "not fetched" renders identically to "no releases".
+  async function loadReleasesLazy(fetched, signal, token) {
+    var needRel = fetched.filter(function (f) {
+      return f.res && f.res.repo && !f.res.error && f.res.rel === undefined;
+    });
+    if (!needRel.length) return;
+
+    var headers = { "Accept": "application/vnd.github+json" };
+    if (token) headers["Authorization"] = "Bearer " + token;
+    var applied = 0;
+    for (var i = 0; i < needRel.length; i++) {
+      if (signal && signal.aborted) break;
+      if (quotaRemain != null && quotaRemain <= 5) break;
+      var f = needRel[i];
+      var cacheKey = (f.item.owner + "/" + f.item.repo).toLowerCase();
+      var cached = cacheGet(cacheKey);
+      if (cached && cached.rel) {
+        f.res.rel = cached.rel;
+        applied++;
+        continue;
+      }
+      try {
+        var base = "https://api.github.com/repos/" + encodeURIComponent(f.item.owner) + "/" + encodeURIComponent(f.item.repo);
+        var rr = await fetch(base + "/releases?per_page=100", { headers: headers, signal: signal });
+        recordQuota(rr.headers);
+        if (rr.ok) {
+          var rels = await rr.json();
+          var total = 0;
+          if (Array.isArray(rels)) {
+            for (var j = 0; j < rels.length; j++) {
+              var assets = rels[j].assets || [];
+              for (var k = 0; k < assets.length; k++) total += assets[k].download_count || 0;
+            }
+          }
+          f.res.rel = { total: total, capped: Array.isArray(rels) && rels.length >= 100 };
+          // Merge into the existing 30-min cache entry so repeat runs skip the fetch
+          var cachedNow = cacheGet(cacheKey);
+          if (cachedNow && cachedNow.repo) {
+            cacheSet(cacheKey, { repo: cachedNow.repo, langs: cachedNow.langs, rel: f.res.rel, fromCache: false });
+          }
+          applied++;
+        } else if (rr.status === 403 || rr.status === 429) {
+          break; // rate-limited — releases are expendable, stop the phase
+        }
+      } catch (e) { /* ignore */ }
+    }
+    if (applied > 0) renderResults();
   }
 
   function renderResults() {
@@ -1234,6 +1292,10 @@ footer a:hover { color: var(--green); }
     }
     var badgesHtml = buildBadges(item.owner, item.repo);
     var cacheTag = res.fromCache ? '<span class="cache-tag">缓存</span>' : "";
+    var showRel = res.rel && res.rel.total > 0;
+    var relHtml = showRel
+      ? '<span class="meta-item" title="' + (res.rel.capped ? "最近 100 个 Release 资产累计下载量" : "全部 Release 资产累计下载量") + '">&#8595; ' + fmtNum(res.rel.total) + ' 下载</span>'
+      : "";
     var langSection = langList(res.langs);
     var favClass = isFavorite(item.owner, item.repo) ? "fav-btn active" : "fav-btn";
     var favStar = isFavorite(item.owner, item.repo) ? "★" : "☆";
@@ -1251,6 +1313,7 @@ footer a:hover { color: var(--green); }
         '<span class="meta-item">' + relTime(r.pushed_at) + '</span>' +
         '<span class="meta-item">' + (r.license ? escapeHtml(r.license.spdx_id || r.license.name) : "无 License") + '</span>' +
         '<span class="meta-item">' + fmtNum(r.open_issues_count) + ' open issue</span>' +
+        relHtml +
       '</div>' +
       topics +
       langSection +
