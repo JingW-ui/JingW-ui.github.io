@@ -1156,7 +1156,7 @@
         <div class="empty-state" id="emptyState">未找到匹配的软件，换个关键词试试</div>
     </div>
 
-    <!-- 累计下载量（GitHub Releases 真实数据，shields.io 代取并缓存）+ 全站访问统计（VerCount CN 镜像）
+    <!-- 累计下载量（GitHub Releases 资产计数直取官方 API，localStorage 缓存 1 小时）+ 全站访问统计（VerCount CN 镜像）
          共用一个角标：任一数据源就绪即显示，失败的一组自动隐藏 -->
     <div class="visit-stats" id="downloadStats" hidden>
         <span class="stat-group" id="dlGroup">
@@ -1210,15 +1210,32 @@
             statChip.hidden = !(statState.dl || statState.vc);
         }
 
-        // 累计下载量：GitHub Releases 资产计数求和（shields.io 代取，服务端缓存约 5~60 分钟）
+        // 累计下载量：GitHub Releases 资产 download_count 直取官方 API 求和（localStorage 缓存 1 小时）。
+        // 不走 shields.io：其 .json 端点的 value 是格式化字符串（如 "1.23k"/"230M"），
+        // parseInt 会静默算错；API 原始数字在任意量级都精确。
         (async () => {
             const repos = ['PI-MAPP', 'AutoTask-UI-', 'MediScreen-Brain'];
+            const CACHE_KEY = 'sw_dl_total';
+            const CACHE_TTL = 60 * 60 * 1000;
             try {
-                const results = await Promise.all(repos.map(r =>
-                    fetch(`https://img.shields.io/github/downloads/JingW-ui/${r}/total.json`)
-                        .then(res => { if (!res.ok) throw new Error(res.status); return res.json(); })
-                ));
-                const total = results.reduce((sum, d) => sum + (parseInt(d.value, 10) || 0), 0);
+                let total = null;
+                try {
+                    const cached = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+                    if (cached && typeof cached.total === 'number' && Date.now() - cached.ts < CACHE_TTL) {
+                        total = cached.total;
+                    }
+                } catch (e) { /* 缓存损坏按未命中处理 */ }
+                if (total === null) {
+                    const results = await Promise.all(repos.map(r =>
+                        fetch(`https://api.github.com/repos/JingW-ui/${r}/releases?per_page=100`, {
+                            headers: { 'Accept': 'application/vnd.github+json' }
+                        }).then(res => { if (!res.ok) throw new Error(res.status); return res.json(); })
+                    ));
+                    total = results.reduce((sum, rels) => sum + (Array.isArray(rels)
+                        ? rels.reduce((s, rel) => s + (rel.assets || []).reduce((t, a) => t + (a.download_count || 0), 0), 0)
+                        : 0), 0);
+                    try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), total: total })); } catch (e) { /* 隐私模式等场景静默跳过 */ }
+                }
                 const num = document.getElementById('totalDownloads');
                 if (num) num.textContent = total.toLocaleString();
                 statState.dl = true;
