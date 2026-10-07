@@ -674,6 +674,8 @@
         }
         generateCalendar();
 
+        const GH_MARK = (color) => `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23${color}'%3E%3Cpath d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z'/%3E%3C/svg%3E" alt="" width="22" height="22">`;
+        const ICON_GITHUB_GREEN = GH_MARK('238636'), ICON_GITHUB_BLUE = GH_MARK('2f81f7');
         const TOOLS = [
             ['biji','笔记工具','便捷的在线笔记应用，支持文本编辑和保存功能','other'],
             ['create_icon','图标创建','在线创建和自定义图标，支持多种格式导出','image'],
@@ -723,7 +725,7 @@
             ['40-lorem-generator','Lorem 生成器','生成占位文本，支持段落和单词数量自定义','text'],
             ['lucky_draw','上课抽签器','像素风课堂点名工具，支持Excel导入和隐蔽数据管理','other'],
             ['script_forge','脚本工坊','在线脚本编辑和管理工具','other'],
-            ['thrending','github热门榜单','github热门榜单','info'],
+            ['thrending','github热门榜单','github热门榜单','info', ICON_GITHUB_GREEN],
             ['hot-dashboard','60s信息流','60s聚合信息流看板','info'],
             ['academic_rank','学科评估数据面板','第四轮学科评估结果可视化，高校学科实力洞察','info'],
             ['hupu','虎扑评分数据面板','虎扑JRs评分数据可视化，图鉴式人物榜单','info'],
@@ -737,7 +739,7 @@
             ['os_kg','手机 OS 数据仪表盘','手机 OS 知识图谱与市场份额可视化，覆盖 OS 占比、品牌出货、区域对比','info'],
             ['h_kg','心血管疾病知识图谱','心血管疾病领域知识图谱可视化，展示疾病、症状、治疗等信息关联','info'],
             ['gz','实时毫秒薪计时器','按工作制毫秒级实时计算秒薪与今日/本月累计收入','calc'],
-            ['repo-radar','Repo Radar','粘贴文本自动嗅探 GitHub 仓库，徽章展示与一键复制嵌入代码','info'],
+            ['repo-radar','Repo Radar','粘贴文本自动嗅探 GitHub 仓库，徽章展示与一键复制嵌入代码','info', ICON_GITHUB_BLUE],
             ['game_kg','游戏行业知识图谱','游戏厂商、热门游戏、引擎、类型、平台等实体关系可视化，聚焦网易游戏生态','info'],
             ['zhuiju-nav','追剧资源导航','免费无广告追剧资源聚合导航，分类/搜索/评分/风险一目了然','info'],
             ['world-monitor','世界实时监控','实时地震与全球自然事件监控地图','info'],
@@ -759,9 +761,10 @@
             let idx;
             do { idx = Math.floor(Math.random() * TOOLS.length); } while (idx === lastIndex && TOOLS.length > 1);
             lastIndex = idx;
-            const [slug, name, desc, cat] = TOOLS[idx];
+            const [slug, name, desc, cat, icon] = TOOLS[idx];
             document.getElementById('recommendItem').href = slug.startsWith('http') ? slug : '/tools/' + slug + '/';
-            document.getElementById('recIcon').textContent = ICONS[cat] || '🧰';
+            const recIconEl = document.getElementById('recIcon');
+            if (icon) { recIconEl.innerHTML = icon; } else { recIconEl.textContent = ICONS[cat] || '🧰'; }
             document.getElementById('recName').textContent = name;
             document.getElementById('recDesc').textContent = desc;
             document.getElementById('recTag').textContent = TAGS[cat] || '工具';
