@@ -1,7 +1,7 @@
 /* =====================================================
    免费追剧资源导航 app.js
    数据流：内置快照 data.js（同步首屏）→ jsDelivr/raw 拉最新 → 失败回退快照
-   纯静态、零依赖，仅依赖 Font Awesome（CSS 图标）
+   纯静态、零依赖（纸面清单风，无图标库）
    ===================================================== */
 (function () {
   'use strict';
@@ -31,10 +31,8 @@
     'subtitles', 'player', 'subscription', 'tvbox_config', 'open_source'
   ];
 
-  var SCORE_LABELS = { more: '资源', speed: '速度', clean: '干净', stable: '稳定', ease: '易用' };
   var RISK_LABELS = { copyright: '版权', safety: '安全', privacy: '隐私', payment: '支付' };
   var RISK_TEXT = { low: '低', medium: '中', high: '高', unknown: '未知' };
-  var FREE_TEXT = { free: '免费', mostly_free: '基本免费', partly_free: '部分免费', paid: '付费', unknown: '' };
 
   /* ---------- 状态 ---------- */
   var state = {
@@ -53,9 +51,7 @@
   var emptyEl = document.getElementById('empty');
   var emptyTextEl = document.getElementById('emptyText');
   var resultInfoEl = document.getElementById('resultInfo');
-  var statusTextEl = document.getElementById('statusText');
-  var statusPillEl = document.getElementById('statusPill');
-  var statusIconEl = statusPillEl.querySelector('i');
+  var heroNoteEl = document.getElementById('heroNote');
 
   /* ---------- 工具函数 ---------- */
   function escapeHtml(s) {
@@ -139,19 +135,31 @@
     renderAll();
   }
 
+  /* 头部一行小字：状态 + 数量（离线快照/加载失败时整段转琥珀色） */
+  var heroStatus = { kind: 'loading', extra: '' };
   function setStatus(kind, extra) {
+    heroStatus.kind = kind;
+    heroStatus.extra = extra || '';
+    renderHeroNote();
+  }
+  function renderHeroNote() {
+    if (!heroNoteEl) return;
     var map = {
-      loading:  ['fa-spinner fa-spin', '加载中…', ''],
-      checking: ['fa-spinner fa-spin', '正在检测…', ''],
-      fresh:    ['fa-circle', '今日已检测', ''],
-      same:     ['fa-circle', '今日已检测', ''],
-      stale:    ['fa-triangle-exclamation', '离线快照 · ' + (extra || '—'), 'stale'],
-      error:    ['fa-triangle-exclamation', '加载失败', 'stale']
+      loading:  '加载中…',
+      checking: '正在检测…',
+      fresh:    '今日已检测',
+      same:     '今日已检测',
+      stale:    '离线快照 · ' + (heroStatus.extra || '—'),
+      error:    '加载失败'
     };
-    var m = map[kind] || map.loading;
-    statusIconEl.className = 'fa-solid ' + m[0];
-    statusTextEl.textContent = m[1];
-    statusPillEl.classList.toggle('is-stale', m[2] === 'stale');
+    var t = map[heroStatus.kind] || '';
+    if (!t) {
+      heroNoteEl.textContent = '';
+      heroNoteEl.classList.remove('stale');
+      return;
+    }
+    heroNoteEl.textContent = ' · ' + t + (state.data.length ? ' · ' + state.data.length + ' 个资源' : '');
+    heroNoteEl.classList.toggle('stale', heroStatus.kind === 'stale' || heroStatus.kind === 'error');
   }
 
   function loadData() {
@@ -217,36 +225,6 @@
     return list;
   }
 
-  /* ---------- 渲染：评分点阵 ---------- */
-  function dotRow(score) {
-    var s = Math.max(0, Math.min(5, Number(score) || 0));
-    var full = Math.floor(s);
-    var half = 0;
-    var frac = s - full;
-    if (frac >= 0.75) { full += 1; }
-    else if (frac >= 0.25) { half = 1; }
-    full = Math.min(full, 5);
-    var html = '';
-    for (var i = 0; i < full; i++) html += '<span class="dot on"></span>';
-    if (half && full < 5) html += '<span class="dot half"></span>';
-    for (var j = full + half; j < 5; j++) html += '<span class="dot"></span>';
-    return html;
-  }
-
-  function renderScores(scores) {
-    var rows = '';
-    var dims = ['more', 'speed', 'clean', 'stable', 'ease'];
-    for (var i = 0; i < dims.length; i++) {
-      var d = dims[i];
-      var v = Number(scores[d]);
-      rows += '<div class="score-row">' +
-        '<span class="s-label">' + SCORE_LABELS[d] + '</span>' +
-        '<span class="dots">' + dotRow(isFinite(v) ? v : 0) + '</span>' +
-        '</div>';
-    }
-    return '<div class="card-scores">' + rows + '</div>';
-  }
-
   /* ---------- 渲染：风险（单行低饱和文本） ----------
      规则：
      - 版权风险在此类站点属常态，一律灰标，不制造恐慌；
@@ -271,78 +249,29 @@
         segs.push('<span class="risk-seg" title="' + RISK_LABELS[k] + '风险：' + RISK_TEXT[lvl] + '">' + label + '</span>');
       }
     }
+    if (!segs.length) return '';
     return '<div class="risk-line">' + segs.join('') + '</div>';
   }
 
   /* ---------- 渲染：卡片 ---------- */
-  function formatStars(stars) {
-    if (stars == null) return null;
-    return stars >= 1000 ? (stars / 1000).toFixed(1) + 'k' : String(stars);
-  }
-
   function cardHTML(r, idx) {
     var openUrl = r.link_url || r.url;
-    var avg = scoreAvg(r.scores);
-    // 评分环：一律灰色（数据中 65% 均分为 5.0，按分值着色会铺满青色，失去意义）
-    var circleClass = '';
-
-    var statusBadge = '';
-    if (r.verification.status === 'recommended') {
-      statusBadge = '<span class="badge badge-ok"><i class="fa-solid fa-star" style="font-size:9px"></i> 推荐</span>';
-    } else if (r.verification.status === 'caution') {
-      statusBadge = '<span class="badge badge-warn"><i class="fa-solid fa-triangle-exclamation" style="font-size:9px"></i> 谨慎</span>';
-    }
-
-    // 访问信息 chips
-    var accessChips = '';
-    if (r.access.requires_login) accessChips += '<span class="tag">需登录</span>';
-    if (r.access.free_level && FREE_TEXT[r.access.free_level]) {
-      accessChips += '<span class="tag">' + FREE_TEXT[r.access.free_level] + '</span>';
-    }
-
-    // tags（截断）
-    var tags = (r.github && r.github.stars != null)
-      ? ['★ ' + formatStars(r.github.stars)].concat(r.tags)
-      : r.tags.slice();
-    var shown = tags.slice(0, 3);
-    var tagHTML = shown.map(function (t) {
-      return '<span class="tag">' + escapeHtml(t) + '</span>';
-    }).join('');
-    if (tags.length > shown.length) {
-      tagHTML += '<span class="tag">+' + (tags.length - shown.length) + '</span>';
-    }
-    if (accessChips) tagHTML += accessChips;
-
     var delay = Math.min(idx, 24) * 22;
 
     var configBtn = '';
     if (r.category === 'tvbox_config' && r.url) {
       configBtn = '<button class="btn btn-config" data-action="copy" data-url="' + escapeHtml(r.url) +
-        '" data-label="复制接口" title="复制 TVBox/影视仓配置地址"><i class="fa-solid fa-clipboard"></i> 复制接口</button>';
+        '" data-label="复制接口" title="复制 TVBox/影视仓配置地址">复制接口</button>';
     }
 
     return '<div class="card" style="animation-delay:' + delay + 'ms">' +
-      '<div class="card-header">' +
-        '<div>' +
-          '<h3 class="card-name">' + escapeHtml(r.name) + '</h3>' +
-          '<div class="card-badges">' +
-            '<span class="badge badge-cat">' + escapeHtml(CATEGORY_LABELS[r.category] || r.category) + '</span>' +
-            statusBadge +
-          '</div>' +
-        '</div>' +
-        '<div class="score-circle' + circleClass + '" title="综合评分（多/快/净/稳/易 均分）">' +
-          (avg != null ? avg.toFixed(1) : '–') +
-        '</div>' +
-      '</div>' +
+      '<h3 class="card-name">' + escapeHtml(r.name) + '</h3>' +
       '<p class="card-desc">' + escapeHtml(r.summary_short || r.summary) + '</p>' +
-      '<div class="card-tags">' + tagHTML + '</div>' +
-      renderScores(r.scores) +
       renderRisks(r.risks) +
       '<div class="card-actions">' +
-        '<a class="btn btn-open" href="' + escapeHtml(openUrl) + '" target="_blank" rel="noopener noreferrer" title="' + escapeHtml(openUrl) + '">' +
-          '<i class="fa-solid fa-arrow-up-right-from-square"></i> 打开</a>' +
+        '<a class="btn btn-open" href="' + escapeHtml(openUrl) + '" target="_blank" rel="noopener noreferrer" title="' + escapeHtml(openUrl) + '">打开</a>' +
         '<button class="btn btn-ghost" data-action="copy" data-url="' + escapeHtml(openUrl) +
-          '" data-label="复制链接" title="' + escapeHtml(openUrl) + '"><i class="fa-solid fa-link"></i> 复制链接</button>' +
+          '" data-label="复制链接" title="' + escapeHtml(openUrl) + '">复制链接</button>' +
         configBtn +
       '</div>' +
     '</div>';
@@ -390,18 +319,13 @@
   }
 
   function renderStats() {
-    var total = document.getElementById('statTotal');
-    var cats = document.getElementById('statCats');
-    var updated = document.getElementById('statUpdated');
-    if (total) total.textContent = state.data.length;
-    if (cats) cats.textContent = Object.keys(state.data.reduce(function (o, r) { o[r.category] = 1; return o; }, {})).length;
-    if (updated) updated.textContent = state.meta ? state.meta.updated_at : '—';
     var meta = document.getElementById('footerMeta');
     if (meta) {
       meta.textContent = state.meta
         ? '内置快照更新于 ' + state.meta.updated_at + ' · 运行时将从 jsDelivr 拉取最新数据'
         : '';
     }
+    renderHeroNote();
   }
 
   function renderAll() {
@@ -440,17 +364,17 @@
     if (!url) return;
     copyText(url).then(function () {
       btn.classList.add('copied');
-      btn.innerHTML = '<i class="fa-solid fa-check"></i> 已复制';
+      btn.textContent = '已复制';
       setTimeout(function () {
         btn.classList.remove('copied');
-        btn.innerHTML = '<i class="fa-solid ' + (label === '复制接口' ? 'fa-clipboard' : 'fa-link') + '"></i> ' + label;
+        btn.textContent = label;
       }, 1800);
     }).catch(function () {
       btn.classList.add('copied');
-      btn.innerHTML = '<i class="fa-solid fa-xmark"></i> 失败';
+      btn.textContent = '失败';
       setTimeout(function () {
         btn.classList.remove('copied');
-        btn.innerHTML = '<i class="fa-solid ' + (label === '复制接口' ? 'fa-clipboard' : 'fa-link') + '"></i> ' + label;
+        btn.textContent = label;
       }, 1800);
     });
   }
