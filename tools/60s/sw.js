@@ -1,6 +1,6 @@
-const CACHE_NAME = "60s-web-static-v0.1.1";
+const CACHE_NAME = "60s-web-static-v0.1.2";
 const APP_SHELL = [
-	"/",
+	"/tools/60s/",
 	"/tools/60s/index.html",
 	"/tools/60s/favicon.png",
 	"/tools/60s/apple-touch-icon.png",
@@ -51,13 +51,13 @@ self.addEventListener("fetch", (event) => {
 					const copy = response.clone();
 					caches
 						.open(CACHE_NAME)
-						.then((cache) => cache.put("/index.html", copy));
+						.then((cache) => cache.put("/tools/60s/index.html", copy));
 					return response;
 				})
 				.catch(() =>
 					caches
-						.match("/index.html")
-						.then((cached) => cached || caches.match("/")),
+						.match("/tools/60s/index.html")
+						.then((cached) => cached || caches.match("/tools/60s/")),
 				),
 		);
 		return;
