@@ -550,7 +550,7 @@
             <h1 class="name">投递看板</h1>
             <p class="tagline">
                 2027 届校招的投递进度。<strong>拖动卡片换列</strong>自动记录进展日期，点击卡片看完整时间线（投递 → 笔试 → 各轮面试 → Offer / 结束）。
-                阶段、备注与进展时间线都存在这台设备的浏览器里（localStorage），<strong>不同步到公开仓库</strong>；换设备用导出 / 导入。
+                阶段、备注、进展时间线与本机添加的岗位都存在这台设备的浏览器里（localStorage），<strong>不同步到公开仓库</strong>；换设备用导出 / 导入。
                 岗位本身来自仓库内的 <code>tracker.json</code>。
             </p>
         </div>
@@ -594,7 +594,7 @@
         匹配分由本站 <code>matcher.py</code> 按画像打分，非官方评价<br>
         定制简历见 <a href="/resume/tailored.html">岗位定制简历</a> ·
         完整清单见 <a href="/resume/">Details</a> ·
-        岗位数据分析见 <a href="/reports/">分析报告</a>
+        岗位数据分析见 <a href="/reports/">分析报告</a><span id="localHint"></span>
     </footer>
 
 </div>
@@ -614,7 +614,8 @@ const STAGES = [
     {key: 'closed', label: '已结束'}
 ];
 
-const LS_KEY = 'tracker.v1';
+const LS_KEY  = 'tracker.v1';       // 进度覆盖层：{id: {stage, note, done, timeline, resume}}
+const LS_JOBS = 'tracker.jobs.v1';  // 看板成员变化：本机新增岗位 + 移出基础岗位的墓碑
 
 function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
@@ -624,8 +625,9 @@ function esc(s) {
 /* ---------- 数据 ---------- */
 
 let POOL = [];            // 候选池（tracker.pool.json）
-let JOBS = [];            // 看板上的岗位（tracker.json）
+let JOBS = [];            // 看板上的岗位 = tracker.json 基础岗位 + 本机新增
 let ST = {};              // localStorage 覆盖：{id: {stage, note, done}}
+let LSJ = {addedJobs: [], removedIds: []};   // 本机新增岗位 + 移出岗位墓碑（LS_JOBS）
 let view = [];            // 当前筛选结果
 
 function loadState() {
@@ -646,6 +648,65 @@ function saveState() {
         toast('本地存储不可用，改动没有保存');
         return false;
     }
+}
+
+function loadJobStore() {
+    try {
+        const raw = localStorage.getItem(LS_JOBS);
+        const d = raw ? JSON.parse(raw) : null;
+        LSJ = (d && typeof d === 'object' && !Array.isArray(d))
+            ? {addedJobs: Array.isArray(d.addedJobs) ? d.addedJobs : [],
+               removedIds: Array.isArray(d.removedIds) ? d.removedIds : []}
+            : {addedJobs: [], removedIds: []};
+    } catch (e) {
+        LSJ = {addedJobs: [], removedIds: []};   // 同 loadState：存储不可用 → 降级
+    }
+}
+
+function saveJobStore() {
+    try {
+        localStorage.setItem(LS_JOBS, JSON.stringify(LSJ));
+        return true;
+    } catch (e) {
+        toast('本地存储不可用，改动没有保存');
+        return false;
+    }
+}
+
+// 本机新增岗位（手工 / 候选池）：进内存看板 + 落盘，刷新后仍在
+function addExtraJob(job) {
+    JOBS.push(job);
+    if (!LSJ.addedJobs.some(j => j.id === job.id)) LSJ.addedJobs.push(job);
+    return saveJobStore();
+}
+
+// 基础岗位（来自 tracker.json）移出看板 → 记墓碑，防止刷新后复活
+function tombstoneJob(id) {
+    if (!LSJ.removedIds.includes(id)) LSJ.removedIds.push(id);
+    return saveJobStore();
+}
+
+// 合并完成后清理孤儿：ST 里已不在看板上的进度条目（岗位被移出 / 数据源变化）
+function pruneOrphans() {
+    const ids = new Set(JOBS.map(j => j.id));
+    let dropped = 0;
+    Object.keys(ST).forEach(id => {
+        if (!ids.has(id)) { delete ST[id]; dropped++; }
+    });
+    if (dropped) saveState();
+}
+
+// 页脚提示：让用户知道本机存了什么、怎么搬走
+function renderLocalHint() {
+    const el = document.getElementById('localHint');
+    if (!el) return;
+    const n = LSJ.addedJobs.length;
+    const r = LSJ.removedIds.length;
+    if (!n && !r) { el.textContent = ''; return; }
+    const parts = [];
+    if (n) parts.push('本机已存 ' + n + ' 个自建岗位');
+    if (r) parts.push(r + ' 个基础岗位已移出');
+    el.textContent = ' · ' + parts.join(' · ') + '（存于本机浏览器，换设备用导出/导入）';
 }
 
 /* ---------- 进展时间线 ---------- */
@@ -842,6 +903,7 @@ function render() {
 
     document.getElementById('count').textContent = view.length + ' / ' + JOBS.length + ' 个岗位';
     renderStats();
+    renderLocalHint();
     bindDnD();
 }
 
@@ -1097,6 +1159,13 @@ function delJob(id) {
     JOBS = JOBS.filter(x => x.id !== id);
     delete ST[id];
     saveState();
+    // 本机新增的岗位直接移除记录；tracker.json 基础岗位留墓碑，防止刷新后复活
+    if (LSJ.addedJobs.some(j => j.id === id)) {
+        LSJ.addedJobs = LSJ.addedJobs.filter(j => j.id !== id);
+        saveJobStore();
+    } else {
+        tombstoneJob(id);
+    }
     closeModal();
     render();
 }
@@ -1162,8 +1231,7 @@ function addFromPool(id) {
     const p = POOL.find(x => x.id === id);
     if (!p) return;
     if (JOBS.some(j => j.id === id)) { toast('这个岗位已经在看板上了'); return; }
-    JOBS.push(Object.assign({}, p, {stage: 'wish'}));
-    if (saveState()) toast('已加入「想投」');
+    if (addExtraJob(Object.assign({}, p, {stage: 'wish'}))) toast('已加入「想投」');
     closeModal();
     render();
 }
@@ -1191,8 +1259,7 @@ function addManual() {
         manual: true,
         stage: 'wish'
     };
-    JOBS.push(job);
-    if (saveState()) toast('已加入「想投」');
+    if (addExtraJob(job)) toast('已加入「想投」');
     closeModal();
     render();
 }
@@ -1225,7 +1292,8 @@ function exportProgress() {
                 updated: s.done || ''
             };
         }
-        if (j.manual) out.manualJobs.push(j);
+        // 手工岗位和候选池加入的岗位都是"本机新增"，导出都要带上
+        if (j.manual || LSJ.addedJobs.some(x => x.id === j.id)) out.manualJobs.push(j);
     });
 
     const blob = new Blob([JSON.stringify(out, null, 2)], {type: 'application/json'});
@@ -1260,7 +1328,7 @@ function importProgress(file) {
             let m = 0;
             (data.manualJobs || []).forEach(j => {
                 if (!j.id || JOBS.some(x => x.id === j.id)) return;
-                JOBS.push(j);
+                addExtraJob(j);   // 同步落盘，刷新后仍在
                 m++;
             });
             if (saveState()) toast('已导入 ' + n + ' 个岗位进度' + (m ? '，新增 ' + m + ' 个手工岗位' : ''));
@@ -1288,6 +1356,7 @@ function fillFilters() {
 
 window.addEventListener('DOMContentLoaded', () => {
     loadState();
+    loadJobStore();
     ['q', 'fCity', 'fDir', 'fFlag'].forEach(id =>
         document.getElementById(id).addEventListener('input', render));
     document.getElementById('addBtn').addEventListener('click', openAdd);
@@ -1308,8 +1377,21 @@ window.addEventListener('DOMContentLoaded', () => {
             .then(r => r.ok ? r.json() : [])
             .catch(() => [])
     ]).then(([jobs, pool]) => {
-        JOBS = Array.isArray(jobs) ? jobs : (jobs.jobs || []);
+        const base = Array.isArray(jobs) ? jobs : (jobs.jobs || []);
         POOL = Array.isArray(pool) ? pool : [];
+        // 看板 = 仓库基础岗位（剔除本机移出的墓碑） + 本机新增岗位。
+        // 去重：仓库里未被移出的 id 以仓库版本为准；被移出又从候选池重新加入的，以本机版本为准。
+        const removed = new Set(LSJ.removedIds);
+        const activeBase = base.filter(j => !removed.has(j.id));
+        const activeIds = new Set(activeBase.map(j => j.id));
+        JOBS = activeBase.concat(LSJ.addedJobs.filter(j => j.id && !activeIds.has(j.id)));
+        // 仓库已收录且未被移出的本机新增条目是冗余 → 清掉，保持存储干净
+        const dup = LSJ.addedJobs.filter(j => j.id && activeIds.has(j.id)).map(j => j.id);
+        if (dup.length) {
+            LSJ.addedJobs = LSJ.addedJobs.filter(j => !dup.includes(j.id));
+            saveJobStore();
+        }
+        pruneOrphans();
         fillFilters();
         render();
     }).catch(() => {
