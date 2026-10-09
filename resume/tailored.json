@@ -1043,7 +1043,12 @@
     "company": "经纬恒润 · 秋招",
     "role": "AI 工程师",
     "direction": "AI Agent / RAG",
-    "tags": ["AI Agent", "RAG", "MCP", "Python"],
+    "tags": [
+      "AI Agent",
+      "RAG",
+      "MCP",
+      "Python"
+    ],
     "date": "2026.09",
     "url": "/resume/resume_qz/resume_jingwei_ai.html",
     "match": "high",
@@ -1069,7 +1074,12 @@
     "company": "中电云计算技术有限公司 · 秋招",
     "role": "AI Coding 开发工程师",
     "direction": "Coding Agent / 评测体系",
-    "tags": ["Coding Agent", "评测体系", "MCP 工具链", "RAG 检索"],
+    "tags": [
+      "Coding Agent",
+      "评测体系",
+      "MCP 工具链",
+      "RAG 检索"
+    ],
     "date": "2026.09",
     "url": "/resume/resume_qz/resume_ceccloud_aicoding.html",
     "match": "high",
@@ -1098,7 +1108,12 @@
     "company": "联影医疗 · 2027 校招",
     "role": "软件测试工程师",
     "direction": "医疗软件测试 / 自动化测试",
-    "tags": ["自动化测试", "质量评价", "测试工具", "医疗软件"],
+    "tags": [
+      "自动化测试",
+      "质量评价",
+      "测试工具",
+      "医疗软件"
+    ],
     "date": "2026.09",
     "url": "/resume/resume_qz/resume_lianying_test.html",
     "match": "high",
@@ -1126,7 +1141,12 @@
     "company": "米哈游 · 2027校招/上海",
     "role": "UI蓝图工程师",
     "direction": "UI蓝图 / 界面落地与交互",
-    "tags": ["UI蓝图", "控件化与界面搭建", "自适应布局", "AI 辅助开发"],
+    "tags": [
+      "UI蓝图",
+      "控件化与界面搭建",
+      "自适应布局",
+      "AI 辅助开发"
+    ],
     "date": "2026.09",
     "url": "/resume/resume_qz/resume_mihoyo_uiblueprint.html",
     "match": "",
@@ -1148,5 +1168,20 @@
         "有代码阅读/开发能力，了解引擎性能开销分布，能配合界面性能优化；有AI工具使用经验或学习意愿"
       ]
     }
+  },
+  {
+    "index": "54",
+    "company": "通用 · 秋招",
+    "role": "AI 全栈开发工程师",
+    "direction": "LLM 应用 / Agent / 全栈交付",
+    "tags": [
+      "AI 全栈",
+      "Agent 开发",
+      "RAG",
+      "全栈交付"
+    ],
+    "date": "2026.10",
+    "url": "/resume/resume_qz/resume_general_ai_fullstack.html",
+    "match": "high"
   }
 ]
