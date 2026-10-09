@@ -1183,5 +1183,38 @@
     "date": "2026.10",
     "url": "/resume/resume_qz/resume_general_ai_fullstack.html",
     "match": "high"
+  },
+  {
+    "index": "55",
+    "company": "快手 · 秋招",
+    "role": "Data Agent 研发工程师",
+    "direction": "Multi-Agent / Agent 评测 / RAG",
+    "tags": [
+      "Multi-Agent",
+      "Agent 评测",
+      "RAG",
+      "知识图谱"
+    ],
+    "date": "2026.09",
+    "url": "/resume/resume_qz/resume_kuaishou_data_agent.html",
+    "match": "high",
+    "applyLink": "https://campus.kuaishou.cn/recruit/campus/e/#/campus/job-info/12829",
+    "jobId": "12829",
+    "jobTitle": "【快Star】Data Agent研发工程师",
+    "location": "北京",
+    "jd": {
+      "duty": [
+        "Multi-Agent 框架工程研发，探索 Agent + Skill 多智能体协作的边界",
+        "多模态知识构建与服务，让 AI 看懂百万级数据资产",
+        "智能评测与可观测平台建设，让 AI 行为可测量、可追溯",
+        "以 RAG、知识图谱、记忆管理等 LLM 技术突破 DataAgent 能力天花板"
+      ],
+      "req": [
+        "本科及以上，计算机相关专业，应届或 Gap year 均欢迎",
+        "扎实的 Java 后端基础，熟悉 Spring 等主流框架，有工程规范意识",
+        "LLM 基本认知：Prompt Engineering、RAG、Function Calling 等",
+        "加分：Agent/LLM 项目实践，Text2SQL / RAG / 知识图谱经验，跑过大模型微调或强化学习"
+      ]
+    }
   }
 ]
