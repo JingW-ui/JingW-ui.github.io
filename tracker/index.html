@@ -138,7 +138,7 @@
         .board {
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 13px;
+            gap: 12px;
             align-items: start;
         }
         .col {
@@ -172,7 +172,7 @@
             padding: 1px 7px;
             border-radius: 20px;
         }
-        .col-body { display: flex; flex-direction: column; gap: 8px; min-height: 40px; }
+        .col-body { display: flex; flex-direction: column; gap: 7px; min-height: 40px; }
         .col-empty {
             font-size: 11.5px;
             color: var(--ink-3);
@@ -187,7 +187,7 @@
             background: var(--card);
             border: 1px solid var(--line);
             border-radius: 9px;
-            padding: 11px 12px;
+            padding: 9px 11px;
             cursor: pointer;
             transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
             position: relative;
@@ -201,7 +201,7 @@
             display: flex;
             align-items: baseline;
             gap: 7px;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
         .jc-score {
             font-family: var(--mono);
@@ -223,14 +223,14 @@
             font-size: 13px;
             font-weight: 600;
             line-height: 1.4;
-            margin-bottom: 7px;
+            margin-bottom: 5px;
             overflow-wrap: anywhere;
         }
         .jc-meta {
             display: flex;
             flex-wrap: wrap;
             gap: 5px;
-            margin-bottom: 7px;
+            margin-bottom: 5px;
         }
         .chip {
             font-size: 10.5px;
@@ -250,8 +250,10 @@
             background: var(--line-2);
             border-radius: 6px;
             padding: 5px 8px;
-            margin-bottom: 7px;
-            overflow-wrap: anywhere;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .jc-foot {
             display: flex;
@@ -260,7 +262,7 @@
             font-size: 11px;
             color: var(--ink-3);
             border-top: 1px solid var(--line-2);
-            padding-top: 7px;
+            padding-top: 6px;
             margin-top: 2px;
         }
         .jc-foot a {
@@ -272,6 +274,52 @@
         .jc-foot .sp { margin-left: auto; }
         .jc-due { color: var(--amber); font-weight: 600; }
         .jc-due.past { color: #b91c1c; }
+
+        /* ---------- 简介模式：单行卡片 ---------- */
+        .jc.row {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 10px;
+        }
+        .jc.row .r-co {
+            font-size: 11px;
+            color: var(--ink-3);
+            max-width: 38%;
+            flex-shrink: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .jc.row .r-ti {
+            flex: 1;
+            min-width: 0;
+            font-size: 12px;
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .jc.row .r-dt {
+            font-family: var(--mono);
+            font-size: 10.5px;
+            color: var(--ink-3);
+            flex-shrink: 0;
+        }
+        .rdot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--ink-3);
+        }
+        .rdot.offer { background: var(--green); }
+        .rdot.stop {
+            width: 5px;
+            height: 5px;
+            background: transparent;
+            border: 1.5px solid var(--ink-3);
+        }
 
         /* ---------- 弹层 ---------- */
         .modal {
@@ -437,7 +485,7 @@
             background: var(--line-2);
             border-radius: 6px;
             padding: 4px 8px;
-            margin-bottom: 7px;
+            margin-bottom: 5px;
         }
         .jc-tl b { font-weight: 600; color: var(--ink); white-space: nowrap; }
         .jc-tl .ago {
@@ -549,7 +597,7 @@
             <div class="eyebrow">Application Tracker</div>
             <h1 class="name">投递看板</h1>
             <p class="tagline">
-                2027 届校招的投递进度。<strong>拖动卡片换列</strong>自动记录进展日期，点击卡片看完整时间线（投递 → 笔试 → 各轮面试 → Offer / 结束）。
+                2027 届校招的投递进度。<strong>拖动卡片换列</strong>自动记录进展日期，点击卡片看完整时间线（投递 → 笔试 → 各轮面试 → Offer / 结束）；工具栏可切到<strong>简介模式</strong>，单行只看公司 / 岗位 / 投递日期。
                 阶段、备注、进展时间线与本机添加的岗位都存在这台设备的浏览器里（localStorage），<strong>不同步到公开仓库</strong>；换设备用导出 / 导入。
                 岗位本身来自仓库内的 <code>tracker.json</code>。
             </p>
@@ -581,6 +629,7 @@
             <option value="manual">仅手工添加</option>
         </select>
         <button class="btn primary" id="addBtn">+ 添加岗位</button>
+        <button class="btn" id="modeBtn" title="切换卡片密度：简介 = 单行公司 / 岗位 / 投递日期">简介模式</button>
         <button class="btn" id="exportBtn">导出进度</button>
         <button class="btn" id="importBtn">导入进度</button>
         <input type="file" id="importFile" accept="application/json,.json" hidden>
@@ -616,6 +665,7 @@ const STAGES = [
 
 const LS_KEY  = 'tracker.v1';       // 进度覆盖层：{id: {stage, note, done, timeline, resume}}
 const LS_JOBS = 'tracker.jobs.v1';  // 看板成员变化：本机新增岗位 + 移出基础岗位的墓碑
+const LS_UI   = 'tracker.ui.v1';    // 界面偏好：{compact} 简介/详细模式
 
 function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
@@ -629,6 +679,23 @@ let JOBS = [];            // 看板上的岗位 = tracker.json 基础岗位 + �
 let ST = {};              // localStorage 覆盖：{id: {stage, note, done}}
 let LSJ = {addedJobs: [], removedIds: []};   // 本机新增岗位 + 移出岗位墓碑（LS_JOBS）
 let view = [];            // 当前筛选结果
+let UI = {compact: false};    // 界面偏好（LS_UI）：是否简介模式
+
+function loadUi() {
+    try {
+        const raw = localStorage.getItem(LS_UI);
+        const d = raw ? JSON.parse(raw) : null;
+        if (d && typeof d === 'object' && !Array.isArray(d) && typeof d.compact === 'boolean') UI.compact = d.compact;
+    } catch (e) {
+        UI = {compact: false};   // 存储不可用 → 默认详细模式
+    }
+}
+
+function saveUi() {
+    try {
+        localStorage.setItem(LS_UI, JSON.stringify(UI));
+    } catch (e) { /* 偏好存不下不影响功能，下次打开回到默认 */ }
+}
 
 function loadState() {
     try {
@@ -872,13 +939,50 @@ function cardHtml(j, i) {
             ${j.manual ? `<span class="chip manual">手工</span>` : ''}
         </div>
         ${recent}
-        ${note ? `<div class="jc-note">${esc(note)}</div>` : ''}
+        ${note ? `<div class="jc-note" title="${esc(note)}">${esc(note)}</div>` : ''}
         <div class="jc-foot">
             ${resumeOf(j) ? `<a href="${esc(resumeOf(j))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">简历</a>` : ''}
             ${j.applyLink ? `<a href="${esc(j.applyLink)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">投递页</a>` : ''}
             <span class="sp"></span>
             ${due}
         </div>
+    </div>`;
+}
+
+/* ---------- 简介模式：单行卡片 ---------- */
+
+// 投递日期 = 时间线里「投递」事件的日期；没有投递动作（想投列）→ 空，行尾显示 —
+function appliedDateOf(j) {
+    const ev = timelineOf(j).find(x => x.e === 'applied');
+    return (ev && ev.d) ? ev.d : '';
+}
+
+// 校招季跨年：今年内的日期只显示 MM-DD 省宽度，往年显示完整 YYYY-MM-DD
+function fmtDay(d) {
+    if (!d) return '—';
+    return d.slice(0, 4) === String(new Date().getFullYear()) ? d.slice(5) : d;
+}
+
+function rowTitle(j) {
+    const parts = [j.company + ' · ' + j.title];
+    const le = lastEvent(j);
+    if (le && EVENTS[le.e]) {
+        const days = daysAgo(le.d);
+        const ago = days === null ? '' : (days <= 0 ? '（今天）' : '（' + days + ' 天前）');
+        parts.push('最近：' + EVENTS[le.e].label + ' ' + (le.d || '') + ago);
+    }
+    const note = noteOf(j);
+    if (note) parts.push('备注：' + note);
+    return parts.join('\n');
+}
+
+function rowHtml(j, i) {
+    const sub = closedSub(j);
+    return `<div class="jc row" draggable="true" data-i="${i}" data-id="${esc(j.id)}" title="${esc(rowTitle(j))}">
+        <span class="r-co">${esc(j.company)}</span>
+        <span class="r-ti">${esc(j.title)}</span>
+        ${sub ? `<span class="rdot ${sub}"></span>` : ''}
+        <span class="r-dt">${esc(fmtDay(appliedDateOf(j)))}</span>
     </div>`;
 }
 
@@ -895,7 +999,7 @@ function render() {
                 <span class="n">${items.length}</span>
             </div>
             <div class="col-body">
-                ${items.length ? items.map(cardHtml).join('')
+                ${items.length ? items.map(UI.compact ? rowHtml : cardHtml).join('')
                                : '<div class="col-empty">拖到这里</div>'}
             </div>
         </section>`;
@@ -905,6 +1009,21 @@ function render() {
     renderStats();
     renderLocalHint();
     bindDnD();
+}
+
+/* ---------- 简介模式切换 ---------- */
+
+function toggleMode() {
+    UI.compact = !UI.compact;
+    saveUi();
+    syncModeBtn();
+    render();
+}
+
+// 按钮显示的是「切换到」的目标模式
+function syncModeBtn() {
+    const b = document.getElementById('modeBtn');
+    b.textContent = UI.compact ? '详细模式' : '简介模式';
 }
 
 function renderStats() {
@@ -1357,9 +1476,12 @@ function fillFilters() {
 window.addEventListener('DOMContentLoaded', () => {
     loadState();
     loadJobStore();
+    loadUi();
+    syncModeBtn();
     ['q', 'fCity', 'fDir', 'fFlag'].forEach(id =>
         document.getElementById(id).addEventListener('input', render));
     document.getElementById('addBtn').addEventListener('click', openAdd);
+    document.getElementById('modeBtn').addEventListener('click', toggleMode);
     document.getElementById('exportBtn').addEventListener('click', exportProgress);
     document.getElementById('importBtn').addEventListener('click', () =>
         document.getElementById('importFile').click());
