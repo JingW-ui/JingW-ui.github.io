@@ -115,12 +115,22 @@
         .welcome-stat .stat-value { font-family: 'Courier New', monospace; font-size: 17px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
         .welcome-stat .stat-label { font-size: 9.5px; color: var(--text-muted); margin-top: 1px; }
 
-        /* 全站访问量（VerCount）：锚定 welcome-card 本体——贴上边缘内侧顶格、头像右侧一点的位置
-           回填成功才浮现（visibility 双保险），hover 弹出玻璃气泡彩蛋 */
-        .visit-n {
+        /* 全站访问量 + 访客数（VerCount）：锚定 welcome-card 本体——贴上边缘内侧顶格、头像右侧一点的位置
+           两枚并排小胶囊（访问量 PV / 访客数 UV，只摆数字），回填成功才浮现（visibility 双保险），
+           hover 弹出玻璃气泡彩蛋（「您是第 N 位」N 取访客数 UV） */
+        .visit-n-wrap {
             position: absolute;
             top: 0;                     /* 卡片上边缘内侧顶格 */
             left: 8px;                  /* 贴顶、贴近卡片左缘 */
+            display: flex;
+            gap: 4px;
+            z-index: 3;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity var(--m-std) var(--e-std);
+        }
+        .visit-n-wrap.on { visibility: visible; opacity: 1; }
+        .visit-n {
             min-width: 30px;
             padding: 0 8px;
             border-radius: 999px;
@@ -135,14 +145,10 @@
             color: var(--text-muted);
             text-align: center;
             white-space: nowrap;
-            z-index: 3;
-            visibility: hidden;
-            opacity: 0;
-            transition: opacity var(--m-std) var(--e-std), color var(--m-fast) var(--e-std), border-color var(--m-fast) var(--e-std);
+            transition: color var(--m-fast) var(--e-std), border-color var(--m-fast) var(--e-std);
         }
-        .visit-n.on { visibility: visible; opacity: 1; }
         .visit-n:hover { color: var(--accent-teal); border-color: var(--accent-teal); }
-        .visit-n::after {
+        .visit-n-wrap::after {
             content: '欢迎，您是第 ' attr(data-n) ' 位光临本站的吴彦祖/迪丽热巴';
             position: absolute;
             top: calc(100% + 7px);
@@ -165,7 +171,7 @@
             transition: opacity var(--m-fast) var(--e-std), transform var(--m-fast) var(--e-out-expo);
             z-index: 5;
         }
-        .visit-n:hover::after { opacity: 1; transform: translateY(0); }
+        .visit-n-wrap:hover::after { opacity: 1; transform: translateY(0); }
 
         .content-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
         .section-card { padding: 22px 24px; }
@@ -297,7 +303,7 @@
             .welcome-card { padding: 20px 18px; flex-wrap: wrap; }
             .welcome-card-top { flex-direction: column; gap: 14px; }
             .welcome-avatar { width: 72px; height: 72px; }
-            .visit-n { left: 8px; }     /* 移动端同步：贴顶、贴近卡片左缘 */
+            .visit-n-wrap { left: 8px; }     /* 移动端同步：贴顶、贴近卡片左缘 */
             .welcome-title { font-size: 21px; }
             .welcome-stats { width: 100%; grid-template-columns: repeat(3, 1fr); gap: 6px; }
             .welcome-stat { min-width: 0; padding: 6px 4px; }
@@ -383,8 +389,11 @@
                     <a href="/tracker/" aria-label="投递看板" style="line-height:0;flex-shrink:0;">
                         <img src="imgs/life_and_others/myavtar.png" alt="王京" class="welcome-avatar" style="cursor:pointer;">
                     </a>
-                    <!-- 全站访问量徽章：锚定卡片本体左上角区域（贴顶、头像右侧），点击不再误入投递看板 -->
-                    <span class="visit-n" id="vercount_value_site_pv" data-n="" aria-label="全站访问量">—</span>
+                    <!-- 全站访问量 + 访客数徽章：两枚并排小胶囊锚定卡片本体左上角区域（贴顶、头像右侧），点击不再误入投递看板 -->
+                    <div class="visit-n-wrap" id="visitBadges" data-n="" aria-label="全站访问量与访客数">
+                        <span class="visit-n" id="vercount_value_site_pv" aria-label="全站访问量">—</span>
+                        <span class="visit-n" id="vercount_value_site_uv" aria-label="全站访客数">—</span>
+                    </div>
                     <div class="welcome-text">
                         <div class="welcome-title-row">
                             <h1 class="welcome-title" id="welcomeTitle">你好</h1>
@@ -1048,23 +1057,30 @@
             if (b2) b2.addEventListener('click', () => spin(b2));
         })();
 
-        /* ── 全站访问量徽章：VerCount 回填后浮现并写入 data-n 供 hover 气泡展示；10s 未回填静默放弃 ── */
+        /* ── 全站访问量 + 访客数徽章：VerCount 回填后浮现，data-n 写入访客数 UV 供 hover 气泡展示（UV 未回填回落 PV）；10s 未回填静默放弃 ── */
         (function() {
-            const el = document.getElementById('vercount_value_site_pv');
-            if (!el) return;
+            const wrap = document.getElementById('visitBadges');
+            const pv = document.getElementById('vercount_value_site_pv');
+            const uv = document.getElementById('vercount_value_site_uv');
+            if (!wrap || !pv || !uv) return;
+            const ok = t => t && t !== '—';
             const fill = () => {
-                const t = (el.textContent || '').trim();
-                if (t && t !== '—') { el.dataset.n = t; el.classList.add('on'); return true; }
-                return false;
+                const p = (pv.textContent || '').trim();
+                const u = (uv.textContent || '').trim();
+                if (ok(p) || ok(u)) wrap.classList.add('on');
+                if (ok(u)) wrap.dataset.n = u;
+                else if (ok(p)) wrap.dataset.n = p;
+                return ok(p) && ok(u);
             };
             if (fill()) return;
             const mo = new MutationObserver(() => { if (fill()) mo.disconnect(); });
-            mo.observe(el, { childList: true, characterData: true, subtree: true });
+            mo.observe(pv, { childList: true, characterData: true, subtree: true });
+            mo.observe(uv, { childList: true, characterData: true, subtree: true });
             setTimeout(() => mo.disconnect(), 10000);
         })();
     </script>
 
-    <!-- VerCount 计数脚本（CN 镜像）：数字回填至 welcome-card 头像上方小徽章 -->
+    <!-- VerCount 计数脚本（CN 镜像）：数字回填至 welcome-card 头像上方两枚小胶囊（访问量/访客数） -->
     <script defer src="https://cn.vercount.one/js"></script>
 </body>
 </html>
