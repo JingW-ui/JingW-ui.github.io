@@ -2,7 +2,7 @@
 
 # JingW-ui.github.io
 
-> A fully static personal site: 76 online tools, 11 Windows desktop applications, and 39 browser games — all free, ad-free, and build-free, hosted on GitHub Pages.
+> A fully static personal site: 76 online tools, 11 Windows desktop applications, and 39 browser games — all free, ad-free, and build-free. **Download the source and run it locally, or host it on your own site as-is.**
 
 **Live site**：<https://jingw-ui.github.io>
 
@@ -24,6 +24,13 @@
 | [Game Center](https://jingw-ui.github.io/Games/) | 39 | Browser games: casual, puzzle, action — just open and play | Canvas / vanilla JS |
 | [Home](https://jingw-ui.github.io/) | — | Site-wide navigation with randomized recommendations | Vanilla HTML / CSS / JS |
 | [Resume / Videos / Awards / Slides](https://jingw-ui.github.io/resume/) | 4 sections | Static pages: resume, videos, carousel, ppt | HTML / CSS |
+
+## Download & Run
+
+Every tool and game is a ready-to-run static page — most are a single `index.html`, the rest just a few relatively-referenced files. No dependencies to install, no build step:
+
+- **Local use**: clone this repo (or GitHub Code → Download ZIP) and double-click the `index.html` in any folder — the vast majority work offline out of the box; a few pages need any local static server or the online version;
+- **Self-hosting**: drop the `tools/` and `Games/` folders as-is onto any static host — GitHub Pages, Vercel, Netlify, Nginx, etc. Zero configuration.
 
 ## Metrics
 
@@ -59,9 +66,8 @@ Interactive diagram: [gitdiagram.com/jingw-ui/jingw-ui.github.io](https://gitdia
 
 ## Deployment
 
-- Pure static HTML — pushing to `main` triggers an automatic GitHub Pages deploy, no build step.
-- `robots.txt` explicitly allows AI and model-training crawlers; `llms.txt` / `llms-full.txt` provide LLM-oriented site indexes.
-- Read this repo quickly with AI: [gitingest.com/JingW-ui/JingW-ui.github.io](https://gitingest.com/JingW-ui/JingW-ui.github.io)
+- Pure static HTML — pushing to `main` triggers an automatic GitHub Pages deploy, no build step;
+- AI/GEO: `robots.txt` allows model crawlers, `llms.txt` / `llms-full.txt` provide site indexes; read the whole repo quickly via [gitingest](https://gitingest.com/JingW-ui/JingW-ui.github.io).
 
 ## License
 

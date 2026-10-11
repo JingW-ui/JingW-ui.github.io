@@ -2,7 +2,7 @@
 
 # JingW-ui.github.io
 
-> 纯静态个人站点：76 个在线工具、11 款 Windows 软件、39 个网页小游戏，全部免费、无广告、无构建，由 GitHub Pages 托管。
+> 纯静态个人站点：76 个在线工具、11 款 Windows 软件、39 个网页小游戏，全部免费、无广告、无构建——**下载源码双击即用，也可原样部署到你自己的站点**。
 
 **在线访问**：<https://jingw-ui.github.io>
 
@@ -24,6 +24,13 @@
 | [游戏中心](https://jingw-ui.github.io/Games/) | 39 个 | 网页小游戏：休闲、益智、动作，打开即玩 | Canvas / 原生 JS |
 | [个人主页](https://jingw-ui.github.io/) | — | 全站导航与各模块随机推荐入口 | 原生 HTML / CSS / JS |
 | [简历 / 演示 / 获奖 / 幻灯片](https://jingw-ui.github.io/resume/) | 4 个模块 | resume、videos、carousel、ppt 四组静态页面 | HTML / CSS |
+
+## 下载即用
+
+所有工具与游戏都是即开即用的静态页面——多数是单个 `index.html`，其余也只是目录内相对引用的少量文件，无需安装依赖、无需构建：
+
+- **本地使用**：克隆本仓库（或 GitHub Code → Download ZIP），双击各目录里的 `index.html` 即可使用——绝大多数页面离线直接可用，少数页面需通过任意本地静态服务或在线版访问；
+- **部署到自己的站点**：把 `tools/`、`Games/` 目录原样放进 GitHub Pages、Vercel、Netlify、Nginx 等任意静态托管即可，零配置。
 
 ## 数据成果
 
@@ -59,9 +66,8 @@ JingW-ui.github.io/
 
 ## 部署
 
-- 纯静态 HTML，push 到 `main` 后 GitHub Pages 自动发布，无构建步骤。
-- `robots.txt` 显式放行 AI 与模型训练爬虫；`llms.txt` / `llms-full.txt` 提供面向大模型的站点索引。
-- AI 快速阅读本仓库：[gitingest.com/JingW-ui/JingW-ui.github.io](https://gitingest.com/JingW-ui/JingW-ui.github.io)
+- 纯静态 HTML，push 到 `main` 后 GitHub Pages 自动发布，无构建步骤；
+- 面向 AI/GEO：`robots.txt` 放行模型爬虫，`llms.txt` / `llms-full.txt` 提供站点索引，整仓快速阅读见 [gitingest](https://gitingest.com/JingW-ui/JingW-ui.github.io)。
 
 ## 许可证与版权
 
