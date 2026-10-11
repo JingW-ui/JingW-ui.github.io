@@ -294,37 +294,42 @@
             font-weight: 600;
         }
 
-        /* Nav buttons */
-        .nav-btn {
-            background: white;
-            border: 2px solid #333;
-            color: #333;
-            padding: 8px 18px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
+        /* 了解更多：站点导航文字链 */
+        .more-link {
+            color: #1a1a1a;
             font-weight: 600;
-            transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
-            letter-spacing: 0.5px;
         }
-        .nav-btn:hover {
-            background: #f5f5f5;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        .more-link:hover {
+            text-decoration: underline;
+            color: #2d74bb;
         }
-        .nav-btn:active {
-            transform: translateY(0);
+
+        /* 了解更多：两列栅格利用横向空间（5 条奇数，PDF 行动项全宽收尾避免 3+2 空格）；
+           A4 打印视口 794px 虽 <820px，但下方回退写在 screen 媒体查询内，打印保持两列 */
+        .more-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 24px;
         }
-        .nav-btn.primary {
-            background: #333;
-            color: white;
-            border-color: #333;
+        .more-list li:last-child {
+            grid-column: 1 / -1;
         }
-        .nav-btn.primary:hover {
-            background: #1a1a1a;
-            box-shadow: 0 4px 12px rgba(51, 51, 51, 0.2);
+
+        /* 点击区块标题复制纯净文本：平时无痕迹，成功后短暂反馈；打印零影响 */
+        .section-title.copyable {
+            cursor: pointer;
+        }
+        .section-title.copyable.copied::after {
+            content: ' · 已复制 ✓';
+            font-size: 11px;
+            font-weight: 400;
+            color: #1F883D;
+        }
+        @media print {
+            .section-title.copyable.copied::after {
+                content: none;
+            }
         }
 
         /* Print */
@@ -374,6 +379,9 @@
             }
             .name-portal {
                 font-size: 22px;
+            }
+            .more-list {
+                grid-template-columns: 1fr;
             }
         }
         html, body, .header, .label-link, .github-label-link, .awards-label-link, .bilibili-label-link, .contact-info a {
@@ -517,7 +525,7 @@
 
     <!-- 科研成果 -->
     <div class="section">
-        <div class="section-title">科研成果</div>
+        <div class="section-title copyable">科研成果</div>
         <ul>
             <li>SCI论文：<strong title="MediScreen-Brain: A Portable, YOLO-powered GUI for Multi-Modal Brain Tumor Detection and 3D Localization">MediScreen-Brain</strong>（多模态脑肿瘤检测与3D定位平台）<a class="label-link"
                                href="https://jingw-ui.github.io/MediScreen-Brain/"
@@ -771,7 +779,7 @@
 
     <!-- 获奖经历 -->
     <div class="section">
-        <div class="section-title">获奖经历</div>
+        <div class="section-title copyable">获奖经历</div>
         <ul>
             <li>2021年数学建模亚太地区三等奖（1/3）</li>
             <li>2021年企业竞赛模拟一等奖（中国管理现代化研究会）（2/3）<a class="label-link"
@@ -820,7 +828,7 @@
 
     <!-- 证书 -->
     <div class="section">
-        <div class="section-title">证书</div>
+        <div class="section-title copyable">证书</div>
         <ul>
             <li>国家级：国家励志奖学金荣誉证书（<span class="hl-red">2次</span>）<a class="label-link"
                                                      href="/imgs/life_and_others/2020-2021年度国家励志奖学金.png"
@@ -883,14 +891,16 @@
         </ul>
     </div>
 
-    <!-- 作品展示 -->
+    <!-- 了解更多 -->
     <div class="section">
-        <div class="section-title">作品展示</div>
-        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <a href="/carousel/" class="nav-btn">Image Gallery</a>
-            <a href="/videos/" class="nav-btn primary">Video Gallery →</a>
-            <a href="/resources/王京的个人简历20260109_compressed.pdf" class="nav-btn" download>Download PDF</a>
-        </div>
+        <div class="section-title">了解更多</div>
+        <ul class="more-list">
+            <li><a class="more-link" href="/">主页</a> —— 个人主页与全部内容总入口</li>
+            <li><a class="more-link" href="/tools/">工具页</a> —— 76 个纯前端在线小工具，打开即用</li>
+            <li><a class="more-link" href="/Games/">游戏页</a> —— 39 个浏览器小游戏，无需安装</li>
+            <li><a class="more-link" href="/softwares/">软件下载页</a> —— 11 款桌面软件下载，附源码仓库</li>
+            <li><a class="more-link" href="/resources/王京的个人简历20260109_compressed.pdf" download>下载简历 PDF</a> —— A4 单文件，投递/打印用</li>
+        </ul>
     </div>
 
 </div>
@@ -921,6 +931,61 @@
             modal.addEventListener('click', function (e) {
                 if (e.target === modal) modal.style.display = 'none';
             });
+        }
+    })();
+
+    // 点击区块标题复制纯净文本：克隆 li -> 删除链接 -> 取纯文本 -> 压缩空白。
+    // 内容永远取自当前 DOM，简历改动后复制结果自动同步，无第二份维护。
+    (function () {
+        function cleanSection(section) {
+            var items = section.querySelectorAll('li');
+            var lines = [];
+            for (var i = 0; i < items.length; i++) {
+                var clone = items[i].cloneNode(true);
+                var links = clone.querySelectorAll('a');
+                for (var j = 0; j < links.length; j++) {
+                    links[j].parentNode.removeChild(links[j]);
+                }
+                var text = (clone.textContent || '').replace(/\s+/g, ' ').trim();
+                if (text) lines.push(text);
+            }
+            return lines.join('\n');
+        }
+        // file:// 本地打开等非安全上下文的降级路径
+        function fallbackCopy(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            var ok = false;
+            try { ok = document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+            return ok;
+        }
+        function flash(heading) {
+            heading.classList.add('copied');
+            setTimeout(function () { heading.classList.remove('copied'); }, 1500);
+        }
+        var headings = document.querySelectorAll('.section-title.copyable');
+        for (var i = 0; i < headings.length; i++) {
+            (function (heading) {
+                heading.addEventListener('click', function () {
+                    var section = heading.closest('.section');
+                    if (!section) return;
+                    var text = cleanSection(section);
+                    if (!text) return;
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        navigator.clipboard.writeText(text).then(
+                            function () { flash(heading); },
+                            function () { if (fallbackCopy(text)) flash(heading); }
+                        );
+                    } else if (fallbackCopy(text)) {
+                        flash(heading);
+                    }
+                });
+            })(headings[i]);
         }
     })();
 
