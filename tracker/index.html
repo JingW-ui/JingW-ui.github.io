@@ -181,6 +181,18 @@
             border: 1px dashed var(--line);
             border-radius: 8px;
         }
+        .no-data {
+            background: var(--card);
+            border: 1px dashed var(--line);
+            border-radius: 12px;
+            padding: 34px 22px;
+            text-align: center;
+            color: var(--ink-2);
+            font-size: 13px;
+        }
+        .no-data b { display: block; font-size: 15px; color: var(--ink); margin-bottom: 6px; }
+        .no-data p { max-width: 460px; margin: 0 auto 14px; line-height: 1.7; }
+        .no-data code { background: var(--line-2); border-radius: 4px; padding: 1px 5px; }
 
         /* ---------- 卡片 ---------- */
         .jc {
@@ -598,8 +610,7 @@
             <h1 class="name">投递看板</h1>
             <p class="tagline">
                 2027 届校招的投递进度。<strong>拖动卡片换列</strong>自动记录进展日期，点击卡片看完整时间线（投递 → 笔试 → 各轮面试 → Offer / 结束）；工具栏可切到<strong>简介模式</strong>，单行只看公司 / 岗位 / 投递日期。
-                阶段、备注、进展时间线与本机添加的岗位都存在这台设备的浏览器里（localStorage），<strong>不同步到公开仓库</strong>；换设备用导出 / 导入。
-                岗位本身来自仓库内的 <code>tracker.json</code>。
+                岗位、候选池与全部进度都存在这台设备的浏览器里，<strong>不公开、不同步</strong>；首次使用选一次本地数据文件（<code>tracker-data.json</code>），之后打开即用，换设备用导出 / 导入。
             </p>
         </div>
         <nav class="nav">
@@ -630,8 +641,8 @@
         </select>
         <button class="btn primary" id="addBtn">+ 添加岗位</button>
         <button class="btn" id="modeBtn" title="切换卡片密度：简介 = 单行公司 / 岗位 / 投递日期">简介模式</button>
-        <button class="btn" id="exportBtn">导出进度</button>
-        <button class="btn" id="importBtn">导入进度</button>
+        <button class="btn" id="exportBtn">导出数据</button>
+        <button class="btn" id="importBtn">导入数据</button>
         <input type="file" id="importFile" accept="application/json,.json" hidden>
         <span class="count" id="count"></span>
     </div>
@@ -663,9 +674,11 @@ const STAGES = [
     {key: 'closed', label: '已结束'}
 ];
 
-const LS_KEY  = 'tracker.v1';       // 进度覆盖层：{id: {stage, note, done, timeline, resume}}
-const LS_JOBS = 'tracker.jobs.v1';  // 看板成员变化：本机新增岗位 + 移出基础岗位的墓碑
-const LS_UI   = 'tracker.ui.v1';    // 界面偏好：{compact} 简介/详细模式
+const LS_KEY   = 'tracker.v1';       // 进度覆盖层：{id: {stage, note, done, timeline, resume}}
+const LS_JOBS  = 'tracker.jobs.v1';  // 看板成员变化：本机新增岗位 + 移出快照岗位的墓碑
+const LS_UI    = 'tracker.ui.v1';    // 界面偏好：{compact} 简介/详细模式
+const LS_DATA  = 'tracker.data.v1';  // 本地数据快照：{kind, jobs, pool}（首次导入 tracker-data.json 后落盘）
+const DATA_KIND = 'jingw-tracker-data.v1';
 
 function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => (
@@ -674,8 +687,9 @@ function esc(s) {
 
 /* ---------- 数据 ---------- */
 
-let POOL = [];            // 候选池（tracker.pool.json）
-let JOBS = [];            // 看板上的岗位 = tracker.json 基础岗位 + 本机新增
+let POOL = [];            // 候选池（本地数据快照）
+let JOBS = [];            // 看板上的岗位 = 快照岗位（剔除墓碑） + 本机新增
+let DATA = null;          // {kind, jobs: [], pool: []} localStorage 里的数据快照；null = 尚未导入
 let ST = {};              // localStorage 覆盖：{id: {stage, note, done}}
 let LSJ = {addedJobs: [], removedIds: []};   // 本机新增岗位 + 移出岗位墓碑（LS_JOBS）
 let view = [];            // 当前筛选结果
@@ -740,6 +754,67 @@ function saveJobStore() {
     }
 }
 
+function loadData() {
+    try {
+        const raw = localStorage.getItem(LS_DATA);
+        const d = raw ? JSON.parse(raw) : null;
+        DATA = (d && Array.isArray(d.jobs) && d.jobs.length) ? d : null;
+    } catch (e) {
+        DATA = null;   // 存储不可用 / 数据损坏 → 回到首装引导
+    }
+}
+
+function saveData() {
+    try {
+        localStorage.setItem(LS_DATA, JSON.stringify(DATA));
+        return true;
+    } catch (e) {
+        toast('本地存储不可用，数据快照没有保存');
+        return false;
+    }
+}
+
+// 看板 = 快照岗位（剔除本机移出的墓碑） + 本机新增岗位（快照导入后新加的）
+function buildJobsFromData() {
+    const removed = new Set(LSJ.removedIds);
+    const activeBase = DATA.jobs.filter(j => !removed.has(j.id));
+    const activeIds = new Set(activeBase.map(j => j.id));
+    JOBS = activeBase.concat(LSJ.addedJobs.filter(j => j.id && !activeIds.has(j.id)));
+    POOL = Array.isArray(DATA.pool) ? DATA.pool : [];
+    // 快照里已含的本机新增条目是冗余 → 清掉，保持存储干净
+    const dup = LSJ.addedJobs.filter(j => j.id && activeIds.has(j.id)).map(j => j.id);
+    if (dup.length) {
+        LSJ.addedJobs = LSJ.addedJobs.filter(j => !dup.includes(j.id));
+        saveJobStore();
+    }
+    pruneOrphans();
+}
+
+// 首次使用 / 数据未装载：看板区给出导入入口
+function renderNoData() {
+    JOBS = [];
+    POOL = [];
+    document.getElementById('board').innerHTML = `
+        <div class="no-data">
+            <b>本地数据未装载</b>
+            <p>看板数据全部存在本机。选择之前导出的 <code>tracker-data.json</code>（或旧版导出的进度文件）完成初始化；也可以把 JSON 文件直接拖到本页。</p>
+            <button class="btn primary" onclick="document.getElementById('importFile').click()">选择本地数据文件</button>
+        </div>`;
+    document.getElementById('count').textContent = '0 个岗位';
+    renderStats();
+    renderLocalHint();
+}
+
+// 没数据时允许把 JSON 拖进页面直接导入（装载后忽略拖拽，避免误替换）
+function enableDropImport() {
+    window.addEventListener('dragover', e => e.preventDefault());
+    window.addEventListener('drop', e => {
+        e.preventDefault();
+        const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+        if (f && !DATA) importProgress(f);
+    });
+}
+
 // 本机新增岗位（手工 / 候选池）：进内存看板 + 落盘，刷新后仍在
 function addExtraJob(job) {
     JOBS.push(job);
@@ -747,7 +822,7 @@ function addExtraJob(job) {
     return saveJobStore();
 }
 
-// 基础岗位（来自 tracker.json）移出看板 → 记墓碑，防止刷新后复活
+// 快照岗位（来自本地数据文件）移出看板 → 记墓碑，防止刷新后复活
 function tombstoneJob(id) {
     if (!LSJ.removedIds.includes(id)) LSJ.removedIds.push(id);
     return saveJobStore();
@@ -847,9 +922,8 @@ function noteOf(j) {
     const s = ST[j.id];
     return (s && s.note !== undefined) ? s.note : (j.note || '');
 }
-// 简历路径也走覆盖层。它本该是岗位属性（写回 tracker.json），
-// 但 tracker.json 是静态文件——页面改不动它。只看内存的话刷新就丢，
-// 所以运行时统一从 ST 读，导出时再带出去。
+// 简历路径也走覆盖层。详情弹窗里改的是运行时 ST，
+// 只看内存的话刷新就丢，所以运行时统一从 ST 读，导出时再带出去。
 function resumeOf(j) {
     const s = ST[j.id];
     return (s && s.resume !== undefined) ? s.resume : (j.resume || '');
@@ -1254,7 +1328,7 @@ function delEvent(id, i) {
     const patch = Object.assign({}, cur, {timeline: tl, done: todayStr()});
     if (!tl.length) {
         delete patch.timeline;
-        delete patch.stage;   // 记录清零 → 阶段回到 tracker.json 默认
+        delete patch.stage;   // 记录清零 → 阶段回到岗位默认
     }
     ST[id] = patch;
     if (saveState()) toast('已删除');
@@ -1278,7 +1352,7 @@ function delJob(id) {
     JOBS = JOBS.filter(x => x.id !== id);
     delete ST[id];
     saveState();
-    // 本机新增的岗位直接移除记录；tracker.json 基础岗位留墓碑，防止刷新后复活
+    // 本机新增的岗位直接移除记录；快照岗位留墓碑，防止刷新后复活
     if (LSJ.addedJobs.some(j => j.id === id)) {
         LSJ.addedJobs = LSJ.addedJobs.filter(j => j.id !== id);
         saveJobStore();
@@ -1386,78 +1460,91 @@ function addManual() {
 /* ---------- 导出 ---------- */
 
 function exportProgress() {
-    // 只导出"你的进度"：阶段、备注、简历关联 + 手工岗位本身。
-    // offerio 岗位的 JD 正文不入导出文件——它是别人的抓取结果，
-    // 你的投递记录没必要把它再存一份。
+    // 全量快照：看板岗位（含手工）+ 候选池 + 进度覆盖层一体导出。
+    // 这个文件本身就是数据文件——换设备导入它 = 完整恢复看板。
     const out = {
+        kind: DATA_KIND,
         exportedAt: new Date().toISOString(),
-        progress: {},
-        manualJobs: []
+        jobs: JOBS.slice(),
+        pool: POOL.slice(),
+        progress: ST
     };
-    JOBS.forEach(j => {
-        const s = ST[j.id] || {};
-        const stage = stageOf(j);
-        const note = noteOf(j);
-        const resume = resumeOf(j);
-        const tl = Array.isArray(s.timeline) ? s.timeline : [];
-        if (stage !== (j.stage || 'wish') || note || resume || s.done || tl.length) {
-            out.progress[j.id] = {
-                company: j.company,
-                title: j.title,
-                stage: stage,
-                note: note || '',
-                resume: resume,
-                timeline: tl,
-                updated: s.done || ''
-            };
-        }
-        // 手工岗位和候选池加入的岗位都是"本机新增"，导出都要带上
-        if (j.manual || LSJ.addedJobs.some(x => x.id === j.id)) out.manualJobs.push(j);
-    });
 
     const blob = new Blob([JSON.stringify(out, null, 2)], {type: 'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'tracker-progress-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.download = 'tracker-data-' + new Date().toISOString().slice(0, 10) + '.json';
     a.click();
     URL.revokeObjectURL(a.href);
-    toast('已导出进度文件');
+    toast('已导出全量数据快照');
 }
 
 /* ---------- 导入 ---------- */
 
-// 与导出配对：合并进度到本机 localStorage；旧格式（无 timeline）兼容
+// 与导出配对。全量快照（含 jobs）→ 整体替换本机数据；旧格式（只有 progress/manualJobs）→ 增量合并。
 function importProgress(file) {
     const r = new FileReader();
     r.onload = () => {
+        let data;
         try {
-            const data = JSON.parse(r.result);
-            const prog = data.progress || {};
-            let n = 0;
-            Object.keys(prog).forEach(id => {
-                const p = prog[id] || {};
-                const next = Object.assign({}, ST[id] || {});
-                if (p.stage) next.stage = p.stage;
-                if (p.note !== undefined) next.note = p.note;
-                if (p.resume !== undefined) next.resume = p.resume;
-                if (Array.isArray(p.timeline) && p.timeline.length) next.timeline = p.timeline;
-                ST[id] = next;
-                n++;
-            });
-            let m = 0;
-            (data.manualJobs || []).forEach(j => {
-                if (!j.id || JOBS.some(x => x.id === j.id)) return;
-                addExtraJob(j);   // 同步落盘，刷新后仍在
-                m++;
-            });
-            if (saveState()) toast('已导入 ' + n + ' 个岗位进度' + (m ? '，新增 ' + m + ' 个手工岗位' : ''));
-            fillFilters();
-            render();
+            data = JSON.parse(r.result);
         } catch (e) {
             toast('导入失败：文件格式不对');
+            return;
         }
+        if (Array.isArray(data.jobs)) importFullSnapshot(data);
+        else importLegacy(data);
     };
     r.readAsText(file);
+}
+
+// 全量快照：文件即真源，替换岗位/池/进度（已有数据时先确认）
+function importFullSnapshot(data) {
+    const jobs = (data.jobs || []).filter(j => j && j.id && j.title);
+    if (!jobs.length) { toast('导入失败：快照里没有岗位'); return; }
+    if (DATA && Array.isArray(DATA.jobs) && DATA.jobs.length) {
+        if (!confirm('已有本地数据（' + DATA.jobs.length + ' 个岗位）。用导入的快照整体替换？')) return;
+    }
+    DATA = {
+        kind: data.kind || DATA_KIND,
+        exportedAt: data.exportedAt || '',
+        jobs: jobs,
+        pool: Array.isArray(data.pool) ? data.pool : []
+    };
+    ST = (data.progress && typeof data.progress === 'object' && !Array.isArray(data.progress))
+        ? JSON.parse(JSON.stringify(data.progress)) : {};
+    LSJ = {addedJobs: [], removedIds: []};   // 快照岗位清单已是真源，墓碑/新增记录一并重置
+    if (!saveData()) return;
+    saveState();
+    saveJobStore();
+    fillFilters();
+    render();
+    toast('已导入 ' + DATA.jobs.length + ' 个岗位 · 候选池 ' + DATA.pool.length + ' 条');
+}
+
+// 旧格式（tracker-progress-*.json）：只合并进度与手工岗位，不动岗位/池
+function importLegacy(data) {
+    const prog = data.progress || {};
+    let n = 0;
+    Object.keys(prog).forEach(id => {
+        const p = prog[id] || {};
+        const next = Object.assign({}, ST[id] || {});
+        if (p.stage) next.stage = p.stage;
+        if (p.note !== undefined) next.note = p.note;
+        if (p.resume !== undefined) next.resume = p.resume;
+        if (Array.isArray(p.timeline) && p.timeline.length) next.timeline = p.timeline;
+        ST[id] = next;
+        n++;
+    });
+    let m = 0;
+    (data.manualJobs || []).forEach(j => {
+        if (!j.id || JOBS.some(x => x.id === j.id)) return;
+        addExtraJob(j);   // 同步落盘，刷新后仍在
+        m++;
+    });
+    if (saveState()) toast('已导入 ' + n + ' 个岗位进度' + (m ? '，新增 ' + m + ' 个手工岗位' : ''));
+    fillFilters();
+    render();
 }
 
 /* ---------- 启动 ---------- */
@@ -1490,36 +1577,16 @@ window.addEventListener('DOMContentLoaded', () => {
         this.value = '';
     });
 
-    Promise.all([
-        fetch('/tracker/tracker.json?_=' + Date.now()).then(r => {
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            return r.json();
-        }),
-        fetch('/tracker/tracker.pool.json?_=' + Date.now())
-            .then(r => r.ok ? r.json() : [])
-            .catch(() => [])
-    ]).then(([jobs, pool]) => {
-        const base = Array.isArray(jobs) ? jobs : (jobs.jobs || []);
-        POOL = Array.isArray(pool) ? pool : [];
-        // 看板 = 仓库基础岗位（剔除本机移出的墓碑） + 本机新增岗位。
-        // 去重：仓库里未被移出的 id 以仓库版本为准；被移出又从候选池重新加入的，以本机版本为准。
-        const removed = new Set(LSJ.removedIds);
-        const activeBase = base.filter(j => !removed.has(j.id));
-        const activeIds = new Set(activeBase.map(j => j.id));
-        JOBS = activeBase.concat(LSJ.addedJobs.filter(j => j.id && !activeIds.has(j.id)));
-        // 仓库已收录且未被移出的本机新增条目是冗余 → 清掉，保持存储干净
-        const dup = LSJ.addedJobs.filter(j => j.id && activeIds.has(j.id)).map(j => j.id);
-        if (dup.length) {
-            LSJ.addedJobs = LSJ.addedJobs.filter(j => !dup.includes(j.id));
-            saveJobStore();
-        }
-        pruneOrphans();
+    // 数据全部来自本地：localStorage 快照，没有则进入首装引导（选文件 / 拖拽导入）
+    loadData();
+    if (DATA && Array.isArray(DATA.jobs) && DATA.jobs.length) {
+        buildJobsFromData();
         fillFilters();
         render();
-    }).catch(() => {
-        document.getElementById('board').innerHTML =
-            '<div class="col-empty" style="grid-column:1/-1">数据加载失败 —— 请通过 HTTP 访问（如 <code>python -m http.server</code>），直接双击打开 html 时浏览器会拦截 fetch。</div>';
-    });
+    } else {
+        renderNoData();
+        enableDropImport();
+    }
 });
 </script>
 </body>
