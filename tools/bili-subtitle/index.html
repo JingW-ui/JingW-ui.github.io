@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="vendor/style.css">
 </head>
 <body class="centered">
+<button class="login-float" id="loginBadge" onclick="onBadgeClick()">未登录</button>
 <div class="wrap">
   <div class="hero-pad">
     <header>
@@ -15,17 +16,10 @@
       <div class="sub">粘贴视频链接，扫码登录后在线查看与导出字幕</div>
     </header>
 
-    <section class="card">
-      <div class="query-row">
-        <input id="videoInput" type="text" placeholder="粘贴 B 站视频链接或 BV 号" autocomplete="off" spellcheck="false">
-        <button class="btn" id="queryBtn" onclick="startQuery()">提取</button>
-      </div>
-      <div class="examples">
-        <button class="ex-chip" onclick="fillExample('https://www.bilibili.com/video/BV1GJ411x7h7')">BV1GJ411x7h7</button>
-        <span class="spacer"></span>
-        <button class="badge clickable" id="loginBadge" onclick="onBadgeClick()">未登录</button>
-      </div>
-    </section>
+    <div class="query-row">
+      <input id="videoInput" type="text" placeholder="粘贴 B 站视频链接或 BV 号" autocomplete="off" spellcheck="false">
+      <button class="btn" id="queryBtn" onclick="startQuery()">提取</button>
+    </div>
 
     <section class="card" id="videoCard" style="display:none">
       <div class="video-title" id="videoTitle"></div>
@@ -740,11 +734,6 @@ function toggleHistory() {
 }
 
 /* ================= 入口 ================= */
-
-function fillExample(v) {
-  document.getElementById('videoInput').value = v;
-  startQuery();
-}
 
 document.getElementById('videoInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') startQuery();
