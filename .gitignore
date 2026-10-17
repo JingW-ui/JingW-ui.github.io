@@ -97,3 +97,6 @@ export_tracker.py
 
 # nature-figure 论文图资产（30MB 开发素材，本地保留不进仓库/部署）
 skills/nature-figure/assets/
+
+# wrangler 本地缓存
+tools/bili-subtitle/worker/.wrangler/

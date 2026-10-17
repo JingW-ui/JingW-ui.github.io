@@ -2,7 +2,7 @@
 
 > 站点: https://jingw-ui.github.io · 生成日期: 2026-10-17 · 纯静态站点，所有工具/游戏浏览器直接运行，软件为 Windows exe（GitHub Releases 下载）。
 
-## 一、在线工具箱（77 个）
+## 一、在线工具箱（78 个）
 入口: https://jingw-ui.github.io/tools/
 
 ### 图标创建
@@ -252,6 +252,10 @@ URL: https://jingw-ui.github.io/tools/douyin-hot/
 ### 网站服务器查询
 用途: 输入域名查询解析到的 IP 与服务器运营商，识别阿里云、腾讯云、AWS、Cloudflare 等云厂商与 CDN
 URL: https://jingw-ui.github.io/tools/domain-check/
+
+### B站字幕提取
+用途: 粘贴B站视频链接，扫码登录后在线查看与导出字幕，支持AI与CC字幕，可导出SRT、ASS、TXT、JSON
+URL: https://jingw-ui.github.io/tools/bili-subtitle/
 
 ### 笔记工具
 用途: 便捷的在线笔记应用，支持文本编辑和保存功能

@@ -1,0 +1,8 @@
+name = "bili-subtitle"
+main = "worker.js"
+compatibility_date = "2024-12-01"
+
+# 可选：把 ALLOWED_ORIGIN 设为你的站点（如 https://jingw-ui.github.io），
+# 只有该来源的浏览器能调用 Worker。留空表示不限制。
+# [vars]
+# ALLOWED_ORIGIN = "https://jingw-ui.github.io"
