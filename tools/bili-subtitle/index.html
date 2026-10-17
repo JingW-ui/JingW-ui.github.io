@@ -9,6 +9,12 @@
 </head>
 <body class="centered">
 <button class="login-float" id="loginBadge" onclick="onBadgeClick()">未登录</button>
+<div class="user-pop" id="userPop" style="display:none">
+  <img class="up-avatar" id="upAvatar" referrerpolicy="no-referrer" alt="">
+  <div class="up-name" id="upName"></div>
+  <div class="up-uid" id="upUid"></div>
+  <button class="up-logout" onclick="logout()">退出登录</button>
+</div>
 <div class="wrap">
   <div class="hero-pad">
     <header>
@@ -533,23 +539,57 @@ let pollTimer = null;
 let pollKey = null;
 
 function onBadgeClick() {
-  if (state.login) {
-    if (confirm('退出登录「' + (state.login.uname || 'B 站账号') + '」？')) logout();
-  } else {
-    openLogin();
-  }
+  if (state.login && state.login.sessdata) toggleUserPop();
+  else openLogin();
 }
 
+// 头像加载失败降级：圆片内显示昵称前两字
 function renderBadge() {
   const b = document.getElementById('loginBadge');
   if (state.login && state.login.sessdata) {
-    b.textContent = state.login.uname ? '已登录：' + state.login.uname : '已登录';
     b.classList.add('ok');
+    b.title = state.login.uname ? '已登录：' + state.login.uname : '已登录';
+    if (state.login.face) {
+      const img = document.createElement('img');
+      img.src = state.login.face;
+      img.alt = '';
+      img.referrerPolicy = 'no-referrer';
+      img.onerror = () => { img.remove(); b.textContent = (state.login.uname || '已登录').slice(0, 2); };
+      b.innerHTML = '';
+      b.appendChild(img);
+    } else {
+      b.textContent = (state.login.uname || '已登录').slice(0, 2);
+    }
   } else {
-    b.textContent = '未登录';
     b.classList.remove('ok');
+    b.title = '登录 B 站账号';
+    b.innerHTML = '<span class="lf-plus">＋</span>';
   }
 }
+
+function toggleUserPop() {
+  const pop = document.getElementById('userPop');
+  if (pop.style.display !== 'none') { pop.style.display = 'none'; return; }
+  const av = document.getElementById('upAvatar');
+  av.removeAttribute('src');
+  if (state.login.face) {
+    av.src = state.login.face;
+    av.style.display = '';
+  } else {
+    av.style.display = 'none';
+  }
+  document.getElementById('upName').textContent = state.login.uname || 'B 站用户';
+  document.getElementById('upUid').textContent = 'UID ' + (state.login.dede || '—');
+  pop.style.display = '';
+}
+
+// 点击徽章/卡片以外区域关闭悬浮卡片
+document.addEventListener('click', e => {
+  const pop = document.getElementById('userPop');
+  if (!pop || pop.style.display === 'none') return;
+  if (e.target.closest && (e.target.closest('#userPop') || e.target.closest('#loginBadge'))) return;
+  pop.style.display = 'none';
+});
 
 async function openLogin() {
   assertWorker();
@@ -668,6 +708,8 @@ async function verifyLogin(sessdata, dede) {
 function logout() {
   state.login = null;
   localStorage.removeItem(LS_LOGIN);
+  const pop = document.getElementById('userPop');
+  if (pop) pop.style.display = 'none';
   renderBadge();
   showToast('已退出登录');
 }

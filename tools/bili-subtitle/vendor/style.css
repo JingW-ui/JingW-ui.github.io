@@ -53,19 +53,49 @@ h1 .accent { color: var(--accent); }
 }
 .btn.ghost:hover { color: var(--accent); border-color: var(--accent); filter: none; }
 .btn.sm { padding: 5px 14px; font-size: .78rem; }
-/* 固定悬浮的登录徽章（右上角，滚动时常驻） */
+/* 固定悬浮的登录圆片（右上角，滚动时常驻）：已登录显示头像，未登录显示 ＋ */
 .login-float {
-  position: fixed; top: 16px; right: 20px; z-index: 50;
-  display: inline-flex; align-items: center; gap: 5px;
-  font: inherit; font-size: .72rem; font-weight: 600;
-  padding: 4px 13px; border-radius: 20px; white-space: nowrap;
-  border: 1px solid var(--border); background: rgba(255,255,255,.85);
+  position: fixed; top: 16px; right: 20px; z-index: 60;
+  width: 40px; height: 40px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; overflow: hidden;
+  border: 1.5px solid var(--border);
+  background: rgba(255,255,255,.9);
   backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  color: var(--muted); cursor: pointer; transition: all .2s ease;
-  max-width: 42vw; overflow: hidden; text-overflow: ellipsis;
+  font: inherit; font-size: .68rem; font-weight: 600; color: var(--muted);
+  cursor: pointer; transition: all .2s ease;
 }
-.login-float:hover { border-color: var(--accent-border); color: var(--accent-b); }
-.login-float.ok { background: rgba(251,114,153,.1); color: var(--accent-b); border-color: var(--accent-border); }
+.login-float:hover { border-color: var(--accent-border); transform: scale(1.06); }
+.login-float.ok { border-color: var(--accent-border); box-shadow: 0 0 0 2px var(--accent-bg); }
+.login-float img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.lf-plus { font-size: 1.15rem; color: var(--tertiary); line-height: 1; }
+
+/* 账号悬浮卡片：头像 + 昵称 + UID + 退出 */
+.user-pop {
+  position: fixed; top: 64px; right: 20px; z-index: 60;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: var(--shadow-md); padding: 18px 20px 16px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  min-width: 176px;
+  opacity: 0; transform: translateY(-8px);
+  animation: cardIn .25s cubic-bezier(.16,1,.3,1) forwards;
+}
+.up-avatar {
+  width: 52px; height: 52px; border-radius: 50%; object-fit: cover;
+  border: 1.5px solid var(--accent-border); margin-bottom: 2px;
+}
+.up-name {
+  font-weight: 700; font-size: .92rem; max-width: 170px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.up-uid { font-size: .7rem; color: var(--tertiary); }
+.up-logout {
+  width: 100%; margin-top: 6px;
+  border: 1px solid var(--red); background: none; color: var(--red);
+  border-radius: 8px; font: inherit; font-size: .8rem; font-weight: 600;
+  padding: 6px 0; cursor: pointer; transition: all .2s;
+}
+.up-logout:hover { background: rgba(207,34,46,.06); }
 
 /* 视频信息卡 */
 .video-title { font-weight: 700; font-size: 1.02rem; word-break: break-all; }
@@ -225,7 +255,8 @@ h1 .accent { color: var(--accent); }
   .query-row { margin-top: 20px; }
   .query-row input { padding: 9px 14px; font-size: .85rem; }
   .btn { padding: 8px 16px; font-size: .8rem; }
-  .login-float { top: 12px; right: 12px; font-size: .68rem; padding: 3px 10px; max-width: 46vw; }
+  .login-float { top: 12px; right: 12px; width: 36px; height: 36px; }
+  .user-pop { top: 56px; right: 12px; min-width: 160px; }
   .modal-card { padding: 22px 18px 18px; }
   .st-box { padding: 6px 8px; }
   .st-row { gap: 8px; padding: 3px 6px; }
