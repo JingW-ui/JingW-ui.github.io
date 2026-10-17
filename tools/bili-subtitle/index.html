@@ -115,16 +115,17 @@ function fmtShort(sec) {
 }
 
 function fmtSrtTime(sec) {
-  sec = Math.max(0, sec);
-  const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = Math.floor(sec % 60);
-  const ms = Math.round((sec - Math.floor(sec)) * 1000);
+  // 先化总毫秒再拆分：避免「先 floor 秒、毫秒又四舍五入到 1000」的进位溢出
+  const total = Math.max(0, Math.round((sec || 0) * 1000));
+  const h = Math.floor(total / 3600000), m = Math.floor(total % 3600000 / 60000);
+  const s = Math.floor(total % 60000 / 1000), ms = total % 1000;
   return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + ',' + String(ms).padStart(3, '0');
 }
 
 function fmtAssTime(sec) {
-  sec = Math.max(0, sec);
-  const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = Math.floor(sec % 60);
-  const cs = Math.round((sec - Math.floor(sec)) * 100);
+  const total = Math.max(0, Math.round((sec || 0) * 100));
+  const h = Math.floor(total / 360000), m = Math.floor(total % 360000 / 6000);
+  const s = Math.floor(total % 6000 / 100), cs = total % 100;
   return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0') + '.' + String(cs).padStart(2, '0');
 }
 
@@ -475,29 +476,43 @@ function showNotLogin() {
 
 /* ================= 导出 ================= */
 
+// Windows 文件名安全化：非法字符、换行归一、首尾空格与尾部点去除
+function safeFilename(s) {
+  return String(s || '').replace(/[\\/:*?"<>|]/g, '_').replace(/\s+/g, ' ').trim().replace(/\.+$/, '').trim();
+}
+
 function exportName(ext) {
   const pg = state.video && state.video.pages.find(x => x.page === state.p);
   const base = (pg && pg.part ? pg.part : state.video ? state.video.title : 'subtitle') || 'subtitle';
-  return base.replace(/[\\/:*?"<>|]/g, '_').slice(0, 60) + '.' + ext;
+  return safeFilename(base).slice(0, 60) + '.' + ext;
+}
+
+// ASS 台词净化：花括号会被解析器当作覆盖标签（{\b1}），替换为全角括号
+function assText(s) {
+  return String(s || '').replace(/[{}]/g, c => c === '{' ? '（' : '）').replace(/\r?\n/g, '\\N');
 }
 
 function exportSub(fmt) {
   if (!state.body || !Array.isArray(state.body.body)) { showToast('暂无字幕可导出'); return; }
   const body = state.body.body;
+  if (!body.length) { showToast('字幕为空，无可导出内容'); return; }
+  // 文本格式带 UTF-8 BOM：无 BOM 时部分 Windows 播放器会误判 GBK 导致中文乱码
+  const BOM = '\uFEFF';
 
   if (fmt === 'srt') {
     const lines = body.map((it, i) =>
       (i + 1) + '\n' + fmtSrtTime(it.from || 0) + ' --> ' + fmtSrtTime(it.to || 0) + '\n' + (it.content || ''));
-    downloadBlob(lines.join('\n\n') + '\n', exportName('srt'), 'text/plain;charset=utf-8');
+    downloadBlob(BOM + lines.join('\n\n') + '\n', exportName('srt'), 'text/plain;charset=utf-8');
   } else if (fmt === 'txt') {
-    downloadBlob(body.map(it => it.content || '').join('\n') + '\n', exportName('txt'), 'text/plain;charset=utf-8');
+    downloadBlob(BOM + body.map(it => it.content || '').join('\n') + '\n', exportName('txt'), 'text/plain;charset=utf-8');
   } else if (fmt === 'json') {
     downloadBlob(JSON.stringify(state.body, null, 2), exportName('json'), 'application/json;charset=utf-8');
   } else if (fmt === 'ass') {
     const dialogues = body.map(it =>
-      'Dialogue: 0,' + fmtAssTime(it.from || 0) + ',' + fmtAssTime(it.to || 0) + ',Default,,0,0,0,,' + (it.content || ''));
+      'Dialogue: 0,' + fmtAssTime(it.from || 0) + ',' + fmtAssTime(it.to || 0) + ',Default,,0,0,0,,' + assText(it.content));
+    const title = safeFilename(state.video ? state.video.title : '') || 'bilibili subtitle';
     const ass = [
-      '[Script Info]', 'Title: ' + (state.video ? state.video.title : ''), 'ScriptType: v4.00+',
+      '[Script Info]', 'Title: ' + title, 'ScriptType: v4.00+',
       'WrapStyle: 2', 'ScaledBorderAndShadow: yes', 'PlayResX: 1920', 'PlayResY: 1080', '',
       '[V4+ Styles]',
       'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
@@ -506,9 +521,9 @@ function exportSub(fmt) {
       'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text',
       dialogues.join('\n'), '',
     ].join('\n');
-    downloadBlob(ass, exportName('ass'), 'text/plain;charset=utf-8');
+    downloadBlob(BOM + ass, exportName('ass'), 'text/plain;charset=utf-8');
   }
-  showToast('已导出 ' + fmt.toUpperCase());
+  showToast('已导出 ' + fmt.toUpperCase() + '（' + body.length + ' 条）');
 }
 
 /* ================= 登录模块（扫码） ================= */
