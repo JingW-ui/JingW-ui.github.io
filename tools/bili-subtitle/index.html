@@ -384,16 +384,48 @@ function renderListView(bodyArr) {
 }
 
 function renderTextView(bodyArr) {
+  const paras = buildFlowParagraphs(bodyArr);
   document.getElementById('results').innerHTML =
-    '<div class="st-plain">' + bodyArr.map(it =>
-      (state.showTs ? '<span class="ts">' + fmtShort(it.from || 0) + '</span>' : '') + esc(it.content || '')
-    ).join('<br>') + '</div>';
+    '<div class="st-plain">' + paras.map(p =>
+      '<p class="st-para">' + esc(p.text) + '</p>').join('') + '</div>';
+}
+
+/* 文稿流式：把台词连成自然段落，浏览器自动折行使每行填满。
+   断段依据：与上一行结束间隔 ≥ 2s（换气/换句处），兜底每 10 行必断（防无缝 CC 糊成一坨） */
+function joinFlowText(a, b) {
+  if (!a) return b || '';
+  if (!b) return a;
+  const asciiEnd = /[A-Za-z0-9,.!?;:'")\]]$/.test(a);
+  const asciiStart = /^[A-Za-z0-9(\["']/.test(b);
+  return a + (asciiEnd || asciiStart ? ' ' : '') + b;
+}
+
+function buildFlowParagraphs(bodyArr) {
+  const paras = [];
+  let cur = null;
+  for (const it of bodyArr) {
+    const from = it.from || 0;
+    if (!cur || from - cur.lastTo >= 2 || cur.count >= 10) {
+      cur = { lastTo: from, count: 0, parts: [] };
+      paras.push(cur);
+    }
+    cur.parts.push(it.content || '');
+    cur.lastTo = Math.max(cur.lastTo, it.to || from);
+    cur.count++;
+  }
+  return paras.map(p => {
+    let text = '';
+    for (const part of p.parts) text = joinFlowText(text, part);
+    return text;
+  });
 }
 
 function setView(v) {
   state.view = v;
   document.getElementById('segList').classList.toggle('active', v === 'list');
   document.getElementById('segText').classList.toggle('active', v === 'text');
+  // 时间戳开关只作用于列表模式，文稿流式下不显示（避免死控件）
+  document.getElementById('tsToggle').style.display = (v === 'list') ? '' : 'none';
   savePrefs();
   if (state.body) renderCurrent();
 }
@@ -418,6 +450,7 @@ function loadPrefs() {
   document.getElementById('segList').classList.toggle('active', state.view === 'list');
   document.getElementById('segText').classList.toggle('active', state.view === 'text');
   document.getElementById('tsToggle').classList.toggle('on', state.showTs);
+  document.getElementById('tsToggle').style.display = (state.view === 'list') ? '' : 'none';
 }
 
 /* ================= 渲染 ================= */
