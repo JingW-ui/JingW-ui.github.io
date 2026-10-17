@@ -363,6 +363,7 @@ async function loadSubtitle(lan, token) {
 
 function renderCurrent() {
   const body = state.body.body;
+  document.getElementById('resultsHead').style.display = '';
   document.getElementById('lineCount').textContent = '（' + body.length + ' 条）';
   if (state.view === 'text') renderTextView(body); else renderListView(body);
 }
