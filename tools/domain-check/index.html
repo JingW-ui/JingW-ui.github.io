@@ -81,7 +81,7 @@
   <!-- 查询输入 -->
   <div class="section">
     <div class="section-header">
-      <span class="section-title">🔎 查询域名</span>
+      <span class="section-title">查询域名</span>
     </div>
     <div class="section-body">
       <div class="query-row">
@@ -103,7 +103,7 @@
   <!-- 结果概览 -->
   <div class="section" id="summarySection" hidden>
     <div class="section-header">
-      <span class="section-title">📋 服务概览</span>
+      <span class="section-title">服务概览</span>
       <span style="flex:1"></span>
       <button class="btn btn-sm" onclick="copyReport()">⎘ 复制全部</button>
       <button class="btn btn-sm" onclick="downloadReport()">⬇ 导出报告</button>
@@ -128,14 +128,14 @@
 /* ================= 常量与字典 ================= */
 
 const RECORD_TYPES = [
-  { key: 'A',     num: 1,   zh: 'IPv4 地址',   icon: '🏠' },
-  { key: 'AAAA',  num: 28,  zh: 'IPv6 地址',   icon: '🏢' },
-  { key: 'CNAME', num: 5,   zh: '别名记录',     icon: '🔗' },
-  { key: 'MX',    num: 15,  zh: '邮件交换',     icon: '📧' },
-  { key: 'NS',    num: 2,   zh: '域名服务器',   icon: '🧭' },
-  { key: 'TXT',   num: 16,  zh: '文本记录',     icon: '📝' },
-  { key: 'SOA',   num: 6,   zh: '权威起始',     icon: '⚙️' },
-  { key: 'CAA',   num: 257, zh: '证书授权策略', icon: '🔒' },
+  { key: 'A',     num: 1,   zh: 'IPv4 地址' },
+  { key: 'AAAA',  num: 28,  zh: 'IPv6 地址' },
+  { key: 'CNAME', num: 5,   zh: '别名记录' },
+  { key: 'MX',    num: 15,  zh: '邮件交换' },
+  { key: 'NS',    num: 2,   zh: '域名服务器' },
+  { key: 'TXT',   num: 16,  zh: '文本记录' },
+  { key: 'SOA',   num: 6,   zh: '权威起始' },
+  { key: 'CAA',   num: 257, zh: '证书授权策略' },
 ];
 const TYPE_META = {};
 RECORD_TYPES.forEach(t => TYPE_META[t.key] = t);
@@ -360,7 +360,7 @@ function renderSkeleton() {
   let html = '';
   RECORD_TYPES.forEach(t => {
     html += '<div class="section rec-section" id="sec-' + t.key + '">' +
-      '<div class="section-header"><span class="section-title">' + t.icon + ' ' + t.key + ' 记录</span>' +
+      '<div class="section-header"><span class="section-title">' + t.key + ' 记录</span>' +
       '<span class="section-subtitle">' + t.zh + '</span>' +
       '<span style="flex:1"></span><span class="badge" id="meta-' + t.key + '">等待查询</span></div>' +
       '<div class="section-body" id="body-' + t.key + '"></div></div>';
