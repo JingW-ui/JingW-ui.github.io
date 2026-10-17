@@ -58,7 +58,16 @@
   details.raw { margin-top:10px; }
   details.raw summary { font-size:12px; color:var(--text-muted); cursor:pointer; user-select:none; }
   details.raw pre { margin-top:6px; padding:10px 12px; background:var(--bg2); border:1px solid var(--border-light); border-radius:6px; font-size:11px; line-height:1.5; overflow:auto; max-height:260px; font-family:'Consolas',monospace; }
-  .rec-section.dim { opacity:.62; }
+  /* 结果分组（单卡内轻量分组，替代多卡片） */
+  .rgroup { padding:14px 0 6px; border-bottom:1px solid var(--border-light); }
+  .rgroup:last-child { border-bottom:none; }
+  .rgroup-head { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  .rkey { font-family:'Consolas',monospace; font-weight:700; font-size:14px; }
+  .rzh { font-size:12px; color:var(--text-muted); }
+  .rcount { font-size:11px; color:var(--text2); background:var(--bg2); border-radius:10px; padding:1px 8px; }
+  .rsrc { font-size:11px; color:var(--text-muted); margin-left:auto; }
+  .sum-block { padding-bottom:12px; margin-bottom:8px; border-bottom:1px solid var(--border-light); }
+  .rnone { font-size:12px; color:var(--text-muted); padding:12px 0 2px; }
 
   /* 加载 */
   .spin { display:inline-block; width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--green); border-radius:50%; animation:sp .7s linear infinite; vertical-align:-2px; }
@@ -96,26 +105,19 @@
         <span style="flex:1"></span>
         <span class="badge" id="srcBadge">线路：自动切换</span>
       </div>
-      <div style="margin-top:10px" id="topStatus"></div>
     </div>
   </div>
 
-  <!-- 结果概览 -->
-  <div class="section" id="summarySection" hidden>
+  <!-- 结果 -->
+  <div class="section" id="resultsCard" hidden>
     <div class="section-header">
-      <span class="section-title">服务概览</span>
+      <span class="section-title">结果</span>
       <span style="flex:1"></span>
-      <button class="btn btn-sm" onclick="copyReport()">⎘ 复制全部</button>
-      <button class="btn btn-sm" onclick="downloadReport()">⬇ 导出报告</button>
+      <button class="btn btn-sm" onclick="copyReport()">⎘ 复制</button>
+      <button class="btn btn-sm" onclick="downloadReport()">⬇ 导出</button>
     </div>
-    <div class="section-body">
-      <div class="sum-meta" id="sumMeta">-</div>
-      <div class="interp" id="sumTags" style="margin:0"></div>
-    </div>
+    <div class="section-body" id="resultsBody"></div>
   </div>
-
-  <!-- 分类型结果 -->
-  <div id="results"></div>
 
   <p class="foot-line">查询由浏览器直连公共 DoH（默认阿里云，失败自动切 Cloudflare），本站不经手、不存储查询记录；服务解释由本地指纹库推断，仅供参考。</p>
 
@@ -245,6 +247,7 @@ let lastResults = {};         // type -> {state, answers, source, ms, json, chai
 let queryStart = 0;
 let usedSources = new Set();
 let queryToken = 0;           // 防止并发查询串台
+let pending = new Set();      // 尚未返回的记录类型
 
 /* ================= 域名处理 ================= */
 
@@ -307,10 +310,11 @@ async function startQuery() {
   const token = ++queryToken;
   curDomain = nd.puny; displayDomain = nd.display;
   lastResults = {}; usedSources = new Set(); queryStart = performance.now();
+  pending = new Set(RECORD_TYPES.map(t => t.key));
   document.getElementById('queryBtn').disabled = true;
   input.disabled = true;
-  document.getElementById('summarySection').hidden = true;
-  renderSkeleton();
+  document.getElementById('resultsCard').hidden = false;
+  renderAll();
   try {
     await Promise.all(RECORD_TYPES.map(t => runOne(t, token)));
   } finally {
@@ -320,15 +324,10 @@ async function startQuery() {
     }
   }
   if (token !== queryToken) return;
-
-  const cost = Math.round(performance.now() - queryStart);
-  renderSummary(cost);
+  renderAll();
 }
 
 async function runOne(t, token) {
-  const box = document.getElementById('body-' + t.key);
-  setSectionState(t.key, 'loading');
-  if (box) box.innerHTML = '<div class="loading-line"><span class="spin"></span>查询中…</div>';
   try {
     const r = await dohQuery(curDomain, t.num);
     if (token !== queryToken) return;
@@ -338,9 +337,8 @@ async function runOne(t, token) {
       if (a.type === t.num) answers.push({ value: a.data, ttl: a.TTL });
       else if (a.type === 5) chain.push({ value: a.data, ttl: a.TTL });
     });
-    const st = r.json.Status === 0
-      ? (answers.length ? 'ok' : 'empty')
-      : 'dnserror';
+    const hasData = answers.length || (t.key === 'CNAME' && chain.length);
+    const st = r.json.Status === 0 ? (hasData ? 'ok' : 'empty') : 'dnserror';
     lastResults[t.key] = {
       state: st, answers: answers, chain: chain,
       status: r.json.Status, source: r.source, ms: r.ms, json: r.json,
@@ -349,31 +347,93 @@ async function runOne(t, token) {
     if (token !== queryToken) return;
     lastResults[t.key] = { state: 'network', message: (e && e.name === 'AbortError') ? '请求超时' : (e.message || '网络错误'), source: null };
   }
-  renderOne(t.key);
+  pending.delete(t.key);
+  renderAll();
   updateSourceBadge();
 }
 
 /* ================= 渲染 ================= */
 
-function renderSkeleton() {
-  const wrap = document.getElementById('results');
+function renderAll() {
+  const body = document.getElementById('resultsBody');
+  if (!body) return;
+  if (pending.size === RECORD_TYPES.length) {
+    body.innerHTML = '<div class="loading-line"><span class="spin"></span>查询中…</div>';
+    return;
+  }
+  const a = lastResults.A;
+  if (a && a.state === 'dnserror' && a.status === 3) {
+    body.innerHTML = '<div class="rec-error">域名不存在或尚未注册（NXDOMAIN）</div>';
+    return;
+  }
   let html = '';
+  const emptyTypes = [];
   RECORD_TYPES.forEach(t => {
-    html += '<div class="section rec-section" id="sec-' + t.key + '">' +
-      '<div class="section-header"><span class="section-title">' + t.key + ' 记录</span>' +
-      '<span class="section-subtitle">' + t.zh + '</span>' +
-      '<span style="flex:1"></span><span class="badge" id="meta-' + t.key + '">等待查询</span></div>' +
-      '<div class="section-body" id="body-' + t.key + '"></div></div>';
+    const r = lastResults[t.key];
+    if (!r || pending.has(t.key)) return;
+    if (r.state === 'ok' && !r.answers.length) { emptyTypes.push(t.key); return; }
+    html += groupHtml(t.key, r);
   });
-  wrap.innerHTML = html;
-  document.getElementById('topStatus').innerHTML =
-    '<div class="loading-line"><span class="spin"></span>正在查询 ' + displayDomain + ' …</div>';
+  if (pending.size === 0) {
+    if (RECORD_TYPES.every(t => lastResults[t.key] && lastResults[t.key].state === 'network')) {
+      body.innerHTML = '<div class="rec-error">两条 DoH 线路均不可达，查询失败。<button class="btn btn-sm" style="margin-left:8px" onclick="retryAll()">重试</button></div>';
+      return;
+    }
+    const okCount = RECORD_TYPES.filter(t => lastResults[t.key] && lastResults[t.key].state === 'ok' && lastResults[t.key].answers.length).length;
+    const tags = collectAllTags();
+    const srcNames = [...usedSources].map(k => SOURCES[k].label);
+    const cost = Math.round(performance.now() - queryStart);
+    let block = '<div class="sum-meta" style="margin:0"><b>' + esc(displayDomain) + '</b> · ' + esc(srcNames.join(' → ')) + ' · ' + cost + ' ms · ' + okCount + '/' + RECORD_TYPES.length + ' 类有记录</div>';
+    const chips = tags.map(tag => '<span class="tag"><b>' + esc(tag.label) + '</b><span class="tag-kind">' + esc(KIND_LABEL[tag.kind] || tag.kind) + '</span></span>').join('');
+    block += '<div class="interp" style="margin-top:8px">' + (chips || '<span class="rec-empty">未识别出已知服务指纹</span>') + '</div>';
+    html = '<div class="sum-block">' + block + '</div>' + html +
+      (emptyTypes.length ? '<div class="rnone">' + esc(emptyTypes.join(' / ')) + ' 无记录</div>' : '');
+  } else if (html) {
+    html += '<div class="loading-line" style="margin-top:12px"><span class="spin"></span>剩余类型查询中…</div>';
+  } else {
+    html = '<div class="loading-line"><span class="spin"></span>查询中…</div>';
+  }
+  body.innerHTML = html;
 }
 
-function setSectionState(key, state) {
-  const sec = document.getElementById('sec-' + key);
-  if (!sec) return;
-  sec.classList.toggle('dim', state === 'loading' || state === 'empty' || state === 'network');
+function groupHtml(key, r) {
+  const t = TYPE_META[key];
+  let head = '<div class="rgroup-head"><span class="rkey">' + key + '</span><span class="rzh">' + esc(t.zh) + '</span>';
+  if (r.state === 'ok') {
+    head += '<span class="rcount">' + r.answers.length + ' 条</span><span class="rsrc">' + esc(SOURCES[r.source].label) + ' · ' + r.ms + 'ms</span>';
+  } else if (r.state === 'dnserror') {
+    head += '<span class="badge bad">' + esc(DNS_ERRORS[r.status] || ('Status ' + r.status)) + '</span>';
+  } else {
+    head += '<span class="badge bad">查询失败</span>';
+  }
+  head += '</div>';
+
+  let bodyHtml = '';
+  if (r.state === 'ok') {
+    if (key === 'CNAME' && !r.answers.length && r.chain.length) {
+      bodyHtml = '<table class="rec-table"><tr><th style="width:56px">TTL</th><th>别名（来自 A/AAAA 应答链）</th><th style="width:36px"></th></tr>' +
+        r.chain.map(rec => '<tr><td class="rec-ttl">' + rec.ttl + 's</td><td><span class="rec-val">' + esc(rec.value) + '</span></td><td>' + copyBtn(rec.value) + '</td></tr>').join('') + '</table>';
+    } else if (key === 'SOA') {
+      bodyHtml = valueCell(key, r.answers[0]);
+    } else {
+      bodyHtml = '<table class="rec-table"><tr><th style="width:56px">TTL</th><th>记录值</th><th style="width:36px"></th></tr>' +
+        r.answers.map(rec => '<tr><td class="rec-ttl">' + rec.ttl + 's</td><td>' + valueCell(key, rec) + '</td><td>' + copyBtn(rec.value) + '</td></tr>').join('') + '</table>';
+    }
+    const tags = interpret(key, r).tags;
+    if (tags.length) {
+      bodyHtml += '<div class="interp">' +
+        tags.map(tag => '<span class="tag"><b>' + esc(tag.label) + '</b><span class="tag-kind">' + esc(tag.kind) + '</span></span>').join('') + '</div>';
+    }
+  } else if (r.state === 'dnserror') {
+    const msg = DNS_ERRORS[r.status] || ('Status ' + r.status);
+    bodyHtml = '<div class="rec-empty">DNS 错误：' + esc(msg) + '</div>';
+  } else {
+    bodyHtml = '<div class="rec-error">✕ ' + esc(r.message || '网络错误') + '，两条线路均不可达。<button class="btn btn-sm" style="margin-left:8px" onclick="retryOne(\'' + key + '\')">重试</button></div>';
+  }
+
+  let html = '<div class="rgroup">' + head + bodyHtml;
+  if (r.json) html += '<details class="raw"><summary>原始应答 JSON</summary><pre>' + esc(JSON.stringify(r.json, null, 1)) + '</pre></details>';
+  return html + '</div>';
 }
 
 function esc(s) {
@@ -407,61 +467,19 @@ function copyBtn(text) {
   return '<button class="copy-mini" title="复制此值" onclick="copyText(this.dataset.v)" data-v="' + esc(text) + '">⎘</button>';
 }
 
-function renderOne(key) {
-  const r = lastResults[key];
-  const box = document.getElementById('body-' + key);
-  const meta = document.getElementById('meta-' + key);
-  const t = TYPE_META[key];
-  if (!r || !box) return;
-  setSectionState(key, r.state);
-
-  let metaHtml = '', bodyHtml = '';
-  if (r.state === 'ok') {
-    metaHtml = '<span class="badge ok">' + SOURCES[r.source].label + ' · ' + r.ms + 'ms</span>';
-    if (key === 'SOA') {
-      bodyHtml = '<div class="section-subtitle" style="margin-bottom:8px">共 1 条（TTL ' + r.answers[0].ttl + 's）</div>' + valueCell(key, r.answers[0]);
-    } else {
-      bodyHtml = '<table class="rec-table"><tr><th style="width:56px">TTL</th><th>记录值</th><th style="width:36px"></th></tr>' +
-        r.answers.map(rec =>
-          '<tr><td class="rec-ttl">' + rec.ttl + 's</td><td>' + valueCell(key, rec) + '</td><td>' + copyBtn(rec.value) + '</td></tr>'
-        ).join('') + '</table>';
-    }
-    const tags = interpret(key, r).tags;
-    if (tags.length) {
-      bodyHtml += '<div class="interp">' +
-        tags.map(tag => '<span class="tag"><b>' + esc(tag.label) + '</b><span class="tag-kind">' + esc(tag.kind) + '</span></span>').join('') + '</div>';
-    }
-    // A/AAAA 应答中的 CNAME 链补充进 CNAME 卡片
-    if (key === 'CNAME' && !r.answers.length && r.chain.length) {
-      bodyHtml = '<table class="rec-table"><tr><th style="width:56px">TTL</th><th>别名（来自 A/AAAA 应答链）</th><th style="width:36px"></th></tr>' +
-        r.chain.map(rec => '<tr><td class="rec-ttl">' + rec.ttl + 's</td><td><span class="rec-val">' + esc(rec.value) + '</span></td><td>' + copyBtn(rec.value) + '</td></tr>').join('') + '</table>';
-    }
-  } else if (r.state === 'empty') {
-    metaHtml = '<span class="badge">无记录 · ' + SOURCES[r.source].label + ' · ' + r.ms + 'ms</span>';
-    bodyHtml = '<div class="rec-empty">无 ' + key + ' 记录</div>';
-  } else if (r.state === 'dnserror') {
-    const msg = DNS_ERRORS[r.status] || ('Status ' + r.status);
-    metaHtml = '<span class="badge bad">' + esc(msg) + '</span>';
-    bodyHtml = '<div class="' + (r.status === 3 ? 'rec-error' : 'rec-empty') + '">' +
-      (r.status === 3 ? '⚠️ 域名不存在或尚未注册（NXDOMAIN）' : 'DNS 错误：' + esc(msg)) + '</div>';
-  } else { // network
-    metaHtml = '<span class="badge bad">查询失败</span>';
-    bodyHtml = '<div class="rec-error">✕ ' + esc(r.message || '网络错误') + '，两条线路均不可达。<button class="btn btn-sm" style="margin-left:8px" onclick="retryOne(\'' + key + '\')">重试</button></div>';
-  }
-  meta.innerHTML = metaHtml;
-  box.innerHTML = bodyHtml;
-  if (r.json) {
-    const d = document.createElement('details');
-    d.className = 'raw';
-    d.innerHTML = '<summary>原始应答 JSON</summary><pre>' + esc(JSON.stringify(r.json, null, 1)) + '</pre>';
-    box.appendChild(d);
-  }
-}
-
 function retryOne(key) {
   const t = TYPE_META[key];
-  if (!t || !curDomain) return;
+  if (!t || !curDomain || pending.has(key)) return;
+  pending.add(key);
+  renderAll();
   runOne(t, queryToken);
+}
+
+function retryAll() {
+  if (!curDomain) return;
+  pending = new Set(RECORD_TYPES.map(t => t.key));
+  renderAll();
+  RECORD_TYPES.forEach(t => runOne(t, queryToken));
 }
 
 function updateSourceBadge() {
@@ -580,21 +598,6 @@ function collectAllTags() {
   });
   all.sort((a, b) => (KIND_ORDER[a.kind] || 9) - (KIND_ORDER[b.kind] || 9));
   return all;
-}
-
-function renderSummary(cost) {
-  const okTypes = RECORD_TYPES.filter(t => lastResults[t.key] && lastResults[t.key].state === 'ok' && lastResults[t.key].answers.length).map(t => t.key);
-  const tags = collectAllTags();
-  const srcNames = [...usedSources].map(k => SOURCES[k].label);
-
-  document.getElementById('sumMeta').innerHTML =
-    '<b>' + esc(displayDomain) + '</b> · ' + esc(srcNames.join(' → ')) + ' · ' + cost + ' ms · ' + okTypes.length + '/' + RECORD_TYPES.length + ' 类有记录';
-  document.getElementById('sumTags').innerHTML = tags.length
-    ? tags.map(tag => '<span class="tag"><b>' + esc(tag.label) + '</b><span class="tag-kind">' + esc(KIND_LABEL[tag.kind] || tag.kind) + '</span></span>').join('')
-    : '<span class="rec-empty">未识别出已知服务指纹</span>';
-
-  document.getElementById('summarySection').hidden = Object.keys(lastResults).length === 0;
-  document.getElementById('topStatus').innerHTML = '';
 }
 
 function buildReport() {
