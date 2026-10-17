@@ -240,7 +240,7 @@ async function parseVideoInput(input) {
     s = j.data.url;
   }
 
-  const bv = s.match(/[Bb][Vv][1-9A-HJ-NP-Za-km-z]{9}/);
+  const bv = s.match(/[Bb][Vv][1-9A-HJ-NP-Za-km-z]{10}/);
   const av = s.match(/[^A-Za-z]av(\d+)|^av(\d+)/i) || s.match(/av(\d+)/i);
   let bvid;
   if (bv) {
