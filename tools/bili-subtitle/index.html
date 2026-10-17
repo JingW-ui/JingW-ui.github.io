@@ -481,7 +481,7 @@ function renderCurrent() {
 
 function renderListView(bodyArr) {
   document.getElementById('results').innerHTML =
-    '<div class="st-box">' + bodyArr.map(it =>
+    '<div class="st-box">' + COPY_CHIP_HTML + bodyArr.map(it =>
       '<div class="st-row">' +
       (state.showTs ? '<span class="st-time">' + fmtShort(it.from || 0) + '</span>' : '') +
       '<span class="st-text">' + esc(it.content || '') + '</span>' +
@@ -492,8 +492,28 @@ function renderTextView(bodyArr) {
   // buildFlowParagraphs 返回字符串数组
   const paras = buildFlowParagraphs(bodyArr);
   document.getElementById('results').innerHTML =
-    '<div class="st-plain">' + paras.map(t =>
+    '<div class="st-plain">' + COPY_CHIP_HTML + paras.map(t =>
       '<p class="st-para">' + esc(t) + '</p>').join('') + '</div>';
+}
+
+/* 快速复制：容器角标按钮，复制当前视图全部内容（所见即所得） */
+const COPY_CHIP_HTML = '<button class="copy-chip" onclick="copyCurrent(this)" title="复制全部">⧉ 复制</button>';
+
+function copyCurrent(btn) {
+  if (!state.body || !Array.isArray(state.body.body) || !state.body.body.length) return;
+  let text;
+  if (state.view === 'text') {
+    text = buildFlowParagraphs(state.body.body).join('\n\n');
+  } else {
+    text = state.body.body.map(it =>
+      (state.showTs ? fmtShort(it.from || 0) + ' ' : '') + (it.content || '')).join('\n');
+  }
+  copyText(text, '已复制 ' + state.body.body.length + ' 条');
+  if (btn) {
+    btn.classList.add('done');
+    btn.textContent = '✓ 已复制';
+    setTimeout(() => { btn.classList.remove('done'); btn.textContent = '⧉ 复制'; }, 1200);
+  }
 }
 
 /* 文稿流式：把台词连成自然段落，浏览器自动折行使每行填满。

@@ -154,6 +154,7 @@ h1 .accent { color: var(--accent); }
 
 /* 字幕内容：单容器紧凑列表 */
 .st-box {
+  position: relative;
   background: var(--card); border: 1px solid var(--border); border-radius: 10px;
   padding: 8px 14px; box-shadow: var(--shadow-sm);
   opacity: 0; transform: translateY(16px);
@@ -173,6 +174,7 @@ h1 .accent { color: var(--accent); }
 
 /* 字幕内容：文稿（自然文本流，段落两端对齐）模式 */
 .st-plain {
+  position: relative;
   background: var(--card); border: 1px solid var(--border); border-radius: 10px;
   padding: 18px 22px; box-shadow: var(--shadow-sm);
   font-size: .94rem; line-height: 2;
@@ -181,6 +183,19 @@ h1 .accent { color: var(--accent); }
 }
 .st-para { margin: 0 0 1.1em; text-align: justify; }
 .st-para:last-child { margin-bottom: 0; }
+
+/* 快速复制角标（GitHub 代码块风格：容器悬停浮现，触屏常显） */
+.copy-chip {
+  position: absolute; top: 8px; right: 8px; z-index: 5;
+  border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+  border-radius: 100px; font: inherit; font-size: .68rem; font-weight: 600;
+  padding: 2px 10px; cursor: pointer; transition: all .2s ease;
+  opacity: 0;
+}
+.st-box:hover .copy-chip, .st-plain:hover .copy-chip, .copy-chip.done { opacity: 1; }
+.copy-chip:hover { color: var(--accent-b); border-color: var(--accent-border); }
+.copy-chip.done { color: var(--accent-b); border-color: var(--accent-border); background: var(--accent-bg); }
+@media (hover: none) { .copy-chip { opacity: 1; } }
 
 /* AI 总结卡片 */
 .ai-card {
