@@ -1,9 +1,9 @@
 # JingW-ui — 免费在线工具、Windows 软件与网页小游戏
 
-> 纯静态个人公益站，无需注册、无后端、浏览器直接使用。含 76 个在线工具、11 款 Windows 免费软件（GitHub Releases 下载）、39 款网页小游戏。
+> 纯静态个人公益站，无需注册、无后端、浏览器直接使用。含 77 个在线工具、11 款 Windows 免费软件（GitHub Releases 下载）、39 款网页小游戏。
 
-## 在线工具（共 76 个，浏览器直接运行）
-- [工具箱总览](https://jingw-ui.github.io/tools/): 76 个在线工具汇总页，支持搜索与分类快筛，覆盖文本处理、编解码、图片处理、计算器、生成器、知识图谱等
+## 在线工具（共 77 个，浏览器直接运行）
+- [工具箱总览](https://jingw-ui.github.io/tools/): 77 个在线工具汇总页，支持搜索与分类快筛，覆盖文本处理、编解码、图片处理、计算器、生成器、知识图谱等
 - [图标创建](https://jingw-ui.github.io/tools/create_icon/): 在线创建和自定义图标，支持多种格式导出
 - [图片转图标](https://jingw-ui.github.io/tools/img2icon/): 将普通图片转换为图标格式，支持批量处理
 - [图片转PDF](https://jingw-ui.github.io/tools/img2pdf/): 将图片文件转换为PDF文档，保持高质量输出
@@ -65,6 +65,7 @@
 - [OSSU 自学路径](https://jingw-ui.github.io/tools/ossu-cs/): OSSU 计算机科学课程表本地进度追踪：63门课三态标记、分区进度条、剩余学时估算，进度保存在本浏览器
 - [顶会主图画廊](https://jingw-ui.github.io/tools/paperfig/): 六大顶会 3516 张论文主图灵感画廊：搜索筛选、等级角标、灯箱浏览
 - [抖音高赞雷达](https://jingw-ui.github.io/tools/douyin-hot/): 抖音关键词搜索高赞视频快照浏览，按点赞/评论/收藏排序筛选，可跳转原视频
+- [域名信息查询](https://jingw-ui.github.io/tools/domain-check/): 一键查询 A/AAAA/CNAME/MX/NS/TXT/SOA/CAA 记录，自动识别 CDN、邮箱服务商与 DNS 托管商
 - [笔记工具](https://jingw-ui.github.io/tools/biji/): 便捷的在线笔记应用，支持文本编辑和保存功能
 - [硬币抛掷](https://jingw-ui.github.io/tools/coin/): 在线抛硬币决策工具，支持自定义硬币贴图
 - [显示弹幕](https://jingw-ui.github.io/tools/danmu/): 创建和生成视频弹幕效果，支持多种样式和动画
