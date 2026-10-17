@@ -73,8 +73,8 @@
 
 /* ================= 配置 ================= */
 
-// 部署 Worker 后回填，如 'https://bili-subtitle.example.workers.dev'
-const WORKER_BASE = 'https://bili.jingweb.me';
+// 中继服务地址（部署在阿里云函数计算，B 站 WAF 封锁 CF Workers 出口段故迁至国内）
+const WORKER_BASE = 'https://bili-subtitle-ovpdktbmmq.cn-hangzhou.fcapp.run';
 
 const LS_LOGIN = 'bili-sub-login-v1';
 const LS_WBI = 'bili-sub-wbi-v1';
@@ -127,7 +127,7 @@ function fmtAssTime(sec) {
 /* ================= Worker 请求层 ================= */
 
 function assertWorker() {
-  if (!WORKER_BASE) throw new Error('Worker 未配置：请先部署 tools/bili-subtitle/worker 并回填 WORKER_BASE');
+  if (!WORKER_BASE) throw new Error('中继服务未配置：请先部署 tools/bili-subtitle/relay-aliyun 并回填 WORKER_BASE');
 }
 
 function cookieHeader() {

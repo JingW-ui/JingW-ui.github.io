@@ -1,0 +1,12 @@
+{
+  "name": "bili-subtitle-relay",
+  "version": "1.0.0",
+  "description": "B站字幕提取 - 阿里云函数计算 Web 函数中继",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

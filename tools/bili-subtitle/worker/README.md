@@ -1,4 +1,9 @@
-# bili-subtitle Worker
+# bili-subtitle Worker（Cloudflare 版，存档）
+
+> ⚠️ **此版本已停用**：B 站 WAF 在 IP 层封锁 Cloudflare Workers 出口段，
+> 所有 api/passport 请求返回 `-412 request was banned`（实测含指纹引导接口 spi）。
+> 现役后端为 `../relay-aliyun/`（阿里云函数计算版，逻辑与本版一致）。
+> 本目录保留作参考。
 
 B站字幕提取工具（`tools/bili-subtitle/index.html`）的后端反代，部署到 Cloudflare Workers。
 
