@@ -249,8 +249,8 @@ URL: https://jingw-ui.github.io/tools/paperfig/
 用途: 抖音关键词搜索高赞视频快照浏览，按点赞/评论/收藏排序筛选，可跳转原视频
 URL: https://jingw-ui.github.io/tools/douyin-hot/
 
-### 域名信息查询
-用途: 一键查询 A/AAAA/CNAME/MX/NS/TXT/SOA/CAA 记录，自动识别 CDN、邮箱服务商与 DNS 托管商
+### 网站服务器查询
+用途: 输入域名查询解析到的 IP 与服务器运营商，识别阿里云、腾讯云、AWS、Cloudflare 等云厂商与 CDN
 URL: https://jingw-ui.github.io/tools/domain-check/
 
 ### 笔记工具

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>域名信息查询 - DNS 记录与服务解释</title>
-<meta name="description" content="在线域名信息查询工具：一键查询 A / AAAA / CNAME / MX / NS / TXT / SOA / CAA 记录，自动识别 CDN、邮箱服务商与 DNS 托管商，解释一个域名背后运行着什么服务。">
+<title>网站服务器查询 - 域名 IP 与运营商识别</title>
+<meta name="description" content="输入域名，一键查询网站服务器解析到的 IP 地址与运营商（阿里云、腾讯云、AWS、Cloudflare 等），支持 IPv6 与 CDN 识别。">
 <link rel="stylesheet" href="../common.css">
 <style>
   :root { --red:#cf222e; --red-bg:#fff0ee; --blue:#0969da; --blue-bg:#ddf4ff; --text2:#656d76; --text-muted:#9198a1; --border-light:#e8eaed; }
@@ -14,14 +14,12 @@
   .section-title { font-size:14px; font-weight:600; color:var(--text); }
   .section-subtitle { font-size:12px; color:var(--text2); }
   .section-body { padding:16px 20px; }
-  .label { font-size:12px; color:var(--text2); margin-bottom:6px; font-weight:500; }
   .btn { display:inline-flex; align-items:center; gap:6px; padding:7px 16px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text); font-size:13px; cursor:pointer; transition:all .15s; font-family:inherit; white-space:nowrap; }
   .btn:hover { background:var(--bg3); }
   .btn-primary { background:var(--green); color:#fff; border-color:var(--green); }
   .btn-primary:hover { background:var(--green2); }
   .btn-sm { padding:5px 12px; font-size:12px; }
 
-  /* 查询行 */
   .query-row { display:flex; gap:8px; }
   .query-row input { flex:1; padding:10px 14px; border:1px solid var(--border); border-radius:6px; font-size:14px; font-family:'Consolas',monospace; background:var(--bg); color:var(--text); transition:border-color .15s; }
   .query-row input:focus { outline:none; border-color:var(--green); box-shadow:0 0 0 3px rgba(45,164,78,.12); }
@@ -30,47 +28,24 @@
   .ex-chip { font-size:12px; font-family:'Consolas',monospace; padding:2px 10px; border-radius:12px; border:1px solid var(--border); background:var(--bg2); color:var(--text2); cursor:pointer; transition:all .15s; }
   .ex-chip:hover { border-color:var(--green); color:var(--green); }
 
-  /* 徽章与标签 */
   .badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; padding:2px 10px; border-radius:12px; border:1px solid var(--border); background:var(--bg); color:var(--text2); }
   .badge.ok { background:var(--blue-bg); border-color:rgba(9,105,218,.25); color:var(--blue); }
   .badge.warn { background:#fff8c5; border-color:rgba(154,103,0,.3); color:#9a6700; }
-  .badge.bad { background:var(--red-bg); border-color:rgba(207,34,46,.25); color:var(--red); }
-  .tag { display:inline-flex; align-items:center; gap:4px; font-size:12px; padding:3px 10px; border-radius:14px; border:1px solid var(--border); background:var(--bg2); color:var(--text); }
-  .tag b { font-weight:600; }
-  .tag .tag-kind { font-size:10px; color:var(--text-muted); }
 
-  /* 概览 */
-  .sum-meta { font-size:12px; color:var(--text-muted); margin-bottom:10px; line-height:1.7; }
-  .sum-meta b { color:var(--text); font-family:'Consolas',monospace; font-weight:600; }
-
-  /* 记录表 */
-  .rec-table { width:100%; border-collapse:collapse; font-size:13px; }
-  .rec-table th, .rec-table td { padding:7px 12px; border-bottom:1px solid var(--border-light); text-align:left; vertical-align:top; }
-  .rec-table th { background:var(--bg2); font-weight:600; color:var(--text2); font-size:12px; white-space:nowrap; }
-  .rec-table tr:last-child th, .rec-table tr:last-child td { border-bottom:none; }
-  .rec-val { font-family:'Consolas',monospace; color:var(--blue); word-break:break-all; line-height:1.55; }
-  .rec-ttl { font-family:'Consolas',monospace; color:var(--text-muted); font-size:12px; white-space:nowrap; }
+  .srv-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .srv-table th, .srv-table td { padding:8px 12px; border-bottom:1px solid var(--border-light); text-align:left; vertical-align:middle; }
+  .srv-table th { background:var(--bg2); font-weight:600; color:var(--text2); font-size:12px; white-space:nowrap; }
+  .srv-table tr:last-child th, .srv-table tr:last-child td { border-bottom:none; }
+  .srv-ip { font-family:'Consolas',monospace; color:var(--blue); word-break:break-all; }
+  .v6-tag { font-size:10px; color:var(--text-muted); border:1px solid var(--border-light); border-radius:4px; padding:0 4px; margin-left:6px; }
+  .srv-op { color:var(--text); }
+  .srv-op .city { color:var(--text2); }
   .copy-mini { border:none; background:none; color:var(--text-muted); cursor:pointer; font-size:13px; padding:0 4px; }
   .copy-mini:hover { color:var(--green); }
   .rec-empty { color:var(--text-muted); font-size:13px; padding:2px 0; }
   .rec-error { color:var(--red); font-size:13px; }
-  .interp { margin-top:10px; display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
-  details.raw { margin-top:10px; }
-  details.raw summary { font-size:12px; color:var(--text-muted); cursor:pointer; user-select:none; }
-  details.raw pre { margin-top:6px; padding:10px 12px; background:var(--bg2); border:1px solid var(--border-light); border-radius:6px; font-size:11px; line-height:1.5; overflow:auto; max-height:260px; font-family:'Consolas',monospace; }
-  /* 结果分组（单卡内轻量分组，替代多卡片） */
-  .rgroup { padding:14px 0 6px; border-bottom:1px solid var(--border-light); }
-  .rgroup:last-child { border-bottom:none; }
-  .rgroup-head { display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
-  .rkey { font-family:'Consolas',monospace; font-weight:700; font-size:14px; }
-  .rzh { font-size:12px; color:var(--text-muted); }
-  .rcount { font-size:11px; color:var(--text2); background:var(--bg2); border-radius:10px; padding:1px 8px; }
-  .rsrc { font-size:11px; color:var(--text-muted); margin-left:auto; }
-  .sum-block { padding-bottom:12px; margin-bottom:8px; border-bottom:1px solid var(--border-light); }
-  .rnone { font-size:12px; color:var(--text-muted); padding:12px 0 2px; }
 
-  /* 加载 */
-  .spin { display:inline-block; width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--green); border-radius:50%; animation:sp .7s linear infinite; vertical-align:-2px; }
+  .spin { display:inline-block; width:13px; height:13px; border:2px solid var(--border); border-top-color:var(--green); border-radius:50%; animation:sp .7s linear infinite; vertical-align:-2px; }
   @keyframes sp { to { transform:rotate(360deg); } }
   .loading-line { display:flex; align-items:center; gap:8px; color:var(--text2); font-size:13px; }
   .foot-line { font-size:12px; color:var(--text-muted); line-height:1.7; margin:0 0 16px; }
@@ -80,8 +55,8 @@
 <body>
 <header>
   <div>
-    <h1>域名信息查询</h1>
-    <p>DNS 记录查询与服务解释：一眼看懂域名背后的 CDN、邮箱、DNS 托管商</p>
+    <h1>网站服务器查询</h1>
+    <p>查域名解析到哪些 IP、服务器在哪家运营商（CDN / 云厂商识别）</p>
   </div>
 </header>
 
@@ -113,13 +88,12 @@
     <div class="section-header">
       <span class="section-title">结果</span>
       <span style="flex:1"></span>
-      <button class="btn btn-sm" onclick="copyReport()">⎘ 复制</button>
-      <button class="btn btn-sm" onclick="downloadReport()">⬇ 导出</button>
+      <button class="btn btn-sm" onclick="copyIps()">⎘ 复制 IP</button>
     </div>
     <div class="section-body" id="resultsBody"></div>
   </div>
 
-  <p class="foot-line">查询由浏览器直连公共 DoH（默认阿里云，失败自动切 Cloudflare），本站不经手、不存储查询记录；服务解释由本地指纹库推断，仅供参考。</p>
+  <p class="foot-line">查询由浏览器直连公共 DoH（默认阿里云，失败自动切 Cloudflare）；运营商信息来自 ipwho.is / ip.sb 公共接口。本站不经手、不存储查询记录。</p>
 
 </div>
 
@@ -130,18 +104,10 @@
 /* ================= 常量与字典 ================= */
 
 const RECORD_TYPES = [
-  { key: 'A',     num: 1,   zh: 'IPv4 地址' },
-  { key: 'AAAA',  num: 28,  zh: 'IPv6 地址' },
-  { key: 'CNAME', num: 5,   zh: '别名记录' },
-  { key: 'MX',    num: 15,  zh: '邮件交换' },
-  { key: 'NS',    num: 2,   zh: '域名服务器' },
-  { key: 'TXT',   num: 16,  zh: '文本记录' },
-  { key: 'SOA',   num: 6,   zh: '权威起始' },
-  { key: 'CAA',   num: 257, zh: '证书授权策略' },
+  { key: 'CNAME', num: 5 },
+  { key: 'A',     num: 1 },
+  { key: 'AAAA',  num: 28 },
 ];
-const TYPE_META = {};
-RECORD_TYPES.forEach(t => TYPE_META[t.key] = t);
-
 const DNS_ERRORS = { 1: '格式错误 (FormErr)', 2: '服务器失败 (ServFail)', 3: '域名不存在 (NXDOMAIN)', 4: '未实现 (NotImp)', 5: '拒绝应答 (Refused)' };
 
 /* DoH 双线路：阿里云为主（国内可达），Cloudflare 回退（国际） */
@@ -159,7 +125,26 @@ const SOURCES = {
 };
 let curSource = 'alidns'; // 会话内记忆上一次成功的线路
 
-/* CNAME / 建站平台 / CDN 指纹 */
+/* IP 情报双源：主 ipwho.is，备 ip.sb（均 HTTPS + CORS，免 key） */
+const IP_SOURCES = {
+  ipwho: {
+    label: 'ipwho.is',
+    url: ip => 'https://ipwho.is/' + encodeURIComponent(ip),
+    parse: j => (j && j.success !== false && (j.connection || j.city || j.country))
+      ? { org: (j.connection && (j.connection.org || j.connection.isp)) || '', city: j.city || '', country: j.country || '', cc: j.country_code || '' }
+      : null,
+  },
+  ipsb: {
+    label: 'ip.sb',
+    url: ip => 'https://api.ip.sb/geoip/' + encodeURIComponent(ip),
+    parse: j => (j && j.ip)
+      ? { org: j.organization || j.isp || j.asn_organization || '', city: j.city || '', country: j.country || '', cc: j.country_code || '' }
+      : null,
+  },
+};
+let curIpSource = 'ipwho';
+
+/* CNAME / 建站平台 / CDN 指纹（命中即直接作为运营商结论，跳过 IP 接口） */
 const CNAME_SERVICES = [
   [/cloudflare(\.net|\.com)|pages\.dev/i, 'Cloudflare', 'CDN'],
   [/vercel-dns\.com|vercel\.app/i, 'Vercel', '建站平台'],
@@ -177,77 +162,52 @@ const CNAME_SERVICES = [
   [/cdnhwc\d?\.|myhuaweicdn|huaweicdn/i, '华为云 CDN', 'CDN'],
   [/aicdn\.com|upyun/i, '又拍云 CDN', 'CDN'],
   [/qiniudns|qiniuio|qiniu\.com/i, '七牛云 CDN', 'CDN'],
-  [/jomodns|bdydns|baidubce|jomodns\.com/i, '百度智能云 CDN', 'CDN'],
+  [/jomodns|bdydns|baidubce/i, '百度智能云 CDN', 'CDN'],
   [/lxdns\.com|wscdn|chinanetcenter/i, '网宿 CDN', 'CDN'],
   [/cdn77\.org/i, 'CDN77', 'CDN'],
   [/bunnycdn/i, 'Bunny CDN', 'CDN'],
   [/edgecast|edg\.io/i, 'Edgio (Edgecast)', 'CDN'],
   [/stackpath|stackassets/i, 'StackPath', 'CDN'],
-  [/myqcloud\.com/i, '腾讯云 COS/云', '对象存储'],
-  [/oss\.|aliyuncs\.com/i, '阿里云 OSS/云', '对象存储'],
-  [/myhuaweicloud/i, '华为云 OBS', '对象存储'],
-  [/amazonaws\.com/i, 'AWS (S3/LightSail)', '云服务'],
 ];
 
-/* NS 托管商指纹 */
-const NS_PROVIDERS = [
-  [/\.cloudflare\.com$/i, 'Cloudflare DNS'],
-  [/alibabadns\.com|hichina\.com$/i, '阿里云（万网）DNS'],
-  [/\.dnspod\.(net|cn)$/i, 'DNSPod（腾讯云）'],
-  [/awsdns-\d+\.net$/i, 'AWS Route 53'],
-  [/azure-dns|azuredns/i, 'Microsoft Azure DNS'],
-  [/\.googledomains\.com$|^ns\d\.google\.com$/i, 'Google Cloud DNS'],
-  [/registrar-servers\.com$/i, 'Namecheap'],
-  [/domaincontrol\.com$/i, 'GoDaddy'],
-  [/dns-parking\.com$/i, 'Hostinger'],
-  [/\.he\.net$/i, 'Hurricane Electric'],
-  [/cloudns\.(net|com)$/i, 'ClouDNS'],
-  [/\.verisign-dns\.com$|verisign/i, 'Verisign'],
-  [/\.ns\.cloudflare|^ns\d\.cloudflare/i, 'Cloudflare DNS'],
-  [/\.xn--|\.nic\./i, null], // 忽略
-  [/\.towerzone|^ns\d\.tencent/i, '腾讯云'],
+/* org/isp 字符串 → 中文运营商名 */
+const ORG_MAP = [
+  [/aliyun|alibaba|alicloud|taobao/i, '阿里云'],
+  [/tencent|\bqq\b/i, '腾讯云'],
+  [/huawei/i, '华为云'],
+  [/baidu/i, '百度云'],
+  [/volcengine|bytedance|火山/i, '火山引擎'],
+  [/ucloud/i, 'UCloud'],
+  [/qiniu/i, '七牛云'],
+  [/upyun/i, '又拍云'],
+  [/jdcloud|jingdong|京东/i, '京东云'],
+  [/amazon|aws|\bamzn/i, 'AWS'],
+  [/google/i, 'Google'],
+  [/microsoft|azure|msft/i, '微软 Azure'],
+  [/cloudflare/i, 'Cloudflare'],
+  [/oracle/i, 'Oracle 云'],
+  [/akamai|linode/i, 'Akamai'],
+  [/fastly/i, 'Fastly'],
+  [/digitalocean/i, 'DigitalOcean'],
+  [/hetzner/i, 'Hetzner'],
+  [/ovh/i, 'OVH'],
+  [/vultr|choopa/i, 'Vultr'],
+  [/chinatelecom|china ?telecom|电信/i, '中国电信'],
+  [/china ?unicom|联通/i, '中国联通'],
+  [/china ?mobile|cmcc|移动/i, '中国移动'],
+  [/cernet|教育网/i, '教育网'],
 ];
-
-/* MX 邮箱服务商指纹（顺序即优先级） */
-const MX_PROVIDERS = [
-  [/aspmx.*\.google\.com|google(mail)?\.com$/i, 'Google Workspace'],
-  [/protection\.outlook\.com|outlook\.com$/i, 'Microsoft 365'],
-  [/mxhichina\.com|alimail/i, '阿里云邮箱'],
-  [/mxbiz.*\.qq\.com|exmail/i, '腾讯企业邮箱'],
-  [/\.qq\.com$/i, 'QQ 邮箱'],
-  [/qiye\.163\.com|\.163\.com$|\.126\.com$/i, '网易邮箱'],
-  [/zoho/i, 'Zoho Mail'],
-  [/yandex/i, 'Yandex 360'],
-  [/secureserver\.net$/i, 'GoDaddy 邮件'],
-  [/messagingengine\.com|fastmail/i, 'Fastmail'],
-  [/migadu/i, 'Migadu'],
-  [/improvmx/i, 'ImprovMX'],
-  [/icloud\.com|\.apple\.com$/i, 'iCloud 邮件'],
-  [/mailgun/i, 'Mailgun'],
-  [/sendgrid/i, 'SendGrid'],
-  [/amazonses|amazonaws/i, 'Amazon SES'],
-  [/mx\.cloudflare\.(net|com)|cloudflare/i, 'Cloudflare Email Routing'],
-  [/feishu|larksuite/i, '飞书邮箱'],
-  [/mail\.ru$/i, 'Mail.ru'],
-];
-
-/* Cloudflare 出口 IP 常见前缀（启发式，仅提示"疑似"） */
-const CF_IP_V4 = ['104.16.','104.17.','104.18.','104.19.','104.20.','104.21.','104.22.','104.23.','104.24.','104.25.','104.26.','104.27.',
-  '172.64.','172.65.','172.66.','172.67.','172.68.','172.69.','172.70.','172.71.',
-  '162.158.','162.159.','188.114.96.','188.114.97.','198.41.192.','198.41.200.','198.41.208.','198.41.216.','198.41.224.','198.41.232.','198.41.240.','198.41.248.',
-  '131.0.72.','141.101.64.','141.101.65.','141.101.66.','141.101.67.','141.101.68.','141.101.69.','141.101.70.','141.101.71.',
-  '108.162.192.','108.162.200.','108.162.216.','108.162.224.','108.162.232.','108.162.240.','108.162.248.',
-  '190.93.240.','190.93.244.','190.93.248.','103.21.244.','103.22.200.','103.31.4.'];
 
 /* ================= 状态 ================= */
 
 let curDomain = '';           // 当前查询的域名（punycode）
 let displayDomain = '';       // 展示用（原样输入）
-let lastResults = {};         // type -> {state, answers, source, ms, json, chain}
-let queryStart = 0;
+let lastResults = {};         // type -> {state, answers, chain, source, ms, json}
 let usedSources = new Set();
 let queryToken = 0;           // 防止并发查询串台
-let pending = new Set();      // 尚未返回的记录类型
+let dnsPending = new Set();   // 尚未返回的 DNS 类型
+let ips = [];                 // [{ip, v6, op:{state:'pending'|'ok'|'fail', label, city}}]
+const ipCache = new Map();    // ip -> op 结果（会话内去重，省接口配额）
 
 /* ================= 域名处理 ================= */
 
@@ -299,6 +259,23 @@ async function dohQuery(name, type) {
   throw (lastErr || new Error('查询失败'));
 }
 
+/* IP 情报：主源失败自动切备源 */
+async function ipQuery(ip) {
+  const order = curIpSource === 'ipwho' ? ['ipwho', 'ipsb'] : ['ipsb', 'ipwho'];
+  let lastErr = null;
+  for (const key of order) {
+    const src = IP_SOURCES[key];
+    try {
+      const j = await fetchJson(src.url(ip), {}, 6000);
+      const d = src.parse(j);
+      if (!d || !d.org) throw new Error('no data');
+      curIpSource = key;
+      return d;
+    } catch (e) { lastErr = e; }
+  }
+  throw (lastErr || new Error('IP 查询失败'));
+}
+
 /* ================= 查询编排 ================= */
 
 async function startQuery() {
@@ -309,8 +286,9 @@ async function startQuery() {
 
   const token = ++queryToken;
   curDomain = nd.puny; displayDomain = nd.display;
-  lastResults = {}; usedSources = new Set(); queryStart = performance.now();
-  pending = new Set(RECORD_TYPES.map(t => t.key));
+  lastResults = {}; usedSources = new Set();
+  dnsPending = new Set(RECORD_TYPES.map(t => t.key));
+  ips = [];
   document.getElementById('queryBtn').disabled = true;
   input.disabled = true;
   document.getElementById('resultsCard').hidden = false;
@@ -324,7 +302,14 @@ async function startQuery() {
     }
   }
   if (token !== queryToken) return;
+
+  buildIpList();
   renderAll();
+  if (ips.length) {
+    const uniq = [...new Set(ips.filter(x => !x.op).map(x => x.ip))];
+    await Promise.all(uniq.map(ip => queryIpInfo(ip, token)));
+    if (token === queryToken) renderAll();
+  }
 }
 
 async function runOne(t, token) {
@@ -347,17 +332,85 @@ async function runOne(t, token) {
     if (token !== queryToken) return;
     lastResults[t.key] = { state: 'network', message: (e && e.name === 'AbortError') ? '请求超时' : (e.message || '网络错误'), source: null };
   }
-  pending.delete(t.key);
+  dnsPending.delete(t.key);
   renderAll();
   updateSourceBadge();
 }
 
+/* 从 A/AAAA 应答构建 IP 列表；CNAME 链指纹命中时直接作为运营商结论 */
+function buildIpList() {
+  ips = [];
+  const chains = [];
+  ['A', 'AAAA', 'CNAME'].forEach(k => {
+    const r = lastResults[k];
+    if (r && r.chain) r.chain.forEach(c => chains.push(c.value));
+  });
+  let chainHit = null;
+  for (const c of chains) {
+    for (const [re, name, kind] of CNAME_SERVICES) {
+      if (re.test(c)) { chainHit = { label: name + (kind === 'CDN' ? '（CDN）' : '') }; break; }
+    }
+    if (chainHit) break;
+  }
+  ['A', 'AAAA'].forEach(k => {
+    const r = lastResults[k];
+    if (!r || r.state !== 'ok') return;
+    r.answers.forEach(a => {
+      const v6 = k === 'AAAA';
+      if (ips.some(x => x.ip === a.value)) return;
+      ips.push({
+        ip: a.value, v6: v6,
+        op: chainHit ? { state: 'ok', label: chainHit.label, city: '' } : { state: 'pending' },
+      });
+    });
+  });
+}
+
+async function queryIpInfo(ip, token) {
+  if (ipCache.has(ip)) {
+    const hit = ips.find(x => x.ip === ip);
+    if (hit) hit.op = ipCache.get(ip);
+    return;
+  }
+  let op;
+  try {
+    const d = await ipQuery(ip);
+    op = { state: 'ok', label: mapOrg(d.org), city: d.city || d.country || '' };
+  } catch (e) {
+    op = { state: 'fail' };
+  }
+  if (token !== queryToken) return;
+  ipCache.set(ip, op);
+  const hit = ips.find(x => x.ip === ip);
+  if (hit) hit.op = op;
+  renderAll();
+}
+
+function mapOrg(org) {
+  const s = String(org || '');
+  if (!s) return '未知';
+  for (const [re, name] of ORG_MAP) {
+    if (re.test(s)) return name;
+  }
+  return s.length > 42 ? s.slice(0, 42) + '…' : s;
+}
+
 /* ================= 渲染 ================= */
+
+function esc(s) {
+  var h = window.escapeHtml ? escapeHtml(s) : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  // 记录值可被域名持有者任意控制，必须转义引号，防止 data-v="..." 属性逃逸造成 XSS
+  return h.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function copyBtn(text) {
+  return '<button class="copy-mini" title="复制" onclick="copyText(this.dataset.v)" data-v="' + esc(text) + '">⎘</button>';
+}
 
 function renderAll() {
   const body = document.getElementById('resultsBody');
   if (!body) return;
-  if (pending.size === RECORD_TYPES.length) {
+  if (dnsPending.size === RECORD_TYPES.length) {
     body.innerHTML = '<div class="loading-line"><span class="spin"></span>查询中…</div>';
     return;
   }
@@ -366,120 +419,39 @@ function renderAll() {
     body.innerHTML = '<div class="rec-error">域名不存在或尚未注册（NXDOMAIN）</div>';
     return;
   }
-  let html = '';
-  const emptyTypes = [];
-  RECORD_TYPES.forEach(t => {
-    const r = lastResults[t.key];
-    if (!r || pending.has(t.key)) return;
-    if (r.state === 'ok' && !r.answers.length) { emptyTypes.push(t.key); return; }
-    html += groupHtml(t.key, r);
-  });
-  if (pending.size === 0) {
-    if (RECORD_TYPES.every(t => lastResults[t.key] && lastResults[t.key].state === 'network')) {
-      body.innerHTML = '<div class="rec-error">两条 DoH 线路均不可达，查询失败。<button class="btn btn-sm" style="margin-left:8px" onclick="retryAll()">重试</button></div>';
+  if (!ips.length) {
+    if (dnsPending.size) {
+      body.innerHTML = '<div class="loading-line"><span class="spin"></span>查询中…</div>';
       return;
     }
-    const okCount = RECORD_TYPES.filter(t => lastResults[t.key] && lastResults[t.key].state === 'ok' && lastResults[t.key].answers.length).length;
-    const tags = collectAllTags();
-    const srcNames = [...usedSources].map(k => SOURCES[k].label);
-    const cost = Math.round(performance.now() - queryStart);
-    let block = '<div class="sum-meta" style="margin:0"><b>' + esc(displayDomain) + '</b> · ' + esc(srcNames.join(' → ')) + ' · ' + cost + ' ms · ' + okCount + '/' + RECORD_TYPES.length + ' 类有记录</div>';
-    const chips = tags.map(tag => '<span class="tag"><b>' + esc(tag.label) + '</b><span class="tag-kind">' + esc(KIND_LABEL[tag.kind] || tag.kind) + '</span></span>').join('');
-    block += '<div class="interp" style="margin-top:8px">' + (chips || '<span class="rec-empty">未识别出已知服务指纹</span>') + '</div>';
-    html = '<div class="sum-block">' + block + '</div>' + html +
-      (emptyTypes.length ? '<div class="rnone">' + esc(emptyTypes.join(' / ')) + ' 无记录</div>' : '');
-  } else if (html) {
-    html += '<div class="loading-line" style="margin-top:12px"><span class="spin"></span>剩余类型查询中…</div>';
-  } else {
-    html = '<div class="loading-line"><span class="spin"></span>查询中…</div>';
-  }
-  body.innerHTML = html;
-}
-
-function groupHtml(key, r) {
-  const t = TYPE_META[key];
-  let head = '<div class="rgroup-head"><span class="rkey">' + key + '</span><span class="rzh">' + esc(t.zh) + '</span>';
-  if (r.state === 'ok') {
-    head += '<span class="rcount">' + r.answers.length + ' 条</span><span class="rsrc">' + esc(SOURCES[r.source].label) + ' · ' + r.ms + 'ms</span>';
-  } else if (r.state === 'dnserror') {
-    head += '<span class="badge bad">' + esc(DNS_ERRORS[r.status] || ('Status ' + r.status)) + '</span>';
-  } else {
-    head += '<span class="badge bad">查询失败</span>';
-  }
-  head += '</div>';
-
-  let bodyHtml = '';
-  if (r.state === 'ok') {
-    if (key === 'CNAME' && !r.answers.length && r.chain.length) {
-      bodyHtml = '<table class="rec-table"><tr><th style="width:56px">TTL</th><th>别名（来自 A/AAAA 应答链）</th><th style="width:36px"></th></tr>' +
-        r.chain.map(rec => '<tr><td class="rec-ttl">' + rec.ttl + 's</td><td><span class="rec-val">' + esc(rec.value) + '</span></td><td>' + copyBtn(rec.value) + '</td></tr>').join('') + '</table>';
-    } else if (key === 'SOA') {
-      bodyHtml = valueCell(key, r.answers[0]);
-    } else {
-      bodyHtml = '<table class="rec-table"><tr><th style="width:56px">TTL</th><th>记录值</th><th style="width:36px"></th></tr>' +
-        r.answers.map(rec => '<tr><td class="rec-ttl">' + rec.ttl + 's</td><td>' + valueCell(key, rec) + '</td><td>' + copyBtn(rec.value) + '</td></tr>').join('') + '</table>';
+    const net = ['A', 'AAAA'].every(k => lastResults[k] && lastResults[k].state === 'network');
+    if (net) {
+      body.innerHTML = '<div class="rec-error">两条 DoH 线路均不可达，查询失败。<button class="btn btn-sm" style="margin-left:8px" onclick="startQuery()">重试</button></div>';
+      return;
     }
-    const tags = interpret(key, r).tags;
-    if (tags.length) {
-      bodyHtml += '<div class="interp">' +
-        tags.map(tag => '<span class="tag"><b>' + esc(tag.label) + '</b><span class="tag-kind">' + esc(tag.kind) + '</span></span>').join('') + '</div>';
+    const dnsErr = ['A', 'AAAA'].map(k => lastResults[k]).find(r => r && r.state === 'dnserror');
+    if (dnsErr) {
+      body.innerHTML = '<div class="rec-error">DNS 错误：' + esc(DNS_ERRORS[dnsErr.status] || ('Status ' + dnsErr.status)) + '</div>';
+      return;
     }
-  } else if (r.state === 'dnserror') {
-    const msg = DNS_ERRORS[r.status] || ('Status ' + r.status);
-    bodyHtml = '<div class="rec-empty">DNS 错误：' + esc(msg) + '</div>';
-  } else {
-    bodyHtml = '<div class="rec-error">✕ ' + esc(r.message || '网络错误') + '，两条线路均不可达。<button class="btn btn-sm" style="margin-left:8px" onclick="retryOne(\'' + key + '\')">重试</button></div>';
+    body.innerHTML = '<div class="rec-empty">该域名未解析到 IP 地址。</div>';
+    return;
   }
-
-  let html = '<div class="rgroup">' + head + bodyHtml;
-  if (r.json) html += '<details class="raw"><summary>原始应答 JSON</summary><pre>' + esc(JSON.stringify(r.json, null, 1)) + '</pre></details>';
-  return html + '</div>';
+  let rows = '';
+  ips.forEach(x => {
+    let opHtml;
+    if (!x.op || x.op.state === 'pending') opHtml = '<span class="spin"></span>';
+    else if (x.op.state === 'fail') opHtml = '<span class="rec-empty">—</span>';
+    else opHtml = '<span class="srv-op">' + esc(x.op.label) + (x.op.city ? '<span class="city"> · ' + esc(x.op.city) + '</span>' : '') + '</span>';
+    rows += '<tr><td><span class="srv-ip">' + esc(x.ip) + '</span>' + (x.v6 ? '<span class="v6-tag">v6</span>' : '') + '</td>' +
+      '<td>' + opHtml + '</td><td style="width:36px">' + copyBtn(x.ip) + '</td></tr>';
+  });
+  body.innerHTML = '<table class="srv-table"><tr><th>IP 地址</th><th>运营商</th><th style="width:36px"></th></tr>' + rows + '</table>';
 }
 
-function esc(s) {
-  var h = window.escapeHtml ? escapeHtml(s) : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  // 关键：TXT 等记录值可被域名持有者任意控制，且 DoH 返回的 TXT 值自带双引号，
-  // 必须转义引号，防止 data-v="..." 属性逃逸造成 XSS
-  return h.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-
-function valueCell(key, rec) {
-  let html = '';
-  if (key === 'MX') {
-    const m = String(rec.value).trim().match(/^(\d+)\s+(\S+)$/);
-    if (m) html = '优先级 <b>' + m[1] + '</b> → <span class="rec-val">' + esc(m[2]) + '</span>';
-  } else if (key === 'SOA') {
-    const f = String(rec.value).trim().split(/\s+/);
-    if (f.length >= 7) {
-      html = '<table class="rec-table" style="font-size:12px">' +
-        '<tr><th>主 DNS</th><td class="rec-val">' + esc(f[0]) + '</td></tr>' +
-        '<tr><th>管理员</th><td class="rec-val">' + esc(f[1].replace(/^([^.]*)\./, '$1@')) + '</td></tr>' +
-        '<tr><th>序列号</th><td class="rec-val">' + esc(f[2]) + '</td><th style="border:none"></th></tr>' +
-        '<tr><th>刷新 / 重试</th><td class="rec-val">' + esc(f[3]) + ' / ' + esc(f[4]) + '</td></tr>' +
-        '<tr><th>过期 / 默认 TTL</th><td class="rec-val">' + esc(f[5]) + ' / ' + esc(f[6]) + '</td></tr></table>';
-    }
-  }
-  if (!html) html = '<span class="rec-val">' + esc(rec.value) + '</span>';
-  return html;
-}
-
-function copyBtn(text) {
-  return '<button class="copy-mini" title="复制此值" onclick="copyText(this.dataset.v)" data-v="' + esc(text) + '">⎘</button>';
-}
-
-function retryOne(key) {
-  const t = TYPE_META[key];
-  if (!t || !curDomain || pending.has(key)) return;
-  pending.add(key);
-  renderAll();
-  runOne(t, queryToken);
-}
-
-function retryAll() {
-  if (!curDomain) return;
-  pending = new Set(RECORD_TYPES.map(t => t.key));
-  renderAll();
-  RECORD_TYPES.forEach(t => runOne(t, queryToken));
+function copyIps() {
+  if (!ips.length) { showToast('暂无 IP 可复制'); return; }
+  copyText(ips.map(x => x.ip).join('\n'), 'IP 已复制');
 }
 
 function updateSourceBadge() {
@@ -489,149 +461,6 @@ function updateSourceBadge() {
   badge.textContent = '线路：' + names.join(' → ');
   badge.className = 'badge' + (usedSources.size > 1 ? ' warn' : ' ok');
   badge.title = usedSources.size > 1 ? '主线路失败，已自动切换备用线路' : '查询正常';
-}
-
-/* ================= 服务解释引擎 ================= */
-
-function matchDict(text, dict) {
-  for (const [re, name, kind] of dict) {
-    if (re.test(text)) return { label: name, kind: kind };
-  }
-  return null;
-}
-
-function explainTxtValue(v) {
-  if (/^v=spf1/i.test(v)) {
-    const inc = (v.match(/include:(\S+)/g) || []).map(x => x.replace('include:', ''));
-    const all = /-all$/.test(v) ? '拒绝伪造' : /~all$/.test(v) ? '软失败' : '?all 表示不限制';
-    return { tag: { label: 'SPF 发件策略', kind: '邮件安全' }, note: '声明了允许替该域名发信的服务器（' + all + '）' + (inc.length ? '，涉及：' + inc.join(', ') : '') };
-  }
-  if (/^v=DMARC1/i.test(v)) {
-    const p = (v.match(/p=(\w+)/i) || [])[1] || 'none';
-    return { tag: { label: 'DMARC 策略 (p=' + p + ')', kind: '邮件安全' }, note: '定义了伪造邮件的处置策略：' + (p === 'reject' ? '直接拒收' : p === 'quarantine' ? '进垃圾箱' : '仅上报') };
-  }
-  if (/v=DKIM1/i.test(v) || /\.domainkey\./i.test(v)) return { tag: { label: 'DKIM 公钥', kind: '邮件安全' }, note: '用于邮件签名防篡改' };
-  if (/google-site-verification/i.test(v)) return { tag: { label: 'Google 站点验证', kind: '站点归属' }, note: '向 Google Search Console 证明域名所有权' };
-  if (/^MS=ms\d+$/i.test(v)) return { tag: { label: 'Microsoft 365 域验证', kind: '站点归属' }, note: '用于绑定 Microsoft 365 服务' };
-  if (/facebook-domain-verification/i.test(v)) return { tag: { label: 'Meta 域验证', kind: '站点归属' }, note: '向 Facebook/Meta 证明域名所有权' };
-  if (/github-pages-challenge/i.test(v)) return { tag: { label: 'GitHub Pages 验证', kind: '站点归属' }, note: '自定义域绑定 GitHub Pages 的归属验证' };
-  if (/tencent-?site-?verification/i.test(v)) return { tag: { label: '腾讯云验证', kind: '站点归属' } };
-  if (/aliyun-?site-?verification/i.test(v)) return { tag: { label: '阿里云验证', kind: '站点归属' } };
-  if (/atlassian-domain-verification/i.test(v)) return { tag: { label: 'Atlassian 域验证', kind: '站点归属' } };
-  if (/keybase-site-verification/i.test(v)) return { tag: { label: 'Keybase 验证', kind: '站点归属' } };
-  if (/brave-ledger-verification/i.test(v)) return { tag: { label: 'Brave 验证', kind: '站点归属' } };
-  if (/globalsign|sectigo|comodo|digicert|trust-provider/i.test(v)) return { tag: { label: 'CA 域名验证', kind: '站点归属' }, note: '证书签发时的域名控制权验证记录' };
-  return null;
-}
-
-function explainCAA(v) {
-  const m = v.match(/^\d+\s+(issue|issuewild|iodef)\s+"([^"]*)"/);
-  if (!m) return null;
-  if (m[1] === 'iodef') return { tag: { label: 'CAA 违规上报', kind: '安全策略' }, note: '证书误签发时上报至 ' + m[2] };
-  const ca = m[2] || '（任何 CA）';
-  return { tag: { label: 'CAA 限定 CA: ' + ca, kind: '安全策略' }, note: (m[1] === 'issuewild' ? '通配符证书' : '证书') + '只允许由 ' + ca + ' 签发' };
-}
-
-/* 汇总所有卡片的解释结果，生成概览 */
-function interpret(key, r) {
-  const tags = [];
-  if (key === 'CNAME' || key === 'A' || key === 'AAAA') {
-    const targets = [];
-    if (key === 'CNAME') r.answers.concat(r.chain || []).forEach(a => targets.push(a.value));
-    if (key !== 'CNAME') (r.chain || []).forEach(a => targets.push(a.value));
-    const seen = new Set();
-    targets.forEach(tgt => {
-      const hit = matchDict(tgt, CNAME_SERVICES);
-      if (hit && !seen.has(hit.label)) { seen.add(hit.label); tags.push(hit); }
-    });
-  }
-  if (key === 'A') {
-    const cf = r.answers.some(a => CF_IP_V4.some(p => String(a.value).indexOf(p) === 0));
-    if (cf && !tags.some(t => t.label.indexOf('Cloudflare') >= 0)) tags.push({ label: '疑似 Cloudflare 接入', kind: 'CDN' });
-    if (r.answers.length > 1) tags.push({ label: r.answers.length + ' 个 IPv4 负载均衡', kind: '网络' });
-  }
-  if (key === 'AAAA' && r.answers.length) tags.push({ label: 'IPv6 已启用', kind: '网络' });
-  if (key === 'NS') {
-    r.answers.forEach(a => {
-      const hit = matchDict(a.value, NS_PROVIDERS);
-      if (hit && hit.label && !tags.some(t => t.label === hit.label)) tags.push(hit);
-    });
-  }
-  if (key === 'MX') {
-    r.answers.forEach(a => {
-      const host = (String(a.value).trim().match(/^\d+\s+(\S+)$/) || [])[1];
-      if (!host) return;
-      const hit = matchDict(host, MX_PROVIDERS);
-      if (hit && !tags.some(t => t.label === hit.label)) tags.push(hit);
-    });
-    if (!tags.length && r.answers.length) tags.push({ label: '自建/独立邮件服务', kind: '邮箱' });
-  }
-  if (key === 'TXT') {
-    r.answers.forEach(a => {
-      const hit = explainTxtValue(a.value);
-      if (hit && !tags.some(t => t.label === hit.tag.label)) tags.push(hit.tag);
-    });
-  }
-  if (key === 'CAA') {
-    r.answers.forEach(a => {
-      const hit = explainCAA(a.value);
-      if (hit && !tags.some(t => t.label === hit.tag.label)) tags.push(hit.tag);
-    });
-  }
-  return { tags: tags };
-}
-
-/* ================= 概览与报告 ================= */
-
-const KIND_ORDER = { 'DNS 托管': 0, 'CDN': 1, '建站平台': 1, '云服务': 2, '对象存储': 2, '邮箱': 3, '邮件安全': 4, '安全策略': 5, '站点归属': 6, '网络': 7 };
-const KIND_LABEL = { 'CDN': 'CDN / 建站', '建站平台': 'CDN / 建站', '云服务': '云服务', '对象存储': '云服务' };
-
-function collectAllTags() {
-  const all = [];
-  RECORD_TYPES.forEach(t => {
-    const r = lastResults[t.key];
-    if (r && (r.state === 'ok')) {
-      interpret(t.key, r).tags.forEach(tag => {
-        if (!all.some(x => x.label === tag.label)) all.push(tag);
-      });
-    }
-  });
-  all.sort((a, b) => (KIND_ORDER[a.kind] || 9) - (KIND_ORDER[b.kind] || 9));
-  return all;
-}
-
-function buildReport() {
-  const lines = [];
-  lines.push('域名信息查询报告');
-  lines.push('================');
-  lines.push('域名：' + displayDomain + (displayDomain !== curDomain ? ' (punycode: ' + curDomain + ')' : ''));
-  lines.push('时间：' + new Date().toLocaleString('zh-CN'));
-  lines.push('线路：' + ([...usedSources].map(k => SOURCES[k].label).join(' → ') || '-'));
-  lines.push('');
-  const tags = collectAllTags();
-  if (tags.length) {
-    lines.push('服务识别：' + tags.map(t => t.label + '（' + (KIND_LABEL[t.kind] || t.kind) + '）').join('、'));
-    lines.push('');
-  }
-  RECORD_TYPES.forEach(t => {
-    const r = lastResults[t.key];
-    lines.push('[' + t.key + ' · ' + t.zh + ']');
-    if (!r) { lines.push('  (未查询)'); return; }
-    if (r.state === 'ok') {
-      r.answers.forEach(a => lines.push('  ' + a.value + '   (TTL ' + a.ttl + 's)'));
-    } else if (r.state === 'empty') lines.push('  (无记录)');
-    else if (r.state === 'dnserror') lines.push('  (错误: ' + (DNS_ERRORS[r.status] || r.status) + ')');
-    else lines.push('  (查询失败: ' + (r.message || '') + ')');
-    lines.push('');
-  });
-  lines.push('—— 由 JingW-UI 域名信息查询生成，记录值为查询时刻快照，仅供参考。');
-  return lines.join('\n');
-}
-
-function copyReport() { copyText(buildReport(), '报告已复制'); }
-
-function downloadReport() {
-  downloadBlob(buildReport(), 'dns-' + curDomain.replace(/[^a-z0-9.-]/gi, '_') + '.txt');
 }
 
 /* ================= 入口 ================= */
