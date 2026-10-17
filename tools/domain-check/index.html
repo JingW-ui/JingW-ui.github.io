@@ -116,6 +116,36 @@ h1 .accent { color: var(--green); }
 .empty { text-align: center; color: var(--tertiary); padding: 44px 10px; font-size: .92rem; }
 .error-line { color: var(--red); font-size: .9rem; }
 
+/* 历史记录（localStorage，仅存本机） */
+.history-wrap { margin-top: 14px; }
+.history-toggle {
+  background: none; border: none; color: var(--muted); cursor: pointer;
+  font: inherit; font-size: .8rem; padding: 4px 0;
+  display: inline-flex; align-items: center; gap: 5px; transition: color .2s;
+}
+.history-toggle:hover { color: var(--green); }
+.history-toggle .chev { display: inline-block; font-size: .7rem; transition: transform .15s; }
+.history-toggle .chev.open { transform: rotate(90deg); }
+.history-list { display: none; margin-top: 6px; }
+.history-list.open { display: block; }
+.history-head { display: flex; justify-content: flex-end; }
+.history-clear { font-size: .7rem; color: var(--tertiary); cursor: pointer; background: none; border: none; padding: 2px 4px; }
+.history-clear:hover { color: var(--red); text-decoration: underline; }
+.history-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 7px 12px; border-radius: 8px; cursor: pointer; font-size: .8rem;
+  color: var(--muted); transition: all .2s; border: 1px solid transparent;
+}
+.history-item:hover { background: var(--card-2); color: var(--text); border-color: var(--border); }
+.history-item.active { border-color: var(--green-border); background: var(--green-bg); color: var(--green-b); }
+.history-item .hi-domain {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;
+}
+.history-item .hi-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.history-item .hi-sub { font-size: .68rem; color: var(--tertiary); max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.history-item .hi-time { font-size: .68rem; color: var(--tertiary); white-space: nowrap; }
+
 footer { text-align: center; color: var(--tertiary); font-size: .75rem; margin-top: 32px; padding: 0 12px 16px; opacity: 0; animation: fadeUp .6s ease .55s forwards; }
 
 ::-webkit-scrollbar { width: 6px; }
@@ -138,6 +168,8 @@ footer { text-align: center; color: var(--tertiary); font-size: .75rem; margin-t
   .srv-ip { font-size: .95rem; }
   .srv-op { justify-content: flex-start; }
   .empty { padding: 28px 8px; font-size: .8rem; }
+  .history-item { font-size: .72rem; padding: 6px 9px; }
+  .history-item .hi-sub { display: none; }
 }
 </style>
 </head>
@@ -163,13 +195,18 @@ footer { text-align: center; color: var(--tertiary); font-size: .75rem; margin-t
       </div>
     </section>
 
+    <div class="history-wrap">
+      <button class="history-toggle" onclick="toggleHistory()">🕘 历史记录<span id="histCount"></span><span class="chev" id="histChev">▸</span></button>
+      <div class="history-list" id="histList"></div>
+    </div>
+
     <div class="results-head" id="resultsHead" style="display:none">
       <h2>解析结果<span class="count" id="ipCount"></span></h2>
       <button class="btn ghost sm" onclick="copyIps()">⎘ 复制 IP</button>
     </div>
     <div id="results"></div>
 
-    <footer>查询由浏览器直连公共 DoH（阿里云 → Cloudflare 自动切换）· 运营商数据 ipwho.is / ip.sb · 本站不经手查询记录</footer>
+    <footer>查询由浏览器直连公共 DoH（阿里云 → Cloudflare 自动切换）· 运营商数据 ipwho.is / ip.sb · 历史记录仅保存在本浏览器（localStorage），本站不经手查询记录</footer>
   </div>
 </div>
 
@@ -381,9 +418,14 @@ async function startQuery() {
   buildIpList();
   renderAll();
   if (ips.length) {
+    pushHist({ d: displayDomain, t: Date.now(), s: '' });
     const uniq = [...new Set(ips.filter(x => x.op && x.op.state === 'pending').map(x => x.ip))];
     await Promise.all(uniq.map(ip => queryIpInfo(ip, token)));
-    if (token === queryToken) renderAll();
+    if (token === queryToken) {
+      const labels = [...new Set(ips.filter(x => x.op && x.op.state === 'ok').map(x => x.op.label))];
+      if (labels.length) updateHistSummary(displayDomain, labels.slice(0, 3).join('、') + (labels.length > 3 ? ' 等' : ''));
+      renderAll();
+    }
   }
 }
 
@@ -552,6 +594,71 @@ function updateSourceBadge() {
   badge.title = usedSources.size > 1 ? '主线路失败，已自动切换备用线路' : '查询正常';
 }
 
+/* ================= 历史记录（localStorage，仅存本机） ================= */
+
+const LS_KEY = 'dc-history-v1';
+const HIST_MAX = 20;
+let histOpen = false;
+
+function loadHist() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; } catch (e) { return []; }
+}
+function saveHist(list) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch (e) {}
+}
+/* 同域名去重置顶；超出上限裁剪 */
+function pushHist(entry) {
+  const list = loadHist().filter(x => x.d !== entry.d);
+  list.unshift(entry);
+  saveHist(list.slice(0, HIST_MAX));
+  renderHist();
+}
+function updateHistSummary(d, summary) {
+  const list = loadHist();
+  const e = list.find(x => x.d === d);
+  if (e) { e.s = summary; saveHist(list); renderHist(); }
+}
+function timeAgo(t) {
+  const diff = Date.now() - t;
+  if (diff < 60e3) return '刚刚';
+  if (diff < 3600e3) return Math.floor(diff / 60e3) + ' 分钟前';
+  if (diff < 86400e3) return Math.floor(diff / 3600e3) + ' 小时前';
+  const d = new Date(t);
+  return (d.getMonth() + 1) + '-' + d.getDate() + ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+function toggleHistory() {
+  histOpen = !histOpen;
+  document.getElementById('histChev').classList.toggle('open', histOpen);
+  renderHist();
+}
+function renderHist() {
+  const list = loadHist();
+  document.getElementById('histCount').textContent = list.length ? '（' + list.length + '）' : '';
+  const box = document.getElementById('histList');
+  if (!histOpen) { box.classList.remove('open'); box.innerHTML = ''; return; }
+  box.classList.add('open');
+  if (!list.length) { box.innerHTML = '<div class="history-item" style="cursor:default">暂无查询记录</div>'; return; }
+  box.innerHTML = '<div class="history-head"><button class="history-clear" onclick="clearHist()">清空</button></div>' +
+    list.map(e =>
+      '<div class="history-item' + (e.d === displayDomain ? ' active' : '') + '" onclick="clickHist(this.dataset.d)" data-d="' + esc(e.d) + '">' +
+        '<span class="hi-domain">' + esc(e.d) + '</span>' +
+        '<span class="hi-right">' +
+          (e.s ? '<span class="hi-sub">' + esc(e.s) + '</span>' : '') +
+          '<span class="hi-time">' + timeAgo(e.t) + '</span>' +
+        '</span>' +
+      '</div>'
+    ).join('');
+}
+function clickHist(d) {
+  document.getElementById('domainInput').value = d;
+  startQuery();
+}
+function clearHist() {
+  saveHist([]);
+  renderHist();
+  showToast('历史记录已清空');
+}
+
 /* ================= 入口 ================= */
 
 function fillExample(d) {
@@ -562,6 +669,8 @@ function fillExample(d) {
 document.getElementById('domainInput').addEventListener('keydown', function (e) {
   if (e.key === 'Enter') startQuery();
 });
+
+renderHist();
 </script>
 </body>
 </html>
