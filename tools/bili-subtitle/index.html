@@ -37,11 +37,18 @@
 
     <div class="results-head" id="resultsHead" style="display:none">
       <h2>字幕内容<span class="count" id="lineCount"></span></h2>
-      <div class="export-group">
-        <button class="btn ghost sm" onclick="exportSub('srt')">SRT</button>
-        <button class="btn ghost sm" onclick="exportSub('ass')">ASS</button>
-        <button class="btn ghost sm" onclick="exportSub('txt')">TXT</button>
-        <button class="btn ghost sm" onclick="exportSub('json')">JSON</button>
+      <div class="view-controls">
+        <div class="seg">
+          <button class="seg-btn active" id="segList" onclick="setView('list')">列表</button>
+          <button class="seg-btn" id="segText" onclick="setView('text')">文稿</button>
+        </div>
+        <button class="ts-toggle on" id="tsToggle" onclick="toggleTs()">时间戳</button>
+        <div class="export-group">
+          <button class="btn ghost sm" onclick="exportSub('srt')">SRT</button>
+          <button class="btn ghost sm" onclick="exportSub('ass')">ASS</button>
+          <button class="btn ghost sm" onclick="exportSub('txt')">TXT</button>
+          <button class="btn ghost sm" onclick="exportSub('json')">JSON</button>
+        </div>
       </div>
     </div>
     <div id="results"></div>
@@ -79,6 +86,7 @@ const WORKER_BASE = 'https://bili-subtitle-ovpdktbmmq.cn-hangzhou.fcapp.run';
 const LS_LOGIN = 'bili-sub-login-v1';
 const LS_WBI = 'bili-sub-wbi-v1';
 const LS_HIST = 'bili-sub-history-v1';
+const LS_PREFS = 'bili-sub-prefs-v1';
 const HIST_MAX = 20;
 const WBI_TTL = 6 * 3600 * 1000;
 
@@ -92,6 +100,8 @@ const state = {
   subtitles: [],        // player API 返回的字幕列表
   curLan: '',
   body: null,           // 当前字幕 JSON
+  view: 'list',         // 'list' 紧凑列表 | 'text' 纯文稿
+  showTs: true,         // 时间戳显示开关
   token: 0,
 };
 
@@ -349,7 +359,63 @@ async function loadSubtitle(lan, token) {
   if (!body || !Array.isArray(body.body)) { showEmpty('字幕内容为空'); return; }
 
   state.body = body;
-  renderLines(body.body);
+  renderCurrent();
+}
+
+/* ================= 字幕渲染（列表 / 文稿） ================= */
+// 注：曾按时间间隔做碎句合并，实测 CC 字幕行间天然无缝（间隔≈0）会把整段并成一坨，
+// 且句子边界缺可靠判定信号，故放弃合并，两视图均按原始行渲染。
+
+function renderCurrent() {
+  const body = state.body.body;
+  document.getElementById('lineCount').textContent = '（' + body.length + ' 条）';
+  if (state.view === 'text') renderTextView(body); else renderListView(body);
+}
+
+function renderListView(bodyArr) {
+  document.getElementById('results').innerHTML =
+    '<div class="st-box">' + bodyArr.map(it =>
+      '<div class="st-row">' +
+      '<span class="st-time">' + fmtShort(it.from || 0) + '</span>' +
+      '<span class="st-text">' + esc(it.content || '') + '</span>' +
+      '</div>').join('') + '</div>';
+}
+
+function renderTextView(bodyArr) {
+  document.getElementById('results').innerHTML =
+    '<div class="st-plain">' + bodyArr.map(it =>
+      (state.showTs ? '<span class="ts">' + fmtShort(it.from || 0) + '</span>' : '') + esc(it.content || '')
+    ).join('<br>') + '</div>';
+}
+
+function setView(v) {
+  state.view = v;
+  document.getElementById('segList').classList.toggle('active', v === 'list');
+  document.getElementById('segText').classList.toggle('active', v === 'text');
+  savePrefs();
+  if (state.body) renderCurrent();
+}
+
+function toggleTs() {
+  state.showTs = !state.showTs;
+  document.getElementById('tsToggle').classList.toggle('on', state.showTs);
+  savePrefs();
+  if (state.body) renderCurrent();
+}
+
+function savePrefs() {
+  localStorage.setItem(LS_PREFS, JSON.stringify({ view: state.view, ts: state.showTs }));
+}
+
+function loadPrefs() {
+  try {
+    const p = JSON.parse(localStorage.getItem(LS_PREFS) || '{}');
+    if (p.view === 'text' || p.view === 'list') state.view = p.view;
+    if (typeof p.ts === 'boolean') state.showTs = p.ts;
+  } catch (e) { /* 忽略坏数据 */ }
+  document.getElementById('segList').classList.toggle('active', state.view === 'list');
+  document.getElementById('segText').classList.toggle('active', state.view === 'text');
+  document.getElementById('tsToggle').classList.toggle('on', state.showTs);
 }
 
 /* ================= 渲染 ================= */
@@ -411,18 +477,6 @@ function showNotLogin() {
   document.getElementById('results').innerHTML =
     '<div class="empty">该视频的字幕需要登录后才能获取<br><br>' +
     '<button class="btn" onclick="openLogin()">扫码登录</button></div>';
-}
-
-function renderLines(bodyArr) {
-  const head = document.getElementById('resultsHead');
-  head.style.display = '';
-  document.getElementById('lineCount').textContent = '（' + bodyArr.length + ' 条）';
-  document.getElementById('results').innerHTML = bodyArr.map(item =>
-    '<div class="st-line">' +
-    '<span class="st-time">' + fmtShort(item.from || 0) + '</span>' +
-    '<span class="st-text">' + esc(item.content || '') + '</span>' +
-    '</div>'
-  ).join('');
 }
 
 /* ================= 导出 ================= */
@@ -698,9 +752,10 @@ document.getElementById('videoInput').addEventListener('keydown', e => {
 
 (async function init() {
   if (!WORKER_BASE) {
-    document.getElementById('loginBadge').textContent = 'Worker 未配置';
+    document.getElementById('loginBadge').textContent = '中继未配置';
     return;
   }
+  loadPrefs();
   renderBadge();
   renderHist();
   await restoreLogin();
