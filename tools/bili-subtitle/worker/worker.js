@@ -357,14 +357,8 @@ export default {
           return jsonResponse({ code: -1, message: '仅支持 b23.tv 短链' }, env);
         }
         await bootstrapFingerprint();
-        const fwdHeaders = {
-          'User-Agent': UPSTREAM_UA,
-          'Accept': 'application/json, text/plain, */*',
-          'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-          'Referer': 'https://www.bilibili.com/',
-          'Cookie': baseCookieString() + '; ' + (request.headers.get('x-bili-cookie') || ''),
-        };
-        const resp = await fetch(tu.href, { headers: fwdHeaders, redirect: 'follow' });
+        const resolveCookie = baseCookieString() + (request.headers.get('x-bili-cookie') ? '; ' + request.headers.get('x-bili-cookie') : '');
+        const resp = await fetch(tu.href, { headers: { 'User-Agent': UPSTREAM_UA, 'Referer': 'https://www.bilibili.com/', 'Cookie': resolveCookie }, redirect: 'follow' });
         return jsonResponse({ code: 0, data: { url: resp.url } }, env);
       }
 
@@ -406,6 +400,27 @@ export default {
           },
           redirect: 'follow',
         });
+
+        // 二维码登录成功时，凭证通过 Set-Cookie 头下发（crossDomain URL 已不含 Cookie），
+        // 转写进 JSON 体（bili_cookies 字段）交给前端
+        if (m[2].includes('qrcode/poll')) {
+          let setCookies = [];
+          try {
+            if (typeof resp.headers.getSetCookie === 'function') setCookies = resp.headers.getSetCookie();
+            else {
+              const raw = resp.headers.get('set-cookie');
+              if (raw) setCookies = [raw];
+            }
+          } catch (e) { setCookies = []; }
+          if (setCookies.length) {
+            const bodyText = await resp.text();
+            let j = {};
+            try { j = JSON.parse(bodyText); } catch (e) { j = { code: -1, message: 'bad json' }; }
+            j.bili_cookies = setCookies;
+            return jsonResponse(j, env, resp.status);
+          }
+        }
+
         return proxyResponse(resp, env);
       }
 

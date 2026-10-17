@@ -349,11 +349,12 @@ const server = http.createServer(async (req, res) => {
       try { tu = new URL(target); } catch (e) { return sendJson(res, { code: -1, message: '链接格式错误' }); }
       if (tu.hostname !== 'b23.tv') return sendJson(res, { code: -1, message: '仅支持 b23.tv 短链' });
       await bootstrapFingerprint();
+      const userCookie = req.headers['x-bili-cookie'] || '';
       const resp = await fetch(tu.href, {
         headers: {
           'User-Agent': UPSTREAM_UA,
           'Referer': 'https://www.bilibili.com/',
-          'Cookie': baseCookieString(),
+          'Cookie': baseCookieString() + (userCookie ? '; ' + userCookie : ''),
         },
         redirect: 'follow',
       });
@@ -369,12 +370,13 @@ const server = http.createServer(async (req, res) => {
         (tu.hostname === 'aisubtitle.hdslb.com' || tu.hostname.endsWith('.hdslb.com'));
       if (!ok) return sendJson(res, { code: -1, message: '仅支持 hdslb.com 字幕资源' });
       await bootstrapFingerprint();
+      const userCookie = req.headers['x-bili-cookie'] || '';
       const resp = await fetch(tu.href, {
         headers: {
           'User-Agent': UPSTREAM_UA,
           'Accept': '*/*',
           'Referer': 'https://www.bilibili.com/',
-          'Cookie': baseCookieString(),
+          'Cookie': baseCookieString() + (userCookie ? '; ' + userCookie : ''),
         },
       });
       return pipeUpstream(res, resp);
@@ -385,6 +387,8 @@ const server = http.createServer(async (req, res) => {
     if (m) {
       const host = m[1] === 'api' ? 'api.bilibili.com' : 'passport.bilibili.com';
       await bootstrapFingerprint();
+      const userCookie = req.headers['x-bili-cookie'] || '';
+      const fullCookie = baseCookieString() + (userCookie ? '; ' + userCookie : '');
       const upstream = 'https://' + host + '/' + m[2] + url.search;
       const resp = await fetch(upstream, {
         headers: {
@@ -392,10 +396,31 @@ const server = http.createServer(async (req, res) => {
           'Accept': 'application/json, text/plain, */*',
           'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
           'Referer': 'https://www.bilibili.com/',
-          'Cookie': baseCookieString(),
+          'Cookie': fullCookie,
         },
         redirect: 'follow',
       });
+
+      // 二维码登录成功时，凭证通过 Set-Cookie 头下发（crossDomain URL 已不含 Cookie），
+      // 转写进 JSON 体（bili_cookies 字段）交给前端
+      if (m[2].includes('qrcode/poll')) {
+        let setCookies = [];
+        try {
+          if (typeof resp.headers.getSetCookie === 'function') setCookies = resp.headers.getSetCookie();
+          else {
+            const raw = resp.headers.get('set-cookie');
+            if (raw) setCookies = [raw];
+          }
+        } catch (e) { setCookies = []; }
+        if (setCookies.length) {
+          const bodyText = await resp.text();
+          let j = {};
+          try { j = JSON.parse(bodyText); } catch (e) { j = { code: -1, message: 'bad json' }; }
+          j.bili_cookies = setCookies;
+          return sendJson(res, j, resp.status);
+        }
+      }
+
       return pipeUpstream(res, resp);
     }
 

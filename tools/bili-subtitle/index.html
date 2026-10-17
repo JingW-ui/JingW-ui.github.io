@@ -521,14 +521,25 @@ async function pollLogin() {
 
   if (st === 0) {
     stopPoll();
-    const cookies = (j.data.cookie_info && j.data.cookie_info.cookies) || [];
     let sessdata = '', dede = '';
-    for (const c of cookies) {
-      if (c.name === 'SESSDATA') sessdata = c.value;
-      if (c.name === 'DedeUserID') dede = c.value;
+    // 凭证通过 poll 响应的 Set-Cookie 下发，中继转写为 bili_cookies 字段
+    const list = Array.isArray(j.bili_cookies) ? j.bili_cookies : [];
+    for (const line of list) {
+      let mm = /(?:^|[\s,])SESSDATA=([^;]+)/.exec(line);
+      if (mm) sessdata = mm[1];
+      mm = /(?:^|[\s,])DedeUserID=([^;]+)/.exec(line);
+      if (mm) dede = mm[1];
     }
+    // 兜底一：旧版响应的 cookie_info
+    if (!sessdata) {
+      const cookies = (j.data.cookie_info && j.data.cookie_info.cookies) || [];
+      for (const c of cookies) {
+        if (c.name === 'SESSDATA') sessdata = c.value;
+        if (c.name === 'DedeUserID') dede = c.value;
+      }
+    }
+    // 兜底二：旧版 crossDomain URL 查询串
     if (!sessdata && j.data.url) {
-      // 兜底：从 crossDomain 跳转 URL 的查询串里取
       try {
         const u = new URL(j.data.url);
         sessdata = u.searchParams.get('SESSDATA') || '';
