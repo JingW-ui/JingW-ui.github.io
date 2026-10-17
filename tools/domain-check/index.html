@@ -306,7 +306,7 @@ async function startQuery() {
   buildIpList();
   renderAll();
   if (ips.length) {
-    const uniq = [...new Set(ips.filter(x => !x.op).map(x => x.ip))];
+    const uniq = [...new Set(ips.filter(x => x.op && x.op.state === 'pending').map(x => x.ip))];
     await Promise.all(uniq.map(ip => queryIpInfo(ip, token)));
     if (token === queryToken) renderAll();
   }
