@@ -24,3 +24,21 @@ B 站 WAF 在 IP 层封锁 Cloudflare Workers 出口段（所有 api/passport �
 ## 安全
 
 只做只读 GET 转发；用户 Cookie 仅在单次请求内存中中转，不落盘不打日志。
+
+## 路由
+
+| 路由 | 用途 |
+|---|---|
+| `/bili/api/*` | 透传 api.bilibili.com（GET） |
+| `/bili/passport/*` | 透传 passport.bilibili.com（扫码登录） |
+| `/bili/cdn?url=` | 拉取字幕 JSON，仅限 `*.hdslb.com` |
+| `/resolve?url=` | b23.tv 短链跟随重定向，返回最终 URL |
+| `/ai/summary` | POST `{bvid, cid, lan}` → 服务端拉字幕并调 GLM-4-Flash 生成结构化总结 |
+| `/debug/fp` | 设备指纹引导状态 |
+
+## AI 总结配置
+
+1. https://bigmodel.cn 注册并实名，创建 API key（GLM-4-Flash 模型免费）
+2. FC 控制台 → 函数详情 → 配置 → 环境变量 → 创建 `ZHIPU_API_KEY` = 你的 key
+3. 无 key 时 `/ai/summary` 返回 503；软限流：每 IP 10 次/时、50 次/日，全局 300 次/日
+4. 字幕文本由服务端自行拉取（不接受客户端传文本），上限 400 行 / 8000 字

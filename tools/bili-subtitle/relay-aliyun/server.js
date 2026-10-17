@@ -41,6 +41,8 @@ const fp = {
   buvidFp: '',
   biliTicket: '',
   biliTicketExpires: 0,
+  wbiImg: '',
+  wbiSub: '',
   bootAt: 0,
   log: [],
   promise: null, // 并发去重：冷启动同时来多个请求只引导一次
@@ -251,6 +253,17 @@ async function bootstrapFingerprint() {
 
       fp.ready = true;
       note('bootstrap done');
+
+      // 5) 顺带取 WBI 签名密钥（nav 匿名也返回 wbi_img），供 /ai/summary 服务端签名
+      try {
+        const nv = await (await bareFetch('https://api.bilibili.com/x/web-interface/nav')).json();
+        const wbi = nv.data && nv.data.wbi_img;
+        if (wbi && wbi.img_url && wbi.sub_url) {
+          fp.wbiImg = wbi.img_url.split('/').pop().split('.')[0];
+          fp.wbiSub = wbi.sub_url.split('/').pop().split('.')[0];
+          note('wbi keys: ok');
+        }
+      } catch (e) { note('wbi keys err: ' + e.message); }
     } catch (e) {
       note('bootstrap failed: ' + e.message);
       fp.buvid3 = fp.buvid3 || FALLBACK_BUVID3;
@@ -285,8 +298,8 @@ function baseCookieString() {
 function corsHeaders() {
   return {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'x-bili-cookie',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'x-bili-cookie, Content-Type',
     'Access-Control-Max-Age': '86400',
   };
 }
@@ -316,6 +329,140 @@ async function pipeUpstream(res, upstreamResp) {
   res.end();
 }
 
+/* ================= AI 总结（GLM-4-Flash） ================= */
+
+// 软限流：每 IP 10 次/时、50 次/日；全局 300 次/日（实例级，冷启动重置——个人工具合理强度）
+const aiLimit = new Map();
+const AI_H = 10, AI_D = 50, AI_GLOBAL_D = 300;
+let aiGlobalDay = { count: 0, start: Date.now() };
+
+function aiAllow(ip) {
+  const now = Date.now();
+  let e = aiLimit.get(ip);
+  if (!e || now - e.hStart > 3600e3) {
+    e = (e && now - e.dStart <= 86400e3) ? e : { d: 0, dStart: now };
+    e.h = 0; e.hStart = now;
+    aiLimit.set(ip, e);
+  }
+  if (now - e.dStart > 86400e3) { e.d = 0; e.dStart = now; }
+  if (e.h >= AI_H || e.d >= AI_D) return '达到调用频率限制，请稍后再试';
+  e.h++; e.d++;
+  if (now - aiGlobalDay.start > 86400e3) aiGlobalDay = { count: 0, start: now };
+  if (aiGlobalDay.count >= AI_GLOBAL_D) return '今日总结额度已用完';
+  aiGlobalDay.count++;
+  return null;
+}
+
+const WBI_TAB = [
+  46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
+  33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40,
+  61, 26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11,
+  36, 20, 34, 44, 52
+];
+
+function wbiSignNode(params) {
+  const mixinKey = WBI_TAB.map(i => (fp.wbiImg + fp.wbiSub)[i]).join('').slice(0, 32);
+  const all = Object.assign({}, params, { wts: Math.floor(Date.now() / 1000) });
+  const q = Object.keys(all).sort()
+    .map(k => k + '=' + encodeURIComponent(String(all[k]).replace(/[!'()*]/g, '')))
+    .join('&');
+  return q + '&w_rid=' + crypto.createHash('md5').update(q + mixinKey, 'utf-8').digest('hex');
+}
+
+function fmtTs(sec) {
+  sec = Math.max(0, Math.floor(sec || 0));
+  const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+  return h > 0
+    ? h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0')
+    : String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+async function aiSummaryHandler(req, res, url) {
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+  const denied = aiAllow(ip);
+  if (denied) return sendJson(res, { code: -1, message: denied }, 429);
+
+  const key = process.env.ZHIPU_API_KEY;
+  if (!key) return sendJson(res, { code: -1, message: 'AI 总结未配置（缺少 ZHIPU_API_KEY）' }, 503);
+
+  let reqBody = {};
+  try { reqBody = JSON.parse(await readBody(req)); } catch (e) { return sendJson(res, { code: -1, message: '请求体格式错误' }); }
+  const bvid = String(reqBody.bvid || ''), cid = Number(reqBody.cid || 0), lan = String(reqBody.lan || '');
+  if (!/^BV[1-9A-HJ-NP-Za-km-z]{10}$/.test(bvid) || !cid || !lan) {
+    return sendJson(res, { code: -1, message: '参数不完整' });
+  }
+
+  await bootstrapFingerprint();
+  const userCookie = req.headers['x-bili-cookie'] || '';
+  const fullCookie = baseCookieString() + (userCookie ? '; ' + userCookie : '');
+  const hdrs = {
+    'User-Agent': UPSTREAM_UA,
+    'Accept': 'application/json, text/plain, */*',
+    'Referer': 'https://www.bilibili.com/',
+    'Cookie': fullCookie,
+  };
+
+  // 服务端自己拉字幕（不接受客户端传文本，杜绝端点被当成任意摘要服务）
+  const qs = wbiSignNode({ bvid: bvid, cid: cid, dm_img_list: '[]', dm_img_str: 'V2ViR0wgMS4wIChPcGVuR0wgRVMgMi4wIENocm9taXVtKQ', dm_cover_img_str: 'QU5HTEUgKE5WSURJQSwgTlZJRElBIEdlRm9yY2UgUlRYIDQwNjAgTGFwdG9wIEdQVSAoMHgwMDAwMjhFMCkgRGlyZWN0M0QxMSB2c181XzAgcHNfNV8wLCBEM0QxMSlHb29nbGUgSW5jLiAoTlZJRElBKQ', dm_img_inter: '{"ds":[],"wh":[5231,6067,75],"of":[475,950,475]}' });
+  const player = await (await fetch('https://api.bilibili.com/x/player/wbi/v2?' + qs, { headers: hdrs })).json();
+  if (player.code !== 0) return sendJson(res, { code: -1, message: '字幕列表获取失败：' + (player.message || player.code) });
+  const entry = ((player.data.subtitle || {}).subtitles || []).find(s => s.lan === lan);
+  if (!entry || !entry.subtitle_url) return sendJson(res, { code: -1, message: '未找到该语言的字幕' });
+  let sUrl = entry.subtitle_url;
+  if (sUrl.startsWith('//')) sUrl = 'https:' + sUrl;
+  const subBody = await (await fetch(sUrl, { headers: hdrs })).json();
+  if (!Array.isArray(subBody.body) || !subBody.body.length) return sendJson(res, { code: -1, message: '字幕内容为空' });
+
+  // 拼接带时间戳的字幕文本（上限 400 行 / 8000 字）
+  const text = subBody.body.slice(0, 400)
+    .map(it => '[' + fmtTs(it.from || 0) + ']' + (it.content || ''))
+    .join('\n').slice(0, 8000);
+
+  const sys = '你是视频字幕总结助手。根据带时间戳的字幕内容输出 JSON（不要输出其他内容），字段：'
+    + 'tldr（一句话总结，不超过 60 字）、points（核心要点字符串数组，3-7 条，每条不超过 40 字）、'
+    + 'chapters（章节对象数组 [{time: "MM:SS", title: "章节名"}]，3-8 个，time 必须取自字幕中出现的时间戳）、'
+    + 'keywords（关键词字符串数组，3-6 个，每个不超过 6 字）。';
+
+  const glmResp = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+    body: JSON.stringify({
+      model: 'glm-4-flash',
+      messages: [
+        { role: 'system', content: sys },
+        { role: 'user', content: '以下是视频字幕：\n' + text },
+      ],
+      temperature: 0.3,
+      response_format: { type: 'json_object' },
+    }),
+  });
+  const glm = await glmResp.json();
+  const content = glm.choices && glm.choices[0] && glm.choices[0].message && glm.choices[0].message.content;
+  if (!content) {
+    return sendJson(res, { code: -1, message: 'AI 调用失败：' + ((glm.error && glm.error.message) || glmResp.status) }, 502);
+  }
+  let parsed;
+  try { parsed = JSON.parse(content); } catch (e) { parsed = { tldr: content }; }
+  return sendJson(res, {
+    code: 0,
+    data: {
+      tldr: String(parsed.tldr || ''),
+      points: Array.isArray(parsed.points) ? parsed.points.map(String).slice(0, 7) : [],
+      chapters: Array.isArray(parsed.chapters) ? parsed.chapters.slice(0, 8).map(c => ({ time: String(c.time || ''), title: String(c.title || '') })) : [],
+      keywords: Array.isArray(parsed.keywords) ? parsed.keywords.map(String).slice(0, 6) : [],
+    },
+  });
+}
+
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    let data = '';
+    req.on('data', c => { data += c; if (data.length > 1e5) req.destroy(); });
+    req.on('end', () => resolve(data));
+    req.on('error', reject);
+  });
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
 
@@ -324,7 +471,14 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(204, corsHeaders());
       return res.end();
     }
-    if (req.method !== 'GET') return sendJson(res, { code: -1, message: 'method not allowed' }, 405);
+    if (req.method !== 'GET' && req.method !== 'POST') {
+      return sendJson(res, { code: -1, message: 'method not allowed' }, 405);
+    }
+
+    // ---- AI 总结（POST）----
+    if (url.pathname === '/ai/summary') {
+      return aiSummaryHandler(req, res, url);
+    }
 
     // ---- 调试 ----
     if (url.pathname === '/debug/fp') {

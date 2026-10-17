@@ -182,6 +182,40 @@ h1 .accent { color: var(--accent); }
 .st-para { margin: 0 0 1.1em; text-align: justify; }
 .st-para:last-child { margin-bottom: 0; }
 
+/* AI 总结卡片 */
+.ai-card {
+  background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: 10px;
+  padding: 16px 18px; margin-top: 18px;
+  opacity: 0; transform: translateY(16px);
+  animation: cardIn .4s cubic-bezier(.16,1,.3,1) forwards;
+}
+.ai-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.ai-title { font-weight: 700; font-size: .95rem; color: var(--accent-b); }
+.ai-src { font-size: .66rem; color: var(--tertiary); }
+.ai-head .spacer { flex: 1 1 auto; }
+.ai-mini {
+  border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+  border-radius: 100px; font: inherit; font-size: .7rem; padding: 3px 11px;
+  cursor: pointer; transition: all .2s;
+}
+.ai-mini:hover { color: var(--accent-b); border-color: var(--accent-border); }
+.ai-tldr { font-size: .92rem; margin-bottom: 8px; }
+.ai-sec { font-size: .72rem; font-weight: 700; color: var(--accent-b); margin: 12px 0 6px; }
+.ai-points { margin: 0; padding-left: 18px; }
+.ai-points li { font-size: .88rem; margin: 3px 0; }
+.ai-chapters { display: flex; flex-wrap: wrap; gap: 6px; }
+.ai-chip {
+  font-size: .76rem; border: 1px solid var(--border); border-radius: 8px;
+  padding: 3px 10px; background: var(--bg);
+}
+.ai-chip b {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--accent-b); margin-right: 4px; font-weight: 600;
+}
+.ai-chip.kw { border-style: dashed; }
+.ai-loading { padding: 4px 0; }
+.ai-hint { font-size: .74rem; color: var(--tertiary); margin-top: 10px; }
+
 .empty { text-align: center; color: var(--tertiary); padding: 44px 10px; font-size: .92rem; }
 .error-line { color: var(--red); font-size: .9rem; }
 

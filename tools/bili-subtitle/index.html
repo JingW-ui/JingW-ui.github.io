@@ -35,6 +35,8 @@
 
     <div class="lang-row" id="langRow" style="display:none"></div>
 
+    <div id="aiCard" style="display:none"></div>
+
     <div class="results-head" id="resultsHead" style="display:none">
       <h2>字幕内容<span class="count" id="lineCount"></span></h2>
       <div class="view-controls">
@@ -43,6 +45,7 @@
           <button class="seg-btn" id="segText" onclick="setView('text')">文稿</button>
         </div>
         <button class="ts-toggle on" id="tsToggle" onclick="toggleTs()">时间戳</button>
+        <button class="btn ghost sm" id="aiBtn" onclick="startAiSummary(false)">✨ AI 总结</button>
         <div class="export-group">
           <button class="btn ghost sm" onclick="exportSub('srt')">SRT</button>
           <button class="btn ghost sm" onclick="exportSub('ass')">ASS</button>
@@ -87,6 +90,7 @@ const LS_LOGIN = 'bili-sub-login-v1';
 const LS_WBI = 'bili-sub-wbi-v1';
 const LS_HIST = 'bili-sub-history-v1';
 const LS_PREFS = 'bili-sub-prefs-v1';
+const LS_AI = 'bili-sub-ai-v1';
 const HIST_MAX = 20;
 const WBI_TTL = 6 * 3600 * 1000;
 
@@ -314,6 +318,7 @@ async function selectP(page, token) {
   state.subtitles = [];
   state.curLan = '';
   state.body = null;
+  aiSetCard(null, false);
 
   renderPTabs(pg.page);
   renderLangTabs();
@@ -361,7 +366,107 @@ async function loadSubtitle(lan, token) {
 
   state.body = body;
   renderCurrent();
+  // 有缓存的历史总结则直接展示
+  const cached = aiLoadCache()[aiCacheKey()];
+  if (cached) renderAiCard(cached);
 }
+
+/* ================= AI 总结（GLM-4-Flash） ================= */
+
+const AI_CACHE_MAX = 30;
+
+function aiCacheKey() { return state.video.bvid + ':' + state.cid + ':' + state.curLan; }
+
+function aiLoadCache() {
+  try { return JSON.parse(localStorage.getItem(LS_AI)) || {}; } catch (e) { return {}; }
+}
+
+function aiSaveCache(key, data) {
+  const c = aiLoadCache();
+  c[key] = Object.assign({ ts: Date.now() }, data);
+  const keys = Object.keys(c);
+  if (keys.length > AI_CACHE_MAX) {
+    keys.sort((a, b) => c[a].ts - c[b].ts);
+    keys.slice(0, keys.length - AI_CACHE_MAX).forEach(k => delete c[k]);
+  }
+  localStorage.setItem(LS_AI, JSON.stringify(c));
+}
+
+function aiSetCard(html, show) {
+  const card = document.getElementById('aiCard');
+  if (show !== undefined) card.style.display = show ? '' : 'none';
+  if (html !== null) card.innerHTML = html;
+}
+
+function startAiSummary(force) {
+  if (!state.body || !state.video) { showToast('请先提取字幕'); return; }
+  const btn = document.getElementById('aiBtn');
+  const key = aiCacheKey();
+  const token = state.token;
+  if (!force) {
+    const cached = aiLoadCache()[key];
+    if (cached) { renderAiCard(cached); return; }
+  }
+  btn.disabled = true;
+  aiSetCard(
+    '<div class="ai-card"><div class="ai-head"><span class="ai-title">✨ AI 总结</span></div>' +
+    '<div class="ai-loading"><span class="skeleton" style="width:72%;height:14px"></span><br>' +
+    '<span class="skeleton" style="width:90%;height:14px"></span><br>' +
+    '<span class="skeleton" style="width:48%;height:14px"></span>' +
+    '<div class="ai-hint">GLM-4-Flash 正在阅读字幕，约 5~15 秒…</div></div></div>', true);
+  (async () => {
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 60000);
+      const res = await fetch(WORKER_BASE + '/ai/summary', {
+        method: 'POST',
+        headers: Object.assign(
+          { 'Content-Type': 'application/json' },
+          cookieHeader() ? { 'x-bili-cookie': cookieHeader() } : {}),
+        body: JSON.stringify({ bvid: state.video.bvid, cid: state.cid, lan: state.curLan }),
+        signal: ctrl.signal,
+      });
+      clearTimeout(timer);
+      if (token !== state.token) return;
+      const j = await res.json();
+      if (j.code !== 0) throw new Error(j.message || '生成失败');
+      aiSaveCache(key, j.data);
+      renderAiCard(j.data);
+    } catch (e) {
+      if (token !== state.token) return;
+      aiSetCard('<div class="ai-card"><div class="ai-head"><span class="ai-title">✨ AI 总结</span></div>' +
+        '<div class="error-line">' + esc(e.name === 'AbortError' ? '生成超时，请重试' : e.message) + '</div>' +
+        '<button class="btn ghost sm" style="margin-top:10px" onclick="startAiSummary(true)">重试</button></div>', true);
+    } finally {
+      btn.disabled = false;
+    }
+  })();
+}
+
+function renderAiCard(data) {
+  let html = '<div class="ai-card"><div class="ai-head"><span class="ai-title">✨ AI 总结</span>' +
+    '<span class="ai-src">GLM-4-Flash 生成 · 字幕文本已发送至智谱 API</span>' +
+    '<span class="spacer"></span>' +
+    '<button class="ai-mini" onclick="startAiSummary(true)">重新生成</button>' +
+    '<button class="ai-mini" onclick="aiClose()">收起</button></div>';
+  if (data.tldr) html += '<p class="ai-tldr">' + esc(data.tldr) + '</p>';
+  if (data.points && data.points.length) {
+    html += '<div class="ai-sec">核心要点</div><ul class="ai-points">' +
+      data.points.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul>';
+  }
+  if (data.chapters && data.chapters.length) {
+    html += '<div class="ai-sec">章节</div><div class="ai-chapters">' +
+      data.chapters.map(c => '<span class="ai-chip"><b>' + esc(c.time) + '</b> ' + esc(c.title) + '</span>').join('') + '</div>';
+  }
+  if (data.keywords && data.keywords.length) {
+    html += '<div class="ai-sec">关键词</div><div class="ai-chapters">' +
+      data.keywords.map(k => '<span class="ai-chip kw"># ' + esc(k) + '</span>').join('') + '</div>';
+  }
+  html += '</div>';
+  aiSetCard(html, true);
+}
+
+function aiClose() { aiSetCard(null, false); }
 
 /* ================= 字幕渲染（列表 / 文稿） ================= */
 // 注：曾按时间间隔做碎句合并，实测 CC 字幕行间天然无缝（间隔≈0）会把整段并成一坨，
