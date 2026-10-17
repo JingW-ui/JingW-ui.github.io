@@ -186,6 +186,8 @@ function buildExClimbWuzhiPayload(uuid) {
 async function bareFetch(url, init) {
   return fetch(url, {
     ...init,
+    // 所有出站请求必须带超时：Node fetch 默认无超时，上游停滞会挂死整个请求
+    signal: AbortSignal.timeout(10000),
     headers: {
       'User-Agent': UPSTREAM_UA,
       'Accept': 'application/json, text/plain, */*',
@@ -410,7 +412,7 @@ async function aiSummaryHandler(req, res, url) {
   if (!entry || !entry.subtitle_url) return sendJson(res, { code: -1, message: '未找到该语言的字幕' });
   let sUrl = entry.subtitle_url;
   if (sUrl.startsWith('//')) sUrl = 'https:' + sUrl;
-  const subBody = await (await fetch(sUrl, { headers: hdrs })).json();
+  const subBody = await (await fetch(sUrl, { headers: hdrs, signal: AbortSignal.timeout(15000) })).json();
   if (!Array.isArray(subBody.body) || !subBody.body.length) return sendJson(res, { code: -1, message: '字幕内容为空' });
 
   // 拼接带时间戳的字幕文本（上限 400 行 / 8000 字）
@@ -425,6 +427,7 @@ async function aiSummaryHandler(req, res, url) {
 
   const glmResp = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
     method: 'POST',
+    signal: AbortSignal.timeout(45000),
     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
     body: JSON.stringify({
       model: 'glm-4-flash',
@@ -553,6 +556,7 @@ const server = http.createServer(async (req, res) => {
           'Cookie': fullCookie,
         },
         redirect: 'follow',
+        signal: AbortSignal.timeout(20000),
       });
 
       // 二维码登录成功时，凭证通过 Set-Cookie 头下发（crossDomain URL 已不含 Cookie），
