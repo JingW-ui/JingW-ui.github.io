@@ -357,7 +357,7 @@ async function loadSubtitle(lan, token) {
   if (token !== state.token) return;
   const body = await res.json();
   if (token !== state.token) return;
-  if (!body || !Array.isArray(body.body)) { showEmpty('字幕内容为空'); return; }
+  if (!body || !Array.isArray(body.body) || !body.body.length) { showEmpty('字幕内容为空'); return; }
 
   state.body = body;
   renderCurrent();
@@ -378,16 +378,17 @@ function renderListView(bodyArr) {
   document.getElementById('results').innerHTML =
     '<div class="st-box">' + bodyArr.map(it =>
       '<div class="st-row">' +
-      '<span class="st-time">' + fmtShort(it.from || 0) + '</span>' +
+      (state.showTs ? '<span class="st-time">' + fmtShort(it.from || 0) + '</span>' : '') +
       '<span class="st-text">' + esc(it.content || '') + '</span>' +
       '</div>').join('') + '</div>';
 }
 
 function renderTextView(bodyArr) {
+  // buildFlowParagraphs 返回字符串数组
   const paras = buildFlowParagraphs(bodyArr);
   document.getElementById('results').innerHTML =
-    '<div class="st-plain">' + paras.map(p =>
-      '<p class="st-para">' + esc(p.text) + '</p>').join('') + '</div>';
+    '<div class="st-plain">' + paras.map(t =>
+      '<p class="st-para">' + esc(t) + '</p>').join('') + '</div>';
 }
 
 /* 文稿流式：把台词连成自然段落，浏览器自动折行使每行填满。
