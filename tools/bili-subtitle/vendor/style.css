@@ -99,6 +99,21 @@ h1 .accent { color: var(--accent); }
 }
 .up-logout:hover { background: rgba(207,34,46,.06); }
 
+/* 返回顶部（右下角，滚动后浮现） */
+.back-top {
+  position: fixed; bottom: 24px; right: 24px; z-index: 55;
+  width: 42px; height: 42px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border); background: rgba(255,255,255,.9);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  color: var(--muted); cursor: pointer; padding: 0;
+  opacity: 0; visibility: hidden; transform: translateY(10px);
+  transition: all .25s ease;
+}
+.back-top.show { opacity: 1; visibility: visible; transform: none; }
+.back-top:hover { color: var(--accent-b); border-color: var(--accent-border); box-shadow: var(--shadow-md); }
+.back-top svg { width: 18px; height: 18px; }
+
 /* 视频信息卡：封面 + 信息横排 */
 .video-card { display: flex; gap: 14px; align-items: flex-start; }
 .video-cover {
@@ -317,6 +332,7 @@ h1 .accent { color: var(--accent); }
   .btn { padding: 8px 16px; font-size: .8rem; }
   .login-float { top: 12px; right: 12px; width: 36px; height: 36px; }
   .user-pop { top: 56px; right: 12px; min-width: 160px; }
+  .back-top { bottom: 16px; right: 16px; width: 38px; height: 38px; }
   .modal-card { padding: 22px 18px 18px; }
   .st-box { padding: 6px 8px; }
   .st-row { gap: 8px; padding: 3px 6px; }
