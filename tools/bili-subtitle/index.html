@@ -28,11 +28,7 @@
       <button class="btn" id="queryBtn" onclick="startQuery()">提取</button>
     </div>
 
-    <section class="card" id="videoCard" style="display:none">
-      <div class="video-title" id="videoTitle"></div>
-      <div class="video-meta" id="videoMeta"></div>
-      <div class="p-chips" id="pChips"></div>
-    </section>
+    <section class="card video-card" id="videoCard" style="display:none"></section>
 
     <div class="lang-row" id="langRow" style="display:none"></div>
 
@@ -300,6 +296,7 @@ async function startQuery() {
       owner: d.owner ? d.owner.name : '',
       duration: d.duration || 0,
       pages: d.pages,
+      pic: d.pic || '',
     };
     pushHist(d.bvid, d.title);
     renderVideoCard();
@@ -585,12 +582,29 @@ function loadPrefs() {
 function renderVideoCard() {
   const card = document.getElementById('videoCard');
   card.style.display = '';
-  document.getElementById('videoTitle').textContent = state.video.title;
+  const v = state.video;
+
+  // 封面：http 强制升 https，防盗链用 no-referrer，加载失败整块隐藏
+  let coverHtml = '';
+  if (v.pic) {
+    const coverUrl = String(v.pic).replace(/^http:\/\//i, 'https://');
+    coverHtml = '<a class="video-cover" href="https://www.bilibili.com/video/' + esc(v.bvid) + '"' +
+      ' target="_blank" rel="noopener noreferrer" title="在 B 站打开">' +
+      '<img src="' + esc(coverUrl) + '" alt="封面" loading="lazy" referrerpolicy="no-referrer"' +
+      ' onerror="this.parentNode.style.display=\'none\'"></a>';
+  }
+
   const parts = [];
-  if (state.video.owner) parts.push('UP：' + state.video.owner);
-  if (state.video.duration) parts.push('时长 ' + fmtShort(state.video.duration));
-  if (state.video.pages.length > 1) parts.push('共 ' + state.video.pages.length + 'P');
-  document.getElementById('videoMeta').textContent = parts.join(' · ');
+  if (v.owner) parts.push('UP：' + v.owner);
+  if (v.duration) parts.push('时长 ' + fmtShort(v.duration));
+  if (v.pages.length > 1) parts.push('共 ' + v.pages.length + 'P');
+
+  card.innerHTML = coverHtml +
+    '<div class="video-info">' +
+    '<div class="video-title">' + esc(v.title) + '</div>' +
+    '<div class="video-meta">' + esc(parts.join(' · ')) + '</div>' +
+    '<div class="p-chips" id="pChips"></div>' +
+    '</div>';
   renderPTabs(state.p);
 }
 
