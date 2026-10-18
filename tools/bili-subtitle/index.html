@@ -515,33 +515,24 @@ function copyCurrent(btn) {
 }
 
 /* 文稿流式：把台词连成自然段落，浏览器自动折行使每行填满。
-   断段依据：与上一行结束间隔 ≥ 2s（换气/换句处），兜底每 10 行必断（防无缝 CC 糊成一坨） */
-function joinFlowText(a, b) {
-  if (!a) return b || '';
-  if (!b) return a;
-  const asciiEnd = /[A-Za-z0-9,.!?;:'")\]]$/.test(a);
-  const asciiStart = /^[A-Za-z0-9(\["']/.test(b);
-  return a + (asciiEnd || asciiStart ? ' ' : '') + b;
-}
-
+   行与行之间统一以空格分隔（保留原始字幕的短语边界）；
+   断段依据：与上一行结束间隔 ≥ 2s（换气/换句处），兜底每 10 行必断 */
 function buildFlowParagraphs(bodyArr) {
   const paras = [];
   let cur = null;
   for (const it of bodyArr) {
     const from = it.from || 0;
+    const c = String(it.content || '').trim();
+    if (!c) continue;
     if (!cur || from - cur.lastTo >= 2 || cur.count >= 10) {
       cur = { lastTo: from, count: 0, parts: [] };
       paras.push(cur);
     }
-    cur.parts.push(it.content || '');
+    cur.parts.push(c);
     cur.lastTo = Math.max(cur.lastTo, it.to || from);
     cur.count++;
   }
-  return paras.map(p => {
-    let text = '';
-    for (const part of p.parts) text = joinFlowText(text, part);
-    return text;
-  });
+  return paras.map(p => p.parts.join(' ')).filter(t => t);
 }
 
 function setView(v) {
