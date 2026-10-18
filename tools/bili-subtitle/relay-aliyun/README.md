@@ -21,6 +21,13 @@ B 站 WAF 在 IP 层封锁 Cloudflare Workers 出口段（所有 api/passport �
 按量付费，每月有免费试用额度；个人工具用量（每月几千次调用、流量几 MB）
 账单趋近 0 元。
 
+## 访问控制
+
+- Origin 白名单：仅允许 jingw-ui.github.io / jingweb.me / localhost / file://(null)，
+  其他来源一律 403 且不下发 CORS 头（其他网站无法热链本中继）
+- /ai/summary 强制 B 站登录态校验（nav isLogin，按 Cookie 哈希缓存 10 分钟），
+  滥用需消耗真实 B 站账号
+
 ## 安全
 
 只做只读 GET 转发；用户 Cookie 仅在单次请求内存中中转，不落盘不打日志。

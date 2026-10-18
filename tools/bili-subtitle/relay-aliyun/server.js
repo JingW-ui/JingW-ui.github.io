@@ -297,29 +297,20 @@ function baseCookieString() {
 
 /* ================= HTTP 服务 ================= */
 
-function corsHeaders() {
-  return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'x-bili-cookie, Content-Type',
-    'Access-Control-Max-Age': '86400',
-  };
-}
-
-function sendJson(res, obj, status = 200) {
+function sendJson(res, obj, status = 200, req = null) {
   res.writeHead(status, {
     'Content-Type': 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
-    ...corsHeaders(),
+    ...corsHeaders(req),
   });
   res.end(JSON.stringify(obj));
 }
 
-async function pipeUpstream(res, upstreamResp) {
+async function pipeUpstream(res, upstreamResp, req = null) {
   const headers = {
     'Content-Type': upstreamResp.headers.get('Content-Type') || 'application/json; charset=utf-8',
     'Cache-Control': 'no-store',
-    ...corsHeaders(),
+    ...corsHeaders(req),
   };
   res.writeHead(upstreamResp.status, headers);
   const reader = upstreamResp.body.getReader();
@@ -380,19 +371,23 @@ function fmtTs(sec) {
 }
 
 async function aiSummaryHandler(req, res, url) {
+  const json = (obj, status = 200) => sendJson(res, obj, status, req);
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
   const denied = aiAllow(ip);
-  if (denied) return sendJson(res, { code: -1, message: denied }, 429);
+  if (denied) return json({ code: -1, message: denied }, 429);
 
   const key = process.env.ZHIPU_API_KEY;
-  if (!key) return sendJson(res, { code: -1, message: 'AI 总结未配置（缺少 ZHIPU_API_KEY）' }, 503);
+  if (!key) return json({ code: -1, message: 'AI 总结未配置（缺少 ZHIPU_API_KEY）' }, 503);
 
   let reqBody = {};
-  try { reqBody = JSON.parse(await readBody(req)); } catch (e) { return sendJson(res, { code: -1, message: '请求体格式错误' }); }
+  try { reqBody = JSON.parse(await readBody(req)); } catch (e) { return json({ code: -1, message: '请求体格式错误' }); }
   const bvid = String(reqBody.bvid || ''), cid = Number(reqBody.cid || 0), lan = String(reqBody.lan || '');
   if (!/^BV[1-9A-HJ-NP-Za-km-z]{10}$/.test(bvid) || !cid || !lan) {
-    return sendJson(res, { code: -1, message: '参数不完整' });
+    return json({ code: -1, message: '参数不完整' });
   }
+
+  // AI 强制登录：滥用需消耗真实 B 站账号（校验结果按 Cookie 哈希缓存 10 分钟）
+  if (!(await requireLogin(req))) return json({ code: -1, message: 'AI 总结需要登录后使用' }, 401);
 
   await bootstrapFingerprint();
   const userCookie = req.headers['x-bili-cookie'] || '';
@@ -407,13 +402,13 @@ async function aiSummaryHandler(req, res, url) {
   // 服务端自己拉字幕（不接受客户端传文本，杜绝端点被当成任意摘要服务）
   const qs = wbiSignNode({ bvid: bvid, cid: cid, dm_img_list: '[]', dm_img_str: 'V2ViR0wgMS4wIChPcGVuR0wgRVMgMi4wIENocm9taXVtKQ', dm_cover_img_str: 'QU5HTEUgKE5WSURJQSwgTlZJRElBIEdlRm9yY2UgUlRYIDQwNjAgTGFwdG9wIEdQVSAoMHgwMDAwMjhFMCkgRGlyZWN0M0QxMSB2c181XzAgcHNfNV8wLCBEM0QxMSlHb29nbGUgSW5jLiAoTlZJRElBKQ', dm_img_inter: '{"ds":[],"wh":[5231,6067,75],"of":[475,950,475]}' });
   const player = await (await fetch('https://api.bilibili.com/x/player/wbi/v2?' + qs, { headers: hdrs })).json();
-  if (player.code !== 0) return sendJson(res, { code: -1, message: '字幕列表获取失败：' + (player.message || player.code) });
+  if (player.code !== 0) return json({ code: -1, message: '字幕列表获取失败：' + (player.message || player.code) });
   const entry = ((player.data.subtitle || {}).subtitles || []).find(s => s.lan === lan);
-  if (!entry || !entry.subtitle_url) return sendJson(res, { code: -1, message: '未找到该语言的字幕' });
+  if (!entry || !entry.subtitle_url) return json({ code: -1, message: '未找到该语言的字幕' });
   let sUrl = entry.subtitle_url;
   if (sUrl.startsWith('//')) sUrl = 'https:' + sUrl;
   const subBody = await (await fetch(sUrl, { headers: hdrs, signal: AbortSignal.timeout(15000) })).json();
-  if (!Array.isArray(subBody.body) || !subBody.body.length) return sendJson(res, { code: -1, message: '字幕内容为空' });
+  if (!Array.isArray(subBody.body) || !subBody.body.length) return json({ code: -1, message: '字幕内容为空' });
 
   // 拼接带时间戳的字幕文本（上限 400 行 / 8000 字）
   const text = subBody.body.slice(0, 400)
@@ -442,11 +437,11 @@ async function aiSummaryHandler(req, res, url) {
   const glm = await glmResp.json();
   const content = glm.choices && glm.choices[0] && glm.choices[0].message && glm.choices[0].message.content;
   if (!content) {
-    return sendJson(res, { code: -1, message: 'AI 调用失败：' + ((glm.error && glm.error.message) || glmResp.status) }, 502);
+    return json({ code: -1, message: 'AI 调用失败：' + ((glm.error && glm.error.message) || glmResp.status) }, 502);
   }
   let parsed;
   try { parsed = JSON.parse(content); } catch (e) { parsed = { tldr: content }; }
-  return sendJson(res, {
+  return json({
     code: 0,
     data: {
       tldr: String(parsed.tldr || ''),
@@ -466,16 +461,74 @@ function readBody(req) {
   });
 }
 
+/* ================= 访问控制 ================= */
+
+// Origin 白名单：浏览器跨域请求必带 Origin 且无法伪造，可挡住其他网站热链中继；
+// curl 等非浏览器客户端可伪造该头，属残留风险（前端无秘密可言，此为合理强度）
+const ALLOWED_ORIGINS = ['https://jingw-ui.github.io', 'https://jingweb.me'];
+const LOCAL_ORIGIN_RE = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+
+function originOk(req) {
+  const o = req.headers.origin;
+  // 无 Origin（同源探测）或 null（file:// 本地直开）放行
+  if (o === undefined || o === '' || o === 'null') return true;
+  return ALLOWED_ORIGINS.indexOf(o) !== -1 || LOCAL_ORIGIN_RE.test(o);
+}
+
+function corsHeaders(req) {
+  const o = req && req.headers ? req.headers.origin : undefined;
+  // CORS 按白名单反射；不在白名单的来源不给 ACAO 头，浏览器直接拦截响应
+  let acao = '*';
+  if (o !== undefined && o !== '' && o !== 'null') {
+    acao = (ALLOWED_ORIGINS.indexOf(o) !== -1 || LOCAL_ORIGIN_RE.test(o)) ? o : '';
+  }
+  const h = {
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'x-bili-cookie, Content-Type',
+    'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin',
+  };
+  if (acao) h['Access-Control-Allow-Origin'] = acao;
+  return h;
+}
+
+// 登录校验（结果按 Cookie 哈希缓存 10 分钟，避免每次总结都多打一次 nav）
+const loginCache = new Map();
+
+async function requireLogin(req) {
+  const cookie = req.headers['x-bili-cookie'] || '';
+  if (cookie.indexOf('SESSDATA=') === -1) return false;
+  const hash = crypto.createHash('sha256').update(cookie).digest('hex').slice(0, 16);
+  const now = Date.now();
+  const c = loginCache.get(hash);
+  if (c && now < c.until) return c.ok;
+  let ok = false;
+  try {
+    const nav = await (await bareFetch('https://api.bilibili.com/x/web-interface/nav', {
+      headers: { Cookie: baseCookieString() + '; ' + cookie },
+    })).json();
+    ok = !!(nav.data && nav.data.isLogin);
+  } catch (e) { ok = false; }
+  loginCache.set(hash, { ok: ok, until: now + 600e3 });
+  if (loginCache.size > 500) loginCache.clear();
+  return ok;
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
+  const json = (obj, status = 200) => sendJson(res, obj, status, req);
+  const pipe = (up) => pipeUpstream(res, up, req);
 
   try {
+    // 非 白名单 Origin 一律 403（其他网站热链/盗用中继的第一道闸）
+    if (!originOk(req)) return json({ code: -1, message: 'forbidden' }, 403);
+
     if (req.method === 'OPTIONS') {
       res.writeHead(204, corsHeaders());
       return res.end();
     }
     if (req.method !== 'GET' && req.method !== 'POST') {
-      return sendJson(res, { code: -1, message: 'method not allowed' }, 405);
+      return json({ code: -1, message: 'method not allowed' }, 405);
     }
 
     // ---- AI 总结（POST）----
@@ -486,16 +539,16 @@ const server = http.createServer(async (req, res) => {
     // ---- 调试 ----
     if (url.pathname === '/debug/fp') {
       await bootstrapFingerprint();
-      return sendJson(res, { ready: fp.ready, buvid3: fp.buvid3, bootAt: fp.bootAt, log: fp.log });
+      return json({ ready: fp.ready, buvid3: fp.buvid3, bootAt: fp.bootAt, log: fp.log });
     }
     if (url.pathname === '/debug/upstream') {
       const host = url.searchParams.get('host') || 'api.bilibili.com';
       try {
         const r = await bareFetch('https://' + host + '/x/web-interface/view?bvid=BV1GJ411x7h7');
         const j = await r.json();
-        return sendJson(res, { host: host, http: r.status, code: j.code, message: j.message, hasData: !!j.data });
+        return json({ host: host, http: r.status, code: j.code, message: j.message, hasData: !!j.data });
       } catch (e) {
-        return sendJson(res, { host: host, error: e.message });
+        return json({ host: host, error: e.message });
       }
     }
 
@@ -503,8 +556,8 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/resolve') {
       const target = url.searchParams.get('url') || '';
       let tu;
-      try { tu = new URL(target); } catch (e) { return sendJson(res, { code: -1, message: '链接格式错误' }); }
-      if (tu.hostname !== 'b23.tv') return sendJson(res, { code: -1, message: '仅支持 b23.tv 短链' });
+      try { tu = new URL(target); } catch (e) { return json({ code: -1, message: '链接格式错误' }); }
+      if (tu.hostname !== 'b23.tv') return json({ code: -1, message: '仅支持 b23.tv 短链' });
       await bootstrapFingerprint();
       const userCookie = req.headers['x-bili-cookie'] || '';
       const resp = await fetch(tu.href, {
@@ -515,17 +568,17 @@ const server = http.createServer(async (req, res) => {
         },
         redirect: 'follow',
       });
-      return sendJson(res, { code: 0, data: { url: resp.url } });
+      return json({ code: 0, data: { url: resp.url } });
     }
 
     // ---- 字幕 CDN ----
     if (url.pathname === '/bili/cdn') {
       const target = url.searchParams.get('url') || '';
       let tu;
-      try { tu = new URL(target); } catch (e) { return sendJson(res, { code: -1, message: '链接格式错误' }); }
+      try { tu = new URL(target); } catch (e) { return json({ code: -1, message: '链接格式错误' }); }
       const ok = tu.protocol === 'https:' &&
         (tu.hostname === 'aisubtitle.hdslb.com' || tu.hostname.endsWith('.hdslb.com'));
-      if (!ok) return sendJson(res, { code: -1, message: '仅支持 hdslb.com 字幕资源' });
+      if (!ok) return json({ code: -1, message: '仅支持 hdslb.com 字幕资源' });
       await bootstrapFingerprint();
       const userCookie = req.headers['x-bili-cookie'] || '';
       const resp = await fetch(tu.href, {
@@ -536,7 +589,7 @@ const server = http.createServer(async (req, res) => {
           'Cookie': baseCookieString() + (userCookie ? '; ' + userCookie : ''),
         },
       });
-      return pipeUpstream(res, resp);
+      return pipe(resp);
     }
 
     // ---- B 站 API / 登录接口透传 ----
@@ -575,16 +628,16 @@ const server = http.createServer(async (req, res) => {
           let j = {};
           try { j = JSON.parse(bodyText); } catch (e) { j = { code: -1, message: 'bad json' }; }
           j.bili_cookies = setCookies;
-          return sendJson(res, j, resp.status);
+          return json(j, resp.status);
         }
       }
 
-      return pipeUpstream(res, resp);
+      return pipe(resp);
     }
 
-    return sendJson(res, { code: -1, message: 'not found' }, 404);
+    return json({ code: -1, message: 'not found' }, 404);
   } catch (e) {
-    return sendJson(res, { code: -1, message: 'relay error: ' + ((e && e.message) || String(e)) }, 502);
+    return json({ code: -1, message: 'relay error: ' + ((e && e.message) || String(e)) }, 502);
   }
 });
 
