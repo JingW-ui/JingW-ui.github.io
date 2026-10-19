@@ -326,6 +326,12 @@
             background: var(--ink-3);
         }
         .rdot.offer { background: var(--green); }
+        .rdot.pool {
+            width: 5px;
+            height: 5px;
+            background: transparent;
+            border: 1.5px solid var(--green);   // 空心绿环：等开奖中，与 Offer 实心绿点区分
+        }
         .rdot.stop {
             width: 5px;
             height: 5px;
@@ -511,7 +517,10 @@
         .jc-tl.stale .ago { color: var(--amber); font-weight: 600; }
         .jc-tl.win { background: var(--green-bg); }
         .jc-tl.win b, .jc-tl.win .ago { color: var(--green); }
+        .jc-tl.pool { background: var(--green-bg); }
+        .jc-tl.pool b, .jc-tl.pool .ago { color: var(--green); }
         .chip.offer { background: var(--green-bg); color: var(--green); font-weight: 650; }
+        .chip.pool { background: var(--green-bg); color: var(--green); }
         .chip.rej, .chip.stop { background: #f0ede8; color: var(--ink-3); }
 
         .tl { margin: 2px 0 10px; }
@@ -534,7 +543,7 @@
             position: absolute;
             left: -5px;
         }
-        .tl-row.offer .tl-dot { background: var(--green); }
+        .tl-row.offer .tl-dot, .tl-row.pool .tl-dot { background: var(--green); }
         .tl-row.rej .tl-dot, .tl-row.stop .tl-dot { background: var(--ink-3); }
         .tl-row .tl-date {
             font-family: var(--mono);
@@ -609,7 +618,7 @@
             <div class="eyebrow">Application Tracker</div>
             <h1 class="name">投递看板</h1>
             <p class="tagline">
-                2027 届校招的投递进度。<strong>拖动卡片换列</strong>自动记录进展日期，点击卡片看完整时间线（投递 → 笔试 → 各轮面试 → Offer / 结束）；工具栏可切到<strong>简介模式</strong>，单行只看公司 / 岗位 / 投递日期。
+                2027 届校招的投递进度。<strong>拖动卡片换列</strong>自动记录进展日期，点击卡片看完整时间线（投递 → 笔试 → 各轮面试 → 入池等开奖 → Offer / 结束）；工具栏可切到<strong>简介模式</strong>，单行只看公司 / 岗位 / 投递日期。
                 岗位、候选池与全部进度都存在这台设备的浏览器里，<strong>不公开、不同步</strong>；首次使用选一次本地数据文件（<code>tracker-data.json</code>），之后打开即用，换设备用导出 / 导入。
             </p>
         </div>
@@ -860,13 +869,14 @@ const EVENTS = {
     i1:      {label: '一面',      stage: 'interview'},
     i2:      {label: '二面',      stage: 'interview'},
     i3:      {label: '三面/HR面', stage: 'interview'},
+    pool:    {label: '入池',      stage: 'interview', sub: 'pool'},   // 全过等开奖：不挪列，面试中卡片挂绿色子标签
     offer:   {label: 'Offer',    stage: 'closed', sub: 'offer'},
     rej:     {label: '挂了',      stage: 'closed', sub: 'rej'},
     stop:    {label: '放弃',      stage: 'closed', sub: 'stop'}
 };
-const EVENT_ORDER = ['applied', 'test', 'i1', 'i2', 'i3', 'offer', 'rej', 'stop'];
+const EVENT_ORDER = ['applied', 'test', 'i1', 'i2', 'i3', 'pool', 'offer', 'rej', 'stop'];
 // 「下一步」建议：默认选中项跟着最近事件走
-const NEXT_EVENT = {applied: 'test', test: 'i1', i1: 'i2', i2: 'i3', i3: 'offer'};
+const NEXT_EVENT = {applied: 'test', test: 'i1', i1: 'i2', i2: 'i3', i3: 'pool', pool: 'offer'};
 
 function todayStr() {
     const d = new Date();
@@ -889,7 +899,7 @@ function stageOf(j) {
     return (ST[j.id] && ST[j.id].stage) || j.stage || 'wish';
 }
 
-// 已结束列的三种子状态：offer / rej / stop（没有时间线时为 null）
+// 卡片子状态角标：offer / rej / stop（已结束列）+ pool（面试中·已入池）；没有时间线时为 null
 function closedSub(j) {
     const le = lastEvent(j);
     return (le && EVENTS[le.e] && EVENTS[le.e].sub) ? EVENTS[le.e].sub : null;
@@ -988,13 +998,16 @@ function cardHtml(j, i) {
     const sub = closedSub(j);
     const subChip = sub ? `<span class="chip ${sub}">${esc(EVENTS[sub].label)}</span>` : '';
 
-    // 最近事件 + 距今天数（拖到「已结束」前的活跃阶段超过 7 天变琥珀色提醒）
+    // 最近事件 + 距今天数（活跃阶段超 7 天变琥珀色提醒；入池等开奖属正常等待，绿色且不提醒）
     let recent = '';
     const le = lastEvent(j);
     if (le && EVENTS[le.e]) {
         const days = daysAgo(le.d);
         const ago = days === null ? '' : (days <= 0 ? '今天' : days + ' 天前');
-        const cls = EVENTS[le.e].sub === 'offer' ? ' win' : ((EVENTS[le.e].stage !== 'closed' && days > 7) ? ' stale' : '');
+        const sub2 = EVENTS[le.e].sub;
+        const cls = sub2 === 'offer' ? ' win'
+                  : sub2 === 'pool' ? ' pool'
+                  : ((EVENTS[le.e].stage !== 'closed' && days > 7) ? ' stale' : '');
         recent = `<div class="jc-tl${cls}"><b>${esc(EVENTS[le.e].label)}</b><span>${esc((le.d || '').slice(5))}</span><span class="ago">${ago}</span></div>`;
     }
 
@@ -1103,6 +1116,7 @@ function syncModeBtn() {
 function renderStats() {
     const byStage = {};
     STAGES.forEach(s => byStage[s.key] = JOBS.filter(j => stageOf(j) === s.key).length);
+    const pool = JOBS.filter(j => closedSub(j) === 'pool').length;   // 已入池：计入进行中，从「面试中」格里拆出来单列
     const active = byStage.applied + byStage.test + byStage.interview;
     const offer = JOBS.filter(j => closedSub(j) === 'offer').length;
     let soon = 0;
@@ -1116,7 +1130,8 @@ function renderStats() {
     document.getElementById('stats').innerHTML = `
         <div class="stat"><b>${JOBS.length}</b><span>意向岗位</span></div>
         <div class="stat hot"><b>${active}</b><span>进行中</span></div>
-        <div class="stat"><b>${byStage.interview}</b><span>面试中</span></div>
+        <div class="stat"><b>${byStage.interview - pool}</b><span>面试中</span></div>
+        <div class="stat${pool ? ' good' : ''}"><b>${pool}</b><span>入池</span></div>
         <div class="stat${offer ? ' good' : ''}"><b>${offer}</b><span>Offer</span></div>
         <div class="stat"><b>${byStage.closed}</b><span>已完结</span></div>
         <div class="stat"><b>${soon}</b><span>两周内截止</span></div>`;
@@ -1181,6 +1196,11 @@ function setStage(id, stage) {
     if (stage === 'applied') e = 'applied';
     else if (stage === 'test') e = 'test';
     else {
+        // 已入池再拖回面试列不自动记事件（防误拖在池后追加面试）；真有开奖后加面，在时间线里手动记
+        if (tl.length && tl[tl.length - 1].e === 'pool') {
+            toast('已入池，加面请在详情时间线里手动记录');
+            return;
+        }
         const rounds = tl.map(x => x.e).filter(x => ['i1', 'i2', 'i3'].includes(x));
         const last = rounds[rounds.length - 1];
         e = !last ? 'i1' : {i1: 'i2', i2: 'i3', i3: 'i3'}[last];
@@ -1201,11 +1221,11 @@ function openJob(id) {
     const stageOpts = STAGES.map(s =>
         `<option value="${s.key}"${stageOf(j) === s.key ? ' selected' : ''}>${esc(s.label)}</option>`).join('');
 
-    // 有时间线时阶段由事件推导，下拉换成只读展示，避免两套状态打架
+    // 有时间线时阶段由事件推导，下拉换成只读展示，避免两套状态打架；已入池补一句子状态
     const stageField = tl.length
         ? `<div class="field">
                 <label>当前阶段</label>
-                <div class="stage-now"><b>${esc(stageLabelOf(j))}</b><small>由时间线推导，在下方增删事件即可更新</small></div>
+                <div class="stage-now"><b>${esc(stageLabelOf(j))}${closedSub(j) === 'pool' ? ' · 已入池' : ''}</b><small>由时间线推导，在下方增删事件即可更新</small></div>
             </div>`
         : `<div class="field">
                 <label>当前阶段</label>
