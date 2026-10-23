@@ -741,7 +741,7 @@ let JOBS = [];            // 看板上的岗位 = 快照岗位（剔除墓碑）
 let DATA = null;          // {kind, jobs: [], pool: []} localStorage 里的数据快照；null = 尚未导入
 let ST = {};              // localStorage 覆盖：{id: {stage, note, done}}
 let LSJ = {addedJobs: [], removedIds: []};   // 本机新增岗位 + 移出岗位墓碑（LS_JOBS）
-let UI = {compact: false, wishOpen: true};    // 界面偏好（LS_UI）：简介模式 + 待投条展开
+let UI = {compact: false, wishOpen: true, addStage: 'applied'};    // 界面偏好（LS_UI）：简介模式 + 待投条展开 + 添加岗位默认阶段
 let view = [];            // 当前筛选结果
 
 function loadUi() {
@@ -750,8 +750,9 @@ function loadUi() {
         const d = raw ? JSON.parse(raw) : null;
         if (d && typeof d === 'object' && !Array.isArray(d) && typeof d.compact === 'boolean') UI.compact = d.compact;
         if (d && typeof d === 'object' && !Array.isArray(d) && typeof d.wishOpen === 'boolean') UI.wishOpen = d.wishOpen;
+        if (d && typeof d === 'object' && !Array.isArray(d) && ['wish', 'applied', 'test', 'interview'].includes(d.addStage)) UI.addStage = d.addStage;
     } catch (e) {
-        UI = {compact: false, wishOpen: true};   // 存储不可用 → 默认详细模式
+        UI = {compact: false, wishOpen: true, addStage: 'applied'};   // 存储不可用 → 默认详细模式
     }
 }
 
@@ -1517,15 +1518,13 @@ function openAdd() {
         <div class="msec"><h3>当前状态</h3>
             <div class="row2">
                 <div class="field">
-                    <label>加入看板时的阶段</label>
+                    <label>加入看板时的阶段（记住上次选择）</label>
                     <select id="nStage">
-                        <option value="wish">想投</option>
-                        <option value="applied">已投递</option>
-                        <option value="test">已做测评</option>
-                        <option value="interview">面试中</option>
+                        ${['wish', 'applied', 'test', 'interview'].map(k =>
+                            `<option value="${k}"${k === UI.addStage ? ' selected' : ''}>${{wish: '想投', applied: '已投递', test: '已做测评', interview: '面试中'}[k]}</option>`).join('')}
                     </select>
                 </div>
-                <div class="field" id="nDateWrap" style="display:none">
+                <div class="field" id="nDateWrap" style="display:${UI.addStage === 'wish' ? 'none' : ''}">
                     <label>事件日期（写进时间线）</label>
                     <input type="date" id="nDate" value="">
                 </div>
@@ -1561,6 +1560,8 @@ function openAdd() {
     const nDate = document.getElementById('nDate');
     nDate.value = todayStr();
     document.getElementById('nStage').addEventListener('change', function () {
+        UI.addStage = this.value;   // 记住本次选择，下次打开沿用
+        saveUi();
         document.getElementById('nDateWrap').style.display = this.value === 'wish' ? 'none' : '';
     });
     renderPool('');
@@ -1644,6 +1645,15 @@ function addManual() {
 
 /* ---------- 导出 ---------- */
 
+// 导出文件名时间戳：本地时间精确到分钟（YYYY-MM-DD_HH-MM），多次导出不互相覆盖；
+// 用本地时间而非 toISOString（UTC），避免早八点前导出日期标错一天
+function exportStamp() {
+    const d = new Date();
+    const p = n => String(n).padStart(2, '0');
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) +
+           '_' + p(d.getHours()) + '-' + p(d.getMinutes());
+}
+
 function exportProgress() {
     // 全量快照：看板岗位（含手工）+ 候选池 + 进度覆盖层一体导出。
     // 这个文件本身就是数据文件——换设备导入它 = 完整恢复看板。
@@ -1658,7 +1668,7 @@ function exportProgress() {
     const blob = new Blob([JSON.stringify(out, null, 2)], {type: 'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'tracker-data-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.download = 'tracker-data-' + exportStamp() + '.json';
     a.click();
     URL.revokeObjectURL(a.href);
     toast('已导出全量数据快照');
