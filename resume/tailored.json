@@ -1281,5 +1281,38 @@
         "熟悉机器视觉、3D 重建、目标检测、人体姿态估计；OpenGL/WebGL、VTK/Unity 经验优先"
       ]
     }
+  },
+  {
+    "index": "58",
+    "company": "京东集团 · 2027 校招 技术支持",
+    "role": "技术支持工程师（运维支持类）",
+    "direction": "运维支持 / IT 服务",
+    "tags": [
+      "自动化运维",
+      "Python 脚本",
+      "IT 服务支持",
+      "服务器管理运维"
+    ],
+    "date": "2026.10",
+    "url": "/resume/resume_qz/resume_jd_support.html",
+    "match": "",
+    "applyLink": "https://campus.jd.com/api/wx/position/index#/details?codeValueErp=XK116J&id=9364&recommendDeptCode=&recommendDeptName=",
+    "jobId": "XK116J-9364",
+    "jobTitle": "技术支持工程师",
+    "location": "北京 / 成都",
+    "jd": {
+      "duty": [
+        "通过热线、工单、即时通讯等渠道响应用户咨询与技术问题",
+        "定位业务系统、办公软件及基础 IT 设施故障并推动解决",
+        "跟踪服务工单闭环管理，确保服务质量与响应时效",
+        "参与知识库建设，沉淀常见问题解决方案与服务经验"
+      ],
+      "req": [
+        "2026 年 10 月及之后毕业的在校生，本科及以上，27 届优先",
+        "了解计算机软硬件、计算机网络与常见终端设备基本原理",
+        "有校园 IT 服务、实验室运维或相关实习经历者优先",
+        "有 Python/Shell/PowerShell 脚本实践经验者优先；沟通表达与问题定位能力强"
+      ]
+    }
   }
 ]
