@@ -194,6 +194,44 @@
         .no-data p { max-width: 460px; margin: 0 auto 14px; line-height: 1.7; }
         .no-data code { background: var(--line-2); border-radius: 4px; padding: 1px 5px; }
 
+        /* ---------- 待投小条：想投列移除后，wish 岗位收进看板上方一行 ---------- */
+        .wishbar {
+            margin-bottom: 12px;
+            background: #f4f2ee;
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+            padding: 8px 12px;
+        }
+        .wish-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            font-size: 12px;
+            color: var(--ink-2);
+        }
+        .wish-head b { font-size: 12.5px; color: var(--ink); }
+        .wish-head .n {
+            font-size: 11px;
+            font-family: var(--mono);
+            background: rgba(28, 25, 23, 0.05);
+            padding: 1px 7px;
+            border-radius: 20px;
+        }
+        .wish-head .arr { color: var(--ink-3); }
+        .wish-head .hint { color: var(--ink-3); font-size: 11px; margin-left: auto; }
+        .wish-chips { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 8px; }
+        /* 药丸形小卡：复用 .jc 的拖拽/点击绑定，仅压扁外观 */
+        .jc.wish-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 11px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            margin: 0;
+        }
+
         /* ---------- 卡片 ---------- */
         .jc {
             background: var(--card);
@@ -656,6 +694,8 @@
         <span class="count" id="count"></span>
     </div>
 
+    <div class="wishbar" id="wishbar" style="display:none"></div>
+
     <div class="board" id="board"></div>
 
     <footer class="footer">
@@ -701,16 +741,17 @@ let JOBS = [];            // 看板上的岗位 = 快照岗位（剔除墓碑）
 let DATA = null;          // {kind, jobs: [], pool: []} localStorage 里的数据快照；null = 尚未导入
 let ST = {};              // localStorage 覆盖：{id: {stage, note, done}}
 let LSJ = {addedJobs: [], removedIds: []};   // 本机新增岗位 + 移出岗位墓碑（LS_JOBS）
+let UI = {compact: false, wishOpen: true};    // 界面偏好（LS_UI）：简介模式 + 待投条展开
 let view = [];            // 当前筛选结果
-let UI = {compact: false};    // 界面偏好（LS_UI）：是否简介模式
 
 function loadUi() {
     try {
         const raw = localStorage.getItem(LS_UI);
         const d = raw ? JSON.parse(raw) : null;
         if (d && typeof d === 'object' && !Array.isArray(d) && typeof d.compact === 'boolean') UI.compact = d.compact;
+        if (d && typeof d === 'object' && !Array.isArray(d) && typeof d.wishOpen === 'boolean') UI.wishOpen = d.wishOpen;
     } catch (e) {
-        UI = {compact: false};   // 存储不可用 → 默认详细模式
+        UI = {compact: false, wishOpen: true};   // 存储不可用 → 默认详细模式
     }
 }
 
@@ -809,6 +850,7 @@ function renderNoData() {
             <p>看板数据全部存在本机。选择之前导出的 <code>tracker-data.json</code>（或旧版导出的进度文件）完成初始化；也可以把 JSON 文件直接拖到本页。</p>
             <button class="btn primary" onclick="document.getElementById('importFile').click()">选择本地数据文件</button>
         </div>`;
+    document.getElementById('wishbar').style.display = 'none';
     document.getElementById('count').textContent = '0 个岗位';
     renderStats();
     renderLocalHint();
@@ -939,6 +981,36 @@ function resumeOf(j) {
     return (s && s.resume !== undefined) ? s.resume : (j.resume || '');
 }
 
+// 岗位名称/公司可修正：ST 覆盖层优先（详情弹窗保存写入），原值兜底；id 不变，时间线不动
+function titleOf(j) {
+    const s = ST[j.id];
+    return (s && s.title) ? s.title : j.title;
+}
+function companyOf(j) {
+    const s = ST[j.id];
+    return (s && s.company) ? s.company : j.company;
+}
+
+// 备注纯追加检测：新内容以旧内容为前缀且确实变长 → 衔接处插入【MM-DD HH:MM】时间戳；
+// 整体改写、缩短、首次填写（旧备注为空）都不加戳——规则零 UI，只认「纯追加」这一种形态
+function mergeNoteStamp(prev, next) {
+    if (!next || !prev || next === prev || !next.startsWith(prev)) return next;
+    const added = next.slice(prev.length).replace(/^\s+/, '');
+    if (!added) return next;
+    const d = new Date();
+    const ts = String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0') +
+               ' ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    return prev.replace(/\s+$/, '') + '\n【' + ts + '】' + added;
+}
+
+// textarea 随内容自适应高度：初始化拉一次 + 输入时跟随
+function autogrow(el) {
+    if (!el) return;
+    const fit = () => { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; };
+    el.addEventListener('input', fit);
+    fit();
+}
+
 /* ---------- 渲染 ---------- */
 
 function toast(msg) {
@@ -968,7 +1040,7 @@ function visible() {
             if (days < 0 || days > 14) return false;
         }
         if (q) {
-            const hay = [j.title, j.company, j.city, noteOf(j),
+            const hay = [titleOf(j), companyOf(j), j.city, noteOf(j),
                          (j.directions || []).join(' '), (j.skills || []).join(' ')]
                         .join(' ').toLowerCase();
             if (!hay.includes(q)) return false;
@@ -1011,13 +1083,17 @@ function cardHtml(j, i) {
         recent = `<div class="jc-tl${cls}"><b>${esc(EVENTS[le.e].label)}</b><span>${esc((le.d || '').slice(5))}</span><span class="ago">${ago}</span></div>`;
     }
 
+    // 备注为追加日志（可能带时间戳多行）：卡片单行省略显示最新一条，悬停 title 看全量
+    const noteLines = note.split('\n').map(s => s.trim()).filter(Boolean);
+    const noteHead = noteLines.length ? noteLines[noteLines.length - 1] : '';
+
     return `
     <div class="jc" draggable="true" data-i="${i}" data-id="${esc(j.id)}">
         <div class="jc-top">
             ${score}
-            <span class="jc-company">${esc(j.company)}</span>
+            <span class="jc-company">${esc(companyOf(j))}</span>
         </div>
-        <div class="jc-title">${esc(j.title)}</div>
+        <div class="jc-title">${esc(titleOf(j))}</div>
         <div class="jc-meta">
             ${subChip}
             ${j.city ? `<span class="chip city">${esc(j.city)}</span>` : ''}
@@ -1026,7 +1102,7 @@ function cardHtml(j, i) {
             ${j.manual ? `<span class="chip manual">手工</span>` : ''}
         </div>
         ${recent}
-        ${note ? `<div class="jc-note" title="${esc(note)}">${esc(note)}</div>` : ''}
+        ${noteHead ? `<div class="jc-note" title="${esc(note)}">${esc(noteHead)}</div>` : ''}
         <div class="jc-foot">
             ${resumeOf(j) ? `<a href="${esc(resumeOf(j))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">简历</a>` : ''}
             ${j.applyLink ? `<a href="${esc(j.applyLink)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">投递页</a>` : ''}
@@ -1051,7 +1127,7 @@ function fmtDay(d) {
 }
 
 function rowTitle(j) {
-    const parts = [j.company + ' · ' + j.title];
+    const parts = [companyOf(j) + ' · ' + titleOf(j)];
     const le = lastEvent(j);
     if (le && EVENTS[le.e]) {
         const days = daysAgo(le.d);
@@ -1066,8 +1142,8 @@ function rowTitle(j) {
 function rowHtml(j, i) {
     const sub = closedSub(j);
     return `<div class="jc row" draggable="true" data-i="${i}" data-id="${esc(j.id)}" title="${esc(rowTitle(j))}">
-        <span class="r-co">${esc(j.company)}</span>
-        <span class="r-ti">${esc(j.title)}</span>
+        <span class="r-co">${esc(companyOf(j))}</span>
+        <span class="r-ti">${esc(titleOf(j))}</span>
         ${sub ? `<span class="rdot ${sub}"></span>` : ''}
         <span class="r-dt">${esc(fmtDay(appliedDateOf(j)))}</span>
     </div>`;
@@ -1077,13 +1153,25 @@ function render() {
     view = visible();
     const board = document.getElementById('board');
 
-    board.innerHTML = STAGES.map(s => {
-        const items = view.filter(j => stageOf(j) === s.key);
+    // 已投递拆两个物理列：28+ 张卡不再把单列撑出两屏；两列 drop 都写 applied
+    const appliedAll = view.filter(j => stageOf(j) === 'applied');
+    const half = Math.ceil(appliedAll.length / 2);
+    const cols = [
+        {key: 'applied',   label: '已投递',      n: appliedAll.length,             items: appliedAll.slice(0, half)},
+        {key: 'applied',   label: '已投递 · 续', n: appliedAll.slice(half).length, items: appliedAll.slice(half)},
+        {key: 'test',      label: '笔试 / 测评', n: null, items: view.filter(j => stageOf(j) === 'test')},
+        {key: 'interview', label: '面试中',      n: null, items: view.filter(j => stageOf(j) === 'interview')},
+        {key: 'closed',    label: '已结束',      n: null, items: view.filter(j => stageOf(j) === 'closed')}
+    ];
+
+    board.innerHTML = cols.map(s => {
+        const items = s.items;
+        const cnt = s.n === null ? items.length : s.n;   // 已投递首列显示总数，续列显示本格数量
         return `
         <section class="col" data-stage="${s.key}">
             <div class="col-head">
                 <h2>${esc(s.label)}</h2>
-                <span class="n">${items.length}</span>
+                <span class="n">${cnt}</span>
             </div>
             <div class="col-body">
                 ${items.length ? items.map(UI.compact ? rowHtml : cardHtml).join('')
@@ -1092,10 +1180,35 @@ function render() {
         </section>`;
     }).join('');
 
+    renderWishBar();
     document.getElementById('count').textContent = view.length + ' / ' + JOBS.length + ' 个岗位';
     renderStats();
     renderLocalHint();
     bindDnD();
+}
+
+/* ---------- 待投小条：wish 岗位收进看板上方一行，可折叠，可拖回列 ---------- */
+
+function renderWishBar() {
+    const bar = document.getElementById('wishbar');
+    const items = view.filter(j => stageOf(j) === 'wish');
+    if (!items.length) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
+    bar.style.display = '';
+    bar.innerHTML = `
+        <div class="wish-head" onclick="toggleWish()">
+            <b>待投</b><span class="n">${items.length}</span><span class="arr">${UI.wishOpen ? '▾' : '▸'}</span>
+            <span class="hint">点卡片进详情记投递，或直接拖进「已投递」列</span>
+        </div>
+        ${UI.wishOpen ? `<div class="wish-chips">${items.map(j =>
+            `<div class="jc wish-chip" draggable="true" data-id="${esc(j.id)}"
+                  title="${esc(companyOf(j) + ' · ' + titleOf(j))}">${esc(companyOf(j))} · ${esc(titleOf(j))}</div>`).join('')}</div>`
+                      : ''}`;
+}
+
+function toggleWish() {
+    UI.wishOpen = !UI.wishOpen;
+    saveUi();
+    render();
 }
 
 /* ---------- 简介模式切换 ---------- */
@@ -1271,8 +1384,11 @@ function openJob(id) {
 
     mbox.innerHTML = `
         <button class="close" onclick="closeModal()">×</button>
-        <h2>${esc(j.title)}</h2>
-        <div class="mco">${esc(j.company)}${j.city ? ' · ' + esc(j.city) : ''}${j.score != null ? ' · 匹配 ' + Math.round(j.score) : ''}${j.salary ? ' · ' + esc(j.salary) : ''}</div>
+        <div class="row2" style="margin-bottom:6px">
+            <div class="field"><label>岗位名称（可修正）</label><input id="mTitle" value="${esc(titleOf(j))}"></div>
+            <div class="field"><label>公司（可修正）</label><input id="mCo" value="${esc(companyOf(j))}"></div>
+        </div>
+        <div class="mco">${j.city ? esc(j.city) + ' · ' : ''}${j.score != null ? '匹配 ' + Math.round(j.score) : ''}${j.salary ? ' · ' + esc(j.salary) : ''}</div>
         <div class="jc-meta">
             ${(j.directions || []).map(d => `<span class="chip dir">${esc(d)}</span>`).join('')}
             ${(j.skills || []).map(s => `<span class="chip">${esc(s)}</span>`).join('')}
@@ -1307,6 +1423,7 @@ function openJob(id) {
 
     document.getElementById('modal').classList.add('on');
     document.body.style.overflow = 'hidden';
+    autogrow(document.getElementById('mNote'));
 }
 
 function closeModal() {
@@ -1322,6 +1439,11 @@ function saveModal(id) {
         resume: document.getElementById('mResume').value.trim(),
         done: todayStr()
     };
+    const t = document.getElementById('mTitle').value.trim();
+    const co = document.getElementById('mCo').value.trim();
+    if (t) patch.title = t;      // 空值视为不改；写进 ST 覆盖层，原值兜底、导出天然携带
+    if (co) patch.company = co;
+    patch.note = mergeNoteStamp(noteOf(j), patch.note);   // 纯追加自动打时间戳
     const sel = document.getElementById('mStage');   // 有时间线时不存在，阶段由事件推导
     if (sel) patch.stage = sel.value;
     ST[id] = Object.assign({}, ST[id], patch);
@@ -1392,6 +1514,24 @@ function openAdd() {
         <h2>添加岗位</h2>
         <div class="mco">从候选池选，或手工填一个不在池里的岗位（如已投过的线下岗位）。</div>
 
+        <div class="msec"><h3>当前状态</h3>
+            <div class="row2">
+                <div class="field">
+                    <label>加入看板时的阶段</label>
+                    <select id="nStage">
+                        <option value="wish">想投</option>
+                        <option value="applied">已投递</option>
+                        <option value="test">已做测评</option>
+                        <option value="interview">面试中</option>
+                    </select>
+                </div>
+                <div class="field" id="nDateWrap" style="display:none">
+                    <label>事件日期（写进时间线）</label>
+                    <input type="date" id="nDate" value="">
+                </div>
+            </div>
+        </div>
+
         <div class="msec"><h3>从候选池选</h3>
             <input type="search" id="pq" placeholder="搜索公司 / 岗位 / 城市…" style="width:100%">
             <div class="pool" id="pool"></div>
@@ -1407,7 +1547,7 @@ function openAdd() {
                 <div class="field"><label>截止日期</label><input id="nDue" placeholder="YYYY-MM-DD"></div>
             </div>
             <div class="field"><label>投递链接</label><input id="nLink" placeholder="https://"></div>
-            <div class="field"><label>备注</label><input id="nNote" placeholder="如 官网直投，已做完测评"></div>
+            <div class="field"><label>备注</label><input id="nNote" placeholder="如 官网直投"></div>
         </div>
 
         <div class="actions">
@@ -1418,6 +1558,11 @@ function openAdd() {
 
     document.getElementById('modal').classList.add('on');
     document.body.style.overflow = 'hidden';
+    const nDate = document.getElementById('nDate');
+    nDate.value = todayStr();
+    document.getElementById('nStage').addEventListener('change', function () {
+        document.getElementById('nDateWrap').style.display = this.value === 'wish' ? 'none' : '';
+    });
     renderPool('');
     document.getElementById('pq').addEventListener('input', e => renderPool(e.target.value));
 }
@@ -1440,13 +1585,35 @@ function renderPool(q) {
         : '<div class="pool-item" style="color:var(--ink-3);cursor:default">没有匹配的候选岗位</div>';
 }
 
+// 添加时的阶段 → 时间线事件映射：非 wish 档必须写事件，
+// 因为列位/卡片「最近事件」/简介模式投递日期全部由时间线推导，只写 stage 会分裂
+function stageEventOf(st) {
+    if (st === 'applied') return 'applied';
+    if (st === 'test') return 'test';
+    if (st === 'interview') return 'i1';
+    return null;
+}
+
+// 入板收尾（候选池/手工共用）：落盘 → 非 wish 档按所选日期补时间线事件 → 关弹窗重绘
+function finalizeAdd(job, st) {
+    if (!addExtraJob(job)) return;
+    const ev = stageEventOf(st);
+    if (ev) {
+        const d = document.getElementById('nDate').value || todayStr();
+        pushEvent(job.id, ev, d);
+        toast('已加入看板 · ' + EVENTS[ev].label + ' ' + d);
+    } else {
+        toast('已加入「想投」');
+    }
+    closeModal();
+    render();
+}
+
 function addFromPool(id) {
     const p = POOL.find(x => x.id === id);
     if (!p) return;
     if (JOBS.some(j => j.id === id)) { toast('这个岗位已经在看板上了'); return; }
-    if (addExtraJob(Object.assign({}, p, {stage: 'wish'}))) toast('已加入「想投」');
-    closeModal();
-    render();
+    finalizeAdd(Object.assign({}, p, {stage: 'wish'}), document.getElementById('nStage').value);
 }
 
 function addManual() {
@@ -1472,9 +1639,7 @@ function addManual() {
         manual: true,
         stage: 'wish'
     };
-    if (addExtraJob(job)) toast('已加入「想投」');
-    closeModal();
-    render();
+    finalizeAdd(job, document.getElementById('nStage').value);
 }
 
 /* ---------- 导出 ---------- */
@@ -1552,6 +1717,8 @@ function importLegacy(data) {
         if (p.stage) next.stage = p.stage;
         if (p.note !== undefined) next.note = p.note;
         if (p.resume !== undefined) next.resume = p.resume;
+        if (p.title) next.title = p.title;         // 岗位名称/公司修正随覆盖层合并
+        if (p.company) next.company = p.company;
         if (Array.isArray(p.timeline) && p.timeline.length) next.timeline = p.timeline;
         ST[id] = next;
         n++;
