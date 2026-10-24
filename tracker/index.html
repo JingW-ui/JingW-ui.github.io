@@ -867,6 +867,57 @@ function enableDropImport() {
     });
 }
 
+/* ---------- 关联简历（站点定制简历列表，运行时拉取） ---------- */
+
+// 简历清单来自简历墙数据源 resume/tailored.json。fetch 顺序：相对路径（本地 http 服务与
+// GitHub Pages 均可）→ 站点绝对路径兜底；file:// 下浏览器禁止 fetch → 静默降级（快捷下拉
+// 不出现，手填输入框照常用），看板其余功能不受影响。
+let RESUMES = [];   // [{url, company, role, date}]，倒序 = 最近在前；[] = 未加载成功
+
+function resumeHref(u) {
+    // tailored.json 存站点绝对路径（/resume/...），file:// 下会指向文件系统根 → 转相对
+    const proto = (typeof location !== 'undefined' && location.protocol) || '';
+    return (proto === 'file:' && u.charAt(0) === '/') ? '..' + u : u;
+}
+
+function resumeLabel(r) {
+    return [r.date, r.company, r.role].filter(Boolean).join(' · ') || r.url;
+}
+
+function loadResumes() {
+    const pick = data => {
+        RESUMES = (Array.isArray(data) ? data : [])
+            .filter(r => r && r.url)
+            .map(r => ({url: r.url, company: r.company || '', role: r.role || '', date: r.date || ''}))
+            .reverse();   // tailored.json 按时间追加，倒序即「最近排序」
+        fillResumeSelects();
+    };
+    const tryFetch = (url, fallback) =>
+        fetch(url)
+            .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(pick)
+            .catch(fallback);
+    return tryFetch('../resume/tailored.json', () => tryFetch('/resume/tailored.json', () => { RESUMES = []; }));
+}
+
+// 简历列表晚于弹窗打开才到达时，补灌当前已打开弹窗里的快捷下拉
+function fillResumeSelects() {
+    const opts = RESUMES.map(r => `<option value="${esc(r.url)}">${esc(resumeLabel(r))}</option>`).join('');
+    [['nResume', '不关联'], ['mResumeQuick', '快速选择简历…']].forEach(([id, ph]) => {
+        const sel = document.getElementById(id);
+        if (!sel || (id === 'nResume' && sel.value)) return;   // 用户已选 → 不打扰
+        sel.innerHTML = `<option value="">${ph}</option>` + opts;
+        sel.style.display = RESUMES.length ? '' : 'none';
+    });
+}
+
+// 详情弹窗快捷下拉：选中即填入手填框，下拉自身复位（下次打开仍是提示项）
+function quickResume(sel) {
+    const inp = document.getElementById('mResume');
+    if (inp && sel.value) inp.value = sel.value;
+    sel.selectedIndex = 0;
+}
+
 // 本机新增岗位（手工 / 候选池）：进内存看板 + 落盘，刷新后仍在
 function addExtraJob(job) {
     JOBS.push(job);
@@ -1105,7 +1156,7 @@ function cardHtml(j, i) {
         ${recent}
         ${noteHead ? `<div class="jc-note" title="${esc(note)}">${esc(noteHead)}</div>` : ''}
         <div class="jc-foot">
-            ${resumeOf(j) ? `<a href="${esc(resumeOf(j))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">简历</a>` : ''}
+            ${resumeOf(j) ? `<a href="${esc(resumeHref(resumeOf(j)))}" target="_blank" rel="noopener" onclick="event.stopPropagation()">简历</a>` : ''}
             ${j.applyLink ? `<a href="${esc(j.applyLink)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">投递页</a>` : ''}
             <span class="sp"></span>
             ${due}
@@ -1402,6 +1453,10 @@ function openJob(id) {
                 ${stageField}
                 <div class="field">
                     <label>关联简历</label>
+                    <select id="mResumeQuick" style="display:${RESUMES.length ? '' : 'none'};margin-bottom:4px" onchange="quickResume(this)">
+                        <option value="">快速选择简历…</option>
+                        ${RESUMES.map(r => `<option value="${esc(r.url)}">${esc(resumeLabel(r))}</option>`).join('')}
+                    </select>
                     <input id="mResume" value="${esc(resumeOf(j))}" placeholder="/resume/resume_xxx.html">
                 </div>
             </div>
@@ -1529,6 +1584,13 @@ function openAdd() {
                     <input type="date" id="nDate" value="">
                 </div>
             </div>
+            <div class="field" id="nResumeWrap" style="display:${RESUMES.length ? '' : 'none'}">
+                <label>关联简历（可选，最近添加在前）</label>
+                <select id="nResume">
+                    <option value="">不关联</option>
+                    ${RESUMES.map(r => `<option value="${esc(r.url)}">${esc(resumeLabel(r))}</option>`).join('')}
+                </select>
+            </div>
         </div>
 
         <div class="msec"><h3>从候选池选</h3>
@@ -1597,6 +1659,8 @@ function stageEventOf(st) {
 
 // 入板收尾（候选池/手工共用）：落盘 → 非 wish 档按所选日期补时间线事件 → 关弹窗重绘
 function finalizeAdd(job, st) {
+    const nResume = document.getElementById('nResume');
+    if (nResume && nResume.value) job.resume = nResume.value;   // 关联简历落进岗位数据，导出天然携带
     if (!addExtraJob(job)) return;
     const ev = stageEventOf(st);
     if (ev) {
@@ -1761,6 +1825,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loadState();
     loadJobStore();
     loadUi();
+    loadResumes();   // 定制简历列表（异步拉取，失败静默降级）
     syncModeBtn();
     ['q', 'fCity', 'fDir', 'fFlag'].forEach(id =>
         document.getElementById(id).addEventListener('input', render));
