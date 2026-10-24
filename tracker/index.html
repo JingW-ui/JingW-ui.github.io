@@ -873,6 +873,7 @@ function enableDropImport() {
 // GitHub Pages 均可）→ 站点绝对路径兜底；file:// 下浏览器禁止 fetch → 静默降级（快捷下拉
 // 不出现，手填输入框照常用），看板其余功能不受影响。
 let RESUMES = [];   // [{url, company, role, date}]，倒序 = 最近在前；[] = 未加载成功
+let modalResume = '';   // 详情弹窗当前关联简历值：打开时初始化，quickResume/clearResume 维护，保存时作为真源
 
 function resumeHref(u) {
     // tailored.json 存站点绝对路径（/resume/...），file:// 下会指向文件系统根 → 转相对
@@ -911,11 +912,64 @@ function fillResumeSelects() {
     });
 }
 
-// 详情弹窗快捷下拉：选中即填入手填框，下拉自身复位（下次打开仍是提示项）
+// 详情弹窗快捷下拉：选中即建立关联（切到「打开简历」态），下拉自身复位（下次打开仍是提示项）
 function quickResume(sel) {
-    const inp = document.getElementById('mResume');
-    if (inp && sel.value) inp.value = sel.value;
+    if (!sel.value) return;
+    modalResume = sel.value;
+    syncResumeUI();
     sel.selectedIndex = 0;
+}
+
+// 详情弹窗：清除关联 → 回到未关联态（快捷下拉 + 手填输入框）
+function clearResume() {
+    modalResume = '';
+    syncResumeUI();
+}
+
+// 按 modalResume 同步弹窗内「已关联 / 未关联」两个状态的显隐与链接
+function syncResumeUI() {
+    const on = document.getElementById('mResumeOn');
+    const inp = document.getElementById('mResume');
+    const link = document.getElementById('mResumeOpen');
+    if (!on || !inp || !link) return;
+    on.style.display = modalResume ? '' : 'none';
+    inp.style.display = modalResume ? 'none' : '';
+    if (modalResume) {
+        link.href = resumeHref(modalResume);
+        link.textContent = resumeLinkText(modalResume);
+    } else {
+        inp.value = '';
+    }
+}
+
+// 链接文字 = 所选简历名称（公司 · 岗位）；匹配不到（手填 / 列表未加载）回退通用文案
+function resumeLinkText(url) {
+    const r = RESUMES.find(x => x.url === url);
+    const name = r ? [r.company, r.role].filter(Boolean).join(' · ') : '';
+    return name ? name + ' ↗' : '打开简历 ↗';
+}
+
+// 从简历墙条目解析公司名/岗位名：company 形如「联影 · 2026 校招 · 武汉」取首段，role 直接用
+function parseResumeInfo(url) {
+    const r = RESUMES.find(x => x.url === url);
+    if (!r) return null;
+    return {company: (r.company || '').split(' · ')[0].trim(), role: (r.role || '').trim()};
+}
+
+// 添加弹窗：选中简历 → 更新预览链接 + 公司/岗位输入框空位填充（已有内容一律不动）
+function onAddResume(sel) {
+    const pv = document.getElementById('nResumePreview');
+    const pl = document.getElementById('nResumePreviewLink');
+    if (pv && pl) {
+        pv.style.display = sel.value ? '' : 'none';
+        if (sel.value) pl.href = resumeHref(sel.value);
+    }
+    const info = parseResumeInfo(sel.value);
+    if (!info) return;
+    const co = document.getElementById('nCo');
+    const ti = document.getElementById('nTitle');
+    if (co && !co.value.trim()) co.value = info.company;
+    if (ti && !ti.value.trim()) ti.value = info.role;
 }
 
 // 本机新增岗位（手工 / 候选池）：进内存看板 + 落盘，刷新后仍在
@@ -1379,6 +1433,7 @@ function setStage(id, stage) {
 function openJob(id) {
     const j = JOBS.find(x => x.id === id);
     if (!j) return;
+    modalResume = resumeOf(j) || '';   // 弹窗内关联简历的唯一真源，UI 双状态与保存都读写它
     const mbox = document.getElementById('mbox');
     const st = stageOf(j);
     const tl = timelineOf(j);
@@ -1457,7 +1512,11 @@ function openJob(id) {
                         <option value="">快速选择简历…</option>
                         ${RESUMES.map(r => `<option value="${esc(r.url)}">${esc(resumeLabel(r))}</option>`).join('')}
                     </select>
-                    <input id="mResume" value="${esc(resumeOf(j))}" placeholder="/resume/resume_xxx.html">
+                    <div id="mResumeOn" style="display:${modalResume ? '' : 'none'};margin-bottom:4px">
+                        <a id="mResumeOpen" href="${esc(resumeHref(modalResume))}" target="_blank" rel="noopener">${esc(resumeLinkText(modalResume))}</a>
+                        <a href="#" style="margin-left:8px" onclick="clearResume();return false">清除</a>
+                    </div>
+                    <input id="mResume" placeholder="/resume/resume_xxx.html（手填兜底）" style="display:${modalResume ? 'none' : ''}">
                 </div>
             </div>
             <div class="field">
@@ -1492,7 +1551,7 @@ function saveModal(id) {
     if (!j) return;
     const patch = {
         note: document.getElementById('mNote').value.trim(),
-        resume: document.getElementById('mResume').value.trim(),
+        resume: modalResume || document.getElementById('mResume').value.trim(),   // 已关联走弹窗状态，未关联走手填输入框
         done: todayStr()
     };
     const t = document.getElementById('mTitle').value.trim();
@@ -1586,10 +1645,13 @@ function openAdd() {
             </div>
             <div class="field" id="nResumeWrap" style="display:${RESUMES.length ? '' : 'none'}">
                 <label>关联简历（可选，最近添加在前）</label>
-                <select id="nResume">
+                <select id="nResume" style="margin-bottom:4px" onchange="onAddResume(this)">
                     <option value="">不关联</option>
                     ${RESUMES.map(r => `<option value="${esc(r.url)}">${esc(resumeLabel(r))}</option>`).join('')}
                 </select>
+                <div id="nResumePreview" style="display:none">
+                    <a id="nResumePreviewLink" href="#" target="_blank" rel="noopener">预览 ↗</a>
+                </div>
             </div>
         </div>
 
