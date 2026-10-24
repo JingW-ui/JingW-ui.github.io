@@ -1314,5 +1314,37 @@
         "有 Python/Shell/PowerShell 脚本实践经验者优先；沟通表达与问题定位能力强"
       ]
     }
+  },
+  {
+    "index": "59",
+    "company": "联影 · 2026 校招 · 武汉",
+    "role": "软件开发工程师（前端）",
+    "direction": "医疗软件 Web 前端 / 图形学",
+    "tags": [
+      "Three.js/WebGL",
+      "Vue",
+      "JavaScript",
+      "医疗软件"
+    ],
+    "date": "2026.10",
+    "url": "/resume/resume_qz/resume_unitedimaging_frontend.html",
+    "match": "high",
+    "applyLink": "https://united-imaging.zhiye.com/campus/detail?jobAdId=b8717b4a-b514-48fd-9b10-1926d218b1d0",
+    "jobId": "J19719",
+    "jobTitle": "软件开发工程师（前端）",
+    "location": "湖北 · 武汉",
+    "jd": {
+      "duty": [
+        "负责平台前端架构设计与开发，制定编码规范，与后端工程师沟通协作",
+        "负责产品体验、性能改进与 Web 界面技术优化",
+        "通过各种前端技术手段提升用户体验、满足性能要求、解决各类前端问题"
+      ],
+      "req": [
+        "硕士及以上，计算机/生物医学工程/电子信息等相关专业",
+        "熟悉 HTML、CSS、JavaScript、Ajax 等 Web 开发技术",
+        "掌握至少一种主流 JavaScript 框架（Vue/React/Angular），熟悉 Vue 优先",
+        "有图形学开发经验（three.js/vtk）优先；了解前端工程化与构建工具（Webpack 等）"
+      ]
+    }
   }
 ]
