@@ -108,8 +108,11 @@
     noLoop();
     V.initBrushes();
     V.TL = await (await fetch('timeline.json')).json();
-    for (const s of V.TL.scenes) await loadScript(`src/scenes/${s.id}.js`);
+    window.__boot && window.__boot.tick();
+    // load all scene scripts in parallel (registration order doesn't matter; inits stay sequential)
+    await Promise.all(V.TL.scenes.map((s) => loadScript(`src/scenes/${s.id}.js`).then(() => { window.__boot && window.__boot.tick(); })));
     for (const s of V.TL.scenes) if (V.scenes[s.id] && V.scenes[s.id].init) await V.scenes[s.id].init(s);
+    window.__boot && window.__boot.tick();
     window.__ready = true;
   }
   function draw() {

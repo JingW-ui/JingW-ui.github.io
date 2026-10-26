@@ -8,6 +8,7 @@
  *   - ?notrans=1       : upstream flag, disables the slat-slide transitions
  *
  * Scaling: the stage is authored at a fixed 1920x1080; it is scaled to fit the viewport.
+ * The #boot loading overlay (see index.html) is dismissed after the first rendered frame.
  */
 (function () {
   const q = new URLSearchParams(location.search);
@@ -15,6 +16,7 @@
   const tStart = Math.max(0, parseFloat(q.get('t')) || 0);
   const DUR = 82; // keep in sync with timeline.json duration
   let t0 = null;
+  let booted = false;
 
   function fit() {
     const s = Math.min(innerWidth / 1920, innerHeight / 1080);
@@ -24,21 +26,17 @@
   addEventListener('resize', fit);
   fit();
 
-  async function pump(now) {
-    if (window.__ready) {
-      if (t0 == null) t0 = now - tStart * 1000;
-      const t = ((now - t0) / 1000) % DUR;
-      await window.renderAt(t);
-    }
-    requestAnimationFrame(pump);
-  }
-
   if (still) {
+    // QA stills must capture the bare canvas — drop the loading overlay entirely
+    const b = document.getElementById('boot');
+    if (b) b.remove();
     // still mode: poll instead of rAF so headless virtual-time budget isn't consumed
     // by animation frames; render exactly one frame, then the page goes fully idle.
     // document.title reports the outcome for headless QA: AH67_OK / AH67_ERR / AH67_FAIL.
     (function waitReady() {
       if (window.__ready) {
+        const b = document.getElementById('boot'); // DOM is parsed by now
+        if (b) b.remove();
         (async () => {
           try {
             await window.renderAt(tStart);
@@ -53,6 +51,19 @@
       setTimeout(waitReady, 60);
     })();
   } else {
+    async function pump(now) {
+      if (window.__ready) {
+        if (t0 == null) t0 = now - tStart * 1000;
+        const t = ((now - t0) / 1000) % DUR;
+        try {
+          await window.renderAt(t);
+          if (!booted) { booted = true; window.__boot && window.__boot.finish(); }
+        } catch (e) {
+          console.error('frame failed at t=' + t.toFixed(2), e);
+        }
+      }
+      requestAnimationFrame(pump);
+    }
     requestAnimationFrame(pump);
   }
 })();
