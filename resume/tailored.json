@@ -1409,5 +1409,36 @@
         "较强逻辑思维与分析能力、团队协作与领导力潜质；优秀的中英文表达能力"
       ]
     }
+  },
+  {
+    "index": "62",
+    "company": "西门子医疗 · FY27 校招",
+    "role": "R&D Trainee - Research Scientist",
+    "direction": "医疗 AI 智能体 / 工作流自动化",
+    "tags": [
+      "LLM/Agent",
+      "深度学习",
+      "计算机视觉",
+      "医疗 AI"
+    ],
+    "date": "2026.10",
+    "url": "/resume/resume_qz/resume_siemenshealthineers_rdscientist.html",
+    "match": "high",
+    "applyLink": "https://siemens.tupu360.com/position/detail/6acdf0bf5643cc5f6a59df79?type=CAMPUSRECRUITMENT",
+    "jobTitle": "R&D Trainee - Research Scientist",
+    "jd": {
+      "duty": [
+        "研究、设计并实现 AI 驱动的工作流自动化与自主系统的智能算法",
+        "面向真实临床挑战开发创新方案，从概念到部署交付可扩展 AI 系统",
+        "与医疗伙伴协作理解临床需求，通过迭代反馈确保方案现实可用",
+        "分析临床研究数据验证系统性能，指导持续改进"
+      ],
+      "req": [
+        "硕士及以上（计算机/电子工程/统计/机器人/应用数学等工程或科学专业）",
+        "深度学习功底扎实，有 PyTorch 等框架动手经验（TensorRT/openVINO 加分）",
+        "熟练 Python、C++、C#、Qt，Windows 与 Linux 平台开发",
+        "有计算机视觉、具身智能、基础模型（Foundation Models）研究经验；英语沟通出色"
+      ]
+    }
   }
 ]

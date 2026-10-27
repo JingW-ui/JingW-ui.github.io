@@ -4,7 +4,7 @@
 > 若本索引与 cv/resume 实际内容冲突，以 cv/resume 为准，并提示用户更新本文件。
 
 ## 个人信息（固定）
-- 姓名：王京 ｜ 男 ｜ 24岁 ｜ 硕士
+- 姓名：王京 ｜ 男 ｜ 26岁 ｜ 硕士
 - 电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj
 - GitHub：https://github.com/JingW-ui ｜ 主页：https://jingw-ui.github.io/
 - 头像：`/imgs/life_and_others/myavtar.png`

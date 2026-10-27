@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/imgs/logo/github_logo.png" type="image/png">
+    <title>王京_电子科技大学_R&D Trainee Research Scientist_西门子医疗</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', 'Microsoft YaHei', sans-serif;
+            font-size: 11px;
+            line-height: 1.2;
+            color: #333;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            padding: 18mm 16mm;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 9px;
+            padding: 0 0 8px;
+            border-bottom: 2px solid #333;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        .profile-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .avatar {
+            width: 100px;
+            height: 110px;
+            object-fit: cover;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        .profile-info {
+            text-align: left;
+        }
+        .name {
+            font-size: 26px;
+            font-weight: bold;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        .target {
+            font-size: 13px;
+            color: #4a90e2;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+        .contact-info {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.6;
+        }
+        .contact-info a {
+            color: #4a90e2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        .section {
+            margin-bottom: 5px;
+        }
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            border-left: 4px solid #333;
+            padding-left: 10px;
+        }
+        .summary {
+            font-size: 11px;
+            color: #444;
+            line-height: 1.55;
+        }
+        .summary strong {
+            color: #1a1a1a;
+        }
+        .hl-red {
+            color: #fd0000;
+            font-weight: 600;
+        }
+        .subsection {
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .subsection:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .subsection-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 3px;
+        }
+        .date {
+            font-size: 10.5px;
+            color: #999;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+        .tech-line {
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+        .tech-line em {
+            font-style: normal;
+            color: #2d74bb;
+            font-weight: 500;
+        }
+        ul {
+            padding-left: 18px;
+        }
+        li {
+            margin-bottom: 1px;
+            font-size: 11px;
+            color: #555;
+            line-height: 1.45;
+            break-inside: avoid;
+        }
+        .skill-line {
+            font-size: 11px;
+            color: #555;
+            line-height: 1.55;
+            margin-bottom: 6px;
+        }
+        .skill-line:last-child {
+            margin-bottom: 0;
+        }
+        .skill-cat {
+            color: #1a1a1a;
+            font-weight: 600;
+            margin-right: 2px;
+        }
+        .skill-hl {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+        .label-link {
+            display: inline-block;
+            background-color: #f5f5f5;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            border: 1px solid #d0d0d0;
+            color: #666;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .label-link:hover {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+        .github-label-link {
+            display: inline-block;
+            background-color: #1F883D;
+            padding: 1px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 4px;
+            font-weight: 500;
+        }
+        .github-label-link:hover {
+            background-color: #176d31;
+        }
+        @media print {
+            /* 所见即所得：打印沿用屏幕字号，不做压缩，仅去掉页面装饰。
+               @page 保留 5mm 10mm 页边距；页面留白由 .page 自身 padding 提供 */
+            @page { size: A4; margin: 5mm 10mm; }
+            body {
+                background: #fff;
+                padding: 0;
+                display: block;
+            }
+            .page {
+                box-shadow: none;
+                width: auto;
+                min-height: auto;
+                padding: 9mm;
+            }
+        }
+        /* 必须限定 screen：A4 打印视口宽约 794px < 820px，
+           若不加 screen，打印/导出 PDF 时会误触移动端布局，
+           头像与信息变成上下排列。移动端样式只作用于屏幕。 */
+        @media screen and (max-width: 820px) {
+            body {
+                padding: 10px;
+            }
+            .page {
+                width: 100%;
+                min-height: auto;
+                padding: 18px 16px;
+            }
+            .profile-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .profile-info {
+                text-align: center;
+            }
+            .name {
+                font-size: 22px;
+            }
+        }
+        /* print-color-fix */
+        html, body, .header, .label-link, .github-label-link, .target, .contact-info a, .hl-red {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+        @media print {
+            .header { box-shadow: none !important; border-bottom: 2px solid #333 !important; }
+            /* 打印时头像与信息强制左右布局：
+               部分浏览器打印视口较窄，flex-wrap 会把头像挤到信息上方堆叠 */
+            .profile-container {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 24px;
+            }
+            .profile-info { text-align: left !important; }
+            .contact-info { word-break: break-word; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <!-- Header -->
+    <div class="header">
+        <div class="profile-container">
+            <img src="/imgs/life_and_others/myavtar.png" alt="王京" class="avatar">
+            <div class="profile-info">
+                <div class="name">王京</div>
+                <div class="target">求职意向：R&D Trainee - Research Scientist（西门子医疗 FY27 校招）</div>
+                <div class="contact-info">
+                    男 · 24岁 · 硕士<br>
+                    电话：17702376984 ｜ 邮箱：2642144249@qq.com ｜ 微信：Barbarianwj<br>
+                    GitHub：<a href="https://github.com/JingW-ui" target="_blank" rel="noopener">JingW-ui</a>
+                    ｜ 主页：<a href="https://jingw-ui.github.io/" target="_blank" rel="noopener">jingw-ui.github.io</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人优势 -->
+    <div class="section">
+        <div class="section-title">个人优势</div>
+        <div class="summary">
+            电子科技大学生物医学工程硕士（2027 届毕业），研究方向为<strong>医学影像智能分析与可视化</strong>——在真实医疗场景中做 AI 算法研发，从概念到部署完成多个系统落地。<strong>智能体与工作流自动化</strong>：主导 NEURA——由大模型驱动的自主智能体系统，以双知识图谱动态桥接医学知识与异构工具链，自主编排端到端多模态分析工作流，bioRxiv 已发布。<strong>计算机视觉与深度学习</strong>：PyTorch/YOLO 医疗检测与分割双线落地——MediScreen-Brain 脑肿瘤检测平台 SCI 论文在审；MRI 海马体 3D 分割系统精度 <span class="hl-red">Dice=0.9554</span>，全国一等奖。<strong>工程栈与快速原型</strong>：Python/C++/Qt（Windows/Linux），模型评测体系从 0 到 1（网易实习），GitHub 开源 <span class="hl-red">200+ Star</span>，基于 150+ 用户社群反馈持续迭代。<strong>沟通与协作</strong>：英语六级，B 站技术教学视频播放 20w+，多个项目独立负责人。
+        </div>
+    </div>
+
+    <!-- 教育背景 -->
+    <div class="section">
+        <div class="section-title">教育背景</div>
+        <div class="subsection">
+            <div class="subsection-title">电子科技大学（985） · 电子信息大类-生物医学工程 · 硕士</div>
+            <div class="date">2024.09 - 至今（2027 届） ｜ GPA 3.83/4（专业前 5%）｜ 导师：陈华富教授 ｜ 神经信息教育部重点实验室</div>
+            <div class="tech-line"><em>研究方向：</em>医学影像智能分析与可视化</div>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">西南科技大学 · 电子信息大类-生物医学工程 · 本科</div>
+            <div class="date">2020.09 - 2024.06 ｜ GPA 4.15/5（专业前 2%）｜ <span class="hl-red">四川省优秀毕业生</span> · 推免生</div>
+            <div class="tech-line"><em>研究方向：</em>算法设计与深度学习应用</div>
+        </div>
+    </div>
+
+    <!-- 项目经验 -->
+    <div class="section">
+        <div class="section-title">项目经验</div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                智能体系统：NEURA 神经影像分析智能体
+                <a class="github-label-link" href="https://github.com/NeuroScienceLab/NEURA" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://www.biorxiv.org/content/10.64898/2026.04.27.721217v1.full.pdf" target="_blank" rel="noopener">论文</a>
+            </div>
+            <div class="date">2025.07 - 2026.02 ｜ Python · LLM · Agent · Chain-of-Thought · Toolset · RAG</div>
+            <ul>
+                <li>由大模型驱动的自主智能体系统：通过双知识图谱架构（DiseaseKG/ToolKG）动态桥接医学知识与异构软件工具，自主理解科研需求、编排并执行端到端多模态分析工作流，显著降低神经影像处理门槛并解决可复现性难题。</li>
+                <li><strong>项目职责：</strong>主导智能体系统设计与开发，构建核心认知架构与双知识图谱，整合 SPM、FreeSurfer 等异构工具链实现复杂工作流自主编排与端到端自动化；<strong>项目成果：</strong>bioRxiv 已发布（NEURA: An agentic system for autonomous neuroimaging workflows）。</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <div class="subsection-title">
+                医疗软件系统：MediScreen-Brain 多模态脑肿瘤检测平台
+                <a class="github-label-link" href="https://github.com/JingW-ui/MediScreen-Brain" target="_blank" rel="noopener">GitHub</a>
+                <a class="label-link" href="https://jingw-ui.github.io/MediScreen-Brain/" target="_blank" rel="noopener">Home</a>
+            </div>
+            <div class="tech-line"><em>技术栈：</em>YOLO · PyTorch · 医学影像 · QT 界面（PySide6）</div>
+            <ul>
+                <li>将 YOLO/PyTorch 深度学习检测能力接入多模态脑肿瘤检测与 3D 定位平台，形成「影像输入—检测—3D 定位—结果展示」完整闭环，面向医生筛查诊断场景快速原型迭代。</li>
+                <li><strong>项目职责：</strong>系统页面设计与实现、多端一致性优化、与算法侧协作完成前后端联调；<strong>项目成果：</strong>系统已开源，SCI 论文在审。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 实习经历 -->
+    <div class="section">
+        <div class="section-title">实习经历</div>
+        <div class="subsection">
+            <div class="subsection-title">网易互娱 — 游戏测试开发工程师（实习）</div>
+            <div class="date">2026.07 - 2026.09 ｜ Python · LLM · Agent · MCP · 自动化评测</div>
+            <ul>
+                <li>以 agent + skill 落地远程 PC 自动化（UU 取号、G66 部署）两个真实业务场景，实现批量并发执行与自动校验，大幅压缩环境准备耗时。</li>
+                <li><strong>项目职责：</strong>自主搭建 <strong>Agent 评测系统（从 0 到 1）</strong>——以成功率/耗时/成本三指标量化 agent 与 model 选型，设计 L1–L4 题库与并发评测并可视化结果；另开发远程设备操控 MCP 服务。</li>
+            </ul>
+        </div>
+        <div class="subsection">
+            <div class="subsection-title">心曜医疗 — 算法工程师实习生</div>
+            <div class="date">2026.03 - 2026.06 ｜ Python · LLM · RAG · 向量数据库 · 医疗知识库</div>
+            <ul>
+                <li>独立负责医疗领域 RAG 问答系统开发（大模型检索增强应用），设计并持续优化检索增强流程，提升问答准确率与响应速度；另开发服务器管理系统与多端同步看板，上线公网供团队使用。</li>
+                <li><strong>项目职责：</strong>RAG 系统架构设计、医疗知识库构建与优化、问答算法开发，参与心电信号分析与房颤检测算法研究——覆盖从算法研究到工程落地部署的完整链路。</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 获奖荣誉 -->
+    <div class="section">
+        <div class="section-title">获奖荣誉</div>
+        <ul>
+            <li>国家级：第九届全国大学生生物医学工程创新设计竞赛<span class="hl-red">一等奖</span>（2024）、第八届二等奖（2023）</li>
+            <li>省级：四川省生物医学工程创新设计大赛一等奖 ×4（2023-2025）、湖北"华为云杯"昇腾云血液图像处理大赛二等奖（2025）</li>
+            <li>竞赛与其他：数学建模亚太地区三等奖（2021）；国家励志奖学金 ×2、电子科技大学优秀研究生 ×2、学业奖学金一等奖 ×2</li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>
