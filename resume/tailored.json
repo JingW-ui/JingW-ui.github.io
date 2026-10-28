@@ -1471,5 +1471,36 @@
         "快速学习、分析与解决问题能力强；英语书面口语良好优先，接受区域内出差"
       ]
     }
+  },
+  {
+    "index": "64",
+    "company": "Philips · 社招",
+    "role": "MR Systems Engineer / Architect",
+    "direction": "MR 系统工程 / 医学影像系统（英文简历）",
+    "tags": [
+      "Systems Engineering",
+      "Medical Imaging",
+      "LLM/Agent",
+      "Python"
+    ],
+    "date": "2026.10",
+    "url": "/resume/resume_qz/resume_philips_mr_systems.html",
+    "match": "",
+    "applyLink": "https://www.careers.philips.com/global/en/job/591005/MR-Systems-Engineer-Architect",
+    "jobTitle": "MR Systems Engineer/Architect",
+    "jd": {
+      "duty": [
+        "Analyze, define, and manage system and subsystem requirements; drive requirement decomposition",
+        "Support system architecture design and overall system integration activities",
+        "Lead technical reviews, FMEA and risk management, defect root cause analysis",
+        "Collaborate with Global System Engineering, System Architects, and component teams"
+      ],
+      "req": [
+        "Bachelor's or Master's in EE / CS / BME or related engineering disciplines",
+        "5+ years in MR Systems Engineering or related medical imaging product development",
+        "Skills: system design & integration, requirements engineering, FMEA, root cause analysis",
+        "Preferred: MR architecture knowledge, DFSS / INCOSE CSEP certification, strong English"
+      ]
+    }
   }
 ]
