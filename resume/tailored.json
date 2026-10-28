@@ -1566,5 +1566,37 @@
         "熟练使用 AI、善于 AI 驱动开发；良好的中英文听说读写能力"
       ]
     }
+  },
+  {
+    "index": "67",
+    "company": "英特尔 Intel · 校招 · 上海",
+    "role": "AI 软件开发工程师",
+    "direction": "端侧 AI / Agent 与 RAG 应用",
+    "tags": [
+      "LLM/Agent",
+      "RAG",
+      "Python",
+      "AI 编程工具"
+    ],
+    "date": "2026.10",
+    "url": "/resume/resume_qz/resume_intel_ai_swdev.html",
+    "match": "high",
+    "applyLink": "https://chinacampus.jobs.intel.cn/intel/position/detail?positionId=6acc4f44a960023b07c0bbaf&recruitmentType=CAMPUSRECRUITMENT&currentLang=zh_CN",
+    "jobTitle": "AI 软件开发工程师",
+    "location": "上海",
+    "jd": {
+      "duty": [
+        "协同国内顶尖模型团队，推进 LLM、VLM、图像/视频生成、AI Agent 端侧落地",
+        "基于 Python/C/C++ 开发推理管线、媒体编解码与研发自动化工具",
+        "完整参与技术选型、原型开发、系统集成、性能调优到产品迭代全链路",
+        "面向 CPU/GPU/NPU 开展系统级软硬协同优化，探索 AI 赋能研发提效"
+      ],
+      "req": [
+        "本科/硕士/博士应届毕业生，不限专业，看重思考能力、学习速度与动手落地能力",
+        "熟练掌握 Python/C/C++，熟悉 Windows/Linux 开发",
+        "擅长借助 AI 编程工具高效开发，具备甄别、优化代码的判断力",
+        "加分：LLM/VLM/AI Agent、RAG 与工具调用、PyTorch/OpenVINO/ONNX Runtime、模型量化蒸馏与端侧部署"
+      ]
+    }
   }
 ]
