@@ -1502,5 +1502,37 @@
         "Preferred: MR architecture knowledge, DFSS / INCOSE CSEP certification, strong English"
       ]
     }
+  },
+  {
+    "index": "65",
+    "company": "联发科 · 2026 校招 · 成都",
+    "role": "软件开发工程师（无线通信系统软件方向）",
+    "direction": "系统软件 / C 语言与自动化",
+    "tags": [
+      "C/C++",
+      "Python",
+      "自动化",
+      "调试"
+    ],
+    "date": "2026.10",
+    "url": "/resume/resume_qz/resume_mediatek_swdev.html",
+    "match": "high",
+    "applyLink": "https://mediatek.zhiye.com/campus/detail?jobAdId=a7819a1c-80b2-47fc-b5d9-dca471bead3c",
+    "jobTitle": "软件开发工程师(无线通信系统软件方向)",
+    "location": "四川 · 成都",
+    "jd": {
+      "duty": [
+        "参与无线通信系统软件设计开发：通信协议/信令流程分析、协议栈适配及业务功能实现",
+        "参与子系统与主控/外设间通信架构与接口开发，完成方案设计、接口实现与系统联调验证",
+        "支持模块功能开发与版本迭代，问题定位与故障排查，持续优化性能与稳定性",
+        "编写与维护设计、测试与调试文档，配合项目验证、发布与后续维护"
+      ],
+      "req": [
+        "2027 届硕士毕业生，通信、计算机、电子信息、自动化或电子类相关专业",
+        "熟练掌握 C 语言，具有良好的编码习惯与调试基础",
+        "具备无线通信与网络基础知识，了解 3GPP 相关协议（有 IMS 相关了解者优先）",
+        "熟悉 Python 等脚本/自动化工具者优先，有 AI 工具提效经验者优先；英语六级"
+      ]
+    }
   }
 ]
