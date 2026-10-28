@@ -1534,5 +1534,37 @@
         "熟悉 Python 等脚本/自动化工具者优先，有 AI 工具提效经验者优先；英语六级"
       ]
     }
+  },
+  {
+    "index": "66",
+    "company": "芯原 VeriSilicon · 校招 · 成都/南京",
+    "role": "软件工程师",
+    "direction": "GPU/NPU 软件栈 / AI 框架适配",
+    "tags": [
+      "C/C++",
+      "Python",
+      "PyTorch",
+      "AI 驱动开发"
+    ],
+    "date": "2026.10",
+    "url": "/resume/resume_qz/resume_verisilicon_swengineer.html",
+    "match": "high",
+    "applyLink": "https://xyz.51job.com/External/Others/JobsSelect.aspx?JobID=cf79e617-1518-4595-b9e2-93deff57949e&CtmID=9bbee253-2703-420b-aee7-898e3302a3d2&JobSelectType=0&prd=campus.51job.com&prp=&cd=xyz.51job.com&cp=&ruid=&backurl=&auid=&uuid=&partner=",
+    "jobTitle": "软件工程师",
+    "location": "成都 / 南京",
+    "jd": {
+      "duty": [
+        "GPU/GPGPU/NPU/VPU/ISP 等 IP 的软件设计、开发和优化工作",
+        "负责各种 IP C 模型的建模工作",
+        "上层 AI 软件框架的适配及开发，提升 AI 模型在 GPU/GPGPU/NPU 处理器上的性能",
+        "Windows/Android/Linux/Chromium/嵌入式 SDK 的软件测试与自动化"
+      ],
+      "req": [
+        "计算机、通信工程、信息工程、电子工程、自动化等专业本科及以上学历",
+        "熟悉或精通一门编程语言（C/C++、Python 等），对操作系统和数据结构有良好理解",
+        "满足两条以上优先：PyTorch/ONNX、AI 编译器（MLIR/TVM/Triton）、CUDA/OpenGL 等图形 API",
+        "熟练使用 AI、善于 AI 驱动开发；良好的中英文听说读写能力"
+      ]
+    }
   }
 ]
