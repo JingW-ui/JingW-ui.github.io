@@ -1598,5 +1598,38 @@
         "加分：LLM/VLM/AI Agent、RAG 与工具调用、PyTorch/OpenVINO/ONNX Runtime、模型量化蒸馏与端侧部署"
       ]
     }
+  },
+  {
+    "index": "68",
+    "company": "TP-LINK · 2026 校园招聘 · 成都",
+    "role": "前端开发工程师（成都）",
+    "direction": "Web 前端 / 前端工程化 / 可视化",
+    "tags": [
+      "Vue",
+      "TypeScript",
+      "前端工程化",
+      "数据可视化"
+    ],
+    "date": "2026.10",
+    "url": "/resume/resume_qz/resume_tplink_frontend.html",
+    "match": "high",
+    "applyLink": "https://join.tplinkglobal.com/job_detail/2087836427546771459",
+    "jobId": "J30213",
+    "jobTitle": "前端开发工程师（成都）",
+    "location": "成都",
+    "jd": {
+      "duty": [
+        "负责云服务、VMS/NMS/RMS 等管理系统及嵌入式设备的 Web、H5 前端开发",
+        "与产品/交互协作完善需求场景与 UI 设计；与后端对齐业务需求、完善接口设计",
+        "持续优化自有前端框架、完善自研组件库，满足新业务与多产品复用",
+        "开发 lint 插件、cli 工具、npm 包、前端内部系统提升开发效率；基于 ECharts 开发各类统计图"
+      ],
+      "req": [
+        "本科及以上，电子、通信、计算机、网络工程、软件工程等相关专业",
+        "熟悉 HTTP 协议与 Web 标准规范，熟悉 HTML、CSS、JavaScript 编程基础",
+        "熟悉 Vue、jQuery、Vite、TypeScript 者优先；熟悉移动端 Web 开发者优先",
+        "逻辑思维严谨，学习与沟通能力强，有团队协作精神，热爱技术"
+      ]
+    }
   }
 ]
