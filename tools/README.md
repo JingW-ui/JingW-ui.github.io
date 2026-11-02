@@ -1,8 +1,8 @@
 # tools/ 在线工具箱
 
-> 79 browser-based utilities — image, text, time, calc and live data dashboards. Free, no ads, no build step, self-hostable.
+> 80 browser-based utilities — image, text, time, calc and live data dashboards. Free, no ads, no build step, self-hostable.
 
-79 个浏览器即开即用的在线工具：免安装、免注册、无广告，纯原生 HTML/CSS/JS 前端实现，无后端、无构建步骤——**源码全开放，下载即可自部署**。
+80 个浏览器即开即用的在线工具：免安装、免注册、无广告，纯原生 HTML/CSS/JS 前端实现，无后端、无构建步骤——**源码全开放，下载即可自部署**。
 
 **在线使用**：<https://jingw-ui.github.io/tools/>（完整列表、搜索与分类筛选见该页）
 
@@ -15,7 +15,7 @@
 | 时间与日期 | 5 | 时间戳转换、农历日历、世界时钟墙 |
 | 计算与换算 | 6 | 科学计算器、单位/进制换算、贷款计算器、毫秒薪计时器 |
 | 信息聚合 | 20 | 每天60秒、60s 信息流、GitHub 热门榜、网站服务器查询、世界实时监控 |
-| 实用杂项 | 16 | 密码生成器、文件哈希校验、PDF 工具、待办清单、深呼吸放松、韩语40音 |
+| 实用杂项 | 17 | 密码生成器、文件哈希校验、PDF 工具、待办清单、深呼吸放松、韩语40音、日语五十音 |
 
 ## 取用与自部署
 

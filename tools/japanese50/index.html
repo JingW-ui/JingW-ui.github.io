@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="日语五十音互动课件：PPT 式翻页学习 46 清音、25 浊音与 33 拗音，平假名片假名对照、逐字发音、记忆口诀与真实例词，配闪卡记忆与测验，进度本地保存。">
+    <title>日语五十音 · 拼读课件</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    </noscript>
+    <style>
+        /* ===== 玻璃态设计令牌（glassmorphism-design-system） ===== */
+        :root {
+            --bg-gradient-1: #e7f1f0;
+            --bg-gradient-2: #dfe9ec;
+            --bg-gradient-3: #e6edf2;
+            --card-bg: rgba(255, 255, 255, 0.50);
+            --card-bg-strong: rgba(255, 255, 255, 0.68);
+            --card-border: rgba(255, 255, 255, 0.55);
+            --text-primary: #2c3e50;
+            --text-secondary: #5a6c7d;
+            --text-muted: #8e9aaf;
+            --accent-teal: #2dd4bf;
+            --accent-blue: #3b82f6;
+            --accent-pink: #f472b6;
+            --shadow-sm: 0 2px 8px rgba(20,40,50,0.05);
+            --shadow-md: 0 6px 24px rgba(20,40,50,0.08);
+            --shadow-lg: 0 12px 40px rgba(20,40,50,0.12);
+            --radius-sm: 14px;
+            --radius-md: 20px;
+            --radius-lg: 28px;
+            --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .bg-decoration { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.45; pointer-events: none; z-index: 0; }
+        .bg-decoration-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(94,234,212,0.30) 0%, transparent 70%); top: -180px; left: -120px; animation: float 22s ease-in-out infinite; }
+        .bg-decoration-2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(125,211,252,0.28) 0%, transparent 70%); bottom: -140px; right: -120px; animation: float 26s ease-in-out infinite reverse; }
+        .bg-decoration-3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%); top: 48%; left: 52%; transform: translate(-50%, -50%); animation: pulse 16s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 33% { transform: translate(30px, -30px) rotate(120deg); } 66% { transform: translate(-20px, 20px) rotate(240deg); } }
+        @keyframes pulse { 0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; } 50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.45; } }
+        @keyframes play-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(45,212,191,0.0); } 50% { box-shadow: 0 0 0 14px rgba(45,212,191,0.18); } }
+
+        /* ===== 顶栏 ===== */
+        .topbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+            display: flex; align-items: center; gap: 14px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(18px) saturate(140%);
+            -webkit-backdrop-filter: blur(18px) saturate(140%);
+            border-bottom: 1px solid var(--card-border);
+        }
+        .topbar .back-link {
+            color: var(--text-secondary); text-decoration: none; font-size: 13px;
+            padding: 6px 12px; border-radius: 10px;
+            border: 1px solid rgba(44,62,80,0.12); background: transparent;
+            transition: var(--transition); white-space: nowrap;
+        }
+        .topbar .back-link:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); color: var(--text-primary); }
+        .topbar .page-title { font-size: 15px; font-weight: 700; letter-spacing: 0.5px; white-space: nowrap; }
+        .topbar .page-title .kr-mark { color: var(--accent-teal); margin-right: 4px; font-family: 'Noto Sans JP', sans-serif; }
+        .mode-tabs { margin-left: auto; display: flex; gap: 6px; }
+        .mode-tabs button {
+            font-family: inherit; font-size: 13px; font-weight: 500; white-space: nowrap;
+            padding: 6px 16px; border-radius: 10px; cursor: pointer;
+            background: transparent; border: 1px solid rgba(44,62,80,0.12); color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .mode-tabs button:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); color: var(--text-primary); }
+        .mode-tabs button.active { background: rgba(45,212,191,0.12); border-color: rgba(45,212,191,0.45); color: var(--text-primary); font-weight: 700; }
+
+        /* ===== 课件视图 ===== */
+        .deck-view { position: relative; z-index: 1; padding: 76px 16px 96px; max-width: 980px; margin: 0 auto; }
+        .slide-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(24px) saturate(140%);
+            -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            padding: clamp(22px, 4vw, 44px);
+            min-height: min(62vh, 560px);
+            display: flex; flex-direction: column;
+            animation: slide-in 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slide-in { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: translateX(0); } }
+        .slide-card.back-dir { animation-name: slide-in-back; }
+        @keyframes slide-in-back { from { opacity: 0; transform: translateX(-26px); } to { opacity: 1; transform: translateX(0); } }
+
+        .slide-head { display: flex; align-items: flex-start; gap: 10px; }
+        .slide-tag {
+            display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+            font-size: 11.5px; font-weight: 600; color: var(--accent-teal);
+            background: rgba(45,212,191,0.12); padding: 3px 12px; border-radius: 12px;
+            margin-bottom: 10px;
+        }
+        .slide-tag .idx { color: var(--text-muted); font-weight: 500; }
+        .script-toggle { margin-left: auto; display: flex; gap: 6px; }
+        .script-toggle button {
+            font-family: 'Noto Sans JP', sans-serif; font-size: 13px; cursor: pointer;
+            padding: 4px 13px; border-radius: 10px;
+            border: 1px solid rgba(44,62,80,0.12); background: transparent; color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .script-toggle button:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); }
+        .script-toggle button.active { background: rgba(45,212,191,0.12); border-color: rgba(45,212,191,0.45); color: var(--text-primary); font-weight: 700; }
+
+        /* 封面 */
+        .cover { align-items: center; justify-content: center; text-align: center; gap: 14px; }
+        .cover .cover-kr {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: clamp(56px, 12vw, 108px); font-weight: 700; line-height: 1.15;
+            background: linear-gradient(135deg, #3b82f6, #2dd4bf);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .cover .cover-sub { font-size: clamp(15px, 2.4vw, 18px); color: var(--text-secondary); max-width: 600px; line-height: 1.8; }
+        .cover-stats { display: flex; gap: 10px; margin: 12px 0 6px; flex-wrap: wrap; justify-content: center; }
+        .cover-stat { text-align: center; padding: 8px 16px; border-radius: 10px; background: rgba(255,255,255,0.5); min-width: 84px; transition: var(--transition); }
+        .cover-stat:hover { transform: scale(1.04); background: rgba(255,255,255,0.72); }
+        .cover-stat .v { font-family: 'Courier New', monospace; font-size: 19px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .cover-stat .l { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+        .cover-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; justify-content: center; }
+        .primary-btn {
+            font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+            padding: 10px 26px; border-radius: 12px; border: none;
+            background: linear-gradient(135deg, #3b82f6, #2dd4bf); color: #fff;
+            box-shadow: var(--shadow-sm); transition: var(--transition);
+        }
+        .primary-btn:hover { box-shadow: var(--shadow-md); filter: brightness(1.06); }
+
+        /* 使用说明 / 特殊假名 */
+        .info-list { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
+        .info-item { display: flex; gap: 14px; align-items: flex-start; padding: 14px 16px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.45); border: 1px solid var(--card-border); }
+        .info-item .num {
+            flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+            background: linear-gradient(135deg, rgba(59,130,246,0.14), rgba(45,212,191,0.14));
+            color: var(--accent-teal); font-weight: 800; font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .info-item .num.jp { font-family: 'Noto Sans JP', sans-serif; background: linear-gradient(135deg, rgba(45,212,191,0.2), rgba(59,130,246,0.14)); }
+        .info-item h4 { font-size: 14.5px; margin-bottom: 3px; }
+        .info-item h4 .jp-inline { font-family: 'Noto Sans JP', sans-serif; color: var(--accent-teal); }
+        .info-item p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+        .info-item p .w-audio { color: var(--accent-blue); cursor: pointer; text-decoration: underline dotted; }
+
+        /* 组概览页 */
+        .group-intro h2 { font-size: clamp(22px, 4vw, 30px); font-weight: 700; margin: 4px 0 10px; }
+        .group-intro h2 .kr-inline { font-family: 'Noto Sans JP', sans-serif; color: var(--accent-teal); }
+        .group-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.9; background: rgba(255,255,255,0.42); padding: 14px 18px; border-radius: var(--radius-sm); border: 1px solid var(--card-border); }
+        .group-desc strong { color: var(--text-primary); }
+        .group-strip { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+        .strip-card {
+            flex: 1; min-width: 86px; text-align: center; cursor: pointer;
+            padding: 14px 8px 12px; border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.45); border: 1px solid var(--card-border);
+            transition: var(--transition);
+        }
+        .strip-card:hover { background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
+        .strip-card .sc-ch { font-family: 'Noto Sans JP', sans-serif; font-size: 32px; font-weight: 700; line-height: 1.3; }
+        .strip-card .sc-rr { font-size: 12px; color: var(--accent-teal); font-weight: 600; margin-top: 2px; }
+        .strip-card .sc-k { display: block; font-family: 'Noto Sans JP', sans-serif; font-size: 14px; color: var(--text-muted); font-weight: 500; }
+
+        /* 字母页 */
+        .letter-slide { justify-content: center; }
+        .letter-main { display: flex; gap: clamp(18px, 4vw, 42px); align-items: center; margin: 8px 0 4px; flex-wrap: wrap; }
+        .letter-glyph {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: clamp(110px, 24vw, 180px); font-weight: 700; line-height: 1;
+            color: var(--text-primary); cursor: pointer; user-select: none;
+            padding: 6px 24px 16px; border-radius: var(--radius-md); transition: var(--transition);
+            position: relative;
+        }
+        .letter-glyph:hover { background: rgba(255,255,255,0.55); color: var(--accent-teal); }
+        .letter-glyph.playing { animation: play-glow 0.9s ease-in-out; color: var(--accent-teal); }
+        .letter-glyph .glyph-hint {
+            position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%);
+            font-size: 10.5px; color: var(--text-muted); font-weight: 500; letter-spacing: 1px;
+            opacity: 0; transition: var(--transition); white-space: nowrap;
+        }
+        .letter-glyph:hover .glyph-hint { opacity: 1; }
+        .letter-side { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 10px; }
+        .letter-rr { font-size: clamp(24px, 4.6vw, 34px); font-weight: 800; letter-spacing: 1px; }
+        .letter-rr .rr-main { background: linear-gradient(135deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .letter-rr .rr-zh { font-size: 14px; font-weight: 500; color: var(--text-muted); margin-left: 10px; -webkit-text-fill-color: var(--text-muted); }
+        .memo-card, .tip-card {
+            padding: 12px 16px; border-radius: var(--radius-sm); font-size: 13.5px; line-height: 1.75;
+            border: 1px solid var(--card-border); background: rgba(255,255,255,0.42);
+        }
+        .memo-card b, .tip-card b { color: var(--accent-teal); margin-right: 6px; font-size: 12px; letter-spacing: 2px; }
+        .memo-card .jp-inline, .tip-card .jp-inline { font-family: 'Noto Sans JP', sans-serif; }
+        .memo-card { color: var(--text-primary); }
+        .tip-card { color: var(--text-secondary); }
+        .word-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+        .word-card {
+            flex: 1; min-width: 150px; display: flex; align-items: center; gap: 12px;
+            padding: 10px 14px; border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.45); border: 1px solid var(--card-border);
+            transition: var(--transition); cursor: pointer;
+        }
+        .word-card:hover { background: rgba(255,255,255,0.75); }
+        .word-card .w-k { font-family: 'Noto Sans JP', sans-serif; font-size: 21px; font-weight: 700; white-space: nowrap; }
+        .word-card .w-meta { flex: 1; }
+        .word-card .w-r { font-size: 12px; color: var(--accent-teal); font-weight: 600; white-space: nowrap; }
+        .word-card .w-zh { font-size: 12.5px; color: var(--text-secondary); }
+        .word-card .w-play {
+            width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+            border: 1px solid rgba(44,62,80,0.12); background: transparent; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: var(--transition);
+        }
+        .word-card .w-play:hover { background: rgba(45,212,191,0.12); border-color: rgba(45,212,191,0.45); }
+        .word-card .w-play svg { width: 12px; height: 12px; fill: var(--text-secondary); margin-left: 2px; }
+        .word-empty-note { font-size: 12.5px; color: var(--text-muted); margin-top: 16px; }
+
+        /* 拗音行页 */
+        .yoon-grid { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+        .yoon-cell {
+            flex: 1; min-width: 200px; text-align: center; cursor: pointer;
+            padding: 18px 10px 16px; border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.45); border: 1px solid var(--card-border);
+            transition: var(--transition);
+        }
+        .yoon-cell:hover { background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
+        .yoon-cell .y-ch { font-family: 'Noto Sans JP', sans-serif; font-size: clamp(46px, 9vw, 64px); font-weight: 700; line-height: 1.25; }
+        .yoon-cell .y-ch .small { font-size: 0.55em; }
+        .yoon-cell .y-rr { font-size: 15px; font-weight: 700; color: var(--accent-teal); margin: 2px 0 6px; }
+        .yoon-cell .y-word { font-family: 'Noto Sans JP', sans-serif; font-size: 14px; color: var(--text-secondary); }
+        .yoon-cell .y-word .w-audio { color: var(--accent-blue); }
+        .yoon-cell .y-zh { font-size: 11.5px; color: var(--text-muted); }
+
+        /* 易混对比 */
+        .duo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-top: 14px; }
+        .duo-cell { padding: 16px 14px; border-radius: var(--radius-sm); background: rgba(255,255,255,0.45); border: 1px solid var(--card-border); text-align: center; cursor: pointer; transition: var(--transition); }
+        .duo-cell:hover { background: rgba(255,255,255,0.75); box-shadow: var(--shadow-sm); }
+        .duo-cell .d-pair { font-family: 'Noto Sans JP', sans-serif; font-size: 40px; font-weight: 700; letter-spacing: 8px; }
+        .duo-cell .d-pair .sep { color: var(--text-muted); font-weight: 300; }
+        .duo-cell .d-rule { font-size: 12.5px; color: var(--text-secondary); line-height: 1.7; margin-top: 8px; }
+        .duo-cell .d-rule b { color: var(--accent-teal); }
+
+        /* 底部导航 */
+        .deck-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 20;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 18px;
+            background: rgba(255,255,255,0.55);
+            backdrop-filter: blur(18px) saturate(140%);
+            -webkit-backdrop-filter: blur(18px) saturate(140%);
+            border-top: 1px solid var(--card-border);
+        }
+        .nav-arrow {
+            width: 38px; height: 38px; border-radius: 12px; cursor: pointer;
+            border: 1px solid rgba(44,62,80,0.12); background: transparent;
+            display: flex; align-items: center; justify-content: center; transition: var(--transition);
+        }
+        .nav-arrow:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); }
+        .nav-arrow:disabled { opacity: 0.35; cursor: default; }
+        .nav-arrow:disabled:hover { background: transparent; border-color: rgba(44,62,80,0.12); }
+        .nav-arrow svg { width: 15px; height: 15px; fill: none; stroke: var(--text-secondary); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+        .nav-progress { flex: 1; height: 5px; border-radius: 3px; background: rgba(20,40,50,0.10); overflow: hidden; cursor: pointer; }
+        .nav-progress .fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #2dd4bf); border-radius: 3px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-counter { font-family: 'Courier New', monospace; font-size: 13px; font-weight: 700; color: var(--text-secondary); white-space: nowrap; }
+        .nav-counter .cur { color: var(--text-primary); }
+        .nav-ov-btn {
+            font-family: inherit; font-size: 12.5px; cursor: pointer; white-space: nowrap;
+            padding: 8px 14px; border-radius: 10px;
+            border: 1px solid rgba(44,62,80,0.12); background: transparent; color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .nav-ov-btn:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); color: var(--text-primary); }
+
+        /* ===== 总览弹层 ===== */
+        .overview-modal {
+            position: fixed; inset: 0; z-index: 40; display: none;
+            background: rgba(230,237,242,0.72);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            overflow-y: auto; padding: 70px 20px 40px;
+        }
+        .overview-modal.open { display: block; }
+        .ov-panel {
+            max-width: 880px; margin: 0 auto;
+            background: var(--card-bg-strong); border: 1px solid var(--card-border);
+            border-radius: var(--radius-md); box-shadow: var(--shadow-lg);
+            padding: 26px clamp(18px, 4vw, 36px) 30px;
+        }
+        .ov-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .ov-head h3 { font-size: 18px; }
+        .ov-close {
+            width: 34px; height: 34px; border-radius: 10px; cursor: pointer;
+            border: 1px solid rgba(44,62,80,0.12); background: transparent;
+            font-size: 15px; color: var(--text-secondary); transition: var(--transition);
+        }
+        .ov-close:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); }
+        .ov-group { margin-bottom: 16px; }
+        .ov-group h4 { font-size: 13.5px; color: var(--text-secondary); margin-bottom: 8px; }
+        .ov-group h4 .g-en { color: var(--text-muted); font-weight: 500; font-size: 12px; margin-left: 6px; }
+        .ov-grid { display: flex; gap: 7px; flex-wrap: wrap; }
+        .ov-cell {
+            text-align: center; cursor: pointer; padding: 8px 6px 6px; min-width: 58px;
+            border-radius: 12px; background: rgba(255,255,255,0.5); border: 1px solid var(--card-border);
+            transition: var(--transition); position: relative;
+        }
+        .ov-cell:hover { background: rgba(255,255,255,0.85); box-shadow: var(--shadow-sm); }
+        .ov-cell .c-ch { font-family: 'Noto Sans JP', sans-serif; font-size: 21px; font-weight: 700; line-height: 1.3; }
+        .ov-cell .c-rr { font-size: 10px; color: var(--accent-teal); font-weight: 600; }
+        .ov-cell .c-dot { position: absolute; top: 5px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-teal); }
+        .ov-cell.unknown .c-dot { background: var(--accent-pink); }
+        .ov-block-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin: 18px 0 10px; padding-left: 10px; border-left: 3px solid var(--accent-teal); }
+
+        /* ===== 闪卡视图 ===== */
+        .flash-view, .quiz-view {
+            position: relative; z-index: 1; padding: 86px 16px 40px;
+            max-width: 760px; margin: 0 auto; display: none;
+        }
+        .flash-view.visible, .quiz-view.visible { display: block; }
+        .view-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+        .view-head h2 { font-size: 20px; }
+        .view-head .hint { font-size: 12.5px; color: var(--text-muted); }
+        .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .chip {
+            font-family: inherit; font-size: 12.5px; cursor: pointer;
+            padding: 6px 14px; border-radius: 16px;
+            border: 1px solid rgba(44,62,80,0.12); background: transparent; color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .chip:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); }
+        .chip.active { background: rgba(45,212,191,0.12); border-color: rgba(45,212,191,0.45); color: var(--text-primary); font-weight: 700; }
+
+        .flip-stage { perspective: 1200px; }
+        .flip-card { position: relative; height: 340px; cursor: pointer; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .flip-card.flipped { transform: rotateY(180deg); }
+        .flip-face {
+            position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            border-radius: var(--radius-md); border: 1px solid var(--card-border);
+            background: var(--card-bg); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%);
+            box-shadow: var(--shadow-md);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px;
+        }
+        .flip-face.back { transform: rotateY(180deg); }
+        .flip-face .f-ch { font-family: 'Noto Sans JP', sans-serif; font-size: clamp(90px, 20vw, 150px); font-weight: 700; line-height: 1.1; }
+        .flip-face .f-tip { font-size: 12px; color: var(--text-muted); letter-spacing: 2px; }
+        .flip-face .f-rr { font-size: 30px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .flip-face .f-zh { font-size: 13.5px; color: var(--text-secondary); margin-top: -8px; }
+        .flip-face .f-mn { font-size: 13px; color: var(--text-secondary); text-align: center; line-height: 1.8; max-width: 480px; }
+        .flip-face .f-audio {
+            font-family: inherit; font-size: 13px; cursor: pointer;
+            padding: 7px 18px; border-radius: 10px;
+            border: 1px solid rgba(44,62,80,0.12); background: transparent; color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .flip-face .f-audio:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); color: var(--text-primary); }
+        .flash-actions { display: flex; gap: 12px; margin-top: 16px; justify-content: center; }
+        .flash-btn {
+            flex: 1; max-width: 200px; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer;
+            padding: 11px 0; border-radius: 12px; border: 1px solid rgba(44,62,80,0.12);
+            background: rgba(255,255,255,0.45); color: var(--text-secondary); transition: var(--transition);
+        }
+        .flash-btn:hover { box-shadow: var(--shadow-sm); }
+        .flash-btn.know { border-color: rgba(45,212,191,0.45); color: var(--text-primary); }
+        .flash-btn.know:hover { background: rgba(45,212,191,0.14); }
+        .flash-stats { text-align: center; font-size: 12.5px; color: var(--text-muted); margin-top: 14px; }
+        .flash-stats a { color: var(--accent-blue); cursor: pointer; text-decoration: none; }
+
+        /* ===== 测验视图 ===== */
+        .quiz-card {
+            background: var(--card-bg); backdrop-filter: blur(24px) saturate(140%); -webkit-backdrop-filter: blur(24px) saturate(140%);
+            border: 1px solid var(--card-border); border-radius: var(--radius-md); box-shadow: var(--shadow-md);
+            padding: clamp(20px, 4vw, 34px); text-align: center;
+        }
+        .quiz-meta { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px; }
+        .quiz-q-ch { font-family: 'Noto Sans JP', sans-serif; font-size: clamp(76px, 17vw, 120px); font-weight: 700; line-height: 1.15; margin: 6px 0; }
+        .quiz-q-text { font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
+        .quiz-replay {
+            font-family: inherit; font-size: 13px; cursor: pointer; margin: 4px 0 10px;
+            padding: 7px 18px; border-radius: 10px;
+            border: 1px solid rgba(44,62,80,0.12); background: transparent; color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .quiz-replay:hover { background: rgba(45,212,191,0.10); border-color: rgba(45,212,191,0.45); color: var(--text-primary); }
+        .quiz-opts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+        .quiz-opt {
+            font-family: 'Noto Sans JP', 'Noto Sans SC', sans-serif; font-size: 24px; font-weight: 700; cursor: pointer;
+            padding: 14px 8px; border-radius: var(--radius-sm);
+            border: 1px solid var(--card-border); background: rgba(255,255,255,0.5); color: var(--text-primary);
+            transition: var(--transition);
+        }
+        .quiz-opt .q-rr { display: block; font-family: 'Noto Sans SC', sans-serif; font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+        .quiz-opt:hover:not(:disabled) { background: rgba(255,255,255,0.8); }
+        .quiz-opt.right { border-color: rgba(45,212,191,0.65); background: rgba(45,212,191,0.16); }
+        .quiz-opt.wrong { border-color: rgba(239,68,68,0.5); background: rgba(239,68,68,0.10); }
+        .quiz-feedback { min-height: 24px; font-size: 13px; color: var(--text-secondary); margin-top: 12px; }
+        .quiz-score .big { font-size: 46px; font-weight: 800; font-family: 'Courier New', monospace; background: linear-gradient(135deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .quiz-wrong-list { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 14px 0 4px; }
+        .quiz-wrong-item {
+            font-family: 'Noto Sans JP', 'Noto Sans SC', sans-serif; font-size: 15px; cursor: pointer;
+            padding: 8px 14px; border-radius: 12px;
+            border: 1px solid rgba(239,68,68,0.35); background: rgba(255,255,255,0.5); color: var(--text-primary);
+        }
+        .quiz-wrong-item:hover { background: rgba(255,255,255,0.8); }
+        .quiz-wrong-item span { color: var(--text-muted); font-family: 'Noto Sans SC', sans-serif; font-size: 12px; }
+
+        @media (max-width: 640px) {
+            .topbar { gap: 8px; padding: 8px 12px; }
+            .topbar .page-title { font-size: 13.5px; white-space: nowrap; }
+            .topbar .page-title .title-suffix { display: none; }
+            .mode-tabs button { padding: 6px 12px; font-size: 12.5px; }
+            .quiz-opts { gap: 8px; }
+            .letter-main { justify-content: center; text-align: center; }
+            .letter-side { align-items: center; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration bg-decoration-1"></div>
+    <div class="bg-decoration bg-decoration-2"></div>
+    <div class="bg-decoration bg-decoration-3"></div>
+
+    <header class="topbar">
+        <a class="back-link" href="/tools/">&larr; 工具箱</a>
+        <div class="page-title"><span class="kr-mark">あ</span>日语五十音<span class="title-suffix"> · 拼读课件</span></div>
+        <nav class="mode-tabs">
+            <button data-mode="deck" class="active">课件</button>
+            <button data-mode="flash">闪卡</button>
+            <button data-mode="quiz">测验</button>
+        </nav>
+    </header>
+
+    <!-- 课件 -->
+    <section class="deck-view" id="deck-view">
+        <div id="slide-holder"></div>
+    </section>
+
+    <!-- 底部导航（仅课件模式） -->
+    <div class="deck-nav" id="deck-nav">
+        <button class="nav-arrow" id="btn-prev" title="上一页（←）" aria-label="上一页">
+            <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="nav-progress" id="nav-progress"><div class="fill" id="nav-fill"></div></div>
+        <div class="nav-counter"><span class="cur" id="cur-page">1</span> / <span id="total-page">105</span></div>
+        <button class="nav-arrow" id="btn-next" title="下一页（→）" aria-label="下一页">
+            <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="nav-ov-btn" id="btn-overview">总览</button>
+    </div>
+
+    <!-- 闪卡 -->
+    <section class="flash-view" id="flash-view">
+        <div class="view-head">
+            <h2>闪卡记忆</h2>
+            <span class="hint">点击卡片翻面，用「认识 / 还不熟」标记掌握度</span>
+        </div>
+        <div class="filter-chips" id="flash-script-chips"></div>
+        <div class="filter-chips" id="flash-chips"></div>
+        <div class="flip-stage"><div class="flip-card" id="flip-card">
+            <div class="flip-face front">
+                <div class="f-ch" id="fc-front"></div>
+                <div class="f-tip">点击翻面</div>
+            </div>
+            <div class="flip-face back">
+                <div class="f-rr" id="fc-rr"></div>
+                <div class="f-zh" id="fc-zh"></div>
+                <div class="f-mn" id="fc-mn"></div>
+                <button class="f-audio" id="fc-audio">播放发音</button>
+            </div>
+        </div></div>
+        <div class="flash-actions">
+            <button class="flash-btn" id="fc-fuzzy">还不熟</button>
+            <button class="flash-btn know" id="fc-know">认识了</button>
+        </div>
+        <div class="flash-stats" id="flash-stats"></div>
+    </section>
+
+    <!-- 测验 -->
+    <section class="quiz-view" id="quiz-view">
+        <div class="view-head">
+            <h2>假名 &amp; 听音测验</h2>
+            <span class="hint">10 题一轮，答错自动整理成错题卡</span>
+        </div>
+        <div class="filter-chips" id="quiz-chips"></div>
+        <div class="quiz-card" id="quiz-card"></div>
+    </section>
+
+    <!-- 总览弹层 -->
+    <div class="overview-modal" id="overview-modal">
+        <div class="ov-panel">
+            <div class="ov-head">
+                <h3>五十音总览</h3>
+                <button class="ov-close" id="ov-close" aria-label="关闭">&times;</button>
+            </div>
+            <div id="ov-body"></div>
+        </div>
+    </div>
+
+    <script>
+    /* ================= 数据：假名 ================= */
+    function def(id, hira, kata, rr, zh, group, hmn, kmn, tip, words) {
+        var w = Array.isArray(words) ? words.slice() : [];
+        for (var i = 9; i < arguments.length; i++) {
+            var a = arguments[i];
+            if (Array.isArray(a)) w = a.slice();
+            else if (typeof a === 'string' && a) w.push(a);
+        }
+        K[id] = { id: id, hira: hira, kata: kata, rr: rr, zh: zh, group: group, hmn: hmn, kmn: kmn, tip: tip, words: w };
+    }
+    var K = {};
+
+    /* ---- 清音 46 ---- */
+    def('a','あ','ア','a','a','a','像「安」的草书','像「阿」的耳刀旁','五个元音之首，口型开得最大；后四行全靠它拼',['asa','ame']);
+    def('i','い','イ','i','i','a','两短一长三笔，像「以」的简写','单人旁「イ」','嘴角左右拉开，像汉语「衣」',['inu','isu']);
+    def('u','う','ウ','u','u','a','源字「宇」，像侧放的「3」加一竖','宝盖头「宀」','双唇微圆前突，嘴唇别太用力',['umi','uta']);
+    def('e','え','エ','e','e（读「欸」）','a','像「元」少一撇','像「工」','嘴半开、舌尖抵下齿，不是拼音 e 的「鹅」',['eki','e']);
+    def('o','お','オ','o','o','a','像「才」，收笔多一点','像「才」','双唇拢圆，喉咙放松',['ocha','okashi']);
+    def('ka','か','カ','ka','ka','k','像「力」加一点（刀刻一下）','像「力」','k + a；送气清音',['kasa','kaze']);
+    def('ki','き','キ','ki','ki','k','像一把钥匙（key）','钥匙齿加一横','き/キ 都联想 key',['ki','kinoko']);
+    def('ku','ku','ク','ku','ku','k','像张开嘴的侧面「＜」','像「＜」','口自然张开送气',['kutsu','kumo']);
+    def('ke','け','ケ','ke','ke','k','像「计」字的右半','像「介」','','kemuri','ken');
+    def('ko','こ','コ','ko','ko','k','两个小弯钩上下排','像「口」缺一边','','kodomo','koe');
+    def('sa','さ','サ','sa','sa','s','像「杀」字的上半','像草字头「サ」','','sakana','sakura');
+    def('shi','し','シ','shi','shi（读「西」）','s','像一根竖弯的吸管','三点水「氵」','整行读「西」不是 s+i；与 ツ 区分见对比页',['shio','shinbun']);
+    def('su','す','ス','su','su','s','像数字「5」加一横','像「个」','日语 u 双唇不圆，别噘嘴读「苏」',['sushi','suika']);
+    def('se','せ','セ','se','se','s','像「世」的连笔','像「世」','','sensei','sekai');
+    def('so','そ','ソ','so','so','s','像 z 加一撇，缝纫走线','右上到左下两点','与 ン 区分见对比页',['sora','soto']);
+    def('ta','た','タ','ta','ta','t','像「太」的草书','像「夕」','','tamago','tako');
+    def('chi','ち','チ','chi','chi（读「七」）','t','一横一折一钩，像夹起面条','像「千」','读「七」不是 t+i',['chizu','chikatetsu']);
+    def('tsu','つ','ツ','tsu','tsu（读「呲」）','t','像一道海浪的弯钩','三点头朝上排','读「呲」，气流顶在牙齿后（类似汉语 c）',['tsuki','tsukue']);
+    def('te','て','テ','te','te','t','像一只摊开的手掌（手）','三笔像小天线','','te','tegami');
+    def('to','と','ト','to','to','t','像一枚钉在墙上的钉子','像「卜」','','tori','tokei');
+    def('na','な','ナ','na','na','n','源字「奈」，左边打了个结','像「十」斜着写','','natsu','namae');
+    def('ni','に','ニ','ni','ni','n','像「二」加一点','像「二」','','niku','niwa');
+    def('nu','ぬ','ヌ','nu','nu','n','像「奴」的草书，圈里缠着线','像「奴」的右半','与 め 区分：ぬ 中间闭合','nuigurumi');
+    def('ne','ね','ネ','ne','ne','n','像猫尾巴卷成圈（ねこ＝猫）','示字旁「ネ」','','neko');
+    def('no','の','ノ','no','no','n','一个圈加甩尾，日语里最常见的假名','一撇','','nori');
+    def('ha','は','ハ','ha','ha','h','源字「波」，像波浪线加一竖','像「八」','作助词时读 wa（进阶知识先记字形）',['hana','hashi']);
+    def('hi','ひ','ヒ','hi','hi','h','像一张笑脸（两个酒窝）','像「匕首」','','hi','hikouki');
+    def('fu','ふ','フ','fu','fu','h','像富士山的轮廓（ふじさん）','像「厂」缺竖','双唇轻吹，介于 fu / hu 之间',['fune','fuyu']);
+    def('he','へ','ヘ','he','he','h','像一座小山峰','与平假名几乎同形','平片假名同形的少数特例',['heya']);
+    def('ho','ほ','ホ','ho','ho','h','像「ま」多两横','像「木」','','hoshi','hon');
+    def('ma','ま','マ','ma','ma','m','像「末」字，头发打了卷','两笔像一把小刀','','mado','machi');
+    def('mi','み','ミ','mi','mi','m','像数字「3」带尾巴（源字「三」）','像「三」','','mizu','mise');
+    def('mu','む','ム','mu','mu','m','像「牛」（むし＝虫）','像「厶」','','mushi');
+    def('me','め','メ','me','me','m','源字「女」，像女的草书','像「乂」','与 ぬ 区分：め 中间不闭合','me','megane');
+    def('mo','も','モ','mo','mo','m','源字「毛」，像挂钩搭了两条毛巾','像「毛」的骨架','','mori');
+    def('ya','や','ヤ','ya','ya','y','像「也」的草书','像「也」','や行只有 や ゆ よ 三个（い、え 段空缺）',['yama','yasai']);
+    def('yu','ゆ','ユ','yu','yu','y','像「由」的草书','像鱼钩「ユ」','','yuki','yubi');
+    def('yo','よ','ヨ','yo','yo','y','一竖挂个圈（源字「与」）','像横放的「E」加一横','','yoru');
+    def('ra','ら','ラ','ra','ra（l/r 之间）','r','像拉满的弓（ら＝拉）','像「ク」多一横','日语 r 舌尖轻弹，介于 l 和 r 之间','rakuda');
+    def('ri','り','リ','ri','ri','r','像「利」的立刀旁分开写','像立刀「リ」','','ringo');
+    def('ru','る','ル','ru','ru','r','一个圈加甩尾','像「儿」','与 ろ 区分：る 闭合有圈','rusu');
+    def('re','れ','レ','re','re','r','与 る 相反：开口朝上','像「レ」','与 わ 区分：れ 末笔向右上挑','rekishi');
+    def('ro','ろ','ロ','ro','ro','r','像数字「3」','像「口」','与 る 区分：ろ 不闭合','roku');
+    def('wa','わ','ワ','wa','wa','w','源字「和」，右半像 る 的开口版','像鱼尾「ワ」','','watashi','wani');
+    def('wo','を','ヲ','wo','o（助词）','w','源字「遠」，一笔画完','像「リ」加一点','现代几乎只作助词，读音是「o」不是 wo',[]);
+    def('n','ん','ン','n','n','w','像躺着的「n」加尾巴','左点加竖撇','拨音：独占一拍，跟在词尾拖住不吞掉',['minna','pan']);
+
+    /* ---- 浊音 25 ---- */
+    def('ga','が','ガ','ga','ga','g','か + 两点浊点','カ + 两点','两点＝浊化：读「嘎」','gakkou');
+    def('gi','ぎ','ギ','gi','gi','g','き + 两点','キ + 两点','行首读 gi，词中常鼻化（近似 ngi）','ginkou');
+    def('gu','ぐ','グ','gu','gu','g','く + 两点','ク + 两点','','gumi');
+    def('ge','げ','ゲ','ge','ge','g','け + 两点','ケ + 两点','','genki');
+    def('go','ご','ゴ','go','go','g','こ + 两点','コ + 两点','','gohan');
+    def('za','ざ','ザ','za','za（读「砸」）','z','さ + 两点','サ + 两点','za 读「砸」不是「匝」','zasshi');
+    def('ji','じ','ジ','ji','ji（读「机」）','z','し + 两点','シ + 两点','读「机」不是 zi','jikan');
+    def('zu','ず','ズ','zu','zu（读「兹」）','z','す + 两点','ス + 两点','','chizu');
+    def('ze','ぜ','ゼ','ze','ze（读「贼」）','z','せ + 两点','セ + 两点','','zenbu');
+    def('zo','ぞ','ゾ','zo','zo（读「造」）','z','そ + 两点','ソ + 两点','','zou');
+    def('da','だ','ダ','da','da','d','た + 两点','タ + 两点','','daigaku');
+    def('di','ぢ','ヂ','ji','≈ji','d','ち + 两点','チ + 两点','现代极少用，读音≈じ（如 はなぢ 鼻血）',[]);
+    def('du','づ','ヅ','zu','≈zu','d','つ + 两点','ツ + 两点','现代极少用，读音≈ず',[]);
+    def('de','で','デ','de','de','d','て + 两点','テ + 两点','','denwa');
+    def('do','ど','ド','do','do','d','と + 两点','ト + 两点','','doa');
+    def('ba','ば','バ','ba','ba','b','は + 两点','ハ + 两点','b 系浊音','','basu');
+    def('bi','び','ビ','bi','bi','b','ひ + 两点','ヒ + 两点','','byouin');
+    def('bu','ぶ','ブ','bu','bu','b','ふ + 两点','フ + 两点','双唇轻闭再弹开','buta');
+    def('be','べ','ベ','be','be','b','へ + 两点','ヘ + 两点','','benri','taberu');
+    def('bo','ぼ','ボ','bo','bo','b','ほ + 两点','ホ + 两点','','boushi');
+    def('pa','ぱ','パ','pa','pa','p','は + 小圈「°」','ハ + 小圈','半浊音＝小圈：读 p（送气清音）','pan');
+    def('pi','ぴ','ピ','pi','pi','p','ひ + 小圈','ヒ + 小圈','','piano');
+    def('pu','ぷ','プ','pu','pu','p','ふ + 小圈','フ + 小圈','','purin');
+    def('pe','ぺ','ペ','pe','pe','p','へ + 小圈','ヘ + 小圈','','pen');
+    def('po','ぽ','ポ','po','po','p','ほ + 小圈','ホ + 小圈','','sanpo');
+
+    /* ---- 拗音 33 ---- */
+    def('kya','きゃ','キャ','kya','kya','yoon','き + 小ゃ（右下角）','キ + 小ャ','小字另占半拍，连读成一个音','kyaku');
+    def('kyu','きゅ','キュ','kyu','kyu','yoon','き + 小ゅ','キ + 小ャ的 u 段','','kyuu');
+    def('kyo','きょ','キョ','kyo','kyo','yoon','き + 小ょ','キ + 小ョ','','kyou');
+    def('sha','しゃ','シャ','sha','sha（读「下」）','yoon','し + 小ゃ','シ + 小ャ','注意是 sha 不是 sya（赫伯恩式拼写）','densha');
+    def('shu','しゅ','シュ','shu','shu（读「输」）','yoon','し + 小ゅ','シ + 小ュ','','shukudai');
+    def('sho','しょ','ショ','sho','sho（读「说」）','yoon','し + 小ょ','シ + 小ョ','','shokudou');
+    def('cha','ちゃ','チャ','cha','cha（读「掐」）','yoon','ち + 小ゃ','チ + 小ャ','ch + 小ゃ；おちゃ（茶）就靠它','ocha');
+    def('chu','ちゅ','チュ','chu','chu','yoon','ち + 小ゅ','チ + 小ュ','','chuui');
+    def('cho','ちょ','チョ','cho','cho','yoon','ち + 小ょ','チ + 小ョ','','chotto');
+    def('nya','にゃ','ニャ','nya','nya','yoon','に + 小ゃ','ニ + 小ャ','','nyanko');
+    def('nyu','にゅ','ニュ','nyu','nyu','yoon','に + 小ゅ','ニ + 小ュ','','nyusu');
+    def('nyo','にょ','ニョ','nyo','nyo','yoon','に + 小ょ','ニ + 小ョ','','nyoki');
+    def('hya','ひゃ','ヒャ','hya','hya','yoon','ひ + 小ゃ','ヒ + 小ャ','','hyaku');
+    def('hyu','ひゅ','ヒュ','hyu','hyu','yoon','ひ + 小ゅ','ヒ + 小ュ','多见于外来语','hyuzu');
+    def('hyo','ひょ','ヒョ','hyo','hyo','yoon','ひ + 小ょ','ヒ + 小ョ','','hyou');
+    def('mya','みゃ','ミャ','mya','mya','yoon','み + 小ゃ','ミ + 小ャ','','myaku');
+    def('myu','みゅ','ミュ','myu','myu','yoon','み + 小ゅ','ミ + 小ュ','常见于外来语（music→ミュージック）','myujikku');
+    def('myo','みょ','ミョ','myo','myo','yoon','み + 小ょ','ミ + 小ョ','','myouji');
+    def('rya','りゃ','リャ','rya','rya','yoon','り + 小ゃ','リ + 小ャ','','ryakugo');
+    def('ryu','りゅ','リュ','ryu','ryu','yoon','り + 小ゅ','リ + 小ュ','','ryuugaku');
+    def('ryo','りょ','リョ','ryo','ryo','yoon','り + 小ょ','リ + 小ョ','','ryokan');
+    def('gya','ぎゃ','ギャ','gya','gya','yoon','ぎ + 小ゃ','ギ + 小ャ','','gyaku');
+    def('gyu','ぎゅ','ギュ','gyu','gyu','yoon','ぎ + 小ゅ','ギ + 小ュ','','gyuuniku');
+    def('gyo','ぎょ','ギョ','gyo','gyo','yoon','ぎ + 小ょ','ギ + 小ョ','','gyouza');
+    def('ja','じゃ','ジャ','ja','ja（读「加」）','yoon','じ + 小ゃ','ジ + 小ャ','じゃ＝jya；じゃがいも（土豆）','jagaimo');
+    def('ju','じゅ','ジュ','ju','ju','yoon','じ + 小ゅ','ジ + 小ュ','','jugyou');
+    def('jo','じょ','ジョ','jo','jo','yoon','じ + 小ょ','ジ + 小ョ','人名地名高频：じょう（城）','josei');
+    def('bya','びゃ','ビャ','bya','bya','yoon','び + 小ゃ','ビ + 小ャ','多见于外来语',[]);
+    def('byu','びゅ','ビュ','byu','byu','yoon','び + 小ゅ','ビ + 小ュ','','byuu');
+    def('byo','びょ','ビョ','byo','byo','yoon','び + 小ょ','ビ + 小ョ','びょういん（医院）','byouin');
+    def('pya','ぴゃ','ピャ','pya','pya','yoon','ぴ + 小ゃ','ピ + 小ャ','多见于外来语',[]);
+    def('pyu','ぴゅ','ピュ','pyu','pyu','yoon','ぴ + 小ゅ','ピ + 小ュ','','pyua');
+    def('pyo','ぴょ','ピョ','pyo','pyo','yoon','ぴ + 小ょ','ピ + 小ョ','','pyokopyoko');
+
+    /* ================= 数据：行 / 例词 ================= */
+    var GROUPS = {
+        a: { name: 'あ行', en: '元音行', letters: ['a','i','u','e','o'] },
+        k: { name: 'か行', en: 'k 行', letters: ['ka','ki','ku','ke','ko'] },
+        s: { name: 'さ行', en: 's 行', letters: ['sa','shi','su','se','so'] },
+        t: { name: 'た行', en: 't 行', letters: ['ta','chi','tsu','te','to'] },
+        n: { name: 'な行', en: 'n 行', letters: ['na','ni','nu','ne','no'] },
+        h: { name: 'は行', en: 'h 行', letters: ['ha','hi','fu','he','ho'] },
+        m: { name: 'ま行', en: 'm 行', letters: ['ma','mi','mu','me','mo'] },
+        y: { name: 'や行', en: 'y 行（3 音）', letters: ['ya','yu','yo'] },
+        r: { name: 'ら行', en: 'r 行', letters: ['ra','ri','ru','re','ro'] },
+        w: { name: 'わ行・ん', en: 'w 行 + 拨音', letters: ['wa','wo','n'] },
+        g: { name: 'が行', en: '浊音', letters: ['ga','gi','gu','ge','go'] },
+        z: { name: 'ざ行', en: '浊音', letters: ['za','ji','zu','ze','zo'] },
+        d: { name: 'だ行', en: '浊音', letters: ['da','di','du','de','do'] },
+        b: { name: 'ば行', en: '浊音', letters: ['ba','bi','bu','be','bo'] },
+        p: { name: 'ぱ行', en: '半浊音', letters: ['pa','pi','pu','pe','po'] }
+    };
+    var SEION_ROWS = ['a','k','s','t','n','h','m','y','r','w'];
+    var DAKUON_ROWS = ['g','z','d','b','p'];
+    var YOON_ROWS = [
+        ['kya','kyu','kyo'], ['sha','shu','sho'], ['cha','chu','cho'],
+        ['nya','nyu','nyo'], ['hya','hyu','hyo'], ['mya','myu','myo'],
+        ['rya','ryu','ryo'], ['gya','gyu','gyo'], ['ja','ju','jo'],
+        ['bya','byu','byo'], ['pya','pyu','pyo']
+    ];
+    var GROUP_INTRO = {
+        a: { title: 'あ行 · 日语的全部元音', desc: 'a i u e o 是日语仅有的<strong>五个元音</strong>，后面所有假名都是「辅音 + 元音」的组合。注意三个发音要点：u 双唇不圆、e 读「欸」、o 拢圆喉咙放松。' },
+        k: { title: 'か行 · k + 元音', desc: '五个「k + 元音」。か 加两点浊化成 が（ga），加小圈变 ぱ 是半浊音——先记清音，浊点后面统一讲。' },
+        s: { title: 'さ行 · s 行有两个例外', desc: 'し 读「西」不是 s+i，つ 读「呲」类似汉语 c——这两位是五十音里最著名的例外。本行加两点变 ざ行。' },
+        t: { title: 'た行 · t 行也有例外', desc: 'ち 读「七」、つ 读「呲」，te 和 to 与拼音一致。た 加两点变 だ行。' },
+        n: { title: 'な行 · n + 元音', desc: '五个「n + 元音」。注意 ぬ 与 め、ね 与 れ 的字形区分——多写几遍就能分清。' },
+        h: { title: 'は行 · h 行的两个特殊', desc: 'ふ 介于 fu 和 hu 之间、双唇轻吹即可；へ 是平片假名几乎同形的特例。は 作助词读 wa（先记读音，语法后面再接触）。' },
+        m: { title: 'ま行 · m + 元音', desc: '五个「m + 元音」，全部好读。注意 む（牛）与 め（女）的字形。' },
+        y: { title: 'や行 · 只有三个音', desc: 'や行历史上曾有两个音，现代日语只剩 <strong>や ゆ よ</strong>（い、え 段空缺）。这三个假名同时也是后面拗音的「小字版本」来源。' },
+        r: { title: 'ら行 · r 行，l/r 之间', desc: '日语的 r 是舌尖轻弹，介于汉语 l 和 r 之间，初学直接读「拉里勒列洛」的 l 也无伤大雅。る/ろ、れ/わ 的字形区分要留意。' },
+        w: { title: 'わ行・ん · 收尾', desc: 'わ行现代只剩 <strong>わ</strong> 和助词 <strong>を</strong>（读「o」）。<strong>ん</strong> 是唯一的拨音——自成一门，独占一拍。学会它，清音 46 个就齐了。' },
+        g: { title: 'が行 · 浊音开始', desc: '清音か行<strong>加两点「゛」</strong>就是浊音：读「嘎 gi gu ge 勾」。初学者把浊音当「不送气的清音」理解也可以——关键区别不在声带，而在气流。' },
+        z: { title: 'ざ行 · じ 是重点', desc: 'さ行加两点。注意 <strong>じ 读「机」</strong>不是 zi；ぢ 现代几乎不用，读音≈じ。' },
+        d: { title: 'だ行 · 只剩两个常用', desc: 'た行加两点。だ、で、ど 常用；<strong>ぢ、づ 已被 じ、ず 取代</strong>，只在个别词里出现（はなぢ 鼻血、つづく 继续）。' },
+        b: { title: 'ば行 · b 系浊音', desc: 'は行加两点变浊音：ba bi bu be bo。ぱ行的小圈「°」与之相对，是送气清音 p。' },
+        p: { title: 'ぱ行 · 半浊音', desc: '严格说「半浊音」不是浊音——は行加<strong>小圈「°」</strong>，读送气的 p。ぱ行只有 5 个，多见于外来语（パン 面包、ピアノ 钢琴）。' }
+    };
+    var WORDS = {
+        asa:['あさ','asa','早上'], ame:['あめ','ame','雨'], inu:['いぬ','inu','狗'], isu:['いす','isu','椅子'],
+        umi:['うみ','umi','大海'], uta:['うた','uta','歌'], eki:['えき','eki','车站'], e:['え','e','图画'],
+        ocha:['おちゃ','ocha','茶'], okashi:['おかし','okashi','点心'],
+        kasa:['かさ','kasa','伞'], kaze:['かぜ','kaze','风'], ki:['き','ki','树'], kinoko:['きのこ','kinoko','蘑菇'],
+        kutsu:['くつ','kutsu','鞋子'], kumo:['くも','kumo','云'], kemuri:['けむり','kemuri','烟'], ken:['けん','ken','剑'],
+        kodomo:['こども','kodomo','孩子'], koe:['こえ','koe','声音'],
+        sakana:['さかな','sakana','鱼'], sakura:['さくら','sakura','樱花'], shio:['しお','shio','盐'], shinbun:['しんぶん','shinbun','报纸'],
+        sushi:['すし','sushi','寿司'], suika:['すいか','suika','西瓜'], sensei:['せんせい','sensei','老师'], sekai:['せかい','sekai','世界'],
+        sora:['そら','sora','天空'], soto:['そと','soto','外面'],
+        tamago:['たまご','tamago','鸡蛋'], tako:['たこ','tako','章鱼'], chizu:['ちず','chizu','地图'], chikatetsu:['ちかてつ','chikatetsu','地铁'],
+        tsuki:['つき','tsuki','月亮'], tsukue:['つくえ','tsukue','书桌'], te:['て','te','手'], tegami:['てがみ','tegami','信'],
+        tori:['とり','tori','鸟'], tokei:['とけい','tokei','钟表'],
+        natsu:['なつ','natsu','夏天'], namae:['なまえ','namae','名字'], niku:['にく','niku','肉'], niwa:['にわ','niwa','庭院'],
+        nuigurumi:['ぬいぐるみ','nuigurumi','毛绒玩具'], neko:['ねこ','neko','猫'], nori:['のり','nori','海苔'],
+        hana:['はな','hana','花'], hashi:['はし','hashi','筷子'], hi:['ひ','hi','火'], hikouki:['ひこうき','hikouki','飞机'],
+        fune:['ふね','fune','船'], fuyu:['ふゆ','fuyu','冬天'], heya:['へや','heya','房间'], hoshi:['ほし','hoshi','星星'], hon:['ほん','hon','书'],
+        mado:['まど','mado','窗户'], machi:['まち','machi','城镇'], mizu:['みず','mizu','水'], mise:['みせ','mise','商店'],
+        mushi:['むし','mushi','虫子'], me:['め','me','眼睛'], megane:['めがね','megane','眼镜'], mori:['もり','mori','森林'],
+        yama:['やま','yama','山'], yasai:['やさい','yasai','蔬菜'], yuki:['ゆき','yuki','雪'], yubi:['ゆび','yubi','手指'], yoru:['よる','yoru','夜晚'],
+        rakuda:['らくだ','rakuda','骆驼'], ringo:['りんご','ringo','苹果'], rusu:['るす','rusu','不在家'], rekishi:['れきし','rekishi','历史'], roku:['ろく','roku','六'],
+        watashi:['わたし','watashi','我'], wani:['わに','wani','鳄鱼'], minna:['みんな','minna','大家'], pan:['パン','pan','面包'],
+        gakkou:['がっこう','gakkou','学校'], ginkou:['ぎんこう','ginkou','银行'], gumi:['ぐみ','gumi','软糖'], genki:['げんき','genki','精神'],
+        gohan:['ごはん','gohan','米饭'], zasshi:['ざっし','zasshi','杂志'], jikan:['じかん','jikan','时间'], zenbu:['ぜんぶ','zenbu','全部'],
+        zou:['ぞう','zou','大象'], daigaku:['だいがく','daigaku','大学'], denwa:['でんわ','denwa','电话'], doa:['どあ','doa','门'],
+        basu:['ばす','basu','公交车'], byouin:['びょういん','byouin','医院'], buta:['ぶた','buta','猪'], benri:['べんり','benri','方便'],
+        taberu:['たべる','taberu','吃'], boushi:['ぼうし','boushi','帽子'], purin:['ぷりん','purin','布丁'], pen:['ぺん','pen','笔'],
+        sanpo:['さんぽ','sanpo','散步'], piano:['ぴあの','piano','钢琴'],
+        kyaku:['きゃく','kyaku','客人'], kyuu:['きゅう','kyuu','九'], kyou:['きょう','kyou','今天'],
+        densha:['でんしゃ','densha','电车'], shukudai:['しゅくだい','shukudai','作业'], shokudou:['しょくどう','shokudou','食堂'],
+        chuui:['ちゅうい','chuui','注意'], chotto:['ちょっと','chotto','稍微'],
+        nyanko:['にゃんこ','nyanko','猫咪'], nyusu:['にゅーす','nyusu','新闻'], nyoki:['にょき','nyoki','噌地冒出'],
+        hyaku:['ひゃく','hyaku','一百'], hyuzu:['ひゅーず','hyuzu','保险丝'], hyou:['ひょう','hyou','表格'],
+        myaku:['みゃく','myaku','脉络'], myujikku:['みゅーじっく','myuujikku','音乐'], myouji:['みょうじ','myouji','姓氏'],
+        ryakugo:['りゃくご','ryakugo','缩略语'], ryuugaku:['りゅうがく','ryuugaku','留学'], ryokan:['りょかん','ryokan','旅馆'],
+        gyaku:['ぎゃく','gyaku','相反'], gyuuniku:['ぎゅうにく','gyuuniku','牛肉'], gyouza:['ぎょうざ','gyouza','饺子'],
+        jagaimo:['じゃがいも','jagaimo','土豆'], jugyou:['じゅぎょう','jugyou','上课'], josei:['じょせい','josei','女性'],
+        byuu:['びゅー','byuu','视图'], pyua:['ぴゅあ','pyua','纯粹'], pyokopyoko:['ぴょこぴょこ','pyokopyoko','蹦蹦跳跳']
+    };
+
+    var SEION_IDS = SEION_ROWS.flatMap(r => GROUPS[r].letters);
+    var DAKUON_IDS = DAKUON_ROWS.flatMap(r => GROUPS[r].letters);
+    var YOON_IDS = YOON_ROWS.flat();
+    var ALL_IDS = SEION_IDS.concat(DAKUON_IDS, YOON_IDS);
+
+    /* ================= 音频 ================= */
+    var audioCache = {};
+    function playAudio(id, text, onEnd) {
+        var a = audioCache[id];
+        if (!a) { a = new Audio('audio/' + id + '.mp3'); audioCache[id] = a; }
+        a.currentTime = 0;
+        a.onended = onEnd || null;
+        a.onerror = function () {
+            try {
+                var synth = window.speechSynthesis;
+                synth.cancel();
+                var u = new SpeechSynthesisUtterance(text);
+                u.lang = 'ja-JP'; u.rate = 0.8;
+                synth.speak(u);
+            } catch (e) {}
+            if (onEnd) onEnd();
+        };
+        a.play().catch(function () { a.onerror && a.onerror(); });
+    }
+
+    /* ================= 幻灯片构建 ================= */
+    var scriptMode = 'hira';
+    try { var sm = localStorage.getItem('jp50_script'); if (sm === 'kata') scriptMode = 'kata'; } catch (e) {}
+
+    var slides = [];
+    slides.push({ type: 'cover' });
+    slides.push({ type: 'howto' });
+    slides.push({ type: 'overview' });
+    SEION_ROWS.forEach(function (g) {
+        slides.push({ type: 'group', group: g });
+        GROUPS[g].letters.forEach(function (id) { slides.push({ type: 'letter', id: id }); });
+    });
+    slides.push({ type: 'smallchars' });
+    DAKUON_ROWS.forEach(function (g) {
+        slides.push({ type: 'group', group: g });
+        GROUPS[g].letters.forEach(function (id) { slides.push({ type: 'letter', id: id }); });
+    });
+    slides.push({ type: 'yoonintro' });
+    YOON_ROWS.forEach(function (row, i) { slides.push({ type: 'yoonrow', row: row, label: '拗音第 ' + (i + 1) + ' 组' }); });
+    slides.push({ type: 'contrast1' });
+    slides.push({ type: 'contrast2' });
+    slides.push({ type: 'summary' });
+
+    var holder = document.getElementById('slide-holder');
+    var letterIndex = {};
+    slides.forEach(function (s, i) {
+        if (s.type === 'letter') letterIndex[s.id] = i;
+        if (s.type === 'yoonrow') s.row.forEach(function (id) { letterIndex[id] = i; });
+    });
+
+    var cur = 0, lastDir = 1;
+    try {
+        var sv = parseInt(localStorage.getItem('jp50_last'), 10);
+        if (!isNaN(sv) && sv > 0 && sv < slides.length) cur = sv;
+    } catch (e) {}
+
+    var PLAY_SVG = '<svg viewBox="0 0 12 12"><path d="M2 1.2v9.6l8.4-4.8z"/></svg>';
+
+    function glyphOf(id) { return scriptMode === 'kata' ? K[id].kata : K[id].hira; }
+    function glyphHtml(id) {
+        var k = K[id];
+        if (k.group === 'yoon') {
+            return scriptMode === 'kata' ? k.kata.slice(0, 1) + '<span class="small">' + k.kata.slice(1) + '</span>'
+                                         : k.hira.slice(0, 1) + '<span class="small">' + k.hira.slice(1) + '</span>';
+        }
+        return scriptMode === 'kata' ? k.kata : k.hira;
+    }
+
+    function el(html) { var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstElementChild; }
+
+    function scriptToggleHtml() {
+        return '<div class="script-toggle">'
+            + '<button data-sc="hira" class="' + (scriptMode === 'hira' ? 'active' : '') + '">平あ</button>'
+            + '<button data-sc="kata" class="' + (scriptMode === 'kata' ? 'active' : '') + '">片ア</button>'
+            + '</div>';
+    }
+    function bindScriptToggle(card) {
+        card.querySelectorAll('.script-toggle button').forEach(function (b) {
+            b.addEventListener('click', function () {
+                scriptMode = b.dataset.sc;
+                try { localStorage.setItem('jp50_script', scriptMode); } catch (e) {}
+                render();
+            });
+        });
+    }
+
+    function wordRowHtml(words) {
+        if (!words || !words.length) return '<div class="word-empty-note">该假名极少单独出现在词首——字形记住即可，读音点上面的假名听。</div>';
+        return '<div class="word-row">' + words.map(function (wk) {
+            var w = WORDS[wk];
+            return '<div class="word-card" data-a="w_' + wk + '" data-t="' + w[0] + '">'
+                + '<div class="w-k">' + w[0] + '</div>'
+                + '<div class="w-meta"><div class="w-r">' + w[1] + '</div><div class="w-zh">' + w[2] + '</div></div>'
+                + '<button class="w-play" title="播放">' + PLAY_SVG + '</button></div>';
+        }).join('') + '</div>';
+    }
+    function bindWordRows(card) {
+        card.querySelectorAll('.word-card').forEach(function (w) {
+            w.addEventListener('click', function () { playAudio(w.dataset.a, w.dataset.t); });
+        });
+    }
+
+    function buildSlide(s) {
+        var card = document.createElement('div');
+        card.className = 'slide-card';
+
+        if (s.type === 'cover') {
+            card.classList.add('cover');
+            card.innerHTML = '<div class="cover-kr">五十音</div>'
+                + '<div style="font-size:clamp(24px,4.5vw,34px);font-weight:700;">日语五十音 · 零基础拼读课件</div>'
+                + '<div class="cover-sub">平假名 + 片假名 + 读音 + 口诀 + 例词，一套搞定日语入门第一关。46 个清音、25 个浊音、33 个拗音，每个音都配微软日语声库的真人级发音。</div>'
+                + '<div class="cover-stats">'
+                + '<div class="cover-stat"><div class="v">46</div><div class="l">清音</div></div>'
+                + '<div class="cover-stat"><div class="v">25</div><div class="l">浊音·半浊音</div></div>'
+                + '<div class="cover-stat"><div class="v">33</div><div class="l">拗音</div></div>'
+                + '<div class="cover-stat"><div class="v">104</div><div class="l">总音数</div></div>'
+                + '<div class="cover-stat"><div class="v">' + slides.length + '</div><div class="l">页课件</div></div>'
+                + '</div>'
+                + '<div class="cover-actions">'
+                + '<button class="primary-btn" id="cover-start">从头学</button>'
+                + (cur > 0 ? '<button class="primary-btn" id="cover-resume" style="background:rgba(255,255,255,0.6);color:var(--text-primary);">继续上次（第 ' + (cur + 1) + ' 页）</button>' : '')
+                + '</div>';
+        } else if (s.type === 'howto') {
+            card.innerHTML = '<span class="slide-tag">使用说明</span>'
+                + '<div class="info-list">'
+                + '<div class="info-item"><div class="num">1</div><div><h4>点击假名听发音</h4><p>每个假名配微软日语声库（Nanami）的音频，离线随点随播。例词也能点读。</p></div></div>'
+                + '<div class="info-item"><div class="num">2</div><div><h4>平假名 ⇄ 片假名 一键切换</h4><p>每页右上角有「平あ / 片ア」开关，切换后全站大字与闪卡同步换写法。同一个音两种写法都要认识，建议学完平假名后切到片假名再过一遍。</p></div></div>'
+                + '<div class="info-item"><div class="num">3</div><div><h4>三种模式配合</h4><p>课件学新知 → 闪卡过记忆（可分别刷平/片/混合）→ 测验收尾。进度与测验成绩都存在本地浏览器。</p></div></div>'
+                + '<div class="info-item"><div class="num jp">っ</div><div><h4>两个小字符别忽略</h4><p>课件第 50 页专门讲 <b class="jp-inline">っ</b>（促音）和 <b class="jp-inline">ー</b>（长音），它们不是独立音，但决定单词读得对不对。</p></div></div>'
+                + '</div>';
+        } else if (s.type === 'overview') {
+            card.innerHTML = '<span class="slide-tag">五十音总览<span class="idx">点击任意假名直达</span></span>'
+                + scriptToggleHtml()
+                + '<div class="ov-block-title" style="margin-top:8px;">清音 46</div>'
+                + SEION_ROWS.map(function (g) {
+                    return '<div style="margin-top:8px;"><div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:5px;">' + GROUPS[g].name + '</div>'
+                        + '<div class="ov-grid">' + GROUPS[g].letters.map(function (id) {
+                            return '<span class="ov-jump" data-id="' + id + '" style="cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;font-size:23px;font-weight:700;padding:5px 11px;border-radius:11px;background:rgba(255,255,255,0.5);border:1px solid var(--card-border);">' + glyphOf(id) + '</span>';
+                        }).join('') + '</div></div>';
+                }).join('')
+                + '<div class="ov-block-title">浊音 · 半浊音 25</div>'
+                + DAKUON_ROWS.map(function (g) {
+                    return '<div style="margin-top:8px;"><div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:5px;">' + GROUPS[g].name + '</div>'
+                        + '<div class="ov-grid">' + GROUPS[g].letters.map(function (id) {
+                            return '<span class="ov-jump" data-id="' + id + '" style="cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;font-size:23px;font-weight:700;padding:5px 11px;border-radius:11px;background:rgba(255,255,255,0.5);border:1px solid var(--card-border);">' + glyphOf(id) + '</span>';
+                        }).join('') + '</div></div>';
+                }).join('')
+                + '<div class="ov-block-title">拗音 33（点击跳到该组页）</div>'
+                + '<div class="ov-grid" style="margin-top:8px;">' + YOON_IDS.map(function (id) {
+                    return '<span class="ov-jump" data-id="' + id + '" style="cursor:pointer;font-family:\'Noto Sans JP\',sans-serif;font-size:23px;font-weight:700;padding:5px 11px;border-radius:11px;background:rgba(255,255,255,0.5);border:1px solid var(--card-border);">' + glyphHtml(id) + '</span>';
+                }).join('') + '</div>';
+            bindScriptToggle(card);
+            card.querySelectorAll('.ov-jump').forEach(function (n) {
+                n.addEventListener('click', function () { goTo(letterIndex[n.dataset.id]); });
+            });
+        } else if (s.type === 'group') {
+            var gi = GROUP_INTRO[s.group], g = GROUPS[s.group];
+            card.classList.add('group-intro');
+            card.innerHTML = '<span class="slide-tag">' + g.name + '<span class="idx">' + g.en + '</span></span>'
+                + scriptToggleHtml()
+                + '<h2>' + gi.title.replace(/(あ行|か行|さ行|た行|な行|は行|ま行|や行|ら行|わ行|が行|ざ行|だ行|ば行|ぱ行)/, '<span class="kr-inline">$1</span>') + '</h2>'
+                + '<div class="group-desc">' + gi.desc + '</div>'
+                + '<div class="group-strip">' + g.letters.map(function (id) {
+                    return '<div class="strip-card" data-id="' + id + '"><div class="sc-ch">' + glyphHtml(id) + '</div><div class="sc-rr">' + K[id].rr + '</div><div class="sc-k">' + K[id].zh + '</div></div>';
+                }).join('') + '</div>';
+            bindScriptToggle(card);
+            card.querySelectorAll('.strip-card').forEach(function (n) {
+                var id = n.dataset.id;
+                n.addEventListener('click', function () { playAudio(id, K[id].hira); });
+            });
+        } else if (s.type === 'letter') {
+            var d = K[s.id];
+            var num = ALL_IDS.indexOf(d.id) + 1;
+            card.classList.add('letter-slide');
+            card.innerHTML = '<div class="slide-head"><span class="slide-tag">' + GROUPS[d.group].name + '<span class="idx">第 ' + num + ' / 104 音</span></span>' + scriptToggleHtml() + '</div>'
+                + '<div class="letter-main">'
+                + '<div class="letter-glyph" data-id="' + d.id + '" title="点击播放发音">' + glyphHtml(d.id) + '<span class="glyph-hint">点击发音 · 右上角可切平/片</span></div>'
+                + '<div class="letter-side">'
+                + '<div class="letter-rr"><span class="rr-main">' + d.rr + '</span><span class="rr-zh">' + d.zh + '</span></div>'
+                + '<div class="memo-card"><b>字形</b><span class="jp-inline">平' + d.hira + '</span>　' + d.hmn + '；<span class="jp-inline">片' + d.kata + '</span>　' + d.kmn + '</div>'
+                + '<div class="tip-card"><b>发音</b>' + (d.tip || '对应清音 ' + d.rr + ' 的浊化/组合读音') + '</div>'
+                + '</div></div>'
+                + wordRowHtml(d.words);
+            bindScriptToggle(card);
+            bindWordRows(card);
+            var glyph = card.querySelector('.letter-glyph');
+            glyph.addEventListener('click', function () {
+                glyph.classList.remove('playing'); void glyph.offsetWidth;
+                glyph.classList.add('playing');
+                playAudio(d.id, d.hira, function () { setTimeout(function () { glyph.classList.remove('playing'); }, 200); });
+            });
+        } else if (s.type === 'smallchars') {
+            card.innerHTML = '<span class="slide-tag">特殊假名<span class="idx">小字大作用</span></span>'
+                + '<div class="group-desc">五十音图之外还有两个<strong>不成音的符号</strong>，它们决定单词的节奏——读错一拍意思就变：</div>'
+                + '<div class="info-list">'
+                + '<div class="info-item"><div class="num jp">っ</div><div><h4>促音っ（小っ）· 停一拍</h4><p>出现在词中时<strong>停顿一拍</strong>再发下一个音：<span class="w-audio" data-a="w_kitte">きって（kitte 邮票）</span> = き・っ・て 三拍；没有小っ的 きて 是「穿」，有小っ的 きって 是「邮票」。片假名单独写作小ツ。</p></div></div>'
+                + '<div class="info-item"><div class="num jp">ー</div><div><h4>长音记号ー · 拖一拍</h4><p>片假名单词里用横线把元音<strong>拖长一拍</strong>：<span class="w-audio" data-a="w_kohii">コーヒー（kōhī 咖啡）</span> = コ・ー・ヒ・ー 四拍。平假名则直接多写一个元音（せんせい 老师里的 い）。</p></div></div>'
+                + '<div class="info-item"><div class="num jp">゛</div><div><h4>浊点「゛」与小圈「°」</h4><p>从下一页开始：清音右上角加<strong>两点</strong>变浊音（か→が），加<strong>小圈</strong>变半浊音（は→ぱ）。写法不同，读音不同。</p></div></div>'
+                + '</div>';
+            card.querySelectorAll('.w-audio').forEach(function (n) {
+                n.addEventListener('click', function () { playAudio(n.dataset.a, n.dataset.t); });
+            });
+        } else if (s.type === 'yoonintro') {
+            card.innerHTML = '<span class="slide-tag">拗音<span class="idx">33 音</span></span>'
+                + '<div class="group-intro"><h2>拗音 · <span class="kr-inline">きゃ</span> 行的秘密</h2>'
+                + '<div class="group-desc">拗音 = <strong>い 段假名 + 右下角小ゃ/小ゅ/小ょ</strong>，两个字拼一个音（小字只占半拍）。共 11 组 33 个，全部由清音、浊音行的い段假名变来：<strong>き し ち に ひ み り</strong>（清音 7 行）+ <strong>ぎ じ び ぴ</strong>（浊音 4 行）。发音规律完全一致——都是「r-ya → rya」式的拼合，学会一组等于学会全部。</div></div>'
+                + '<div class="group-strip">' + YOON_ROWS.map(function (row) {
+                    return '<div class="strip-card" data-id="' + row[0] + '"><div class="sc-ch">' + glyphHtml(row[0]) + '<span class="sc-k" style="display:inline;">' + row.map(function (id) { return glyphOf(id); }).join(' ') + '</span></div><div class="sc-rr">' + K[row[0]].rr + '…</div></div>';
+                }).join('') + '</div>';
+            card.querySelectorAll('.strip-card').forEach(function (n) {
+                var id = n.dataset.id;
+                n.addEventListener('click', function () {
+                    playAudio(id, K[id].hira);
+                    n.style.borderColor = 'rgba(45,212,191,0.65)';
+                    setTimeout(function () { n.style.borderColor = ''; }, 600);
+                });
+            });
+        } else if (s.type === 'yoonrow') {
+            var rowLabel = s.label;
+            card.innerHTML = '<span class="slide-tag">' + rowLabel + '<span class="idx">' + s.row.map(function (id) { return K[id].rr; }).join(' · ') + '</span></span>'
+                + scriptToggleHtml()
+                + '<div class="group-desc">小字写法：' + s.row.map(function (id) {
+                    return '<strong class="jp-inline" style="font-family:\'Noto Sans JP\',sans-serif;">平 ' + K[id].hira + ' / 片 ' + K[id].kata + '</strong>（' + K[id].rr + '）';
+                }).join('　') + '。点卡片听音、点例词听单词：</div>'
+                + '<div class="yoon-grid">' + s.row.map(function (id) {
+                    var k = K[id], w = k.words && k.words.length ? WORDS[k.words[0]] : null;
+                    return '<div class="yoon-cell" data-id="' + id + '">'
+                        + '<div class="y-ch">' + glyphHtml(id) + '</div>'
+                        + '<div class="y-rr">' + k.rr + '</div>'
+                        + (w ? '<div class="y-word"><span class="w-audio" data-a="w_' + k.words[0] + '" data-t="' + w[0] + '">' + w[0] + '</span></div><div class="y-zh">' + w[2] + '</div>' : '<div class="y-word" style="color:var(--text-muted);">多见于外来语</div>')
+                        + '</div>';
+                }).join('') + '</div>';
+            bindScriptToggle(card);
+            card.querySelectorAll('.yoon-cell').forEach(function (c) {
+                c.addEventListener('click', function (e) {
+                    if (e.target.closest('.w-audio')) return;
+                    var id = c.dataset.id;
+                    playAudio(id, K[id].hira);
+                    c.style.borderColor = 'rgba(45,212,191,0.65)';
+                    setTimeout(function () { c.style.borderColor = ''; }, 600);
+                });
+            });
+            card.querySelectorAll('.w-audio').forEach(function (n) {
+                n.addEventListener('click', function (e) { e.stopPropagation(); playAudio(n.dataset.a, n.dataset.t); });
+            });
+        } else if (s.type === 'contrast1') {
+            card.innerHTML = '<span class="slide-tag">易混字形<span class="idx">片假名三兄弟</span></span>'
+                + '<div class="group-desc">片假名最容易认错的四组——记口诀：<strong>「シ横ツ竖、ソ右上ン左上」</strong>。点卡片听音加深记忆：</div>'
+                + '<div class="duo-grid">'
+                + '<div class="duo-cell" data-a="shi" data-t="し"><div class="d-pair">シ<span class="sep"> vs </span>ツ</div><div class="d-rule"><b>シ</b>：两点从左上往右下斜（联想 し 的吸管横躺）；<b>ツ</b>：三点在正上方（联想海浪往上溅）——「横シ竖ツ」</div></div>'
+                + '<div class="duo-cell" data-a="so" data-t="そ"><div class="d-pair">ソ<span class="sep"> vs </span>ン</div><div class="d-rule"><b>ソ</b>：两点从右上往左下切（像「凿子」往下凿）；<b>ン</b>：点在左上、撇向右下（像「引导」向右）——「ソ凿ン引」</div></div>'
+                + '</div>';
+            card.querySelectorAll('.duo-cell').forEach(function (c) {
+                c.addEventListener('click', function () { playAudio(c.dataset.a, c.dataset.t); });
+            });
+        } else if (s.type === 'contrast2') {
+            card.innerHTML = '<span class="slide-tag">易混字形<span class="idx">平假名双胞胎</span></span>'
+                + '<div class="group-desc">平假名的四对「双胞胎」，全靠<strong>一个圈的闭合方向</strong>区分，多写几遍形成肌肉记忆：</div>'
+                + '<div class="duo-grid">'
+                + '<div class="duo-cell" data-a="ru" data-t="る"><div class="d-pair">る<span class="sep"> vs </span>ろ</div><div class="d-rule"><b>る</b>：尾巴绕回来<strong>闭合</strong>（路上有个井盖）；<b>ろ</b>：直接甩出去不闭合</div></div>'
+                + '<div class="duo-cell" data-a="nu" data-t="ぬ"><div class="d-pair">ぬ<span class="sep"> vs </span>め</div><div class="d-rule"><b>ぬ</b>：中间的圈<strong>闭合</strong>（奴，缠住不放）；<b>め</b>：中间<strong>开口</strong>（女，甩开手）</div></div>'
+                + '<div class="duo-cell" data-a="re" data-t="れ"><div class="d-pair">れ<span class="sep"> vs </span>わ</div><div class="d-rule"><b>れ</b>：末笔<strong>向右上挑</strong>（れきし 历史的れ）；<b>わ</b>：末笔打弯<strong>向左收</strong></div></div>'
+                + '<div class="duo-cell" data-a="a" data-t="あ"><div class="d-pair">あ<span class="sep"> vs </span>お</div><div class="d-rule"><b>あ</b>：像「安」三点收尾；<b>お</b>：像「才」，收笔<strong>多一点</strong>——都是元音，读混了没关系，写对就行</div></div>'
+                + '</div>';
+            card.querySelectorAll('.duo-cell').forEach(function (c) {
+                c.addEventListener('click', function () { playAudio(c.dataset.a, c.dataset.t); });
+            });
+        } else if (s.type === 'summary') {
+            card.innerHTML = '<span class="slide-tag">结业</span>'
+                + '<div style="text-align:center;margin:auto 0;">'
+                + '<div class="cover-kr" style="font-size:clamp(44px,9vw,72px);">完璧!</div>'
+                + '<div style="font-size:clamp(19px,3.5vw,25px);font-weight:700;margin:6px 0 10px;">五十音全部过完一遍</div>'
+                + '<div class="cover-sub" style="margin:0 auto 18px;">下一步：单词 → 助词 は/が/を → 动词变形。先用下面的模式把 104 个音焊牢——记得切到片假名再刷一轮闪卡：</div>'
+                + '<div class="cover-actions">'
+                + '<button class="primary-btn" id="go-flash">去闪卡</button>'
+                + '<button class="primary-btn" id="go-quiz" style="background:rgba(255,255,255,0.6);color:var(--text-primary);">去测验</button>'
+                + '<button class="primary-btn" id="go-cover" style="background:rgba(255,255,255,0.6);color:var(--text-primary);">回封面</button>'
+                + '</div></div>';
+        }
+        return card;
+    }
+
+    function render() {
+        holder.innerHTML = '';
+        var card = buildSlide(slides[cur]);
+        if (lastDir < 0) card.classList.add('back-dir');
+        holder.appendChild(card);
+
+        var start = card.querySelector('#cover-start');
+        if (start) start.addEventListener('click', function () { goTo(1); });
+        var resume = card.querySelector('#cover-resume');
+        if (resume) resume.addEventListener('click', function () { goTo(cur); });
+        var gf = card.querySelector('#go-flash'); if (gf) gf.addEventListener('click', function () { setMode('flash'); });
+        var gq = card.querySelector('#go-quiz'); if (gq) gq.addEventListener('click', function () { setMode('quiz'); });
+        var gc = card.querySelector('#go-cover'); if (gc) gc.addEventListener('click', function () { goTo(0); });
+
+        document.getElementById('cur-page').textContent = cur + 1;
+        document.getElementById('total-page').textContent = slides.length;
+        document.getElementById('nav-fill').style.width = (cur / (slides.length - 1) * 100) + '%';
+        document.getElementById('btn-prev').disabled = cur === 0;
+        document.getElementById('btn-next').disabled = cur === slides.length - 1;
+        try { localStorage.setItem('jp50_last', String(cur)); } catch (e) {}
+    }
+
+    function goTo(i, dir) {
+        var t = Math.max(0, Math.min(slides.length - 1, i));
+        if (t === cur) return;
+        lastDir = dir !== undefined ? dir : (t > cur ? 1 : -1);
+        cur = t;
+        render();
+        window.scrollTo({ top: 0 });
+    }
+
+    document.getElementById('btn-prev').addEventListener('click', function () { goTo(cur - 1, -1); });
+    document.getElementById('btn-next').addEventListener('click', function () { goTo(cur + 1, 1); });
+    document.getElementById('nav-progress').addEventListener('click', function (e) {
+        var r = e.currentTarget.getBoundingClientRect();
+        goTo(Math.round((e.clientX - r.left) / r.width * (slides.length - 1)));
+    });
+
+    var mode = 'deck';
+    document.addEventListener('keydown', function (e) {
+        if (document.querySelector('.overview-modal.open')) {
+            if (e.key === 'Escape') closeOverview();
+            return;
+        }
+        if (mode !== 'deck') return;
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); goTo(cur + 1, 1); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(cur - 1, -1); }
+        else if (e.key === 'Home') goTo(0, -1);
+        else if (e.key === 'End') goTo(slides.length - 1, 1);
+    });
+
+    var touchX = null, touchY = null;
+    document.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; touchY = e.touches[0].clientY; }, { passive: true });
+    document.addEventListener('touchend', function (e) {
+        if (touchX === null || mode !== 'deck') return;
+        var dx = e.changedTouches[0].clientX - touchX;
+        var dy = e.changedTouches[0].clientY - touchY;
+        if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+            if (dx < 0) goTo(cur + 1, 1); else goTo(cur - 1, -1);
+        }
+        touchX = touchY = null;
+    }, { passive: true });
+
+    /* ================= 总览弹层 ================= */
+    var ovModal = document.getElementById('overview-modal');
+    function ovCells(ids) {
+        return ids.map(function (id) {
+            return '<div class="ov-cell ' + (known[id] ? '' : 'unknown') + '" data-id="' + id + '">'
+                + '<div class="c-ch">' + glyphHtml(id) + '</div><div class="c-rr">' + K[id].rr + '</div>'
+                + '<div class="c-dot" title="' + (known[id] ? '已认识' : '待巩固') + '"></div></div>';
+        }).join('');
+    }
+    function openOverview() {
+        var body = document.getElementById('ov-body');
+        body.innerHTML = '<div class="ov-block-title" style="margin-top:0;">清音 46</div>'
+            + SEION_ROWS.map(function (g) {
+                return '<div class="ov-group"><h4>' + GROUPS[g].name + '<span class="g-en">' + g + ' 行</span></h4><div class="ov-grid">' + ovCells(GROUPS[g].letters) + '</div></div>';
+            }).join('')
+            + '<div class="ov-block-title">浊音 · 半浊音 25</div>'
+            + DAKUON_ROWS.map(function (g) {
+                return '<div class="ov-group"><h4>' + GROUPS[g].name + '<span class="g-en">dakuten</span></h4><div class="ov-grid">' + ovCells(GROUPS[g].letters) + '</div></div>';
+            }).join('')
+            + '<div class="ov-block-title">拗音 33（点击跳到该组页）</div>'
+            + YOON_ROWS.map(function (row) {
+                return '<div class="ov-group"><h4>' + row.map(function (id) { return glyphOf(id) + ' ' + K[id].rr; }).join('　') + '<span class="g-en">yoon</span></h4><div class="ov-grid">' + ovCells(row) + '</div></div>';
+            }).join('');
+        body.querySelectorAll('.ov-cell').forEach(function (c) {
+            c.addEventListener('click', function () {
+                closeOverview();
+                setMode('deck');
+                goTo(letterIndex[c.dataset.id]);
+            });
+        });
+        ovModal.classList.add('open');
+    }
+    function closeOverview() { ovModal.classList.remove('open'); }
+    document.getElementById('btn-overview').addEventListener('click', openOverview);
+    document.getElementById('ov-close').addEventListener('click', closeOverview);
+    ovModal.addEventListener('click', function (e) { if (e.target === ovModal) closeOverview(); });
+
+    /* ================= 模式切换 ================= */
+    function setMode(m) {
+        mode = m;
+        document.querySelectorAll('.mode-tabs button').forEach(function (b) { b.classList.toggle('active', b.dataset.mode === m); });
+        document.getElementById('deck-view').style.display = m === 'deck' ? '' : 'none';
+        document.getElementById('deck-nav').style.display = m === 'deck' ? '' : 'none';
+        document.getElementById('flash-view').classList.toggle('visible', m === 'flash');
+        document.getElementById('quiz-view').classList.toggle('visible', m === 'quiz');
+        window.scrollTo({ top: 0 });
+    }
+    document.querySelectorAll('.mode-tabs button').forEach(function (b) {
+        b.addEventListener('click', function () { setMode(b.dataset.mode); });
+    });
+
+    /* ================= 闪卡 ================= */
+    var known = {};
+    try { known = JSON.parse(localStorage.getItem('jp50_known') || '{}') || {}; } catch (e) { known = {}; }
+    function saveKnown() { try { localStorage.setItem('jp50_known', JSON.stringify(known)); } catch (e) {} }
+
+    var FLASH_FILTERS = [['all', '全部 104'], ['seion', '清音 46'], ['dakuon', '浊音 25'], ['yoon', '拗音 33'], ['unknown', '待巩固'], ['known', '已认识']];
+    var SCRIPT_FILTERS = [['hira', '平假名'], ['kata', '片假名'], ['mix', '平片混合']];
+    var flashFilter = 'all', flashScript = 'hira';
+    var flashDeck = [], flashPos = 0, flipped = false;
+
+    var FLASH_POOL = { all: ALL_IDS, seion: SEION_IDS, dakuon: DAKUON_IDS, yoon: YOON_IDS };
+    function flashPool() {
+        var pool = flashFilter === 'unknown' ? ALL_IDS.filter(function (id) { return !known[id]; })
+            : flashFilter === 'known' ? ALL_IDS.filter(function (id) { return known[id]; })
+            : FLASH_POOL[flashFilter];
+        return pool;
+    }
+    function shuffle(a) {
+        var r = a.slice();
+        for (var i = r.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = r[i]; r[i] = r[j]; r[j] = t; }
+        return r;
+    }
+
+    function buildChips(containerId, items, active, onPick) {
+        var c = document.getElementById(containerId);
+        c.innerHTML = '';
+        items.forEach(function (it) {
+            var b = document.createElement('button');
+            b.className = 'chip' + (it[0] === active ? ' active' : '');
+            b.textContent = it[1];
+            b.addEventListener('click', function () { onPick(it[0]); });
+            c.appendChild(b);
+        });
+    }
+
+    function flashGlyph(id) {
+        if (flashScript === 'mix') return Math.random() < 0.5 ? K[id].hira : K[id].kata;
+        return flashScript === 'kata' ? K[id].kata : K[id].hira;
+    }
+
+    function initFlash() {
+        buildChips('flash-script-chips', SCRIPT_FILTERS, flashScript, function (k) { flashScript = k; initFlash(); });
+        buildChips('flash-chips', FLASH_FILTERS, flashFilter, function (k) { flashFilter = k; initFlash(); });
+        var pool = flashPool();
+        var fc = document.getElementById('flip-card');
+        if (!pool.length) {
+            fc.style.display = 'none';
+            renderFlashStats('这个筛选下没有卡片');
+            flashDeck = [];
+            return;
+        }
+        fc.style.display = '';
+        flashDeck = shuffle(pool);
+        flashPos = 0; flipped = false;
+        fc.classList.remove('flipped');
+        showFlashCard();
+        renderFlashStats();
+    }
+    function showFlashCard() {
+        if (!flashDeck.length) return;
+        flashPos = flashPos % flashDeck.length;
+        var d = K[flashDeck[flashPos]];
+        document.getElementById('fc-front').textContent = flashGlyph(d.id);
+        document.getElementById('fc-rr').textContent = d.rr;
+        document.getElementById('fc-zh').textContent = d.zh + ' · ' + (d.group === 'yoon' ? '拗音' : GROUPS[d.group].name);
+        document.getElementById('fc-mn').textContent = '平' + d.hira + '：' + d.hmn + '；片' + d.kata + '：' + d.kmn + '。' + (d.tip || '');
+        document.getElementById('fc-audio').onclick = function (e) { e.stopPropagation(); playAudio(d.id, d.hira); };
+    }
+    function renderFlashStats(extra) {
+        var n = ALL_IDS.filter(function (id) { return known[id]; }).length;
+        document.getElementById('flash-stats').innerHTML =
+            (extra ? extra + '<br>' : '') +
+            '已认识 <b style="color:var(--text-primary);">' + n + '</b> / 104 · 当前牌组 ' + flashDeck.length + ' 张 <a id="flash-reset">重置进度</a>';
+        var rs = document.getElementById('flash-reset');
+        if (rs) rs.addEventListener('click', function () { known = {}; saveKnown(); initFlash(); });
+    }
+    document.getElementById('flip-card').addEventListener('click', function () {
+        if (!flashDeck.length) return;
+        flipped = !flipped; this.classList.toggle('flipped', flipped);
+        if (flipped) { var d = K[flashDeck[flashPos]]; playAudio(d.id, d.hira); }
+    });
+    document.getElementById('fc-fuzzy').addEventListener('click', function () {
+        if (!flashDeck.length) return;
+        known[flashDeck[flashPos]] = false; saveKnown(); nextCard();
+    });
+    document.getElementById('fc-know').addEventListener('click', function () {
+        if (!flashDeck.length) return;
+        known[flashDeck[flashPos]] = true; saveKnown(); nextCard();
+    });
+    function nextCard() {
+        if (!flashDeck.length) return;
+        var fc = document.getElementById('flip-card');
+        flipped = false; fc.classList.remove('flipped');
+        flashPos++;
+        if (flashPos >= flashDeck.length) { flashDeck = shuffle(flashPool()); flashPos = 0; }
+        showFlashCard(); renderFlashStats();
+    }
+
+    /* ================= 测验 ================= */
+    var QUIZ_FILTERS = [['all', '全部 104'], ['seion', '清音 46'], ['dakuon', '浊音 25'], ['yoon', '拗音 33']];
+    var QUIZ_POOL = { all: ALL_IDS, seion: SEION_IDS, dakuon: DAKUON_IDS, yoon: YOON_IDS };
+    var quizFilter = 'all', quizQueue = [], quizScore = 0, quizIdx = 0, quizWrong = [], quizLocked = false;
+    var bestScore = -1;
+    try { bestScore = parseInt(localStorage.getItem('jp50_best'), 10); if (isNaN(bestScore)) bestScore = -1; } catch (e) { bestScore = -1; }
+
+    function startQuiz(filter) {
+        quizFilter = filter;
+        buildChips('quiz-chips', QUIZ_FILTERS, filter, function (k) { startQuiz(k); });
+        var pool = QUIZ_POOL[filter];
+        quizQueue = shuffle(pool).slice(0, 10).map(function (id) {
+            var types = ['listen', 'read', 'romaji'];
+            return { id: id, type: types[Math.floor(Math.random() * 3)] };
+        });
+        if (pool.length < 10) quizQueue = shuffle(pool).map(function (id) {
+            var types = ['listen', 'read', 'romaji'];
+            return { id: id, type: types[Math.floor(Math.random() * 3)] };
+        });
+        quizScore = 0; quizIdx = 0; quizWrong = [];
+        showQuizQuestion();
+    }
+
+    function showQuizQuestion() {
+        var card = document.getElementById('quiz-card');
+        quizLocked = false;
+        if (quizIdx >= quizQueue.length) { showQuizResult(); return; }
+        var q = quizQueue[quizIdx], d = K[q.id];
+        var pool = QUIZ_POOL[quizFilter];
+        var distractors = shuffle(pool.filter(function (x) { return x !== q.id && K[x].rr !== d.rr; })).slice(0, 3);
+        var opts = shuffle([q.id].concat(distractors));
+
+        if (q.type === 'listen') {
+            var script = Math.random() < 0.5 ? 'hira' : 'kata';
+            card.innerHTML = '<div class="quiz-meta"><span>第 ' + (quizIdx + 1) + ' / ' + quizQueue.length + ' 题</span><span>听音选假名</span></div>'
+                + '<div class="quiz-q-text">听发音，选出对应的假名</div>'
+                + '<button class="quiz-replay" id="q-replay">重新播放</button>'
+                + '<div class="quiz-opts">' + opts.map(function (o) {
+                    return '<button class="quiz-opt" data-o="' + o + '">' + (script === 'kata' ? K[o].kata : K[o].hira) + '</button>';
+                }).join('') + '</div>'
+                + '<div class="quiz-feedback" id="q-fb"></div>';
+            playAudio(d.id, d.hira);
+            document.getElementById('q-replay').addEventListener('click', function () { playAudio(d.id, d.hira); });
+        } else if (q.type === 'romaji') {
+            var script2 = Math.random() < 0.5 ? 'hira' : 'kata';
+            card.innerHTML = '<div class="quiz-meta"><span>第 ' + (quizIdx + 1) + ' / ' + quizQueue.length + ' 题</span><span>看音选假名</span></div>'
+                + '<div class="quiz-q-text">这个读音对应的假名是？</div>'
+                + '<div style="font-size:clamp(40px,9vw,64px);font-weight:800;background:linear-gradient(135deg,#3b82f6,#2dd4bf);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-family:\'Courier New\',monospace;">' + d.rr + '</div>'
+                + '<div class="quiz-opts">' + opts.map(function (o) {
+                    return '<button class="quiz-opt" data-o="' + o + '">' + (script2 === 'kata' ? K[o].kata : K[o].hira) + '</button>';
+                }).join('') + '</div>'
+                + '<div class="quiz-feedback" id="q-fb"></div>';
+        } else {
+            var script3 = Math.random() < 0.5;
+            card.innerHTML = '<div class="quiz-meta"><span>第 ' + (quizIdx + 1) + ' / ' + quizQueue.length + ' 题</span><span>' + (script3 ? '看平假名选音' : '看片假名选音') + '</span></div>'
+                + '<div class="quiz-q-text">这个假名的发音是？</div>'
+                + '<div class="quiz-q-ch">' + (script3 ? d.hira : d.kata) + '</div>'
+                + '<div class="quiz-opts">' + opts.map(function (o) {
+                    return '<button class="quiz-opt" data-o="' + o + '">' + K[o].rr + '<span class="q-rr">' + K[o].zh + '</span></button>';
+                }).join('') + '</div>'
+                + '<div class="quiz-feedback" id="q-fb"></div>';
+        }
+        card.querySelectorAll('.quiz-opt').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (quizLocked) return;
+                quizLocked = true;
+                var pick = btn.dataset.o;
+                var right = pick === q.id;
+                if (right) quizScore++; else quizWrong.push(q.id);
+                card.querySelectorAll('.quiz-opt').forEach(function (b) {
+                    b.disabled = true;
+                    if (b.dataset.o === q.id) b.classList.add('right');
+                });
+                if (!right) btn.classList.add('wrong');
+                document.getElementById('q-fb').textContent = right ? '正确！' : ('是 ' + d.hira + ' / ' + d.kata + '（' + d.rr + '）');
+                playAudio(d.id, d.hira);
+                setTimeout(function () { quizIdx++; showQuizQuestion(); }, right ? 700 : 1500);
+            });
+        });
+    }
+
+    function showQuizResult() {
+        var card = document.getElementById('quiz-card');
+        if (quizScore > bestScore) { bestScore = quizScore; try { localStorage.setItem('jp50_best', String(bestScore)); } catch (e) {} }
+        card.innerHTML = '<div class="quiz-score">'
+            + '<div style="font-size:14px;color:var(--text-secondary);">本轮成绩</div>'
+            + '<div class="big">' + quizScore + ' / ' + quizQueue.length + '</div>'
+            + '<div style="font-size:12.5px;color:var(--text-muted);margin:4px 0 8px;">历史最佳：' + bestScore + '</div>'
+            + (quizWrong.length
+                ? '<div style="font-size:13px;color:var(--text-secondary);">错题卡（点击听发音）：</div><div class="quiz-wrong-list">'
+                    + quizWrong.map(function (id) {
+                        return '<button class="quiz-wrong-item" data-id="' + id + '">' + K[id].hira + K[id].kata + '<span> ' + K[id].rr + '</span></button>';
+                    }).join('') + '</div>'
+                : '<div style="font-size:13.5px;color:var(--text-secondary);margin-top:6px;">全对，一个不漏！</div>')
+            + '<div class="cover-actions" style="margin-top:18px;">'
+            + '<button class="primary-btn" id="quiz-again">再来一轮</button>'
+            + '<button class="primary-btn" id="quiz-flash" style="background:rgba(255,255,255,0.6);color:var(--text-primary);">错题去闪卡</button>'
+            + '</div></div>';
+        document.getElementById('quiz-again').addEventListener('click', function () { startQuiz(quizFilter); });
+        document.getElementById('quiz-flash').addEventListener('click', function () { setMode('flash'); });
+        card.querySelectorAll('.quiz-wrong-item').forEach(function (b) {
+            b.addEventListener('click', function () { playAudio(b.dataset.id, K[b.dataset.id].hira); });
+        });
+    }
+
+    /* ================= 启动 ================= */
+    render();
+    initFlash();
+    startQuiz('all');
+    </script>
+</body>
+</html>
