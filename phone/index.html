@@ -1032,6 +1032,25 @@
         // 注册网络状态监听器
         setupNetworkListener();
 
+        // URL 参数自动连接 (?ws=<ip>:<port>): PC 端"扫码连接"托管的页面,
+        // 扫码即连, 免手输 IP/端口; 参数优先于本地记忆 (扫码连的是新 PC, 旧记忆不作数)。
+        // 参数驱动的逻辑放哪个托管环境都正确: GitHub Pages 打开时无参数, 走原手填流程。
+        const wsParam = new URLSearchParams(location.search).get('ws');
+        if (wsParam && wsParam.includes(':')) {
+            const idx = wsParam.lastIndexOf(':');
+            const ip = wsParam.slice(0, idx).trim();
+            const port = wsParam.slice(idx + 1).trim();
+            if (ip && /^\d+$/.test(port)) {
+                document.getElementById('ipInput').value = ip;
+                document.getElementById('portInput').value = port;
+                // 写回 localStorage: 页面刷新/自动重连时无需再扫码
+                localStorage.setItem('pc_ip', ip);
+                localStorage.setItem('pc_port', port);
+                connect();
+                return;
+            }
+        }
+
         // 如果有已保存的有效配置，自动连接
         const savedIP = localStorage.getItem('pc_ip');
         const savedPort = localStorage.getItem('pc_port');
