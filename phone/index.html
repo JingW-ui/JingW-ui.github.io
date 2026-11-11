@@ -1051,6 +1051,17 @@
             }
         }
 
+        // PC 端 HTTP 托管的页面: 无参数也自动连接, 地址就是当前 host
+        // (http 页面连 ws:// 无混合内容限制; GitHub Pages 是 https 且本地 file:// 非协议, 均不进此分支)
+        if (location.protocol === 'http:' && location.hostname && location.port) {
+            document.getElementById('ipInput').value = location.hostname;
+            document.getElementById('portInput').value = location.port;
+            localStorage.setItem('pc_ip', location.hostname);
+            localStorage.setItem('pc_port', location.port);
+            connect();
+            return;
+        }
+
         // 如果有已保存的有效配置，自动连接
         const savedIP = localStorage.getItem('pc_ip');
         const savedPort = localStorage.getItem('pc_port');
