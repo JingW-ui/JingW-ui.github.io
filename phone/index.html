@@ -922,6 +922,8 @@
 
         <!-- 中间：消息显示区 -->
         <div class="message-panel">
+            <!-- 本轮截图图库: 收集/分析等待阶段展示, 结果内容落地时清空 (screenshot_image 消息) -->
+            <div id="shotGallery"></div>
             <div id="messages">
                 <div class="empty-state">
                     <div class="empty-state-icon">📭</div>
@@ -1324,6 +1326,15 @@
                     if (jsonData.type === 'image_switch') {
                         isJsonMessage = true;
                         handleImageSwitch(jsonData);
+                        return;
+                    }
+
+                    // 处理本轮截图展示 (收集 + 分析等待阶段; 结果内容落地时由 displayMessage 清空)
+                    if (jsonData.type === 'screenshot_image') {
+                        isJsonMessage = true;
+                        try {
+                            addShotToGallery(jsonData.data);
+                        } catch (e) { console.error('处理 screenshot_image 失败:', e); }
                         return;
                     }
 
@@ -2066,6 +2077,45 @@
         // 不保存到历史记录（避免大量上传记录）
     }
 
+    // 本轮截图: 追加到图库区 (纵向堆叠, 点击放大)。图库在 #messages 之外,
+    // 不受 displayMessage 整屏替换影响; 结果内容落地时在 displayMessage 里清空。
+    function addShotToGallery(dataUrl) {
+        const gal = document.getElementById('shotGallery');
+        if (!gal || !dataUrl) return;
+        const card = document.createElement('div');
+        card.style.cssText = 'width:95%;max-width:600px;margin:8px auto 0;border-radius:10px;'
+            + 'overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.25);cursor:zoom-in;background:#1a1a2e;';
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.alt = '本轮截图';
+        img.style.cssText = 'width:100%;height:auto;display:block;';
+        img.onclick = () => showShotZoom(dataUrl);
+        card.appendChild(img);
+        gal.appendChild(card);
+        gal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // 截图放大: 全屏暗底 + 完整等比图, 点击任意处关闭
+    function showShotZoom(dataUrl) {
+        const old = document.getElementById('shotZoomModal');
+        if (old) old.remove();
+        const modal = document.createElement('div');
+        modal.id = 'shotZoomModal';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;'
+            + 'display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.style.cssText = 'max-width:96%;max-height:96%;border-radius:8px;';
+        modal.appendChild(img);
+        modal.onclick = () => modal.remove();
+        document.body.appendChild(modal);
+    }
+
+    function clearShotGallery() {
+        const gal = document.getElementById('shotGallery');
+        if (gal) gal.innerHTML = '';
+    }
+
     // 处理图片切换消息
     function handleImageSwitch(data) {
         const messagesEl = document.getElementById('messages');
@@ -2238,6 +2288,7 @@
 
     function displayMessage(text, skipHistory = false) {
         const messagesEl = document.getElementById('messages');
+        clearShotGallery();   // 内容落地 (结果/答案) -> 本轮截图不再展示 (与悬浮面板同规则)
         currentMessage = text;  // 保存当前消息
 
         // 使用 marked.js 渲染 Markdown
