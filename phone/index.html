@@ -1376,7 +1376,7 @@
 
                 // 更新PC状态（始终更新，包含耗时信息）
                 if (messageData.status) {
-                    updatePCStatus(messageData.status, messageData.elapsed, messageData.content);
+                    updatePCStatus(messageData.status, messageData.elapsed, messageData.content, messageData.model);
                     // 复位/空闲 -> 本轮截图清空 (与悬浮面板 Alt+R 复位同步)
                     if (messageData.status === '待命') clearShotGallery();
                 }
@@ -1458,8 +1458,15 @@
     }
 
     // 更新PC端工作状态
-    function updatePCStatus(status, elapsed = null, content = '') {
+    function updatePCStatus(status, elapsed = null, content = '', model = null) {
         const pcStatusEl = document.getElementById('pc-status');
+
+        // 模型名显示: "分析中"类状态 -> "<模型> 分析中", 其余 -> "<状态> · <模型>" (超 24 字符截断)
+        let displayStatus = status;
+        if (model) {
+            const short = model.length > 24 ? model.slice(0, 23) + '…' : model;
+            displayStatus = status.endsWith('分析中') ? `${short} 分析中` : `${status} · ${short}`;
+        }
 
         // 确保状态元素可见
         pcStatusEl.style.display = 'inline-block';
@@ -1554,8 +1561,9 @@
         if (status === 'OCR分析中' || status === 'LLM分析中' || status === 'VLM分析中' ||
             status === '整体代码中' || status === '整理代码中' || status === '自动写入中' ||
             status === '录音识别中') {
-            // 记录当前长任务状态和图标
-            currentLongStatus = status;
+            // 记录当前长任务状态和图标 (displayStatus 含模型名, 计时/覆盖层均用它显示;
+            // 计时判断仍用规范 status, 匹配逻辑不受动态后缀影响)
+            currentLongStatus = displayStatus;
             currentLongIcon = config.icon;
             currentLongContent = content || '';
 
@@ -1574,7 +1582,7 @@
             const stopStatuses = new Set(['已完成', '写入完成', '错误', '待命']);
 
             // 构建显示文本（使用传入的elapsed或无耗时）
-            let displayText = `${config.icon} ${status}`;
+            let displayText = `${config.icon} ${displayStatus}`;
             if (elapsed !== null && elapsed > 0) {
                 displayText += ` (${elapsed.toFixed(2)}s)`;
             }
@@ -1967,18 +1975,26 @@
         const result = {
             status: null,
             content: rawMessage,
-            elapsed: null
+            elapsed: null,
+            model: null
         };
 
         // 尝试从消息中提取状态标记
         // 格式示例: [STATUS:OCR分析中] 或 [STATUS:已完成|ELAPSED:15.23]
         const statusMatch = rawMessage.match(/\[STATUS:(.+?)\]/);
         const elapsedMatch = rawMessage.match(/\[ELAPSED:([\d.]+)\]/);
+        const modelMatch = rawMessage.match(/\[MODEL:([^\]]+)\]/);
 
         if (statusMatch) {
             result.status = statusMatch[1];
             // 移除状态标记，保留纯内容
             result.content = rawMessage.replace(/\[STATUS:.+?\]/g, '').trim();
+        }
+
+        if (modelMatch) {
+            result.model = modelMatch[1];
+            // 移除模型标记 (芯片显示用, 不属于内容)
+            result.content = result.content.replace(/\[MODEL:[^\]]+\]/g, '').trim();
         }
 
         if (elapsedMatch) {
