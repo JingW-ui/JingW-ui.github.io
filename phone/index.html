@@ -1377,6 +1377,8 @@
                 // 更新PC状态（始终更新，包含耗时信息）
                 if (messageData.status) {
                     updatePCStatus(messageData.status, messageData.elapsed, messageData.content);
+                    // 复位/空闲 -> 本轮截图清空 (与悬浮面板 Alt+R 复位同步)
+                    if (messageData.status === '待命') clearShotGallery();
                 }
 
                 // 语音识别专用：当收到识别过程中或识别结果时，弹出大面板以便手机端查看（仅显示状态，移除复制）
