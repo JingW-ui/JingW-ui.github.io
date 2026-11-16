@@ -56,8 +56,8 @@
 
   /* ---- Controls ---- */
   .controls{
-    max-width:960px;margin:40px auto 0;padding:0 24px;
-    display:flex;flex-wrap:wrap;align-items:center;gap:16px;
+    max-width:960px;margin:28px auto 0;padding:0 24px;
+    display:flex;flex-wrap:wrap;align-items:center;gap:12px;
     opacity:0;animation:fadeUp 0.6s ease 0.55s forwards;
   }
   .control-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -99,6 +99,66 @@
 
   .divider{
     width:1px;height:24px;background:var(--border);margin:0 4px;
+  }
+
+  /* ---- Search input(独占一行,居中) ---- */
+  .search-group{flex:1 1 100%;max-width:none;justify-content:center}
+  .search-input{
+    flex:1;min-width:0;width:100%;max-width:520px;
+    padding:6px 14px;border-radius:100px;
+    font-size:0.85rem;font-weight:500;
+    border:1.5px solid var(--border);background:var(--bg);color:var(--text-secondary);
+    outline:none;transition:all 0.25s ease;font-family:inherit;
+  }
+  .search-input:hover,.search-input:focus{border-color:var(--green)}
+  .search-input::placeholder{color:var(--text-tertiary);font-weight:400;font-size:0.76rem}
+
+  /* ---- Keyword highlight ---- */
+  mark{background:rgba(35,134,54,0.16);color:inherit;border-radius:3px;padding:0 1px}
+
+  /* ---- Author quick filter ---- */
+  .owner-click{cursor:pointer;border-bottom:1px dashed var(--text-tertiary)}
+  .owner-click:hover{color:var(--green);border-bottom-color:var(--green)}
+
+  /* ---- Filter chips ---- */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
+  .chips:empty{display:none;margin:0}
+  .filter-chip{
+    display:inline-flex;align-items:center;gap:7px;
+    font-size:0.78rem;font-weight:600;padding:4px 12px;border-radius:100px;
+    background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);
+    max-width:100%;
+  }
+  .filter-chip .chip-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px}
+  .chip-x{cursor:pointer;font-weight:700;opacity:0.65;line-height:1}
+  .chip-x:hover{opacity:1}
+  .chip-clear{
+    background:var(--bg);color:var(--text-tertiary);border:1px solid var(--border);
+    border-radius:100px;padding:4px 12px;font-size:0.75rem;cursor:pointer;
+    transition:all 0.2s;font-weight:500;font-family:inherit;
+  }
+  .chip-clear:hover{color:var(--red);border-color:var(--red)}
+
+  /* ---- Pagination ---- */
+  .pager{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;margin-top:26px}
+  .pager:empty{display:none}
+  .page-pill{
+    padding:5px 12px;border-radius:100px;font-size:0.8rem;font-weight:500;
+    cursor:pointer;transition:all 0.25s ease;
+    border:1.5px solid var(--border);background:var(--bg);color:var(--text-secondary);
+    user-select:none;font-variant-numeric:tabular-nums;font-family:inherit;
+  }
+  .page-pill:hover{border-color:var(--green);color:var(--green)}
+  .page-pill.active{
+    background:var(--green);color:#fff;border-color:var(--green);
+    box-shadow:0 2px 8px rgba(35,134,54,0.25);
+  }
+  .page-pill.nav{font-weight:700}
+  .page-pill.disabled{opacity:0.35;cursor:default;pointer-events:none}
+  .pager-ellipsis{color:var(--text-tertiary);font-size:0.8rem;padding:0 2px;user-select:none}
+  .page-info{
+    font-size:0.75rem;color:var(--text-tertiary);margin-left:10px;
+    font-variant-numeric:tabular-nums;white-space:nowrap;
   }
 
   /* ---- Loading ---- */
@@ -322,7 +382,7 @@
   .stat-label{font-size:0.78rem;color:var(--text-tertiary);margin-top:2px}
 
   .updated-at{
-    max-width:960px;margin:16px auto 0;padding:0 24px;
+    max-width:960px;margin:0 auto 48px;padding:0 24px;
     text-align:center;font-size:0.78rem;color:var(--text-tertiary);
   }
 
@@ -371,6 +431,14 @@
     .hist-item{padding:10px 12px}
     .hist-row{font-size:0.74rem;gap:6px}
     .hist-top1{font-size:0.78rem}
+
+    .search-group{max-width:none}
+    .search-input{font-size:0.8rem;padding:5px 12px}
+    .filter-chip{font-size:0.7rem;padding:3px 10px}
+    .chip-clear{font-size:0.68rem;padding:3px 10px}
+    .pager{gap:4px;margin-top:18px}
+    .page-pill{padding:4px 10px;font-size:0.72rem}
+    .page-info{font-size:0.68rem;margin-left:6px}
 
     .empty-state{padding:50px 16px}
     .empty-state p{font-size:0.95rem}
@@ -460,9 +528,11 @@
   </div>
 </div>
 
-<p class="updated-at" id="updatedAt"></p>
-
 <div class="controls">
+  <div class="control-group search-group">
+    <span class="control-label">Search</span>
+    <input type="search" class="search-input" id="searchInput" placeholder="搜本榜名称/描述 · author:用户名" aria-label="搜索仓库或按作者筛选">
+  </div>
   <div class="control-group">
     <span class="control-label">Period</span>
     <button class="pill view-pill active" data-view="daily">Daily</button>
@@ -478,13 +548,22 @@
     <button class="pill look-pill" data-offset="-7">7 天前</button>
     <input type="date" class="date-input" id="datePick" title="回看任意一天创建的新仓库(按 UTC 创建日期)" aria-label="选择回看日期">
   </div>
-  <div class="divider"></div>
   <button class="pill" id="histBtn" title="本浏览器保存的历史浏览足迹">🕘 足迹</button>
+  <button class="pill" id="refreshBtn" title="清除缓存并重新拉取">↻ 刷新</button>
   <div class="divider"></div>
   <div class="control-group">
     <span class="control-label">Language</span>
     <select class="badge-style-pill" id="langSel" title="筛选语言">
       <option value="">All</option>
+    </select>
+  </div>
+  <div class="divider"></div>
+  <div class="control-group">
+    <span class="control-label">Sort</span>
+    <select class="badge-style-pill" id="sortSel" title="排序方式(本地重排,不重新请求)">
+      <option value="stars">⭐ 星数</option>
+      <option value="new">🕐 创建时间</option>
+      <option value="forks">🍴 Forks</option>
     </select>
   </div>
   <div class="divider"></div>
@@ -498,13 +577,15 @@
       <option value="for-the-badge">for-the-badge</option>
     </select>
   </div>
-  <div class="divider"></div>
-  <button class="pill" id="refreshBtn" title="清除缓存并重新拉取">↻ 刷新</button>
 </div>
 
 <div class="container">
+  <div class="chips" id="chipsRow"></div>
   <div id="repoList" class="repo-list"></div>
+  <div class="pager" id="pager"></div>
 </div>
+
+<p class="updated-at" id="updatedAt"></p>
 
 <script>
 (function(){
@@ -528,6 +609,16 @@
   var refreshNonce = "";
   var loading = false;
   var historyMode = false;
+
+  // ---- 搜索 / 作者筛选 / 排序 / 分页:全部在已拉取的榜单内本地完成,不增加 API 请求 ----
+  var PAGE_SIZE = 10;
+  var currentQuery = "";       // 搜索框文本,支持 author:用户名 语法
+  var currentAuthor = "";      // 点击作者名产生的作者筛选 chip
+  var currentSort = "stars";   // stars | new | forks
+  var currentPage = 1;
+  var currentFiltered = [];    // 最近一次过滤+排序后的完整结果(用于统计/页脚)
+  var activeKws = [];          // 当前搜索关键词(用于命中高亮)
+  var lastTotalCount = null;   // GitHub 返回的 total_count(全站符合条件数)
 
   // ---- 请求超时：避免上游卡死时无限转圈 ----
   function fetchWithTimeout(url, ms) {
@@ -598,6 +689,10 @@
   var refreshBtn = document.getElementById("refreshBtn");
   var histBtn = document.getElementById("histBtn");
   var datePick = document.getElementById("datePick");
+  var searchInput = document.getElementById("searchInput");
+  var sortSel = document.getElementById("sortSel");
+  var chipsRowEl = document.getElementById("chipsRow");
+  var pagerEl = document.getElementById("pager");
 
   // ---- 视图工具 ----
   function isDayView(v) { return /^\d{4}-\d{2}-\d{2}$/.test(String(v)); }
@@ -689,13 +784,14 @@
     return y + "y old";
   }
 
-  // ---- Fetch data（每种视图一次请求,per_page=25,按星数降序）----
+  // ---- Fetch data（每种视图一次请求,per_page=100 取榜单前 100,按星数降序;本地再过滤/排序/分页）----
   // daily/weekly/monthly → 最近 N 天创建;all → stars:>1 全站总榜;日期 → created:DAY..DAY 回看
   async function fetchData(view, lang) {
     var key = CACHE_PREFIX + view + ":" + (lang || "all");
     var hit = lsGet(key);
     if (hit && hit.t && Array.isArray(hit.items) && Date.now() - hit.t < CACHE_TTL) {
       lastFetchAt = new Date(hit.t);
+      lastTotalCount = (typeof hit.total === "number") ? hit.total : null;
       fromCache = true;
       return hit.items;
     }
@@ -711,7 +807,7 @@
     }
     if (lang) q += ' language:"' + (LANG_NAME[lang] || lang) + '"';
 
-    var url = SEARCH_API + "?q=" + encodeURIComponent(q) + "&sort=stars&order=desc&per_page=25";
+    var url = SEARCH_API + "?q=" + encodeURIComponent(q) + "&sort=stars&order=desc&per_page=100";
     if (refreshNonce) url += "&_=" + refreshNonce;
 
     var res = await fetchWithTimeout(url);
@@ -724,9 +820,10 @@
 
     var json = await res.json();
     var items = normalize(json);
+    lastTotalCount = (typeof json.total_count === "number") ? json.total_count : null;
     lastFetchAt = new Date();
     fromCache = false;
-    lsSet(key, { t: Date.now(), items: items });
+    lsSet(key, { t: Date.now(), items: items, total: lastTotalCount });
     return items;
   }
 
@@ -806,15 +903,74 @@
     return parts.join(" ");
   }
 
+  // ---- 搜索解析:空格分词,author:xxx 提取为作者条件,其余为关键词(AND 匹配) ----
+  function parseQuery(q) {
+    var authors = [], kws = [];
+    String(q || "").split(/\s+/).forEach(function(t) {
+      if (!t) return;
+      var m = t.match(/^author:(.+)$/i);
+      if (m) { authors.push(m[1].toLowerCase()); return; }
+      kws.push(t.toLowerCase());
+    });
+    return { authors: authors, kws: kws };
+  }
+
+  // ---- 本地过滤:作者(精确) + 关键词(owner/repo/description 包含,AND) ----
+  function getFiltered() {
+    if (!currentItems) return [];
+    var pq = parseQuery(currentQuery);
+    var authors = pq.authors.slice();
+    if (currentAuthor) authors.push(currentAuthor.toLowerCase());
+    if (!authors.length && !pq.kws.length) return currentItems.slice();
+    return currentItems.filter(function(r) {
+      for (var i = 0; i < authors.length; i++) {
+        if (r.username.toLowerCase() !== authors[i]) return false;
+      }
+      if (pq.kws.length) {
+        var hay = (r.username + " " + r.reponame + " " + r.description).toLowerCase();
+        for (var j = 0; j < pq.kws.length; j++) {
+          if (hay.indexOf(pq.kws[j]) === -1) return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  // ---- 本地排序:stars 保持 API 原序(即星数降序);forks/创建时间本地排 ----
+  function sortFiltered(items) {
+    var arr = items.slice();
+    if (currentSort === "forks") {
+      arr.sort(function(a, b) { return b.forks - a.forks; });
+    } else if (currentSort === "new") {
+      arr.sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+    }
+    return arr;
+  }
+
+  // ---- 关键词高亮:先转义再一次正则包 <mark>,避免破坏 HTML 实体 ----
+  function hiHtml(text, kws) {
+    var safe = escHtml(text);
+    if (!kws || !kws.length) return safe;
+    var parts = kws.map(function(k) {
+      return k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    });
+    var re;
+    try { re = new RegExp("(" + parts.join("|") + ")", "gi"); } catch (e) { return safe; }
+    return safe.replace(re, "<mark>$1</mark>");
+  }
+
   // ---- Render cards ----
   function renderCards(repos) {
     if (statBarEl) statBarEl.style.display = "";
     repoListEl.innerHTML = "";
 
     if (!repos.length) {
-      var emptyMsg = currentLang
-        ? "该筛选条件下暂无结果，可换个时间窗口或语言试试"
-        : "No repositories found for this filter.";
+      var filtersActive = !!(currentQuery || currentAuthor);
+      var emptyMsg = filtersActive
+        ? "没有匹配当前搜索/作者筛选的仓库，可调整关键词或清除筛选"
+        : (currentLang
+          ? "该筛选条件下暂无结果，可换个时间窗口或语言试试"
+          : "No repositories found for this filter.");
       repoListEl.innerHTML = '<div class="empty-state"><p>' + escHtml(emptyMsg) + '</p></div>';
       updateStats([]);
       return;
@@ -822,8 +978,11 @@
 
     updateStats(repos);
 
+    var start = (currentPage - 1) * PAGE_SIZE;
+    var pageRepos = repos.slice(start, start + PAGE_SIZE);
+
     var frag = document.createDocumentFragment();
-    repos.forEach(function(repo, i) {
+    pageRepos.forEach(function(repo, i) {
       var card = document.createElement("div");
       card.className = "repo-card";
       card.style.animationDelay = (i * 50) + "ms";
@@ -848,11 +1007,11 @@
           '<div class="repo-rank">' + repo.rank + '</div>' +
           '<div class="repo-info">' +
             '<a class="repo-name" href="' + repo.url + '" target="_blank" rel="noopener">' +
-              '<span class="owner">' + escHtml(repo.username) + '</span>' +
+              '<span class="owner owner-click" data-user="' + escHtml(repo.username) + '" title="点击按该作者筛选">' + hiHtml(repo.username, activeKws) + '</span>' +
               '<span class="slash">/</span>' +
-              escHtml(repo.reponame) +
+              hiHtml(repo.reponame, activeKws) +
             '</a>' +
-            (repo.description ? '<p class="repo-desc">' + escHtml(repo.description) + '</p>' : '') +
+            (repo.description ? '<p class="repo-desc">' + hiHtml(repo.description, activeKws) + '</p>' : '') +
           '</div>' +
           '<span class="assess-badge ' + a.cls + '" title="' + a.tip + '">' + a.txt + '</span>' +
         '</div>' +
@@ -901,6 +1060,67 @@
     statLangs.textContent = langs.size;
   }
 
+  // ---- 筛选 chip 行:语言/作者生效时显示,可单独移除或一键清除 ----
+  function renderChips() {
+    if (!chipsRowEl) return;
+    var chips = [];
+    if (currentLang) {
+      chips.push('<span class="filter-chip">🌐 ' + escHtml(LANG_NAME[currentLang] || currentLang) +
+        '<span class="chip-x" data-chip="lang" title="移除语言筛选">×</span></span>');
+    }
+    if (currentAuthor) {
+      chips.push('<span class="filter-chip">👤 ' + escHtml(currentAuthor) +
+        '<span class="chip-x" data-chip="author" title="移除作者筛选">×</span></span>');
+    }
+    if (!chips.length) { chipsRowEl.innerHTML = ""; return; }
+    chipsRowEl.innerHTML = chips.join("") +
+      '<button class="chip-clear" id="clearFiltersBtn" title="清除搜索/作者/语言筛选">清除全部</button>';
+  }
+
+  // ---- 分页条:‹ 1 … n … 末页 › + 页码信息;≤7 页全量,更多时省略号折叠 ----
+  function renderPager(total, totalPages) {
+    if (!pagerEl) return;
+    if (totalPages <= 1) { pagerEl.innerHTML = ""; return; }
+    var nums = [];
+    if (totalPages <= 7) {
+      for (var i = 1; i <= totalPages; i++) nums.push(i);
+    } else {
+      nums.push(1);
+      if (currentPage > 3) nums.push("…");
+      for (var j = Math.max(2, currentPage - 1); j <= Math.min(totalPages - 1, currentPage + 1); j++) nums.push(j);
+      if (currentPage < totalPages - 2) nums.push("…");
+      nums.push(totalPages);
+    }
+    var html = '<button class="page-pill nav' + (currentPage === 1 ? " disabled" : "") +
+      '" data-page="' + (currentPage - 1) + '" title="上一页">‹</button>';
+    nums.forEach(function(n) {
+      if (n === "…") { html += '<span class="pager-ellipsis">…</span>'; return; }
+      html += '<button class="page-pill' + (n === currentPage ? " active" : "") +
+        '" data-page="' + n + '">' + n + '</button>';
+    });
+    html += '<button class="page-pill nav' + (currentPage === totalPages ? " disabled" : "") +
+      '" data-page="' + (currentPage + 1) + '" title="下一页">›</button>';
+    html += '<span class="page-info">第 ' + currentPage + ' / ' + totalPages +
+      ' 页 · 共 ' + total + ' 条</span>';
+    pagerEl.innerHTML = html;
+  }
+
+  // ---- 过滤 → 排序 → 分页 → 渲染 的统一入口;resetPage 用于筛选条件变化时回到第 1 页 ----
+  function applyAndRender(resetPage) {
+    if (!currentItems) return;
+    if (resetPage) currentPage = 1;
+    var filtered = sortFiltered(getFiltered());
+    var totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+    currentFiltered = filtered;
+    activeKws = parseQuery(currentQuery).kws;
+    renderChips();
+    renderCards(filtered);
+    renderPager(filtered.length, totalPages);
+    renderUpdatedAt();
+  }
+
   // ---- 访客浏览足迹:每次成功拉取记一条(仅存本浏览器) ----
   function readHistory() {
     var h = lsGet(HIST_KEY);
@@ -930,6 +1150,8 @@
   function renderHistory() {
     var hist = readHistory();
     if (statBarEl) statBarEl.style.display = "none";
+    if (chipsRowEl) chipsRowEl.innerHTML = "";
+    if (pagerEl) pagerEl.innerHTML = "";
     if (!hist.length) {
       repoListEl.innerHTML =
         '<div class="empty-state"><p>暂无足迹</p>' +
@@ -970,8 +1192,7 @@
     historyMode = false;
     if (histBtn) histBtn.classList.remove("active");
     if (currentItems) {
-      renderCards(currentItems);
-      renderUpdatedAt();
+      applyAndRender(false);
     } else {
       loadAndRender(false);
     }
@@ -997,15 +1218,16 @@
         repoListEl.classList.remove("transitioning");
       }
 
-      renderCards(repos);
       recordHistory(currentView, currentLang, repos);
-      renderUpdatedAt();
+      applyAndRender(false);
     } catch (err) {
       currentItems = null;
       var msg = (err && err.rateLimited)
         ? "GitHub API 限流中（未认证 10 次/分钟），请约 1 分钟后再试。"
         : "Failed to load trending data. Please try again.";
       repoListEl.innerHTML = '<div class="empty-state"><p>' + escHtml(msg) + '</p></div>';
+      if (pagerEl) pagerEl.innerHTML = "";
+      if (chipsRowEl) chipsRowEl.innerHTML = "";
     }
 
     loading = false;
@@ -1013,23 +1235,35 @@
 
   function sleep(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
 
-  // ---- 展示数据获取时间与当前视图口径 ----
+  // ---- 展示数据获取时间与当前视图口径;筛选时附命中数与全站总量 ----
   function renderUpdatedAt() {
     if (!updatedAtEl) return;
     var t = lastFetchAt || new Date();
-    updatedAtEl.textContent = "数据获取于 " +
+    var text = "数据获取于 " +
       t.toLocaleString("zh-CN", { hour12: false }) +
-      " · " + viewLabel(currentView) +
-      (fromCache ? " · 缓存" : "") +
-      " · GitHub Search API";
+      " · " + viewLabel(currentView);
+    if (!historyMode && currentItems) {
+      if (currentQuery || currentAuthor) {
+        text += " · 命中 " + currentFiltered.length + " / " + currentItems.length;
+      } else {
+        text += " · 榜单 " + currentItems.length + " 条";
+      }
+      if (lastTotalCount) text += " · 全站共 " + fmtNum(lastTotalCount) + " 个";
+    }
+    text += (fromCache ? " · 缓存" : "") + " · GitHub Search API";
+    updatedAtEl.textContent = text;
   }
 
-  // ---- URL 深链:view/lang/badge 写回地址栏,刷新/分享不丢状态 ----
+  // ---- URL 深链:view/lang/q/author/sort/page/badge 写回地址栏,刷新/分享不丢状态 ----
   function syncUrl() {
     try {
       var p = new URLSearchParams();
       p.set("view", currentView);
       if (currentLang) p.set("lang", currentLang);
+      if (currentQuery) p.set("q", currentQuery);
+      if (currentAuthor) p.set("author", currentAuthor);
+      if (currentSort !== "stars") p.set("sort", currentSort);
+      if (currentPage > 1) p.set("page", String(currentPage));
       if (currentBadge && currentBadge !== "social") p.set("badge", currentBadge);
       var qs = p.toString();
       history.replaceState(null, "", location.pathname + (qs ? "?" + qs : ""));
@@ -1051,12 +1285,15 @@
     }
     if (langSel) langSel.value = currentLang;
     if (badgeStyleSel) badgeStyleSel.value = currentBadge;
+    if (searchInput) searchInput.value = currentQuery;
+    if (sortSel) sortSel.value = currentSort;
   }
 
   function setView(v) {
     if (v === currentView) { syncControls(); return; }
     currentView = v;
     historyMode = false;
+    currentPage = 1;
     syncControls();
     syncUrl();
     loadAndRender(true);
@@ -1088,6 +1325,7 @@
     var lang = langSel.value;
     if (lang === currentLang) return;
     currentLang = lang;
+    currentPage = 1;
     syncUrl();
     loadAndRender(true);
   });
@@ -1097,7 +1335,7 @@
     currentBadge = badgeStyleSel.value;
     syncUrl();
     if (currentItems) {
-      renderCards(currentItems);
+      applyAndRender(false);
     }
   });
 
@@ -1107,6 +1345,92 @@
     clearLocalCache();
     loadAndRender(true);
   });
+
+  // ---- Event: search input(300ms 防抖;Esc 清空;/ 键全局聚焦) ----
+  if (searchInput) {
+    var searchTimer = null;
+    searchInput.addEventListener("input", function() {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(function() {
+        var v = searchInput.value.trim();
+        if (v === currentQuery) return;
+        currentQuery = v;
+        applyAndRender(true); // 先重置页码再写 URL
+        syncUrl();
+      }, 300);
+    });
+    searchInput.addEventListener("keydown", function(e) {
+      if (e.key !== "Escape") return;
+      searchInput.value = "";
+      if (currentQuery) {
+        currentQuery = "";
+        applyAndRender(true);
+        syncUrl();
+      }
+    });
+  }
+  document.addEventListener("keydown", function(e) {
+    if (e.key !== "/") return;
+    var tag = document.activeElement ? document.activeElement.tagName : "";
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+    if (searchInput) { e.preventDefault(); searchInput.focus(); }
+  });
+
+  // ---- Event: sort select(本地重排,不重新请求) ----
+  if (sortSel) {
+    sortSel.addEventListener("change", function() {
+      if (sortSel.value === currentSort) return;
+      currentSort = sortSel.value;
+      applyAndRender(true);
+      syncUrl();
+    });
+  }
+
+  // ---- Event: pager clicks(翻页后滚回列表顶部) ----
+  if (pagerEl) {
+    pagerEl.addEventListener("click", function(e) {
+      var pill = e.target.closest(".page-pill[data-page]");
+      if (!pill || pill.classList.contains("disabled")) return;
+      var n = parseInt(pill.getAttribute("data-page"), 10);
+      if (!n || n === currentPage) return;
+      currentPage = n;
+      syncUrl();
+      applyAndRender(false);
+      repoListEl.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  // ---- Event: chips(移除单个筛选 / 清除全部) ----
+  if (chipsRowEl) {
+    chipsRowEl.addEventListener("click", function(e) {
+      if (e.target.closest("#clearFiltersBtn")) {
+        currentQuery = "";
+        currentAuthor = "";
+        currentPage = 1;
+        if (searchInput) searchInput.value = "";
+        if (currentLang) {
+          currentLang = "";
+          if (langSel) langSel.value = "";
+        }
+        syncUrl();
+        loadAndRender(true);
+        return;
+      }
+      var x = e.target.closest(".chip-x");
+      if (!x) return;
+      var k = x.getAttribute("data-chip");
+      if (k === "author") {
+        currentAuthor = "";
+        applyAndRender(true);
+        syncUrl();
+      } else if (k === "lang") {
+        currentLang = "";
+        if (langSel) langSel.value = "";
+        syncUrl();
+        loadAndRender(true);
+      }
+    });
+  }
 
   // ---- Event: history toggle ----
   if (histBtn) {
@@ -1130,6 +1454,17 @@
       updateHistBtn(0);
       renderHistory();
       renderHistUpdatedAt();
+      return;
+    }
+    var ownerEl = e.target.closest(".owner-click");
+    if (ownerEl) {
+      e.preventDefault(); // owner 位于仓库链接内,阻止跳转
+      e.stopPropagation();
+      var u = ownerEl.getAttribute("data-user") || "";
+      if (historyMode) { historyMode = false; if (histBtn) histBtn.classList.remove("active"); }
+      currentAuthor = (currentAuthor === u) ? "" : u; // 再点一次取消
+      applyAndRender(true);
+      syncUrl();
       return;
     }
     var btn = e.target.closest(".embed-btn");
@@ -1173,6 +1508,14 @@
     if (l && LANG_NAME[l]) currentLang = l;
     var b = sp.get("badge");
     if (b) currentBadge = b;
+    var qv = sp.get("q");
+    if (qv) currentQuery = qv;
+    var au = sp.get("author");
+    if (au) currentAuthor = au;
+    var sv = sp.get("sort");
+    if (sv === "new" || sv === "forks") currentSort = sv;
+    var pg = parseInt(sp.get("page"), 10);
+    if (pg >= 1) currentPage = pg;
   })();
 
   syncControls();
