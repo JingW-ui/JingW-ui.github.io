@@ -618,7 +618,8 @@
   var currentPage = 1;
   var currentFiltered = [];    // 最近一次过滤+排序后的完整结果(用于统计/页脚)
   var activeKws = [];          // 当前搜索关键词(用于命中高亮)
-  var lastTotalCount = null;   // GitHub 返回的 total_count(全站符合条件数)
+  var lastTotalCount = null;   // GitHub 返回的 total_count(全站/该作者符合条件数)
+  var authorApiActive = false; // 作者筛选是否走 API(user: 限定符拉取该作者全量仓库)
 
   // ---- 请求超时：避免上游卡死时无限转圈 ----
   function fetchWithTimeout(url, ms) {
@@ -786,8 +787,10 @@
 
   // ---- Fetch data（每种视图一次请求,per_page=100 取榜单前 100,按星数降序;本地再过滤/排序/分页）----
   // daily/weekly/monthly → 最近 N 天创建;all → stars:>1 全站总榜;日期 → created:DAY..DAY 回看
-  async function fetchData(view, lang) {
-    var key = CACHE_PREFIX + view + ":" + (lang || "all");
+  // 传入 author 时追加 user: 限定符(作者模式):拉取该作者在时间窗口内的全量仓库,不再受榜单前 100 限制
+  async function fetchData(view, lang, author) {
+    var key = CACHE_PREFIX + view + ":" + (lang || "all") +
+      (author ? ":u:" + author.toLowerCase() : "");
     var hit = lsGet(key);
     if (hit && hit.t && Array.isArray(hit.items) && Date.now() - hit.t < CACHE_TTL) {
       lastFetchAt = new Date(hit.t);
@@ -806,6 +809,7 @@
       q = "created:>" + new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
     }
     if (lang) q += ' language:"' + (LANG_NAME[lang] || lang) + '"';
+    if (author) q += " user:" + author;
 
     var url = SEARCH_API + "?q=" + encodeURIComponent(q) + "&sort=stars&order=desc&per_page=100";
     if (refreshNonce) url += "&_=" + refreshNonce;
@@ -901,6 +905,20 @@
       parts.push("[![" + b.label + "](" + url + ")](" + href + ")");
     }
     return parts.join(" ");
+  }
+
+  // ---- 作者条件统一出口:chip 优先,其次搜索框 author: 语法(多个取第一个,其余仍本地 AND 校验) ----
+  function queryAuthor() {
+    if (currentAuthor) return currentAuthor;
+    var pq = parseQuery(currentQuery);
+    return pq.authors.length ? pq.authors[0] : "";
+  }
+
+  // ---- 剔除查询串中的 author: 词(owner chip 点击时让 chip 接管作者条件) ----
+  function stripAuthors(q) {
+    return String(q || "").split(/\s+/).filter(function(t) {
+      return t && !/^author:/i.test(t);
+    }).join(" ");
   }
 
   // ---- 搜索解析:空格分词,author:xxx 提取为作者条件,其余为关键词(AND 匹配) ----
@@ -1002,9 +1020,12 @@
       var badgesHtml = buildBadges(repo.username, repo.reponame);
       var repoUrl = "https://github.com/" + encodeURIComponent(repo.username) + "/" + encodeURIComponent(repo.reponame);
 
+      // 作者模式下的 rank 是作者列表内的序号而非趋势榜位,不再展示避免误导
+      var rankHtml = authorApiActive ? "" : '<div class="repo-rank">' + repo.rank + '</div>';
+
       card.innerHTML =
         '<div class="repo-top">' +
-          '<div class="repo-rank">' + repo.rank + '</div>' +
+          rankHtml +
           '<div class="repo-info">' +
             '<a class="repo-name" href="' + repo.url + '" target="_blank" rel="noopener">' +
               '<span class="owner owner-click" data-user="' + escHtml(repo.username) + '" title="点击按该作者筛选">' + hiHtml(repo.username, activeKws) + '</span>' +
@@ -1209,7 +1230,9 @@
     repoListEl.innerHTML = '<div class="loading-container"><div class="loading-spinner"></div></div>';
 
     try {
-      var repos = await fetchData(currentView, currentLang);
+      var author = queryAuthor();
+      authorApiActive = !!author;
+      var repos = await fetchData(currentView, currentLang, author);
       currentItems = repos;
 
       if (animate) {
@@ -1243,12 +1266,19 @@
       t.toLocaleString("zh-CN", { hour12: false }) +
       " · " + viewLabel(currentView);
     if (!historyMode && currentItems) {
-      if (currentQuery || currentAuthor) {
+      if (authorApiActive) {
+        text += " · user:" + queryAuthor() +
+          (currentQuery
+            ? " · 命中 " + currentFiltered.length + " / " + currentItems.length
+            : " · 作者仓库 " + currentItems.length + " 个");
+        if (lastTotalCount) text += " · 该作者共 " + fmtNum(lastTotalCount) + " 个仓库";
+      } else if (currentQuery || currentAuthor) {
         text += " · 命中 " + currentFiltered.length + " / " + currentItems.length;
+        if (lastTotalCount) text += " · 全站共 " + fmtNum(lastTotalCount) + " 个";
       } else {
         text += " · 榜单 " + currentItems.length + " 条";
+        if (lastTotalCount) text += " · 全站共 " + fmtNum(lastTotalCount) + " 个";
       }
-      if (lastTotalCount) text += " · 全站共 " + fmtNum(lastTotalCount) + " 个";
     }
     text += (fromCache ? " · 缓存" : "") + " · GitHub Search API";
     updatedAtEl.textContent = text;
@@ -1354,18 +1384,33 @@
       searchTimer = setTimeout(function() {
         var v = searchInput.value.trim();
         if (v === currentQuery) return;
+        var prevAuthor = queryAuthor();
         currentQuery = v;
-        applyAndRender(true); // 先重置页码再写 URL
-        syncUrl();
+        if (parseQuery(v).authors.length) currentAuthor = ""; // author: 语法接管作者条件,清除 chip
+        if (queryAuthor() !== prevAuthor) {
+          // 作者条件变化 → 走 API 重新拉取(user: 模式)
+          syncUrl();
+          loadAndRender(true);
+        } else {
+          // 仅关键词变化 → 本地过滤,零请求
+          applyAndRender(true);
+          syncUrl();
+        }
       }, 300);
     });
     searchInput.addEventListener("keydown", function(e) {
       if (e.key !== "Escape") return;
       searchInput.value = "";
       if (currentQuery) {
+        var prevAuthor = queryAuthor();
         currentQuery = "";
-        applyAndRender(true);
-        syncUrl();
+        if (queryAuthor() !== prevAuthor) {
+          syncUrl();
+          loadAndRender(true);
+        } else {
+          applyAndRender(true);
+          syncUrl();
+        }
       }
     });
   }
@@ -1421,8 +1466,8 @@
       var k = x.getAttribute("data-chip");
       if (k === "author") {
         currentAuthor = "";
-        applyAndRender(true);
         syncUrl();
+        loadAndRender(true); // 回到趋势榜单数据
       } else if (k === "lang") {
         currentLang = "";
         if (langSel) langSel.value = "";
@@ -1456,17 +1501,22 @@
       renderHistUpdatedAt();
       return;
     }
-    var ownerEl = e.target.closest(".owner-click");
-    if (ownerEl) {
-      e.preventDefault(); // owner 位于仓库链接内,阻止跳转
-      e.stopPropagation();
-      var u = ownerEl.getAttribute("data-user") || "";
-      if (historyMode) { historyMode = false; if (histBtn) histBtn.classList.remove("active"); }
-      currentAuthor = (currentAuthor === u) ? "" : u; // 再点一次取消
-      applyAndRender(true);
-      syncUrl();
-      return;
-    }
+      var ownerEl = e.target.closest(".owner-click");
+      if (ownerEl) {
+        e.preventDefault(); // owner 位于仓库链接内,阻止跳转
+        e.stopPropagation();
+        var u = ownerEl.getAttribute("data-user") || "";
+        if (historyMode) { historyMode = false; if (histBtn) histBtn.classList.remove("active"); }
+        var stripped = stripAuthors(currentQuery); // chip 接管作者条件,剔除搜索框里的 author: 词
+        if (stripped !== currentQuery) {
+          currentQuery = stripped;
+          if (searchInput) searchInput.value = stripped;
+        }
+        currentAuthor = (currentAuthor === u) ? "" : u; // 再点一次取消
+        syncUrl();
+        loadAndRender(true); // 作者筛选走 API(user: 模式),取该作者全量数据
+        return;
+      }
     var btn = e.target.closest(".embed-btn");
     if (!btn) return;
     e.stopPropagation();
