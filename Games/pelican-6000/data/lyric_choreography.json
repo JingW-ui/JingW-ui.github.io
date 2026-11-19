@@ -1,0 +1,537 @@
+{
+  "version": "4.1-museum-4k-literary-sync",
+  "description": "4K museum-grade spatial kinetic typography choreography synced 1:1 with polished literary lyrics, upper-and-foreground rhythm, era-adaptive ink vs ivory-gold sculpting, and strict curator-plaque safe zone.",
+  "shots": [
+    {
+      "lineIndex": 0,
+      "layout": "upper_staggered",
+      "x": 480,
+      "y": 566,
+      "font": "sans",
+      "size": 54,
+      "inkMode": "ivory_gold",
+      "accent": "#ff9642",
+      "hero": [
+        "沙漠",
+        "神庙"
+      ],
+      "ornament": "route_arc"
+    },
+    {
+      "lineIndex": 1,
+      "layout": "upper_staggered",
+      "x": 480,
+      "y": 124,
+      "font": "serif",
+      "size": 56,
+      "inkMode": "ivory_gold",
+      "accent": "#f4a43b",
+      "hero": [
+        "石头在敲"
+      ],
+      "ornament": "chisel_sparks"
+    },
+    {
+      "lineIndex": 2,
+      "layout": "chisel_monument",
+      "x": 456,
+      "y": 162,
+      "font": "serif",
+      "size": 66,
+      "inkMode": "ivory_gold",
+      "accent": "#e65c38",
+      "hero": [
+        "大嘴鸟"
+      ],
+      "ornament": "rubbing_seal"
+    },
+    {
+      "lineIndex": 3,
+      "layout": "split_diagonal",
+      "x": 480,
+      "y": 566,
+      "font": "sans",
+      "size": 52,
+      "inkMode": "ivory_gold",
+      "accent": "#f2a341",
+      "hero": [
+        "踏板跑"
+      ],
+      "ornament": "speed_lines"
+    },
+    {
+      "lineIndex": 4,
+      "layout": "bell_acoustic",
+      "x": 486,
+      "y": 186,
+      "font": "kai",
+      "size": 62,
+      "inkMode": "paper_ink",
+      "accent": "#c83b26",
+      "hero": [
+        "车铃"
+      ],
+      "ornament": "bell_rings"
+    },
+    {
+      "lineIndex": 5,
+      "layout": "left_editorial",
+      "x": 206,
+      "y": 114,
+      "font": "kai",
+      "size": 58,
+      "inkMode": "paper_ink",
+      "accent": "#b83422",
+      "hero": [
+        "壁画",
+        "今朝"
+      ],
+      "ornament": "route_arc"
+    },
+    {
+      "lineIndex": 6,
+      "layout": "vertical_scroll",
+      "x": 852,
+      "y": 84,
+      "font": "kai",
+      "size": 50,
+      "inkMode": "paper_ink",
+      "accent": "#c43f26",
+      "hero": [
+        "颜料",
+        "姿势"
+      ],
+      "ornament": "pigment_chips",
+      "seal": "未变"
+    },
+    {
+      "lineIndex": 7,
+      "layout": "beak_caliper",
+      "x": 204,
+      "y": 112,
+      "font": "serif",
+      "size": 54,
+      "inkMode": "paper_ink",
+      "accent": "#c43e26",
+      "hero": [
+        "鹈鹕",
+        "车把"
+      ],
+      "ornament": "caliper_bracket"
+    },
+    {
+      "lineIndex": 8,
+      "layout": "left_editorial",
+      "x": 206,
+      "y": 536,
+      "font": "serif",
+      "size": 52,
+      "inkMode": "ivory_gold",
+      "accent": "#ff9e44",
+      "hero": [
+        "六千趟"
+      ],
+      "ornament": "counter_badge"
+    },
+    {
+      "lineIndex": 9,
+      "layout": "bell_acoustic",
+      "x": 472,
+      "y": 206,
+      "font": "sans",
+      "size": 60,
+      "inkMode": "paper_ink",
+      "accent": "#c63622",
+      "hero": [
+        "叮叮当"
+      ],
+      "ornament": "bell_rings"
+    },
+    {
+      "lineIndex": 10,
+      "layout": "upper_staggered",
+      "x": 456,
+      "y": 126,
+      "font": "serif",
+      "size": 60,
+      "inkMode": "ivory_gold",
+      "accent": "#ffd166",
+      "hero": [
+        "骑得好"
+      ],
+      "ornament": "gold_filigree"
+    },
+    {
+      "lineIndex": 11,
+      "layout": "upper_staggered",
+      "x": 480,
+      "y": 568,
+      "font": "serif",
+      "size": 56,
+      "inkMode": "ivory_gold",
+      "accent": "#ffb845",
+      "hero": [
+        "微微笑"
+      ],
+      "ornament": "smile_arc"
+    },
+    {
+      "lineIndex": 12,
+      "layout": "vertical_scroll",
+      "x": 256,
+      "y": 88,
+      "font": "kai",
+      "size": 50,
+      "inkMode": "paper_ink",
+      "accent": "#b42c1e",
+      "hero": [
+        "不摔跤"
+      ],
+      "ornament": "ink_wheels",
+      "seal": "稳行"
+    },
+    {
+      "lineIndex": 13,
+      "layout": "chisel_monument",
+      "x": 428,
+      "y": 148,
+      "font": "kai",
+      "size": 60,
+      "inkMode": "paper_ink",
+      "accent": "#b83022",
+      "hero": [
+        "锤子还在敲"
+      ],
+      "ornament": "hammer_stamp"
+    },
+    {
+      "lineIndex": 14,
+      "layout": "chisel_monument",
+      "x": 480,
+      "y": 528,
+      "font": "serif",
+      "size": 54,
+      "splitAt": 5,
+      "inkMode": "ivory_gold",
+      "accent": "#ffb84d",
+      "hero": [
+        "六千年",
+        "多少稿"
+      ],
+      "ornament": "hammer_stamp"
+    },
+    {
+      "lineIndex": 15,
+      "layout": "split_diagonal",
+      "x": 480,
+      "y": 138,
+      "font": "sans",
+      "size": 60,
+      "inkMode": "ivory_gold",
+      "accent": "#ff9234",
+      "hero": [
+        "往前跑"
+      ],
+      "ornament": "speed_lines"
+    },
+    {
+      "lineIndex": 16,
+      "layout": "crt_terminal",
+      "x": 208,
+      "y": 116,
+      "font": "mono",
+      "size": 48,
+      "inkMode": "ivory_gold",
+      "accent": "#6eff9e",
+      "hero": [
+        "水墨",
+        "电脑"
+      ],
+      "ornament": "crt_reticle"
+    },
+    {
+      "lineIndex": 17,
+      "layout": "crt_terminal",
+      "x": 248,
+      "y": 508,
+      "font": "mono",
+      "size": 48,
+      "inkMode": "ivory_gold",
+      "accent": "#7affb2",
+      "hero": [
+        "屏幕傻笑"
+      ],
+      "ornament": "crt_reticle"
+    },
+    {
+      "lineIndex": 18,
+      "layout": "pixel_banner",
+      "x": 480,
+      "y": 144,
+      "font": "mono",
+      "size": 58,
+      "inkMode": "ivory_gold",
+      "accent": "#ffd84d",
+      "hero": [
+        "真奇妙"
+      ],
+      "ornament": "pixel_badges"
+    },
+    {
+      "lineIndex": 19,
+      "layout": "pixel_banner",
+      "x": 480,
+      "y": 510,
+      "font": "sans",
+      "size": 48,
+      "inkMode": "ivory_gold",
+      "accent": "#ff8856",
+      "hero": [
+        "小鱼",
+        "午觉"
+      ],
+      "ornament": "pixel_badges"
+    },
+    {
+      "lineIndex": 20,
+      "layout": "chat_bubbles",
+      "x": 206,
+      "y": 176,
+      "font": "sans",
+      "size": 54,
+      "inkMode": "paper_ink",
+      "accent": "#d94e1f",
+      "hero": [
+        "把车蹬好"
+      ],
+      "ornament": "im_stack",
+      "sideBubbles": [
+        "「在吗？？」",
+        "「鹈鹕还在骑！」",
+        "「6000年未掉线」"
+      ]
+    },
+    {
+      "lineIndex": 21,
+      "layout": "chat_bubbles",
+      "x": 206,
+      "y": 168,
+      "font": "sans",
+      "size": 50,
+      "inkMode": "paper_ink",
+      "accent": "#d94e1f",
+      "hero": [
+        "追着它跑"
+      ],
+      "ornament": "im_stack",
+      "sideBubbles": [
+        "「换水墨！」",
+        "「切像素风」",
+        "「跟上那只鸟」"
+      ]
+    },
+    {
+      "lineIndex": 22,
+      "layout": "center_angled_cards",
+      "x": 480,
+      "y": 528,
+      "font": "serif",
+      "size": 54,
+      "inkMode": "paper_ink",
+      "accent": "#c8431c",
+      "hero": [
+        "六千年",
+        "时髦"
+      ],
+      "ornament": "angled_history"
+    },
+    {
+      "lineIndex": 23,
+      "layout": "beak_caliper",
+      "x": 204,
+      "y": 132,
+      "font": "sans",
+      "size": 54,
+      "inkMode": "ivory_gold",
+      "accent": "#ff5edb",
+      "hero": [
+        "鹈鹕",
+        "车把"
+      ],
+      "ornament": "caliper_bracket"
+    },
+    {
+      "lineIndex": 24,
+      "layout": "left_editorial",
+      "x": 208,
+      "y": 534,
+      "font": "sans",
+      "size": 52,
+      "inkMode": "ivory_gold",
+      "accent": "#00f0ff",
+      "hero": [
+        "六千趟"
+      ],
+      "ornament": "counter_badge"
+    },
+    {
+      "lineIndex": 25,
+      "layout": "shorts_punch",
+      "x": 458,
+      "y": 172,
+      "font": "sans",
+      "size": 50,
+      "inkMode": "ivory_gold",
+      "accent": "#fe2c55",
+      "hero": [
+        "叮叮当"
+      ],
+      "ornament": "bell_rings"
+    },
+    {
+      "lineIndex": 26,
+      "layout": "shorts_punch",
+      "x": 458,
+      "y": 168,
+      "font": "sans",
+      "size": 52,
+      "splitAt": 4,
+      "inkMode": "ivory_gold",
+      "accent": "#25f4ee",
+      "hero": [
+        "骑得好"
+      ],
+      "ornament": "shorts_tags"
+    },
+    {
+      "lineIndex": 27,
+      "layout": "shorts_punch",
+      "x": 458,
+      "y": 166,
+      "font": "serif",
+      "size": 50,
+      "splitAt": 6,
+      "inkMode": "ivory_gold",
+      "accent": "#ffb84d",
+      "hero": [
+        "微微笑"
+      ],
+      "ornament": "smile_arc"
+    },
+    {
+      "lineIndex": 28,
+      "layout": "shorts_punch",
+      "x": 458,
+      "y": 168,
+      "font": "sans",
+      "size": 52,
+      "splitAt": 4,
+      "inkMode": "ivory_gold",
+      "accent": "#fe2c55",
+      "hero": [
+        "不摔跤"
+      ],
+      "ornament": "shorts_tags"
+    },
+    {
+      "lineIndex": 29,
+      "layout": "chisel_monument",
+      "x": 480,
+      "y": 564,
+      "font": "mono",
+      "size": 56,
+      "inkMode": "ivory_gold",
+      "accent": "#ffb347",
+      "hero": [
+        "锤子还在敲"
+      ],
+      "ornament": "hammer_stamp"
+    },
+    {
+      "lineIndex": 30,
+      "layout": "left_editorial",
+      "x": 208,
+      "y": 136,
+      "font": "serif",
+      "size": 56,
+      "splitAt": 5,
+      "inkMode": "ivory_gold",
+      "accent": "#66d9ff",
+      "hero": [
+        "六千年",
+        "多少稿"
+      ],
+      "ornament": "route_arc"
+    },
+    {
+      "lineIndex": 31,
+      "layout": "split_diagonal",
+      "x": 480,
+      "y": 562,
+      "font": "sans",
+      "size": 60,
+      "inkMode": "ivory_gold",
+      "accent": "#ffd166",
+      "hero": [
+        "往前跑"
+      ],
+      "ornament": "speed_lines"
+    },
+    {
+      "lineIndex": 32,
+      "layout": "outro_duet",
+      "x": 480,
+      "y": 642,
+      "font": "serif",
+      "size": 60,
+      "inkMode": "ivory_gold",
+      "accent": "#e87a3d",
+      "hero": [
+        "铁锤敲"
+      ],
+      "ornament": "hammer_stamp"
+    },
+    {
+      "lineIndex": 33,
+      "layout": "outro_duet",
+      "x": 480,
+      "y": 642,
+      "font": "kai",
+      "size": 60,
+      "inkMode": "ivory_gold",
+      "accent": "#f0b254",
+      "hero": [
+        "轻轻扫"
+      ],
+      "ornament": "guitar_strings"
+    },
+    {
+      "lineIndex": 34,
+      "layout": "outro_duet",
+      "x": 480,
+      "y": 642,
+      "font": "serif",
+      "size": 60,
+      "inkMode": "ivory_gold",
+      "accent": "#e87a3d",
+      "hero": [
+        "六千年"
+      ],
+      "ornament": "timeline_ticks"
+    },
+    {
+      "lineIndex": 35,
+      "layout": "outro_pill_button",
+      "x": 480,
+      "y": 636,
+      "font": "sans",
+      "size": 44,
+      "inkMode": "ivory_gold",
+      "accent": "#d97543",
+      "hero": [
+        "还在跑"
+      ],
+      "ornament": "cursor_click"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+[
+  {"paper":"#bd8b55","ink":"#4a2719","body":"#cfad77","wing":"#9c673a","bill":"#a14f27","accent":"#f7dc9e","mode":"rock"},
+  {"paper":"#dec58d","ink":"#423d2a","body":"#ebd19a","wing":"#3a6c6a","bill":"#b45134","accent":"#bc633d","mode":"flat"},
+  {"paper":"#302f29","ink":"#e0d8c6","body":"#cbc1a8","wing":"#544d40","bill":"#d7caad","accent":"#e9d6a2","mode":"rubbing"},
+  {"paper":"#eee3c8","ink":"#423c31","body":"#f6eedc","wing":"#d7cbb0","bill":"#c69d65","accent":"#b3442e","mode":"line"},
+  {"paper":"#e2e2ce","ink":"#253e39","body":"#f6f4e4","wing":"#bbc4b6","bill":"#7a7960","accent":"#a84430","mode":"ink"},
+  {"paper":"#dfcda9","ink":"#4b4831","body":"#f0e8cf","wing":"#ada78b","bill":"#a17f45","accent":"#963f2c","mode":"line"},
+  {"paper":"#d4b780","ink":"#3c3227","body":"#c7a14f","wing":"#448379","bill":"#b64b2e","accent":"#b33227","mode":"flat"},
+  {"paper":"#304d46","ink":"#d7b15b","body":"#eedfb5","wing":"#ad4f3a","bill":"#deb758","accent":"#edca74","mode":"miniature"},
+  {"paper":"#eee9d9","ink":"#202321","body":"#f5f3e5","wing":"#757d72","bill":"#6b6953","accent":"#a13224","mode":"ink"},
+  {"paper":"#bd8541","ink":"#211710","body":"#2d2014","wing":"#6b4923","bill":"#2a1b13","accent":"#ffe09b","mode":"shadow"},
+  {"paper":"#e7d9b1","ink":"#254452","body":"#eee9d6","wing":"#6c8d89","bill":"#c28b43","accent":"#c54833","mode":"woodcut"},
+  {"paper":"#162c57","ink":"#203040","body":"#f3e4ab","wing":"#bfa94f","bill":"#e1b546","accent":"#ffe08a","mode":"oil"},
+  {"paper":"#863f35","ink":"#35292d","body":"#dfc2a7","wing":"#ba9274","bill":"#e8a85b","accent":"#f5c98b","mode":"expression"},
+  {"paper":"#252a26","ink":"#131713","body":"#c0c4ae","wing":"#606b61","bill":"#9eab8f","accent":"#e1e6ca","mode":"silent"},
+  {"paper":"#071b13","ink":"#69f5a1","body":"#0b3222","wing":"#0e5b34","bill":"#83ffb4","accent":"#83ffb4","mode":"scope"},
+  {"paper":"#253c62","ink":"#172442","body":"#ffe4b0","wing":"#8195b6","bill":"#ffb64f","accent":"#ffe878","mode":"pixel"},
+  {"paper":"#96b4d0","ink":"#2c4771","body":"#fff8e3","wing":"#94aaca","bill":"#d6a550","accent":"#ffe183","mode":"gif"},
+  {"paper":"#563661","ink":"#73e5e8","body":"#ffe3d4","wing":"#df92bf","bill":"#ffca9b","accent":"#ff9dd1","mode":"neon"},
+  {"paper":"#17242d","ink":"#14232d","body":"#f0f4e6","wing":"#97bec1","bill":"#ffba57","accent":"#ff6e96","mode":"video"},
+  {"paper":"#0e1925","ink":"#72e0d2","body":"#d7eee6","wing":"#74a0ba","bill":"#e7be70","accent":"#e9c47d","mode":"code"}
+]

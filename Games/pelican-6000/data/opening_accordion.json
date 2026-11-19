@@ -1,0 +1,31 @@
+{
+  "version": "3.1-live-gold-printmaking-forge",
+  "leftPanelWidth": 344,
+  "guitarDropRealT": 3.668,
+  "handoffStartRealT": 10.02,
+  "handoffEndRealT": 11.447,
+  "title": {
+    "line1": "鹈鹕",
+    "line2": "六千年的车",
+    "seal": "六千年"
+  },
+  "forgeDrawers": [
+    { "id": "g1_copperplate", "num": "01", "tag": "铜版金刻", "fullLabel": "铜版金线精刻 · 左匠执钳运锤" },
+    { "id": "g2_woodblock", "num": "02", "tag": "木刻金版", "fullLabel": "古法木刻金版 · 拱炉烈焰铁砧" },
+    { "id": "g3_mosaic", "num": "03", "tag": "金网像素", "fullLabel": "十字金网镶嵌 · 右匠双手抡锤" }
+  ],
+  "eraDrawers": [
+    { "sceneId": "s01_sahara", "num": "01", "year": "前4000", "style": "ochre" },
+    { "sceneId": "s02_egypt", "num": "02", "year": "前1300", "style": "egypt" },
+    { "sceneId": "s03_han", "num": "03", "year": "100", "style": "han" },
+    { "sceneId": "s05_song", "num": "05", "year": "1000", "style": "song" },
+    { "sceneId": "s11_ukiyoe", "num": "11", "year": "1830s", "style": "ukiyoe" },
+    { "sceneId": "s12_starry", "num": "12", "year": "1889", "style": "vangogh" },
+    { "sceneId": "s13_scream", "num": "13", "year": "1893", "style": "munch" },
+    { "sceneId": "s14_nosferatu", "num": "14", "year": "1922", "style": "nosferatu" },
+    { "sceneId": "s15_oscilloscope", "num": "15", "year": "1950s", "style": "vector" },
+    { "sceneId": "s16_8bit", "num": "16", "year": "1980s", "style": "pixel" },
+    { "sceneId": "s18_vaporwave", "num": "18", "year": "2010s", "style": "vaporwave" },
+    { "sceneId": "s20_code", "num": "20", "year": "2020s", "style": "svg" }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "audioOffset": 0.125,
+  "guitarEntryRealT": 3.664,
+  "forgeHoldUntilRealT": 4.95,
+  "morphStartRealT": 4.35,
+  "morphEndRealT": 5.25,
+  "config": {
+    "width": 1320,
+    "height": 880,
+    "fps": 60,
+    "duration": 14.70,
+    "anvilTarget": {
+      "leftTapX": 586,
+      "leftTapY": 442,
+      "rightHitX": 674,
+      "rightHitY": 462,
+      "barStartX": 588,
+      "barStartY": 444,
+      "barEndX": 748,
+      "barEndY": 506
+    },
+    "leftCraftsman": {
+      "hipBase": { "x": 216, "y": 468 },
+      "footBack": { "x": 136, "y": 798 },
+      "footFront": { "x": 292, "y": 822 },
+      "shoulderHammerLocal": { "x": -42, "y": -168 },
+      "shoulderTongsLocal": { "x": 48, "y": -178 },
+      "tongsUpperLen": 128,
+      "tongsForeLen": 124,
+      "hammerUpperLen": 148,
+      "hammerForeLen": 144,
+      "hammerHandleLen": 175
+    },
+    "rightCraftsman": {
+      "hipBase": { "x": 1048, "y": 474 },
+      "footLead": { "x": 934, "y": 798 },
+      "footTrail": { "x": 1144, "y": 826 },
+      "shoulderLeadLocal": { "x": -68, "y": -186 },
+      "shoulderTrailLocal": { "x": 14, "y": -176 },
+      "armUpperLen": 142,
+      "armForeLen": 136,
+      "sledgeHandleLen": 485,
+      "sledgeImpactAngleDeg": -167.5,
+      "sledgeApexAngleDeg": -114.0
+    }
+  },
+  "strikes": [
+    { "id": 1,  "t": 0.320, "hand": "L", "kind": "tap",   "intensity": 0.90 },
+    { "id": 2,  "t": 0.682, "hand": "R", "kind": "heavy", "intensity": 1.00 },
+    { "id": 3,  "t": 1.036, "hand": "L", "kind": "dbl",   "intensity": 0.95, "reboundDt": 0.088 },
+    { "id": 4,  "t": 1.392, "hand": "R", "kind": "heavy", "intensity": 1.00 },
+    { "id": 5,  "t": 1.744, "hand": "L", "kind": "tap",   "intensity": 0.88, "postShift": 0.20 },
+    { "id": 6,  "t": 2.100, "hand": "R", "kind": "heavy", "intensity": 1.00 },
+    { "id": 7,  "t": 2.454, "hand": "L", "kind": "tap",   "intensity": 0.90 },
+    { "id": 8,  "t": 2.812, "hand": "R", "kind": "heavy", "intensity": 1.02 },
+    { "id": 9,  "t": 3.175, "hand": "L", "kind": "tap",   "intensity": 0.92 },
+    { "id": 10, "t": 3.532, "hand": "R", "kind": "heavy", "intensity": 1.08 },
+    { "id": 11, "t": 3.890, "hand": "L", "kind": "tap",   "intensity": 0.92 },
+    { "id": 12, "t": 4.240, "hand": "R", "kind": "heavy", "intensity": 1.04 },
+    { "id": 13, "t": 4.590, "hand": "L", "kind": "dbl",   "intensity": 0.94, "reboundDt": 0.092 },
+    { "id": 14, "t": 4.950, "hand": "R", "kind": "heavy", "intensity": 1.00 }
+  ],
+  "barShifts": [
+    { "start": 1.78, "peak": 1.93, "end": 2.06, "dx": -14, "dy": -8, "rotDeg": -6.5 }
+  ]
+}

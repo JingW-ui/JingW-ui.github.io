@@ -1,0 +1,173 @@
+{
+  "title": "鹈鹕六千年的车",
+  "width": 960,
+  "height": 720,
+  "fps": 30,
+  "duration": 174.64,
+  "intro": 11.447,
+  "outro": 26.079,
+  "scenes": [
+    {
+      "id": "sahara",
+      "image": "IMG-01",
+      "name": "撒哈拉岩画",
+      "year": "约公元前4000年",
+      "medium": "赭石",
+      "story": "牧人与牛群停下，围观骑车鹈鹕"
+    },
+    {
+      "id": "egypt",
+      "image": "IMG-02",
+      "name": "埃及壁画",
+      "year": "约公元前1300年",
+      "medium": "纸草",
+      "story": "未完成的墓室壁画，鹈鹕停下摆出埃及侧身姿势"
+    },
+    {
+      "id": "han",
+      "image": "IMG-03",
+      "name": "汉画像石拓片",
+      "year": "约公元100年",
+      "medium": "拓片",
+      "story": "混进官员车马队，石匠刻下鹈鹕骑者"
+    },
+    {
+      "id": "tang",
+      "image": "IMG-04",
+      "name": "唐代白描",
+      "year": "约750年",
+      "medium": "绢本",
+      "story": "吴带当风，羽毛与衣带一同翻飞"
+    },
+    {
+      "id": "song",
+      "image": "IMG-05",
+      "name": "宋代山水",
+      "year": "约1000年",
+      "medium": "水墨",
+      "story": "镜头推进千仞山峦，在山路上找到小小骑车鹈鹕"
+    },
+    {
+      "id": "qingming",
+      "image": "IMG-06",
+      "name": "清明上河图",
+      "year": "约1100年",
+      "medium": "长卷",
+      "story": "骑上虹桥，桥上路人纷纷回头"
+    },
+    {
+      "id": "maya",
+      "image": "IMG-07",
+      "name": "玛雅抄本",
+      "year": "约1200年",
+      "medium": "矿彩",
+      "story": "旁人用玛雅点横数字记录踩了多少圈"
+    },
+    {
+      "id": "mughal",
+      "image": "IMG-08",
+      "name": "莫卧儿细密画",
+      "year": "约1600年",
+      "medium": "金彩",
+      "story": "宫廷花园宾客从多个视角围观"
+    },
+    {
+      "id": "bada",
+      "image": "IMG-09",
+      "name": "八大山人写意",
+      "year": "约1690年",
+      "medium": "写意",
+      "story": "大片留白寥寥几笔，鹈鹕翻一个白眼"
+    },
+    {
+      "id": "wayang",
+      "image": "IMG-10",
+      "name": "爪哇皮影戏",
+      "year": "约1800年",
+      "medium": "皮影",
+      "story": "变成镂空皮影，车轮一顿一顿地转"
+    },
+    {
+      "id": "ukiyoe",
+      "image": "IMG-11",
+      "name": "浮世绘",
+      "year": "1830年代",
+      "medium": "木版",
+      "story": "富士山下田间小道，赶路的人回头"
+    },
+    {
+      "id": "starry",
+      "image": "IMG-12",
+      "name": "星月夜",
+      "year": "1889年",
+      "medium": "油彩",
+      "story": "星空漩涡跟着车轮一起转"
+    },
+    {
+      "id": "scream",
+      "image": "IMG-13",
+      "name": "呐喊",
+      "year": "1893年",
+      "medium": "表现",
+      "story": "桥上呐喊者受惊，鹈鹕吼回去，随后尴尬沉默"
+    },
+    {
+      "id": "nosferatu",
+      "image": "IMG-14",
+      "name": "诺斯费拉图",
+      "year": "1922年",
+      "medium": "默片",
+      "story": "墙上影子自行爬楼梯，离开时通了电"
+    },
+    {
+      "id": "scope",
+      "image": "IMG-15",
+      "name": "示波器矢量图",
+      "year": "1950年代",
+      "medium": "荧光",
+      "story": "有人转错旋钮，扭成李萨如图形"
+    },
+    {
+      "id": "pixel",
+      "image": "IMG-16",
+      "name": "8-bit像素游戏",
+      "year": "1980年代",
+      "medium": "像素",
+      "story": "跳过坑洞，吃金币，弹出1UP"
+    },
+    {
+      "id": "chat",
+      "image": "IMG-17",
+      "name": "早期聊天窗口",
+      "year": "2000年代",
+      "medium": "动图",
+      "story": "被发成256色动图，对方两次窗口抖动"
+    },
+    {
+      "id": "vapor",
+      "image": "IMG-18",
+      "name": "蒸汽波",
+      "year": "2010年代",
+      "medium": "磁带",
+      "story": "世界慢放，大理石像回头，磁带跳针"
+    },
+    {
+      "id": "shorts",
+      "image": "IMG-19",
+      "name": "竖屏短视频",
+      "year": "2020年代",
+      "medium": "短片",
+      "story": "画面变竖屏，定格慢放，点赞爆满"
+    },
+    {
+      "id": "code",
+      "image": "IMG-20",
+      "name": "代码美学",
+      "year": "大模型时代",
+      "medium": "代码",
+      "story": "一行行SVG代码，把鹈鹕重新画出来"
+    }
+  ],
+  "outro_story": "二十幅时代答卷挂满展墙，第二十一席空椅静候「鹈鹕本人」回应。",
+  "audioMode": "pure-code-compact-worklet"
+}
