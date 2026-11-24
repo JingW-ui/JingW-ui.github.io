@@ -43,6 +43,12 @@ jobs:
         with:
           path: .
 
+      # 2026-11-24 起出现产物索引传播竞态：站点产物约 103MB，upload 刚结束时
+      # deploy 同秒查询元数据会得到 "No artifacts named github-pages were found"
+      # （产物实际已存在）。缓冲 60s 让元数据索引完成后再部署。
+      - name: Wait for artifact metadata propagation
+        run: sleep 60
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
