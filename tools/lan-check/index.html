@@ -223,10 +223,8 @@ body {
             </div>
             <ul class="client-list" id="clientList"></ul>
             <div class="net-info">
-                <div class="ni-row"><span class="ni-k">本机设备</span><span class="ni-v" id="hostDev">识别中…</span></div>
                 <div class="ni-row"><span class="ni-k">本机 IP</span><span class="ni-v mono" id="hostIps">收集中…</span></div>
-                <div class="ni-row"><span class="ni-k">会话端口</span><span class="ni-v mono" id="hostPort">待设备接入</span></div>
-                <div class="ob-note" id="hostObNote" style="display:none">上面的 .local 地址是浏览器（Chrome/Edge/Firefox）的隐私保护机制：以 mDNS 名替代局域网 IP。真实 IP 可改用 Safari 查看，或在浏览器 flags 中关闭 WebRTC mDNS 混淆。</div>
+                <div class="ob-note" id="hostObNote" style="display:none">显示为 .local 的地址是浏览器的隐私保护，手机改用 Safari 扫码即可看到真实 IP。</div>
             </div>
         </div>
     </div>
@@ -240,10 +238,10 @@ body {
             </div>
             <div class="room-line">测试房间：<b id="joinCode">——</b></div>
             <ol class="stages" id="stageList">
-                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>连接信令服务器</li>
-                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>查找对方设备</li>
-                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>建立局域网直连</li>
-                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>测量往返延迟</li>
+                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>连接服务器</li>
+                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>查找对方</li>
+                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>建立直连</li>
+                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>测量延迟</li>
             </ol>
             <div class="verdict" id="verdict"></div>
         </div>
@@ -258,15 +256,15 @@ body {
             </div>
             <ul>
                 <li><b>用法</b>：电脑端打开本页生成二维码 → 手机相机扫码 → 手机页面自动完成连接测试并给出「连通 / 不连通」结果。</li>
-                <li><b>原理</b>：两端浏览器经公共信令交换握手信息后，尝试 <b>WebRTC 局域网直连</b>（host 候选）。由于双方能打开本页即已证明公网可达，直连握手能否成功便只取决于局域网路径——连上即局域网互通，连不上即被隔离或不同网段。</li>
-                <li><b>隐私</b>：页面显示的 IP 与设备信息仅取自浏览器本地、只在两台设备之间直接交换，不经任何服务器存储；房间码随机生成、用完即弃。</li>
+                <li><b>原理</b>：电脑与手机各自打开本页后，直接在局域网内互相握手——能连上即连通，连不上即被隔离或不在同一网段。</li>
+                <li><b>隐私</b>：IP 与设备信息仅在两台设备间直接交换，不经任何服务器存储；房间码随机生成、用完即弃。</li>
                 <li><b>提示</b>：若显示不连通，请检查是否连接同一 Wi-Fi、是否被访客网络 / AP 隔离 / 公司防火墙限制。</li>
             </ul>
         </div>
     </div>
 
     <div class="credit">
-        WebRTC P2P 直连 · 信令 <a href="https://github.com/peers/peerjs" target="_blank" rel="noopener noreferrer">PeerJS</a> (MIT) · 二维码 <a href="https://github.com/davidshimjs/qrcodejs" target="_blank" rel="noopener noreferrer">qrcodejs</a> (MIT) · <a href="/tools/">返回工具箱</a>
+        基于 WebRTC · <a href="/tools/">返回工具箱</a>
     </div>
 </div>
 
@@ -384,11 +382,9 @@ function startHost() {
 }
 
 function renderHostNet() {
-    $('hostDev').textContent = devText(selfDev) || '识别中…';
     $('hostIps').textContent = ipListText(selfNet.ips, selfNet.used);
     $('hostIps').className = 'ni-v mono' + (selfNet.obf ? ' obf' : '');
     $('hostObNote').style.display = selfNet.obf ? '' : 'none';
-    $('hostPort').textContent = selfNet.port ? ('UDP ' + selfNet.port + '（临时）') : '待设备接入';
 }
 
 function newHost() {
@@ -428,7 +424,7 @@ function newHost() {
                 selectedPairTypes(conn.peerConnection).then(function (t) {
                     if (!t) return;
                     lastPair = t;
-                    selfNet.used = t.la; selfNet.port = t.lp;
+                    selfNet.used = t.la;
                     log('pair local=' + t.la + ':' + t.lp + ' remote=' + t.ra + ':' + t.rp);
                     renderHostNet();
                 });
@@ -699,10 +695,9 @@ function verdictOk(rtt, t) {
         '<div class="v-head">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' +
         '局域网连通</div>' +
-        '<div class="v-sub">手机与电脑成功建立 P2P 直连，平均往返延迟 <span class="v-rtt">' + rtt + ' ms</span></div>' +
-        '<div class="v-link">直连方式 ' + link + (good ? ' · 局域网路径 ✓' : ' · 未见局域网直连候选') + '</div>' +
+        '<div class="v-sub">往返延迟 <span class="v-rtt">' + rtt + ' ms</span></div>' +
+        '<div class="v-link">' + (good ? '局域网直连 ✓' : '未走局域网直连') + '</div>' +
         '<div class="v-net" id="vExtra" style="display:none"></div>' +
-        '<div class="v-sub" style="margin-top:10px">判定方式：两台设备直接握手测速，测试数据不经任何服务器中转。</div>' +
         '<div class="v-actions"><button class="action-btn" type="button" onclick="location.reload()">重新测试</button></div>';
     renderVerdictExtra();
 }
@@ -713,23 +708,13 @@ function renderVerdictExtra() {
     function row(k, val, obf) {
         return '<div class="ni-row"><span class="ni-k">' + k + '</span><span class="ni-v mono' + (obf ? ' obf' : '') + '">' + val + '</span></div>';
     }
-    rows += row('本机设备', devText(selfDev) || '—');
     rows += row('本机 IP', selfNet.ips.length ? selfNet.ips.map(function (x) { return x.addr; }).join('　') : '—', selfNet.obf);
-    if (lastPair && lastPair.lp) {
-        rows += row('会话端口', '本机 UDP ' + lastPair.lp + ' ↔ 对方 UDP ' + lastPair.rp + '（临时）');
-        var oppIp = lastPair.ra || (peerInfo && peerInfo.ips && peerInfo.ips[0]) || '';
-        if (oppIp) rows += row('对方 IP', oppIp, /\.local$/.test(oppIp));
-    } else if (peerInfo && peerInfo.ips && peerInfo.ips.length) {
-        rows += row('对方 IP', peerInfo.ips[0], /\.local$/.test(peerInfo.ips[0] || ''));
-    }
+    var oppIp = (lastPair && lastPair.ra) || (peerInfo && peerInfo.ips && peerInfo.ips[0]) || '';
+    if (oppIp) rows += row('对方 IP', oppIp, /\.local$/.test(oppIp));
     if (peerInfo && peerInfo.dev) rows += row('对方设备', devText(peerInfo.dev));
-    var obf = selfNet.obf ||
-        (peerInfo && peerInfo.ips && peerInfo.ips.length && /\.local$/.test(peerInfo.ips[0] || '')) ||
-        (lastPair && /\.local$/.test(lastPair.ra || ''));
-    if (obf) {
-        rows += '<div class="ob-note">带混淆标记的地址是浏览器（Chrome/Edge/Firefox）的隐私保护机制：以 mDNS 名替代局域网 IP。真实 IP 可改用 Safari 查看，或在浏览器 flags 中关闭 WebRTC mDNS 混淆。</div>';
+    if (selfNet.obf || /\.local$/.test(oppIp)) {
+        rows += '<div class="ob-note">显示为 .local 的地址是浏览器的隐私保护，改用 Safari 打开即可看到真实 IP。</div>';
     }
-    rows += '<div class="ob-note">以上信息仅在本次测试的两台设备之间直接交换，不经任何服务器存储。</div>';
     el.innerHTML = rows;
     el.style.display = '';
 }
@@ -737,7 +722,7 @@ function verdictFail(kind) {
     var v = $('verdict');
     var head, sub, tips = '';
     if (kind === 'signaling') {
-        head = '无法连接信令服务';
+        head = '无法连接测试服务';
         sub = '本机当前可能无法上网，请确认网络可用后重试。';
     } else if (kind === 'notfound') {
         head = '未找到对方设备';
