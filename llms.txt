@@ -1,9 +1,9 @@
 # JingW-ui — 免费在线工具、Windows 软件与网页小游戏
 
-> 纯静态个人公益站，无需注册、无后端、浏览器直接使用。含 78 个在线工具、11 款 Windows 免费软件（GitHub Releases 下载）、39 款网页小游戏。
+> 纯静态个人公益站，无需注册、无后端、浏览器直接使用。含 81 个在线工具、11 款 Windows 免费软件（GitHub Releases 下载）、40 款网页小游戏。
 
-## 在线工具（共 78 个，浏览器直接运行）
-- [工具箱总览](https://jingw-ui.github.io/tools/): 78 个在线工具汇总页，支持搜索与分类快筛，覆盖文本处理、编解码、图片处理、计算器、生成器、知识图谱等
+## 在线工具（共 81 个，浏览器直接运行）
+- [工具箱总览](https://jingw-ui.github.io/tools/): 81 个在线工具汇总页，支持搜索与分类快筛，覆盖文本处理、编解码、图片处理、计算器、生成器、知识图谱等
 - [图标创建](https://jingw-ui.github.io/tools/create_icon/): 在线创建和自定义图标，支持多种格式导出
 - [图片转图标](https://jingw-ui.github.io/tools/img2icon/): 将普通图片转换为图标格式，支持批量处理
 - [图片转PDF](https://jingw-ui.github.io/tools/img2pdf/): 将图片文件转换为PDF文档，保持高质量输出
@@ -81,7 +81,10 @@
 - [3D模型查看器](https://jingw-ui.github.io/tools/glb_viewer_meshy/): 一个简单的3D模型查看器，支持GLB格式的模型加载和展示
 - [反应速度测试](https://jingw-ui.github.io/tools/speed/): 测试你的反应速度，变绿瞬间点击记录毫秒级反应时间
 - [深呼吸放松](https://jingw-ui.github.io/tools/breathe/): 引导式呼吸节律动画，缓解焦虑与压力，放松身心
+- [韩语40音](https://jingw-ui.github.io/tools/korean40/): PPT 式韩语四十音课件：19 辅音 21 元音逐字发音、记忆口诀与例词，配闪卡记忆和听音测验
+- [日语五十音](https://jingw-ui.github.io/tools/japanese50/): PPT 式日语五十音课件：46 清音 + 25 浊音 + 33 拗音，平/片假名对照、逐字发音、记忆口诀与例词，配闪卡和测验
 - [PDF工具](https://jingw-ui.github.io/tools/pdf-tools/): PDF合并/提取页面/旋转，本地处理不上传
+- [局域网连通性测试](https://jingw-ui.github.io/tools/lan-check/): 电脑端生成二维码，手机扫码后 WebRTC 局域网直连，秒级判定两设备是否互通并显示往返延迟
 
 ## Windows 免费软件（共 11 款，GitHub Releases 下载）
 - [软件下载中心](https://jingw-ui.github.io/softwares/): 11 款 Windows 软件的汇总与下载页
@@ -97,8 +100,8 @@
 - [抖音爬虫工具](https://jingw-ui.github.io/softwares/): 高效的抖音视频数据采集工具，支持批量下载（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/DouyinCrawler2.1/DouyinCrawler2.1.exe）
 - [VIP追剧神器](https://jingw-ui.github.io/softwares/): 便捷的影视资源获取工具，让追剧更轻松（下载: https://github.com/JingW-ui/PI-MAPP/releases/download/VIP%E8%BF%BD%E5%89%A7%E7%A5%9E%E5%99%A8/VIP.exe）
 
-## 网页小游戏（共 39 款，浏览器直接玩）
-- [游戏中心](https://jingw-ui.github.io/Games/): 39 款网页游戏汇总页
+## 网页小游戏（共 40 款，浏览器直接玩）
+- [游戏中心](https://jingw-ui.github.io/Games/): 40 款网页游戏汇总页
 - [鹈鹕骑单车](https://jingw-ui.github.io/Games/pelican-bike/): action 类网页游戏
 - [运输船 3D](https://jingw-ui.github.io/Games/cf-transport-ship/): action 类网页游戏
 - [飞车 3D](https://jingw-ui.github.io/Games/qq-speed/): action 类网页游戏
@@ -133,6 +136,7 @@
 - [扑克牌游戏](https://jingw-ui.github.io/Games/puke/): puzzle 类网页游戏
 - [3D 地球模型](https://jingw-ui.github.io/Games/earth_3D/): scene 类网页游戏
 - [赛博木鱼](https://jingw-ui.github.io/Games/muyu/): toy 类网页游戏
+- [鹈鹕六千年](https://jingw-ui.github.io/Games/pelican-6000/): toy 类网页游戏
 - [3D 极速赛车](https://jingw-ui.github.io/Games/racing/): action 类网页游戏
 - [霓虹贪吃蛇](https://jingw-ui.github.io/Games/snake): action 类网页游戏
 - [3D 炫光骰子](https://jingw-ui.github.io/Games/dice_3D/): toy 类网页游戏

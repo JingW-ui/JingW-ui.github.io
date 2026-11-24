@@ -1,8 +1,8 @@
 # JingW-ui 站点全量内容（供 AI 检索引用）
 
-> 站点: https://jingw-ui.github.io · 生成日期: 2026-11-01 · 纯静态站点，所有工具/游戏浏览器直接运行，软件为 Windows exe（GitHub Releases 下载）。
+> 站点: https://jingw-ui.github.io · 生成日期: 2026-11-24 · 纯静态站点，所有工具/游戏浏览器直接运行，软件为 Windows exe（GitHub Releases 下载）。
 
-## 一、在线工具箱（78 个）
+## 一、在线工具箱（81 个）
 入口: https://jingw-ui.github.io/tools/
 
 ### 图标创建
@@ -313,9 +313,21 @@ URL: https://jingw-ui.github.io/tools/speed/
 用途: 引导式呼吸节律动画，缓解焦虑与压力，放松身心
 URL: https://jingw-ui.github.io/tools/breathe/
 
+### 韩语40音
+用途: PPT 式韩语四十音课件：19 辅音 21 元音逐字发音、记忆口诀与例词，配闪卡记忆和听音测验
+URL: https://jingw-ui.github.io/tools/korean40/
+
+### 日语五十音
+用途: PPT 式日语五十音课件：46 清音 + 25 浊音 + 33 拗音，平/片假名对照、逐字发音、记忆口诀与例词，配闪卡和测验
+URL: https://jingw-ui.github.io/tools/japanese50/
+
 ### PDF工具
 用途: PDF合并/提取页面/旋转，本地处理不上传
 URL: https://jingw-ui.github.io/tools/pdf-tools/
+
+### 局域网连通性测试
+用途: 电脑端生成二维码，手机扫码后 WebRTC 局域网直连，秒级判定两设备是否互通并显示往返延迟
+URL: https://jingw-ui.github.io/tools/lan-check/
 
 ## 二、Windows 免费软件（11 款）
 入口: https://jingw-ui.github.io/softwares/
@@ -375,7 +387,7 @@ URL: https://jingw-ui.github.io/tools/pdf-tools/
 下载: https://github.com/JingW-ui/PI-MAPP/releases/download/VIP%E8%BF%BD%E5%89%A7%E7%A5%9E%E5%99%A8/VIP.exe
 开源仓库: https://github.com/JingW-ui/PI-MAPP
 
-## 三、网页小游戏（39 款）
+## 三、网页小游戏（40 款）
 入口: https://jingw-ui.github.io/Games/
 
 ### 鹈鹕骑单车
@@ -479,6 +491,9 @@ URL: https://jingw-ui.github.io/tools/pdf-tools/
 
 ### 赛博木鱼
 类型: toy · URL: https://jingw-ui.github.io/Games/muyu/
+
+### 鹈鹕六千年
+类型: toy · URL: https://jingw-ui.github.io/Games/pelican-6000/
 
 ### 3D 极速赛车
 类型: action · URL: https://jingw-ui.github.io/Games/racing/

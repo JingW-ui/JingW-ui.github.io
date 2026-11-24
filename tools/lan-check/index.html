@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#e7f1f0">
+<title>局域网连通性测试 - 手机扫码检测设备互通</title>
+<meta name="description" content="电脑端生成二维码，手机扫码后经 WebRTC 局域网直连握手，秒级判定手机与电脑是否处于同一可互通的局域网，成功时附带往返延迟（RTT）。全程无服务器存储、无需安装。">
+<style>
+:root {
+    /* —— JingW-ui 设计令牌（glassmorphism-design-system）—— */
+    --bg-gradient-1: #e7f1f0;
+    --bg-gradient-2: #dfe9ec;
+    --bg-gradient-3: #e6edf2;
+    --card-bg: rgba(255, 255, 255, 0.50);
+    --card-bg-strong: rgba(255, 255, 255, 0.68);
+    --card-border: rgba(255, 255, 255, 0.55);
+    --text-primary: #2c3e50;
+    --text-secondary: #5a6c7d;
+    --text-muted: #8e9aaf;
+    --accent-teal: #2dd4bf;
+    --accent-blue: #3b82f6;
+    --accent-pink: #f472b6;
+    --ok: #16a985;
+    --ok-bg: rgba(45, 212, 191, 0.13);
+    --ok-border: rgba(45, 212, 191, 0.38);
+    --bad: #d95f6d;
+    --bad-bg: rgba(227, 109, 110, 0.12);
+    --bad-border: rgba(227, 109, 110, 0.35);
+    --warn-bg: rgba(212, 160, 60, 0.12);
+    --warn-border: rgba(212, 160, 60, 0.38);
+    --warn: #b98a1e;
+    --shadow-sm: 0 2px 8px rgba(20,40,50,0.05);
+    --shadow-md: 0 6px 24px rgba(20,40,50,0.08);
+    --shadow-lg: 0 12px 40px rgba(20,40,50,0.12);
+    --radius-sm: 14px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%) fixed;
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 40px 16px 28px;
+    font-size: 14px;
+}
+/* —— 背景光斑 —— */
+.bg-decoration { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.45; pointer-events: none; z-index: 0; }
+.bg-decoration-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(94,234,212,0.30) 0%, transparent 70%); top: -180px; left: -120px; animation: float 22s ease-in-out infinite; }
+.bg-decoration-2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(125,211,252,0.28) 0%, transparent 70%); bottom: -140px; right: -120px; animation: float 26s ease-in-out infinite reverse; }
+.bg-decoration-3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%); top: 48%; left: 52%; transform: translate(-50%, -50%); animation: pulse 16s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translate(0,0) rotate(0deg);} 33%{transform:translate(30px,-30px) rotate(120deg);} 66%{transform:translate(-20px,20px) rotate(240deg);} }
+@keyframes pulse { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.3;} 50%{transform:translate(-50%,-50%) scale(1.2);opacity:.45;} }
+/* —— 布局 —— */
+.wrap { max-width: 660px; margin: 0 auto; position: relative; z-index: 1; }
+.page-head { text-align: center; margin-bottom: 22px; opacity: 0; transform: translateY(-14px); animation: headerIn .7s cubic-bezier(0.16,1,0.3,1) .05s forwards; }
+@keyframes headerIn { to { opacity: 1; transform: translateY(0); } }
+.page-head .logo-ic { width: 52px; height: 52px; margin: 0 auto 10px; border-radius: 16px; background: linear-gradient(135deg, #d9efef, #c4e3e8); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
+.page-head .logo-ic svg { width: 27px; height: 27px; stroke: #1a9e8f; }
+.page-head h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+.page-head .sub { color: var(--text-secondary); font-size: 13px; margin-top: 4px; }
+/* —— 玻璃卡片 —— */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s ease, backdrop-filter 0.35s ease;
+    margin-bottom: 18px;
+}
+.glass-card:hover { box-shadow: var(--shadow-lg); backdrop-filter: blur(28px) saturate(160%); -webkit-backdrop-filter: blur(28px) saturate(160%); }
+.card-pad { padding: 22px 24px; }
+.card-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+.card-title svg { width: 17px; height: 17px; stroke: var(--accent-teal); flex-shrink: 0; }
+.hint { color: var(--text-muted); font-size: 12px; }
+/* —— 状态徽章 —— */
+.state-pill { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 600; padding: 4px 13px; border-radius: 20px; background: var(--card-bg-strong); border: 1px solid var(--card-border); color: var(--text-secondary); transition: var(--transition); }
+.state-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-blue); animation: blink 1.2s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.25;} }
+.state-pill.ok { background: var(--ok-bg); border-color: var(--ok-border); color: var(--ok); }
+.state-pill.ok .dot { background: var(--ok); animation: none; }
+.state-pill.err { background: var(--bad-bg); border-color: var(--bad-border); color: var(--bad); }
+.state-pill.err .dot { background: var(--bad); animation: none; }
+.state-pill.warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn); }
+/* —— 主机视图 —— */
+.host-flex { display: flex; gap: 26px; align-items: center; flex-wrap: wrap; }
+.host-info { flex: 1 1 220px; min-width: 200px; }
+.code-show { font-family: 'Courier New', monospace; font-size: 30px; font-weight: 700; letter-spacing: 0.24em; color: var(--text-primary); margin: 8px 0 4px; }
+.code-label { font-size: 11.5px; color: var(--text-muted); letter-spacing: 0.08em; }
+.qr-box { flex: 0 0 auto; background: #fff; border-radius: var(--radius-sm); padding: 12px; box-shadow: var(--shadow-sm); border: 1px solid var(--card-border); }
+.qr-box img, .qr-box canvas { display: block; }
+.host-meta { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+/* —— 低存在感按钮 —— */
+.action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; border: 1px solid rgba(44,62,80,0.14);
+    color: var(--text-secondary); border-radius: 10px;
+    padding: 7px 16px; font: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: var(--transition);
+}
+.action-btn:hover { background: rgba(255,255,255,0.65); color: var(--text-primary); border-color: rgba(44,62,80,0.22); transform: translateY(-1px); }
+.action-btn:active { transform: translateY(0); }
+.action-btn svg { width: 14px; height: 14px; stroke: currentColor; }
+/* —— 客户端列表 —— */
+.client-list { list-style: none; margin-top: 12px; }
+.client-list li {
+    display: flex; align-items: center; gap: 9px; font-size: 12.5px; color: var(--text-secondary);
+    background: var(--card-bg-strong); border: 1px solid var(--card-border);
+    border-radius: 10px; padding: 8px 13px; margin-bottom: 7px; transition: var(--transition);
+    animation: cardIn .4s cubic-bezier(0.16,1,0.3,1);
+}
+@keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.client-list .cdot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-blue); flex-shrink: 0; }
+.client-list li.done .cdot { background: var(--ok); }
+.client-list li.done { color: var(--text-primary); }
+.client-list .crtt { margin-left: auto; font-family: 'Courier New', monospace; font-weight: 700; color: var(--ok); }
+/* —— 加入视图 —— */
+.room-line { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+.room-line b { font-family: 'Courier New', monospace; letter-spacing: 0.18em; color: var(--text-primary); }
+.stages { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.stages li { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-muted); transition: var(--transition); }
+.stages .s-ic { width: 20px; height: 20px; border-radius: 50%; border: 1.6px solid rgba(44,62,80,0.16); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: var(--transition); }
+.stages .s-ic svg { width: 11px; height: 11px; stroke: #fff; stroke-width: 3; fill: none; opacity: 0; transition: var(--transition); }
+.stages li.act { color: var(--text-primary); font-weight: 600; }
+.stages li.act .s-ic { border-color: var(--accent-teal); background: rgba(45,212,191,0.14); box-shadow: 0 0 0 3px rgba(45,212,191,0.12); }
+.stages li.done { color: var(--text-secondary); }
+.stages li.done .s-ic { border-color: var(--ok); background: var(--ok); }
+.stages li.done .s-ic svg { opacity: 1; }
+.stages li.fail { color: var(--bad); }
+.stages li.fail .s-ic { border-color: var(--bad-border); background: var(--bad-bg); }
+/* —— 判定面板 —— */
+.verdict { border-radius: var(--radius-sm); padding: 18px 20px; margin-top: 16px; animation: cardIn .45s cubic-bezier(0.16,1,0.3,1); display: none; }
+.verdict.show { display: block; }
+.verdict.ok { background: var(--ok-bg); border: 1px solid var(--ok-border); }
+.verdict.bad { background: var(--bad-bg); border: 1px solid var(--bad-border); }
+.verdict .v-head { display: flex; align-items: center; gap: 9px; font-size: 16px; font-weight: 700; }
+.verdict.ok .v-head { color: var(--ok); }
+.verdict.bad .v-head { color: var(--bad); }
+.verdict .v-head svg { width: 20px; height: 20px; stroke: currentColor; }
+.verdict .v-sub { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
+.verdict .v-rtt { font-family: 'Courier New', monospace; font-weight: 700; color: var(--text-primary); }
+.verdict .v-link { display: inline-block; font-size: 11.5px; font-weight: 600; margin-top: 10px; padding: 3px 12px; border-radius: 12px; background: var(--card-bg-strong); border: 1px solid var(--card-border); color: var(--text-secondary); font-family: 'Courier New', monospace; }
+.verdict .v-tips { margin-top: 12px; font-size: 12.5px; color: var(--text-secondary); }
+.verdict .v-tips li { margin: 4px 0 4px 18px; }
+.verdict .v-actions { margin-top: 14px; }
+/* —— 手动加入 —— */
+.manual-row { display: none; gap: 9px; margin-top: 12px; align-items: center; flex-wrap: wrap; }
+.manual-row input {
+    flex: 0 0 150px; background: rgba(255,255,255,0.72); border: 1.5px solid rgba(44,62,80,0.14);
+    border-radius: 10px; padding: 7px 12px; font: inherit; font-size: 14px;
+    font-family: 'Courier New', monospace; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text-primary); outline: none; transition: var(--transition);
+}
+.manual-row input:focus { border-color: var(--accent-teal); box-shadow: 0 0 0 3px rgba(45,212,191,0.12); }
+.manual-hint { font-size: 12px; color: var(--bad); display: none; }
+/* —— 说明卡 —— */
+.about ul { margin: 8px 0 0 18px; color: var(--text-secondary); font-size: 12.8px; }
+.about li { margin-bottom: 6px; }
+.about b { color: var(--text-primary); font-weight: 600; }
+.credit { text-align: center; font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+.credit a { color: var(--text-muted); text-decoration: none; border-bottom: 1px dotted rgba(142,154,175,0.6); transition: var(--transition); }
+.credit a:hover { color: var(--accent-blue); border-color: var(--accent-blue); }
+@media (max-width: 560px) {
+    body { padding: 26px 12px 20px; }
+    .card-pad { padding: 18px 16px; }
+    .host-flex { justify-content: center; }
+    .code-show { font-size: 25px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-decoration bg-decoration-1"></div>
+<div class="bg-decoration bg-decoration-2"></div>
+<div class="bg-decoration bg-decoration-3"></div>
+
+<div class="wrap">
+    <div class="page-head">
+        <div class="logo-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+        </div>
+        <h1>局域网连通性测试</h1>
+        <div class="sub">手机扫码 · 秒级判定设备间是否互通</div>
+    </div>
+
+    <!-- 电脑端（主机）视图 -->
+    <div class="glass-card" id="hostCard" style="display:none">
+        <div class="card-pad">
+            <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" r="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                电脑端 · 等待接入
+            </div>
+            <div class="host-flex">
+                <div class="host-info">
+                    <span class="state-pill" id="hostState"><span class="dot"></span><span id="hostStateText">正在连接信令服务器…</span></span>
+                    <div class="code-show" id="codeText">······</div>
+                    <div class="code-label">房间号（备用输入码）</div>
+                    <div class="host-meta">
+                        <button class="action-btn" id="copyBtn" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            复制链接
+                        </button>
+                        <div id="hostCount" class="hint">尚未有设备接入</div>
+                    </div>
+                </div>
+                <div class="qr-box" id="qrBox"></div>
+            </div>
+            <ul class="client-list" id="clientList"></ul>
+        </div>
+    </div>
+
+    <!-- 手机端（加入）视图 -->
+    <div class="glass-card" id="joinCard" style="display:none">
+        <div class="card-pad">
+            <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                手机端 · 连接测试
+            </div>
+            <div class="room-line">测试房间：<b id="joinCode">——</b></div>
+            <ol class="stages" id="stageList">
+                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>连接信令服务器</li>
+                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>查找对方设备</li>
+                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>建立局域网直连</li>
+                <li><span class="s-ic"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>测量往返延迟</li>
+            </ol>
+            <div class="verdict" id="verdict"></div>
+        </div>
+    </div>
+
+    <!-- 说明 -->
+    <div class="glass-card about">
+        <div class="card-pad">
+            <div class="card-title">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                使用说明与原理
+            </div>
+            <ul>
+                <li><b>用法</b>：电脑端打开本页生成二维码 → 手机相机扫码 → 手机页面自动完成连接测试并给出「连通 / 不连通」结果。</li>
+                <li><b>原理</b>：两端浏览器经公共信令交换握手信息后，尝试 <b>WebRTC 局域网直连</b>（host 候选）。由于双方能打开本页即已证明公网可达，直连握手能否成功便只取决于局域网路径——连上即局域网互通，连不上即被隔离或不同网段。</li>
+                <li><b>隐私</b>：测试数据不经任何服务器存储，房间码随机生成、用完即弃，仅握手信息短暂路过公共信令。</li>
+                <li><b>提示</b>：若显示不连通，请检查是否连接同一 Wi-Fi、是否被访客网络 / AP 隔离 / 公司防火墙限制。</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="credit">
+        WebRTC P2P 直连 · 信令 <a href="https://github.com/peers/peerjs" target="_blank" rel="noopener noreferrer">PeerJS</a> (MIT) · 二维码 <a href="https://github.com/davidshimjs/qrcodejs" target="_blank" rel="noopener noreferrer">qrcodejs</a> (MIT) · <a href="/tools/">返回工具箱</a>
+    </div>
+</div>
+
+<script src="vendor/qrcode.min.js"></script>
+<script src="vendor/peerjs.min.js"></script>
+<script>
+(function () {
+'use strict';
+var $ = function (id) { return document.getElementById(id); };
+var ALPHA = 'abcdefghjkmnpqrstuvwxyz23456789';
+var PID_PREFIX = 'lanchk-';
+
+function genCode() {
+    var s = '';
+    for (var i = 0; i < 6; i++) s += ALPHA[Math.floor(Math.random() * ALPHA.length)];
+    return s;
+}
+function log() {
+    try { console.log.apply(console, ['[lanchk]'].concat([].slice.call(arguments))); } catch (e) {}
+}
+function joinUrl(code) { return location.origin + location.pathname + '#room=' + code.toUpperCase(); }
+
+/* ======================= 主机端 ======================= */
+var peer = null, conns = {};
+
+function startHost() {
+    document.body.dataset.mode = 'host';
+    $('hostCard').style.display = '';
+    log('mode=host');
+    newHost();
+}
+
+function newHost() {
+    var code = genCode();
+    $('codeText').textContent = code.toUpperCase();
+    var pill = $('hostState');
+    pill.className = 'state-pill';
+    $('hostStateText').textContent = '正在连接信令服务器…';
+    try { peer && peer.destroy(); } catch (e) {}
+    conns = {};
+    $('clientList').innerHTML = '';
+    peer = new Peer(PID_PREFIX + code, { debug: 0 });
+
+    peer.on('open', function () {
+        pill.className = 'state-pill';
+        $('hostStateText').textContent = '等待手机扫码接入…';
+        log('code=' + code);
+        renderQr(joinUrl(code));
+        $('copyBtn').dataset.url = joinUrl(code);
+    });
+
+    peer.on('connection', function (conn) {
+        conns[conn.peer] = conn;
+        conn.on('open', function () {
+            log('client-connected id=' + conn.peer);
+            addClient(conn.peer);
+            updateHostCount();
+            try { conn.send({ k: 'hello' }); } catch (e) {}
+        });
+        conn.on('data', function (d) {
+            if (!d) return;
+            if (d.k === 'p') { try { conn.send({ k: 'q', i: d.i }); } catch (e) {} }
+            else if (d.k === 'r') {
+                log('result rtt=' + d.rtt + ' link=' + d.link);
+                clientResult(conn.peer, d);
+            }
+        });
+        conn.on('close', function () { removeClient(conn.peer); });
+        conn.on('error', function () { removeClient(conn.peer); });
+    });
+
+    peer.on('disconnected', function () {
+        pill.className = 'state-pill warn';
+        $('hostStateText').textContent = '信令中断，正在重连…';
+        try { peer.reconnect(); } catch (e) {}
+    });
+
+    peer.on('error', function (e) {
+        var t = e && e.type;
+        log('host-error type=' + t);
+        if (t === 'unavailable-id') { newHost(); return; }
+        pill.className = 'state-pill err';
+        $('hostStateText').textContent = '信令服务连接失败，请检查电脑网络后刷新重试';
+    });
+}
+
+function renderQr(url) {
+    var box = $('qrBox');
+    box.innerHTML = '';
+    try {
+        new QRCode(box, { text: url, width: 216, height: 216, correctLevel: QRCode.CorrectLevel.M });
+        log('qr=rendered url=' + url);
+    } catch (e) {
+        box.innerHTML = '<div style="width:216px;height:216px;overflow:hidden;word-break:break-all;font-size:10px">' + url + '</div>';
+        log('qr=fallback');
+    }
+}
+
+function addClient(peerId) {
+    var li = document.createElement('li');
+    li.dataset.peer = peerId;
+    li.innerHTML = '<span class="cdot"></span><span>设备 ···' + peerId.slice(-4) + ' 已接入，测速中…</span>';
+    $('clientList').appendChild(li);
+    $('hostStateText').textContent = '已有设备接入';
+    updateHostCount();
+}
+function clientResult(peerId, d) {
+    var li = $('clientList').querySelector('li[data-peer="' + peerId + '"]');
+    if (!li) return;
+    li.classList.add('done');
+    var label = (d.link && d.link.indexOf('host ↔ host') >= 0) ? '局域网直连' : 'P2P 直连';
+    li.innerHTML = '<span class="cdot"></span><span>设备 ···' + peerId.slice(-4) + ' 测试完成 · ' + label + '</span><span class="crtt">RTT ' + d.rtt + ' ms</span>';
+    var pill = $('hostState');
+    pill.className = 'state-pill ok';
+    $('hostStateText').textContent = '局域网连通 ✓';
+}
+function removeClient(peerId) {
+    var li = $('clientList').querySelector('li[data-peer="' + peerId + '"]');
+    li && li.parentNode.removeChild(li);
+    updateHostCount();
+}
+function updateHostCount() {
+    var n = Object.keys(conns).length;
+    $('hostCount').textContent = n > 0 ? ('当前接入 ' + n + ' 台设备') : '尚未有设备接入';
+}
+
+$('copyBtn').addEventListener('click', function () {
+    var url = this.dataset.url || location.href, btn = this;
+    var done = function () {
+        btn.textContent = '已复制 ✓';
+        setTimeout(function () { btn.textContent = '复制链接'; }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done, function () { fallbackCopy(url, done); });
+    } else fallbackCopy(url, done);
+});
+function fallbackCopy(url, done) {
+    var t = document.createElement('textarea');
+    t.value = url; t.style.position = 'fixed'; t.style.opacity = '0';
+    document.body.appendChild(t); t.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(t);
+}
+
+/* 手动输入房间号（手机端备用入口） */
+function manualJoin() {
+    var v = ($('manualInput').value || '').trim().toLowerCase();
+    var hint = $('manualHint');
+    if (!/^[a-hj-km-np-z2-9]{4,10}$/.test(v)) {
+        hint.style.display = ''; hint.textContent = '房间号格式不正确';
+        return;
+    }
+    location.hash = 'room=' + v;
+    startJoin(v);
+}
+
+/* ======================= 手机端 ======================= */
+var joining = false;
+
+function startJoin(code) {
+    if (joining) return;
+    joining = true;
+    document.body.dataset.mode = 'join';
+    $('hostCard').style.display = 'none';
+    $('joinCard').style.display = '';
+    $('joinCode').textContent = code.toUpperCase();
+    log('mode=join code=' + code);
+
+    var closed = false, finished = false;
+    var pcPeer = null, conn = null;
+    var t1, t2;
+    var pingsDone = 0, rttSum = 0, sendT = 0;
+
+    function setStage(n) {
+        var lis = $('stageList').getElementsByTagName('li');
+        for (var i = 0; i < lis.length; i++) {
+            lis[i].className = n < 0 ? 'fail' : (i < n ? 'done' : (i === n ? 'act' : ''));
+        }
+    }
+    function fail(kind) {
+        if (closed || finished) return;
+        closed = true;
+        clearTimeout(t1); clearTimeout(t2);
+        setStage(-1);
+        log('verdict ' + JSON.stringify({ phase: 'fail', kind: kind }));
+        verdictFail(kind);
+        try { conn && conn.close(); } catch (e) {}
+        try { pcPeer && pcPeer.destroy(); } catch (e) {}
+    }
+    function sendPing() {
+        sendT = performance.now();
+        try { conn.send({ k: 'p', i: 1 }); } catch (e) {}
+    }
+
+    setStage(0);
+    pcPeer = new Peer({ debug: 0 });
+
+    t1 = setTimeout(function () { fail('signaling'); }, 15000);
+
+    pcPeer.on('open', function () {
+        if (closed) return;
+        clearTimeout(t1);
+        log('signaling=open');
+        setStage(1);
+        t2 = setTimeout(function () { fail('timeout'); }, 15000);
+        conn = pcPeer.connect(PID_PREFIX + code, { reliable: true });
+
+        conn.on('open', function () {
+            if (closed) return;
+            clearTimeout(t2);
+            log('channel-open');
+            setStage(2);
+            setTimeout(function () {
+                if (closed) return;
+                setStage(3);
+                log('ping-start');
+                sendPing();
+            }, 250);
+        });
+        conn.on('data', function (d) {
+            if (!d || closed) return;
+            if (d.k === 'q') {
+                var rtt = Math.round(performance.now() - sendT);
+                rttSum += rtt; pingsDone++;
+                log('rtt=' + rtt + ' avg=' + Math.round(rttSum / pingsDone));
+                if (pingsDone < 3) setTimeout(sendPing, 350);
+                else finish(Math.round(rttSum / pingsDone));
+            }
+        });
+        conn.on('close', function () { fail('closed'); });
+        conn.on('error', function () { fail('closed'); });
+    });
+
+    pcPeer.on('error', function (e) {
+        var t = e && e.type;
+        log('join-error type=' + t);
+        if (t === 'peer-unavailable') { clearTimeout(t2); fail('notfound'); }
+        else if (t === 'browser-incompatible') { fail('incompatible'); }
+        else if (!finished) fail('signaling');
+    });
+    pcPeer.on('disconnected', function () { try { pcPeer.reconnect(); } catch (e) {} });
+
+    function finish(avg) {
+        if (finished || closed) return;
+        finished = true;
+        setTimeout(function () {
+            selectedPairTypes(conn && conn.peerConnection).then(function (t) {
+                var link, good;
+                if (t && t.l && t.r) {
+                    link = t.l + ' ↔ ' + t.r;
+                    good = (t.l === 'host' && t.r === 'host');
+                } else { link = 'P2P 直连'; good = true; }
+                setStage(4);
+                log('verdict ' + JSON.stringify({ phase: 'ok', rtt: avg, link: link }));
+                verdictOk(avg, link, good);
+                try { conn.send({ k: 'r', rtt: avg, link: link }); } catch (e) {}
+                try { setTimeout(function () { conn.close(); pcPeer.destroy(); }, 500); } catch (e) {}
+            });
+        }, 300);
+    }
+}
+
+/* 读取 ICE 选中候选对的类型，判定是否为局域网直连 */
+function selectedPairTypes(pc) {
+    return new Promise(function (resolve) {
+        try {
+            pc.getStats().then(function (stats) {
+                var pair = null;
+                stats.forEach(function (s) {
+                    if (s.type === 'candidate-pair' && s.selected === true) pair = pair || s;
+                });
+                if (!pair) stats.forEach(function (s) {
+                    if (s.type === 'candidate-pair' && s.state === 'succeeded' && s.nominated === true) pair = pair || s;
+                });
+                if (!pair) stats.forEach(function (s) {
+                    if (s.type === 'candidate-pair' && s.state === 'succeeded') pair = pair || s;
+                });
+                if (!pair) return resolve(null);
+                var lc = stats.get(pair.localCandidateId), rc = stats.get(pair.remoteCandidateId);
+                resolve({ l: lc && lc.candidateType, r: rc && rc.candidateType });
+            }).catch(function () { resolve(null); });
+        } catch (e) { resolve(null); }
+    });
+}
+
+function verdictOk(rtt, link, good) {
+    var v = $('verdict');
+    v.className = 'verdict ok show';
+    v.innerHTML =
+        '<div class="v-head">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>' +
+        '局域网连通</div>' +
+        '<div class="v-sub">手机与电脑成功建立 P2P 直连，平均往返延迟 <span class="v-rtt">' + rtt + ' ms</span></div>' +
+        '<div class="v-link">直连方式 ' + link + (good ? ' · 局域网路径 ✓' : ' · 未见局域网直连候选') + '</div>' +
+        '<div class="v-sub" style="margin-top:10px">判定方式：两台设备直接握手测速，测试数据不经任何服务器中转。</div>' +
+        '<div class="v-actions"><button class="action-btn" type="button" onclick="location.reload()">重新测试</button></div>';
+}
+function verdictFail(kind) {
+    var v = $('verdict');
+    var head, sub, tips = '';
+    if (kind === 'signaling') {
+        head = '无法连接信令服务';
+        sub = '本机当前可能无法上网，请确认网络可用后重试。';
+    } else if (kind === 'notfound') {
+        head = '未找到对方设备';
+        sub = '电脑端页面可能已关闭，或房间号不正确。请让电脑端重新打开本页生成新二维码。';
+    } else if (kind === 'incompatible') {
+        head = '浏览器不支持 WebRTC';
+        sub = '请更换较新版本的 Chrome / Safari / Edge / Firefox 再试。';
+    } else if (kind === 'closed') {
+        head = '连接中断';
+        sub = '直连握手过程中断，常见于网络切换或信号不稳，请重试。';
+    } else {
+        head = '局域网不连通';
+        sub = '两台设备未能在同一局域网内建立直连。';
+        tips = '<ul class="v-tips"><li>确认手机与电脑连接的是<b>同一个 Wi-Fi / 热点</b>；</li><li>访客网络、AP 隔离（客户端隔离）会禁止设备互访；</li><li>公司 / 校园网络可能限制设备间通信；</li><li>电脑防火墙首次运行时需放行浏览器联网。</li></ul>';
+    }
+    v.className = 'verdict bad show';
+    v.innerHTML =
+        '<div class="v-head">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>' +
+        head + '</div>' +
+        '<div class="v-sub">' + sub + '</div>' + tips +
+        '<div class="v-actions"><button class="action-btn" type="button" onclick="location.reload()">重新测试</button></div>';
+}
+
+/* ======================= 启动 ======================= */
+var m = location.hash.match(/room=([A-Za-z0-9]{4,10})/);
+if (m) {
+    startJoin(m[1].toLowerCase());
+} else {
+    startHost();
+    /* 主机页底部提供手机端手动加入入口 */
+    var hostCard = $('hostCard').querySelector('.card-pad');
+    var foot = document.createElement('div');
+    foot.style.marginTop = '14px';
+    foot.innerHTML =
+        '<button class="action-btn" id="manualToggle" type="button">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>' +
+        '手机端手动输入房间号</button>' +
+        '<div class="manual-row" id="manualRow">' +
+        '<input id="manualInput" maxlength="8" placeholder="输入房间号" autocomplete="off" spellcheck="false">' +
+        '<button class="action-btn" id="manualBtn" type="button">加入</button>' +
+        '<span class="manual-hint" id="manualHint"></span></div>';
+    hostCard.appendChild(foot);
+    $('manualToggle').addEventListener('click', function () {
+        var r = $('manualRow');
+        var showing = (r.style.display === 'flex');
+        r.style.display = showing ? 'none' : 'flex';
+        if (!showing) $('manualInput').focus();
+    });
+    $('manualBtn').addEventListener('click', manualJoin);
+    $('manualInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') manualJoin(); });
+}
+})();
+</script>
+</body>
+</html>
