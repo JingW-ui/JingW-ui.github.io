@@ -161,6 +161,15 @@ body {
 }
 .manual-row input:focus { border-color: var(--accent-teal); box-shadow: 0 0 0 3px rgba(45,212,191,0.12); }
 .manual-hint { font-size: 12px; color: var(--bad); display: none; }
+/* —— 网络与设备信息 —— */
+.net-info { margin-top: 16px; border-top: 1px dashed rgba(44,62,80,0.12); padding-top: 14px; }
+.ni-row { display: flex; gap: 10px; align-items: baseline; margin-bottom: 7px; font-size: 12.5px; }
+.ni-k { flex: 0 0 64px; color: var(--text-muted); font-size: 11.5px; flex-shrink: 0; }
+.ni-v { color: var(--text-primary); word-break: break-all; user-select: all; -webkit-user-select: all; }
+.ni-v.mono { font-family: 'Courier New', monospace; font-weight: 600; }
+.ni-v.obf { color: var(--text-secondary); font-weight: 500; }
+.ob-note { font-size: 11.5px; color: var(--text-muted); line-height: 1.55; margin-top: 8px; }
+.v-net { margin-top: 14px; border-top: 1px dashed var(--ok-border); padding-top: 12px; }
 /* —— 说明卡 —— */
 .about ul { margin: 8px 0 0 18px; color: var(--text-secondary); font-size: 12.8px; }
 .about li { margin-bottom: 6px; }
@@ -213,6 +222,12 @@ body {
                 <div class="qr-box" id="qrBox"></div>
             </div>
             <ul class="client-list" id="clientList"></ul>
+            <div class="net-info">
+                <div class="ni-row"><span class="ni-k">本机设备</span><span class="ni-v" id="hostDev">识别中…</span></div>
+                <div class="ni-row"><span class="ni-k">本机 IP</span><span class="ni-v mono" id="hostIps">收集中…</span></div>
+                <div class="ni-row"><span class="ni-k">会话端口</span><span class="ni-v mono" id="hostPort">待设备接入</span></div>
+                <div class="ob-note" id="hostObNote" style="display:none">上面的 .local 地址是浏览器（Chrome/Edge/Firefox）的隐私保护机制：以 mDNS 名替代局域网 IP。真实 IP 可改用 Safari 查看，或在浏览器 flags 中关闭 WebRTC mDNS 混淆。</div>
+            </div>
         </div>
     </div>
 
@@ -244,7 +259,7 @@ body {
             <ul>
                 <li><b>用法</b>：电脑端打开本页生成二维码 → 手机相机扫码 → 手机页面自动完成连接测试并给出「连通 / 不连通」结果。</li>
                 <li><b>原理</b>：两端浏览器经公共信令交换握手信息后，尝试 <b>WebRTC 局域网直连</b>（host 候选）。由于双方能打开本页即已证明公网可达，直连握手能否成功便只取决于局域网路径——连上即局域网互通，连不上即被隔离或不同网段。</li>
-                <li><b>隐私</b>：测试数据不经任何服务器存储，房间码随机生成、用完即弃，仅握手信息短暂路过公共信令。</li>
+                <li><b>隐私</b>：页面显示的 IP 与设备信息仅取自浏览器本地、只在两台设备之间直接交换，不经任何服务器存储；房间码随机生成、用完即弃。</li>
                 <li><b>提示</b>：若显示不连通，请检查是否连接同一 Wi-Fi、是否被访客网络 / AP 隔离 / 公司防火墙限制。</li>
             </ul>
         </div>
@@ -274,14 +289,106 @@ function log() {
 }
 function joinUrl(code) { return location.origin + location.pathname + '#room=' + code.toUpperCase(); }
 
+/* —— 本机网络与设备信息（展示层，不影响判定逻辑） —— */
+var selfNet = { ips: [], used: null, port: null, obf: false };
+var selfDev = { os: '', browser: '', model: '' };
+var lastPair = null;   // 本次直连选中候选对（本端视角：la/lp=本端，ra/rp=对端）
+var peerInfo = null;   // 对端经数据通道自报的设备与 IP 信息
+
+function fmtAddr(a) { return a || '—'; }
+
+function gatherLocalCandidates() {
+    return new Promise(function (resolve) {
+        var found = [], pc = null, done = false;
+        function finish() {
+            if (done) return; done = true;
+            try { pc && pc.close(); } catch (e) {}
+            resolve(found);
+        }
+        try {
+            pc = new RTCPeerConnection({ iceServers: [] });
+            pc.createDataChannel('probe');
+            pc.onicecandidate = function (e) {
+                if (!e.candidate) { finish(); return; }
+                var c = e.candidate;
+                if (c.type === 'host' && c.address &&
+                    c.address.indexOf('169.254.') !== 0 && c.address.indexOf('fe80:') !== 0 &&
+                    !found.some(function (x) { return x.addr === c.address; })) {
+                    found.push({ addr: c.address, port: c.port, obf: /\.local$/.test(c.address) });
+                }
+            };
+            pc.createOffer().then(function (o) { return pc.setLocalDescription(o); }).catch(finish);
+            setTimeout(finish, 3000);
+        } catch (e) { finish(); }
+    });
+}
+
+function deviceInfo() {
+    var ua = navigator.userAgent, d = { os: '未知系统', browser: '未知浏览器', model: '' }, m;
+    if (/Windows NT/.test(ua)) d.os = 'Windows';
+    else if ((m = ua.match(/Android ([\d.]+)/))) d.os = 'Android ' + m[1];
+    else if (/iPad/.test(ua) && (m = ua.match(/OS ([\d_]+)/))) d.os = 'iPadOS ' + m[1].replace(/_/g, '.');
+    else if (/iPhone/.test(ua) && (m = ua.match(/OS ([\d_]+)/))) d.os = 'iOS ' + m[1].replace(/_/g, '.');
+    else if (/Mac OS X/.test(ua)) d.os = 'macOS';
+    else if (/CrOS/.test(ua)) d.os = 'ChromeOS';
+    else if (/Linux/.test(ua)) d.os = 'Linux';
+    if (/Edg\//.test(ua)) d.browser = 'Edge ' + ((ua.match(/Edg\/([\d.]+)/) || ['', ''])[1]);
+    else if (/OPR\//.test(ua)) d.browser = 'Opera ' + ((ua.match(/OPR\/([\d.]+)/) || ['', ''])[1]);
+    else if (/Firefox\//.test(ua)) d.browser = 'Firefox ' + ((ua.match(/Firefox\/([\d.]+)/) || ['', ''])[1]);
+    else if (/Chrome\//.test(ua)) d.browser = 'Chrome ' + ((ua.match(/Chrome\/([\d.]+)/) || ['', ''])[1]);
+    else if (/Version\/([\d.]+)/.test(ua) && /Safari\//.test(ua)) d.browser = 'Safari ' + ((ua.match(/Version\/([\d.]+)/) || ['', ''])[1]);
+    if ((m = ua.match(/Android [\d.]+; ([^;)]+?)(?:\s+Build|\))/))) d.model = m[1].trim();
+    else if (/iPad/.test(ua)) d.model = 'iPad';
+    else if (/iPhone/.test(ua)) d.model = 'iPhone';
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+        return navigator.userAgentData.getHighEntropyValues(['model', 'platformVersion']).then(function (h) {
+            if (h.model && !d.model) d.model = h.model;
+            if (/Windows/.test(d.os) && h.platformVersion) {
+                d.os = 'Windows ' + (parseInt(h.platformVersion, 10) >= 13 ? '11' : '10');
+            }
+            return d;
+        }).catch(function () { return d; });
+    }
+    return Promise.resolve(d);
+}
+
+function devText(d) {
+    if (!d) return '';
+    return [d.os, d.model, d.browser].filter(function (x) { return x; }).join(' · ');
+}
+function ipListText(ips, used) {
+    return ips.map(function (x) {
+        return (used && x.addr === used ? x.addr + '（本次直连）' : x.addr);
+    }).join('　') || '—';
+}
+
 /* ======================= 主机端 ======================= */
-var peer = null, conns = {};
+var peer = null, conns = {}, clientInfo = {}, clientRtt = {};
 
 function startHost() {
     document.body.dataset.mode = 'host';
     $('hostCard').style.display = '';
     log('mode=host');
+    deviceInfo().then(function (d) {
+        selfDev = d;
+        log('self-dev ' + devText(d));
+        renderHostNet();
+    });
+    gatherLocalCandidates().then(function (ips) {
+        selfNet.ips = ips;
+        selfNet.obf = ips.length > 0 && ips.every(function (x) { return x.obf; });
+        log('self-ips n=' + ips.length + ' obf=' + selfNet.obf + ' ' + ips.map(function (x) { return x.addr; }).join(','));
+        renderHostNet();
+    });
     newHost();
+}
+
+function renderHostNet() {
+    $('hostDev').textContent = devText(selfDev) || '识别中…';
+    $('hostIps').textContent = ipListText(selfNet.ips, selfNet.used);
+    $('hostIps').className = 'ni-v mono' + (selfNet.obf ? ' obf' : '');
+    $('hostObNote').style.display = selfNet.obf ? '' : 'none';
+    $('hostPort').textContent = selfNet.port ? ('UDP ' + selfNet.port + '（临时）') : '待设备接入';
 }
 
 function newHost() {
@@ -310,6 +417,7 @@ function newHost() {
             addClient(conn.peer);
             updateHostCount();
             try { conn.send({ k: 'hello' }); } catch (e) {}
+            try { conn.send({ k: 'info', dev: selfDev, ips: selfNet.ips.map(function (x) { return x.addr; }) }); } catch (e) {}
         });
         conn.on('data', function (d) {
             if (!d) return;
@@ -317,6 +425,18 @@ function newHost() {
             else if (d.k === 'r') {
                 log('result rtt=' + d.rtt + ' link=' + d.link);
                 clientResult(conn.peer, d);
+                selectedPairTypes(conn.peerConnection).then(function (t) {
+                    if (!t) return;
+                    lastPair = t;
+                    selfNet.used = t.la; selfNet.port = t.lp;
+                    log('pair local=' + t.la + ':' + t.lp + ' remote=' + t.ra + ':' + t.rp);
+                    renderHostNet();
+                });
+            }
+            else if (d.k === 'info') {
+                clientInfo[conn.peer] = d;
+                log('client-info ' + devText(d.dev) + ' ip=' + (d.ips || []).join(','));
+                updateClientLi(conn.peer);
             }
         });
         conn.on('close', function () { removeClient(conn.peer); });
@@ -353,17 +473,26 @@ function renderQr(url) {
 function addClient(peerId) {
     var li = document.createElement('li');
     li.dataset.peer = peerId;
-    li.innerHTML = '<span class="cdot"></span><span>设备 ···' + peerId.slice(-4) + ' 已接入，测速中…</span>';
+    li.innerHTML = '<span class="cdot"></span><span class="cli-text">设备 ···' + peerId.slice(-4) + ' 已接入，测速中…</span>';
     $('clientList').appendChild(li);
     $('hostStateText').textContent = '已有设备接入';
     updateHostCount();
 }
-function clientResult(peerId, d) {
+function updateClientLi(peerId) {
     var li = $('clientList').querySelector('li[data-peer="' + peerId + '"]');
     if (!li) return;
-    li.classList.add('done');
-    var label = (d.link && d.link.indexOf('host ↔ host') >= 0) ? '局域网直连' : 'P2P 直连';
-    li.innerHTML = '<span class="cdot"></span><span>设备 ···' + peerId.slice(-4) + ' 测试完成 · ' + label + '</span><span class="crtt">RTT ' + d.rtt + ' ms</span>';
+    var info = clientInfo[peerId], rtt = clientRtt[peerId];
+    var parts = [];
+    if (info && info.dev) { var dt = devText(info.dev); if (dt) parts.push(dt); }
+    if (info && info.ips && info.ips.length) parts.push('IP ' + info.ips[0]);
+    if (rtt) parts.push('RTT ' + rtt.rtt + ' ms');
+    li.querySelector('.cli-text').textContent =
+        parts.length ? parts.join(' · ') : ('设备 ···' + peerId.slice(-4) + ' 已接入，测速中…');
+    if (rtt) li.classList.add('done');
+}
+function clientResult(peerId, d) {
+    clientRtt[peerId] = d;
+    updateClientLi(peerId);
     var pill = $('hostState');
     pill.className = 'state-pill ok';
     $('hostStateText').textContent = '局域网连通 ✓';
@@ -371,6 +500,7 @@ function clientResult(peerId, d) {
 function removeClient(peerId) {
     var li = $('clientList').querySelector('li[data-peer="' + peerId + '"]');
     li && li.parentNode.removeChild(li);
+    delete clientInfo[peerId]; delete clientRtt[peerId];
     updateHostCount();
 }
 function updateHostCount() {
@@ -419,6 +549,18 @@ function startJoin(code) {
     $('joinCard').style.display = '';
     $('joinCode').textContent = code.toUpperCase();
     log('mode=join code=' + code);
+    peerInfo = null;
+    deviceInfo().then(function (d) {
+        selfDev = d;
+        log('self-dev ' + devText(d));
+        renderVerdictExtra();
+    });
+    gatherLocalCandidates().then(function (ips) {
+        selfNet.ips = ips;
+        selfNet.obf = ips.length > 0 && ips.every(function (x) { return x.obf; });
+        log('self-ips n=' + ips.length + ' obf=' + selfNet.obf);
+        renderVerdictExtra();
+    });
 
     var closed = false, finished = false;
     var pcPeer = null, conn = null;
@@ -464,6 +606,7 @@ function startJoin(code) {
             clearTimeout(t2);
             log('channel-open');
             setStage(2);
+            try { conn.send({ k: 'info', dev: selfDev, ips: selfNet.ips.map(function (x) { return x.addr; }) }); } catch (e) {}
             setTimeout(function () {
                 if (closed) return;
                 setStage(3);
@@ -473,7 +616,11 @@ function startJoin(code) {
         });
         conn.on('data', function (d) {
             if (!d || closed) return;
-            if (d.k === 'q') {
+            if (d.k === 'info') {
+                peerInfo = d;
+                log('peer-info ' + devText(d.dev) + ' ip=' + (d.ips || []).join(','));
+                renderVerdictExtra();
+            } else if (d.k === 'q') {
                 var rtt = Math.round(performance.now() - sendT);
                 rttSum += rtt; pingsDone++;
                 log('rtt=' + rtt + ' avg=' + Math.round(rttSum / pingsDone));
@@ -504,9 +651,10 @@ function startJoin(code) {
                     link = t.l + ' ↔ ' + t.r;
                     good = (t.l === 'host' && t.r === 'host');
                 } else { link = 'P2P 直连'; good = true; }
+                lastPair = t;
                 setStage(4);
                 log('verdict ' + JSON.stringify({ phase: 'ok', rtt: avg, link: link }));
-                verdictOk(avg, link, good);
+                verdictOk(avg, t);
                 try { conn.send({ k: 'r', rtt: avg, link: link }); } catch (e) {}
                 try { setTimeout(function () { conn.close(); pcPeer.destroy(); }, 500); } catch (e) {}
             });
@@ -531,14 +679,21 @@ function selectedPairTypes(pc) {
                 });
                 if (!pair) return resolve(null);
                 var lc = stats.get(pair.localCandidateId), rc = stats.get(pair.remoteCandidateId);
-                resolve({ l: lc && lc.candidateType, r: rc && rc.candidateType });
+                resolve({
+                    l: lc && lc.candidateType, r: rc && rc.candidateType,
+                    la: lc && lc.address, lp: lc && lc.port,
+                    ra: rc && rc.address, rp: rc && rc.port
+                });
             }).catch(function () { resolve(null); });
         } catch (e) { resolve(null); }
     });
 }
 
-function verdictOk(rtt, link, good) {
+function verdictOk(rtt, t) {
     var v = $('verdict');
+    var link, good;
+    if (t && t.l && t.r) { link = t.l + ' ↔ ' + t.r; good = (t.l === 'host' && t.r === 'host'); }
+    else { link = 'P2P 直连'; good = true; }
     v.className = 'verdict ok show';
     v.innerHTML =
         '<div class="v-head">' +
@@ -546,8 +701,37 @@ function verdictOk(rtt, link, good) {
         '局域网连通</div>' +
         '<div class="v-sub">手机与电脑成功建立 P2P 直连，平均往返延迟 <span class="v-rtt">' + rtt + ' ms</span></div>' +
         '<div class="v-link">直连方式 ' + link + (good ? ' · 局域网路径 ✓' : ' · 未见局域网直连候选') + '</div>' +
+        '<div class="v-net" id="vExtra" style="display:none"></div>' +
         '<div class="v-sub" style="margin-top:10px">判定方式：两台设备直接握手测速，测试数据不经任何服务器中转。</div>' +
         '<div class="v-actions"><button class="action-btn" type="button" onclick="location.reload()">重新测试</button></div>';
+    renderVerdictExtra();
+}
+function renderVerdictExtra() {
+    var el = $('vExtra');
+    if (!el) return;
+    var rows = '';
+    function row(k, val, obf) {
+        return '<div class="ni-row"><span class="ni-k">' + k + '</span><span class="ni-v mono' + (obf ? ' obf' : '') + '">' + val + '</span></div>';
+    }
+    rows += row('本机设备', devText(selfDev) || '—');
+    rows += row('本机 IP', selfNet.ips.length ? selfNet.ips.map(function (x) { return x.addr; }).join('　') : '—', selfNet.obf);
+    if (lastPair && lastPair.lp) {
+        rows += row('会话端口', '本机 UDP ' + lastPair.lp + ' ↔ 对方 UDP ' + lastPair.rp + '（临时）');
+        var oppIp = lastPair.ra || (peerInfo && peerInfo.ips && peerInfo.ips[0]) || '';
+        if (oppIp) rows += row('对方 IP', oppIp, /\.local$/.test(oppIp));
+    } else if (peerInfo && peerInfo.ips && peerInfo.ips.length) {
+        rows += row('对方 IP', peerInfo.ips[0], /\.local$/.test(peerInfo.ips[0] || ''));
+    }
+    if (peerInfo && peerInfo.dev) rows += row('对方设备', devText(peerInfo.dev));
+    var obf = selfNet.obf ||
+        (peerInfo && peerInfo.ips && peerInfo.ips.length && /\.local$/.test(peerInfo.ips[0] || '')) ||
+        (lastPair && /\.local$/.test(lastPair.ra || ''));
+    if (obf) {
+        rows += '<div class="ob-note">带混淆标记的地址是浏览器（Chrome/Edge/Firefox）的隐私保护机制：以 mDNS 名替代局域网 IP。真实 IP 可改用 Safari 查看，或在浏览器 flags 中关闭 WebRTC mDNS 混淆。</div>';
+    }
+    rows += '<div class="ob-note">以上信息仅在本次测试的两台设备之间直接交换，不经任何服务器存储。</div>';
+    el.innerHTML = rows;
+    el.style.display = '';
 }
 function verdictFail(kind) {
     var v = $('verdict');
