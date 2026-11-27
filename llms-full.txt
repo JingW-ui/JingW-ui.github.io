@@ -1,8 +1,8 @@
 # JingW-ui 站点全量内容（供 AI 检索引用）
 
-> 站点: https://jingw-ui.github.io · 生成日期: 2026-11-24 · 纯静态站点，所有工具/游戏浏览器直接运行，软件为 Windows exe（GitHub Releases 下载）。
+> 站点: https://jingw-ui.github.io · 生成日期: 2026-11-27 · 纯静态站点，所有工具/游戏浏览器直接运行，软件为 Windows exe（GitHub Releases 下载）。
 
-## 一、在线工具箱（81 个）
+## 一、在线工具箱（82 个）
 入口: https://jingw-ui.github.io/tools/
 
 ### 图标创建
@@ -328,6 +328,10 @@ URL: https://jingw-ui.github.io/tools/pdf-tools/
 ### 局域网连通性测试
 用途: 电脑端生成二维码，手机扫码后 WebRTC 局域网直连，秒级判定两设备是否互通并显示往返延迟
 URL: https://jingw-ui.github.io/tools/lan-check/
+
+### LeetCode 简单题 30
+用途: Top Interview 150 前三十道简单题离线题库：中文题面、官方标签、本地打卡与搜索筛选，一页搞定
+URL: https://jingw-ui.github.io/tools/easy-lc/
 
 ## 二、Windows 免费软件（11 款）
 入口: https://jingw-ui.github.io/softwares/

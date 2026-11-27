@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#e7f1f0">
+<title>LeetCode 简单题 30 - Top Interview 150 离线题库</title>
+<meta name="description" content="LeetCode Top Interview 150 学习计划前三十道简单题的离线题库：中文题面、官方标签、完成打卡、搜索筛选，一页搞定。题面数据来源于 LeetCodecn，仅供个人学习。">
+<style>
+:root {
+    /* —— JingW-ui 设计令牌（glassmorphism-design-system）—— */
+    --bg-gradient-1: #e7f1f0;
+    --bg-gradient-2: #dfe9ec;
+    --bg-gradient-3: #e6edf2;
+    --card-bg: rgba(255, 255, 255, 0.50);
+    --card-bg-strong: rgba(255, 255, 255, 0.68);
+    --card-border: rgba(255, 255, 255, 0.55);
+    --text-primary: #2c3e50;
+    --text-secondary: #5a6c7d;
+    --text-muted: #8e9aaf;
+    --accent-teal: #2dd4bf;
+    --accent-blue: #3b82f6;
+    --accent-pink: #f472b6;
+    --shadow-sm: 0 2px 8px rgba(20,40,50,0.05);
+    --shadow-md: 0 6px 24px rgba(20,40,50,0.08);
+    --shadow-lg: 0 12px 40px rgba(20,40,50,0.12);
+    --radius-sm: 14px;
+    --radius-md: 20px;
+    --radius-lg: 28px;
+    --transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+    font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%) fixed;
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 40px 16px 28px;
+    font-size: 14px;
+}
+/* —— 背景光斑 —— */
+.bg-decoration { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.45; pointer-events: none; z-index: 0; }
+.bg-decoration-1 { width: 560px; height: 560px; background: radial-gradient(circle, rgba(94,234,212,0.30) 0%, transparent 70%); top: -180px; left: -120px; animation: float 22s ease-in-out infinite; }
+.bg-decoration-2 { width: 480px; height: 480px; background: radial-gradient(circle, rgba(125,211,252,0.28) 0%, transparent 70%); bottom: -140px; right: -120px; animation: float 26s ease-in-out infinite reverse; }
+.bg-decoration-3 { width: 380px; height: 380px; background: radial-gradient(circle, rgba(45,212,191,0.18) 0%, transparent 70%); top: 48%; left: 52%; transform: translate(-50%, -50%); animation: pulse 16s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translate(0,0) rotate(0deg);} 33%{transform:translate(30px,-30px) rotate(120deg);} 66%{transform:translate(-20px,20px) rotate(240deg);} }
+@keyframes pulse { 0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.3;} 50%{transform:translate(-50%,-50%) scale(1.2);opacity:.45;} }
+/* —— 页头 —— */
+.wrap { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+.page-head { text-align: center; margin-bottom: 20px; opacity: 0; transform: translateY(-14px); animation: headerIn .7s cubic-bezier(0.16,1,0.3,1) .05s forwards; }
+@keyframes headerIn { to { opacity: 1; transform: translateY(0); } }
+.page-head .logo-ic { width: 52px; height: 52px; margin: 0 auto 10px; border-radius: 16px; background: linear-gradient(135deg, #d9efef, #c4e3e8); display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); }
+.page-head .logo-ic svg { width: 27px; height: 27px; stroke: #1a9e8f; }
+.page-head h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+.page-head .sub { color: var(--text-secondary); font-size: 13px; margin-top: 4px; }
+.head-stats { margin-top: 14px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.welcome-stat { text-align: center; padding: 5px 10px; border-radius: 10px; background: rgba(255,255,255,0.5); transition: var(--transition); min-width: 78px; }
+.welcome-stat:hover { transform: scale(1.04); background: rgba(255,255,255,0.72); }
+.welcome-stat .stat-value { font-family: 'Courier New', monospace; font-size: 17px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #2dd4bf); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
+.welcome-stat .stat-label { font-size: 9.5px; color: var(--text-muted); margin-top: 1px; }
+/* —— 玻璃卡片（结构面板无 3D 倾斜，交互反馈交给内部条目）—— */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: box-shadow 0.35s ease, backdrop-filter 0.35s ease;
+}
+.glass-card:hover { box-shadow: var(--shadow-lg); backdrop-filter: blur(28px) saturate(160%); -webkit-backdrop-filter: blur(28px) saturate(160%); }
+@supports not (backdrop-filter: blur(1px)) { .glass-card { background: rgba(255,255,255,0.85); } }
+/* —— 低存在感按钮 —— */
+.action-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; border: 1px solid rgba(44,62,80,0.14);
+    color: var(--text-secondary); border-radius: 10px;
+    padding: 7px 16px; font: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: var(--transition); text-decoration: none;
+}
+.action-btn:hover { background: rgba(255,255,255,0.65); color: var(--text-primary); border-color: rgba(44,62,80,0.22); transform: translateY(-1px); }
+.action-btn:active { transform: translateY(0); }
+.action-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+/* —— 工具栏 —— */
+.toolbar { padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 18px; }
+.search-box { position: relative; flex: 1 1 240px; max-width: 340px; }
+.search-box > svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: var(--text-muted); pointer-events: none; }
+.search-box input {
+    width: 100%; height: 38px; border-radius: 10px; border: 1px solid rgba(44,62,80,0.14);
+    background: rgba(255,255,255,0.6); padding: 0 12px 0 34px; font: inherit; font-size: 13px;
+    color: var(--text-primary); outline: none; transition: var(--transition);
+}
+.search-box input:focus { border-color: rgba(45,212,191,0.5); background: rgba(255,255,255,0.85); box-shadow: 0 0 0 3px rgba(45,212,191,0.10); }
+.chips { display: flex; flex-wrap: wrap; gap: 7px; flex: 3 1 300px; }
+.lc-chip {
+    background: transparent; border: 1px solid rgba(44,62,80,0.12); border-radius: 20px;
+    padding: 4px 12px; font: inherit; font-size: 12px; color: var(--text-secondary);
+    cursor: pointer; transition: var(--transition);
+}
+.lc-chip:hover { background: rgba(255,255,255,0.65); color: var(--text-primary); }
+.lc-chip.on { background: rgba(45,212,191,0.13); border-color: rgba(45,212,191,0.42); color: var(--text-primary); font-weight: 600; }
+.progress-box { flex: 0 0 auto; min-width: 150px; }
+.progress-label { font-size: 11.5px; color: var(--text-muted); display: flex; justify-content: space-between; gap: 14px; }
+#lcDoneNum { font-family: 'Courier New', monospace; font-weight: 700; color: var(--text-primary); }
+.progress-bar { height: 5px; background: rgba(20,40,50,0.08); border-radius: 3px; overflow: hidden; margin-top: 5px; }
+#lcDoneBar { height: 100%; width: 0; background: linear-gradient(90deg, #3b82f6, #2dd4bf); border-radius: 3px; transition: width .4s cubic-bezier(0.4,0,0.2,1); }
+/* —— 双栏主体 —— */
+.lc-body { display: grid; grid-template-columns: 375px minmax(0, 1fr); gap: 18px; align-items: start; }
+.list-panel { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding: 10px; }
+.list-meta { font-size: 11px; color: var(--text-muted); padding: 6px 12px 6px; }
+.lc-list { list-style: none; }
+.lc-item { display: flex; gap: 11px; padding: 10px 12px; border-radius: 12px; cursor: pointer; border: 1px solid transparent; transition: var(--transition); }
+.lc-item:hover { background: rgba(255,255,255,0.62); }
+.lc-item.on { background: rgba(45,212,191,0.12); border-color: rgba(45,212,191,0.30); }
+.lc-check {
+    background: none; border: none; padding: 0; width: 20px; height: 20px; margin-top: 3px; flex-shrink: 0;
+    cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; transition: var(--transition);
+}
+.lc-check svg { width: 16px; height: 16px; }
+.lc-check:hover { color: var(--accent-teal); transform: scale(1.18); }
+.lc-item.done .lc-check { color: var(--accent-teal); }
+.lc-item.done .lc-zh { color: var(--text-muted); text-decoration: line-through; text-decoration-color: rgba(45,212,191,0.55); text-decoration-thickness: 1.5px; }
+.lc-item-main { min-width: 0; flex: 1; }
+.lc-line { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+.lc-no { font-family: 'Courier New', monospace; font-size: 11.5px; font-weight: 700; color: var(--accent-teal); background: rgba(45,212,191,0.12); padding: 1px 7px; border-radius: 8px; flex-shrink: 0; }
+.lc-zh { font-size: 13.5px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-en { font-size: 11px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-item-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+.lc-tag { font-size: 10.5px; color: var(--text-secondary); background: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.6); padding: 1px 8px; border-radius: 9px; }
+.lc-empty { padding: 26px 10px; text-align: center; color: var(--text-muted); font-size: 12.5px; }
+/* —— 详情面板 —— */
+.detail-panel { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow-y: auto; padding: 22px 26px 18px; }
+.detail-top { display: flex; gap: 14px; align-items: flex-start; }
+.detail-no { font-family: 'Courier New', monospace; font-size: 15px; font-weight: 800; color: #fff; background: linear-gradient(135deg, #3b82f6, #2dd4bf); padding: 7px 12px; border-radius: 12px; flex-shrink: 0; line-height: 1.2; }
+.detail-h { min-width: 0; flex: 1; }
+.detail-h h2 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; line-height: 1.4; }
+.detail-en { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.detail-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.detail-meta .spacer { flex: 1; }
+.detail-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn-done.on { background: rgba(45,212,191,0.13); border-color: rgba(45,212,191,0.42); color: var(--text-primary); font-weight: 600; }
+/* —— 题面排版 —— */
+.lc-content { margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.55); font-size: 14px; color: var(--text-primary); line-height: 1.8; word-break: break-word; }
+.lc-content p { margin: 0.85em 0; }
+.lc-content p:first-child { margin-top: 0; }
+.lc-content strong { font-weight: 700; }
+.lc-content strong.example { display: block; margin: 1.15em 0 0.45em; font-size: 13.5px; color: #1a9e8f; }
+.lc-content code { font-family: 'Courier New', monospace; font-size: 13px; background: rgba(20,40,50,0.06); border: 1px solid rgba(20,40,50,0.05); padding: 1px 6px; border-radius: 5px; }
+.lc-content pre { background: rgba(255,255,255,0.62); border: 1px solid rgba(255,255,255,0.65); border-radius: 10px; padding: 12px 14px; margin: 0.9em 0; overflow-x: auto; font-size: 12.5px; line-height: 1.7; }
+.lc-content pre code { background: none; border: none; padding: 0; font-size: 12.5px; white-space: pre; }
+.lc-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 6px 0; background: #fff; padding: 4px; }
+.lc-content a { color: var(--accent-blue); text-decoration: none; border-bottom: 1px solid rgba(59,130,246,0.3); }
+.lc-content ul, .lc-content ol { padding-left: 22px; margin: 0.85em 0; }
+.lc-content blockquote { border-left: 3px solid rgba(45,212,191,0.5); background: rgba(255,255,255,0.4); padding: 8px 14px; border-radius: 0 10px 10px 0; color: var(--text-secondary); margin: 0.9em 0; }
+.lc-content hr { border: none; border-top: 1px dashed rgba(44,62,80,0.15); margin: 1.2em 0; }
+.lc-content table { border-collapse: collapse; margin: 0.9em 0; font-size: 13px; }
+.lc-content th, .lc-content td { border: 1px solid rgba(44,62,80,0.14); padding: 6px 12px; }
+.detail-nav { display: flex; gap: 10px; margin-top: 16px; }
+.detail-nav .action-btn { flex: 1; justify-content: center; }
+.detail-nav .action-btn:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+/* —— 页脚 —— */
+.lc-foot { text-align: center; font-size: 11.5px; color: var(--text-muted); padding: 18px 10px 4px; line-height: 1.9; }
+.lc-foot a { color: var(--text-secondary); text-decoration: none; border-bottom: 1px solid rgba(90,108,125,0.3); transition: var(--transition); }
+.lc-foot a:hover { color: #1a9e8f; border-color: rgba(45,212,191,0.5); }
+/* —— 移动端：单栏 + 详情全屏浮层 —— */
+.mob-back { display: none; }
+@media (max-width: 960px) {
+    .lc-body { grid-template-columns: 1fr; gap: 16px; }
+    .list-panel { position: static; max-height: none; overflow: visible; }
+    .detail-panel {
+        display: none; position: fixed; inset: 0; z-index: 50; max-height: none;
+        border-radius: 0; border: none; background: var(--card-bg-strong);
+        padding: 16px 16px 44px;
+    }
+    .detail-panel.open { display: block; }
+    .mob-back { display: inline-flex; margin-bottom: 14px; }
+    .detail-no { font-size: 13px; padding: 5px 10px; }
+}
+/* —— 滚动条 —— */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(20,40,50,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(20,40,50,0.22); }
+</style>
+</head>
+<body>
+<div class="bg-decoration bg-decoration-1"></div>
+<div class="bg-decoration bg-decoration-2"></div>
+<div class="bg-decoration bg-decoration-3"></div>
+
+<div class="wrap">
+    <header class="page-head">
+        <div class="logo-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-6 6 6 6"/><path d="M16 6l6 6-6 6"/><path d="M13.5 4l-3 16"/></svg>
+        </div>
+        <h1>LeetCode 简单题 30</h1>
+        <p class="sub">Top Interview 150 · 前三十道简单题 · 离线题面 · 本地打卡</p>
+        <div class="head-stats">
+            <div class="welcome-stat"><div class="stat-value" id="statTotal">–</div><div class="stat-label">简单题</div></div>
+            <div class="welcome-stat"><div class="stat-value" id="statDone">–</div><div class="stat-label">已完成</div></div>
+            <div class="welcome-stat"><div class="stat-value" id="statTags">–</div><div class="stat-label">涉及标签</div></div>
+        </div>
+    </header>
+
+    <div class="glass-card toolbar">
+        <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="lcSearch" type="search" placeholder="搜索题号 / 标题 / 标签…" autocomplete="off">
+        </div>
+        <div class="chips" id="lcChips"></div>
+        <div class="progress-box">
+            <div class="progress-label"><span>完成进度</span><span id="lcDoneNum">–</span></div>
+            <div class="progress-bar"><div id="lcDoneBar"></div></div>
+        </div>
+    </div>
+
+    <div class="lc-body">
+        <section class="glass-card panel list-panel">
+            <div class="list-meta" id="lcListMeta"></div>
+            <ul class="lc-list" id="lcListItems"></ul>
+        </section>
+
+        <aside class="glass-card panel detail-panel" id="lcDetail">
+            <button class="action-btn mob-back" id="lcClose" type="button">← 返回列表</button>
+            <div class="detail-top">
+                <div class="detail-no" id="lcDetailNo">–</div>
+                <div class="detail-h">
+                    <h2 id="lcDetailZh">–</h2>
+                    <div class="detail-en" id="lcDetailEn">–</div>
+                </div>
+            </div>
+            <div class="detail-meta">
+                <span id="lcDetailTags" class="lc-item-tags"></span>
+                <span class="spacer"></span>
+                <div class="detail-actions">
+                    <button class="action-btn btn-done" id="lcDetailDone" type="button"></button>
+                    <a class="action-btn" id="lcDetailLink" href="#" target="_blank" rel="noopener">打开原题 ↗</a>
+                </div>
+            </div>
+            <div class="lc-content" id="lcDetailContent"></div>
+            <div class="detail-nav">
+                <button class="action-btn" id="lcPrev" type="button">← 上一题</button>
+                <button class="action-btn" id="lcNext" type="button">下一题 →</button>
+            </div>
+        </aside>
+    </div>
+
+    <footer class="lc-foot">
+        题面数据抓取自 <a href="https://leetcode.cn/studyplan/top-interview-150/" target="_blank" rel="noopener">LeetCodecn · Top Interview 150</a>（<span id="lcUpdated">–</span>），题目版权归原作者所有，本页仅供个人学习。<br>
+        打卡记录仅保存在本机浏览器 · <a href="../">返回工具箱</a>
+    </footer>
+</div>
+
+<noscript><div class="lc-foot">本页需要启用 JavaScript 才能浏览题库。</div></noscript>
+
+<!--LC_DATA:START-->
+<script type="application/json" id="lc-data" data-date="2026-11-27">[{"id":"88","slug":"merge-sorted-array","zh":"合并两个有序数组","en":"Merge Sorted Array","tags":["数组","双指针","排序"],"html":"\u003cp>给你两个按 \u003cstrong>非递减顺序\u003c/strong> 排列的整数数组&nbsp;\u003ccode>nums1\u003c/code>\u003cem> \u003c/em>和 \u003ccode>nums2\u003c/code>，另有两个整数 \u003ccode>m\u003c/code> 和 \u003ccode>n\u003c/code> ，分别表示 \u003ccode>nums1\u003c/code> 和 \u003ccode>nums2\u003c/code> 中的元素数目。\u003c/p>\n\n\u003cp>请你 \u003cstrong>合并\u003c/strong> \u003ccode>nums2\u003c/code>\u003cem> \u003c/em>到 \u003ccode>nums1\u003c/code> 中，使合并后的数组同样按 \u003cstrong>非递减顺序\u003c/strong> 排列。\u003c/p>\n\n\u003cp>\u003cstrong>注意：\u003c/strong>最终，合并后数组不应由函数返回，而是存储在数组 \u003ccode>nums1\u003c/code> 中。为了应对这种情况，\u003ccode>nums1\u003c/code> 的初始长度为 \u003ccode>m + n\u003c/code>，其中前 \u003ccode>m\u003c/code> 个元素表示应合并的元素，后 \u003ccode>n\u003c/code> 个元素为 \u003ccode>0\u003c/code> ，应忽略。\u003ccode>nums2\u003c/code> 的长度为 \u003ccode>n\u003c/code> 。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums1 = [1,2,3,0,0,0], m = 3, nums2 = [2,5,6], n = 3\n\u003cstrong>输出：\u003c/strong>[1,2,2,3,5,6]\n\u003cstrong>解释：\u003c/strong>需要合并 [1,2,3] 和 [2,5,6] 。\n合并结果是 [\u003cem>\u003cstrong>1\u003c/strong>\u003c/em>,\u003cem>\u003cstrong>2\u003c/strong>\u003c/em>,2,\u003cem>\u003cstrong>3\u003c/strong>\u003c/em>,5,6] ，其中斜体加粗标注的为 nums1 中的元素。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums1 = [1], m = 1, nums2 = [], n = 0\n\u003cstrong>输出：\u003c/strong>[1]\n\u003cstrong>解释：\u003c/strong>需要合并 [1] 和 [] 。\n合并结果是 [1] 。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 3：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums1 = [0], m = 0, nums2 = [1], n = 1\n\u003cstrong>输出：\u003c/strong>[1]\n\u003cstrong>解释：\u003c/strong>需要合并的数组是 [] 和 [1] 。\n合并结果是 [1] 。\n注意，因为 m = 0 ，所以 nums1 中没有元素。nums1 中仅存的 0 仅仅是为了确保合并结果可以顺利存放到 nums1 中。\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>nums1.length == m + n\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>nums2.length == n\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>0 &lt;= m, n &lt;= 200\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>1 &lt;= m + n &lt;= 200\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-10\u003csup>9\u003c/sup> &lt;= nums1[i], nums2[j] &lt;= 10\u003csup>9\u003c/sup>\u003c/code>\u003c/li>\n\u003c/ul>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>进阶：\u003c/strong>你可以设计实现一个时间复杂度为 \u003ccode>O(m + n)\u003c/code> 的算法解决此问题吗？\u003c/p>"},{"id":"27","slug":"remove-element","zh":"移除元素","en":"Remove Element","tags":["数组","双指针"],"html":"\u003cp>给你一个数组 \u003ccode>nums\u003c/code>\u003cem>&nbsp;\u003c/em>和一个值 \u003ccode>val\u003c/code>，你需要 \u003cstrong>\u003ca href=\"https://baike.baidu.com/item/%E5%8E%9F%E5%9C%B0%E7%AE%97%E6%B3%95\" target=\"_blank\">原地\u003c/a>\u003c/strong> 移除所有数值等于&nbsp;\u003ccode>val\u003c/code>\u003cem>&nbsp;\u003c/em>的元素。元素的顺序可能发生改变。然后返回&nbsp;\u003ccode>nums\u003c/code>&nbsp;中与&nbsp;\u003ccode>val\u003c/code>&nbsp;不同的元素的数量。\u003c/p>\n\n\u003cp>假设 \u003ccode>nums\u003c/code> 中不等于 \u003ccode>val\u003c/code> 的元素数量为 \u003ccode>k\u003c/code>，要通过此题，您需要执行以下操作：\u003c/p>\n\n\u003cul>\n\t\u003cli>更改 \u003ccode>nums\u003c/code> 数组，使 \u003ccode>nums\u003c/code> 的前 \u003ccode>k\u003c/code> 个元素包含不等于 \u003ccode>val\u003c/code> 的元素。\u003ccode>nums\u003c/code> 的其余元素和 \u003ccode>nums\u003c/code> 的大小并不重要。\u003c/li>\n\t\u003cli>返回 \u003ccode>k\u003c/code>。\u003c/li>\n\u003c/ul>\n\n\u003cp>\u003cstrong>用户评测：\u003c/strong>\u003c/p>\n\n\u003cp>评测机将使用以下代码测试您的解决方案：\u003c/p>\n\n\u003cpre>\nint[] nums = [...]; // 输入数组\nint val = ...; // 要移除的值\nint[] expectedNums = [...]; // 长度正确的预期答案。\n                            // 它以不等于 val 的值排序。\n\nint k = removeElement(nums, val); // 调用你的实现\n\nassert k == expectedNums.length;\nsort(nums, 0, k); // 排序 nums 的前 k 个元素\nfor (int i = 0; i &lt; k; i++) {\n    assert nums[i] == expectedNums[i];\n}\u003c/pre>\n\n\u003cp>如果所有的断言都通过，你的解决方案将会 \u003cstrong>通过\u003c/strong>。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [3,2,2,3], val = 3\n\u003cstrong>输出：\u003c/strong>2, nums = [2,2,_,_]\n\u003cstrong>解释：\u003c/strong>你的函数应该返回 k = 2, 并且 nums\u003cem> \u003c/em>中的前两个元素均为 2。\n你在返回的 k 个元素之外留下了什么并不重要（因此它们并不计入评测）。\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [0,1,2,2,3,0,4,2], val = 2\n\u003cstrong>输出：\u003c/strong>5, nums = [0,1,4,0,3,_,_,_]\n\u003cstrong>解释：\u003c/strong>你的函数应该返回 k = 5，并且 nums 中的前五个元素为 0,0,1,3,4。\n注意这五个元素可以任意顺序返回。\n你在返回的 k 个元素之外留下了什么并不重要（因此它们并不计入评测）。\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>0 &lt;= nums.length &lt;= 100\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>0 &lt;= nums[i] &lt;= 50\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>0 &lt;= val &lt;= 100\u003c/code>\u003c/li>\n\u003c/ul>"},{"id":"26","slug":"remove-duplicates-from-sorted-array","zh":"删除有序数组中的重复项","en":"Remove Duplicates from Sorted Array","tags":["数组","双指针"],"html":"\u003cp>给你一个 \u003cstrong>非严格递增排列\u003c/strong> 的数组 \u003ccode>nums\u003c/code> ，请你\u003cstrong>\u003ca href=\"http://baike.baidu.com/item/%E5%8E%9F%E5%9C%B0%E7%AE%97%E6%B3%95\" target=\"_blank\"> 原地\u003c/a>\u003c/strong> 删除重复出现的元素，使每个元素 \u003cstrong>只出现一次\u003c/strong> ，返回删除后数组的新长度。元素的 \u003cstrong>相对顺序\u003c/strong> 应该保持 \u003cstrong>一致\u003c/strong> 。然后返回 \u003ccode>nums\u003c/code> 中唯一元素的个数。\u003c/p>\n\n\u003cp>考虑 \u003ccode>nums\u003c/code> 的唯一元素的数量为 \u003ccode>k\u003c/code>。去重后，返回唯一元素的数量 \u003ccode>k\u003c/code>。\u003c/p>\n\n\u003cp>\u003ccode>nums\u003c/code> 的前 \u003ccode>k\u003c/code> 个元素应包含 \u003cstrong>排序后\u003c/strong> 的唯一数字。下标&nbsp;\u003ccode>k - 1\u003c/code> 之后的剩余元素可以忽略。\u003c/p>\n\n\u003cp>\u003cstrong>判题标准:\u003c/strong>\u003c/p>\n\n\u003cp>系统会用下面的代码来测试你的题解:\u003c/p>\n\n\u003cpre>\nint[] nums = [...]; // 输入数组\nint[] expectedNums = [...]; // 长度正确的期望答案\n\nint k = removeDuplicates(nums); // 调用\n\nassert k == expectedNums.length;\nfor (int i = 0; i &lt; k; i++) {\n    assert nums[i] == expectedNums[i];\n}\u003c/pre>\n\n\u003cp>如果所有断言都通过，那么您的题解将被 \u003cstrong>通过\u003c/strong>。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong class=\"example\">示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [1,1,2]\n\u003cstrong>输出：\u003c/strong>2, nums = [1,2,_]\n\u003cstrong>解释：\u003c/strong>函数应该返回新的长度 \u003cstrong>\u003ccode>2\u003c/code>\u003c/strong> ，并且原数组 \u003cem>nums \u003c/em>的前两个元素被修改为 \u003cstrong>\u003ccode>1\u003c/code>\u003c/strong>, \u003cstrong>\u003ccode>2 \u003c/code>\u003c/strong>\u003ccode>。\u003c/code>不需要考虑数组中超出新长度后面的元素。\n\u003c/pre>\n\n\u003cp>\u003cstrong class=\"example\">示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [0,0,1,1,1,2,2,3,3,4]\n\u003cstrong>输出：\u003c/strong>5, nums = [0,1,2,3,4,_,_,_,_,_]\n\u003cstrong>解释：\u003c/strong>函数应该返回新的长度 \u003cstrong>\u003ccode>5\u003c/code>\u003c/strong> ， 并且原数组 \u003cem>nums \u003c/em>的前五个元素被修改为 \u003cstrong>\u003ccode>0\u003c/code>\u003c/strong>, \u003cstrong>\u003ccode>1\u003c/code>\u003c/strong>, \u003cstrong>\u003ccode>2\u003c/code>\u003c/strong>, \u003cstrong>\u003ccode>3\u003c/code>\u003c/strong>, \u003cstrong>\u003ccode>4\u003c/code>\u003c/strong> 。不需要考虑数组中超出新长度后面的元素。\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= nums.length &lt;= 3 * 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-10\u003cfont size=\"1\">0\u003c/font>&nbsp;&lt;= nums[i] &lt;= 10\u003cfont size=\"1\">0\u003c/font>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>nums\u003c/code> 已按 \u003cstrong>非递减\u003c/strong>&nbsp;顺序排列。\u003c/li>\n\u003c/ul>"},{"id":"169","slug":"majority-element","zh":"多数元素","en":"Majority Element","tags":["数组","哈希表","分治","计数","排序","摩尔投票算法"],"html":"\u003cp>给定一个大小为 \u003ccode>n\u003c/code>\u003cem> \u003c/em>的数组&nbsp;\u003ccode>nums\u003c/code> ，返回其中的多数元素。多数元素是指在数组中出现次数 \u003cstrong>大于\u003c/strong>&nbsp;\u003ccode>⌊ n/2 ⌋\u003c/code>&nbsp;的元素。\u003c/p>\n\n\u003cp>你可以假设数组是非空的，并且给定的数组总是存在多数元素。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例&nbsp;1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [3,2,3]\n\u003cstrong>输出：\u003c/strong>3\u003c/pre>\n\n\u003cp>\u003cstrong>示例&nbsp;2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [2,2,1,1,1,2,2]\n\u003cstrong>输出：\u003c/strong>2\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\u003cstrong>提示：\u003c/strong>\n\n\u003cul>\n\t\u003cli>\u003ccode>n == nums.length\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>1 &lt;= n &lt;= 5 * 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-10\u003csup>9\u003c/sup> &lt;= nums[i] &lt;= 10\u003csup>9\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>输入保证数组中一定有一个多数元素。\u003c/li>\n\u003c/ul>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>进阶：\u003c/strong>尝试设计时间复杂度为 O(n)、空间复杂度为 O(1) 的算法解决此问题。\u003c/p>"},{"id":"121","slug":"best-time-to-buy-and-sell-stock","zh":"买卖股票的最佳时机","en":"Best Time to Buy and Sell Stock","tags":["数组","动态规划"],"html":"\u003cp>给定一个数组 \u003ccode>prices\u003c/code> ，它的第 \u003ccode>i\u003c/code> 个元素 \u003ccode>prices[i]\u003c/code> 表示一支给定股票第 \u003ccode>i\u003c/code> 天的价格。\u003c/p>\n\n\u003cp>你只能选择 \u003cstrong>某一天\u003c/strong> 买入这只股票，并选择在 \u003cstrong>未来的某一个不同的日子\u003c/strong> 卖出该股票。设计一个算法来计算你所能获取的最大利润。\u003c/p>\n\n\u003cp>返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 \u003ccode>0\u003c/code> 。\u003c/p>\n\n\u003cp> \u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>[7,1,5,3,6,4]\n\u003cstrong>输出：\u003c/strong>5\n\u003cstrong>解释：\u003c/strong>在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。\n     注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>prices = [7,6,4,3,1]\n\u003cstrong>输出：\u003c/strong>0\n\u003cstrong>解释：\u003c/strong>在这种情况下, 没有交易完成, 所以最大利润为 0。\n\u003c/pre>\n\n\u003cp> \u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 \u003c= prices.length \u003c= 10\u003csup>5\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>0 \u003c= prices[i] \u003c= 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\u003c/ul>"},{"id":"13","slug":"roman-to-integer","zh":"罗马数字转整数","en":"Roman to Integer","tags":["哈希表","数学","字符串"],"html":"\u003cp>罗马数字包含以下七种字符:&nbsp;\u003ccode>I\u003c/code>，&nbsp;\u003ccode>V\u003c/code>，&nbsp;\u003ccode>X\u003c/code>，&nbsp;\u003ccode>L\u003c/code>，\u003ccode>C\u003c/code>，\u003ccode>D\u003c/code>&nbsp;和&nbsp;\u003ccode>M\u003c/code>。\u003c/p>\n\n\u003cpre>\n\u003cstrong>字符\u003c/strong>          \u003cstrong>数值\u003c/strong>\nI             1\nV             5\nX             10\nL             50\nC             100\nD             500\nM             1000\u003c/pre>\n\n\u003cp>例如， 罗马数字 \u003ccode>2\u003c/code> 写做&nbsp;\u003ccode>II\u003c/code>&nbsp;，即为两个并列的 1 。\u003ccode>12\u003c/code> 写做&nbsp;\u003ccode>XII\u003c/code>&nbsp;，即为&nbsp;\u003ccode>X\u003c/code>&nbsp;+&nbsp;\u003ccode>II\u003c/code>&nbsp;。 \u003ccode>27\u003c/code> 写做&nbsp;&nbsp;\u003ccode>XXVII\u003c/code>, 即为&nbsp;\u003ccode>XX\u003c/code>&nbsp;+&nbsp;\u003ccode>V\u003c/code>&nbsp;+&nbsp;\u003ccode>II\u003c/code>&nbsp;。\u003c/p>\n\n\u003cp>通常情况下，罗马数字中小的数字在大的数字的右边。但也存在特例，例如 4 不写做&nbsp;\u003ccode>IIII\u003c/code>，而是&nbsp;\u003ccode>IV\u003c/code>。数字 1 在数字 5 的左边，所表示的数等于大数 5 减小数 1 得到的数值 4 。同样地，数字 9 表示为&nbsp;\u003ccode>IX\u003c/code>。这个特殊的规则只适用于以下六种情况：\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>I\u003c/code>&nbsp;可以放在&nbsp;\u003ccode>V\u003c/code>&nbsp;(5) 和&nbsp;\u003ccode>X\u003c/code>&nbsp;(10) 的左边，来表示 4 和 9。\u003c/li>\n\t\u003cli>\u003ccode>X\u003c/code>&nbsp;可以放在&nbsp;\u003ccode>L\u003c/code>&nbsp;(50) 和&nbsp;\u003ccode>C\u003c/code>&nbsp;(100) 的左边，来表示 40 和&nbsp;90。&nbsp;\u003c/li>\n\t\u003cli>\u003ccode>C\u003c/code>&nbsp;可以放在&nbsp;\u003ccode>D\u003c/code>&nbsp;(500) 和&nbsp;\u003ccode>M\u003c/code>&nbsp;(1000) 的左边，来表示&nbsp;400 和&nbsp;900。\u003c/li>\n\u003c/ul>\n\n\u003cp>给定一个罗马数字，将其转换成整数。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例&nbsp;1:\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong>&nbsp;s = \"III\"\n\u003cstrong>输出:\u003c/strong> 3\u003c/pre>\n\n\u003cp>\u003cstrong>示例&nbsp;2:\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong>&nbsp;s = \"IV\"\n\u003cstrong>输出:\u003c/strong> 4\u003c/pre>\n\n\u003cp>\u003cstrong>示例&nbsp;3:\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong>&nbsp;s = \"IX\"\n\u003cstrong>输出:\u003c/strong> 9\u003c/pre>\n\n\u003cp>\u003cstrong>示例&nbsp;4:\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong>&nbsp;s = \"LVIII\"\n\u003cstrong>输出:\u003c/strong> 58\n\u003cstrong>解释:\u003c/strong> L = 50, V= 5, III = 3.\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例&nbsp;5:\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong>&nbsp;s = \"MCMXCIV\"\n\u003cstrong>输出:\u003c/strong> 1994\n\u003cstrong>解释:\u003c/strong> M = 1000, CM = 900, XC = 90, IV = 4.\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= s.length &lt;= 15\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code> 仅含字符 \u003ccode>('I', 'V', 'X', 'L', 'C', 'D', 'M')\u003c/code>\u003c/li>\n\t\u003cli>题目数据保证 \u003ccode>s\u003c/code> 是一个有效的罗马数字，且表示整数在范围 \u003ccode>[1, 3999]\u003c/code> 内\u003c/li>\n\t\u003cli>题目所给测试用例皆符合罗马数字书写规则，不会出现跨位等情况。\u003c/li>\n\t\u003cli>IL 和 IM 这样的例子并不符合题目要求，49 应该写作 XLIX，999 应该写作 CMXCIX 。\u003c/li>\n\t\u003cli>关于罗马数字的详尽书写规则，可以参考 \u003ca href=\"https://baike.baidu.com/item/%E7%BD%97%E9%A9%AC%E6%95%B0%E5%AD%97/772296\">罗马数字 - 百度百科\u003c/a>。\u003c/li>\n\u003c/ul>"},{"id":"58","slug":"length-of-last-word","zh":"最后一个单词的长度","en":"Length of Last Word","tags":["字符串"],"html":"\u003cp>给你一个字符串 \u003ccode>s\u003c/code>，由若干单词组成，单词前后用一些空格字符隔开。返回字符串中 \u003cstrong>最后一个\u003c/strong> 单词的长度。\u003c/p>\n\n\u003cp>\u003cstrong>单词\u003c/strong> 是指仅由字母组成、不包含任何空格字符的最大\u003cspan data-keyword=\"substring-nonempty\">子字符串\u003c/span>。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>s = \"Hello World\"\n\u003cstrong>输出：\u003c/strong>5\n\u003cstrong>解释：\u003c/strong>最后一个单词是“World”，长度为 5。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>s = \"   fly me   to   the moon  \"\n\u003cstrong>输出：\u003c/strong>4\u003cstrong>\n解释：\u003c/strong>最后一个单词是“moon”，长度为 4。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 3：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>s = \"luffy is still joyboy\"\n\u003cstrong>输出：\u003c/strong>6\n\u003cstrong>解释：\u003c/strong>最后一个单词是长度为 6 的“joyboy”。\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= s.length &lt;= 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code> 仅有英文字母和空格 \u003ccode>' '\u003c/code> 组成\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code> 中至少存在一个单词\u003c/li>\n\u003c/ul>"},{"id":"14","slug":"longest-common-prefix","zh":"最长公共前缀","en":"Longest Common Prefix","tags":["字典树","数组","字符串"],"html":"\u003cp>编写一个函数来查找字符串数组中的最长公共前缀。\u003c/p>\n\n\u003cp>如果不存在公共前缀，返回空字符串&nbsp;\u003ccode>\"\"\u003c/code>。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong class=\"example\">示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>strs = [\"flower\",\"flow\",\"flight\"]\n\u003cstrong>输出：\u003c/strong>\"fl\"\n\u003c/pre>\n\n\u003cp>\u003cstrong class=\"example\">示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>strs = [\"dog\",\"racecar\",\"car\"]\n\u003cstrong>输出：\u003c/strong>\"\"\n\u003cstrong>解释：\u003c/strong>输入不存在公共前缀。\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= strs.length &lt;= 200\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>0 &lt;= strs[i].length &lt;= 200\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>strs[i]\u003c/code>&nbsp;如果非空，则仅由小写英文字母组成\u003c/li>\n\u003c/ul>"},{"id":"28","slug":"find-the-index-of-the-first-occurrence-in-a-string","zh":"找出字符串中第一个匹配项的下标","en":"Find the Index of the First Occurrence in a String","tags":["双指针","字符串","字符串匹配","KMP 算法","Boyer–Moore 算法","扩展 KMP"],"html":"\u003cp>给你两个字符串&nbsp;\u003ccode>haystack\u003c/code> 和 \u003ccode>needle\u003c/code> ，请你在 \u003ccode>haystack\u003c/code> 字符串中找出 \u003ccode>needle\u003c/code> 字符串的第一个匹配项的下标（下标从 0 开始）。如果&nbsp;\u003ccode>needle\u003c/code> 不是 \u003ccode>haystack\u003c/code> 的一部分，则返回&nbsp; \u003ccode>-1\u003c/code>\u003cstrong> \u003c/strong>。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong class=\"example\">示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>haystack = \"sadbutsad\", needle = \"sad\"\n\u003cstrong>输出：\u003c/strong>0\n\u003cstrong>解释：\u003c/strong>\"sad\" 在下标 0 和 6 处匹配。\n第一个匹配项的下标是 0 ，所以返回 0 。\n\u003c/pre>\n\n\u003cp>\u003cstrong class=\"example\">示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>haystack = \"leetcode\", needle = \"leeto\"\n\u003cstrong>输出：\u003c/strong>-1\n\u003cstrong>解释：\u003c/strong>\"leeto\" 没有在 \"leetcode\" 中出现，所以返回 -1 。\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= haystack.length, needle.length &lt;= 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>haystack\u003c/code> 和 \u003ccode>needle\u003c/code> 仅由小写英文字符组成\u003c/li>\n\u003c/ul>"},{"id":"125","slug":"valid-palindrome","zh":"验证回文串","en":"Valid Palindrome","tags":["双指针","字符串"],"html":"\u003cp>如果在将所有大写字符转换为小写字符、并移除所有非字母和非数字字符之后，短语正着读和反着读都一样。则可以认为该短语是一个 \u003cstrong>回文串\u003c/strong> 。\u003c/p>\n\n\u003cp>字母和数字都属于字母数字字符。\u003c/p>\n\n\u003cp>给你一个字符串 \u003ccode>s\u003c/code>，如果它是 \u003cstrong>回文串\u003c/strong> ，返回 \u003ccode>true\u003c/code>\u003cem> \u003c/em>；否则，返回\u003cem> \u003c/em>\u003ccode>false\u003c/code>\u003cem> \u003c/em>。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong> s = \"A man, a plan, a canal: Panama\"\n\u003cstrong>输出：\u003c/strong>true\n\u003cstrong>解释：\u003c/strong>\"amanaplanacanalpanama\" 是回文串。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>s = \"race a car\"\n\u003cstrong>输出：\u003c/strong>false\n\u003cstrong>解释：\u003c/strong>\"raceacar\" 不是回文串。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 3：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>s = \" \"\n\u003cstrong>输出：\u003c/strong>true\n\u003cstrong>解释：\u003c/strong>在移除非字母数字字符之后，s 是一个空字符串 \"\" 。\n由于空字符串正着反着读都一样，所以是回文串。\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= s.length &lt;= 2 * 10\u003csup>5\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code> 仅由可打印的 ASCII 字符组成\u003c/li>\n\u003c/ul>"},{"id":"392","slug":"is-subsequence","zh":"判断子序列","en":"Is Subsequence","tags":["双指针","字符串","动态规划"],"html":"\u003cp>给定字符串 \u003cstrong>s\u003c/strong> 和 \u003cstrong>t\u003c/strong> ，判断 \u003cstrong>s\u003c/strong> 是否为 \u003cstrong>t\u003c/strong> 的子序列。\u003c/p>\n\n\u003cp>字符串的一个子序列是原始字符串删除一些（也可以不删除）字符而不改变剩余字符相对位置形成的新字符串。（例如，\u003ccode>\"ace\"\u003c/code>是\u003ccode>\"abcde\"\u003c/code>的一个子序列，而\u003ccode>\"aec\"\u003c/code>不是）。\u003c/p>\n\n\u003cp>\u003cstrong>进阶：\u003c/strong>\u003c/p>\n\n\u003cp>如果有大量输入的 S，称作 S1, S2, ... , Sk 其中 k >= 10亿，你需要依次检查它们是否为 T 的子序列。在这种情况下，你会怎样改变代码？\u003c/p>\n\n\u003cp>\u003cstrong>致谢：\u003c/strong>\u003c/p>\n\n\u003cp>特别感谢\u003cstrong> \u003c/strong>\u003ca href=\"https://leetcode.com/pbrother/\">@pbrother \u003c/a>添加此问题并且创建所有测试用例。\u003c/p>\n\n\u003cp> \u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>s = \"abc\", t = \"ahbgdc\"\n\u003cstrong>输出：\u003c/strong>true\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>s = \"axc\", t = \"ahbgdc\"\n\u003cstrong>输出：\u003c/strong>false\n\u003c/pre>\n\n\u003cp> \u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>0 \u003c= s.length \u003c= 100\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>0 \u003c= t.length \u003c= 10^4\u003c/code>\u003c/li>\n\t\u003cli>两个字符串都只由小写字符组成。\u003c/li>\n\u003c/ul>"},{"id":"383","slug":"ransom-note","zh":"赎金信","en":"Ransom Note","tags":["哈希表","字符串","计数"],"html":"\u003cp>给你两个字符串：\u003ccode>ransomNote\u003c/code> 和 \u003ccode>magazine\u003c/code> ，判断 \u003ccode>ransomNote\u003c/code> 能不能由 \u003ccode>magazine\u003c/code> 里面的字符构成。\u003c/p>\n\n\u003cp>如果可以，返回 \u003ccode>true\u003c/code> ；否则返回 \u003ccode>false\u003c/code> 。\u003c/p>\n\n\u003cp>\u003ccode>magazine\u003c/code> 中的每个字符只能在 \u003ccode>ransomNote\u003c/code> 中使用一次。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>ransomNote = \"a\", magazine = \"b\"\n\u003cstrong>输出：\u003c/strong>false\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>ransomNote = \"aa\", magazine = \"ab\"\n\u003cstrong>输出：\u003c/strong>false\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 3：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>ransomNote = \"aa\", magazine = \"aab\"\n\u003cstrong>输出：\u003c/strong>true\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= ransomNote.length, magazine.length &lt;= 10\u003csup>5\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>ransomNote\u003c/code> 和 \u003ccode>magazine\u003c/code> 由小写英文字母组成\u003c/li>\n\u003c/ul>"},{"id":"205","slug":"isomorphic-strings","zh":"同构字符串","en":"Isomorphic Strings","tags":["哈希表","字符串"],"html":"\u003cp>给定两个字符串&nbsp;\u003ccode>s\u003c/code>&nbsp;和&nbsp;\u003ccode>t\u003c/code>&nbsp;，判断它们是否是同构的。\u003c/p>\n\n\u003cp>如果&nbsp;\u003ccode>s\u003c/code>&nbsp;中的字符可以按某种映射关系替换得到&nbsp;\u003ccode>t\u003c/code>&nbsp;，那么这两个字符串是同构的。\u003c/p>\n\n\u003cp>每个出现的字符都应当映射到另一个字符，同时不改变字符的顺序。不同字符不能映射到同一个字符上，相同字符只能映射到同一个字符上，字符可以映射到自己本身。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong class=\"example\">示例 1：\u003c/strong>\u003c/p>\n\n\u003cdiv class=\"example-block\">\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输入：\u003c/b>s = \"egg\", t = \"add\"\u003c/span>\u003c/p>\n\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输出：\u003c/b>true\u003c/span>\u003c/p>\n\n\u003cp>\u003cstrong>解释：\u003c/strong>\u003c/p>\n\n\u003cp>字符串 \u003ccode>s\u003c/code> 和 \u003ccode>t\u003c/code> 可以通过以下方式变得相同：\u003c/p>\n\n\u003cul>\n\t\u003cli>将&nbsp;\u003ccode>'e'\u003c/code>&nbsp;映射为&nbsp;\u003ccode>'a'\u003c/code>。\u003c/li>\n\t\u003cli>将&nbsp;\u003ccode>'g'\u003c/code> 映射为&nbsp;\u003ccode>'d'\u003c/code>。\u003c/li>\n\u003c/ul>\n\u003c/div>\n\n\u003cp>\u003cstrong class=\"example\">示例 2：\u003c/strong>\u003c/p>\n\n\u003cdiv class=\"example-block\">\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输入：\u003c/b>s = \"f11\", t = \"b23\"\u003c/span>\u003c/p>\n\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输出：\u003c/b>false\u003c/span>\u003c/p>\n\n\u003cp>\u003cstrong>解释：\u003c/strong>\u003c/p>\n\n\u003cp>字符串 \u003ccode>s\u003c/code> 和 \u003ccode>t\u003c/code> 无法变得相同，因为 \u003ccode>'1'\u003c/code> 需要同时映射到 \u003ccode>'2'\u003c/code> 和 \u003ccode>'3'\u003c/code>。\u003c/p>\n\u003c/div>\n\n\u003cp>\u003cstrong class=\"example\">示例 3：\u003c/strong>\u003c/p>\n\n\u003cdiv class=\"example-block\">\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输入：\u003c/b>s = \"paper\", t = \"title\"\u003c/span>\u003c/p>\n\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输出：\u003c/b>true\u003c/span>\u003c/p>\n\u003c/div>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cp>\u003cmeta charset=\"UTF-8\" />\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= s.length &lt;= 5 * 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>t.length == s.length\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code>&nbsp;和&nbsp;\u003ccode>t\u003c/code>&nbsp;由任意有效的 ASCII 字符组成\u003c/li>\n\u003c/ul>"},{"id":"290","slug":"word-pattern","zh":"单词规律","en":"Word Pattern","tags":["哈希表","字符串"],"html":"\u003cp>给定一种规律 \u003ccode>pattern\u003c/code>&nbsp;和一个字符串&nbsp;\u003ccode>s\u003c/code>&nbsp;，判断 \u003ccode>s\u003c/code>&nbsp;是否遵循相同的规律。\u003c/p>\n\n\u003cp>这里的&nbsp;\u003cstrong>遵循&nbsp;\u003c/strong>指完全匹配，例如，&nbsp;\u003ccode>pattern\u003c/code>&nbsp;里的每个字母和字符串&nbsp;\u003ccode>s\u003c/code>\u003cstrong>&nbsp;\u003c/strong>中的每个非空单词之间存在着双向连接的对应规律。具体来说：\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>pattern\u003c/code>&nbsp;中的每个字母都 \u003cstrong>恰好\u003c/strong> 映射到 \u003ccode>s\u003c/code> 中的一个唯一单词。\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code> 中的每个唯一单词都 \u003cstrong>恰好\u003c/strong> 映射到&nbsp;\u003ccode>pattern\u003c/code> 中的一个字母。\u003c/li>\n\t\u003cli>没有两个字母映射到同一个单词，也没有两个单词映射到同一个字母。\u003c/li>\n\u003c/ul>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong class=\"example\">示例1:\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong> pattern = \u003ccode>\"abba\"\u003c/code>, s = \u003ccode>\"dog cat cat dog\"\u003c/code>\n\u003cstrong>输出:\u003c/strong> true\u003c/pre>\n\n\u003cp>\u003cstrong class=\"example\">示例 2:\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong>pattern = \u003ccode>\"abba\"\u003c/code>, s = \u003ccode>\"dog cat cat fish\"\u003c/code>\n\u003cstrong>输出:\u003c/strong> false\u003c/pre>\n\n\u003cp>\u003cstrong class=\"example\">示例 3:\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong> pattern = \u003ccode>\"aaaa\"\u003c/code>, s = \u003ccode>\"dog cat cat dog\"\u003c/code>\n\u003cstrong>输出:\u003c/strong> false\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示:\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= pattern.length &lt;= 300\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>pattern\u003c/code>&nbsp;只包含小写英文字母\u003c/li>\n\t\u003cli>\u003ccode>1 &lt;= s.length &lt;= 3000\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code>&nbsp;只包含小写英文字母和&nbsp;\u003ccode>' '\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code>&nbsp;\u003cstrong>不包含\u003c/strong> 任何前导或尾随对空格\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code>&nbsp;中每个单词都被 \u003cstrong>单个空格 \u003c/strong>分隔\u003c/li>\n\u003c/ul>"},{"id":"242","slug":"valid-anagram","zh":"有效的字母异位词","en":"Valid Anagram","tags":["哈希表","字符串","排序"],"html":"\u003cp>给定两个字符串 \u003ccode>s\u003c/code> 和 \u003ccode>t\u003c/code> ，编写一个函数来判断 \u003ccode>t\u003c/code> 是否是 \u003ccode>s\u003c/code> 的 \u003cspan data-keyword=\"anagram\">字母异位词\u003c/span>。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例&nbsp;1:\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong> s = \"anagram\", t = \"nagaram\"\n\u003cstrong>输出:\u003c/strong> true\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2:\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入:\u003c/strong> s = \"rat\", t = \"car\"\n\u003cstrong>输出: \u003c/strong>false\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示:\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= s.length, t.length &lt;= 5 * 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code> 和 \u003ccode>t\u003c/code>&nbsp;仅包含小写字母\u003c/li>\n\u003c/ul>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>进阶:&nbsp;\u003c/strong>如果输入字符串包含 unicode 字符怎么办？你能否调整你的解法来应对这种情况？\u003c/p>"},{"id":"1","slug":"two-sum","zh":"两数之和","en":"Two Sum","tags":["数组","哈希表"],"html":"\u003cp>给定一个整数数组 \u003ccode>nums\u003c/code>&nbsp;和一个整数目标值 \u003ccode>target\u003c/code>，请你在该数组中找出 \u003cstrong>和为目标值 \u003c/strong>\u003cem>\u003ccode>target\u003c/code>\u003c/em>&nbsp; 的那&nbsp;\u003cstrong>两个\u003c/strong>&nbsp;整数，并返回它们的数组下标。\u003c/p>\n\n\u003cp>你可以假设每种输入只会对应一个答案，并且你不能使用两次相同的元素。\u003c/p>\n\n\u003cp>你可以按任意顺序返回答案。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong class=\"example\">示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [2,7,11,15], target = 9\n\u003cstrong>输出：\u003c/strong>[0,1]\n\u003cstrong>解释：\u003c/strong>因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。\n\u003c/pre>\n\n\u003cp>\u003cstrong class=\"example\">示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [3,2,4], target = 6\n\u003cstrong>输出：\u003c/strong>[1,2]\n\u003c/pre>\n\n\u003cp>\u003cstrong class=\"example\">示例 3：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [3,3], target = 6\n\u003cstrong>输出：\u003c/strong>[0,1]\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>2 &lt;= nums.length &lt;= 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-10\u003csup>9\u003c/sup> &lt;= nums[i] &lt;= 10\u003csup>9\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-10\u003csup>9\u003c/sup> &lt;= target &lt;= 10\u003csup>9\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003cstrong>只会存在一个有效答案\u003c/strong>\u003c/li>\n\u003c/ul>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>进阶：\u003c/strong>你可以想出一个时间复杂度小于 \u003ccode>O(n\u003csup>2\u003c/sup>)\u003c/code> 的算法吗？\u003c/p>"},{"id":"202","slug":"happy-number","zh":"快乐数","en":"Happy Number","tags":["哈希表","数学","双指针","Floyd 判圈算法"],"html":"\u003cp>编写一个算法来判断一个数 \u003ccode>n\u003c/code> 是不是快乐数。\u003c/p>\n\n\u003cp>\u003cstrong>「快乐数」\u003c/strong>&nbsp;定义为：\u003c/p>\n\n\u003cul>\n\t\u003cli>对于一个正整数，每一次将该数替换为它每个位置上的数字的平方和。\u003c/li>\n\t\u003cli>然后重复这个过程直到这个数变为 1，也可能是 \u003cstrong>无限循环\u003c/strong> 但始终变不到 1。\u003c/li>\n\t\u003cli>如果这个过程 \u003cstrong>结果为\u003c/strong>&nbsp;1，那么这个数就是快乐数。\u003c/li>\n\u003c/ul>\n\n\u003cp>如果 \u003ccode>n\u003c/code> 是 \u003cem>快乐数\u003c/em> 就返回 \u003ccode>true\u003c/code> ；不是，则返回 \u003ccode>false\u003c/code> 。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>n = 19\n\u003cstrong>输出：\u003c/strong>true\n\u003cstrong>解释：\n\u003c/strong>1\u003csup>2\u003c/sup> + 9\u003csup>2\u003c/sup> = 82\n8\u003csup>2\u003c/sup> + 2\u003csup>2\u003c/sup> = 68\n6\u003csup>2\u003c/sup> + 8\u003csup>2\u003c/sup> = 100\n1\u003csup>2\u003c/sup> + 0\u003csup>2\u003c/sup> + 0\u003csup>2\u003c/sup> = 1\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>n = 2\n\u003cstrong>输出：\u003c/strong>false\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= n &lt;= 2\u003csup>31\u003c/sup> - 1\u003c/code>\u003c/li>\n\u003c/ul>"},{"id":"219","slug":"contains-duplicate-ii","zh":"存在重复元素 II","en":"Contains Duplicate II","tags":["数组","哈希表","滑动窗口"],"html":"\u003cp>给你一个整数数组&nbsp;\u003ccode>nums\u003c/code> 和一个整数&nbsp;\u003ccode>k\u003c/code> ，判断数组中是否存在两个 \u003cstrong>不同的索引\u003c/strong>\u003cem>&nbsp;\u003c/em>\u003ccode>i\u003c/code>&nbsp;和\u003cem>&nbsp;\u003c/em>\u003ccode>j\u003c/code> ，满足 \u003ccode>nums[i] == nums[j]\u003c/code> 且 \u003ccode>abs(i - j) &lt;= k\u003c/code> 。如果存在，返回 \u003ccode>true\u003c/code> ；否则，返回 \u003ccode>false\u003c/code> 。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例&nbsp;1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [1,2,3,1], k\u003cem> \u003c/em>= 3\n\u003cstrong>输出：\u003c/strong>true\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [1,0,1,1], k\u003cem> \u003c/em>=\u003cem> \u003c/em>1\n\u003cstrong>输出：\u003c/strong>true\u003c/pre>\n\n\u003cp>\u003cstrong>示例 3：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [1,2,3,1,2,3], k\u003cem> \u003c/em>=\u003cem> \u003c/em>2\n\u003cstrong>输出：\u003c/strong>false\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= nums.length &lt;= 10\u003csup>5\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-10\u003csup>9\u003c/sup> &lt;= nums[i] &lt;= 10\u003csup>9\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>0 &lt;= k &lt;= 10\u003csup>5\u003c/sup>\u003c/code>\u003c/li>\n\u003c/ul>"},{"id":"228","slug":"summary-ranges","zh":"汇总区间","en":"Summary Ranges","tags":["数组"],"html":"\u003cp>给定一个 &nbsp;\u003cstrong>无重复元素\u003c/strong> 的&nbsp;\u003cstrong>有序\u003c/strong> 整数数组 \u003ccode>nums\u003c/code> 。\u003c/p>\n\n\u003cp>区间 \u003ccode>[a,b]\u003c/code> 是从 \u003ccode>a\u003c/code> 到 \u003ccode>b\u003c/code>（包含）的所有整数的集合。\u003c/p>\n\n\u003cp>返回 \u003cem>\u003cstrong>恰好覆盖数组中所有数字\u003c/strong> 的 \u003cstrong>最小有序\u003c/strong> 区间范围列表&nbsp;\u003c/em>。也就是说，\u003ccode>nums\u003c/code> 的每个元素都恰好被某个区间范围所覆盖，并且不存在属于某个区间但不属于 \u003ccode>nums\u003c/code> 的数字 \u003ccode>x\u003c/code> 。\u003c/p>\n\n\u003cp>列表中的每个区间范围 \u003ccode>[a,b]\u003c/code> 应该按如下格式输出：\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>\"a-&gt;b\"\u003c/code> ，如果 \u003ccode>a != b\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>\"a\"\u003c/code> ，如果 \u003ccode>a == b\u003c/code>\u003c/li>\n\u003c/ul>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong class=\"example\">示例 1：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [0,1,2,4,5,7]\n\u003cstrong>输出：\u003c/strong>[\"0-&gt;2\",\"4-&gt;5\",\"7\"]\n\u003cstrong>解释：\u003c/strong>区间范围是：\n[0,2] --&gt; \"0-&gt;2\"\n[4,5] --&gt; \"4-&gt;5\"\n[7,7] --&gt; \"7\"\n\u003c/pre>\n\n\u003cp>\u003cstrong class=\"example\">示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [0,2,3,4,6,8,9]\n\u003cstrong>输出：\u003c/strong>[\"0\",\"2-&gt;4\",\"6\",\"8-&gt;9\"]\n\u003cstrong>解释：\u003c/strong>区间范围是：\n[0,0] --&gt; \"0\"\n[2,4] --&gt; \"2-&gt;4\"\n[6,6] --&gt; \"6\"\n[8,9] --&gt; \"8-&gt;9\"\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>0 &lt;= nums.length &lt;= 20\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-2\u003csup>31\u003c/sup> &lt;= nums[i] &lt;= 2\u003csup>31\u003c/sup> - 1\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>nums\u003c/code> 中的所有值都 \u003cstrong>互不相同\u003c/strong>\u003c/li>\n\t\u003cli>\u003ccode>nums\u003c/code> 按升序排列\u003c/li>\n\u003c/ul>"},{"id":"20","slug":"valid-parentheses","zh":"有效的括号","en":"Valid Parentheses","tags":["栈","字符串","括号序列"],"html":"\u003cp>给定一个只包括 \u003ccode>'('\u003c/code>，\u003ccode>')'\u003c/code>，\u003ccode>'{'\u003c/code>，\u003ccode>'}'\u003c/code>，\u003ccode>'['\u003c/code>，\u003ccode>']'\u003c/code>&nbsp;的字符串 \u003ccode>s\u003c/code> ，判断字符串是否有效。\u003c/p>\n\n\u003cp>有效字符串需满足：\u003c/p>\n\n\u003col>\n\t\u003cli>左括号必须用相同类型的右括号闭合。\u003c/li>\n\t\u003cli>左括号必须以正确的顺序闭合。\u003c/li>\n\t\u003cli>每个右括号都有一个对应的相同类型的左括号。\u003c/li>\n\u003c/ol>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong class=\"example\">示例 1：\u003c/strong>\u003c/p>\n\n\u003cdiv class=\"example-block\">\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输入：\u003c/b>s = \"()\"\u003c/span>\u003c/p>\n\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输出：\u003c/b>true\u003c/span>\u003c/p>\n\u003c/div>\n\n\u003cp>\u003cstrong class=\"example\">示例 2：\u003c/strong>\u003c/p>\n\n\u003cdiv class=\"example-block\">\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输入：\u003c/b>s = \"()[]{}\"\u003c/span>\u003c/p>\n\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输出：\u003c/b>true\u003c/span>\u003c/p>\n\u003c/div>\n\n\u003cp>\u003cstrong class=\"example\">示例 3：\u003c/strong>\u003c/p>\n\n\u003cdiv class=\"example-block\">\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输入：\u003c/b>s = \"(]\"\u003c/span>\u003c/p>\n\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输出：\u003c/b>false\u003c/span>\u003c/p>\n\u003c/div>\n\n\u003cp>\u003cstrong class=\"example\">示例 4：\u003c/strong>\u003c/p>\n\n\u003cdiv class=\"example-block\">\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输入：\u003c/b>s = \"([])\"\u003c/span>\u003c/p>\n\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输出：\u003c/b>true\u003c/span>\u003c/p>\n\u003c/div>\n\n\u003cp>\u003cstrong class=\"example\">示例 5：\u003c/strong>\u003c/p>\n\n\u003cdiv class=\"example-block\">\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输入：\u003c/b>s = \"([)]\"\u003c/span>\u003c/p>\n\n\u003cp>\u003cspan class=\"example-io\">\u003cb>输出：\u003c/b>false\u003c/span>\u003c/p>\n\u003c/div>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= s.length &lt;= 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>s\u003c/code> 仅由括号 \u003ccode>'()[]{}'\u003c/code> 组成\u003c/li>\n\u003c/ul>"},{"id":"141","slug":"linked-list-cycle","zh":"环形链表","en":"Linked List Cycle","tags":["哈希表","链表","双指针","Floyd 判圈算法"],"html":"\u003cp>给你一个链表的头节点 \u003ccode>head\u003c/code> ，判断链表中是否有环。\u003c/p>\n\n\u003cp>如果链表中有某个节点，可以通过连续跟踪 \u003ccode>next\u003c/code> 指针再次到达，则链表中存在环。 为了表示给定链表中的环，评测系统内部使用整数 \u003ccode>pos\u003c/code> 来表示链表尾连接到链表中的位置（索引从 0 开始）。\u003cstrong>注意：\u003ccode>pos\u003c/code> 不作为参数进行传递&nbsp;\u003c/strong>。仅仅是为了标识链表的实际情况。\u003c/p>\n\n\u003cp>\u003cem>如果链表中存在环\u003c/em>&nbsp;，则返回 \u003ccode>true\u003c/code> 。 否则，返回 \u003ccode>false\u003c/code> 。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cp>\u003cimg alt=\"\" src=\"https://assets.leetcode.cn/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist.png\" />\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>head = [3,2,0,-4], pos = 1\n\u003cstrong>输出：\u003c/strong>true\n\u003cstrong>解释：\u003c/strong>链表中有一个环，其尾部连接到第二个节点。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例&nbsp;2：\u003c/strong>\u003c/p>\n\n\u003cp>\u003cimg alt=\"\" src=\"https://assets.leetcode.cn/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test2.png\" />\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>head = [1,2], pos = 0\n\u003cstrong>输出：\u003c/strong>true\n\u003cstrong>解释：\u003c/strong>链表中有一个环，其尾部连接到第一个节点。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 3：\u003c/strong>\u003c/p>\n\n\u003cp>\u003cimg alt=\"\" src=\"https://assets.leetcode.cn/aliyun-lc-upload/uploads/2018/12/07/circularlinkedlist_test3.png\" />\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>head = [1], pos = -1\n\u003cstrong>输出：\u003c/strong>false\n\u003cstrong>解释：\u003c/strong>链表中没有环。\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>链表中节点的数目范围是 \u003ccode>[0, 10\u003csup>4\u003c/sup>]\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-10\u003csup>5\u003c/sup> &lt;= Node.val &lt;= 10\u003csup>5\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>pos\u003c/code> 为 \u003ccode>-1\u003c/code> 或者链表中的一个 \u003cstrong>有效索引\u003c/strong> 。\u003c/li>\n\u003c/ul>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>进阶：\u003c/strong>你能用 \u003ccode>O(1)\u003c/code>（即，常量）内存解决此问题吗？\u003c/p>"},{"id":"21","slug":"merge-two-sorted-lists","zh":"合并两个有序链表","en":"Merge Two Sorted Lists","tags":["递归","链表"],"html":"\u003cp>将两个升序链表合并为一个新的 \u003cstrong>升序\u003c/strong> 链表并返回。新链表是通过拼接给定的两个链表的所有节点组成的。 \u003c/p>\n\n\u003cp> \u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/10/03/merge_ex1.jpg\" style=\"width: 662px; height: 302px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>l1 = [1,2,4], l2 = [1,3,4]\n\u003cstrong>输出：\u003c/strong>[1,1,2,3,4,4]\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>l1 = [], l2 = []\n\u003cstrong>输出：\u003c/strong>[]\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 3：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>l1 = [], l2 = [0]\n\u003cstrong>输出：\u003c/strong>[0]\n\u003c/pre>\n\n\u003cp> \u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>两个链表的节点数目范围是 \u003ccode>[0, 50]\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-100 \u003c= Node.val \u003c= 100\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>l1\u003c/code> 和 \u003ccode>l2\u003c/code> 均按 \u003cstrong>非递减顺序\u003c/strong> 排列\u003c/li>\n\u003c/ul>"},{"id":"104","slug":"maximum-depth-of-binary-tree","zh":"二叉树的最大深度","en":"Maximum Depth of Binary Tree","tags":["树","深度优先搜索","广度优先搜索","二叉树"],"html":"\u003cp>给定一个二叉树 \u003ccode>root\u003c/code> ，返回其最大深度。\u003c/p>\n\n\u003cp>二叉树的 \u003cstrong>最大深度\u003c/strong> 是指从根节点到最远叶子节点的最长路径上的节点数。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cp>\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/11/26/tmp-tree.jpg\" style=\"width: 400px; height: 277px;\" />\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cpre>\n\u003cb>输入：\u003c/b>root = [3,9,20,null,null,15,7]\n\u003cb>输出：\u003c/b>3\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cb>输入：\u003c/b>root = [1,null,2]\n\u003cb>输出：\u003c/b>2\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>树中节点的数量在&nbsp;\u003ccode>[0, 10\u003csup>4\u003c/sup>]\u003c/code>&nbsp;区间内。\u003c/li>\n\t\u003cli>\u003ccode>-100 &lt;= Node.val &lt;= 100\u003c/code>\u003c/li>\n\u003c/ul>"},{"id":"100","slug":"same-tree","zh":"相同的树","en":"Same Tree","tags":["树","深度优先搜索","广度优先搜索","二叉树"],"html":"\u003cp>给你两棵二叉树的根节点 \u003ccode>p\u003c/code> 和 \u003ccode>q\u003c/code> ，编写一个函数来检验这两棵树是否相同。\u003c/p>\n\n\u003cp>如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。\u003c/p>\n\n\u003cp> \u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/12/20/ex1.jpg\" style=\"width: 622px; height: 182px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>p = [1,2,3], q = [1,2,3]\n\u003cstrong>输出：\u003c/strong>true\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/12/20/ex2.jpg\" style=\"width: 382px; height: 182px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>p = [1,2], q = [1,null,2]\n\u003cstrong>输出：\u003c/strong>false\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 3：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2020/12/20/ex3.jpg\" style=\"width: 622px; height: 182px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>p = [1,2,1], q = [1,1,2]\n\u003cstrong>输出：\u003c/strong>false\n\u003c/pre>\n\n\u003cp> \u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>两棵树上的节点数目都在范围 \u003ccode>[0, 100]\u003c/code> 内\u003c/li>\n\t\u003cli>\u003ccode>-10\u003csup>4\u003c/sup> \u003c= Node.val \u003c= 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\u003c/ul>"},{"id":"226","slug":"invert-binary-tree","zh":"翻转二叉树","en":"Invert Binary Tree","tags":["树","深度优先搜索","广度优先搜索","二叉树"],"html":"\u003cp>给你一棵二叉树的根节点 \u003ccode>root\u003c/code> ，翻转这棵二叉树，并返回其根节点。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cp>\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/03/14/invert1-tree.jpg\" style=\"height: 165px; width: 500px;\" />\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [4,2,7,1,3,6,9]\n\u003cstrong>输出：\u003c/strong>[4,7,2,9,6,3,1]\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\n\u003cp>\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/03/14/invert2-tree.jpg\" style=\"width: 500px; height: 120px;\" />\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [2,1,3]\n\u003cstrong>输出：\u003c/strong>[2,3,1]\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 3：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = []\n\u003cstrong>输出：\u003c/strong>[]\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>树中节点数目范围在 \u003ccode>[0, 100]\u003c/code> 内\u003c/li>\n\t\u003cli>\u003ccode>-100 &lt;= Node.val &lt;= 100\u003c/code>\u003c/li>\n\u003c/ul>"},{"id":"101","slug":"symmetric-tree","zh":"对称二叉树","en":"Symmetric Tree","tags":["树","深度优先搜索","广度优先搜索","二叉树"],"html":"\u003cp>给你一个二叉树的根节点 \u003ccode>root\u003c/code> ， 检查它是否轴对称。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://pic.leetcode.cn/1698026966-JDYPDU-image.png\" style=\"width: 354px; height: 291px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [1,2,2,3,4,4,3]\n\u003cstrong>输出：\u003c/strong>true\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://pic.leetcode.cn/1698027008-nPFLbM-image.png\" style=\"width: 308px; height: 258px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [1,2,2,null,3,null,3]\n\u003cstrong>输出：\u003c/strong>false\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>树中节点数目在范围 \u003ccode>[1, 1000]\u003c/code> 内\u003c/li>\n\t\u003cli>\u003ccode>-100 &lt;= Node.val &lt;= 100\u003c/code>\u003c/li>\n\u003c/ul>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>进阶：\u003c/strong>你可以运用递归和迭代两种方法解决这个问题吗？\u003c/p>"},{"id":"112","slug":"path-sum","zh":"路径总和","en":"Path Sum","tags":["树","深度优先搜索","广度优先搜索","二叉树"],"html":"\u003cp>给你二叉树的根节点&nbsp;\u003ccode>root\u003c/code> 和一个表示目标和的整数&nbsp;\u003ccode>targetSum\u003c/code> 。判断该树中是否存在 \u003cstrong>根节点到叶子节点\u003c/strong> 的路径，这条路径上所有节点值相加等于目标和&nbsp;\u003ccode>targetSum\u003c/code> 。如果存在，返回 \u003ccode>true\u003c/code> ；否则，返回 \u003ccode>false\u003c/code> 。\u003c/p>\n\n\u003cp>\u003cstrong>叶子节点\u003c/strong> 是指没有子节点的节点。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/01/18/pathsum1.jpg\" style=\"width: 500px; height: 356px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22\n\u003cstrong>输出：\u003c/strong>true\n\u003cstrong>解释：\u003c/strong>等于目标和的根节点到叶节点路径如上图所示。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/01/18/pathsum2.jpg\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [1,2,3], targetSum = 5\n\u003cstrong>输出：\u003c/strong>false\n\u003cstrong>解释：\u003c/strong>树中存在两条根节点到叶子节点的路径：\n(1 --&gt; 2): 和为 3\n(1 --&gt; 3): 和为 4\n不存在 sum = 5 的根节点到叶子节点的路径。\u003c/pre>\n\n\u003cp>\u003cstrong>示例 3：\u003c/strong>\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [], targetSum = 0\n\u003cstrong>输出：\u003c/strong>false\n\u003cstrong>解释：\u003c/strong>由于树是空的，所以不存在根节点到叶子节点的路径。\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>树中节点的数目在范围 \u003ccode>[0, 5000]\u003c/code> 内\u003c/li>\n\t\u003cli>\u003ccode>-1000 &lt;= Node.val &lt;= 1000\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-1000 &lt;= targetSum &lt;= 1000\u003c/code>\u003c/li>\n\u003c/ul>"},{"id":"637","slug":"average-of-levels-in-binary-tree","zh":"二叉树的层平均值","en":"Average of Levels in Binary Tree","tags":["树","深度优先搜索","广度优先搜索","二叉树"],"html":"\u003cp>给定一个非空二叉树的根节点\u003cmeta charset=\"UTF-8\" />&nbsp;\u003ccode>root\u003c/code>&nbsp;, 以数组的形式返回每一层节点的平均值。与实际答案相差&nbsp;\u003ccode>10\u003csup>-5\u003c/sup>\u003c/code> 以内的答案可以被接受。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\n\u003cp>\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/03/09/avg1-tree.jpg\" />\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [3,9,20,null,null,15,7]\n\u003cstrong>输出：\u003c/strong>[3.00000,14.50000,11.00000]\n\u003cstrong>解释：\u003c/strong>第 0 层的平均值为 3,第 1 层的平均值为 14.5,第 2 层的平均值为 11 。\n因此返回 [3, 14.5, 11] 。\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2:\u003c/strong>\u003c/p>\n\n\u003cp>\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/03/09/avg2-tree.jpg\" />\u003c/p>\n\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [3,9,20,15,7]\n\u003cstrong>输出：\u003c/strong>[3.00000,14.50000,11.00000]\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cp>\u003cmeta charset=\"UTF-8\" />\u003c/p>\n\n\u003cul>\n\t\u003cli>树中节点数量在&nbsp;\u003ccode>[1, 10\u003csup>4\u003c/sup>]\u003c/code> 范围内\u003c/li>\n\t\u003cli>\u003ccode>-2\u003csup>31\u003c/sup>&nbsp;&lt;= Node.val &lt;= 2\u003csup>31\u003c/sup>&nbsp;- 1\u003c/code>\u003c/li>\n\u003c/ul>"},{"id":"530","slug":"minimum-absolute-difference-in-bst","zh":"二叉搜索树的最小绝对差","en":"Minimum Absolute Difference in BST","tags":["树","深度优先搜索","广度优先搜索","二叉搜索树","二叉树"],"html":"\u003cp>给你一个二叉搜索树的根节点 \u003ccode>root\u003c/code> ，返回 \u003cstrong>树中任意两不同节点值之间的最小差值\u003c/strong> 。\u003c/p>\n\n\u003cp>差值是一个正数，其数值等于两值之差的绝对值。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/02/05/bst1.jpg\" style=\"width: 292px; height: 301px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [4,2,6,1,3]\n\u003cstrong>输出：\u003c/strong>1\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/02/05/bst2.jpg\" style=\"width: 282px; height: 301px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>root = [1,0,48,null,null,12,49]\n\u003cstrong>输出：\u003c/strong>1\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>树中节点的数目范围是 \u003ccode>[2, 10\u003csup>4\u003c/sup>]\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>0 &lt;= Node.val &lt;= 10\u003csup>5\u003c/sup>\u003c/code>\u003c/li>\n\u003c/ul>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>注意：\u003c/strong>本题与 783 \u003ca href=\"https://leetcode.cn/problems/minimum-distance-between-bst-nodes/\">https://leetcode.cn/problems/minimum-distance-between-bst-nodes/\u003c/a> 相同\u003c/p>"},{"id":"108","slug":"convert-sorted-array-to-binary-search-tree","zh":"将有序数组转换为二叉搜索树","en":"Convert Sorted Array to Binary Search Tree","tags":["树","二叉搜索树","数组","分治","二叉树"],"html":"\u003cp>给你一个整数数组 \u003ccode>nums\u003c/code> ，其中元素已经按 \u003cstrong>升序\u003c/strong> 排列，请你将其转换为一棵 \u003cspan data-keyword=\"height-balanced\">平衡\u003c/span> 二叉搜索树。\u003c/p>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>示例 1：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/02/18/btree1.jpg\" style=\"width: 302px; height: 222px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [-10,-3,0,5,9]\n\u003cstrong>输出：\u003c/strong>[0,-3,9,-10,null,5]\n\u003cstrong>解释：\u003c/strong>[0,-10,5,null,-3,null,9] 也将被视为正确答案：\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/02/18/btree2.jpg\" style=\"width: 302px; height: 222px;\" />\n\u003c/pre>\n\n\u003cp>\u003cstrong>示例 2：\u003c/strong>\u003c/p>\n\u003cimg alt=\"\" src=\"https://assets.leetcode.com/uploads/2021/02/18/btree.jpg\" style=\"width: 342px; height: 142px;\" />\n\u003cpre>\n\u003cstrong>输入：\u003c/strong>nums = [1,3]\n\u003cstrong>输出：\u003c/strong>[3,1]\n\u003cstrong>解释：\u003c/strong>[1,null,3] 和 [3,1] 都是高度平衡二叉搜索树。\n\u003c/pre>\n\n\u003cp>&nbsp;\u003c/p>\n\n\u003cp>\u003cstrong>提示：\u003c/strong>\u003c/p>\n\n\u003cul>\n\t\u003cli>\u003ccode>1 &lt;= nums.length &lt;= 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>-10\u003csup>4\u003c/sup> &lt;= nums[i] &lt;= 10\u003csup>4\u003c/sup>\u003c/code>\u003c/li>\n\t\u003cli>\u003ccode>nums\u003c/code> 按 \u003cstrong>严格递增\u003c/strong> 顺序排列\u003c/li>\n\u003c/ul>"}]</script>
+<!--LC_DATA:END-->
+
+<script>
+(function () {
+    'use strict';
+    var dataEl = document.getElementById('lc-data');
+    var DATA = JSON.parse(dataEl.textContent);
+    var BUILT = dataEl.getAttribute('data-date') || '';
+    var LS_KEY = 'easyLC.done.v1';
+
+    var ICON_TODO = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></svg>';
+    var ICON_DONE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>';
+
+    function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+    }
+
+    var done = {};
+    try { done = JSON.parse(localStorage.getItem(LS_KEY) || '{}') || {}; } catch (e) { done = {}; }
+    function saveDone() { try { localStorage.setItem(LS_KEY, JSON.stringify(done)); } catch (e) {} }
+    function doneCount() { var n = 0; for (var i = 0; i < DATA.length; i++) if (done[DATA[i].slug]) n++; return n; }
+
+    var state = { q: '', tag: '', sel: -1 };
+    var hashMatch = (location.hash || '').match(/^#p(\d+)$/);
+    if (hashMatch) {
+        var hi = parseInt(hashMatch[1], 10) - 1;
+        if (hi >= 0 && hi < DATA.length) state.sel = hi;
+    }
+
+    var allTags = [];
+    DATA.forEach(function (p) { (p.tags || []).forEach(function (t) { if (allTags.indexOf(t) === -1) allTags.push(t); }); });
+    allTags.sort(function (a, b) { return a.localeCompare(b, 'zh'); });
+
+    function filtered() {
+        var q = state.q.trim().toLowerCase();
+        var rows = [];
+        for (var i = 0; i < DATA.length; i++) {
+            var p = DATA[i];
+            if (state.tag && (p.tags || []).indexOf(state.tag) === -1) continue;
+            if (q) {
+                var hay = (String(p.id) + ' ' + p.zh + ' ' + p.en + ' ' + p.slug + ' ' + (p.tags || []).join(' ')).toLowerCase();
+                if (hay.indexOf(q) === -1) continue;
+            }
+            rows.push(i);
+        }
+        return rows;
+    }
+
+    function renderChips() {
+        var html = '<button class="lc-chip' + (state.tag === '' ? ' on' : '') + '" data-tag="" type="button">全部</button>';
+        for (var i = 0; i < allTags.length; i++) {
+            var t = allTags[i];
+            html += '<button class="lc-chip' + (state.tag === t ? ' on' : '') + '" data-tag="' + esc(t) + '" type="button">' + esc(t) + '</button>';
+        }
+        document.getElementById('lcChips').innerHTML = html;
+    }
+
+    function renderProgress() {
+        var n = doneCount();
+        document.getElementById('statDone').textContent = n;
+        document.getElementById('lcDoneNum').textContent = n + '/' + DATA.length;
+        document.getElementById('lcDoneBar').style.width = (DATA.length ? Math.round(n / DATA.length * 100) : 0) + '%';
+    }
+
+    function renderList() {
+        var rows = filtered();
+        document.getElementById('lcListMeta').textContent = '共 ' + DATA.length + ' 题 · 显示 ' + rows.length + ' 题';
+        var el = document.getElementById('lcListItems');
+        if (!rows.length) { el.innerHTML = '<div class="lc-empty">没有匹配的题目</div>'; return; }
+        var html = '';
+        for (var r = 0; r < rows.length; r++) {
+            var i = rows[r], p = DATA[i], isDone = !!done[p.slug];
+            html += '<li class="lc-item' + (i === state.sel ? ' on' : '') + (isDone ? ' done' : '') + '" data-i="' + i + '">'
+                + '<button class="lc-check" data-check="' + i + '" type="button" title="标记已完成" aria-label="标记已完成">' + (isDone ? ICON_DONE : ICON_TODO) + '</button>'
+                + '<div class="lc-item-main">'
+                + '<div class="lc-line"><span class="lc-no">' + esc(p.id) + '</span><span class="lc-zh">' + esc(p.zh) + '</span></div>'
+                + '<div class="lc-en">' + esc(p.en) + '</div>'
+                + '<div class="lc-item-tags">' + (p.tags || []).map(function (t) { return '<span class="lc-tag">' + esc(t) + '</span>'; }).join('') + '</div>'
+                + '</div></li>';
+        }
+        el.innerHTML = html;
+    }
+
+    function openDetail(i) {
+        if (i < 0 || i >= DATA.length) return;
+        state.sel = i;
+        var p = DATA[i], isDone = !!done[p.slug];
+        document.getElementById('lcDetailNo').textContent = p.id;
+        document.getElementById('lcDetailZh').textContent = p.zh;
+        document.getElementById('lcDetailEn').textContent = p.en;
+        document.getElementById('lcDetailTags').innerHTML = (p.tags || []).map(function (t) { return '<span class="lc-tag">' + esc(t) + '</span>'; }).join('');
+        document.getElementById('lcDetailContent').innerHTML = p.html || '<p class="lc-empty">题面数据缺失</p>';
+        var btn = document.getElementById('lcDetailDone');
+        btn.innerHTML = (isDone ? ICON_DONE : ICON_TODO) + (isDone ? '已完成' : '标记完成');
+        btn.className = 'action-btn btn-done' + (isDone ? ' on' : '');
+        document.getElementById('lcDetailLink').href = 'https://leetcode.cn/problems/' + p.slug + '/';
+        document.getElementById('lcPrev').disabled = (i <= 0);
+        document.getElementById('lcNext').disabled = (i >= DATA.length - 1);
+        var detail = document.getElementById('lcDetail');
+        detail.scrollTop = 0;
+        try { history.replaceState(null, '', '#p' + (i + 1)); } catch (e) {}
+        renderList();
+        console.log('[easylc] select idx=' + i + ' id=' + p.id + ' slug=' + p.slug);
+    }
+
+    function toggleDone(i) {
+        if (i < 0 || i >= DATA.length) return;
+        var p = DATA[i];
+        if (done[p.slug]) delete done[p.slug]; else done[p.slug] = 1;
+        saveDone();
+        renderProgress();
+        renderList();
+        if (state.sel === i) {
+            var isDone = !!done[p.slug];
+            var btn = document.getElementById('lcDetailDone');
+            btn.innerHTML = (isDone ? ICON_DONE : ICON_TODO) + (isDone ? '已完成' : '标记完成');
+            btn.className = 'action-btn btn-done' + (isDone ? ' on' : '');
+        }
+        console.log('[easylc] toggle slug=' + p.slug + ' done=' + (done[p.slug] ? 1 : 0) + ' total=' + doneCount());
+    }
+
+    function openOverlay() {
+        var d = document.getElementById('lcDetail');
+        d.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        d.scrollTop = 0;
+    }
+    function closeOverlay() {
+        document.getElementById('lcDetail').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    function isMobile() { return window.matchMedia('(max-width: 960px)').matches; }
+
+    document.getElementById('lcSearch').addEventListener('input', function (e) {
+        state.q = e.target.value; renderList();
+    });
+    document.getElementById('lcChips').addEventListener('click', function (e) {
+        var b = e.target.closest('.lc-chip');
+        if (!b) return;
+        state.tag = b.getAttribute('data-tag') || '';
+        renderChips(); renderList();
+    });
+    document.getElementById('lcListItems').addEventListener('click', function (e) {
+        var chk = e.target.closest('[data-check]');
+        if (chk) { toggleDone(parseInt(chk.getAttribute('data-check'), 10)); return; }
+        var li = e.target.closest('.lc-item');
+        if (!li) return;
+        openDetail(parseInt(li.getAttribute('data-i'), 10));
+        if (isMobile()) openOverlay();
+    });
+    document.getElementById('lcDetailDone').addEventListener('click', function () { toggleDone(state.sel); });
+    document.getElementById('lcPrev').addEventListener('click', function () { openDetail(state.sel - 1); });
+    document.getElementById('lcNext').addEventListener('click', function () { openDetail(state.sel + 1); });
+    document.getElementById('lcClose').addEventListener('click', closeOverlay);
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { closeOverlay(); return; }
+        var tag = (document.activeElement && document.activeElement.tagName) || '';
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); openDetail(state.sel + 1); }
+        if (e.key === 'ArrowUp') { e.preventDefault(); openDetail(state.sel - 1); }
+    });
+
+    document.getElementById('statTotal').textContent = DATA.length;
+    document.getElementById('statTags').textContent = allTags.length;
+    document.getElementById('lcUpdated').textContent = BUILT ? '抓取于 ' + BUILT : '';
+    renderChips();
+    renderProgress();
+    openDetail(state.sel >= 0 ? state.sel : 0);
+    console.log('[easylc] init items=' + DATA.length + ' tags=' + allTags.length + ' done=' + doneCount() + ' sel=' + state.sel + ' built=' + BUILT);
+})();
+</script>
+</body>
+</html>

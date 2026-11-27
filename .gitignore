@@ -100,3 +100,8 @@ skills/nature-figure/assets/
 
 # wrangler 本地缓存
 tools/bili-subtitle/worker/.wrangler/
+
+# ========================
+# easy-lc 抓取中间产物（数据已固化进 index.html，重跑 scrape.mjs 再生成）
+# ========================
+tools/easy-lc/data.json
