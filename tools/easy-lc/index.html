@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#1a1a1a">
+<meta name="theme-color" content="#ffffff">
 <title>LeetCode 简单题 30 - Top Interview 150 离线题库</title>
 <meta name="description" content="LeetCode Top Interview 150 学习计划前三十道简单题的离线题库：中文题面、官方标签、完成打卡、搜索筛选，一页搞定。题面数据来源于 LeetCodecn，仅供个人学习。">
 <style>
 :root {
-    /* —— LeetCode 风格深色实底主题（无透明/无模糊）—— */
-    --bg: #1a1a1a;
-    --panel: #282828;
-    --panel-2: #1e1e1e;
-    --border: #3a3a3a;
-    --border-soft: #2e2e2e;
-    --hover: #303030;
-    --sel: #2c2c2c;
-    --text: #e8e8e8;
-    --text-2: #b0b0b0;
-    --text-3: #828282;
+    /* —— LeetCode 风格浅色实底主题（无透明/无模糊）—— */
+    --bg: #ffffff;
+    --panel: #ffffff;
+    --panel-2: #f6f6f7;
+    --border: #e0e0e0;
+    --border-soft: #eaeaea;
+    --hover: #f0f0f1;
+    --sel: #f0f0f1;
+    --text: #1a1a1a;
+    --text-2: #565656;
+    --text-3: #838383;
     --green: #26b35f;
-    --green-dim: #173424;
-    --green-border: #1f4a30;
-    --blue: #4e8ff7;
+    --green-dim: #e8f7ee;
+    --green-border: #bfe8cf;
+    --blue: #3b82f6;
     --orange: #ffa116;
     --radius: 12px;
     --transition: all 0.15s ease;
@@ -41,7 +41,7 @@ body {
 .topbar { position: sticky; top: 0; z-index: 40; background: var(--bg); border-bottom: 1px solid var(--border-soft); }
 .topbar-inner { max-width: 1200px; margin: 0 auto; padding: 0 16px; display: flex; align-items: center; gap: 12px; height: 56px; }
 .brand-ic { width: 34px; height: 34px; border-radius: 8px; background: var(--orange); color: #fff; font-family: 'Courier New', monospace; font-weight: 800; font-size: 12.5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; letter-spacing: -1px; }
-.brand-t h1 { font-size: 16px; font-weight: 700; color: #fff; line-height: 1.25; letter-spacing: -0.01em; }
+.brand-t h1 { font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.25; letter-spacing: -0.01em; }
 .brand-t .sub { font-size: 11px; color: var(--text-3); line-height: 1.3; }
 .top-stats { margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
 .top-stats .ts-num { font-family: 'Courier New', monospace; font-weight: 700; color: var(--text); }
@@ -56,7 +56,7 @@ body {
     background: var(--panel-2); padding: 0 12px 0 33px; font: inherit; font-size: 13px;
     color: var(--text); outline: none; transition: var(--transition);
 }
-.search-box input:focus { border-color: var(--green); background: #202020; }
+.search-box input:focus { border-color: var(--green); background: #fbfbfb; }
 .search-box input::placeholder { color: var(--text-3); }
 /* —— 标签下拉筛选器 —— */
 .lc-dd { position: relative; flex: 0 0 auto; }
@@ -65,15 +65,15 @@ body {
     border-radius: 8px; border: 1px solid var(--border); background: var(--panel-2);
     color: var(--text-2); font: inherit; font-size: 13px; cursor: pointer; transition: var(--transition);
 }
-.lc-dd-btn:hover { background: var(--hover); color: var(--text); border-color: #4a4a4a; }
+.lc-dd-btn:hover { background: var(--hover); color: var(--text); border-color: #c9c9c9; }
 .lc-dd-btn.on { border-color: var(--green-border); background: var(--green-dim); }
 .lc-dd-btn.on #lcDdLabel { color: var(--green); font-weight: 600; }
 .lc-dd-btn svg { width: 11px; height: 11px; stroke: var(--text-3); fill: none; stroke-width: 2; transition: var(--transition); }
 .lc-dd-btn.open svg { transform: rotate(180deg); }
 .lc-dd-pop {
     display: none; position: absolute; top: 42px; left: 0; z-index: 60; min-width: 300px;
-    max-height: 340px; overflow-y: auto; background: #2d2d2d; border: 1px solid var(--border);
-    border-radius: 10px; box-shadow: 0 10px 32px rgba(0,0,0,0.55); padding: 8px;
+    max-height: 340px; overflow-y: auto; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: 0 10px 32px rgba(0,0,0,0.10); padding: 8px;
 }
 .lc-dd-pop.open { display: block; }
 .lc-dd-item {
@@ -96,25 +96,27 @@ body {
 .list-panel { position: sticky; top: 72px; max-height: calc(100vh - 88px); overflow-y: auto; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); }
 .list-meta { font-size: 11.5px; color: var(--text-3); padding: 10px 14px; border-bottom: 1px solid var(--border-soft); }
 .lc-list { list-style: none; }
-.lc-item { display: flex; gap: 12px; padding: 10px 14px 10px 12px; border-bottom: 1px solid var(--border-soft); border-left: 2px solid transparent; cursor: pointer; transition: var(--transition); }
+.lc-item { display: flex; gap: 12px; padding: 8px 14px 8px 12px; border-bottom: 1px solid var(--border-soft); border-left: 2px solid transparent; cursor: pointer; transition: var(--transition); }
 .lc-item:last-child { border-bottom: none; }
 .lc-item:hover { background: var(--hover); }
 .lc-item.on { background: var(--sel); border-left-color: var(--green); }
 .lc-check {
     background: none; border: none; padding: 0; width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0;
-    cursor: pointer; color: #4d4d4d; display: flex; align-items: center; justify-content: center; transition: var(--transition);
+    cursor: pointer; color: #b9b9b9; display: flex; align-items: center; justify-content: center; transition: var(--transition);
 }
 .lc-check svg { width: 17px; height: 17px; }
 .lc-check:hover { color: var(--green); transform: scale(1.15); }
 .lc-item.done .lc-check { color: var(--green); }
-.lc-item.done .lc-zh { color: var(--text-3); text-decoration: line-through; text-decoration-color: #3f3f3f; }
+.lc-item.done .lc-zh { color: var(--text-3); text-decoration: line-through; text-decoration-color: #c9c9c9; }
 .lc-item-main { min-width: 0; flex: 1; }
 .lc-line { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
 .lc-no { font-family: 'Courier New', monospace; font-size: 12px; font-weight: 700; color: var(--text-3); flex-shrink: 0; }
 .lc-zh { font-size: 13.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lc-en { font-size: 11px; color: var(--text-3); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lc-item-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
-.lc-tag { font-size: 10.5px; color: var(--text-2); background: var(--panel-2); border: 1px solid var(--border-soft); padding: 1px 8px; border-radius: 4px; }
+/* 第二行：英文标题 + 标签同行 */
+.lc-sub { display: flex; align-items: center; gap: 8px; margin-top: 2px; min-width: 0; overflow: hidden; }
+.lc-en { font-size: 11px; color: var(--text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 0 1 auto; min-width: 0; }
+.lc-item-tags { display: flex; align-items: center; gap: 5px; flex-shrink: 0; overflow: hidden; }
+.lc-tag { font-size: 10.5px; color: var(--text-2); background: var(--panel-2); border: 1px solid var(--border-soft); padding: 1px 8px; border-radius: 4px; white-space: nowrap; }
 .lc-tag.more { color: var(--text-3); }
 .lc-empty { padding: 26px 10px; text-align: center; color: var(--text-3); font-size: 12.5px; }
 /* —— 详情面板 —— */
@@ -122,7 +124,7 @@ body {
 .detail-top { display: flex; gap: 14px; align-items: flex-start; }
 .detail-no { font-family: 'Courier New', monospace; font-size: 14px; font-weight: 800; color: var(--green); background: var(--green-dim); border: 1px solid var(--green-border); padding: 5px 10px; border-radius: 8px; flex-shrink: 0; line-height: 1.3; }
 .detail-h { min-width: 0; flex: 1; }
-.detail-h h2 { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: -0.01em; line-height: 1.4; }
+.detail-h h2 { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.01em; line-height: 1.4; }
 .detail-en { font-size: 12px; color: var(--text-3); margin-top: 2px; }
 .detail-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
 .detail-meta .spacer { flex: 1; }
@@ -130,7 +132,7 @@ body {
 .lc-diff { font-size: 11px; font-weight: 600; color: var(--green); background: var(--green-dim); border: 1px solid var(--green-border); padding: 2px 10px; border-radius: 4px; }
 .detail-meta .lc-tag { cursor: pointer; transition: var(--transition); }
 .detail-meta .lc-tag:hover { color: var(--text); border-color: var(--border); background: var(--hover); }
-/* —— 按钮（LC 深灰实底）—— */
+/* —— 按钮（LC 浅灰实底）—— */
 .action-btn {
     display: inline-flex; align-items: center; gap: 6px;
     background: var(--panel-2); border: 1px solid var(--border);
@@ -138,7 +140,7 @@ body {
     padding: 7px 14px; font: inherit; font-size: 12.5px; font-weight: 500;
     cursor: pointer; transition: var(--transition); text-decoration: none;
 }
-.action-btn:hover { background: var(--hover); color: var(--text); border-color: #4a4a4a; }
+.action-btn:hover { background: var(--hover); color: var(--text); border-color: #c9c9c9; }
 .action-btn:active { transform: translateY(0); }
 .action-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
 .btn-done.on { background: var(--green-dim); border-color: var(--green-border); color: var(--green); font-weight: 600; }
@@ -146,10 +148,10 @@ body {
 .lc-content { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-soft); font-size: 14px; color: var(--text); line-height: 1.8; word-break: break-word; }
 .lc-content p { margin: 0.85em 0; }
 .lc-content p:first-child { margin-top: 0; }
-.lc-content strong { font-weight: 700; color: #fff; }
+.lc-content strong { font-weight: 700; color: var(--text); }
 .lc-content strong.example { display: block; margin: 1.15em 0 0.45em; font-size: 13.5px; color: var(--text); }
 .lc-content code { font-family: 'Courier New', monospace; font-size: 13px; background: var(--panel-2); border: 1px solid var(--border-soft); padding: 1px 6px; border-radius: 4px; color: var(--text); }
-.lc-content pre { background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px 14px; margin: 0.9em 0; overflow-x: auto; font-size: 12.5px; line-height: 1.7; color: #d4d4d4; }
+.lc-content pre { background: var(--panel-2); border: 1px solid var(--border-soft); border-radius: 8px; padding: 12px 14px; margin: 0.9em 0; overflow-x: auto; font-size: 12.5px; line-height: 1.7; color: var(--text); }
 .lc-content pre code { background: none; border: none; padding: 0; font-size: 12.5px; white-space: pre; }
 .lc-content img { max-width: 100%; height: auto; border-radius: 6px; margin: 6px 0; background: #fff; padding: 6px; }
 .lc-content a { color: var(--blue); text-decoration: none; }
@@ -184,8 +186,8 @@ body {
 /* —— 滚动条 —— */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #3a3a3a; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #4a4a4a; }
+::-webkit-scrollbar-thumb { background: #cfcfcf; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #bdbdbd; }
 </style>
 </head>
 <body>
@@ -353,14 +355,15 @@ body {
             var i = rows[r], p = DATA[i], isDone = !!done[p.slug];
             var tg = p.tags || [];
             var tagHtml = '';
-            for (var k = 0; k < tg.length && k < 3; k++) tagHtml += '<span class="lc-tag">' + esc(tg[k]) + '</span>';
-            if (tg.length > 3) tagHtml += '<span class="lc-tag more">+' + (tg.length - 3) + '</span>';
+            for (var k = 0; k < tg.length && k < 2; k++) tagHtml += '<span class="lc-tag">' + esc(tg[k]) + '</span>';
+            if (tg.length > 2) tagHtml += '<span class="lc-tag more">+' + (tg.length - 2) + '</span>';
             html += '<li class="lc-item' + (i === state.sel ? ' on' : '') + (isDone ? ' done' : '') + '" data-i="' + i + '">'
                 + '<button class="lc-check" data-check="' + i + '" type="button" title="标记已完成" aria-label="标记已完成">' + (isDone ? ICON_DONE : ICON_TODO) + '</button>'
                 + '<div class="lc-item-main">'
                 + '<div class="lc-line"><span class="lc-no">' + esc(p.id) + '</span><span class="lc-zh">' + esc(p.zh) + '</span></div>'
-                + '<div class="lc-en">' + esc(p.en) + '</div>'
-                + '<div class="lc-item-tags" title="' + esc(tg.join('、')) + '">' + tagHtml + '</div>'
+                + '<div class="lc-sub" title="' + esc(p.en + (tg.length ? ' · ' + tg.join('、') : '')) + '">'
+                + '<span class="lc-en">' + esc(p.en) + '</span>' + tagHtml
+                + '</div>'
                 + '</div></li>';
         }
         el.innerHTML = html;
